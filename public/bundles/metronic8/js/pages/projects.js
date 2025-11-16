@@ -1214,7 +1214,7 @@ var Projects = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
-      initTempus();
+      initFlatpickr();
 
       // Quill SIN variables: se gestiona por selector
       QuillUtil.init('#notes');
@@ -1238,7 +1238,7 @@ var Projects = (function () {
       $('#fileinput').on('change', changeFile);
    };
 
-   var initTempus = function () {
+   var initFlatpickr = function () {
       // filtros fechas
       const desdeInput = document.getElementById('datetimepicker-desde');
       const desdeGroup = desdeInput.closest('.input-group');

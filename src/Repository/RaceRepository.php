@@ -2,20 +2,20 @@
 
 namespace App\Repository;
 
-use App\Entity\Gender;
+use App\Entity\Race;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class GenderRepository extends ServiceEntityRepository
+class RaceRepository extends ServiceEntityRepository
 {
    public function __construct(ManagerRegistry $registry)
    {
-      parent::__construct($registry, Gender::class);
+      parent::__construct($registry, Race::class);
    }
    /**
-    * ListarOrdenados: Lista los genders ordenados por nombre.
+    * ListarOrdenados: Lista los races ordenados por nombre.
     *
-    * @return Gender[]
+    * @return Race[]
     */
    public function ListarOrdenados($search = ''): array
    {
@@ -32,16 +32,16 @@ class GenderRepository extends ServiceEntityRepository
    }
 
    /**
-    * ListarGendersConTotal Lista los genders con total
+    * ListarRacesConTotal Lista los races con total
     *
     * @return []
     */
-   public function ListarGendersConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array
+   public function ListarRacesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array
    {
 
       // Whitelist de columnas ordenables
       $sortable = [
-         'genderId'  => 'g.genderId',
+         'raceId'  => 'g.raceId',
          'description' => 'g.description',
          'code' => 'g.code',
          'classification' => 'g.classification'
@@ -68,7 +68,7 @@ class GenderRepository extends ServiceEntityRepository
       // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
       $countQb = clone $baseQb;
       $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(g.genderId)');
+         ->select('COUNT(g.raceId)');
 
       $total = (int) $countQb->getQuery()->getSingleScalarResult();
 

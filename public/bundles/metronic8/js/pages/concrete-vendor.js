@@ -1,1180 +1,1132 @@
-var ConcreteVendor = function () {
+var ConcreteVendor = (function () {
+   var rowDelete = null;
 
-    var rowDelete = null;
+   //Inicializar table
+   var oTable;
+   var initTable = function () {
+      const table = '#concrete-vendor-table-editable';
+      // datasource
+      const datasource = DatatableUtil.getDataTableDatasource(`concrete-vendor/listar`);
 
-    //Inicializar table
-    var oTable;
-    var initTable = function () {
-        const table = "#concrete-vendor-table-editable";
-        // datasource
-        const datasource = DatatableUtil.getDataTableDatasource(`concrete-vendor/listar`);
+      // columns
+      const columns = getColumnsTable();
 
-        // columns
-        const columns = getColumnsTable();
+      // column defs
+      let columnDefs = getColumnsDefTable();
 
-        // column defs
-        let columnDefs = getColumnsDefTable();
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
 
-        // language
-        const language = DatatableUtil.getDataTableLenguaje();
+      // order
+      const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
 
-        // order
-        const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+      oTable = $(table).DataTable({
+         searchDelay: 500,
+         processing: true,
+         serverSide: true,
+         order: order,
 
-        oTable = $(table).DataTable({
-            searchDelay: 500,
-            processing: true,
-            serverSide: true,
-            order: order,
+         stateSave: true,
+         displayLength: 25,
+         stateSaveParams: DatatableUtil.stateSaveParams,
 
-            stateSave: true,
-            displayLength: 25,
-            stateSaveParams: DatatableUtil.stateSaveParams,
-
-            /*displayLength: 15,
+         /*displayLength: 15,
             lengthMenu: [
               [15, 25, 50, -1],
               [15, 25, 50, 'Todos']
             ],*/
-            select: {
-                info: false,
-                style: 'multi',
-                selector: 'td:first-child input[type="checkbox"]',
-                className: 'row-selected'
+         select: {
+            info: false,
+            style: 'multi',
+            selector: 'td:first-child input[type="checkbox"]',
+            className: 'row-selected',
+         },
+         ajax: datasource,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+      oTable.on('draw', function () {
+         // reset select all
+         resetSelectRecords(table);
+
+         // init acciones
+         initAccionEditar();
+         initAccionEliminar();
+      });
+
+      // select records
+      handleSelectRecords(table);
+
+      // search
+      handleSearchDatatable();
+      // export
+      exportButtons();
+   };
+   var getColumnsTable = function () {
+      // columns
+      const columns = [];
+
+      if (permiso.eliminar) {
+         columns.push({ data: 'id' });
+      }
+      columns.push({ data: 'name' }, { data: 'phone' }, { data: 'email' }, { data: 'address' }, { data: null });
+
+      return columns;
+   };
+   var getColumnsDefTable = function () {
+      let columnDefs = [
+         {
+            targets: 0,
+            orderable: false,
+            render: DatatableUtil.getRenderColumnCheck,
+         },
+         {
+            targets: 2,
+            render: DatatableUtil.getRenderColumnPhone,
+         },
+         {
+            targets: 3,
+            render: DatatableUtil.getRenderColumnEmail,
+         },
+         {
+            targets: 4,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 350);
             },
-            ajax: datasource,
-            columns: columns,
-            columnDefs: columnDefs,
-            language: language
-        });
+         },
+      ];
 
-        // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
-        oTable.on('draw', function () {
-            // reset select all
-            resetSelectRecords(table);
-
-            // init acciones
-            initAccionEditar();
-            initAccionEliminar();
-        });
-
-        // select records
-        handleSelectRecords(table);
-
-        // search
-        handleSearchDatatable();
-        // export
-        exportButtons();
-    }
-    var getColumnsTable = function () {
-        // columns
-        const columns = [];
-
-        if (permiso.eliminar) {
-            columns.push({data: 'id'});
-        }
-        columns.push(
-            {data: 'name'},
-            {data: 'phone'},
-            {data: 'email'},
-            {data: 'address'},
-            {data: null}
-        );
-
-        return columns;
-    }
-    var getColumnsDefTable = function () {
-
-        let columnDefs = [
+      if (!permiso.eliminar) {
+         columnDefs = [
             {
-                targets: 0,
-                orderable: false,
-                render: DatatableUtil.getRenderColumnCheck
+               targets: 1,
+               render: DatatableUtil.getRenderColumnPhone,
             },
             {
-                targets: 2,
-                render: DatatableUtil.getRenderColumnPhone
+               targets: 2,
+               render: DatatableUtil.getRenderColumnEmail,
             },
             {
-                targets: 3,
-                render: DatatableUtil.getRenderColumnEmail
+               targets: 3,
+               render: function (data, type, row) {
+                  return DatatableUtil.getRenderColumnDiv(data, 350);
+               },
             },
-            {
-                targets: 4,
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 350);
-                }
-            },
-        ];
+         ];
+      }
 
-        if (!permiso.eliminar) {
-            columnDefs = [
-                {
-                    targets: 1,
-                    render: DatatableUtil.getRenderColumnPhone
-                },
-                {
-                    targets: 2,
-                    render: DatatableUtil.getRenderColumnEmail
-                },
-                {
-                    targets: 3,
-                    render: function (data, type, row) {
-                        return DatatableUtil.getRenderColumnDiv(data, 350);
-                    }
-                },
-            ];
-        }
+      // acciones
+      columnDefs.push({
+         targets: -1,
+         data: null,
+         orderable: false,
+         className: 'text-center',
+         render: function (data, type, row) {
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+         },
+      });
 
-        // acciones
-        columnDefs.push(
-            {
-                targets: -1,
-                data: null,
-                orderable: false,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
-                },
+      return columnDefs;
+   };
+   var handleSearchDatatable = function () {
+      const filterSearch = document.querySelector('#lista-concrete-vendor [data-table-filter="search"]');
+      let debounceTimeout;
+
+      filterSearch.addEventListener('keyup', function (e) {
+         clearTimeout(debounceTimeout);
+         const searchTerm = e.target.value.trim();
+
+         debounceTimeout = setTimeout(function () {
+            if (searchTerm === '' || searchTerm.length >= 3) {
+               oTable.search(searchTerm).draw();
             }
-        );
+         }, 300); // 300ms de debounce
+      });
+   };
+   var exportButtons = () => {
+      const documentTitle = 'Concrete Vendors';
+      var table = document.querySelector('#concrete-vendor-table-editable');
+      // Excluir la columna de check y acciones
+      var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
 
-        return columnDefs;
-    }
-    var handleSearchDatatable = function () {
-        const filterSearch = document.querySelector('#lista-concrete-vendor [data-table-filter="search"]');
-        let debounceTimeout;
-
-        filterSearch.addEventListener('keyup', function (e) {
-            clearTimeout(debounceTimeout);
-            const searchTerm = e.target.value.trim();
-
-            debounceTimeout = setTimeout(function () {
-                if (searchTerm === '' || searchTerm.length >= 3) {
-                    oTable.search(searchTerm).draw();
-                }
-            }, 300); // 300ms de debounce
-        });
-    }
-    var exportButtons = () => {
-        const documentTitle = 'Concrete Vendors';
-        var table = document.querySelector('#concrete-vendor-table-editable');
-        // Excluir la columna de check y acciones
-        var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
-
-        var buttons = new $.fn.dataTable.Buttons(table, {
-            buttons: [
-                {
-                    extend: 'copyHtml5',
-                    title: documentTitle,
-                    exportOptions: {
-                        columns: exclude_columns
-                    }
-                },
-                {
-                    extend: 'excelHtml5',
-                    title: documentTitle,
-                    exportOptions: {
-                        columns: exclude_columns
-                    }
-                },
-                {
-                    extend: 'csvHtml5',
-                    title: documentTitle,
-                    exportOptions: {
-                        columns: exclude_columns
-                    }
-                },
-                {
-                    extend: 'pdfHtml5',
-                    title: documentTitle,
-                    exportOptions: {
-                        columns: exclude_columns
-                    }
-                }
-            ]
-        }).container().appendTo($('#concrete-vendor-table-editable-buttons'));
-
-        // Hook dropdown menu click event to datatable export buttons
-        const exportButtons = document.querySelectorAll('#concrete-vendor_export_menu [data-kt-export]');
-        exportButtons.forEach(exportButton => {
-            exportButton.addEventListener('click', e => {
-                e.preventDefault();
-
-                // Get clicked export value
-                const exportValue = e.target.getAttribute('data-kt-export');
-                const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
-
-                // Trigger click event on hidden datatable export buttons
-                target.click();
-            });
-        });
-    }
-
-    // select records
-    var tableSelectAll = false;
-    var handleSelectRecords = function (table) {
-        // Evento para capturar filas seleccionadas
-        oTable.on('select', function (e, dt, type, indexes) {
-            if (type === 'row') {
-                // Obtiene los datos de las filas seleccionadas
-                // var selectedData = oTable.rows(indexes).data().toArray();
-                // console.log("Filas seleccionadas:", selectedData);
-                actualizarRecordsSeleccionados();
-            }
-        });
-
-        // Evento para capturar filas deseleccionadas
-        oTable.on('deselect', function (e, dt, type, indexes) {
-            if (type === 'row') {
-                // var deselectedData = oTable.rows(indexes).data().toArray();
-                // console.log("Filas deseleccionadas:", deselectedData);
-                actualizarRecordsSeleccionados();
-            }
-        });
-
-        // Función para seleccionar todas las filas
-        $(`.check-select-all`).on('click', function () {
-            if (!tableSelectAll) {
-                oTable.rows().select(); // Selecciona todas las filas
-            } else {
-                oTable.rows().deselect(); // Deselecciona todas las filas
-            }
-            tableSelectAll = !tableSelectAll;
-        });
-    }
-    var resetSelectRecords = function (table) {
-        tableSelectAll = false;
-        $(`.check-select-all`).prop('checked', false);
-        actualizarRecordsSeleccionados();
-    }
-    var actualizarRecordsSeleccionados = function () {
-        var selectedData = oTable.rows({selected: true}).data().toArray();
-
-        if (selectedData.length > 0) {
-            $('#btn-eliminar-concrete-vendor').removeClass('hide');
-        } else {
-            $('#btn-eliminar-concrete-vendor').addClass('hide');
-        }
-    }
-
-    //Reset forms
-    var resetForms = function () {
-
-        // reset form
-        MyUtil.resetForm("concrete-vendor-form");
-
-        //contacts
-        contacts = [];
-        actualizarTableListaContacts();
-
-        //projects
-        projects = [];
-        actualizarTableListaProjects();
-
-        //Mostrar el primer tab
-        resetWizard();
-
-        event_change = false;
-
-    };
-
-    //Validacion
-    var validateForm = function () {
-        var result = false;
-
-        //Validacion
-        var form = KTUtil.get('concrete-vendor-form');
-
-        var constraints = {
-            name: {
-                presence: {message: "This field is required"},
+      var buttons = new $.fn.dataTable.Buttons(table, {
+         buttons: [
+            {
+               extend: 'copyHtml5',
+               title: documentTitle,
+               exportOptions: {
+                  columns: exclude_columns,
+               },
             },
-            email: {
-                email: {message: "The email must be valid"}
+            {
+               extend: 'excelHtml5',
+               title: documentTitle,
+               exportOptions: {
+                  columns: exclude_columns,
+               },
             },
-        }
+            {
+               extend: 'csvHtml5',
+               title: documentTitle,
+               exportOptions: {
+                  columns: exclude_columns,
+               },
+            },
+            {
+               extend: 'pdfHtml5',
+               title: documentTitle,
+               exportOptions: {
+                  columns: exclude_columns,
+               },
+            },
+         ],
+      })
+         .container()
+         .appendTo($('#concrete-vendor-table-editable-buttons'));
 
-        var errors = validate(form, constraints);
-
-        if (!errors) {
-            result = true;
-        } else {
-            MyApp.showErrorsValidateForm(form, errors);
-        }
-
-        //attach change
-        MyUtil.attachChangeValidacion(form, constraints);
-
-        return result;
-    };
-
-    //Wizard
-    var activeTab = 1;
-    var totalTabs = 2;
-    var initWizard = function () {
-        $(document).off('click', "#form-concrete-vendor .wizard-tab");
-        $(document).on('click', "#form-concrete-vendor .wizard-tab", function (e) {
+      // Hook dropdown menu click event to datatable export buttons
+      const exportButtons = document.querySelectorAll('#concrete-vendor_export_menu [data-kt-export]');
+      exportButtons.forEach((exportButton) => {
+         exportButton.addEventListener('click', (e) => {
             e.preventDefault();
-            var item = $(this).data('item');
 
-            // validar
-            if (item > activeTab && !validWizard()) {
-                mostrarTab();
-                return;
-            }
+            // Get clicked export value
+            const exportValue = e.target.getAttribute('data-kt-export');
+            const target = document.querySelector('.dt-buttons .buttons-' + exportValue);
 
-            activeTab = parseInt(item);
+            // Trigger click event on hidden datatable export buttons
+            target.click();
+         });
+      });
+   };
 
-            if (activeTab < totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
-            }
-            if (activeTab == totalTabs) {
-                // $('#btn-wizard-finalizar').removeClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
-            }
+   // select records
+   var tableSelectAll = false;
+   var handleSelectRecords = function (table) {
+      // Evento para capturar filas seleccionadas
+      oTable.on('select', function (e, dt, type, indexes) {
+         if (type === 'row') {
+            // Obtiene los datos de las filas seleccionadas
+            // var selectedData = oTable.rows(indexes).data().toArray();
+            // console.log("Filas seleccionadas:", selectedData);
+            actualizarRecordsSeleccionados();
+         }
+      });
 
-            // marcar los pasos validos
-            marcarPasosValidosWizard();
+      // Evento para capturar filas deseleccionadas
+      oTable.on('deselect', function (e, dt, type, indexes) {
+         if (type === 'row') {
+            // var deselectedData = oTable.rows(indexes).data().toArray();
+            // console.log("Filas deseleccionadas:", deselectedData);
+            actualizarRecordsSeleccionados();
+         }
+      });
 
-            //bug visual de la tabla que muestra las cols corridas
-            switch (activeTab) {
-                case 2:
-                    actualizarTableListaContacts();
-                    break;
-                case 3:
-                    actualizarTableListaProjects();
-                    break;
-            }
+      // Función para seleccionar todas las filas
+      $(`.check-select-all`).on('click', function () {
+         if (!tableSelectAll) {
+            oTable.rows().select(); // Selecciona todas las filas
+         } else {
+            oTable.rows().deselect(); // Deselecciona todas las filas
+         }
+         tableSelectAll = !tableSelectAll;
+      });
+   };
+   var resetSelectRecords = function (table) {
+      tableSelectAll = false;
+      $(`.check-select-all`).prop('checked', false);
+      actualizarRecordsSeleccionados();
+   };
+   var actualizarRecordsSeleccionados = function () {
+      var selectedData = oTable.rows({ selected: true }).data().toArray();
 
-        });
+      if (selectedData.length > 0) {
+         $('#btn-eliminar-concrete-vendor').removeClass('hide');
+      } else {
+         $('#btn-eliminar-concrete-vendor').addClass('hide');
+      }
+   };
 
-        //siguiente
-        $(document).off('click', "#btn-wizard-siguiente");
-        $(document).on('click', "#btn-wizard-siguiente", function (e) {
-            if (validWizard()) {
-                activeTab++;
-                $('#btn-wizard-anterior').removeClass('hide');
-                if (activeTab == totalTabs) {
-                    $('#btn-wizard-finalizar').removeClass('hide');
-                    $('#btn-wizard-siguiente').addClass('hide');
-                }
+   //Reset forms
+   var resetForms = function () {
+      // reset form
+      MyUtil.resetForm('concrete-vendor-form');
 
-                mostrarTab();
-            }
-        });
-        //anterior
-        $(document).off('click', "#btn-wizard-anterior");
-        $(document).on('click', "#btn-wizard-anterior", function (e) {
-            activeTab--;
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').addClass('hide');
-            }
-            if (activeTab < totalTabs) {
-                $('#btn-wizard-finalizar').addClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
-            }
+      //contacts
+      contacts = [];
+      actualizarTableListaContacts();
+
+      //projects
+      projects = [];
+      actualizarTableListaProjects();
+
+      //Mostrar el primer tab
+      resetWizard();
+
+      event_change = false;
+   };
+
+   //Validacion
+   var validateForm = function () {
+      var result = false;
+
+      //Validacion
+      var form = KTUtil.get('concrete-vendor-form');
+
+      var constraints = {
+         name: {
+            presence: { message: 'This field is required' },
+         },
+         email: {
+            email: { message: 'The email must be valid' },
+         },
+      };
+
+      var errors = validate(form, constraints);
+
+      if (!errors) {
+         result = true;
+      } else {
+         MyApp.showErrorsValidateForm(form, errors);
+      }
+
+      //attach change
+      MyUtil.attachChangeValidacion(form, constraints);
+
+      return result;
+   };
+
+   //Wizard
+   var activeTab = 1;
+   var totalTabs = 2;
+   var initWizard = function () {
+      $(document).off('click', '#form-concrete-vendor .wizard-tab');
+      $(document).on('click', '#form-concrete-vendor .wizard-tab', function (e) {
+         e.preventDefault();
+         var item = $(this).data('item');
+
+         // validar
+         if (item > activeTab && !validWizard()) {
             mostrarTab();
-        });
+            return;
+         }
 
-    };
-    var mostrarTab = function () {
-        setTimeout(function () {
-            switch (activeTab) {
-                case 1:
-                    $('#tab-general').tab('show');
-                    break;
-                case 2:
-                    $('#tab-contacts').tab('show');
-                    actualizarTableListaContacts();
-                    break;
-                case 3:
-                    $('#tab-projects').tab('show');
-                    actualizarTableListaProjects();
-                    break;
+         activeTab = parseInt(item);
+
+         if (activeTab < totalTabs) {
+            // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+         }
+         if (activeTab == 1) {
+            $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab > 1) {
+            $('#btn-wizard-anterior').removeClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab == totalTabs) {
+            // $('#btn-wizard-finalizar').removeClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+         }
+
+         // marcar los pasos validos
+         marcarPasosValidosWizard();
+
+         //bug visual de la tabla que muestra las cols corridas
+         switch (activeTab) {
+            case 2:
+               actualizarTableListaContacts();
+               break;
+            case 3:
+               actualizarTableListaProjects();
+               break;
+         }
+      });
+
+      //siguiente
+      $(document).off('click', '#btn-wizard-siguiente');
+      $(document).on('click', '#btn-wizard-siguiente', function (e) {
+         if (validWizard()) {
+            activeTab++;
+            $('#btn-wizard-anterior').removeClass('hide');
+            if (activeTab == totalTabs) {
+               $('#btn-wizard-finalizar').removeClass('hide');
+               $('#btn-wizard-siguiente').addClass('hide');
             }
-        }, 0);
-    }
-    var resetWizard = function () {
-        activeTab = 1;
-        totalTabs = 2;
-        mostrarTab();
-        // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
-        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
-        $('#btn-wizard-siguiente').removeClass('hide');
-        $('.nav-item-hide').removeClass('hide').addClass('hide');
 
-        // reset valid
-        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
-            KTUtil.removeClass(element, "valid");
-        });
-    }
-    var validWizard = function () {
-        var result = true;
-        if (activeTab == 1) {
+            mostrarTab();
+         }
+      });
+      //anterior
+      $(document).off('click', '#btn-wizard-anterior');
+      $(document).on('click', '#btn-wizard-anterior', function (e) {
+         activeTab--;
+         if (activeTab == 1) {
+            $('#btn-wizard-anterior').addClass('hide');
+         }
+         if (activeTab < totalTabs) {
+            $('#btn-wizard-finalizar').addClass('hide');
+            $('#btn-wizard-siguiente').removeClass('hide');
+         }
+         mostrarTab();
+      });
+   };
+   var mostrarTab = function () {
+      setTimeout(function () {
+         switch (activeTab) {
+            case 1:
+               $('#tab-general').tab('show');
+               break;
+            case 2:
+               $('#tab-contacts').tab('show');
+               actualizarTableListaContacts();
+               break;
+            case 3:
+               $('#tab-projects').tab('show');
+               actualizarTableListaProjects();
+               break;
+         }
+      }, 0);
+   };
+   var resetWizard = function () {
+      activeTab = 1;
+      totalTabs = 2;
+      mostrarTab();
+      // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+      $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+      $('#btn-wizard-siguiente').removeClass('hide');
+      $('.nav-item-hide').removeClass('hide').addClass('hide');
 
-            if (!validateForm()) {
-                result = false;
+      // reset valid
+      KTUtil.findAll(KTUtil.get('concrete-vendor-form'), '.nav-link').forEach(function (element, index) {
+         KTUtil.removeClass(element, 'valid');
+      });
+   };
+   var validWizard = function () {
+      var result = true;
+      if (activeTab == 1) {
+         if (!validateForm()) {
+            result = false;
+         }
+      }
+
+      return result;
+   };
+
+   var marcarPasosValidosWizard = function () {
+      // reset
+      KTUtil.findAll(KTUtil.get('concrete-vendor-form'), '.nav-link').forEach(function (element, index) {
+         KTUtil.removeClass(element, 'valid');
+      });
+
+      KTUtil.findAll(KTUtil.get('concrete-vendor-form'), '.nav-link').forEach(function (element, index) {
+         var tab = index + 1;
+         if (tab < activeTab) {
+            if (validWizard(tab)) {
+               KTUtil.addClass(element, 'valid');
             }
+         }
+      });
+   };
 
-        }
+   //Nuevo
+   var initAccionNuevo = function () {
+      $(document).off('click', '#btn-nuevo-concrete-vendor');
+      $(document).on('click', '#btn-nuevo-concrete-vendor', function (e) {
+         btnClickNuevo();
+      });
 
-        return result;
-    }
+      function btnClickNuevo() {
+         resetForms();
 
-    var marcarPasosValidosWizard = function () {
-        // reset
-        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
-            KTUtil.removeClass(element, "valid");
-        });
+         KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = 'New Concrete Vendors:';
 
-        KTUtil.findAll(KTUtil.get("concrete-vendor-form"), ".nav-link").forEach(function (element, index) {
-            var tab = index + 1;
-            if (tab < activeTab) {
-                if (validWizard(tab)) {
-                    KTUtil.addClass(element, "valid");
-                }
-            }
-        });
-    };
+         mostrarForm();
+      }
+   };
 
-    //Nuevo
-    var initAccionNuevo = function () {
-        $(document).off('click', "#btn-nuevo-concrete-vendor");
-        $(document).on('click', "#btn-nuevo-concrete-vendor", function (e) {
-            btnClickNuevo();
-        });
+   var mostrarForm = function () {
+      KTUtil.removeClass(KTUtil.get('form-concrete-vendor'), 'hide');
+      KTUtil.addClass(KTUtil.get('lista-concrete-vendor'), 'hide');
+   };
 
-        function btnClickNuevo() {
-            resetForms();
+   //Salvar
+   var initAccionSalvar = function () {
+      $(document).off('click', '#btn-wizard-finalizar');
+      $(document).on('click', '#btn-wizard-finalizar', function (e) {
+         btnClickSalvarForm();
+      });
 
-            KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = "New Concrete Vendors:";
+      function btnClickSalvarForm() {
+         KTUtil.scrollTop();
 
-            mostrarForm();
-        };
-    };
+         event_change = false;
 
-    var mostrarForm = function () {
-        KTUtil.removeClass(KTUtil.get('form-concrete-vendor'), 'hide');
-        KTUtil.addClass(KTUtil.get('lista-concrete-vendor'), 'hide');
-    }
-
-    //Salvar
-    var initAccionSalvar = function () {
-        $(document).off('click', "#btn-wizard-finalizar");
-        $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
-        });
-
-        function btnClickSalvarForm() {
-            KTUtil.scrollTop();
-
-            event_change = false;
-
-            if (validateForm()) {
-
-                var formData = new URLSearchParams();
-
-                var vendor_id = $('#vendor_id').val();
-                formData.set("vendor_id", vendor_id);
-
-                var name = $('#name').val();
-                formData.set("name", name);
-
-                var phone = $('#phone').val();
-                formData.set("phone", phone);
-
-                var contactEmail = $('#contactEmail').val();
-                formData.set("contactEmail", contactEmail);
-
-                var address = $('#address').val();
-                formData.set("address", address);
-
-                formData.set("contacts", JSON.stringify(contacts));
-
-                BlockUtil.block('#form-concrete-vendor');
-
-                axios.post("concrete-vendor/salvar", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
-
-                                cerrarForms();
-
-                                oTable.draw();
-
-                            } else {
-                                toastr.error(response.error, "");
-                            }
-                        } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
-                        }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-concrete-vendor");
-                    });
-            }
-        };
-    }
-    //Cerrar form
-    var initAccionCerrar = function () {
-        $(document).off('click', ".cerrar-form-concrete-vendor");
-        $(document).on('click', ".cerrar-form-concrete-vendor", function (e) {
-            cerrarForms();
-        });
-    }
-    //Cerrar forms
-    var cerrarForms = function () {
-        if (!event_change) {
-            cerrarFormsConfirmated();
-        } else {
-            // mostar modal
-            ModalUtil.show('modal-salvar-cambios', {backdrop: 'static', keyboard: true});
-        }
-    };
-
-    //Eventos change
-    var event_change = false;
-    var initAccionChange = function () {
-        $(document).off('change', ".event-change");
-        $(document).on('change', ".event-change", function (e) {
-            event_change = true;
-        });
-
-        $(document).off('click', "#btn-save-changes");
-        $(document).on('click', "#btn-save-changes", function (e) {
-            cerrarFormsConfirmated();
-        });
-    };
-    var cerrarFormsConfirmated = function () {
-        resetForms();
-        $('#form-concrete-vendor').addClass('hide');
-        $('#lista-concrete-vendor').removeClass('hide');
-    };
-
-    //Editar
-    var initAccionEditar = function () {
-        $(document).off('click', "#concrete-vendor-table-editable a.edit");
-        $(document).on('click', "#concrete-vendor-table-editable a.edit", function (e) {
-            e.preventDefault();
-            resetForms();
-
-            var vendor_id = $(this).data('id');
-            $('#vendor_id').val(vendor_id);
-
-            mostrarForm()
-
-            editRow(vendor_id);
-        });
-
-        function editRow(vendor_id) {
-
+         if (validateForm()) {
             var formData = new URLSearchParams();
-            formData.set("vendor_id", vendor_id);
+
+            var vendor_id = $('#vendor_id').val();
+            formData.set('vendor_id', vendor_id);
+
+            var name = $('#name').val();
+            formData.set('name', name);
+
+            var phone = $('#phone').val();
+            formData.set('phone', phone);
+
+            var contactEmail = $('#contactEmail').val();
+            formData.set('contactEmail', contactEmail);
+
+            var address = $('#address').val();
+            formData.set('address', address);
+
+            formData.set('contacts', JSON.stringify(contacts));
 
             BlockUtil.block('#form-concrete-vendor');
 
-            axios.post("concrete-vendor/cargarDatos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
+            axios
+               .post('concrete-vendor/salvar', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
 
-                            //cargar datos
-                            cargarDatos(response.vendor);
+                        cerrarForms();
 
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
-                    }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#form-concrete-vendor");
-                });
+                        oTable.draw();
+                     } else {
+                        toastr.error(response.error, '');
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#form-concrete-vendor');
+               });
+         }
+      }
+   };
+   //Cerrar form
+   var initAccionCerrar = function () {
+      $(document).off('click', '.cerrar-form-concrete-vendor');
+      $(document).on('click', '.cerrar-form-concrete-vendor', function (e) {
+         cerrarForms();
+      });
+   };
+   //Cerrar forms
+   var cerrarForms = function () {
+      if (!event_change) {
+         cerrarFormsConfirmated();
+      } else {
+         // mostar modal
+         ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
+      }
+   };
 
-            function cargarDatos(vendor) {
+   //Eventos change
+   var event_change = false;
+   var initAccionChange = function () {
+      $(document).off('change', '.event-change');
+      $(document).on('change', '.event-change', function (e) {
+         event_change = true;
+      });
 
-                KTUtil.find(KTUtil.get("form-concrete-vendor"), ".card-label").innerHTML = "Update Concrete Vendors: " + vendor.name;
+      $(document).off('click', '#btn-save-changes');
+      $(document).on('click', '#btn-save-changes', function (e) {
+         cerrarFormsConfirmated();
+      });
+   };
+   var cerrarFormsConfirmated = function () {
+      resetForms();
+      $('#form-concrete-vendor').addClass('hide');
+      $('#lista-concrete-vendor').removeClass('hide');
+   };
 
-                $('#name').val(vendor.name);
-                $('#phone').val(vendor.phone);
-                $('#address').val(vendor.address);
-                $('#contactEmail').val(vendor.contactEmail);
+   //Editar
+   var initAccionEditar = function () {
+      $(document).off('click', '#concrete-vendor-table-editable a.edit');
+      $(document).on('click', '#concrete-vendor-table-editable a.edit', function (e) {
+         e.preventDefault();
+         resetForms();
 
-                // contacts
-                contacts = vendor.contacts;
-                actualizarTableListaContacts();
+         var vendor_id = $(this).data('id');
+         $('#vendor_id').val(vendor_id);
 
-                // projects
-                projects = vendor.projects;
-                actualizarTableListaProjects();
+         mostrarForm();
 
-                // habilitar tab
-                totalTabs = 3;
-                $('.nav-item-hide').removeClass('hide');
+         editRow(vendor_id);
+      });
 
-                event_change = false;
-            }
-        }
-    };
-    //Eliminar
-    var initAccionEliminar = function () {
-        $(document).off('click', "#concrete-vendor-table-editable a.delete");
-        $(document).on('click', "#concrete-vendor-table-editable a.delete", function (e) {
-            e.preventDefault();
+      function editRow(vendor_id) {
+         var formData = new URLSearchParams();
+         formData.set('vendor_id', vendor_id);
 
-            rowDelete = $(this).data('id');
+         BlockUtil.block('#form-concrete-vendor');
+
+         axios
+            .post('concrete-vendor/cargarDatos', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     //cargar datos
+                     cargarDatos(response.vendor);
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-concrete-vendor');
+            });
+
+         function cargarDatos(vendor) {
+            KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = 'Update Concrete Vendors: ' + vendor.name;
+
+            $('#name').val(vendor.name);
+            $('#phone').val(vendor.phone);
+            $('#address').val(vendor.address);
+            $('#contactEmail').val(vendor.contactEmail);
+
+            // contacts
+            contacts = vendor.contacts;
+            actualizarTableListaContacts();
+
+            // projects
+            projects = vendor.projects;
+            actualizarTableListaProjects();
+
+            // habilitar tab
+            totalTabs = 3;
+            $('.nav-item-hide').removeClass('hide');
+
+            event_change = false;
+         }
+      }
+   };
+   //Eliminar
+   var initAccionEliminar = function () {
+      $(document).off('click', '#concrete-vendor-table-editable a.delete');
+      $(document).on('click', '#concrete-vendor-table-editable a.delete', function (e) {
+         e.preventDefault();
+
+         rowDelete = $(this).data('id');
+         // mostar modal
+         ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-eliminar-concrete-vendor');
+      $(document).on('click', '#btn-eliminar-concrete-vendor', function (e) {
+         btnClickEliminar();
+      });
+
+      $(document).off('click', '#btn-delete');
+      $(document).on('click', '#btn-delete', function (e) {
+         btnClickModalEliminar();
+      });
+
+      $(document).off('click', '#btn-delete-selection');
+      $(document).on('click', '#btn-delete-selection', function (e) {
+         btnClickModalEliminarSeleccion();
+      });
+
+      function btnClickEliminar() {
+         var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
+         if (ids != '') {
             // mostar modal
-            ModalUtil.show('modal-eliminar', {backdrop: 'static', keyboard: true});
-        });
+            ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
+         } else {
+            toastr.error('Select companies to delete', '');
+         }
+      }
 
-        $(document).off('click', "#btn-eliminar-concrete-vendor");
-        $(document).on('click', "#btn-eliminar-concrete-vendor", function (e) {
-            btnClickEliminar();
-        });
+      function btnClickModalEliminar() {
+         var vendor_id = rowDelete;
 
-        $(document).off('click', "#btn-delete");
-        $(document).on('click', "#btn-delete", function (e) {
-            btnClickModalEliminar();
-        });
+         var formData = new URLSearchParams();
+         formData.set('vendor_id', vendor_id);
 
-        $(document).off('click', "#btn-delete-selection");
-        $(document).on('click', "#btn-delete-selection", function (e) {
-            btnClickModalEliminarSeleccion();
-        });
+         BlockUtil.block('#lista-concrete-vendor');
 
-        function btnClickEliminar() {
-            var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
-            if (ids != '') {
-                // mostar modal
-                ModalUtil.show('modal-eliminar-seleccion', {backdrop: 'static', keyboard: true});
+         axios
+            .post('concrete-vendor/eliminar', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-concrete-vendor');
+            });
+      }
+
+      function btnClickModalEliminarSeleccion() {
+         var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
+
+         var formData = new URLSearchParams();
+
+         formData.set('ids', ids);
+
+         BlockUtil.block('#lista-concrete-vendor');
+
+         axios
+            .post('concrete-vendor/eliminarVendors', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-concrete-vendor');
+            });
+      }
+   };
+
+   var initWidgets = function () {
+      // init widgets generales
+      MyApp.initWidgets();
+
+      Inputmask({
+         mask: '(999) 999-9999',
+      }).mask('.input-phone');
+
+      // google maps
+      inicializarAutocomplete();
+   };
+
+   // google maps
+   var latitud = '';
+   var longitud = '';
+   var inicializarAutocomplete = async function () {
+      // Cargar librería de Places
+      await google.maps.importLibrary('places');
+
+      const input = document.getElementById('address');
+
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+         types: ['address'], // Solo direcciones
+         componentRestrictions: { country: 'us' }, // Opcional: restringir a país (ej: Chile)
+      });
+
+      autocomplete.addListener('place_changed', function () {
+         const place = autocomplete.getPlace();
+
+         if (!place.geometry) {
+            console.log('No se pudo obtener ubicación.');
+            return;
+         }
+
+         latitud = place.geometry.location.lat();
+         longitud = place.geometry.location.lng();
+
+         console.log('Dirección seleccionada:', place.formatted_address);
+         console.log('Coordenadas:', place.geometry?.location?.toString());
+      });
+   };
+
+   // Contacts
+   var contacts = [];
+   var oTableContacts;
+   var nEditingRowContact = null;
+   var initTableContacts = function () {
+      const table = '#contacts-table-editable';
+
+      // columns
+      const columns = [{ data: 'name' }, { data: 'email' }, { data: 'phone' }, { data: 'role' }, { data: 'notes' }, { data: null }];
+
+      // column defs
+      let columnDefs = [
+         {
+            targets: 1,
+            render: DatatableUtil.getRenderColumnEmail,
+         },
+         {
+            targets: 2,
+            render: DatatableUtil.getRenderColumnPhone,
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+            },
+         },
+      ];
+
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
+
+      // order
+      const order = [[0, 'asc']];
+
+      // escapar contenido de la tabla
+      oTableContacts = DatatableUtil.initSafeDataTable(table, {
+         data: contacts,
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableContacts();
+   };
+
+   var handleSearchDatatableContacts = function () {
+      $(document).off('keyup', '#lista-contacts [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-contacts [data-table-filter="search"]', function (e) {
+         oTableContacts.search(e.target.value).draw();
+      });
+   };
+
+   var actualizarTableListaContacts = function () {
+      if (oTableContacts) {
+         oTableContacts.destroy();
+      }
+
+      initTableContacts();
+   };
+
+   var validateFormContact = function () {
+      var result = false;
+
+      //Validacion
+      var form = KTUtil.get('contact-form');
+
+      var constraints = {
+         name: {
+            presence: { message: 'This field is required' },
+         },
+         email: {
+            email: { message: 'The email must be valid' },
+         },
+      };
+
+      var errors = validate(form, constraints);
+
+      if (!errors) {
+         result = true;
+      } else {
+         MyApp.showErrorsValidateForm(form, errors);
+      }
+
+      //attach change
+      MyUtil.attachChangeValidacion(form, constraints);
+
+      return result;
+   };
+   var initAccionesContacts = function () {
+      $(document).off('click', '#btn-agregar-contact');
+      $(document).on('click', '#btn-agregar-contact', function (e) {
+         // reset
+         resetFormContact();
+
+         // mostar modal
+         ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-contact');
+      $(document).on('click', '#btn-salvar-contact', function (e) {
+         e.preventDefault();
+
+         if (validateFormContact()) {
+            var name = $('#contact-name').val();
+            var email = $('#contact-email').val();
+            var phone = $('#contact-phone').val();
+            var role = $('#contact-role').val();
+            var notes = $('#contact-notes').val();
+
+            if (nEditingRowContact == null) {
+               contacts.push({
+                  contact_id: '',
+                  name: name,
+                  email: email,
+                  phone: phone,
+                  role: role,
+                  notes: notes,
+                  posicion: contacts.length,
+               });
             } else {
-                toastr.error('Select companies to delete', "");
-            }
-        };
-
-        function btnClickModalEliminar() {
-            var vendor_id = rowDelete;
-
-            var formData = new URLSearchParams();
-            formData.set("vendor_id", vendor_id);
-
-            BlockUtil.block('#lista-concrete-vendor');
-
-            axios.post("concrete-vendor/eliminar", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
-                            toastr.success(response.message, "");
-
-                            oTable.draw();
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
-                    }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#lista-concrete-vendor");
-                });
-        };
-
-        function btnClickModalEliminarSeleccion() {
-            var ids = DatatableUtil.getTableSelectedRowKeys('#concrete-vendor-table-editable').join(',');
-
-            var formData = new URLSearchParams();
-
-            formData.set("ids", ids);
-
-            BlockUtil.block('#lista-concrete-vendor');
-
-            axios.post("concrete-vendor/eliminarVendors", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
-                            toastr.success(response.message, "");
-
-                            oTable.draw();
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
-                    }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#lista-concrete-vendor");
-                });
-        };
-    };
-
-
-    var initWidgets = function () {
-        // init widgets generales
-        MyApp.initWidgets();
-
-        Inputmask({
-            "mask": "(999) 999-9999"
-        }).mask(".input-phone");
-
-        // google maps
-        inicializarAutocomplete();
-    }
-
-    // google maps
-    var latitud = '';
-    var longitud = '';
-    var inicializarAutocomplete = async function () {
-
-        // Cargar librería de Places
-        await google.maps.importLibrary("places");
-
-        const input = document.getElementById('address');
-
-        const autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ['address'], // Solo direcciones
-            componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)
-        });
-
-        autocomplete.addListener('place_changed', function () {
-            const place = autocomplete.getPlace();
-
-            if (!place.geometry) {
-                console.log("No se pudo obtener ubicación.");
-                return;
+               var posicion = nEditingRowContact;
+               if (contacts[posicion]) {
+                  contacts[posicion].name = name;
+                  contacts[posicion].email = email;
+                  contacts[posicion].phone = phone;
+                  contacts[posicion].role = role;
+                  contacts[posicion].notes = notes;
+               }
             }
 
-            latitud = place.geometry.location.lat();
-            longitud = place.geometry.location.lng();
+            //actualizar lista
+            actualizarTableListaContacts();
 
-            console.log('Dirección seleccionada:', place.formatted_address);
-            console.log('Coordenadas:', place.geometry?.location?.toString());
-        });
-    }
+            // reset
+            resetFormContact();
+            // hide modal
+            ModalUtil.hide('modal-contact');
+         }
+      });
 
-    // Contacts
-    var contacts = [];
-    var oTableContacts;
-    var nEditingRowContact = null;
-    var initTableContacts = function () {
-        const table = "#contacts-table-editable";
-
-        // columns
-        const columns = [
-            {data: 'name'},
-            {data: 'email'},
-            {data: 'phone'},
-            {data: 'role'},
-            {data: 'notes'},
-            {data: null},
-        ];
-
-        // column defs
-        let columnDefs = [
-            {
-                targets: 1,
-                render: DatatableUtil.getRenderColumnEmail
-            },
-            {
-                targets: 2,
-                render: DatatableUtil.getRenderColumnPhone
-            },
-            {
-                targets: -1,
-                data: null,
-                orderable: false,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
-                },
-            }
-        ];
-
-        // language
-        const language = DatatableUtil.getDataTableLenguaje();
-
-        // order
-        const order = [[0, 'asc']];
-
-        // escapar contenido de la tabla
-        oTableContacts = DatatableUtil.initSafeDataTable(table, {
-            data: contacts,
-            displayLength: 10,
-            order: order,
-            columns: columns,
-            columnDefs: columnDefs,
-            language: language
-        });
-
-        handleSearchDatatableContacts();
-
-    };
-
-    var handleSearchDatatableContacts = function () {
-        $(document).off('keyup', '#lista-contacts [data-table-filter="search"]');
-        $(document).on('keyup', '#lista-contacts [data-table-filter="search"]', function (e) {
-            oTableContacts.search(e.target.value).draw();
-        });
-    }
-
-    var actualizarTableListaContacts = function () {
-        if (oTableContacts) {
-            oTableContacts.destroy();
-        }
-
-        initTableContacts();
-    }
-
-    var validateFormContact = function () {
-        var result = false;
-
-        //Validacion
-        var form = KTUtil.get('contact-form');
-
-        var constraints = {
-            name: {
-                presence: {message: "This field is required"},
-            },
-            email: {
-                email: {message: "The email must be valid"}
-            },
-        }
-
-        var errors = validate(form, constraints);
-
-        if (!errors) {
-            result = true;
-        } else {
-            MyApp.showErrorsValidateForm(form, errors);
-        }
-
-        //attach change
-        MyUtil.attachChangeValidacion(form, constraints);
-
-        return result;
-    };
-    var initAccionesContacts = function () {
-
-        $(document).off('click', "#btn-agregar-contact");
-        $(document).on('click', "#btn-agregar-contact", function (e) {
+      $(document).off('click', '#contacts-table-editable a.edit');
+      $(document).on('click', '#contacts-table-editable a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (contacts[posicion]) {
             // reset
             resetFormContact();
 
+            nEditingRowContact = posicion;
+
+            $('#contact_id').val(contacts[posicion].contact_id);
+            $('#contact-name').val(contacts[posicion].name);
+            $('#contact-email').val(contacts[posicion].email);
+            $('#contact-phone').val(contacts[posicion].phone);
+            $('#contact-role').val(contacts[posicion].role);
+            $('#contact-notes').val(contacts[posicion].notes);
+
             // mostar modal
-            ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
-        });
+            ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+         }
+      });
 
-        $(document).off('click', "#btn-salvar-contact");
-        $(document).on('click', "#btn-salvar-contact", function (e) {
-            e.preventDefault();
+      $(document).off('click', '#contacts-table-editable a.delete');
+      $(document).on('click', '#contacts-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (contacts[posicion]) {
+            Swal.fire({
+               text: 'Are you sure you want to delete the contact?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               cancelButtonText: 'No, cancel',
+               customClass: {
+                  confirmButton: 'btn fw-bold btn-success',
+                  cancelButton: 'btn fw-bold btn-danger',
+               },
+            }).then(function (result) {
+               if (result.value) {
+                  eliminarContact(posicion);
+               }
+            });
+         }
+      });
 
-            if (validateFormContact()) {
-                var name = $('#contact-name').val();
-                var email = $('#contact-email').val();
-                var phone = $('#contact-phone').val();
-                var role = $('#contact-role').val();
-                var notes = $('#contact-notes').val();
+      function eliminarContact(posicion) {
+         if (contacts[posicion].contact_id != '') {
+            var formData = new URLSearchParams();
+            formData.set('contact_id', contacts[posicion].contact_id);
 
-                if (nEditingRowContact == null) {
+            BlockUtil.block('#lista-contacts');
 
-                    contacts.push({
-                        contact_id: '',
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        role: role,
-                        notes: notes,
-                        posicion: contacts.length
-                    });
+            axios
+               .post('concrete-vendor/eliminarContact', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
 
-                } else {
-                    var posicion = nEditingRowContact;
-                    if (contacts[posicion]) {
-                        contacts[posicion].name = name;
-                        contacts[posicion].email = email;
-                        contacts[posicion].phone = phone;
-                        contacts[posicion].role = role;
-                        contacts[posicion].notes = notes;
-                    }
-                }
+                        deleteContact(posicion);
+                     } else {
+                        toastr.error(response.error, '');
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#lista-contacts');
+               });
+         } else {
+            deleteContact(posicion);
+         }
+      }
 
-                //actualizar lista
-                actualizarTableListaContacts();
+      function deleteContact(posicion) {
+         //Eliminar
+         contacts.splice(posicion, 1);
+         //actualizar posiciones
+         for (var i = 0; i < contacts.length; i++) {
+            contacts[i].posicion = i;
+         }
+         //actualizar lista
+         actualizarTableListaContacts();
+      }
+   };
+   var resetFormContact = function () {
+      // reset form
+      MyUtil.resetForm('contact-form');
 
-                // reset
-                resetFormContact();
-                // hide modal
-                ModalUtil.hide('modal-contact');
+      nEditingRowContact = null;
+   };
 
-            }
+   // Projects
+   var projects = [];
+   var oTableProjects;
+   var initTableListaProjects = function () {
+      const table = '#projects-table-editable';
 
-        });
+      // columns
+      const columns = [
+         { data: 'projectNumber' },
+         { data: 'county' },
+         { data: 'name' },
+         { data: 'description' },
+         { data: 'dueDate' },
+         { data: 'company' },
+         { data: 'status' },
+         { data: 'nota' },
+         { data: null },
+      ];
 
-        $(document).off('click', "#contacts-table-editable a.edit");
-        $(document).on('click', "#contacts-table-editable a.edit", function () {
-            var posicion = $(this).data('posicion');
-            if (contacts[posicion]) {
-
-                // reset
-                resetFormContact();
-
-                nEditingRowContact = posicion;
-
-                $('#contact_id').val(contacts[posicion].contact_id);
-                $('#contact-name').val(contacts[posicion].name);
-                $('#contact-email').val(contacts[posicion].email);
-                $('#contact-phone').val(contacts[posicion].phone);
-                $('#contact-role').val(contacts[posicion].role);
-                $('#contact-notes').val(contacts[posicion].notes);
-
-                // mostar modal
-                ModalUtil.show('modal-contact', {backdrop: 'static', keyboard: true});
-
-            }
-        });
-
-        $(document).off('click', "#contacts-table-editable a.delete");
-        $(document).on('click', "#contacts-table-editable a.delete", function (e) {
-
-            e.preventDefault();
-            var posicion = $(this).data('posicion');
-            if (contacts[posicion]) {
-
-                Swal.fire({
-                    text: "Are you sure you want to delete the contact?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    buttonsStyling: false,
-                    confirmButtonText: "Yes, delete it!",
-                    cancelButtonText: "No, cancel",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-success",
-                        cancelButton: "btn fw-bold btn-danger"
-                    }
-                }).then(function (result) {
-                    if (result.value) {
-                        eliminarContact(posicion);
-                    }
-                });
-            }
-        });
-
-        function eliminarContact(posicion) {
-
-            if (contacts[posicion].contact_id != '') {
-
-                var formData = new URLSearchParams();
-                formData.set("contact_id", contacts[posicion].contact_id);
-
-                BlockUtil.block('#lista-contacts');
-
-                axios.post("concrete-vendor/eliminarContact", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
-
-                                deleteContact(posicion);
-                            } else {
-                                toastr.error(response.error, "");
-                            }
-                        } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
-                        }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#lista-contacts");
-                    });
-
-            } else {
-                deleteContact(posicion);
-            }
-        }
-
-        function deleteContact(posicion) {
-            //Eliminar
-            contacts.splice(posicion, 1);
-            //actualizar posiciones
-            for (var i = 0; i < contacts.length; i++) {
-                contacts[i].posicion = i;
-            }
-            //actualizar lista
-            actualizarTableListaContacts();
-        }
-
-    };
-    var resetFormContact = function () {
-
-        // reset form
-        MyUtil.resetForm("contact-form");
-
-        nEditingRowContact = null;
-    };
-
-    // Projects
-    var projects = [];
-    var oTableProjects;
-    var initTableListaProjects = function () {
-        const table = "#projects-table-editable";
-
-        // columns
-        const columns = [
-            {data: 'projectNumber'},
-            {data: 'county'},
-            {data: 'name'},
-            {data: 'description'},
-            {data: 'dueDate'},
-            {data: 'company'},
-            {data: 'status'},
-            {data: 'nota'},
-            {data: null},
-        ];
-
-        // column defs
-        let columnDefs = [
-            {
-                targets: 0,
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 150);
-                }
+      // column defs
+      let columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 150);
             },
-            {
-                targets: 2,
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data ?? '', 150);
-                }
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data ?? '', 150);
             },
-            {
-                targets: 4,
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderColumnDiv(data, 100);
-                }
+         },
+         {
+            targets: 4,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 100);
             },
-            {
-                targets: 6,
-                render: function (data, type, row) {
+         },
+         {
+            targets: 6,
+            render: function (data, type, row) {
+               var status = {
+                  1: { title: 'In Progress', class: 'badge-primary' },
+                  0: { title: 'Not Started', class: 'badge-danger' },
+                  2: { title: 'Completed', class: 'badge-success' },
+               };
 
-                    var status = {
-                        1: {'title': 'In Progress', 'class': 'badge-primary'},
-                        0: {'title': 'Not Started', 'class': 'badge-danger'},
-                        2: {'title': 'Completed', 'class': 'badge-success'},
-                    };
-
-                    return `<div style="width: 180px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
-                }
+               return `<div style="width: 180px;"><span class="badge ${status[data].class}">${status[data].title}</span></div>`;
             },
-            {
-                targets: 7,
-                render: function (data, type, row) {
-
-                    var html = '';
-                    if (data != null) {
-                        html = `${data.nota} <span class="badge badge-primary">${data.date}</span>`;
-                    }
-                    return html;
-                }
+         },
+         {
+            targets: 7,
+            render: function (data, type, row) {
+               var html = '';
+               if (data != null) {
+                  html = `${data.nota} <span class="badge badge-primary">${data.date}</span>`;
+               }
+               return html;
             },
-            {
-                targets: -1,
-                data: null,
-                orderable: false,
-                className: 'text-center',
-                render: function (data, type, row) {
-                    return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row,  ['detalle']);
-                },
-            }
-        ];
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['detalle']);
+            },
+         },
+      ];
 
-        // language
-        const language = DatatableUtil.getDataTableLenguaje();
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
 
-        // order
-        const order = [[0, 'asc']];
+      // order
+      const order = [[0, 'asc']];
 
-        // escapar contenido de la tabla
-        oTableProjects = DatatableUtil.initSafeDataTable(table, {
-            data: projects,
-            displayLength: 10,
-            order: order,
-            columns: columns,
-            columnDefs: columnDefs,
-            language: language
-        });
+      // escapar contenido de la tabla
+      oTableProjects = DatatableUtil.initSafeDataTable(table, {
+         data: projects,
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
 
-        handleSearchDatatableProjects();
-    };
-    var handleSearchDatatableProjects = function () {
-        $(document).off('keyup', '#lista-projects [data-table-filter="search"]');
-        $(document).on('keyup', '#lista-projects [data-table-filter="search"]', function (e) {
-            oTableProjects.search(e.target.value).draw();
-        });
-    }
-    var actualizarTableListaProjects = function () {
-        if (oTableProjects) {
-            oTableProjects.destroy();
-        }
+      handleSearchDatatableProjects();
+   };
+   var handleSearchDatatableProjects = function () {
+      $(document).off('keyup', '#lista-projects [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-projects [data-table-filter="search"]', function (e) {
+         oTableProjects.search(e.target.value).draw();
+      });
+   };
+   var actualizarTableListaProjects = function () {
+      if (oTableProjects) {
+         oTableProjects.destroy();
+      }
 
-        initTableListaProjects();
-    }
-    var initAccionesProjects = function () {
+      initTableListaProjects();
+   };
+   var initAccionesProjects = function () {
+      $(document).off('click', '#projects-table-editable a.detalle');
+      $(document).on('click', '#projects-table-editable a.detalle', function (e) {
+         var posicion = $(this).data('posicion');
+         if (projects[posicion]) {
+            localStorage.setItem('project_id_edit', projects[posicion].id);
+            // open
+            window.location.href = url_project;
+         }
+      });
+   };
 
-        $(document).off('click', "#projects-table-editable a.detalle");
-        $(document).on('click', "#projects-table-editable a.detalle", function (e) {
-            var posicion = $(this).data('posicion');
-            if (projects[posicion]) {
-                localStorage.setItem('project_id_edit', projects[posicion].id);
-                // open
-                window.location.href = url_project;
+   return {
+      //main function to initiate the module
+      init: function () {
+         initWidgets();
+         initTable();
 
-            }
-        });
+         initWizard();
 
-    };
+         initAccionNuevo();
+         initAccionSalvar();
+         initAccionCerrar();
 
-    return {
-        //main function to initiate the module
-        init: function () {
+         // contacts
+         initAccionesContacts();
 
-            initWidgets();
-            initTable();
+         // projects
+         initAccionesProjects();
 
-            initWizard();
-
-            initAccionNuevo();
-            initAccionSalvar();
-            initAccionCerrar();
-
-
-            // contacts
-            initAccionesContacts();
-
-            // projects
-            initAccionesProjects();
-
-            initAccionChange();
-        }
-
-    };
-
-}();
+         initAccionChange();
+      },
+   };
+})();

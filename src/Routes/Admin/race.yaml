@@ -1,0 +1,23 @@
+race:
+   path: /races
+   defaults: { _controller: App\Controller\Admin\RaceController::index }
+
+listarRaceAdmin:
+   path: /race/listar
+   defaults: { _controller: App\Controller\Admin\RaceController::listar, _format: json }
+
+eliminarRaceAdmin:
+   path: /race/eliminarRace
+   defaults: { _controller: App\Controller\Admin\RaceController::eliminar, _format: json }
+
+eliminarRacesAdmin:
+   path: /race/eliminarRaces
+   defaults: { _controller: App\Controller\Admin\RaceController::eliminarRaces, _format: json }
+
+salvarRaceAdmin:
+   path: /race/salvarRace
+   defaults: { _controller: App\Controller\Admin\RaceController::salvar, _format: json }
+
+cargarDatosRaceAdmin:
+   path: /race/cargarDatos
+   defaults: { _controller: App\Controller\Admin\RaceController::cargarDatos, _format: json }

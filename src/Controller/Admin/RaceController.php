@@ -3,28 +3,28 @@
 namespace App\Controller\Admin;
 
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\GenderService;
+use App\Utils\Admin\RaceService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class GenderController extends AbstractController
+class RaceController extends AbstractController
 {
 
-   private $genderService;
+   private $raceService;
 
-   public function __construct(GenderService $genderService)
+   public function __construct(RaceService $raceService)
    {
-      $this->genderService = $genderService;
+      $this->raceService = $raceService;
    }
 
    public function index()
    {
       $usuario = $this->getUser();
-      $permiso = $this->genderService->BuscarPermiso($usuario->getUsuarioId(), 34);
+      $permiso = $this->raceService->BuscarPermiso($usuario->getUsuarioId(), 34);
       if (count($permiso) > 0) {
          if ($permiso[0]['ver']) {
 
-            return $this->render('admin/gender/index.html.twig', array(
+            return $this->render('admin/race/index.html.twig', array(
                'permiso' => $permiso[0]
             ));
          }
@@ -48,7 +48,7 @@ class GenderController extends AbstractController
          );
 
          // total + data en una sola llamada a tu servicio
-         $result = $this->genderService->ListarGenders(
+         $result = $this->raceService->ListarRaces(
             $dt['start'],
             $dt['length'],
             $dt['search'],
@@ -73,12 +73,12 @@ class GenderController extends AbstractController
    }
 
    /**
-    * salvar Acción que inserta un gender en la BD
+    * salvar Acción que inserta un race en la BD
     *
     */
    public function salvar(Request $request)
    {
-      $gender_id = $request->get('gender_id');
+      $race_id = $request->get('race_id');
 
       $code = $request->get('code');
       $description = $request->get('description');
@@ -86,17 +86,17 @@ class GenderController extends AbstractController
 
       try {
 
-         if ($gender_id == "") {
-            $resultado = $this->genderService->SalvarGender($code, $description, $classification);
+         if ($race_id == "") {
+            $resultado = $this->raceService->SalvarRace($code, $description, $classification);
          } else {
-            $resultado = $this->genderService->ActualizarGender($gender_id, $code, $description, $classification);
+            $resultado = $this->raceService->ActualizarRace($race_id, $code, $description, $classification);
          }
 
          if ($resultado['success']) {
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
-            $resultadoJson['gender_id'] = $resultado['gender_id'];
+            $resultadoJson['race_id'] = $resultado['race_id'];
 
             return $this->json($resultadoJson);
          } else {
@@ -114,15 +114,15 @@ class GenderController extends AbstractController
    }
 
    /**
-    * eliminar Acción que elimina un gender en la BD
+    * eliminar Acción que elimina un race en la BD
     *
     */
    public function eliminar(Request $request)
    {
-      $gender_id = $request->get('gender_id');
+      $race_id = $request->get('race_id');
 
       try {
-         $resultado = $this->genderService->EliminarGender($gender_id);
+         $resultado = $this->raceService->EliminarRace($race_id);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -141,15 +141,15 @@ class GenderController extends AbstractController
    }
 
    /**
-    * eliminarGenders Acción que elimina los genders seleccionados en la BD
+    * eliminarRaces Acción que elimina los races seleccionados en la BD
     *
     */
-   public function eliminarGenders(Request $request)
+   public function eliminarRaces(Request $request)
    {
       $ids = $request->get('ids');
 
       try {
-         $resultado = $this->genderService->EliminarGenders($ids);
+         $resultado = $this->raceService->EliminarRaces($ids);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -168,19 +168,19 @@ class GenderController extends AbstractController
    }
 
    /**
-    * cargarDatos Acción que carga los datos del gender en la BD
+    * cargarDatos Acción que carga los datos del race en la BD
     *
     */
    public function cargarDatos(Request $request)
    {
-      $gender_id = $request->get('gender_id');
+      $race_id = $request->get('race_id');
 
       try {
-         $resultado = $this->genderService->CargarDatosGender($gender_id);
+         $resultado = $this->raceService->CargarDatosRace($race_id);
          if ($resultado['success']) {
 
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['gender'] = $resultado['gender'];
+            $resultadoJson['race'] = $resultado['race'];
 
             return $this->json($resultadoJson);
          } else {

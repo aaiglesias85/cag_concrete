@@ -1,12 +1,12 @@
-var Genders = (function () {
+var Races = (function () {
    var rowDelete = null;
 
    //Inicializar table
    var oTable;
    var initTable = function () {
-      const table = '#gender-table-editable';
+      const table = '#race-table-editable';
       // datasource
-      const datasource = DatatableUtil.getDataTableDatasource(`gender/listar`);
+      const datasource = DatatableUtil.getDataTableDatasource(`race/listar`);
 
       // columns
       const columns = getColumnsTable();
@@ -103,7 +103,7 @@ var Genders = (function () {
       return columnDefs;
    };
    var handleSearchDatatable = function () {
-      const filterSearch = document.querySelector('#lista-gender [data-table-filter="search"]');
+      const filterSearch = document.querySelector('#lista-race [data-table-filter="search"]');
       let debounceTimeout;
 
       filterSearch.addEventListener('keyup', function (e) {
@@ -118,8 +118,8 @@ var Genders = (function () {
       });
    };
    var exportButtons = () => {
-      const documentTitle = 'Genders';
-      var table = document.querySelector('#gender-table-editable');
+      const documentTitle = 'Races';
+      var table = document.querySelector('#race-table-editable');
       // Excluir la columna de check y acciones
       var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
 
@@ -156,10 +156,10 @@ var Genders = (function () {
          ],
       })
          .container()
-         .appendTo($('#gender-table-editable-buttons'));
+         .appendTo($('#race-table-editable-buttons'));
 
       // Hook dropdown menu click event to datatable export buttons
-      const exportButtons = document.querySelectorAll('#gender_export_menu [data-kt-export]');
+      const exportButtons = document.querySelectorAll('#race_export_menu [data-kt-export]');
       exportButtons.forEach((exportButton) => {
          exportButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -215,16 +215,16 @@ var Genders = (function () {
       var selectedData = oTable.rows({ selected: true }).data().toArray();
 
       if (selectedData.length > 0) {
-         $('#btn-eliminar-gender').removeClass('hide');
+         $('#btn-eliminar-race').removeClass('hide');
       } else {
-         $('#btn-eliminar-gender').addClass('hide');
+         $('#btn-eliminar-race').addClass('hide');
       }
    };
 
    //Reset forms
    var resetForms = function () {
       // reset form
-      MyUtil.resetForm('gender-form');
+      MyUtil.resetForm('race-form');
 
       event_change = false;
    };
@@ -234,7 +234,7 @@ var Genders = (function () {
       var result = false;
 
       //Validacion
-      var form = KTUtil.get('gender-form');
+      var form = KTUtil.get('race-form');
 
       var constraints = {
          code: {
@@ -261,29 +261,29 @@ var Genders = (function () {
 
    //Nuevo
    var initAccionNuevo = function () {
-      $(document).off('click', '#btn-nuevo-gender');
-      $(document).on('click', '#btn-nuevo-gender', function (e) {
+      $(document).off('click', '#btn-nuevo-race');
+      $(document).on('click', '#btn-nuevo-race', function (e) {
          btnClickNuevo();
       });
 
       function btnClickNuevo() {
          resetForms();
 
-         KTUtil.find(KTUtil.get('form-gender'), '.card-label').innerHTML = 'New Gender:';
+         KTUtil.find(KTUtil.get('form-race'), '.card-label').innerHTML = 'New Race:';
 
          mostrarForm();
       }
    };
 
    var mostrarForm = function () {
-      KTUtil.removeClass(KTUtil.get('form-gender'), 'hide');
-      KTUtil.addClass(KTUtil.get('lista-gender'), 'hide');
+      KTUtil.removeClass(KTUtil.get('form-race'), 'hide');
+      KTUtil.addClass(KTUtil.get('lista-race'), 'hide');
    };
 
    //Salvar
    var initAccionSalvar = function () {
-      $(document).off('click', '#btn-salvar-gender');
-      $(document).on('click', '#btn-salvar-gender', function (e) {
+      $(document).off('click', '#btn-salvar-race');
+      $(document).on('click', '#btn-salvar-race', function (e) {
          btnClickSalvarForm();
       });
 
@@ -295,8 +295,8 @@ var Genders = (function () {
          if (validateForm()) {
             var formData = new URLSearchParams();
 
-            var gender_id = $('#gender_id').val();
-            formData.set('gender_id', gender_id);
+            var race_id = $('#race_id').val();
+            formData.set('race_id', race_id);
 
             var code = $('#code').val();
             formData.set('code', code);
@@ -307,10 +307,10 @@ var Genders = (function () {
             var classification = $('#classification').val();
             formData.set('classification', classification);
 
-            BlockUtil.block('#form-gender');
+            BlockUtil.block('#form-race');
 
             axios
-               .post('gender/salvarGender', formData, { responseType: 'json' })
+               .post('race/salvarRace', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -329,15 +329,15 @@ var Genders = (function () {
                })
                .catch(MyUtil.catchErrorAxios)
                .then(function () {
-                  BlockUtil.unblock('#form-gender');
+                  BlockUtil.unblock('#form-race');
                });
          }
       }
    };
    //Cerrar form
    var initAccionCerrar = function () {
-      $(document).off('click', '.cerrar-form-gender');
-      $(document).on('click', '.cerrar-form-gender', function (e) {
+      $(document).off('click', '.cerrar-form-race');
+      $(document).on('click', '.cerrar-form-race', function (e) {
          cerrarForms();
       });
    };
@@ -367,38 +367,38 @@ var Genders = (function () {
    };
    var cerrarFormsConfirmated = function () {
       resetForms();
-      $('#form-gender').addClass('hide');
-      $('#lista-gender').removeClass('hide');
+      $('#form-race').addClass('hide');
+      $('#lista-race').removeClass('hide');
    };
    //Editar
    var initAccionEditar = function () {
-      $(document).off('click', '#gender-table-editable a.edit');
-      $(document).on('click', '#gender-table-editable a.edit', function (e) {
+      $(document).off('click', '#race-table-editable a.edit');
+      $(document).on('click', '#race-table-editable a.edit', function (e) {
          e.preventDefault();
          resetForms();
 
-         var gender_id = $(this).data('id');
-         $('#gender_id').val(gender_id);
+         var race_id = $(this).data('id');
+         $('#race_id').val(race_id);
 
          mostrarForm();
 
-         editRow(gender_id);
+         editRow(race_id);
       });
 
-      function editRow(gender_id) {
+      function editRow(race_id) {
          var formData = new URLSearchParams();
-         formData.set('gender_id', gender_id);
+         formData.set('race_id', race_id);
 
-         BlockUtil.block('#form-gender');
+         BlockUtil.block('#form-race');
 
          axios
-            .post('gender/cargarDatos', formData, { responseType: 'json' })
+            .post('race/cargarDatos', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
                      //Datos unit
-                     cargarDatos(response.gender);
+                     cargarDatos(response.race);
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -408,15 +408,15 @@ var Genders = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#form-gender');
+               BlockUtil.unblock('#form-race');
             });
 
-         function cargarDatos(gender) {
-            KTUtil.find(KTUtil.get('form-gender'), '.card-label').innerHTML = 'Update Gender: ' + gender.description;
+         function cargarDatos(race) {
+            KTUtil.find(KTUtil.get('form-race'), '.card-label').innerHTML = 'Update Race: ' + race.description;
 
-            $('#code').val(gender.code);
-            $('#description').val(gender.description);
-            $('#classification').val(gender.classification);
+            $('#code').val(race.code);
+            $('#description').val(race.description);
+            $('#classification').val(race.classification);
 
             event_change = false;
          }
@@ -424,8 +424,8 @@ var Genders = (function () {
    };
    //Eliminar
    var initAccionEliminar = function () {
-      $(document).off('click', '#gender-table-editable a.delete');
-      $(document).on('click', '#gender-table-editable a.delete', function (e) {
+      $(document).off('click', '#race-table-editable a.delete');
+      $(document).on('click', '#race-table-editable a.delete', function (e) {
          e.preventDefault();
 
          rowDelete = $(this).data('id');
@@ -433,8 +433,8 @@ var Genders = (function () {
          ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
       });
 
-      $(document).off('click', '#btn-eliminar-gender');
-      $(document).on('click', '#btn-eliminar-gender', function (e) {
+      $(document).off('click', '#btn-eliminar-race');
+      $(document).on('click', '#btn-eliminar-race', function (e) {
          btnClickEliminar();
       });
 
@@ -449,25 +449,25 @@ var Genders = (function () {
       });
 
       function btnClickEliminar() {
-         var ids = DatatableUtil.getTableSelectedRowKeys('#gender-table-editable').join(',');
+         var ids = DatatableUtil.getTableSelectedRowKeys('#race-table-editable').join(',');
          if (ids != '') {
             // mostar modal
             ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
          } else {
-            toastr.error('Select genders to delete', '');
+            toastr.error('Select races to delete', '');
          }
       }
 
       function btnClickModalEliminar() {
-         var gender_id = rowDelete;
+         var race_id = rowDelete;
 
          var formData = new URLSearchParams();
-         formData.set('gender_id', gender_id);
+         formData.set('race_id', race_id);
 
-         BlockUtil.block('#lista-gender');
+         BlockUtil.block('#lista-race');
 
          axios
-            .post('gender/eliminarGender', formData, { responseType: 'json' })
+            .post('race/eliminarRace', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -484,21 +484,21 @@ var Genders = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-gender');
+               BlockUtil.unblock('#lista-race');
             });
       }
 
       function btnClickModalEliminarSeleccion() {
-         var ids = DatatableUtil.getTableSelectedRowKeys('#gender-table-editable').join(',');
+         var ids = DatatableUtil.getTableSelectedRowKeys('#race-table-editable').join(',');
 
          var formData = new URLSearchParams();
 
          formData.set('ids', ids);
 
-         BlockUtil.block('#lista-gender');
+         BlockUtil.block('#lista-race');
 
          axios
-            .post('gender/eliminarGenders', formData, { responseType: 'json' })
+            .post('race/eliminarRaces', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -515,7 +515,7 @@ var Genders = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-gender');
+               BlockUtil.unblock('#lista-race');
             });
       }
    };

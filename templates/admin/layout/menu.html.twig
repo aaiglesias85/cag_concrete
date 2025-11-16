@@ -438,7 +438,7 @@
 
                <!-- menu libraries -->
                {% if menu.menuUnit or menu.menuEquation or menu.menuItem or menu.menuInspector or menu.menuHoliday or menu.menuEmployee or menu.menuMaterial or menu.menuOverhead or
-               menu.menuAdvertisement or menu.menuReminder or menu.menuGender %}
+               menu.menuAdvertisement or menu.menuReminder or menu.menuRace %}
 
                <!--begin:Menu item-->
                <div
@@ -447,7 +447,7 @@
                                 {{ activeRoute == 'unit' or activeRoute == 'equation' or activeRoute == 'item' or
                                 activeRoute == 'inspectors' or activeRoute == 'employee' or activeRoute == 'material' or
                                 activeRoute == 'overheadprice' or activeRoute == 'advertisement' or activeRoute == 'reminder' or
-                                activeRoute == 'holiday' or activeRoute == 'gender' ? 'here show' }}
+                                activeRoute == 'holiday' or activeRoute == 'race' ? 'here show' }}
                             "
                >
                   <!--begin:Menu link-->
@@ -525,13 +525,13 @@
                      {% endif %}
 
                      <!--begin:Menu item-->
-                     {% if menu.menuGender %}
+                     {% if menu.menuRace %}
                      <div class="menu-item">
-                        <a class="menu-link {{ activeRoute == 'gender' ? 'active' }}" href="{{ url('gender') }}">
+                        <a class="menu-link {{ activeRoute == 'race' ? 'active' }}" href="{{ url('race') }}">
                            <span class="menu-bullet">
                               <span class="bullet bullet-dot"></span>
                            </span>
-                           <span class="menu-title">Genders</span>
+                           <span class="menu-title">Ethnicity/Race</span>
                         </a>
                      </div>
                      {% endif %}

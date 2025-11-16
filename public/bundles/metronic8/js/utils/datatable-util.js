@@ -240,12 +240,12 @@ var DatatableUtil = (function () {
 
    // render column email
    var getRenderColumnEmail = function (data) {
-      return `<div class="w-200px"><a href="mailto:${data}" class="link">${data}</a></div>`;
+      return data ? `<div class="w-200px"><a href="mailto:${data}" class="link">${data}</a></div>` : '';
    };
 
    // render column phone
    var getRenderColumnPhone = function (data) {
-      return `<div class="w-200px"><a href="tel:${data}" class="link">${data}</a></div>`;
+      return data ? `<div class="w-200px"><a href="tel:${data}" class="link">${data}</a></div>` : '';
    };
 
    // render column estado

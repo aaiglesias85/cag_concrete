@@ -4,14 +4,14 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: 'App\Repository\GenderRepository')]
-#[ORM\Table(name: 'gender')]
-class Gender
+#[ORM\Entity(repositoryClass: 'App\Repository\RaceRepository')]
+#[ORM\Table(name: 'race')]
+class Race
 {
    #[ORM\Id]
    #[ORM\GeneratedValue]
-   #[ORM\Column(name: 'gender_id', type: 'integer')]
-   private ?int $genderId;
+   #[ORM\Column(name: 'race_id', type: 'integer')]
+   private ?int $raceId;
 
    #[ORM\Column(name: 'code', type: 'string', length: 50, nullable: false)]
    private ?string $code;
@@ -22,9 +22,9 @@ class Gender
    #[ORM\Column(name: 'classification', type: 'string', length: 255, nullable: false)]
    private ?string $classification;
 
-   public function getGenderId(): ?int
+   public function getRaceId(): ?int
    {
-      return $this->genderId;
+      return $this->raceId;
    }
 
    public function getCode(): ?string

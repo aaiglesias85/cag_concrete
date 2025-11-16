@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 15-11-2025 a las 16:55:24
+-- Tiempo de generación: 15-11-2025 a las 18:33:21
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -358,8 +358,8 @@ CREATE TABLE `employee` (
   `social_security_number` varchar(50) DEFAULT NULL,
   `apprentice_percentage` decimal(18,2) DEFAULT NULL,
   `work_code` varchar(50) DEFAULT NULL,
-  `ethnicity_race` varchar(255) DEFAULT NULL,
-  `gender_id` int(11) DEFAULT NULL,
+  `gender` varchar(255) DEFAULT NULL,
+  `race_id` int(11) DEFAULT NULL,
   `date_hired` date DEFAULT NULL,
   `date_terminated` date DEFAULT NULL,
   `reason_terminated` varchar(255) DEFAULT NULL,
@@ -370,19 +370,20 @@ CREATE TABLE `employee` (
   `trade_licenses_info` text,
   `notes` text,
   `is_osha_10_certified` tinyint(1) DEFAULT NULL,
-  `is_veteran` tinyint(1) DEFAULT NULL
+  `is_veteran` tinyint(1) DEFAULT NULL,
+  `status` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `ethnicity_race`, `gender_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`) VALUES
-(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 'Andres Iglesias', 70.00, 'Developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 'Geydis Marquez', 5.00, 'Jefe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(4, 'Luis Miguel', 2.00, 'RRHH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(5, 'Brian Marcel', 2.00, 'Ayudante', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
+(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(2, 'Andres Iglesias', 70.00, 'Developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(3, 'Geydis Marquez', 5.00, 'Jefe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(4, 'Luis Miguel', 2.00, 'RRHH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(5, 'Brian Marcel', 2.00, 'Ayudante', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -562,20 +563,7 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (31, 'holiday', 'Holidays'),
 (32, 'county', 'County'),
 (33, 'payment', 'Payments'),
-(34, 'gender', 'Genders');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `gender`
---
-
-CREATE TABLE `gender` (
-  `gender_id` int(11) NOT NULL,
-  `code` varchar(50) DEFAULT NULL,
-  `description` varchar(255) DEFAULT NULL,
-  `classification` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+(34, 'race', 'Races');
 
 -- --------------------------------------------------------
 
@@ -1520,6 +1508,32 @@ CREATE TABLE `proposal_type` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `race`
+--
+
+CREATE TABLE `race` (
+  `race_id` int(11) NOT NULL,
+  `code` varchar(50) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `classification` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `race`
+--
+
+INSERT INTO `race` (`race_id`, `code`, `description`, `classification`) VALUES
+(1, 'As-Ind', 'Asian-Indian', 'Asian or Pacific Islander'),
+(2, 'As-Pac', 'Asian-Pacific', 'Asian or Pacific Islander'),
+(3, 'Blk', 'Black', 'Black (not of Hispanic origin)'),
+(4, 'White', 'White', 'Not a minority'),
+(5, 'His', 'Hispanic', 'Hispanic'),
+(6, 'Na/Am', 'Native American', 'American Indian or Native American'),
+(7, 'Oth', 'Other', 'Not a minority');
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `reminder`
 --
 
@@ -1958,7 +1972,7 @@ ALTER TABLE `district`
 --
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`employee_id`),
-  ADD KEY `gender_id` (`gender_id`);
+  ADD KEY `race_id` (`race_id`);
 
 --
 -- Indices de la tabla `equation`
@@ -2027,12 +2041,6 @@ ALTER TABLE `estimate_quote`
 --
 ALTER TABLE `function`
   ADD PRIMARY KEY (`function_id`);
-
---
--- Indices de la tabla `gender`
---
-ALTER TABLE `gender`
-  ADD PRIMARY KEY (`gender_id`);
 
 --
 -- Indices de la tabla `holiday`
@@ -2193,6 +2201,12 @@ ALTER TABLE `project_type`
 --
 ALTER TABLE `proposal_type`
   ADD PRIMARY KEY (`type_id`);
+
+--
+-- Indices de la tabla `race`
+--
+ALTER TABLE `race`
+  ADD PRIMARY KEY (`race_id`);
 
 --
 -- Indices de la tabla `reminder`
@@ -2445,12 +2459,6 @@ ALTER TABLE `function`
   MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
--- AUTO_INCREMENT de la tabla `gender`
---
-ALTER TABLE `gender`
-  MODIFY `gender_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `holiday`
 --
 ALTER TABLE `holiday`
@@ -2587,6 +2595,12 @@ ALTER TABLE `project_type`
 --
 ALTER TABLE `proposal_type`
   MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `race`
+--
+ALTER TABLE `race`
+  MODIFY `race_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT de la tabla `reminder`
@@ -2756,7 +2770,7 @@ ALTER TABLE `data_tracking_subcontract`
 -- Filtros para la tabla `employee`
 --
 ALTER TABLE `employee`
-  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`gender_id`) REFERENCES `gender` (`gender_id`);
+  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`race_id`) REFERENCES `race` (`race_id`);
 
 --
 -- Filtros para la tabla `estimate`
