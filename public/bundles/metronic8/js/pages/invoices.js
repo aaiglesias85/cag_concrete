@@ -1383,10 +1383,11 @@ var Invoices = (function () {
                               paid_amount_total: item.paid_amount_total,
                               amount_from_previous: item.amount_from_previous,
                               amount_completed: item.amount_completed,
-                              amount_unpaid: item.amount_unpaid,
                               quantity_brought_forward: item.quantity_brought_forward,
                               quantity_final: item.quantity_final,
                               amount_final: item.amount_final,
+                              unpaid_qty: item.unpaid_qty,
+                              unpaid_amount: item.unpaid_amount,
                               principal: item.principal,
                               posicion: posicion,
                            });
@@ -1537,8 +1538,8 @@ var Invoices = (function () {
          { data: 'contract_amount' }, // 3 (sum)
          { data: 'quantity_completed' },
          { data: 'amount_completed' }, // 5 (sum)
-         { data: 'unpaid_from_previous' },
-         { data: 'amount_unpaid' }, // 7 (sum)
+         { data: 'unpaid_qty' },
+         { data: 'unpaid_amount' }, // 7 (sum)
          { data: 'quantity' },
          { data: 'amount' }, // 9 (sum)
          { data: 'quantity_brought_forward' },
@@ -1604,7 +1605,7 @@ var Invoices = (function () {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
-         // unpaid_from_previous
+         // unpaid_qty
          {
             targets: 7,
             className: 'text-center',
@@ -1612,7 +1613,7 @@ var Invoices = (function () {
                return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
             },
          },
-         // amount_unpaid
+         // unpaid_amount
          {
             targets: 8,
             className: 'text-center',

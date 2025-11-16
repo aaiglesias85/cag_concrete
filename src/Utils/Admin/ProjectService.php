@@ -959,12 +959,6 @@ class ProjectService extends Base
    {
       $items = [];
 
-      // listar invoices de project
-      /** @var InvoiceRepository $invoiceRepo */
-      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
-      $invoice_prev_id = !empty($invoices) ? $invoices[0]->getInvoiceId() : '';
-
       // listar items de project
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
@@ -985,24 +979,25 @@ class ProjectService extends Base
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int)$invoice_prev_id);
-         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, (int) $invoice_prev_id);
+         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id);
+         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id);
 
          $quantity_completed = $quantity + $quantity_from_previous;
 
          $amount = $quantity * $price;
 
          $total_amount = $quantity_completed * $price;
+         $amount_completed = $total_amount;
 
          $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
-         $amount_completed = $quantity_completed * $price;
-
-         $amount_unpaid = $unpaid_from_previous * $price;
 
          $quantity_brought_forward = 0;
          $quantity_final = $quantity + $quantity_brought_forward;
          $amount_final = $quantity_final * $price;
+
+         $unpaid_qty = $unpaid_from_previous + $quantity;
+         $unpaid_amount = $unpaid_qty * $price;
 
          $items[] = [
             "project_item_id" => $project_item_id,
@@ -1021,10 +1016,12 @@ class ProjectService extends Base
             "paid_amount_total" => $paid_amount_total,
             "amount_from_previous" => $amount_from_previous,
             "amount_completed" => $amount_completed,
-            "amount_unpaid" => $amount_unpaid,
+
             "quantity_brought_forward" => $quantity_brought_forward,
             "quantity_final" => $quantity_final,
             "amount_final" => $amount_final,
+            "unpaid_qty" => $unpaid_qty,
+            "unpaid_amount" => $unpaid_amount,
             "principal" => $value->getPrincipal()
          ];
       }

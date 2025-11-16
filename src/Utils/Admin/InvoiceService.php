@@ -61,7 +61,7 @@ class InvoiceService extends Base
       } else {
          $error = "Incorrect date format";
       }
-      
+
       // verificar number
       if ($number !== '') {
          $invoice = $this->getDoctrine()->getRepository(Invoice::class)
@@ -169,22 +169,7 @@ class InvoiceService extends Base
       $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
       /** @var Invoice $invoice_entity */
 
-      // listar invoices de project
       $project_id = $invoice_entity->getProject()->getProjectId();
-      /** @var InvoiceRepository $invoiceRepo */
-      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
-      $invoice_prev_id = '';
-      $currentInvoiceId = (int) $invoice_id;
-      foreach ($invoices as $index => $invoice) {
-         if ((int) $invoice->getInvoiceId() === $currentInvoiceId) {
-            $prevInvoice = $invoices[$index + 1] ?? null;
-            if ($prevInvoice !== null) {
-               $invoice_prev_id = $prevInvoice->getInvoiceId();
-            }
-            break;
-         }
-      }
 
       // fecha actual
       $fecha_actual = date('m/d/Y');
@@ -256,15 +241,16 @@ class InvoiceService extends Base
 
          $quantity_brought_forward = $value->getQuantityBroughtForward();
          $quantity = $value->getQuantity();
-         $quantity_completed = $quantity + $quantity_brought_forward;
+
 
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
 
-         // $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, $invoice_prev_id);
-         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id, (int) $invoice_prev_id);
-         $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id, (int)$invoice_prev_id);
+         $quantity_from_previous = $value->getQuantityFromPrevious();
 
+         $quantity_completed = $quantity + $quantity_from_previous;
+
+         $amount_from_previous = $quantity_from_previous * $price;
 
          $total_amount_from_previous += $amount_from_previous;
 
@@ -272,9 +258,9 @@ class InvoiceService extends Base
          $total_amount_final += $amount_completed;
 
          $paid_qty = $value->getPaidQty();
-         $unpaid_qty = $value->getUnpaidQty() ?? ($quantity - $paid_qty);
-         $amount_unpaid = $unpaid_qty * $price;
-         $total_unpaid += $amount_unpaid;
+         $unpaid_qty = $value->getUnpaidQty();
+         $unpaid_amount = $unpaid_qty * $price;
+         $total_unpaid += $unpaid_amount;
 
          // Escribir fila
          $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
@@ -292,7 +278,7 @@ class InvoiceService extends Base
             ->setCellValue('N' . $fila, $quantity_completed)
             ->setCellValue('O' . $fila, $amount_completed)
             ->setCellValue('Q' . $fila, $unpaid_qty)
-            ->setCellValue('R' . $fila, $amount_unpaid)
+            ->setCellValue('R' . $fila, $unpaid_amount)
          ;
 
          // Aplicar bordes a toda la fila (A–P)
@@ -552,7 +538,7 @@ class InvoiceService extends Base
          $quantity = $value->getQuantity();
 
          $quantity_brought_forward = $value->getQuantityBroughtForward();
-         $quantity_completed = $quantity + $quantity_brought_forward;
+         $quantity_completed = $quantity + $quantity_from_previous;
 
          $amount = $quantity * $price;
 
@@ -563,8 +549,10 @@ class InvoiceService extends Base
          $amount_completed = $quantity_completed * $price;
 
          $paid_qty = $value->getPaidQty();
-         $unpaid_qty = $value->getUnpaidQty() ?? ($quantity - $paid_qty);
-         $amount_unpaid = $unpaid_qty * $price;
+
+         $unpaid_qty = $value->getUnpaidQty();
+         $unpaid_amount = $unpaid_qty * $price;
+
 
          $quantity_final = $quantity + $quantity_brought_forward;
          $amount_final = $quantity_final * $price;
@@ -588,7 +576,7 @@ class InvoiceService extends Base
             "amount_completed" => $amount_completed,
             "paid_qty" => $paid_qty,
             "unpaid_qty" => $unpaid_qty,
-            "amount_unpaid" => $amount_unpaid,
+            "unpaid_amount" => $unpaid_amount,
             "quantity_brought_forward" => $quantity_brought_forward,
             "quantity_final" => $quantity_final,
             "amount_final" => $amount_final,
@@ -984,6 +972,7 @@ class InvoiceService extends Base
 
          $invoice_item_entity->setQuantityFromPrevious($value->quantity_from_previous);
          $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
+         $invoice_item_entity->setUnpaidQty($value->unpaid_qty);
          $invoice_item_entity->setQuantity($value->quantity);
          $invoice_item_entity->setPrice($value->price);
          $invoice_item_entity->setQuantityBroughtForward($value->quantity_brought_forward);
