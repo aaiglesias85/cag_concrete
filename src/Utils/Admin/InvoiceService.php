@@ -168,8 +168,9 @@ class InvoiceService extends Base
       // Datos del invoice
       $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
       /** @var Invoice $invoice_entity */
-
-      $project_id = $invoice_entity->getProject()->getProjectId();
+      $project_entity = $invoice_entity->getProject();
+      /** @var Project $project_entity */
+      $project_id = $project_entity->getProjectId();
 
       // fecha actual
       $fecha_actual = date('m/d/Y');
@@ -345,7 +346,9 @@ class InvoiceService extends Base
       // Nuevos campos bajo total
       $fila = $fila + 2;
       $fila_retainage_inicio = $fila;
-      $porciento_retainage = 0.1;
+
+      $porciento_retainage = $this->CalcularPorcientoRetainage($project_entity, $total_amount_final);
+      $porciento_retainage = $porciento_retainage / 100;
 
       // LESS RETAINAGE $
       $objWorksheet->setCellValue("N$fila", "LESS RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
@@ -390,6 +393,7 @@ class InvoiceService extends Base
       //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
       //    ->getStartColor()->setARGB('FFFCD5B4');
 
+
       // Guardar Excel
       $fichero = "invoice-$number.xlsx";
       $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
@@ -402,6 +406,33 @@ class InvoiceService extends Base
       $url = $ruta . 'uploads/invoice/' . $fichero;
 
       return $url;
+   }
+
+   /**
+    * Summary of CalcularPorcientoRetainage
+    * @param Project $project_entity
+    * @param float $total_amount_final
+    * @return float
+    */
+   private function CalcularPorcientoRetainage($project_entity, $total_amount_final)
+   {
+      $porciento = 0;
+
+      if ($project_entity->getRetainage()) {
+         $porciento = $project_entity->getRetainagePercentage();
+         $porciento_adjustment_percentage = $project_entity->getRetainageAdjustmentPercentage();
+         $porciento_adjustment_completion = $project_entity->getRetainageAdjustmentCompletion();
+         $contract_amount = $project_entity->getContractAmount();
+
+         // revisar el total_amount_final sobre pasa al contract_amount en el porciento_adjustment_completion configurado
+         // si eso pasa entonces el porciento = porciento_adjustment_percentage
+         if ($total_amount_final > $contract_amount * ($porciento_adjustment_completion / 100)) {
+            $porciento = $porciento_adjustment_percentage;
+         }
+      }
+
+
+      return $porciento;
    }
 
    private function CalcularCurrentRetainage($project_id, $porciento_retainage)

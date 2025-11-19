@@ -17,6 +17,10 @@ var ProjectsDetalle = (function () {
       $('#tp-unit-detalle').val('');
       $('#tp-unit-detalle').trigger('change');
 
+      $('#retainage-detalle').prop('checked', false);
+
+      $('.div-retainage-detalle').removeClass('hide').addClass('hide');
+
       // items
       items = [];
       actualizarTableListaItems();
@@ -144,6 +148,17 @@ var ProjectsDetalle = (function () {
          $('#tp-unit-detalle').val(project.concrete_time_period_unit);
          $('#tp-unit-detalle').trigger('change');
 
+         // retainage
+         $('#retainage-detalle').prop('checked', project.retainage);
+
+         NumberUtil.setFormattedValue('#retainage_percentage-detalle', project.retainage_percentage, { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_percentage-detalle', project.retainage_adjustment_percentage, { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_completion-detalle', project.retainage_adjustment_completion, { decimals: 2 });
+
+         if (project.retainage) {
+            $('.div-retainage-detalle').removeClass('hide');
+         }
+
          // items
          items = project.items;
          actualizarTableListaItems();
@@ -172,7 +187,7 @@ var ProjectsDetalle = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 9;
+   var totalTabs = 10;
    var initWizard = function () {
       $(document).off('click', '#form-project-detalle .wizard-tab');
       $(document).on('click', '#form-project-detalle .wizard-tab', function (e) {
@@ -198,28 +213,28 @@ var ProjectsDetalle = (function () {
 
          //bug visual de la tabla que muestra las cols corridas
          switch (activeTab) {
-            case 2:
+            case 3:
                actualizarTableListaItems();
                break;
-            case 3:
+            case 4:
                actualizarTableListaContacts();
                break;
-            case 4:
+            case 5:
                btnClickFiltrarNotes();
                break;
-            case 5:
+            case 6:
                actualizarTableListaInvoices();
                break;
-            case 6:
+            case 7:
                btnClickFiltrarDataTracking();
                break;
-            case 7:
+            case 8:
                actualizarTableListaAjustesPrecio();
                break;
-            case 8:
+            case 9:
                actualizarTableListaArchivos();
                break;
-            case 9:
+            case 10:
                actualizarTableListaItemsCompletion();
                break;
          }
@@ -256,33 +271,36 @@ var ProjectsDetalle = (function () {
                $('#tab-general-detalle').tab('show');
                break;
             case 2:
+               $('#tab-retainage-detalle').tab('show');
+               break;
+            case 3:
                $('#tab-items-detalle').tab('show');
                actualizarTableListaItems();
                break;
-            case 3:
+            case 4:
                $('#tab-contacts-detalle').tab('show');
                break;
-            case 4:
+            case 5:
                $('#tab-notes-detalle').tab('show');
                btnClickFiltrarNotes();
                break;
-            case 5:
+            case 6:
                $('#tab-invoices-detalle').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 6:
+            case 7:
                $('#tab-data-tracking-detalle').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 7:
+            case 8:
                $('#tab-ajustes-precio-detalle').tab('show');
                actualizarTableListaAjustesPrecio();
                break;
-            case 8:
+            case 9:
                $('#tab-archivo-detalle').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 9:
+            case 10:
                $('#tab-items-completion-detalle').tab('show');
                actualizarTableListaItemsCompletion();
                break;
@@ -291,7 +309,7 @@ var ProjectsDetalle = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 9;
+      totalTabs = 10;
       mostrarTab();
       $('#btn-wizard-anterior-detalle').removeClass('hide').addClass('hide');
       $('#btn-wizard-siguiente-detalle').removeClass('hide');

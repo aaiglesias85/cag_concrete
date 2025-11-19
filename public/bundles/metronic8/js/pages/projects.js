@@ -443,10 +443,14 @@ var Projects = (function () {
       $('#tp-unit').val('');
       $('#tp-unit').trigger('change');
 
+      $('#retainage').prop('checked', false);
+
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('project-form'));
 
       $('#div-contract-amount').removeClass('hide').addClass('hide');
+
+      $('.div-retainage').removeClass('hide').addClass('hide');
 
       // items
       items = [];
@@ -524,7 +528,7 @@ var Projects = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 3;
+   var totalTabs = 4;
    var initWizard = function () {
       $(document).off('click', '#form-project .wizard-tab');
       $(document).on('click', '#form-project .wizard-tab', function (e) {
@@ -560,28 +564,28 @@ var Projects = (function () {
 
          //bug visual de la tabla que muestra las cols corridas
          switch (activeTab) {
-            case 2:
+            case 3:
                actualizarTableListaItems();
                break;
-            case 3:
+            case 4:
                actualizarTableListaContacts();
                break;
-            case 4:
+            case 5:
                btnClickFiltrarNotes();
                break;
-            case 5:
+            case 6:
                actualizarTableListaInvoices();
                break;
-            case 6:
+            case 7:
                btnClickFiltrarDataTracking();
                break;
-            case 7:
+            case 8:
                actualizarTableListaAjustesPrecio();
                break;
-            case 8:
+            case 9:
                actualizarTableListaArchivos();
                break;
-            case 9:
+            case 10:
                actualizarTableListaItemsCompletion();
                break;
          }
@@ -625,33 +629,36 @@ var Projects = (function () {
                $('#tab-general').tab('show');
                break;
             case 2:
+               $('#tab-retainage').tab('show');
+               break;
+            case 3:
                $('#tab-items').tab('show');
                actualizarTableListaItems();
                break;
-            case 3:
+            case 4:
                $('#tab-contacts').tab('show');
                break;
-            case 4:
+            case 5:
                $('#tab-notes').tab('show');
                btnClickFiltrarNotes();
                break;
-            case 5:
+            case 6:
                $('#tab-invoices').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 6:
+            case 7:
                $('#tab-data-tracking').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 7:
+            case 8:
                $('#tab-ajustes-precio').tab('show');
                actualizarTableListaAjustesPrecio();
                break;
-            case 8:
+            case 9:
                $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 9:
+            case 10:
                $('#tab-items-completion').tab('show');
                actualizarTableListaItemsCompletion();
                break;
@@ -660,7 +667,7 @@ var Projects = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 3;
+      totalTabs = 4;
       mostrarTab();
       // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
@@ -846,6 +853,18 @@ var Projects = (function () {
 
       var concrete_time_period_unit = $('#tp-unit').val();
       formData.set('concrete_time_period_unit', concrete_time_period_unit);
+
+      var retainage = $('#retainage').prop('checked') ? 1 : 0;
+      formData.set('retainage', retainage);
+
+      var retainage_percentage = NumberUtil.getNumericValue('#retainage_percentage');
+      formData.set('retainage_percentage', retainage_percentage);
+
+      var retainage_adjustment_percentage = NumberUtil.getNumericValue('#retainage_adjustment_percentage');
+      formData.set('retainage_adjustment_percentage', retainage_adjustment_percentage);
+
+      var retainage_adjustment_completion = NumberUtil.getNumericValue('#retainage_adjustment_completion');
+      formData.set('retainage_adjustment_completion', retainage_adjustment_completion);
 
       formData.set('items', JSON.stringify(items));
       formData.set('contacts', JSON.stringify(contacts));
@@ -1069,6 +1088,17 @@ var Projects = (function () {
          $('#tp-unit').val(project.concrete_time_period_unit);
          $('#tp-unit').trigger('change');
 
+         // retainage
+         $('#retainage').prop('checked', project.retainage);
+
+         NumberUtil.setFormattedValue('#retainage_percentage', project.retainage_percentage, { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_percentage', project.retainage_adjustment_percentage, { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_completion', project.retainage_adjustment_completion, { decimals: 2 });
+
+         if (project.retainage) {
+            $('.div-retainage').removeClass('hide');
+         }
+
          // items
          items = project.items;
          actualizarTableListaItems();
@@ -1094,7 +1124,7 @@ var Projects = (function () {
          actualizarTableListaItemsCompletion();
 
          // habilitar tab
-         totalTabs = 9;
+         totalTabs = 10;
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
@@ -1236,6 +1266,21 @@ var Projects = (function () {
 
       // change file
       $('#fileinput').on('change', changeFile);
+
+      // retainage
+      $('#retainage').on('click', function (e) {
+         // reset
+         $('.div-retainage').removeClass('hide').addClass('hide');
+
+         // reset values
+         $('#retainage_percentage').val('');
+         $('#retainage_adjustment_percentage').val('');
+         $('#retainage_adjustment_completion').val('');
+
+         if ($(this).prop('checked')) {
+            $('.div-retainage').removeClass('hide');
+         }
+      });
    };
 
    var initFlatpickr = function () {

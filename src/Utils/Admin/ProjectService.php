@@ -1123,6 +1123,11 @@ class ProjectService extends Base
          $arreglo_resultado['concrete_time_period_every_n'] = $entity->getConcreteTimePeriodEveryN() ?? '';
          $arreglo_resultado['concrete_time_period_unit'] = $entity->getConcreteTimePeriodUnit() ?? '';
 
+         $arreglo_resultado['retainage'] = $entity->getRetainage();
+         $arreglo_resultado['retainage_percentage'] = $entity->getRetainagePercentage() ?? '';
+         $arreglo_resultado['retainage_adjustment_percentage'] = $entity->getRetainageAdjustmentPercentage() ?? '';
+         $arreglo_resultado['retainage_adjustment_completion'] = $entity->getRetainageAdjustmentCompletion() ?? '';
+
 
          // items
          $items = $this->ListarItemsDeProject($project_id);
@@ -1591,7 +1596,11 @@ class ProjectService extends Base
       $concrete_quote_price,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
-      $concrete_time_period_unit
+      $concrete_time_period_unit,
+      $retainage,
+      $retainage_percentage,
+      $retainage_adjustment_percentage,
+      $retainage_adjustment_completion
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -1898,6 +1907,39 @@ class ProjectService extends Base
          }
          $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
 
+         if ($retainage != $entity->getRetainage()) {
+            $notas[] = [
+               'notes' => 'Change retainage, old value: ' . $entity->getRetainage() ? 'Yes' : 'No',
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setRetainage($retainage);
+
+         if ($retainage_percentage != $entity->getRetainagePercentage()) {
+            $notas[] = [
+               'notes' => 'Change retainage percentage, old value: ' . $entity->getRetainagePercentage(),
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setRetainagePercentage($retainage_percentage);
+
+         if ($retainage_adjustment_percentage != $entity->getRetainageAdjustmentPercentage()) {
+            $notas[] = [
+               'notes' => 'Change retainage adjustment percentage, old value: ' . $entity->getRetainageAdjustmentPercentage(),
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setRetainageAdjustmentPercentage($retainage_adjustment_percentage);
+
+         if ($retainage_adjustment_completion != $entity->getRetainageAdjustmentCompletion()) {
+            $notas[] = [
+               'notes' => 'Change retainage adjustment completion, old value: ' . $entity->getRetainageAdjustmentCompletion(),
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
+
+
          $entity->setUpdatedAt(new \DateTime());
 
          // items
@@ -1963,7 +2005,11 @@ class ProjectService extends Base
       $concrete_quote_price,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
-      $concrete_time_period_unit
+      $concrete_time_period_unit,
+      $retainage,
+      $retainage_percentage,
+      $retainage_adjustment_percentage,
+      $retainage_adjustment_completion
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2043,6 +2089,11 @@ class ProjectService extends Base
       if ($concrete_quote_price !== '') {
          $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
       }
+
+      $entity->setRetainage($retainage);
+      $entity->setRetainagePercentage($retainage_percentage);
+      $entity->setRetainageAdjustmentPercentage($retainage_adjustment_percentage);
+      $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
 
       $entity->setCreatedAt(new \DateTime());
 

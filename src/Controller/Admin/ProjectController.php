@@ -168,6 +168,11 @@ class ProjectController extends AbstractController
       $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
       $concrete_time_period_unit = $request->get('concrete_time_period_unit');
 
+      $retainage = $request->get('retainage');
+      $retainage_percentage = $request->get('retainage_percentage');
+      $retainage_adjustment_percentage = $request->get('retainage_adjustment_percentage');
+      $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
+
 
       // items
       $items = $request->get('items');
@@ -218,7 +223,11 @@ class ProjectController extends AbstractController
                $concrete_quote_price,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,
-               $concrete_time_period_unit
+               $concrete_time_period_unit,
+               $retainage,
+               $retainage_percentage,
+               $retainage_adjustment_percentage,
+               $retainage_adjustment_completion
             );
          } else {
             $resultado = $this->projectService->ActualizarProject(
@@ -254,7 +263,11 @@ class ProjectController extends AbstractController
                $concrete_quote_price,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,
-               $concrete_time_period_unit
+               $concrete_time_period_unit,
+               $retainage,
+               $retainage_percentage,
+               $retainage_adjustment_percentage,
+               $retainage_adjustment_completion
             );
          }
 
