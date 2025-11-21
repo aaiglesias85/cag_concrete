@@ -1865,7 +1865,7 @@ var Invoices = (function () {
                items_lista[posicion].amount_completed = total_amount;
                items_lista[posicion].total_amount = total_amount;
                items_lista[posicion].quantity_final = items_lista[posicion].quantity_completed;
-               items_lista[posicion].amount_final = total_amount;
+               items_lista[posicion].amount_final = quantity_brought_forward * price;
             }
 
             //actualizar lista
@@ -1980,6 +1980,7 @@ var Invoices = (function () {
 
             items_lista[posicion].quantity_brought_forward = quantity;
             items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
+            items_lista[posicion].amount_final = items_lista[posicion].quantity_brought_forward * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }

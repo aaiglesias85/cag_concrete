@@ -238,6 +238,8 @@ var ModalInvoice = (function () {
 
             formData.set('paid', 0);
 
+            actualizarItems();
+
             formData.set('items', JSON.stringify(items));
 
             formData.set('exportar', exportar ? 1 : 0);
@@ -429,7 +431,7 @@ var ModalInvoice = (function () {
          formData.set('start_date', start_date);
          formData.set('end_date', end_date);
 
-         BlockUtil.block('#lista-items-invoice-modal');
+         //BlockUtil.block('#lista-items-invoice-modal');
 
          axios
             .post('project/listarItemsParaInvoice', formData, { responseType: 'json' })
@@ -468,6 +470,14 @@ var ModalInvoice = (function () {
                            posicion: posicion,
                         });
                      }
+
+                     // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
+                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+                     // setear la posicion
+                     items_lista.forEach((item, index) => {
+                        item.posicion = index;
+                     });
+
                      actualizarTableListaItems();
                   } else {
                      toastr.error(response.error, '');
@@ -478,7 +488,7 @@ var ModalInvoice = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-items-invoice-modal');
+               // BlockUtil.unblock('#lista-items-invoice-modal');
             });
       }
    };
@@ -557,6 +567,7 @@ var ModalInvoice = (function () {
    // items details
    var oTableItems;
    var items = [];
+   var items_lista = [];
    var nEditingRowItem = null;
    var rowDeleteItem = null;
    var initTableItems = function () {
@@ -709,7 +720,7 @@ var ModalInvoice = (function () {
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
-         data: items,
+         data: items_lista,
          displayLength: 10,
          order: order,
          columns: columns,
@@ -855,17 +866,37 @@ var ModalInvoice = (function () {
             var total = NumberUtil.getNumericValue('#item-total-invoice-modal');
 
             var posicion = nEditingRowItem;
-            if (items[posicion]) {
-               items[posicion].quantity = quantity;
-               items[posicion].price = price;
-               items[posicion].amount = total;
+            if (items_lista[posicion]) {
+               items_lista[posicion].quantity = quantity;
+               items_lista[posicion].price = price;
+               items_lista[posicion].amount = total;
 
-               var quantity_from_previous = items[posicion].quantity_from_previous ?? 0;
-               items[posicion].quantity_completed = quantity + quantity_from_previous;
+               var quantity_from_previous = items_lista[posicion].quantity_from_previous ?? 0;
+               items_lista[posicion].quantity_completed = quantity + quantity_from_previous;
 
-               var total_amount = items[posicion].quantity_completed * price;
-               items[posicion].total_amount = total_amount;
+               var total_amount = items_lista[posicion].quantity_completed * price;
+               items_lista[posicion].total_amount = total_amount;
             }
+
+            // actualizar el item en items usando project_item_id
+            if (items_lista[posicion]) {
+               var project_item_id = items_lista[posicion].project_item_id;
+               var itemIndex = items.findIndex((i) => Number(i.project_item_id) === Number(project_item_id));
+               if (itemIndex !== -1) {
+                  items[itemIndex].quantity = quantity;
+                  items[itemIndex].price = price;
+                  items[itemIndex].amount = total;
+                  items[itemIndex].quantity_completed = quantity + (items[itemIndex].quantity_from_previous ?? 0);
+                  items[itemIndex].total_amount = items[itemIndex].quantity_completed * price;
+               }
+            }
+
+            // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
+            items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+            // setear la posicion
+            items_lista.forEach((item, index) => {
+               item.posicion = index;
+            });
 
             //actualizar lista
             actualizarTableListaItems();
@@ -880,7 +911,7 @@ var ModalInvoice = (function () {
       $(document).off('click', '#items-invoice-modal-table-editable a.edit');
       $(document).on('click', '#items-invoice-modal-table-editable a.edit', function (e) {
          var posicion = $(this).data('posicion');
-         if (items[posicion]) {
+         if (items_lista[posicion]) {
             // reset
             resetFormItem();
 
@@ -889,8 +920,8 @@ var ModalInvoice = (function () {
             $('#item-quantity-invoice-modal').off('change', calcularTotalItem);
             $('#item-price-invoice-modal').off('change', calcularTotalItem);
 
-            $('#item-quantity-invoice-modal').val(items[posicion].quantity);
-            $('#item-price-invoice-modal').val(items[posicion].price);
+            $('#item-quantity-invoice-modal').val(items_lista[posicion].quantity);
+            $('#item-price-invoice-modal').val(items_lista[posicion].price);
 
             calcularTotalItem();
 
@@ -926,10 +957,10 @@ var ModalInvoice = (function () {
       });
 
       function eliminarItem(posicion) {
-         if (items[posicion]) {
-            if (items[posicion].invoice_item_id != '') {
+         if (items_lista[posicion]) {
+            if (items_lista[posicion].invoice_item_id != '') {
                var formData = new URLSearchParams();
-               formData.set('invoice_item_id', items[posicion].invoice_item_id);
+               formData.set('invoice_item_id', items_lista[posicion].invoice_item_id);
 
                BlockUtil.block('#lista-items-invoice-modal');
 
@@ -960,12 +991,30 @@ var ModalInvoice = (function () {
       }
 
       function deleteItem(posicion) {
-         //Eliminar
-         items.splice(posicion, 1);
-         //actualizar posiciones
-         for (var i = 0; i < items.length; i++) {
-            items[i].posicion = i;
+         // actualizar el item en items poniendo quantity a 0
+         if (items_lista[posicion]) {
+            var project_item_id = items_lista[posicion].project_item_id;
+            var itemIndex = items.findIndex((i) => Number(i.project_item_id) === Number(project_item_id));
+            if (itemIndex !== -1) {
+               items[itemIndex].quantity = 0;
+               items[itemIndex].amount = 0;
+            }
          }
+
+         //Eliminar de items_lista
+         items_lista.splice(posicion, 1);
+         //actualizar posiciones
+         for (var i = 0; i < items_lista.length; i++) {
+            items_lista[i].posicion = i;
+         }
+
+         // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
+         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+         // setear la posicion
+         items_lista.forEach((item, index) => {
+            item.posicion = index;
+         });
+
          //actualizar lista
          actualizarTableListaItems();
       }
@@ -974,10 +1023,11 @@ var ModalInvoice = (function () {
       $(document).on('change', '#items-invoice-modal-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
-         if (items[posicion]) {
+         if (items_lista[posicion]) {
             var quantity = Number($this.val() || 0);
-            items[posicion].quantity_brought_forward = quantity;
-            items[posicion].quantity_final = items[posicion].quantity + items[posicion].quantity_brought_forward;
+            items_lista[posicion].quantity_brought_forward = quantity;
+            items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
+            items_lista[posicion].amount_final = items_lista[posicion].quantity_brought_forward * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }
@@ -988,6 +1038,19 @@ var ModalInvoice = (function () {
       MyUtil.resetForm('item-invoice-modal-form');
 
       nEditingRowItem = null;
+   };
+
+   // devolver todos los items
+   var actualizarItems = function () {
+      // en items_sin_cant solo deben estar los que quantity y unpaid_from_previous 0
+      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_from_previous == 0);
+      // unir items_lista y items_sin_cant en items
+      items = items_lista.concat(items_sin_cant);
+
+      // actualiar posicion en items
+      items.forEach((item, index) => {
+         item.posicion = index;
+      });
    };
 
    return {

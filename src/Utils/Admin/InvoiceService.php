@@ -586,7 +586,7 @@ class InvoiceService extends Base
 
 
          $quantity_final = $quantity + $quantity_brought_forward;
-         $amount_final = $quantity_final * $price;
+         $amount_final = $quantity_brought_forward * $price;
 
          $items[] = [
             "invoice_item_id" => $value->getId(),
