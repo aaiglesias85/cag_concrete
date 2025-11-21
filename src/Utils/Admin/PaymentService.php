@@ -632,15 +632,22 @@ class PaymentService extends Base
    public function SalvarPayments($entity, $payments)
    {
       $invoice_id = $entity->getInvoiceId();
+      $project_id = $entity->getProject()->getProjectId();
+
+      // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
+      $updated_project_item_ids = [];
 
       //items
-      $paid = true;
+      $paid = false;
       foreach ($payments as $value) {
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
          $invoice_item_entity = $invoiceItemRepo->BuscarItem($invoice_id, $value->project_item_id);
          if ($invoice_item_entity != null) {
+            // Guardar project_item_id para actualizar invoices siguientes
+            $updated_project_item_ids[] = $value->project_item_id;
+
             // payment
             $invoice_item_entity->setPaidQty($value->paid_qty);
             $invoice_item_entity->setUnpaidQty($value->unpaid_qty);
@@ -648,15 +655,141 @@ class PaymentService extends Base
             $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
          }
 
-         // si falta alguno no pago el invoice
-         if ($value->paid_qty == 0 || $value->paid_amount == 0 || $value->paid_amount_total == 0) {
-            $paid = false;
+         // si se paga al menos 1 item, marcar el invoice como paid
+         if ($value->paid_qty > 0 || $value->paid_amount > 0 || $value->paid_amount_total > 0) {
+            $paid = true;
          }
       }
 
-      // paid invoice
-      if (!empty($payments) && !$entity->getPaid()) {
-         $entity->setPaid($paid);
+      // paid invoice - si se paga al menos un item, marcar como paid
+      if (!empty($payments) && $paid && !$entity->getPaid()) {
+         $entity->setPaid(true);
+      }
+
+      // Actualizar unpaid_from_previous en invoices siguientes
+      if (!empty($updated_project_item_ids)) {
+         $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($entity, $updated_project_item_ids);
+      }
+   }
+
+   /**
+    * ActualizarUnpaidFromPreviousEnInvoicesSiguientes
+    * Actualiza el unpaid_from_previous en los invoices siguientes del mismo proyecto
+    * @param Invoice $currentInvoice
+    * @param array $project_item_ids
+    * @return void
+    */
+   private function ActualizarUnpaidFromPreviousEnInvoicesSiguientes($currentInvoice, $project_item_ids)
+   {
+      $project_id = $currentInvoice->getProject()->getProjectId();
+      $current_invoice_id = $currentInvoice->getInvoiceId();
+      $current_invoice_start_date = $currentInvoice->getStartDate();
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+      // Obtener todos los invoices del proyecto ordenados por fecha de inicio
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+
+      // Filtrar solo los invoices posteriores al actual (por fecha de inicio o ID)
+      $followingInvoices = [];
+      foreach ($allInvoices as $invoice) {
+         /** @var Invoice $invoice */
+         if ($invoice->getInvoiceId() != $current_invoice_id) {
+            $invoiceDate = $invoice->getStartDate();
+            // Considerar invoice siguiente si la fecha es mayor o igual (y es diferente)
+            if (
+               $invoiceDate > $current_invoice_start_date ||
+               ($invoiceDate == $current_invoice_start_date && $invoice->getInvoiceId() > $current_invoice_id)
+            ) {
+               $followingInvoices[] = $invoice;
+            }
+         }
+      }
+
+      // Ordenar por fecha de inicio ascendente, luego por ID
+      usort($followingInvoices, function ($a, $b) {
+         /** @var Invoice $a */
+         /** @var Invoice $b */
+         $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+         if ($dateCompare != 0) {
+            return $dateCompare;
+         }
+         return $a->getInvoiceId() <=> $b->getInvoiceId();
+      });
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      // Para cada project_item_id actualizado
+      foreach ($project_item_ids as $project_item_id) {
+         // Para cada invoice siguiente, recalcular unpaid_from_previous
+         foreach ($followingInvoices as $followingInvoice) {
+            /** @var Invoice $followingInvoice */
+            $following_invoice_id = $followingInvoice->getInvoiceId();
+
+            // Buscar el item en este invoice siguiente
+            $following_item = $invoiceItemRepo->BuscarItem($following_invoice_id, $project_item_id);
+
+            if ($following_item != null) {
+               // Obtener todos los invoice items anteriores de este project_item
+               $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+
+               // Calcular unpaid_from_previous: suma del unpaid_qty de todos los invoices anteriores
+               $unpaid_from_previous = 0;
+
+               foreach ($allInvoiceItems as $previousItem) {
+                  /** @var InvoiceItem $previousItem */
+                  $previousInvoice = $previousItem->getInvoice();
+                  $previous_invoice_id = $previousInvoice->getInvoiceId();
+                  $previous_invoice_date = $previousInvoice->getStartDate();
+                  $following_invoice_date = $followingInvoice->getStartDate();
+
+                  // Solo considerar invoices anteriores a este invoice siguiente
+                  if (
+                     $previous_invoice_date < $following_invoice_date ||
+                     ($previous_invoice_date == $following_invoice_date && $previous_invoice_id < $following_invoice_id)
+                  ) {
+
+                     $quantity = $previousItem->getQuantity() ?? 0;
+                     $paid_qty = $previousItem->getPaidQty() ?? 0;
+                     $previous_unpaid_from_previous = $previousItem->getUnpaidFromPrevious() ?? 0;
+
+                     // Calcular unpaid_qty: (quantity + unpaid_from_previous) - paid_qty
+                     $unpaid_qty = ($quantity + $previous_unpaid_from_previous) - $paid_qty;
+
+                     // Sumar al unpaid_from_previous acumulado
+                     $unpaid_from_previous += max(0, $unpaid_qty);
+                  }
+               }
+
+               // Actualizar unpaid_from_previous en el item siguiente
+               $following_item->setUnpaidFromPrevious($unpaid_from_previous);
+
+               // Recalcular unpaid_qty del invoice siguiente después de actualizar unpaid_from_previous
+               $following_quantity = $following_item->getQuantity() ?? 0;
+               $following_paid_qty = $following_item->getPaidQty() ?? 0;
+               $following_price = $following_item->getPrice() ?? 0;
+
+               // Calcular la cantidad total pagable de este invoice siguiente
+               $following_total_payable = $following_quantity + $unpaid_from_previous;
+
+               // Si paid_qty es mayor que lo pagable, ajustar paid_qty
+               if ($following_paid_qty > $following_total_payable) {
+                  $following_paid_qty = $following_total_payable;
+                  $following_item->setPaidQty($following_paid_qty);
+                  $following_item->setPaidAmount($following_paid_qty * $following_price);
+               }
+
+               // Calcular unpaid_qty: (quantity + unpaid_from_previous) - paid_qty
+               $following_unpaid_qty = $following_total_payable - $following_paid_qty;
+
+               // Asegurar que unpaid_qty no sea negativo
+               $following_unpaid_qty = max(0, $following_unpaid_qty);
+
+               $following_item->setUnpaidQty($following_unpaid_qty);
+            }
+         }
       }
    }
 
@@ -703,5 +836,78 @@ class PaymentService extends Base
          'data' => $data,
          'total' => $resultado['total'], // ya viene con el filtro aplicado
       ];
+   }
+
+   /**
+    * PaidInvoice: Paga un invoice
+    * @param int $invoice_id Id
+    * @author Marcel
+    */
+   public function PaidInvoice($invoice_id)
+   {
+      $resultado = array();
+      $em = $this->getDoctrine()->getManager();
+
+      $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+         ->find($invoice_id);
+      /** @var Invoice $invoice */
+      if (!is_null($invoice)) {
+
+         $wasPaid = $invoice->getPaid();
+         $invoice->setPaid(!$wasPaid);
+
+         // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
+         $updated_project_item_ids = [];
+
+         // Si se marca el invoice como paid, poner todos los items pagados
+         if (!$wasPaid) {
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $items = $invoiceItemRepo->ListarItems($invoice_id);
+
+            foreach ($items as $item) {
+               /** @var InvoiceItem $item */
+               $quantity = $item->getQuantity();
+               $unpaidFromPrevious = $item->getUnpaidFromPrevious();
+               $quantityFromPrevious = $item->getQuantityFromPrevious();
+               $price = $item->getPrice();
+               $project_item_id = $item->getProjectItem()->getId();
+
+               // Guardar project_item_id para actualizar invoices siguientes
+               $updated_project_item_ids[] = $project_item_id;
+
+               // Calcular cantidad pagable de este invoice (quantity + unpaid_from_previous)
+               $quantityPayable = $quantity + $unpaidFromPrevious;
+
+               // Calcular cantidad total completada (incluyendo anteriores)
+               $quantityCompleted = $quantityPayable + $quantityFromPrevious;
+
+               // Calcular montos pagados
+               $paidQty = $quantityPayable;
+               $paidAmount = $quantityPayable * $price;
+               $paidAmountTotal = $quantityCompleted * $price;
+               $unpaidQty = 0;
+
+               // Actualizar item como pagado
+               $item->setPaidQty($paidQty);
+               $item->setPaidAmount($paidAmount);
+               $item->setPaidAmountTotal($paidAmountTotal);
+               $item->setUnpaidQty($unpaidQty);
+            }
+         }
+
+         // Actualizar unpaid_from_previous en invoices siguientes después de marcar como paid
+         if (!$wasPaid && !empty($updated_project_item_ids)) {
+            $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($invoice, $updated_project_item_ids);
+         }
+
+         $em->flush();
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+      return $resultado;
    }
 }

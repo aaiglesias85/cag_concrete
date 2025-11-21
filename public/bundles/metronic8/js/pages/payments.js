@@ -1004,7 +1004,9 @@ var Payments = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               var class_css = row.paid_qty > 0 ? 'btn-success' : 'btn-danger';
+               // Un item está pagado si unpaid_qty == 0 (no hay pendiente) o si paid_qty > 0
+               var isPaid = row.unpaid_qty == 0 || row.unpaid_qty == null || parseFloat(row.unpaid_qty) === 0 || parseFloat(row.paid_qty) > 0;
+               var class_css = isPaid ? 'btn-success' : 'btn-danger';
 
                return `
                     <a href="javascript:;" data-posicion="${row.posicion}" 
@@ -2191,7 +2193,7 @@ var Payments = (function () {
          BlockUtil.block('#lista-payment');
 
          axios
-            .post('invoice/paid', formData, { responseType: 'json' })
+            .post('payment/paid', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

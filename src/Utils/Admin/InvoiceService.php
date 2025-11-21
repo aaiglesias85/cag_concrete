@@ -112,32 +112,6 @@ class InvoiceService extends Base
       return $resultado;
    }
 
-   /**
-    * PaidInvoice: Paga un invoice
-    * @param int $invoice_id Id
-    * @author Marcel
-    */
-   public function PaidInvoice($invoice_id)
-   {
-      $resultado = array();
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
-      /** @var Invoice $invoice */
-      if (!is_null($invoice)) {
-
-         $invoice->setPaid(!$invoice->getPaid());
-
-         $em->flush();
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-      return $resultado;
-   }
 
    /**
     * ExportarExcel: Exporta a excel el invoice
