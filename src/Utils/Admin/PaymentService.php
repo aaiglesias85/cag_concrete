@@ -853,51 +853,55 @@ class PaymentService extends Base
       /** @var Invoice $invoice */
       if (!is_null($invoice)) {
 
-         $wasPaid = $invoice->getPaid();
-         $invoice->setPaid(!$wasPaid);
+         // Verificar si ya está pagado - si está pagado, no hacer nada
+         if ($invoice->getPaid()) {
+            $resultado['success'] = false;
+            $resultado['error'] = "This invoice is already paid";
+            return $resultado;
+         }
+
+         // Marcar como pagado (no toggle, solo pagar)
+         $invoice->setPaid(true);
 
          // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
          $updated_project_item_ids = [];
 
-         // Si se marca el invoice como paid, poner todos los items pagados
-         if (!$wasPaid) {
-            /** @var InvoiceItemRepository $invoiceItemRepo */
-            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $items = $invoiceItemRepo->ListarItems($invoice_id);
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $items = $invoiceItemRepo->ListarItems($invoice_id);
 
-            foreach ($items as $item) {
-               /** @var InvoiceItem $item */
-               $quantity = $item->getQuantity();
-               $unpaidFromPrevious = $item->getUnpaidFromPrevious();
-               $quantityFromPrevious = $item->getQuantityFromPrevious();
-               $price = $item->getPrice();
-               $project_item_id = $item->getProjectItem()->getId();
+         foreach ($items as $item) {
+            /** @var InvoiceItem $item */
+            $quantity = $item->getQuantity();
+            $unpaidFromPrevious = $item->getUnpaidFromPrevious();
+            $quantityFromPrevious = $item->getQuantityFromPrevious();
+            $price = $item->getPrice();
+            $project_item_id = $item->getProjectItem()->getId();
 
-               // Guardar project_item_id para actualizar invoices siguientes
-               $updated_project_item_ids[] = $project_item_id;
+            // Guardar project_item_id para actualizar invoices siguientes
+            $updated_project_item_ids[] = $project_item_id;
 
-               // Calcular cantidad pagable de este invoice (quantity + unpaid_from_previous)
-               $quantityPayable = $quantity + $unpaidFromPrevious;
+            // Calcular cantidad pagable de este invoice (quantity + unpaid_from_previous)
+            $quantityPayable = $quantity + $unpaidFromPrevious;
 
-               // Calcular cantidad total completada (incluyendo anteriores)
-               $quantityCompleted = $quantityPayable + $quantityFromPrevious;
+            // Calcular cantidad total completada (incluyendo anteriores)
+            $quantityCompleted = $quantityPayable + $quantityFromPrevious;
 
-               // Calcular montos pagados
-               $paidQty = $quantityPayable;
-               $paidAmount = $quantityPayable * $price;
-               $paidAmountTotal = $quantityCompleted * $price;
-               $unpaidQty = 0;
+            // Calcular montos pagados
+            $paidQty = $quantityPayable;
+            $paidAmount = $quantityPayable * $price;
+            $paidAmountTotal = $quantityCompleted * $price;
+            $unpaidQty = 0;
 
-               // Actualizar item como pagado
-               $item->setPaidQty($paidQty);
-               $item->setPaidAmount($paidAmount);
-               $item->setPaidAmountTotal($paidAmountTotal);
-               $item->setUnpaidQty($unpaidQty);
-            }
+            // Actualizar item como pagado
+            $item->setPaidQty($paidQty);
+            $item->setPaidAmount($paidAmount);
+            $item->setPaidAmountTotal($paidAmountTotal);
+            $item->setUnpaidQty($unpaidQty);
          }
 
          // Actualizar unpaid_from_previous en invoices siguientes después de marcar como paid
-         if (!$wasPaid && !empty($updated_project_item_ids)) {
+         if (!empty($updated_project_item_ids)) {
             $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($invoice, $updated_project_item_ids);
          }
 

@@ -198,10 +198,15 @@ var DatatableUtil = (function () {
    };
 
    var _getRenderAccionPaid = function (row, permiso) {
+      // Si ya está pagado, no mostrar el botón
+      if (row.paid == 1 || row.paid === true) {
+         return '';
+      }
+      
       var edit_icon = 'dollar';
-      var title = 'Paid/Unpaid';
+      var title = 'Mark as Paid';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="paid btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
+      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="paid btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
               <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
    };

@@ -2186,32 +2186,46 @@ var Payments = (function () {
       });
 
       function cambiarEstadoInvoice(invoice_id) {
-         var formData = new URLSearchParams();
+         // Mostrar confirmación antes de pagar (acción irreversible)
+         Swal.fire({
+            title: 'Are you sure?',
+            text: 'This action will mark the invoice as paid. This action is irreversible and cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, mark as paid',
+            cancelButtonText: 'Cancel',
+         }).then((result) => {
+            if (result.isConfirmed) {
+               var formData = new URLSearchParams();
 
-         formData.set('invoice_id', invoice_id);
+               formData.set('invoice_id', invoice_id);
 
-         BlockUtil.block('#lista-payment');
+               BlockUtil.block('#lista-payment');
 
-         axios
-            .post('payment/paid', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     toastr.success('The operation was successful', '');
+               axios
+                  .post('payment/paid', formData, { responseType: 'json' })
+                  .then(function (res) {
+                     if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                           Swal.fire('Paid!', 'The invoice has been marked as paid successfully.', 'success');
 
-                     btnClickFiltrar();
-                  } else {
-                     toastr.error(response.error, '');
-                  }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#lista-payment');
-            });
+                           btnClickFiltrar();
+                        } else {
+                           toastr.error(response.error, '');
+                        }
+                     } else {
+                        toastr.error('An internal error has occurred, please try again.', '');
+                     }
+                  })
+                  .catch(MyUtil.catchErrorAxios)
+                  .then(function () {
+                     BlockUtil.unblock('#lista-payment');
+                  });
+            }
+         });
       }
    };
 
