@@ -674,9 +674,13 @@ class PaymentService extends Base
 
    /**
     * ActualizarUnpaidFromPreviousEnInvoicesSiguientes
-    * Actualiza el unpaid_from_previous en los invoices siguientes del mismo proyecto
-    * @param Invoice $currentInvoice
-    * @param array $project_item_ids
+    * Actualiza el unpaid_from_previous y unpaid_qty en los invoices siguientes del mismo proyecto
+    * IMPORTANTE: NUNCA afecta al invoice actual, solo a los invoices posteriores
+    * 
+    * Ejemplo: Si se paga en Invoice 3, se actualizan Invoice 4 y 5, pero NUNCA el Invoice 3
+    * 
+    * @param Invoice $currentInvoice El invoice que se está pagando (este NO se afecta)
+    * @param array $project_item_ids Los project_item_ids que se están pagando
     * @return void
     */
    private function ActualizarUnpaidFromPreviousEnInvoicesSiguientes($currentInvoice, $project_item_ids)
@@ -692,9 +696,11 @@ class PaymentService extends Base
       $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
 
       // Filtrar solo los invoices posteriores al actual (por fecha de inicio o ID)
+      // IMPORTANTE: El invoice actual ($current_invoice_id) NUNCA se incluye aquí
       $followingInvoices = [];
       foreach ($allInvoices as $invoice) {
          /** @var Invoice $invoice */
+         // Excluir explícitamente el invoice actual - NUNCA se afecta a sí mismo
          if ($invoice->getInvoiceId() != $current_invoice_id) {
             $invoiceDate = $invoice->getStartDate();
             // Considerar invoice siguiente si la fecha es mayor o igual (y es diferente)
