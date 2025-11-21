@@ -1578,7 +1578,7 @@ var Invoices = (function () {
             targets: 3,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          // contract_amount
@@ -1681,7 +1681,7 @@ var Invoices = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order
-      const order = [[8, 'desc']];
+      const order = [[7, 'desc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
@@ -1705,23 +1705,23 @@ var Invoices = (function () {
             const $cells = $('td', row);
 
             // 🔵 quantity_completed y amount_completed (#daeef3)
-            $cells.eq(4).css('background-color', '#daeef3');
             $cells.eq(5).css('background-color', '#daeef3');
+            $cells.eq(6).css('background-color', '#daeef3');
 
             // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
-            $cells.eq(6).css('background-color', '#f79494');
             $cells.eq(7).css('background-color', '#f79494');
+            $cells.eq(8).css('background-color', '#f79494');
 
             // 🟠 quantity y amount (#fcd5b4)
-            $cells.eq(8).css('background-color', '#fcd5b4');
             $cells.eq(9).css('background-color', '#fcd5b4');
+            $cells.eq(10).css('background-color', '#fcd5b4');
 
             // 🟡 quantity_brought_forward (#f2d068)
-            $cells.eq(10).css('background-color', '#f2d068');
+            $cells.eq(11).css('background-color', '#f2d068');
 
             // 🟢 quantity_final y amount_final (#d8e4bc)
-            $cells.eq(11).css('background-color', '#d8e4bc');
             $cells.eq(12).css('background-color', '#d8e4bc');
+            $cells.eq(13).css('background-color', '#d8e4bc');
 
             // Si mantienes la lógica para "row-secondary"
             if (!data.principal) {
@@ -1749,13 +1749,13 @@ var Invoices = (function () {
             });
 
             // Columnas a sumar (índices)
-            const colsToSum = [3, 5, 7, 9, 12];
+            const colsToSum = [4, 6, 8, 10, 13];
             const totalsSelectors = {
-               3: '#total_contract_amount',
-               5: '#total_amount_completed',
-               7: '#total_amount_unpaid',
-               9: '#total_amount_period',
-               12: '#total_amount_final',
+               4: '#total_contract_amount',
+               6: '#total_amount_completed',
+               8: '#total_amount_unpaid',
+               10: '#total_amount_period',
+               13: '#total_amount_final',
             };
 
             // Recorre todas las columnas visibles

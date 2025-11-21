@@ -578,16 +578,17 @@ var ModalInvoice = (function () {
          { data: 'item' },
          { data: 'unit' },
          { data: 'price' },
-         { data: 'contract_amount' }, // 3 (sum)
+         { data: 'contract_qty' },
+         { data: 'contract_amount' }, // 4 (sum)
          { data: 'quantity_completed' },
-         { data: 'amount_completed' }, // 5 (sum)
+         { data: 'amount_completed' }, // 6 (sum)
          { data: 'unpaid_qty' },
-         { data: 'unpaid_amount' }, // 7 (sum)
+         { data: 'unpaid_amount' }, // 8 (sum)
          { data: 'quantity' },
-         { data: 'amount' }, // 9 (sum)
+         { data: 'amount' }, // 10 (sum)
          { data: 'quantity_brought_forward' },
          { data: 'quantity_final' },
-         { data: 'amount_final' }, // 12 (sum)
+         { data: 'amount_final' }, // 13 (sum)
          { data: null },
       ];
 
@@ -616,9 +617,17 @@ var ModalInvoice = (function () {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
-         // contract_amount
+         // contract_qty
          {
             targets: 3,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+            },
+         },
+         // contract_amount
+         {
+            targets: 4,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -626,7 +635,7 @@ var ModalInvoice = (function () {
          },
          // quantity_completed
          {
-            targets: 4,
+            targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -634,7 +643,7 @@ var ModalInvoice = (function () {
          },
          // amount_completed
          {
-            targets: 5,
+            targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -642,7 +651,7 @@ var ModalInvoice = (function () {
          },
          // unpaid_qty
          {
-            targets: 6,
+            targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
                return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
@@ -650,7 +659,7 @@ var ModalInvoice = (function () {
          },
          // unpaid_amount
          {
-            targets: 7,
+            targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -658,7 +667,7 @@ var ModalInvoice = (function () {
          },
          // quantity
          {
-            targets: 8,
+            targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -666,7 +675,7 @@ var ModalInvoice = (function () {
          },
          // amount
          {
-            targets: 9,
+            targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -674,7 +683,7 @@ var ModalInvoice = (function () {
          },
          // quantity_brought_forward
          {
-            targets: 10,
+            targets: 11,
             className: 'text-center',
             render: function (data, type, row) {
                var value = data ?? 0;
@@ -686,7 +695,7 @@ var ModalInvoice = (function () {
          },
          // quantity_final
          {
-            targets: 11,
+            targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 100);
@@ -694,7 +703,7 @@ var ModalInvoice = (function () {
          },
          // amount_final
          {
-            targets: 12,
+            targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
@@ -716,7 +725,7 @@ var ModalInvoice = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order
-      const order = [[6, 'desc']];
+      const order = [[7, 'desc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
@@ -731,23 +740,23 @@ var ModalInvoice = (function () {
             const $cells = $('td', row);
 
             // 🔵 quantity_completed y amount_completed (#daeef3)
-            $cells.eq(4).css('background-color', '#daeef3');
             $cells.eq(5).css('background-color', '#daeef3');
+            $cells.eq(6).css('background-color', '#daeef3');
 
             // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
-            $cells.eq(6).css('background-color', '#f79494');
             $cells.eq(7).css('background-color', '#f79494');
+            $cells.eq(8).css('background-color', '#f79494');
 
             // 🟠 quantity y amount (#fcd5b4)
-            $cells.eq(8).css('background-color', '#fcd5b4');
             $cells.eq(9).css('background-color', '#fcd5b4');
+            $cells.eq(10).css('background-color', '#fcd5b4');
 
             // 🟡 quantity_brought_forward (#f2d068)
-            $cells.eq(10).css('background-color', '#f2d068');
+            $cells.eq(11).css('background-color', '#f2d068');
 
             // 🟢 quantity_final y amount_final (#d8e4bc)
-            $cells.eq(11).css('background-color', '#d8e4bc');
             $cells.eq(12).css('background-color', '#d8e4bc');
+            $cells.eq(13).css('background-color', '#d8e4bc');
 
             // Si mantienes la lógica para "row-secondary"
             if (!data.principal) {
@@ -775,13 +784,13 @@ var ModalInvoice = (function () {
             });
 
             // Columnas a sumar (índices)
-            const colsToSum = [3, 5, 7, 9, 12];
+            const colsToSum = [4, 6, 8, 10, 13];
             const totalsSelectors = {
-               3: '#modal_total_contract_amount',
-               5: '#modal_total_amount_completed',
-               7: '#modal_total_amount_unpaid',
-               9: '#modal_total_amount_period',
-               12: '#modal_total_amount_final',
+               4: '#modal_total_contract_amount',
+               6: '#modal_total_amount_completed',
+               8: '#modal_total_amount_unpaid',
+               10: '#modal_total_amount_period',
+               13: '#modal_total_amount_final',
             };
 
             // Recorre todas las columnas visibles
