@@ -1,182 +1,148 @@
 <div class="modal fade" id="modal-item" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    New item
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">
+               New item
 
-                    <span style="margin-left: 10px">
-                            <span id="proyect-number-item" class="m-badge m-badge--info"></span>
-                            <span id="proyect-name-item"></span>
-                        </span>
-                </h5>
+               <span style="margin-left: 10px">
+                  <span id="proyect-number-item" class="m-badge m-badge--info"></span>
+                  <span id="proyect-name-item"></span>
+               </span>
+            </h5>
 
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                     aria-label="Close">
-                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                </div>
-
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
-            <div class="modal-body">
-                <form class="m-form" id="item-form" action="#"
-                      enctype="multipart/form-data" method="post">
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="item-form" action="#" enctype="multipart/form-data" method="post">
+               <input type="hidden" id="project_item_id" name="project_item_id" />
 
-                    <input type="hidden" id="project_item_id" name="project_item_id"/>
-
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-check form-check-custom form-check-solid me-10">
-                                    <input class="form-check-input h-30px w-30px item-type" type="radio" checked
-                                           id="item-type-existing" name="itemtype"/>
-                                    <label class="form-check-label" for="flexCheckbox30">
-                                        Existing item
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-check-custom form-check-solid me-10">
-                                    <input class="form-check-input h-30px w-30px item-type" type="radio"
-                                           id="item-type-new" name="itemtype"/>
-                                    <label class="form-check-label" for="flexCheckbox30">
-                                        New item
-                                    </label>
-                                </div>
-                            </div>
+               <div class="form-group">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="form-check form-check-custom form-check-solid me-10">
+                           <input class="form-check-input h-30px w-30px item-type" type="radio" checked id="item-type-existing" name="itemtype" />
+                           <label class="form-check-label" for="flexCheckbox30"> Existing item </label>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label required">
-                            Item
-                        </label>
-
-                        <input type="text" class="form-control form-control-solid form-control-validate hide"
-                               id="item-name" name="item" placeholder="Enter the custom name"/>
-
-                        <div class="row" id="div-item">
-                            <div class="col-md-12" id="select-item">
-                                <select class="form-control form-select select-modal-item-project select-validate form-select-solid event-change"
-                                        id="item">
-                                    <option value="">Select</option>
-                                    {% for item in items %}
-                                        <option value="{{ item.itemId }}"
-                                                data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}"
-                                                data-yield="{{ item.yieldCalculation }}"
-                                                data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}">
-                                            {{ item.description }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                     </div>
+                     <div class="col-md-6">
+                        <div class="form-check form-check-custom form-check-solid me-10">
+                           <input class="form-check-input h-30px w-30px item-type" type="radio" id="item-type-new" name="itemtype" />
+                           <label class="form-check-label" for="flexCheckbox30"> New item </label>
                         </div>
-                    </div>
+                     </div>
+                  </div>
+               </div>
 
-                    <div class="form-group">
-                        <label class="form-label">
-                            Yield Calculation
-                        </label>
-                        <div class="row">
-                            <div class="col-md-12" id="select-yield-calculation">
-                                <select class="form-control form-select select-modal-item-project select-validate form-select-solid"
-                                        id="yield-calculation" name="yield">
-                                    <option value="">Select</option>
-                                    {% for item in yields_calculation %}
-                                        <option value="{{ item.id }}">{{ item.name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+               <div class="form-group">
+                  <label class="form-label required"> Item </label>
+
+                  <input type="text" class="form-control form-control-solid form-control-validate hide" id="item-name" name="item" placeholder="Enter the custom name" />
+
+                  <div class="row" id="div-item">
+                     <div class="col-md-12" id="select-item">
+                        <select class="form-control form-select select-modal-item-project select-validate form-select-solid event-change" id="item">
+                           <option value="">Select</option>
+                           {% for item in items %}
+                           <option
+                              value="{{ item.itemId }}"
+                              data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}"
+                              data-yield="{{ item.yieldCalculation }}"
+                              data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
+                           >
+                              {{ item.description }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
+                           </option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="form-group">
+                  <label class="form-label"> Yield Calculation </label>
+                  <div class="row">
+                     <div class="col-md-12" id="select-yield-calculation">
+                        <select class="form-control form-select select-modal-item-project select-validate form-select-solid" id="yield-calculation" name="yield">
+                           <option value="">Select</option>
+                           {% for item in yields_calculation %}
+                           <option value="{{ item.id }}">{{ item.name }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="form-group hide" id="select-equation">
+                  <label class="form-label required"> Equation </label>
+                  <div class="input-group input-group-solid flex-nowrap">
+                     <div class="overflow-hidden flex-grow-1">
+                        <select id="equation" class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
+                           <option value="">Select</option>
+                           {% for item in equations %}
+                           <option value="{{ item.equationId }}" data-equation="{{ item.equation }}">{{ item.description }} {{ item.equation }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <span class="input-group-text" title="Add equation" id="btn-add-equation" style="cursor: pointer">
+                        <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     </span>
+                  </div>
+               </div>
+
+               <div class="form-group hide" id="select-unit">
+                  <label class="form-label required"> Unit </label>
+                  <div class="input-group input-group-solid flex-nowrap">
+                     <div class="overflow-hidden flex-grow-1">
+                        <select id="unit-item-project" class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
+                           <option value="">Select</option>
+                           {% for item in units %}
+                           <option value="{{ item.unitId }}">{{ item.description }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <span class="input-group-text" title="Add unit" id="btn-add-unit" style="cursor: pointer">
+                        <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     </span>
+                  </div>
+               </div>
+
+               <div class="form-group">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <label class="form-label required"> Quantity </label>
+                        <input type="text" class="form-control form-control-validate form-control-solid form-control-number" id="item-quantity" name="quantity" />
+                     </div>
+                     <div class="col-md-6">
+                        <label class="form-label required"> Price </label>
+                        <div class="input-group input-group-solid">
+                           <span class="input-group-text">$</span>
+                           <input type="text" class="form-control form-control-validate form-control-price event-change" id="item-price" name="price" />
                         </div>
-                    </div>
+                     </div>
+                  </div>
+               </div>
 
-                    <div class="form-group hide" id="select-equation">
-                        <label class="form-label required">
-                            Equation
-                        </label>
-                        <div class="input-group input-group-solid flex-nowrap">
-                            <div class="overflow-hidden flex-grow-1">
-                                <select id="equation"
-                                        class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
-                                    <option value="">Select</option>
-                                    {% for item in equations %}
-                                        <option value="{{ item.equationId }}" data-equation="{{ item.equation }}">
-                                            {{ item.description }} {{ item.equation }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <span class="input-group-text" title="Add equation" id="btn-add-equation"
-                                  style="cursor: pointer;">
-                                  <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span
-                                              class="path2"></span><span class="path3"></span><span
-                                              class="path4"></span></i>
-                                </span>
+               <div class="form-group">
+                  <label class="form-label"> Change Order </label>
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input type="checkbox" id="change-order" class="form-check-input" checked />
+                           <label class="form-check-label" for="change-order"> Yes / No </label>
                         </div>
-                    </div>
-
-                    <div class="form-group hide" id="select-unit">
-                        <label class="form-label required">
-                            Unit
-                        </label>
-                        <div class="input-group input-group-solid flex-nowrap">
-                            <div class="overflow-hidden flex-grow-1">
-                                <select id="unit-item-project"
-                                        class="form-control form-select select-modal-item-project select-validate form-select-solid rounded-end-0 border-end">
-                                    <option value="">Select</option>
-                                    {% for item in units %}
-                                        <option value="{{ item.unitId }}">{{ item.description }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <span class="input-group-text" title="Add unit" id="btn-add-unit"
-                                  style="cursor: pointer;">
-                                  <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span
-                                              class="path2"></span><span class="path3"></span><span
-                                              class="path4"></span></i>
-                                </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label required">
-                            Quantity
-                        </label>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <input type="text"
-                                       class="form-control form-control-validate form-control-solid form-control-number"
-                                       id="item-quantity"
-                                       name="quantity">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label required">
-                            Price
-                        </label>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="input-group input-group-solid">
-                                    <span class="input-group-text">$</span>
-                                    <input type="text"
-                                           class="form-control form-control-validate form-control-price event-change"
-                                           id="item-price" name="price"/>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="btn-salvar-item">Save</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-
-            </div>
-        </div>
-    </div>
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-item">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
 </div>
 
 <!-- components -->

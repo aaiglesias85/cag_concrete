@@ -667,9 +667,12 @@ class ProjectController extends AbstractController
       $price = $request->get('price');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
+      $change_order = $request->get('change_order');
+      // Convertir a booleano correctamente
+      $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
 
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";

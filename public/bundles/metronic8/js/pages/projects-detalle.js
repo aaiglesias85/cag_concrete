@@ -355,6 +355,16 @@ var ProjectsDetalle = (function () {
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               var badge = '';
+               if (row.change_order) {
+                  badge = '<span class="badge badge-warning ms-2" title="Change Order">Change Order</span>';
+               }
+               return `<span>${data}</span>${badge}`;
+            },
+         },
+         {
             targets: 3,
             render: function (data, type, row) {
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
@@ -400,11 +410,19 @@ var ProjectsDetalle = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary
+         // marcar secondary y change order
          createdRow: (row, data, index) => {
             // console.log(data);
             if (!data.principal) {
                $(row).addClass('row-secondary');
+            }
+            if (data.change_order) {
+               $(row).addClass('row-change-order');
+               const $cells = $('td', row);
+               $cells.css({
+                  'border-left': '4px solid #ffc107',
+                  background: '#fff8e1',
+               });
             }
          },
       });

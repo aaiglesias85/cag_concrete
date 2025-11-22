@@ -1473,6 +1473,16 @@ var Projects = (function () {
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               var badge = '';
+               if (row.change_order) {
+                  badge = '<span class="badge badge-warning ms-2" title="Change Order">Change Order</span>';
+               }
+               return `<span>${data}</span>${badge}`;
+            },
+         },
+         {
             targets: 3,
             render: function (data, type, row) {
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
@@ -1527,11 +1537,19 @@ var Projects = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary
+         // marcar secondary y change order
          createdRow: (row, data, index) => {
             // console.log(data);
             if (!data.principal) {
                $(row).addClass('row-secondary');
+            }
+            if (data.change_order) {
+               $(row).addClass('row-change-order');
+               const $cells = $('td', row);
+               $cells.css({
+                  'border-left': '4px solid #ffc107',
+                  background: '#fff8e1',
+               });
             }
          },
       });
@@ -1636,6 +1654,9 @@ var Projects = (function () {
 
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
+
+            var change_order = $('#change-order').prop('checked');
+            formData.set('change_order', change_order);
 
             BlockUtil.block('#modal-item .modal-content');
 
@@ -1747,6 +1768,8 @@ var Projects = (function () {
                $('#unit').val(items[posicion].unit_id);
                $('#unit').trigger('change');
             }
+
+            $('#change-order').prop('checked', items[posicion].change_order);
 
             // mostar modal
             ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });
@@ -1896,6 +1919,8 @@ var Projects = (function () {
       $('#unit').val('');
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
+
+      $('#change-order').prop('checked', false);
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));

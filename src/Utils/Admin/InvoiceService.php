@@ -204,8 +204,40 @@ class InvoiceService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $items = $invoiceItemRepo->ListarItems($invoice_id);
 
-      foreach ($items as $key => $value) {
+      // Separar items regulares y change order
+      $items_regulares = [];
+      $items_change_order = [];
 
+      foreach ($items as $value) {
+         $change_order = $value->getProjectItem()->getChangeOrder();
+         if ($change_order) {
+            $change_order_date = $value->getProjectItem()->getChangeOrderDate();
+            if ($change_order_date != null) {
+               // Agrupar por mes/año (formato: "Y-m" para ordenar correctamente)
+               $key_group = $change_order_date->format('Y-m');
+               if (!isset($items_change_order[$key_group])) {
+                  $items_change_order[$key_group] = [];
+               }
+               $items_change_order[$key_group][] = $value;
+            } else {
+               // Si no tiene fecha, agregarlo al grupo por defecto
+               if (!isset($items_change_order['no-date'])) {
+                  $items_change_order['no-date'] = [];
+               }
+               $items_change_order['no-date'][] = $value;
+            }
+         } else {
+            $items_regulares[] = $value;
+         }
+      }
+
+      // Ordenar los grupos de change order por fecha (más antiguo primero)
+      ksort($items_change_order);
+
+      $item_number = 1;
+
+      // Escribir primero los items regulares
+      foreach ($items_regulares as $value) {
          $project_item_id = $value->getProjectItem()->getId();
 
          $contract_qty = $value->getProjectItem()->getQuantity();
@@ -213,10 +245,8 @@ class InvoiceService extends Base
          $contract_amount = $contract_qty * $price;
          $total_contract_amount += $contract_amount;
 
-
          $quantity_brought_forward = $value->getQuantityBroughtForward();
          $quantity = $value->getQuantity();
-
 
          $amount = $quantity * $price;
          $total_amount_invoice_todate += $amount;
@@ -240,7 +270,7 @@ class InvoiceService extends Base
          // Escribir fila
          $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
          $objWorksheet
-            ->setCellValue('A' . $fila, ($key + 1))
+            ->setCellValue('A' . $fila, $item_number)
             ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
             ->setCellValue('E' . $fila, $unit)
             ->setCellValue('F' . $fila, $price)
@@ -261,7 +291,110 @@ class InvoiceService extends Base
          $objWorksheet->getStyle("N{$fila}:O{$fila}")->applyFromArray($styleArray);
          $objWorksheet->getStyle("Q{$fila}:R{$fila}")->applyFromArray($styleArray);
 
+         $item_number++;
          $fila++;
+      }
+
+      // Si hay items change order, agregar separación y escribirlos
+      if (!empty($items_change_order)) {
+         // Agregar fila en blanco para separar
+         $fila++;
+
+         // Escribir items change order agrupados por mes/año
+         foreach ($items_change_order as $group_key => $group_items) {
+            // Obtener mes y año para el encabezado
+            $month_name = '';
+            $year = '';
+            if ($group_key !== 'no-date' && !empty($group_items)) {
+               $first_item_date = $group_items[0]->getProjectItem()->getChangeOrderDate();
+               if ($first_item_date != null) {
+                  // Nombres de meses en inglés
+                  $months = [
+                     'January',
+                     'February',
+                     'March',
+                     'April',
+                     'May',
+                     'June',
+                     'July',
+                     'August',
+                     'September',
+                     'October',
+                     'November',
+                     'December'
+                  ];
+                  $month_name = $months[(int)$first_item_date->format('n') - 1];
+                  $year = $first_item_date->format('Y');
+               }
+            }
+
+            // Escribir encabezado del grupo (solo si tiene fecha válida)
+            if ($month_name && $year) {
+               $objWorksheet
+                  ->setCellValue('B' . $fila, "Change Order in {$month_name} {$year}");
+               $objWorksheet->getStyle("B{$fila}")->getFont()->setBold(true);
+               $fila++;
+            }
+
+            // Escribir items del grupo
+            foreach ($group_items as $value) {
+               $project_item_id = $value->getProjectItem()->getId();
+
+               $contract_qty = $value->getProjectItem()->getQuantity();
+               $price = $value->getPrice();
+               $contract_amount = $contract_qty * $price;
+               $total_contract_amount += $contract_amount;
+
+               $quantity_brought_forward = $value->getQuantityBroughtForward();
+               $quantity = $value->getQuantity();
+
+               $amount = $quantity * $price;
+               $total_amount_invoice_todate += $amount;
+
+               $quantity_from_previous = $value->getQuantityFromPrevious();
+
+               $quantity_completed = $quantity + $quantity_from_previous;
+
+               $amount_from_previous = $quantity_from_previous * $price;
+
+               $total_amount_from_previous += $amount_from_previous;
+
+               $amount_completed = $quantity_completed * $price;
+               $total_amount_final += $amount_completed;
+
+               $paid_qty = $value->getPaidQty();
+               $unpaid_qty = $value->getUnpaidQty();
+               $unpaid_amount = $unpaid_qty * $price;
+               $total_unpaid += $unpaid_amount;
+
+               // Escribir fila
+               $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
+               $objWorksheet
+                  ->setCellValue('A' . $fila, $item_number)
+                  ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
+                  ->setCellValue('E' . $fila, $unit)
+                  ->setCellValue('F' . $fila, $price)
+                  ->setCellValue('G' . $fila, $contract_qty)
+                  ->setCellValue('H' . $fila, $contract_amount)
+                  ->setCellValue('I' . $fila, $quantity)
+                  ->setCellValue('J' . $fila, $amount)
+                  ->setCellValue('K' . $fila, $quantity_from_previous)
+                  ->setCellValue('L' . $fila, $amount_from_previous)
+                  ->setCellValue('N' . $fila, $quantity_completed)
+                  ->setCellValue('O' . $fila, $amount_completed)
+                  ->setCellValue('Q' . $fila, $unpaid_qty)
+                  ->setCellValue('R' . $fila, $unpaid_amount)
+               ;
+
+               // Aplicar bordes a toda la fila (A–P)
+               $objWorksheet->getStyle("A{$fila}:L{$fila}")->applyFromArray($styleArray);
+               $objWorksheet->getStyle("N{$fila}:O{$fila}")->applyFromArray($styleArray);
+               $objWorksheet->getStyle("Q{$fila}:R{$fila}")->applyFromArray($styleArray);
+
+               $item_number++;
+               $fila++;
+            }
+         }
       }
 
       // Totales
@@ -586,6 +719,8 @@ class InvoiceService extends Base
             "quantity_final" => $quantity_final,
             "amount_final" => $amount_final,
             "principal" => $value->getProjectItem()->getPrincipal(),
+            "change_order" => $value->getProjectItem()->getChangeOrder(),
+            "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
             "posicion" => $key
          ];
       }

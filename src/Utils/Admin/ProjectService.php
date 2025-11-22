@@ -399,7 +399,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order)
    {
       $resultado = [];
 
@@ -452,6 +452,10 @@ class ProjectService extends Base
 
          $quantity_old = $project_item_entity->getQuantity();
          $project_item_entity->setQuantity($quantity);
+
+         $project_item_entity->setChangeOrder($change_order);
+         $change_order_date = $change_order ? new \DateTime() : null;
+         $project_item_entity->setChangeOrderDate($change_order_date);
 
          $equation_entity = null;
          if ($equation_id != '') {
@@ -1022,7 +1026,9 @@ class ProjectService extends Base
             "amount_final" => $amount_final,
             "unpaid_qty" => $unpaid_qty,
             "unpaid_amount" => $unpaid_amount,
-            "principal" => $value->getPrincipal()
+            "principal" => $value->getPrincipal(),
+            "change_order" => $value->getChangeOrder(),
+            "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
          ];
       }
 
@@ -1200,6 +1206,8 @@ class ProjectService extends Base
             "amount_completed" => $amount_completed,
             "porciento_completion" => $porciento_completion,
             "principal" => $value->getPrincipal(),
+            "change_order" => $value->getChangeOrder(),
+            "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
             "posicion" => $key
          ];
       }
@@ -1341,6 +1349,8 @@ class ProjectService extends Base
          "yield_calculation_name" => $yield_calculation_name,
          "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
          "principal" => $value->getPrincipal(),
+         "change_order" => $value->getChangeOrder(),
+         "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
          "posicion" => $key
       ];
    }
@@ -2270,6 +2280,12 @@ class ProjectService extends Base
          $project_item_entity->setPrice($value->price);
          $project_item_entity->setQuantity($value->quantity);
 
+         $project_item_entity->setChangeOrder($value->change_order);
+
+         $change_order_date = $value->change_order ? new \DateTime() : null;
+         $project_item_entity->setChangeOrderDate($change_order_date);
+
+
          $equation_entity = null;
          if ($value->equation_id != '') {
             $equation_entity = $this->getDoctrine()->getRepository(Equation::class)->find($value->equation_id);
@@ -2288,7 +2304,9 @@ class ProjectService extends Base
                'price' => $value->price,
                'unit' => $value->unit,
                'equation' => $value->equation_id,
-               'yield' => $value->yield_calculation
+               'yield' => $value->yield_calculation,
+               'change_order' => $value->change_order,
+               'change_order_date' => $value->change_order ? new \DateTime() : null,
             ];
          }
 
