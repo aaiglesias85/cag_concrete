@@ -1540,6 +1540,16 @@ var DataTracking = (function () {
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               var badge = '';
+               if (row.change_order) {
+                  badge = '<span class="badge badge-warning ms-2" title="Change Order">Change Order</span>';
+               }
+               return `<span>${data}</span>${badge}`;
+            },
+         },
+         {
             targets: 3,
             render: function (data, type, row) {
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
@@ -1588,6 +1598,17 @@ var DataTracking = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         // marcar change order
+         createdRow: (row, data, index) => {
+            if (data.change_order) {
+               $(row).addClass('row-change-order');
+               const $cells = $('td', row);
+               $cells.css({
+                  'border-left': '4px solid #ffc107',
+                  background: '#fff8e1',
+               });
+            }
+         },
       });
 
       handleSearchDatatableItems();
@@ -1702,6 +1723,8 @@ var DataTracking = (function () {
                   price: price,
                   total: total,
                   notes: notes,
+                  change_order: item.change_order || false,
+                  change_order_date: item.change_order_date || '',
                   posicion: items_data_tracking.length,
                });
             } else {
@@ -1718,6 +1741,8 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].price = price;
                   items_data_tracking[posicion].total = total;
                   items_data_tracking[posicion].notes = notes;
+                  items_data_tracking[posicion].change_order = item.change_order || false;
+                  items_data_tracking[posicion].change_order_date = item.change_order_date || '';
                }
             }
 
@@ -3308,6 +3333,8 @@ var DataTracking = (function () {
             price: price,
             total: total,
             notes: notes,
+            change_order: item.change_order || false,
+            change_order_date: item.change_order_date || '',
             posicion: items_data_tracking.length,
          });
 

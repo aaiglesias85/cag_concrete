@@ -637,6 +637,8 @@ class DataTrackingService extends Base
             "yield_calculation_name" => $yield_calculation_name,
             "yield_calculation_valor" => $yield_calculation_valor == 0 ? '' : $yield_calculation_valor,
             "equation_id" => $value->getProjectItem()->getEquation() != null ? $value->getProjectItem()->getEquation()->getEquationId() : '',
+            "change_order" => $value->getProjectItem()->getChangeOrder(),
+            "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
             "posicion" => $key
          ];
       }
