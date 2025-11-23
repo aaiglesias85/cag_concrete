@@ -1454,8 +1454,85 @@ var Projects = (function () {
    var items = [];
    var nEditingRowItem = null;
    var rowDeleteItem = null;
+
+   // Función para agrupar items por change_order_date
+   var agruparItemsPorChangeOrder = function (items) {
+      var items_regulares = [];
+      var items_change_order = {};
+
+      // Separar items regulares y change order
+      items.forEach(function (item) {
+         if (item.change_order && item.change_order_date) {
+            // Parsear fecha (formato: m/d/Y)
+            var dateParts = item.change_order_date.split('/');
+            if (dateParts.length === 3) {
+               var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
+               var monthYear = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+               var keyGroup = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
+
+               if (!items_change_order[keyGroup]) {
+                  items_change_order[keyGroup] = {
+                     monthYear: monthYear,
+                     items: [],
+                  };
+               }
+               items_change_order[keyGroup].items.push(item);
+            } else {
+               // Si no tiene fecha válida, agregarlo al grupo por defecto
+               if (!items_change_order['no-date']) {
+                  items_change_order['no-date'] = {
+                     monthYear: 'Unknown Date',
+                     items: [],
+                  };
+               }
+               items_change_order['no-date'].items.push(item);
+            }
+         } else {
+            items_regulares.push(item);
+         }
+      });
+
+      // Ordenar grupos por fecha (más antiguo primero)
+      var sortedGroups = Object.keys(items_change_order).sort();
+
+      // Construir array final: items regulares primero
+      var resultado = [];
+      var orderCounter = 0;
+
+      // Agregar items regulares con orden
+      items_regulares.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
+
+      // Si hay items change order, agregar separación y grupos
+      if (sortedGroups.length > 0) {
+         // Agregar grupos de change order
+         sortedGroups.forEach(function (keyGroup) {
+            var group = items_change_order[keyGroup];
+            // Agregar encabezado del grupo con orden especial (muy alto para que quede después de regulares)
+            resultado.push({
+               isGroupHeader: true,
+               groupTitle: 'Change Order in ' + group.monthYear,
+               monthYear: group.monthYear,
+               _groupOrder: orderCounter++,
+            });
+            // Agregar items del grupo
+            group.items.forEach(function (item) {
+               item._groupOrder = orderCounter++;
+               resultado.push(item);
+            });
+         });
+      }
+
+      return resultado;
+   };
+
    var initTableItems = function () {
       const table = '#items-table-editable';
+
+      // Procesar datos para agrupar por change_order_date
+      var datosAgrupados = agruparItemsPorChangeOrder(items);
 
       // columns
       const columns = [
@@ -1467,6 +1544,7 @@ var Projects = (function () {
          { data: 'total' },
          { data: 'quantity_old' },
          { data: 'price_old' },
+         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
          { data: null },
       ];
 
@@ -1475,40 +1553,59 @@ var Projects = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
-               var badge = '';
-               if (row.change_order) {
-                  badge = '<span class="badge badge-warning ms-2" title="Change Order">Change Order</span>';
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
                }
-               return `<span>${data}</span>${badge}`;
+               return `<span>${data || ''}</span>`;
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return data || '';
+            },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return data || '';
             },
          },
          {
             targets: 3,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          {
             targets: 4,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
             targets: 5,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
             targets: 6,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          {
             targets: 7,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1518,6 +1615,7 @@ var Projects = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -1526,30 +1624,34 @@ var Projects = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = [[0, 'asc']];
+      // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
+      const order = [[8, 'asc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
-         data: items,
-         displayLength: 10,
+         data: datosAgrupados,
+         displayLength: 25,
          order: order,
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary y change order
+         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
-            // console.log(data);
-            if (!data.principal) {
-               $(row).addClass('row-secondary');
-            }
-            if (data.change_order) {
-               $(row).addClass('row-change-order');
-               const $cells = $('td', row);
-               $cells.css({
-                  'border-left': '4px solid #ffc107',
-                  background: '#fff8e1',
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
                });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            } else {
+               if (!data.principal) {
+                  $(row).addClass('row-secondary');
+               }
             }
          },
       });
