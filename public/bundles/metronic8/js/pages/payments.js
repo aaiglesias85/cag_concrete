@@ -80,6 +80,7 @@ var Payments = (function () {
          initAccionEditar();
          initAccionExportar();
          initAccionPaid();
+         initAccionProject();
       });
 
       // select records
@@ -128,14 +129,20 @@ var Payments = (function () {
          {
             targets: 2,
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 150);
+               var html = `<a href="javascript:;" class="project-link text-primary text-hover-primary" data-project-id="${row.project_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(
+                  data,
+               )}</a>`;
+               return DatatableUtil.getRenderColumnDiv(html, 150);
             },
          },
          // project
          {
             targets: 3,
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 300);
+               var html = `<a href="javascript:;" class="project-link text-primary text-hover-primary" data-project-id="${row.project_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(
+                  data,
+               )}</a>`;
+               return DatatableUtil.getRenderColumnDiv(html, 300);
             },
          },
          // startDate
@@ -2227,6 +2234,20 @@ var Payments = (function () {
             }
          });
       }
+   };
+
+   // proyecto
+   var initAccionProject = function () {
+      $(document).off('click', '#payment-table-editable a.project-link');
+      $(document).on('click', '#payment-table-editable a.project-link', function (e) {
+         e.preventDefault();
+         var project_id = $(this).data('project-id');
+         if (project_id) {
+            localStorage.setItem('project_id_edit', project_id);
+            // open
+            window.location.href = url_project;
+         }
+      });
    };
 
    return {

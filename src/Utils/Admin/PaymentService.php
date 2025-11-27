@@ -829,6 +829,7 @@ class PaymentService extends Base
             "company" => $value->getProject()->getCompany()->getName(),
             "projectNumber" => $value->getProject()->getProjectNumber(),
             "project" => $value->getProject()->getDescription(),
+            "project_id" => $value->getProject()->getProjectId(),
             "startDate" => $value->getStartDate()->format('m/d/Y'),
             "endDate" => $value->getEndDate()->format('m/d/Y'),
             "notes" => $this->truncate($value->getNotes(), 50),
