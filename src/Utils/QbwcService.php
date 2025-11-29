@@ -15,15 +15,17 @@ class QbwcService extends Base
 {
    public function BuscarSesion($token)
    {
-      return $this->getDoctrine()->getRepository(UserQbwcToken::class)
-         ->BuscarToken($token);
+      /** @var \App\Repository\UserQbwcTokenRepository $userQbwcTokenRepo */
+      $userQbwcTokenRepo = $this->getDoctrine()->getRepository(UserQbwcToken::class);
+      return $userQbwcTokenRepo->BuscarToken($token);
    }
 
    public function EliminarToken($token)
    {
       $em = $this->getDoctrine()->getManager();
-      $session = $this->getDoctrine()->getRepository(UserQbwcToken::class)
-         ->BuscarToken($token);
+      /** @var \App\Repository\UserQbwcTokenRepository $userQbwcTokenRepo */
+      $userQbwcTokenRepo = $this->getDoctrine()->getRepository(UserQbwcToken::class);
+      $session = $userQbwcTokenRepo->BuscarToken($token);
       if ($session !== null) {
          $em->remove($session);
          $em->flush();
@@ -374,7 +376,9 @@ class QbwcService extends Base
          $qbInvoice->setBillAddress($company->getAddress());
       }
 
-      $items = $this->getDoctrine()->getRepository(InvoiceItem::class)->ListarItems($invoice->getInvoiceId());
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $items = $invoiceItemRepo->ListarItems($invoice->getInvoiceId());
 
       foreach ($items as $item) {
          $projectItem = $item->getProjectItem();
