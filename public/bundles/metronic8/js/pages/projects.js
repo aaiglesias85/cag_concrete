@@ -887,7 +887,7 @@ var Projects = (function () {
                   // add new items
                   if (response.items.length > 0) {
                      for (let item of response.items) {
-                        $('#item').append(new Option(item.description, item.item_id, false, false));
+                        $('#item').append(new Option(item.name, item.item_id, false, false));
                         $('#item option[value="' + item.item_id + '"]').attr('data-price', item.price);
                         $('#item option[value="' + item.item_id + '"]').attr('data-unit', item.unit);
                         $('#item option[value="' + item.item_id + '"]').attr('data-equation', item.equation);
@@ -1281,6 +1281,15 @@ var Projects = (function () {
             $('.div-retainage').removeClass('hide');
          }
       });
+
+      // change order
+      $('#change-order').on('click', function (e) {
+         // reset
+         FlatpickrUtil.clear('change-order-date');
+         if ($(this).prop('checked')) {
+            FlatpickrUtil.setDate('change-order-date', new Date());
+         }
+      });
    };
 
    var initFlatpickr = function () {
@@ -1356,6 +1365,13 @@ var Projects = (function () {
       });
       FlatpickrUtil.initDate('datetimepicker-hasta-items-completion', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+      });
+
+      // change order date
+      const modalElItem = document.getElementById('modal-item');
+      FlatpickrUtil.initDate('change-order-date', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+         container: modalElItem,
       });
    };
 
@@ -1760,6 +1776,9 @@ var Projects = (function () {
             var change_order = $('#change-order').prop('checked');
             formData.set('change_order', change_order);
 
+            var change_order_date = FlatpickrUtil.getString('change-order-date');
+            formData.set('change_order_date', change_order_date);
+
             BlockUtil.block('#modal-item .modal-content');
 
             axios
@@ -1872,6 +1891,11 @@ var Projects = (function () {
             }
 
             $('#change-order').prop('checked', items[posicion].change_order);
+
+            if (items[posicion].change_order_date !== '') {
+               const change_order_date = MyApp.convertirStringAFecha(items[posicion].change_order_date);
+               FlatpickrUtil.setDate('change-order-date', change_order_date);
+            }
 
             // mostar modal
             ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });

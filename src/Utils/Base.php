@@ -895,7 +895,7 @@ class Base
 
       $item_entity = new Item();
 
-      $item_entity->setDescription($value->item);
+      $item_entity->setName($value->item);
       $item_entity->setPrice($value->price);
       $item_entity->setStatus(1);
       $item_entity->setYieldCalculation($value->yield_calculation);
@@ -944,7 +944,7 @@ class Base
 
       return [
          "item_id" => $value->getItemId(),
-         "item" => $value->getDescription(),
+         "item" => $value->getName(),
          "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
          "yield_calculation" => $value->getYieldCalculation(),
          "yield_calculation_name" => $yield_calculation_name,
@@ -1424,7 +1424,7 @@ class Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "item" => $value->getProjectItem()->getItem()->getDescription(),
+            "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,

@@ -271,7 +271,7 @@ class InvoiceService extends Base
          $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
          $objWorksheet
             ->setCellValue('A' . $fila, $item_number)
-            ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
+            ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
             ->setCellValue('E' . $fila, $unit)
             ->setCellValue('F' . $fila, $price)
             ->setCellValue('G' . $fila, $contract_qty)
@@ -371,7 +371,7 @@ class InvoiceService extends Base
                $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
                $objWorksheet
                   ->setCellValue('A' . $fila, $item_number)
-                  ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getDescription())
+                  ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
                   ->setCellValue('E' . $fila, $unit)
                   ->setCellValue('F' . $fila, $price)
                   ->setCellValue('G' . $fila, $contract_qty)
@@ -585,7 +585,7 @@ class InvoiceService extends Base
       /**@var InvoiceItem $entity */
       if ($entity != null) {
 
-         $item_name = $entity->getProjectItem()->getItem()->getDescription();
+         $item_name = $entity->getProjectItem()->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -699,7 +699,7 @@ class InvoiceService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "item" => $value->getProjectItem()->getItem()->getDescription(),
+            "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,

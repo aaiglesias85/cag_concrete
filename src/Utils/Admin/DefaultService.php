@@ -178,7 +178,7 @@ class DefaultService extends Base
          if ($quantity > 0) {
             $arreglo_resultado[] = [
                'item_id' => $project_item_id,
-               'name' => $project_item->getItem()->getDescription(),
+               'name' => $project_item->getItem()->getName(),
                'unit' => $project_item->getItem()->getUnit() != null ? $project_item->getItem()->getUnit()->getDescription() : '',
                'quantity' => $quantity,
                'amount' => $amount

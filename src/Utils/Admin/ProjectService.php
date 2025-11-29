@@ -399,7 +399,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date)
    {
       $resultado = [];
 
@@ -416,9 +416,9 @@ class ProjectService extends Base
             return $resultado;
          }
       } else {
-         //Verificar description
+         //Verificar name
          $item = $this->getDoctrine()->getRepository(Item::class)
-            ->findOneBy(['description' => $item_name]);
+            ->findOneBy(['name' => $item_name]);
          if ($item_id == '' && $item != null) {
             $resultado['success'] = false;
             $resultado['error'] = "The item name is in use, please try entering another one.";
@@ -454,8 +454,11 @@ class ProjectService extends Base
          $project_item_entity->setQuantity($quantity);
 
          $project_item_entity->setChangeOrder($change_order);
-         $change_order_date = $change_order ? new \DateTime() : null;
-         $project_item_entity->setChangeOrderDate($change_order_date);
+
+         if ($change_order_date != '') {
+            $change_order_date = \DateTime::createFromFormat('m/d/Y', $change_order_date);
+            $project_item_entity->setChangeOrderDate($change_order_date);
+         }
 
          $equation_entity = null;
          if ($equation_id != '') {
@@ -479,7 +482,7 @@ class ProjectService extends Base
             $is_new_item = true;
          }
 
-         $item_description = $item_entity->getDescription();
+         $item_description = $item_entity->getName();
          $project_item_entity->setItem($item_entity);
 
          if ($is_new_project_item) {
@@ -568,7 +571,7 @@ class ProjectService extends Base
          // eliminar informacion relacionada
          $this->EliminarInformacionDeProjectItem($project_item_id);
 
-         $item_name = $entity->getItem()->getDescription();
+         $item_name = $entity->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -1006,7 +1009,7 @@ class ProjectService extends Base
          $items[] = [
             "project_item_id" => $project_item_id,
             "item_id" => $value->getItem()->getItemId(),
-            "item" => $value->getItem()->getDescription(),
+            "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,
@@ -1197,7 +1200,7 @@ class ProjectService extends Base
          $items[] = [
             'project_item_id' => $project_item_id,
             "item_id" => $value->getItem()->getItemId(),
-            "item" => $value->getItem()->getDescription(),
+            "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
             "price" => $price,
@@ -1338,7 +1341,7 @@ class ProjectService extends Base
       return [
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
-         "item" => $value->getItem()->getDescription(),
+         "item" => $value->getItem()->getName(),
          "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
          "quantity" => $quantity,
          "quantity_old" => $value->getQuantityOld() ?? '',
@@ -2282,9 +2285,10 @@ class ProjectService extends Base
 
          $project_item_entity->setChangeOrder($value->change_order);
 
-         $change_order_date = $value->change_order ? new \DateTime() : null;
-         $project_item_entity->setChangeOrderDate($change_order_date);
-
+         if ($value->change_order_date != '') {
+            $change_order_date = \DateTime::createFromFormat('m/d/Y', $value->change_order_date);
+            $project_item_entity->setChangeOrderDate($change_order_date);
+         }
 
          $equation_entity = null;
          if ($value->equation_id != '') {
@@ -2300,7 +2304,7 @@ class ProjectService extends Base
             $item_entity = $this->AgregarNewItem($value, $equation_entity);
             $items_news[] = [
                'item_id' => $item_entity->getItemId(),
-               'description' => $value->item,
+               'name' => $item_entity->getName(),
                'price' => $value->price,
                'unit' => $value->unit,
                'equation' => $value->equation_id,

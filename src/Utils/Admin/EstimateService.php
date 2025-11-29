@@ -188,7 +188,7 @@ class EstimateService extends Base
       /**@var EstimateQuote $entity */
       if ($entity != null) {
 
-         $item_name = $entity->getItem()->getDescription();
+         $item_name = $entity->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -439,7 +439,7 @@ class EstimateService extends Base
       return [
          'estimate_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
-         "item" => $value->getItem()->getDescription(),
+         "item" => $value->getItem()->getName(),
          "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
          "quantity" => $quantity,
          "price" => $price,

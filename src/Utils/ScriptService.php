@@ -220,7 +220,7 @@ class ScriptService extends Base
             $notas[] = [
                'notes' => sprintf(
                   'Change Price Item: %s, Percent: %s%%, Previous Price: %.2f, New Price: %.2f',
-                  $item->getItem()->getDescription(),
+                  $item->getItem()->getName(),
                   // mostrar 2 decimales como máximo, sin ceros sobrantes
                   rtrim(rtrim(number_format($percent, 2, '.', ''), '0'), '.'),
                   $precioOld,

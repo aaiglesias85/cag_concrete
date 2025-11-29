@@ -228,7 +228,7 @@ class DataTrackingService extends Base
          $project_name = $entity->getDataTracking()->getProject()->getProjectNumber() . " - " . $entity->getDataTracking()->getProject()->getName();
          $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
 
-         $item_name = $entity->getItem()->getDescription();
+         $item_name = $entity->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -266,7 +266,7 @@ class DataTrackingService extends Base
          $project_name = $entity->getProjectItem()->getProject()->getProjectNumber() . " - " . $entity->getProjectItem()->getProject()->getName();
          $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
 
-         $item_name = $entity->getProjectItem()->getItem()->getDescription();
+         $item_name = $entity->getProjectItem()->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -587,7 +587,7 @@ class DataTrackingService extends Base
          $subcontracts[] = [
             'subcontract_id' => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
-            "item" => $value->getProjectItem()->getItem()->getDescription(),
+            "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "subcontractor_id" => $value->getSubcontractor() ? $value->getSubcontractor()->getSubcontractorId() : '',
             "subcontractor" => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : '',
@@ -627,7 +627,7 @@ class DataTrackingService extends Base
          $items[] = [
             'data_tracking_item_id' => $value->getId(),
             "item_id" => $value->getProjectItem()->getId(),
-            "item" => $value->getProjectItem()->getItem()->getDescription(),
+            "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
             "price" => $price,

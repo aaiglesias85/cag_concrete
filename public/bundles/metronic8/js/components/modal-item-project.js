@@ -15,6 +15,13 @@ var ModalItemProject = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
+      // change order date
+      const modalElItem = document.getElementById('modal-item');
+      FlatpickrUtil.initDate('change-order-date', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+         container: modalElItem,
+      });
+
       $('.select-modal-item-project').select2({
          dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
       });
@@ -25,6 +32,15 @@ var ModalItemProject = (function () {
 
       $(document).off('click', '.item-type');
       $(document).on('click', '.item-type', changeItemType);
+
+      // change order
+      $('#change-order').on('click', function (e) {
+         // reset
+         FlatpickrUtil.clear('change-order-date');
+         if ($(this).prop('checked')) {
+            FlatpickrUtil.setDate('change-order-date', new Date());
+         }
+      });
    };
 
    var changeItemType = function () {
@@ -168,6 +184,9 @@ var ModalItemProject = (function () {
             var change_order = $('#change-order').prop('checked');
             formData.set('change_order', change_order);
 
+            var change_order_date = FlatpickrUtil.getString('change-order-date');
+            formData.set('change_order_date', change_order_date);
+
             BlockUtil.block('#modal-item .modal-content');
 
             axios
@@ -273,6 +292,8 @@ var ModalItemProject = (function () {
       $('#select-unit').removeClass('hide').addClass('hide');
 
       $('#change-order').prop('checked', false);
+
+      FlatpickrUtil.clear('change-order-date');
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));

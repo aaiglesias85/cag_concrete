@@ -36,7 +36,7 @@ class PaymentService extends Base
          $notes = $entity->getNotes();
          $project_entity = $entity->getInvoiceItem()->getInvoice()->getProject();
          $invoice_number = $entity->getInvoiceItem()->getInvoice()->getNumber();
-         $item_name = $entity->getInvoiceItem()->getProjectItem()->getItem()->getDescription();
+         $item_name = $entity->getInvoiceItem()->getProjectItem()->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
@@ -75,7 +75,7 @@ class PaymentService extends Base
 
          $project_entity = $invoice_item_entity->getInvoice()->getProject();
          $invoice_number = $invoice_item_entity->getInvoice()->getNumber();
-         $item_name = $invoice_item_entity->getProjectItem()->getItem()->getDescription();
+         $item_name = $invoice_item_entity->getProjectItem()->getItem()->getName();
 
          $entity = null;
          $is_new = false;
@@ -505,7 +505,7 @@ class PaymentService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "item" => $value->getProjectItem()->getItem()->getDescription(),
+            "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
             "price" => $price,

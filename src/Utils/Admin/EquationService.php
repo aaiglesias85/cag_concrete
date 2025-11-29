@@ -115,7 +115,7 @@ class EquationService extends Base
          $items[] = [
             'project_item_id' => $value->getId(),
             "item_id" => $value->getItem()->getItemId(),
-            "item" => $value->getItem()->getDescription(),
+            "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
             "price" => $price,

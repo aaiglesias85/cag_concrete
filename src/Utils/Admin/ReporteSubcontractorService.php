@@ -76,7 +76,7 @@ class ReporteSubcontractorService extends Base
 
          $subcontractor = $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "";
          $project = $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription();
-         $item = $value->getProjectItem()->getItem()->getDescription();
+         $item = $value->getProjectItem()->getItem()->getName();
          $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
 
          $quantity = $value->getQuantity();
@@ -175,7 +175,7 @@ class ReporteSubcontractorService extends Base
             'subcontractor' => $value->getSubcontractor() ? $value->getSubcontractor()->getName() : "",
             'project' => $value->getDataTracking()->getProject()->getProjectNumber() . " - " . $value->getDataTracking()->getProject()->getDescription(),
             'date' => $value->getDataTracking()->getDate()->format('m/d/Y'),
-            'item' => $value->getProjectItem()->getItem()->getDescription(),
+            'item' => $value->getProjectItem()->getItem()->getName(),
             'unit' => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
             "price" => $price,

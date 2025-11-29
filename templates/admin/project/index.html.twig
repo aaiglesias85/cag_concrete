@@ -2464,7 +2464,7 @@
                               data-yield="{{ item.yieldCalculation }}"
                               data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
                            >
-                              {{ item.description }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
+                              {{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                            </option>
                            {% endfor %}
                         </select>
@@ -2537,12 +2537,21 @@
                </div>
 
                <div class="form-group">
-                  <label class="form-label"> Change Order </label>
                   <div class="row">
                      <div class="col-md-6">
+                        <label class="form-label"> Change Order </label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input type="checkbox" id="change-order" class="form-check-input" checked />
                            <label class="form-check-label" for="change-order"> Yes / No </label>
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <label class="form-label"> Change Order Date </label>
+                        <div class="input-group input-group-solid">
+                           <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date" name="change_order_date" />
+                           <span class="input-group-text">
+                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                           </span>
                         </div>
                      </div>
                   </div>

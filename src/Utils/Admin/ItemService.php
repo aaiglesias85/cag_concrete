@@ -41,6 +41,7 @@ class ItemService extends Base
       /** @var Item $entity */
       if ($entity != null) {
 
+         $arreglo_resultado['name'] = $entity->getName();
          $arreglo_resultado['descripcion'] = $entity->getDescription();
          // $arreglo_resultado['price'] = $entity->getPrice();
          $arreglo_resultado['status'] = $entity->getStatus();
@@ -117,7 +118,7 @@ class ItemService extends Base
          // eliminar informacion relacionada
          $this->EliminarInformacionDeItem($item_id);
 
-         $item_descripcion = $entity->getDescription();
+         $item_name = $entity->getName() ?: $entity->getDescription();
 
 
          $em->remove($entity);
@@ -126,7 +127,7 @@ class ItemService extends Base
          //Salvar log
          $log_operacion = "Delete";
          $log_categoria = "Item";
-         $log_descripcion = "The item is deleted: $item_descripcion";
+         $log_descripcion = "The item is deleted: $item_name";
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
@@ -242,7 +243,7 @@ class ItemService extends Base
                   // eliminar informacion relacionada
                   $this->EliminarInformacionDeItem($item_id);
 
-                  $item_descripcion = $entity->getDescription();
+                  $item_name = $entity->getName() ?: $entity->getDescription();
 
                   $em->remove($entity);
                   $cant_eliminada++;
@@ -250,7 +251,7 @@ class ItemService extends Base
                   //Salvar log
                   $log_operacion = "Delete";
                   $log_categoria = "Item";
-                  $log_descripcion = "The item is deleted: $item_descripcion";
+                  $log_descripcion = "The item is deleted: $item_name";
                   $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
                }
             }
@@ -276,7 +277,7 @@ class ItemService extends Base
     * @param int $item_id Id
     * @author Marcel
     */
-   public function ActualizarItem($item_id, $unit_id, $description, $status, $yield_calculation, $equation_id)
+   public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -284,15 +285,16 @@ class ItemService extends Base
          ->find($item_id);
       /** @var Item $entity */
       if ($entity != null) {
-         //Verificar description
+         //Verificar name
          $item = $this->getDoctrine()->getRepository(Item::class)
-            ->findOneBy(['description' => $description]);
+            ->findOneBy(['name' => $name]);
          if ($item != null && $entity->getItemId() != $item->getItemId()) {
             $resultado['success'] = false;
             $resultado['error'] = "The item name is in use, please try entering another one.";
             return $resultado;
          }
 
+         $entity->setName($name);
          $entity->setDescription($description);
          // $entity->setPrice($price);
          $entity->setStatus($status);
@@ -328,7 +330,7 @@ class ItemService extends Base
          //Salvar log
          $log_operacion = "Update";
          $log_categoria = "Item";
-         $log_descripcion = "The item is modified: $description";
+         $log_descripcion = "The item is modified: $name";
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
@@ -357,16 +359,17 @@ class ItemService extends Base
 
    /**
     * SalvarItem: Guarda los datos de item en la BD
-    * @param string $description Nombre
+    * @param string $name Nombre
+    * @param string $description Descripción
     * @author Marcel
     */
-   public function SalvarItem($unit_id, $description, $status, $yield_calculation, $equation_id)
+   public function SalvarItem($unit_id, $name, $description, $status, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
-      //Verificar description
+      //Verificar name
       $item = $this->getDoctrine()->getRepository(Item::class)
-         ->findOneBy(['description' => $description]);
+         ->findOneBy(['name' => $name]);
       if ($item != null) {
          $resultado['success'] = false;
          $resultado['error'] = "The item name is in use, please try entering another one.";
@@ -375,6 +378,7 @@ class ItemService extends Base
 
       $entity = new Item();
 
+      $entity->setName($name);
       $entity->setDescription($description);
       // $entity->setPrice($price);
       $entity->setStatus($status);
@@ -404,7 +408,7 @@ class ItemService extends Base
       //Salvar log
       $log_operacion = "Add";
       $log_categoria = "Item";
-      $log_descripcion = "The item is added: $description";
+      $log_descripcion = "The item is added: $name";
       $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
       $resultado['success'] = true;
@@ -469,6 +473,7 @@ class ItemService extends Base
 
          $data[] = array(
             "id" => $item_id,
+            "name" => $value->getName(),
             "description" => $value->getDescription(),
             // "price" => number_format($value->getPrice(), 2, '.', ','),
             "status" => $value->getStatus() ? 1 : 0,
