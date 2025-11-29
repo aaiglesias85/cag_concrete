@@ -345,6 +345,17 @@ var DataTrackingDetalle = function () {
         // column defs
         let columnDefs = [
             {
+                targets: 0,
+                render: function (data, type, row) {
+                    // Si es change order, agregar icono de +
+                    var icono = '';
+                    if (row.change_order) {
+                        icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' + row.item_id + '" title="View change order history"></i>';
+                    }
+                    return `<span>${data || ''}${icono}</span>`;
+                },
+            },
+            {
                 targets: 3,
                 render: function (data, type, row) {
                     return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
@@ -387,6 +398,7 @@ var DataTrackingDetalle = function () {
         });
 
         handleSearchDatatableItems();
+        handleChangeOrderHistory();
 
         var total = calcularTotalItemsPrice();
         $('#monto_total_items-detalle').val(MyApp.formatearNumero(total, 2, '.', ','));
@@ -397,6 +409,53 @@ var DataTrackingDetalle = function () {
             oTableItems.search(e.target.value).draw();
         });
     }
+    var handleChangeOrderHistory = function () {
+        $(document).off('click', '.change-order-history-icon');
+        $(document).on('click', '.change-order-history-icon', function (e) {
+            e.preventDefault();
+            var project_item_id = $(this).data('project-item-id');
+            if (project_item_id) {
+                cargarHistorialChangeOrder(project_item_id);
+            }
+        });
+    };
+    var cargarHistorialChangeOrder = function (project_item_id) {
+        BlockUtil.block('#modal-change-order-history .modal-content');
+        axios
+            .get('project/listarHistorialItem', {
+                params: { project_item_id: project_item_id },
+                responseType: 'json',
+            })
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
+                        var historial = response.historial || [];
+                        var html = '';
+                        if (historial.length === 0) {
+                            html = '<div class="alert alert-info">No history available for this item.</div>';
+                        } else {
+                            html = '<ul class="list-unstyled">';
+                            historial.forEach(function (item) {
+                                html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                            });
+                            html += '</ul>';
+                        }
+                        $('#modal-change-order-history .modal-body').html(html);
+                        ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+                    } else {
+                        toastr.error(response.error || 'Error loading history', '');
+                    }
+                }
+            })
+            .catch(function (error) {
+                toastr.error('Error loading history', '');
+                console.error(error);
+            })
+            .finally(function () {
+                BlockUtil.unblock('#modal-change-order-history .modal-content');
+            });
+    };
 
     var actualizarTableListaItems = function () {
         if (oTableItems) {

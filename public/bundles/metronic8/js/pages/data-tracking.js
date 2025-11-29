@@ -1626,7 +1626,7 @@ var DataTracking = (function () {
                }
                // Si es change order, agregar icono de +
                var icono = '';
-               if (row.change_order && !row.isGroupHeader && row.item_id) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' + row.item_id + '" title="View change order history"></i>';
                }
                return `<span>${data || ''}${icono}</span>`;
