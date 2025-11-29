@@ -2834,6 +2834,17 @@ var Projects = (function () {
          }
       });
 
+      $(document).off('click', '#invoices-table-editable a.detalle');
+      $(document).on('click', '#invoices-table-editable a.detalle', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (invoices[posicion]) {
+            localStorage.setItem('invoice_id_edit', invoices[posicion].invoice_id);
+            // open
+            window.location.href = url_invoice;
+         }
+      });
+
       $(document).off('click', '#invoices-table-editable a.invoice-link');
       $(document).on('click', '#invoices-table-editable a.invoice-link', function (e) {
          e.preventDefault();
