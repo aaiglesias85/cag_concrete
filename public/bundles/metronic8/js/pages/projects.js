@@ -2762,6 +2762,15 @@ var Projects = (function () {
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               var html = `<a href="javascript:;" class="invoice-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(
+                  data,
+               )}</a>`;
+               return DatatableUtil.getRenderColumnDiv(html, 100);
+            },
+         },
+         {
             targets: 5,
             render: function (data, type, row) {
                var status = {
@@ -2820,6 +2829,17 @@ var Projects = (function () {
          if (invoices[posicion]) {
             localStorage.setItem('invoice_id_edit', invoices[posicion].invoice_id);
 
+            // open
+            window.location.href = url_invoice;
+         }
+      });
+
+      $(document).off('click', '#invoices-table-editable a.invoice-link');
+      $(document).on('click', '#invoices-table-editable a.invoice-link', function (e) {
+         e.preventDefault();
+         var invoice_id = $(this).data('invoice-id');
+         if (invoice_id) {
+            localStorage.setItem('invoice_id_edit', invoice_id);
             // open
             window.location.href = url_invoice;
          }
