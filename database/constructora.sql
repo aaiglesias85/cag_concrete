@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 28-11-2025 a las 11:39:19
+-- Tiempo de generación: 29-11-2025 a las 14:20:26
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1409,6 +1409,22 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `project_item_history`
+--
+
+CREATE TABLE `project_item_history` (
+  `id` int(11) NOT NULL,
+  `project_item_id` int(11) NOT NULL,
+  `action_type` varchar(50) NOT NULL,
+  `old_value` varchar(255) DEFAULT NULL,
+  `new_value` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `project_notes`
 --
 
@@ -2181,6 +2197,14 @@ ALTER TABLE `project_item`
   ADD KEY `equation_id` (`equation_id`);
 
 --
+-- Indices de la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `project_item_id` (`project_item_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indices de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
@@ -2577,6 +2601,12 @@ ALTER TABLE `project_item`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
+-- AUTO_INCREMENT de la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
@@ -2916,6 +2946,13 @@ ALTER TABLE `project_item`
   ADD CONSTRAINT `Refequation11` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`),
   ADD CONSTRAINT `Refitem80` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
   ADD CONSTRAINT `Refproject79` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  ADD CONSTRAINT `project_item_history_ibfk_1` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
+  ADD CONSTRAINT `project_item_history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Filtros para la tabla `project_notes`

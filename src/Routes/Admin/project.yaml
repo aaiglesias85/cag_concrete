@@ -57,6 +57,10 @@ listarItemsDeProjectAdmin:
    path: /project/listarItems
    defaults: { _controller: App\Controller\Admin\ProjectController::listarItems, _format: json }
 
+listarHistorialItemProjectAdmin:
+   path: /project/listarHistorialItem
+   defaults: { _controller: App\Controller\Admin\ProjectController::listarHistorialItem, _format: json }
+
 eliminarItemProjectAdmin:
    path: /project/eliminarItem
    defaults: { _controller: App\Controller\Admin\ProjectController::eliminarItem, _format: json }

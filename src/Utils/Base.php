@@ -26,6 +26,7 @@ use App\Entity\Project;
 use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
+use App\Entity\ProjectItemHistory;
 use App\Entity\ProjectNotes;
 use App\Entity\InvoiceNotes;
 use App\Entity\ProjectPriceAdjustment;
@@ -330,8 +331,9 @@ class Base
    {
       $permisos = array();
 
-      $usuario_permisos = $this->getDoctrine()->getRepository(PermisoUsuario::class)
-         ->ListarPermisosUsuario($usuario_id);
+      /** @var \App\Repository\PermisoUsuarioRepository $permisoUsuarioRepo */
+      $permisoUsuarioRepo = $this->getDoctrine()->getRepository(PermisoUsuario::class);
+      $usuario_permisos = $permisoUsuarioRepo->ListarPermisosUsuario($usuario_id);
       foreach ($usuario_permisos as $permiso) {
 
          $ver = $permiso->getVer();
@@ -573,8 +575,9 @@ class Base
    {
       $permisos = array();
 
-      $permiso = $this->getDoctrine()->getRepository(PermisoUsuario::class)
-         ->BuscarPermisoUsuario($usuario_id, $funcion_id);
+      /** @var \App\Repository\PermisoUsuarioRepository $permisoUsuarioRepo */
+      $permisoUsuarioRepo = $this->getDoctrine()->getRepository(PermisoUsuario::class);
+      $permiso = $permisoUsuarioRepo->BuscarPermisoUsuario($usuario_id, $funcion_id);
       if ($permiso != null) {
          $ver = $permiso->getVer();
          $agregar = $permiso->getAgregar();
@@ -648,45 +651,59 @@ class Base
       $em = $this->getDoctrine()->getManager();
 
       //Eliminar permisos
-      $permisos_usuario = $this->getDoctrine()->getRepository(PermisoUsuario::class)
-         ->ListarPermisosUsuario($usuario_id);
+      /** @var \App\Repository\PermisoUsuarioRepository $permisoUsuarioRepo */
+      $permisoUsuarioRepo = $this->getDoctrine()->getRepository(PermisoUsuario::class);
+      $permisos_usuario = $permisoUsuarioRepo->ListarPermisosUsuario($usuario_id);
       foreach ($permisos_usuario as $permiso_usuario) {
          $em->remove($permiso_usuario);
       }
 
       // logs
-      $logs = $this->getDoctrine()->getRepository(Log::class)
-         ->ListarLogsDeUsuario($usuario_id);
+      /** @var \App\Repository\LogRepository $logRepo */
+      $logRepo = $this->getDoctrine()->getRepository(Log::class);
+      $logs = $logRepo->ListarLogsDeUsuario($usuario_id);
       foreach ($logs as $log) {
          $em->remove($log);
       }
 
       // notificaciones
-      $notificaciones = $this->getDoctrine()->getRepository(Notification::class)
-         ->ListarNotificationsDeUsuario($usuario_id);
+      /** @var \App\Repository\NotificationRepository $notificationRepo */
+      $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
+      $notificaciones = $notificationRepo->ListarNotificationsDeUsuario($usuario_id);
       foreach ($notificaciones as $notificacion) {
          $em->remove($notificacion);
       }
 
       // reminders
-      $reminders = $this->getDoctrine()->getRepository(ReminderRecipient::class)
-         ->ListarRemindersDeUsuario($usuario_id);
+      /** @var \App\Repository\ReminderRecipientRepository $reminderRecipientRepo */
+      $reminderRecipientRepo = $this->getDoctrine()->getRepository(ReminderRecipient::class);
+      $reminders = $reminderRecipientRepo->ListarRemindersDeUsuario($usuario_id);
       foreach ($reminders as $reminder) {
          $em->remove($reminder);
       }
 
       // estimates
-      $estimates = $this->getDoctrine()->getRepository(EstimateEstimator::class)
-         ->ListarEstimatesDeUsuario($usuario_id);
+      /** @var \App\Repository\EstimateEstimatorRepository $estimateEstimatorRepo */
+      $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
+      $estimates = $estimateEstimatorRepo->ListarEstimatesDeUsuario($usuario_id);
       foreach ($estimates as $estimate) {
          $em->remove($estimate);
       }
 
       // qbwc tokens
-      $qbwc_tokens = $this->getDoctrine()->getRepository(UserQbwcToken::class)
-         ->ListarTokensDeUsuario($usuario_id);
+      /** @var \App\Repository\UserQbwcTokenRepository $userQbwcTokenRepo */
+      $userQbwcTokenRepo = $this->getDoctrine()->getRepository(UserQbwcToken::class);
+      $qbwc_tokens = $userQbwcTokenRepo->ListarTokensDeUsuario($usuario_id);
       foreach ($qbwc_tokens as $qbwc_token) {
          $em->remove($qbwc_token);
+      }
+
+      // project item history
+      /** @var \App\Repository\ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+      $historial = $historyRepo->ListarHistorialDeUsuario($usuario_id);
+      foreach ($historial as $historial_item) {
+         $em->remove($historial_item);
       }
    }
 
@@ -865,8 +882,9 @@ class Base
    {
       $nota = null;
 
-      $lista = $this->getDoctrine()->getRepository(ProjectNotes::class)
-         ->ListarNotesDeProject($project_id);
+      /** @var \App\Repository\ProjectNotesRepository $projectNotesRepo */
+      $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+      $lista = $projectNotesRepo->ListarNotesDeProject($project_id);
       foreach ($lista as $value) {
          $id = $value->getId();
 
@@ -924,7 +942,9 @@ class Base
    {
       $items = [];
 
-      $lista = $this->getDoctrine()->getRepository(Item::class)->ListarOrdenados();
+      /** @var \App\Repository\ItemRepository $itemRepo */
+      $itemRepo = $this->getDoctrine()->getRepository(Item::class);
+      $lista = $itemRepo->ListarOrdenados();
       foreach ($lista as $value) {
          $item = $this->DevolverItem($value);
          $items[] = $item;
@@ -981,44 +1001,50 @@ class Base
       $em = $this->getDoctrine()->getManager();
 
       // conc vendors
-      $conc_vendors = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-         ->ListarConcVendor($data_tracking_id);
+      /** @var \App\Repository\DataTrackingConcVendorRepository $dataTrackingConcVendorRepo */
+      $dataTrackingConcVendorRepo = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class);
+      $conc_vendors = $dataTrackingConcVendorRepo->ListarConcVendor($data_tracking_id);
       foreach ($conc_vendors as $conc_vendor) {
          $em->remove($conc_vendor);
       }
 
       // items
-      $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-         ->ListarItems($data_tracking_id);
+      /** @var \App\Repository\DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
       foreach ($items as $item) {
          $em->remove($item);
       }
 
       // labor
-      $data_tracking_labors = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
-         ->ListarLabor($data_tracking_id);
+      /** @var \App\Repository\DataTrackingLaborRepository $dataTrackingLaborRepo */
+      $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+      $data_tracking_labors = $dataTrackingLaborRepo->ListarLabor($data_tracking_id);
       foreach ($data_tracking_labors as $data_tracking_labor) {
          $em->remove($data_tracking_labor);
       }
 
       // materials
-      $data_tracking_materials = $this->getDoctrine()->getRepository(DataTrackingMaterial::class)
-         ->ListarMaterials($data_tracking_id);
+      /** @var \App\Repository\DataTrackingMaterialRepository $dataTrackingMaterialRepo */
+      $dataTrackingMaterialRepo = $this->getDoctrine()->getRepository(DataTrackingMaterial::class);
+      $data_tracking_materials = $dataTrackingMaterialRepo->ListarMaterials($data_tracking_id);
       foreach ($data_tracking_materials as $data_tracking_material) {
          $em->remove($data_tracking_material);
       }
 
       // data tracking subcontract
-      $subcontract_items = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class)
-         ->ListarSubcontracts($data_tracking_id);
+      /** @var \App\Repository\DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
+      $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
+      $subcontract_items = $dataTrackingSubcontractRepo->ListarSubcontracts($data_tracking_id);
       foreach ($subcontract_items as $subcontract_item) {
          $em->remove($subcontract_item);
       }
 
       // attachments
       $dir = 'uploads/datatracking/';
-      $attachments = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
-         ->ListarAttachmentsDeDataTracking($data_tracking_id);
+      /** @var \App\Repository\DataTrackingAttachmentRepository $dataTrackingAttachmentRepo */
+      $dataTrackingAttachmentRepo = $this->getDoctrine()->getRepository(DataTrackingAttachment::class);
+      $attachments = $dataTrackingAttachmentRepo->ListarAttachmentsDeDataTracking($data_tracking_id);
       foreach ($attachments as $attachment) {
 
          //eliminar archivo
@@ -1040,8 +1066,9 @@ class Base
    {
       $contacts = [];
 
-      $project_contacts = $this->getDoctrine()->getRepository(ProjectContact::class)
-         ->ListarContacts($project_id);
+      /** @var \App\Repository\ProjectContactRepository $projectContactRepo */
+      $projectContactRepo = $this->getDoctrine()->getRepository(ProjectContact::class);
+      $project_contacts = $projectContactRepo->ListarContacts($project_id);
       foreach ($project_contacts as $key => $contact) {
          $contacts[] = [
             'contact_id' => $contact->getContactId(),
@@ -1066,8 +1093,9 @@ class Base
    {
       $contacts = [];
 
-      $vendor_contacts = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
-         ->ListarContacts($vendor_id);
+      /** @var \App\Repository\ConcreteVendorContactRepository $concreteVendorContactRepo */
+      $concreteVendorContactRepo = $this->getDoctrine()->getRepository(ConcreteVendorContact::class);
+      $vendor_contacts = $concreteVendorContactRepo->ListarContacts($vendor_id);
       foreach ($vendor_contacts as $key => $contact) {
          $contacts[] = [
             'contact_id' => $contact->getContactId(),
@@ -1168,8 +1196,9 @@ class Base
    {
       $contacts = [];
 
-      $company_contacts = $this->getDoctrine()->getRepository(CompanyContact::class)
-         ->ListarContacts($company_id);
+      /** @var \App\Repository\CompanyContactRepository $companyContactRepo */
+      $companyContactRepo = $this->getDoctrine()->getRepository(CompanyContact::class);
+      $company_contacts = $companyContactRepo->ListarContacts($company_id);
       foreach ($company_contacts as $key => $contact) {
          $contacts[] = [
             'contact_id' => $contact->getContactId(),
@@ -1194,8 +1223,9 @@ class Base
    {
       $total_conc_yiel = 0;
 
-      $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-         ->ListarItems($data_tracking_id);
+      /** @var \App\Repository\DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $data_tracking_items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
       foreach ($data_tracking_items as $data_tracking_item) {
          // aplicar el yield
          $quantity_yield = $this->CalcularTotalConcreteYielItem($data_tracking_item);
@@ -1238,11 +1268,13 @@ class Base
 
       $data_tracking_id = $value->getId();
 
-      $total_conc_used = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class)
-         ->TotalConcUsed($data_tracking_id);
+      /** @var \App\Repository\DataTrackingConcVendorRepository $dataTrackingConcVendorRepo */
+      $dataTrackingConcVendorRepo = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class);
+      $total_conc_used = $dataTrackingConcVendorRepo->TotalConcUsed($data_tracking_id);
 
-      $data_tracking_items = $this->getDoctrine()->getRepository(DataTrackingItem::class)
-         ->ListarItems($data_tracking_id);
+      /** @var \App\Repository\DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $data_tracking_items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
       foreach ($data_tracking_items as $data_tracking_item) {
 
          // aplicar el yield
@@ -1267,7 +1299,9 @@ class Base
    {
       $holidays = [];
 
-      $lista = $this->getDoctrine()->getRepository(Holiday::class)->ListarOrdenados();;
+      /** @var \App\Repository\HolidayRepository $holidayRepo */
+      $holidayRepo = $this->getDoctrine()->getRepository(Holiday::class);
+      $lista = $holidayRepo->ListarOrdenados();
       foreach ($lista as $value) {
          $holidays[] = [
             'holiday_id' => $value->getHolidayId(),
@@ -1288,8 +1322,9 @@ class Base
    {
       $arreglo_resultado = [];
 
-      $lista = $this->getDoctrine()->getRepository(County::class)
-         ->ListarOrdenados("", "", $district_id);
+      /** @var \App\Repository\CountyRepository $countyRepo */
+      $countyRepo = $this->getDoctrine()->getRepository(County::class);
+      $lista = $countyRepo->ListarOrdenados("", "", $district_id);
       foreach ($lista as $value) {
          $arreglo_resultado[] = [
             'county_id' => $value->getCountyId(),
@@ -1334,13 +1369,15 @@ class Base
       $em = $this->getDoctrine()->getManager();
 
       // items
-      $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarItems($invoice_id);
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $items = $invoiceItemRepo->ListarItems($invoice_id);
       foreach ($items as $item) {
 
          // notes
-         $notes = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
-            ->ListarNotesDeItemInvoice($item->getId());
+         /** @var \App\Repository\InvoiceItemNotesRepository $invoiceItemNotesRepo */
+         $invoiceItemNotesRepo = $this->getDoctrine()->getRepository(InvoiceItemNotes::class);
+         $notes = $invoiceItemNotesRepo->ListarNotesDeItemInvoice($item->getId());
          foreach ($notes as $note) {
             $em->remove($note);
          }
@@ -1349,23 +1386,26 @@ class Base
       }
 
       // quickbooks
-      $quickbooks = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-         ->ListarRegistrosDeEntidadId("invoice", $invoice_id);
+      /** @var \App\Repository\SyncQueueQbwcRepository $syncQueueQbwcRepo */
+      $syncQueueQbwcRepo = $this->getDoctrine()->getRepository(SyncQueueQbwc::class);
+      $quickbooks = $syncQueueQbwcRepo->ListarRegistrosDeEntidadId("invoice", $invoice_id);
       foreach ($quickbooks as $quickbook) {
          $em->remove($quickbook);
       }
 
       // notes
-      $notes = $this->getDoctrine()->getRepository(InvoiceNotes::class)
-         ->ListarNotesDeInvoice($invoice_id);
+      /** @var \App\Repository\InvoiceNotesRepository $invoiceNotesRepo */
+      $invoiceNotesRepo = $this->getDoctrine()->getRepository(InvoiceNotes::class);
+      $notes = $invoiceNotesRepo->ListarNotesDeInvoice($invoice_id);
       foreach ($notes as $note) {
          $em->remove($note);
       }
 
       // attachments
       $dir = 'uploads/invoice/';
-      $attachments = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
-         ->ListarAttachmentsDeInvoice($invoice_id);
+      /** @var \App\Repository\InvoiceAttachmentRepository $invoiceAttachmentRepo */
+      $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
+      $attachments = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
       foreach ($attachments as $attachment) {
 
          //eliminar archivo
@@ -1387,8 +1427,9 @@ class Base
    {
       $payments = [];
 
-      $lista = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarItems($invoice_id);
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $lista = $invoiceItemRepo->ListarItems($invoice_id);
       foreach ($lista as $key => $value) {
 
          $contract_qty = $value->getProjectItem()->getQuantity();
@@ -1456,8 +1497,9 @@ class Base
    {
       $notes = [];
 
-      $lista = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
-         ->ListarNotesDeItemInvoice($invoice_item_id);
+      /** @var \App\Repository\InvoiceItemNotesRepository $invoiceItemNotesRepo */
+      $invoiceItemNotesRepo = $this->getDoctrine()->getRepository(InvoiceItemNotes::class);
+      $lista = $invoiceItemNotesRepo->ListarNotesDeItemInvoice($invoice_item_id);
       foreach ($lista as $key => $value) {
 
          $note = $value->getNotes();

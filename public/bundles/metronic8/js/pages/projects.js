@@ -1573,7 +1573,12 @@ var Projects = (function () {
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
-               return `<span>${data || ''}</span>`;
+               // Si es change order, agregar icono de +
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
+               }
+               return `<span>${data || ''}${icono}</span>`;
             },
          },
          {
@@ -1673,12 +1678,60 @@ var Projects = (function () {
       });
 
       handleSearchDatatableItems();
+      handleChangeOrderHistory();
 
       // totals
       $('#total_count_items').val(items.length);
 
       var total = calcularMontoTotalItems();
       $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
+   };
+   var handleChangeOrderHistory = function () {
+      $(document).off('click', '.change-order-history-icon');
+      $(document).on('click', '.change-order-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id);
+         }
+      });
+   };
+   var cargarHistorialChangeOrder = function (project_item_id) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      axios
+         .get('project/listarHistorialItem', {
+            params: { project_item_id: project_item_id },
+            responseType: 'json',
+         })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var historial = response.historial || [];
+                  var html = '';
+                  if (historial.length === 0) {
+                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                  } else {
+                     html = '<ul class="list-unstyled">';
+                     historial.forEach(function (item) {
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                     });
+                     html += '</ul>';
+                  }
+                  $('#modal-change-order-history .modal-body').html(html);
+                  ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+               } else {
+                  toastr.error(response.error || 'Error loading history', '');
+               }
+            }
+         })
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+            console.error(error);
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
    };
    var handleSearchDatatableItems = function () {
       $(document).off('keyup', '#lista-items [data-table-filter="search"]');

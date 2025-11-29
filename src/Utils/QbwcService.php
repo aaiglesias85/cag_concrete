@@ -74,8 +74,9 @@ class QbwcService extends Base
                   $txnLineId = (string)$lineRet->TxnLineID;
                   $itemFullName = (string)$lineRet->ItemRef->FullName ?? null;
 
-                  $invoiceItems = $this->getDoctrine()->getRepository(InvoiceItem::class)
-                     ->ListarItems($item->getEntidadId());
+                  /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+                  $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+                  $invoiceItems = $invoiceItemRepo->ListarItems($item->getEntidadId());
                   $matched = null;
                   foreach ($invoiceItems as $invoiceItem) {
                      if ($invoiceItem->getProjectItem()->getItem()->getName() === $itemFullName) {
@@ -159,8 +160,9 @@ class QbwcService extends Base
    public function GenerarRequestQBXML(): string
    {
       $qbxml = "";
-      $items = $this->getDoctrine()->getRepository(SyncQueueQbwc::class)
-         ->ListarOrdenados('pendiente');
+      /** @var \App\Repository\SyncQueueQbwcRepository $syncQueueQbwcRepo */
+      $syncQueueQbwcRepo = $this->getDoctrine()->getRepository(SyncQueueQbwc::class);
+      $items = $syncQueueQbwcRepo->ListarOrdenados('pendiente');
 
       if (!empty($items)) {
          $item = $items[0];
@@ -415,8 +417,9 @@ class QbwcService extends Base
          $qbInvoice->setBillAddress($company->getAddress());
       }
 
-      $items = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->ListarItems($invoice->getInvoiceId());
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $items = $invoiceItemRepo->ListarItems($invoice->getInvoiceId());
       foreach ($items as $item) {
          $projectItem = $item->getProjectItem();
          $itemName = trim($projectItem->getItem()->getName());
@@ -449,8 +452,9 @@ class QbwcService extends Base
 
    public function AutenticarLogin($email, $pass)
    {
-      $usuario = $this->getDoctrine()->getRepository(Usuario::class)
-         ->BuscarUsuarioPorEmail($email);
+      /** @var \App\Repository\UsuarioRepository $usuarioRepo */
+      $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
+      $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
 
       if ($usuario != null && $this->VerificarPassword($pass, $usuario->getContrasenna())) {
          if ($usuario->getHabilitado() == 1) {

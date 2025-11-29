@@ -21,6 +21,7 @@ use App\Entity\DataTracking;
 use App\Entity\ProjectAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectItem;
+use App\Entity\ProjectItemHistory;
 use App\Entity\ProjectNotes;
 use App\Entity\ProjectPriceAdjustment;
 use App\Entity\Schedule;
@@ -39,6 +40,7 @@ use App\Repository\InvoiceRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\ProjectAttachmentRepository;
 use App\Repository\ProjectContactRepository;
+use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectNotesRepository;
 use App\Repository\ProjectPriceAdjustmentRepository;
@@ -453,11 +455,23 @@ class ProjectService extends Base
          $quantity_old = $project_item_entity->getQuantity();
          $project_item_entity->setQuantity($quantity);
 
+         // Verificar si se está desactivando el change order
+         $change_order_old = $project_item_entity->getChangeOrder();
          $project_item_entity->setChangeOrder($change_order);
 
-         if ($change_order_date != '') {
-            $change_order_date = \DateTime::createFromFormat('m/d/Y', $change_order_date);
-            $project_item_entity->setChangeOrderDate($change_order_date);
+         if ($change_order) {
+            // Si se activa el change order, establecer la fecha si se proporciona
+            if ($change_order_date != '') {
+               $change_order_date = \DateTime::createFromFormat('m/d/Y', $change_order_date);
+               $project_item_entity->setChangeOrderDate($change_order_date);
+            }
+         } else {
+            // Si se desactiva el change order, establecer la fecha en null y eliminar el historial
+            $project_item_entity->setChangeOrderDate(null);
+            if ($change_order_old && $project_item_entity->getId()) {
+               // Eliminar historial solo si antes estaba activo
+               $this->EliminarHistorialDeProjectItem($project_item_entity->getId());
+            }
          }
 
          $equation_entity = null;
@@ -529,6 +543,19 @@ class ProjectService extends Base
          }
 
          $this->SalvarNotesUpdate($project_entity, $notas);
+
+         // Si es un nuevo item con change order, hacer flush para obtener el ID
+         if ($change_order === true && $is_new_project_item) {
+            $em->flush();
+            // Refrescar la entidad para asegurar que tenga el ID
+            $em->refresh($project_item_entity);
+         }
+
+         // Registrar historial si es change order
+         if ($change_order === true) {
+            $is_first_time_change_order = !$change_order_old && $change_order;
+            $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $quantity, $price_old, $price);
+         }
 
          $em->flush();
 
@@ -622,6 +649,27 @@ class ProjectService extends Base
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $invoice_item) {
          $em->remove($invoice_item);
+      }
+
+      // project item history
+      $this->EliminarHistorialDeProjectItem($project_item_id);
+   }
+
+   /**
+    * EliminarHistorialDeProjectItem: Elimina solo el historial de un ProjectItem
+    * @param $project_item_id
+    * @return void
+    */
+   private function EliminarHistorialDeProjectItem($project_item_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      // project item history
+      /** @var ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+      $historial = $historyRepo->ListarHistorialDeItem($project_item_id);
+      foreach ($historial as $historial_item) {
+         $em->remove($historial_item);
       }
    }
 
@@ -2279,15 +2327,35 @@ class ProjectService extends Base
             $is_new_project_item = true;
          }
 
+         // Guardar valores antiguos antes de actualizar (solo si no es nuevo)
+         $quantity_old = null;
+         $price_old = null;
+         if (!$is_new_project_item && $project_item_entity->getId()) {
+            $quantity_old = $project_item_entity->getQuantity();
+            $price_old = $project_item_entity->getPrice();
+         }
+
          $project_item_entity->setYieldCalculation($value->yield_calculation);
          $project_item_entity->setPrice($value->price);
          $project_item_entity->setQuantity($value->quantity);
 
+         // Verificar si se está desactivando el change order
+         $change_order_old = $project_item_entity->getChangeOrder();
          $project_item_entity->setChangeOrder($value->change_order);
 
-         if ($value->change_order_date != '') {
-            $change_order_date = \DateTime::createFromFormat('m/d/Y', $value->change_order_date);
-            $project_item_entity->setChangeOrderDate($change_order_date);
+         if ($value->change_order) {
+            // Si se activa el change order, establecer la fecha si se proporciona
+            if ($value->change_order_date != '') {
+               $change_order_date = \DateTime::createFromFormat('m/d/Y', $value->change_order_date);
+               $project_item_entity->setChangeOrderDate($change_order_date);
+            }
+         } else {
+            // Si se desactiva el change order, establecer la fecha en null y eliminar el historial
+            $project_item_entity->setChangeOrderDate(null);
+            if ($change_order_old && $project_item_entity->getId()) {
+               // Eliminar historial solo si antes estaba activo
+               $this->EliminarHistorialDeProjectItem($project_item_entity->getId());
+            }
          }
 
          $equation_entity = null;
@@ -2320,8 +2388,21 @@ class ProjectService extends Base
             $project_item_entity->setProject($entity);
 
             $em->persist($project_item_entity);
+            $em->flush(); // Flush para obtener el ID
+         } else {
+            // Guardar valores antiguos antes de actualizar
+            $quantity_old = $project_item_entity->getQuantity();
+            $price_old = $project_item_entity->getPrice();
+         }
+
+         // Registrar historial si es change order
+         if ($value->change_order && $project_item_entity->getId()) {
+            $is_first_time_change_order = !$change_order_old && $value->change_order;
+            $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $value->quantity, $price_old, $value->price);
          }
       }
+
+      $em->flush();
 
       return $items_news;
    }
@@ -2481,5 +2562,100 @@ class ProjectService extends Base
       }
 
       return $acciones;
+   }
+
+   /**
+    * RegistrarHistorialChangeOrder: Registra el historial de cambios para items con change order
+    * @param ProjectItem $project_item_entity
+    * @param bool $is_new
+    * @param bool $is_first_time_change_order Si es la primera vez que se activa el change order
+    * @param float|null $quantity_old
+    * @param float $quantity_new
+    * @param float|null $price_old
+    * @param float $price_new
+    * @return void
+    */
+   private function RegistrarHistorialChangeOrder($project_item_entity, $is_new, $is_first_time_change_order, $quantity_old, $quantity_new, $price_old, $price_new)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      // Si es nuevo item O si se está activando change order por primera vez
+      if ($is_new || $is_first_time_change_order) {
+         $history = new ProjectItemHistory();
+         $history->setProjectItem($project_item_entity);
+         $history->setActionType('add');
+         $history->setOldValue(null);
+         $history->setNewValue(null);
+         $history->setCreatedAt(new \DateTime());
+         $history->setUser($this->getUser());
+         $em->persist($history);
+      }
+
+      // Si cambió la cantidad
+      if ($quantity_old !== null && $quantity_old != $quantity_new) {
+         $history = new ProjectItemHistory();
+         $history->setProjectItem($project_item_entity);
+         $history->setActionType('update_quantity');
+         $history->setOldValue((string)$quantity_old);
+         $history->setNewValue((string)$quantity_new);
+         $history->setCreatedAt(new \DateTime());
+         $history->setUser($this->getUser());
+         $em->persist($history);
+      }
+
+      // Si cambió el precio
+      if ($price_old !== null && $price_old != $price_new) {
+         $history = new ProjectItemHistory();
+         $history->setProjectItem($project_item_entity);
+         $history->setActionType('update_price');
+         $history->setOldValue((string)$price_old);
+         $history->setNewValue((string)$price_new);
+         $history->setCreatedAt(new \DateTime());
+         $history->setUser($this->getUser());
+         $em->persist($history);
+      }
+   }
+
+   /**
+    * ListarHistorialDeItem: Lista el historial de cambios de un ProjectItem
+    * @param int $project_item_id
+    * @return array
+    */
+   public function ListarHistorialDeItem($project_item_id)
+   {
+      $historial = [];
+
+      /** @var ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+      $lista = $historyRepo->ListarHistorialDeItem($project_item_id);
+
+      foreach ($lista as $value) {
+         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+         $fecha = $value->getCreatedAt()->format('m/d/Y');
+         $action_type = $value->getActionType();
+         $old_value = $value->getOldValue();
+         $new_value = $value->getNewValue();
+
+         $mensaje = '';
+         if ($action_type === 'add') {
+            $mensaje = "Add on {$fecha} by \"{$user_name}\"";
+         } elseif ($action_type === 'update_quantity') {
+            $mensaje = "{$fecha} Updated qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+         } elseif ($action_type === 'update_price') {
+            $mensaje = "{$fecha} Updated price from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+         }
+
+         $historial[] = [
+            'id' => $value->getId(),
+            'action_type' => $action_type,
+            'mensaje' => $mensaje,
+            'fecha' => $fecha,
+            'user_name' => $user_name,
+            'old_value' => $old_value,
+            'new_value' => $new_value,
+         ];
+      }
+
+      return $historial;
    }
 }

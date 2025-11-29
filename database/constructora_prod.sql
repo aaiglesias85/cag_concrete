@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 28-11-2025 a las 11:39:27
+-- Tiempo de generación: 29-11-2025 a las 14:20:21
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -3871,7 +3871,7 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (208, 'CONC SWALE 4 FT W X 6.5 in D. CL A CONC INCL REINFORCED STEEL', 'CONC SWALE 4 FT W X 6.5 in D. CL A CONC INCL REINFORCED STEEL', 100.00, '', 1, '2025-01-10 13:44:59', NULL, 12, NULL, NULL, NULL),
 (209, 'CONC FLUME', 'CONC FLUME', 5100.00, '', 1, '2025-01-10 13:55:09', NULL, 15, NULL, NULL, NULL),
 (210, 'C&G 18 IN', 'C&G 18 IN', 18.50, '', 1, '2025-01-10 13:56:30', NULL, 12, NULL, NULL, NULL),
-(211, '12 IN HEADER CURB', '12 IN HEADER CURB', 23.00, '', 1, '2025-01-10 13:57:03', NULL, 12, NULL, NULL, NULL),
+(211, '12 IN HEADER CURB', '12 IN HEADER CURB DESCRIPTION', 23.00, '', 1, '2025-01-10 13:57:03', '2025-11-29 00:30:52', 12, NULL, NULL, NULL),
 (212, 'VALLEY GUTTER', 'VALLEY GUTTER', 28.00, '', 1, '2025-01-10 13:58:07', NULL, 12, NULL, NULL, NULL),
 (213, 'HANDICAP RAMPS', 'HANDICAP RAMPS', 1600.00, '', 1, '2025-01-10 13:58:37', NULL, 15, NULL, NULL, NULL),
 (214, 'CONC SIDEWALK TP 1', 'CONC SIDEWALK TP 1', 2800.00, 'equation', 1, '2025-01-10 14:52:07', '2025-01-20 20:29:34', 15, 20, NULL, NULL),
@@ -3955,7 +3955,8 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (298, 'test', 'test', 34.00, 'none', 1, '2025-09-19 01:52:32', NULL, NULL, NULL, NULL, NULL),
 (299, 'test h', 'test h', 34.00, 'none', 1, '2025-09-19 01:55:16', NULL, NULL, NULL, NULL, NULL),
 (300, 'Test quote', 'Test quote', 150.00, 'none', 1, '2025-10-31 01:31:34', NULL, 20, NULL, NULL, NULL),
-(301, 'Test 2 upd 33', 'Test 2 upd 33', 1.00, 'none', 1, '2025-11-06 23:45:49', NULL, 20, NULL, NULL, NULL);
+(301, 'Test 2 upd 33', 'Test 2 upd 33', 1.00, 'none', 1, '2025-11-06 23:45:49', NULL, 20, NULL, NULL, NULL),
+(302, 'Test Q', NULL, 100.00, 'none', 1, '2025-11-29 00:31:53', NULL, 20, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -5290,7 +5291,10 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4062, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-11-21 02:09:32', 1),
 (4063, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-11-21 02:09:59', 1),
 (4064, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-11-21 02:10:17', 1),
-(4065, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-11-27 01:44:30', 1);
+(4065, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-11-27 01:44:30', 1),
+(4066, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2025-11-29 00:30:40', 1),
+(4067, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2025-11-29 00:30:52', 1),
+(4068, 'Update', 'Project', 'The project is modified: Test', '::1', '2025-11-29 00:32:20', 1);
 
 -- --------------------------------------------------------
 
@@ -5769,7 +5773,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (299, '0013614', 'ERS05029', 'B3CBA2002348-0', 'US 441 WIDENING', 'US 441 WIDENING', NULL, 'GDOT', '60256', 643843.25, 1, 'MORGAN', 0, '', 1, '2021-03-09', '2022-03-10', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 20:59:26', '2025-03-03 21:11:29', NULL, 5, NULL, 46, NULL),
 (300, 'ITB #20-30', 'ERS05025', '', '2020 SPLOST MILLING & RESURF', '2020 SPLOST MILLING & RESURF', NULL, 'E. R. SNELL', 'ITB #20-30', 137500.00, 0, 'CLAYTON', 0, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 21:42:27', '2025-03-03 22:04:56', NULL, 5, NULL, 22, NULL),
 (301, 'ITB #20-03', 'ERS05026', '', '2020 SPLOST MILLING & RESURFACING', '2020 SPLOST MILLING & RESURFACING', NULL, 'E. R. SNELL', 'ITB #20-03', 229710.00, 0, 'CLAYTON', 1, '', 0, '2020-06-04', '2020-12-01', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-03 22:13:17', '2025-03-03 22:20:19', NULL, 5, NULL, 22, NULL),
-(302, '435435', '34324', '', 'Test', 'WR', 'undefined', 'Test', '43543543', 1.00, 0, NULL, 0, '', 0, NULL, NULL, '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-09-17 02:34:22', '2025-11-15 14:43:56', '2025-09-17 02:34:22', 14, NULL, 59, NULL),
+(302, '435435', '34324', '', 'Test', 'WR', 'undefined', 'Test', '43543543', 1001.00, 0, NULL, 0, '', 0, NULL, NULL, '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2025-09-17 02:34:22', '2025-11-29 00:32:20', '2025-09-17 02:34:22', 14, NULL, 59, NULL),
 (303, '345', '345', '', '3246', '2346', 'undefined', '346', '345', 0.00, 0, NULL, 0, '', 0, NULL, NULL, NULL, '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-09-17 02:55:11', NULL, '2025-09-17 02:55:11', 14, NULL, 45, NULL);
 
 -- --------------------------------------------------------
@@ -7373,11 +7377,11 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1695, 6.000000, 3800.00, 'same', NULL, NULL, 1, NULL, NULL, 279, 50, NULL),
 (1696, 58.000000, 3400.00, 'equation', NULL, NULL, 1, NULL, NULL, 280, 47, 24),
 (1697, 50.000000, 81.00, 'none', NULL, NULL, 1, NULL, NULL, 281, 133, NULL),
-(1698, 3.000000, 3.00, '', NULL, NULL, 1, 1, '2025-10-14 02:40:47', 254, 194, NULL),
+(1698, 3.000000, 3.00, '', NULL, NULL, 1, 0, '2025-10-14 13:59:41', 254, 194, NULL),
 (1699, 15.000000, 15.00, 'equation', NULL, NULL, 1, NULL, NULL, 254, 224, 41),
-(1700, 0.000000, 15.00, 'equation', NULL, NULL, 1, 1, '2025-11-22 15:08:29', 254, 72, 8),
+(1700, 0.000000, 15.00, 'equation', NULL, NULL, 1, 0, '2025-11-22 13:59:53', 254, 72, 8),
 (1701, 750.000000, 78.00, 'none', NULL, NULL, 1, NULL, NULL, 282, 133, NULL),
-(1702, 15.000000, 15.00, '', NULL, NULL, 1, 1, '2025-11-23 15:44:09', 254, 223, NULL),
+(1702, 15.000000, 15.00, '', NULL, NULL, 1, 0, '2025-11-23 13:59:57', 254, 223, NULL),
 (1703, 9.000000, 211.00, 'same', NULL, NULL, 1, NULL, NULL, 20, 101, NULL),
 (1704, 772.000000, 72.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 67, 36),
 (1705, 3506.000000, 36.50, 'equation', NULL, NULL, 1, NULL, NULL, 39, 31, 11),
@@ -7485,7 +7489,24 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1808, 450.000000, 54.00, 'equation', NULL, NULL, 1, NULL, NULL, 69, 53, 16),
 (1809, 340.000000, 34.00, 'none', NULL, NULL, 0, NULL, NULL, 69, 298, NULL),
 (1810, 450.000000, 34.00, 'none', NULL, NULL, 0, NULL, NULL, 69, 299, NULL),
-(1811, 1.000000, 1.00, 'none', NULL, NULL, 1, NULL, NULL, 302, 301, NULL);
+(1811, 1.000000, 1.00, 'none', NULL, NULL, 1, NULL, NULL, 302, 301, NULL),
+(1812, 10.000000, 100.00, 'none', NULL, NULL, 0, 0, NULL, 302, 302, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_item_history`
+--
+
+CREATE TABLE `project_item_history` (
+  `id` int(11) NOT NULL,
+  `project_item_id` int(11) NOT NULL,
+  `action_type` varchar(50) NOT NULL,
+  `old_value` varchar(255) DEFAULT NULL,
+  `new_value` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -8201,7 +8222,13 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (760, 'Yes', '2025-11-19', 254),
 (761, 'Change retainage percentage, old value: ', '2025-11-19', 254),
 (762, 'Change retainage adjustment percentage, old value: ', '2025-11-19', 254),
-(763, 'Change retainage adjustment completion, old value: ', '2025-11-19', 254);
+(763, 'Change retainage adjustment completion, old value: ', '2025-11-19', 254),
+(764, 'Add New Item: Test Q', '2025-11-29', 302),
+(765, 'Change contract amount, old value: 1', '2025-11-29', 302),
+(766, 'Yes', '2025-11-29', 302),
+(767, 'Change retainage percentage, old value: ', '2025-11-29', 302),
+(768, 'Change retainage adjustment percentage, old value: ', '2025-11-29', 302),
+(769, 'Change retainage adjustment completion, old value: ', '2025-11-29', 302);
 
 -- --------------------------------------------------------
 
@@ -9213,7 +9240,8 @@ INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`,
 (7, 'invoice', 18, 'pendiente', 0, '2025-11-14 03:04:17'),
 (11, 'invoice', 22, 'pendiente', 0, '2025-11-21 02:09:32'),
 (12, 'invoice', 23, 'pendiente', 0, '2025-11-21 02:09:59'),
-(13, 'invoice', 24, 'pendiente', 0, '2025-11-21 02:10:17');
+(13, 'invoice', 24, 'pendiente', 0, '2025-11-21 02:10:17'),
+(14, 'item', 211, 'pendiente', 0, '2025-11-29 00:30:40');
 
 -- --------------------------------------------------------
 
@@ -9751,6 +9779,14 @@ ALTER TABLE `project_item`
   ADD KEY `equation_id` (`equation_id`);
 
 --
+-- Indices de la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `project_item_id` (`project_item_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indices de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
@@ -10084,13 +10120,13 @@ ALTER TABLE `invoice_notes`
 -- AUTO_INCREMENT de la tabla `item`
 --
 ALTER TABLE `item`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=302;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=303;
 
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4066;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4069;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10144,13 +10180,19 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_item`
 --
 ALTER TABLE `project_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1812;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1813;
+
+--
+-- AUTO_INCREMENT de la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=764;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=770;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
@@ -10246,7 +10288,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -10473,6 +10515,13 @@ ALTER TABLE `project_item`
   ADD CONSTRAINT `Refequation11` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`),
   ADD CONSTRAINT `Refitem80` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
   ADD CONSTRAINT `Refproject79` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `project_item_history`
+--
+ALTER TABLE `project_item_history`
+  ADD CONSTRAINT `project_item_history_ibfk_1` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`),
+  ADD CONSTRAINT `project_item_history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Filtros para la tabla `project_notes`

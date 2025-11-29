@@ -153,8 +153,9 @@ class ScriptService extends Base
       $projects = $this->getDoctrine()->getRepository(Project::class)->findAll();
       foreach ($projects as $project) {
 
-         $items = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->ListarItemsDeProject($project->getProjectId());
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $items = $projectItemRepo->ListarItemsDeProject($project->getProjectId());
 
          // itemId => ya tiene principal
          $seenByItem = [];
@@ -183,9 +184,9 @@ class ScriptService extends Base
       $this->writelog("CronAjustePrecio: " . $fechaActual);
 
       // Ajustes activos para hoy
-      $ajustes = $this->getDoctrine()
-         ->getRepository(ProjectPriceAdjustment::class)
-         ->ListarAjustesDeFecha($fechaActual);
+      /** @var \App\Repository\ProjectPriceAdjustmentRepository $projectPriceAdjustmentRepo */
+      $projectPriceAdjustmentRepo = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class);
+      $ajustes = $projectPriceAdjustmentRepo->ListarAjustesDeFecha($fechaActual);
 
       foreach ($ajustes as $ajuste) {
          $project = $ajuste->getProject();
@@ -199,9 +200,9 @@ class ScriptService extends Base
          // 1 + (2 / 100) = 1.02
          $factor = 1 + ($percent / 100);
 
-         $items = $this->getDoctrine()
-            ->getRepository(ProjectItem::class)
-            ->ListarItemsDeProject($projectId);
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $items = $projectItemRepo->ListarItemsDeProject($projectId);
 
          $notas = []; // acumular notas por proyecto
 
@@ -325,8 +326,9 @@ class ScriptService extends Base
       $fecha_actual = $this->ObtenerFechaActual('m/d/Y');
 
       // listar reminders
-      $reminders = $this->getDoctrine()->getRepository(Reminder::class)
-         ->ListarRemindersRangoFecha($fecha_actual, $fecha_actual, 1);
+      /** @var \App\Repository\ReminderRepository $reminderRepo */
+      $reminderRepo = $this->getDoctrine()->getRepository(Reminder::class);
+      $reminders = $reminderRepo->ListarRemindersRangoFecha($fecha_actual, $fecha_actual, 1);
       foreach ($reminders as $reminder) {
          $reminder_id = $reminder->getReminderId();
 
@@ -339,8 +341,9 @@ class ScriptService extends Base
             ->from(new Address($direccion_from, $from_name));
 
          // to
-         $reminder_usuarios = $this->getDoctrine()->getRepository(ReminderRecipient::class)
-            ->ListarUsuariosDeReminder($reminder_id);
+         /** @var \App\Repository\ReminderRecipientRepository $reminderRecipientRepo */
+         $reminderRecipientRepo = $this->getDoctrine()->getRepository(ReminderRecipient::class);
+         $reminder_usuarios = $reminderRecipientRepo->ListarUsuariosDeReminder($reminder_id);
          foreach ($reminder_usuarios as $reminder_usuario) {
             $mensaje->addTo(new Address($reminder_usuario->getUser()->getEmail(), $reminder_usuario->getUser()->getNombreCompleto()));
          }
@@ -418,8 +421,9 @@ class ScriptService extends Base
          $project_id = $datatracking_subcontractor->getDataTracking()->getProject()->getProjectId();
          $item_id = $datatracking_subcontractor->getItem() ? $datatracking_subcontractor->getItem()->getItemId() : '';
 
-         $project_item = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->BuscarItemProject($project_id, $item_id);
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $project_item = $projectItemRepo->BuscarItemProject($project_id, $item_id);
          if (!empty($project_item)) {
             $datatracking_subcontractor->setProjectItem($project_item[0]);
             $datatracking_subcontractor->setItem(null);
@@ -448,8 +452,9 @@ class ScriptService extends Base
          $equation = $item->getEquation();
 
          // actualizar en proyectos
-         $project_items = $this->getDoctrine()->getRepository(ProjectItem::class)
-            ->ListarProjectsDeItem($item_id);
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $project_items = $projectItemRepo->ListarProjectsDeItem($item_id);
          foreach ($project_items as $project_item) {
             $project_item->setYieldCalculation($yield_calculation);
             $project_item->setEquation($equation);
@@ -553,7 +558,9 @@ class ScriptService extends Base
 
 
          $pending = false;
-         $items = $this->getDoctrine()->getRepository(DataTrackingItem::class)->ListarItems($data_tracking->getId());
+         /** @var \App\Repository\DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         $items = $dataTrackingItemRepo->ListarItems($data_tracking->getId());
          foreach ($items as $value) {
             if ($value->getQuantity() == 0) {
                $pending = true;

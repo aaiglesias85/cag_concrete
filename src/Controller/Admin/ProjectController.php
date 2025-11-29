@@ -626,6 +626,29 @@ class ProjectController extends AbstractController
    }
 
    /**
+    * listarHistorialItem Acción que lista el historial de cambios de un item
+    *
+    */
+   public function listarHistorialItem(Request $request)
+   {
+      $project_item_id = $request->get('project_item_id');
+
+      try {
+         $historial = $this->projectService->ListarHistorialDeItem($project_item_id);
+
+         $resultadoJson['success'] = true;
+         $resultadoJson['historial'] = $historial;
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * eliminarItem Acción que elimina un item en la BD
     *
     */
