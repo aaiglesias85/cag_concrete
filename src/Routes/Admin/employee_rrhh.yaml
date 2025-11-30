@@ -15,7 +15,7 @@ eliminarEmployeesRrhhAdmin:
    defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::eliminarVarios, _format: json }
 
 salvarEmployeeRrhhAdmin:
-   path: /employee-rrhh/salvarEmployee
+   path: /employee-rrhh/salvar
    defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::salvar, _format: json }
 
 cargarDatosEmployeeRrhhAdmin:
