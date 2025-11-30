@@ -1010,4 +1010,27 @@ class ProjectController extends AbstractController
          return $this->json($resultadoJson);
       }
    }
+
+   /**
+    * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto
+    *
+    */
+   public function listarInvoicesRetainage(Request $request)
+   {
+      $project_id = $request->get('project_id');
+
+      try {
+         $invoices = $this->projectService->ListarInvoicesConRetainage($project_id);
+
+         $resultadoJson['success'] = true;
+         $resultadoJson['invoices'] = $invoices;
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
 }
