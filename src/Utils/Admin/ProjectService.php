@@ -2579,6 +2579,12 @@ class ProjectService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
+      // Obtener la fecha del change order date, si no existe usar la fecha actual
+      $change_order_date = $project_item_entity->getChangeOrderDate();
+      if ($change_order_date === null) {
+         $change_order_date = new \DateTime();
+      }
+
       // Si es nuevo item O si se está activando change order por primera vez
       if ($is_new || $is_first_time_change_order) {
          $history = new ProjectItemHistory();
@@ -2586,7 +2592,7 @@ class ProjectService extends Base
          $history->setActionType('add');
          $history->setOldValue(null);
          $history->setNewValue(null);
-         $history->setCreatedAt(new \DateTime());
+         $history->setCreatedAt($change_order_date);
          $history->setUser($this->getUser());
          $em->persist($history);
       }
@@ -2598,7 +2604,7 @@ class ProjectService extends Base
          $history->setActionType('update_quantity');
          $history->setOldValue((string)$quantity_old);
          $history->setNewValue((string)$quantity_new);
-         $history->setCreatedAt(new \DateTime());
+         $history->setCreatedAt($change_order_date);
          $history->setUser($this->getUser());
          $em->persist($history);
       }
@@ -2610,7 +2616,7 @@ class ProjectService extends Base
          $history->setActionType('update_price');
          $history->setOldValue((string)$price_old);
          $history->setNewValue((string)$price_new);
-         $history->setCreatedAt(new \DateTime());
+         $history->setCreatedAt($change_order_date);
          $history->setUser($this->getUser());
          $em->persist($history);
       }
@@ -2683,9 +2689,9 @@ class ProjectService extends Base
 
       // Obtener todos los invoices del proyecto ordenados por fecha de creación (ASC para calcular acumulados)
       $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
-      
+
       // Ordenar por fecha ASC para calcular acumulados correctamente
-      usort($invoices, function($a, $b) {
+      usort($invoices, function ($a, $b) {
          return $a->getCreatedAt() <=> $b->getCreatedAt();
       });
 
@@ -2700,14 +2706,14 @@ class ProjectService extends Base
       foreach ($invoices as $invoice) {
          // Calcular el invoice amount (Final Amount This Period)
          $invoice_amount = $invoiceItemRepo->TotalInvoiceBroughtForward((string) $invoice->getInvoiceId());
-         
+
          // Acumular el total para calcular el porcentaje de retainage
          $total_amount_accumulated += $invoice_amount;
-         
+
          // Calcular el porcentaje de retainage a aplicar
          $porciento_retainage = $retainage_percentage;
          $ajuste_aplicado = false;
-         
+
          // Revisar si se debe aplicar el ajuste
          if ($retainage_adjustment_completion > 0 && $contract_amount > 0) {
             $threshold_amount = $contract_amount * ($retainage_adjustment_completion / 100);
@@ -2716,13 +2722,13 @@ class ProjectService extends Base
                $ajuste_aplicado = true;
             }
          }
-         
+
          // Calcular el retainage amount para este invoice
          $retainage_amount = $invoice_amount * ($porciento_retainage / 100);
-         
+
          // Acumular al total retainage
          $total_retainage_to_date += $retainage_amount;
-         
+
          // Preparar datos para la tabla
          $resultado[] = [
             'invoice_id' => $invoice->getInvoiceId(),
