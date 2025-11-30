@@ -2658,4 +2658,84 @@ class ProjectService extends Base
 
       return $historial;
    }
+
+   /**
+    * ListarInvoicesConRetainage: Lista los invoices de un proyecto con sus cálculos de retainage
+    * @param int $project_id
+    * @return array
+    */
+   public function ListarInvoicesConRetainage($project_id)
+   {
+      if (empty($project_id)) {
+         return [];
+      }
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      // Obtener el proyecto
+      $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
+      if (!$project || !$project->getRetainage()) {
+         return [];
+      }
+
+      // Obtener todos los invoices del proyecto ordenados por fecha de creación (ASC para calcular acumulados)
+      $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
+      
+      // Ordenar por fecha ASC para calcular acumulados correctamente
+      usort($invoices, function($a, $b) {
+         return $a->getCreatedAt() <=> $b->getCreatedAt();
+      });
+
+      $resultado = [];
+      $total_retainage_to_date = 0;
+      $total_amount_accumulated = 0;
+      $contract_amount = $project->getContractAmount() ?? 0;
+      $retainage_percentage = $project->getRetainagePercentage() ?? 0;
+      $retainage_adjustment_percentage = $project->getRetainageAdjustmentPercentage() ?? 0;
+      $retainage_adjustment_completion = $project->getRetainageAdjustmentCompletion() ?? 0;
+
+      foreach ($invoices as $invoice) {
+         // Calcular el invoice amount (Final Amount This Period)
+         $invoice_amount = $invoiceItemRepo->TotalInvoiceBroughtForward((string) $invoice->getInvoiceId());
+         
+         // Acumular el total para calcular el porcentaje de retainage
+         $total_amount_accumulated += $invoice_amount;
+         
+         // Calcular el porcentaje de retainage a aplicar
+         $porciento_retainage = $retainage_percentage;
+         $ajuste_aplicado = false;
+         
+         // Revisar si se debe aplicar el ajuste
+         if ($retainage_adjustment_completion > 0 && $contract_amount > 0) {
+            $threshold_amount = $contract_amount * ($retainage_adjustment_completion / 100);
+            if ($total_amount_accumulated > $threshold_amount) {
+               $porciento_retainage = $retainage_adjustment_percentage;
+               $ajuste_aplicado = true;
+            }
+         }
+         
+         // Calcular el retainage amount para este invoice
+         $retainage_amount = $invoice_amount * ($porciento_retainage / 100);
+         
+         // Acumular al total retainage
+         $total_retainage_to_date += $retainage_amount;
+         
+         // Preparar datos para la tabla
+         $resultado[] = [
+            'invoice_id' => $invoice->getInvoiceId(),
+            'invoice_number' => $invoice->getNumber(),
+            'invoice_date' => $invoice->getCreatedAt()->format('m/d/Y'),
+            'invoice_amount' => $invoice_amount,
+            'retainage_percentage' => $porciento_retainage,
+            'retainage_amount' => $retainage_amount,
+            'total_retainage_to_date' => $total_retainage_to_date,
+            'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No'
+         ];
+      }
+
+      return $resultado;
+   }
 }

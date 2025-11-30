@@ -630,6 +630,11 @@ var Projects = (function () {
                break;
             case 2:
                $('#tab-retainage').tab('show');
+               // Cargar tabla de invoices con retainage si está activado
+               var project_id = $('#project_id').val();
+               if (project_id && $('#retainage').prop('checked')) {
+                  cargarTablaInvoicesRetainage(project_id);
+               }
                break;
             case 3:
                $('#tab-items').tab('show');
@@ -1097,6 +1102,8 @@ var Projects = (function () {
 
          if (project.retainage) {
             $('.div-retainage').removeClass('hide');
+            // Cargar tabla de invoices con retainage
+            cargarTablaInvoicesRetainage(project_id);
          }
 
          // items
@@ -1276,9 +1283,15 @@ var Projects = (function () {
          $('#retainage_percentage').val('');
          $('#retainage_adjustment_percentage').val('');
          $('#retainage_adjustment_completion').val('');
+         $('#total-retainage-withheld').val('');
 
          if ($(this).prop('checked')) {
             $('.div-retainage').removeClass('hide');
+            // Cargar tabla de invoices con retainage si hay un project_id
+            var project_id = $('#project_id').val();
+            if (project_id) {
+               cargarTablaInvoicesRetainage(project_id);
+            }
          }
       });
 
@@ -1576,7 +1589,10 @@ var Projects = (function () {
                // Si es change order, agregar icono de +
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
                }
                return `<span>${data || ''}${icono}</span>`;
             },
@@ -3880,6 +3896,162 @@ var Projects = (function () {
                BlockUtil.unblock('#lista-items-completion');
             });
       };
+   };
+
+   // Invoices Retainage Table
+   var oTableInvoicesRetainage;
+   var initTableInvoicesRetainage = function (data) {
+      const table = '#invoices-retainage-table-editable';
+
+      // columns
+      const columns = [
+         { data: 'invoice_date' },
+         { data: 'invoice_amount' },
+         { data: 'retainage_percentage' },
+         { data: 'retainage_amount' },
+         { data: 'total_retainage_to_date' },
+         { data: 'ajuste_retainage' },
+      ];
+
+      // column defs
+      let columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               // Formatear fecha a formato más amigable
+               var dateFormatted = data;
+               if (data && data.includes('/')) {
+                  var dateParts = data.split('/');
+                  if (dateParts.length === 3) {
+                     var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
+                     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                     dateFormatted = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
+                  }
+               }
+               var displayText = `${row.invoice_number} - ${dateFormatted}`;
+               var html = `<a href="javascript:;" class="invoice-retainage-link text-primary text-hover-primary" data-invoice-id="${
+                  row.invoice_id
+               }" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
+               return html;
+            },
+         },
+         {
+            targets: 1,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 2,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
+            },
+         },
+         {
+            targets: 3,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 4,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 5,
+            className: 'text-center',
+            render: function (data, type, row) {
+               var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
+               return `<span class="badge ${badgeClass}">${data}</span>`;
+            },
+         },
+      ];
+
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
+
+      // order - ordenar por fecha DESC (más reciente primero)
+      const order = [[0, 'desc']];
+
+      // destroy if exists
+      if (oTableInvoicesRetainage) {
+         oTableInvoicesRetainage.destroy();
+      }
+
+      // escapar contenido de la tabla
+      oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
+         data: data || [],
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      // Agregar event handlers para los links de invoice
+      handleInvoiceRetainageLinks();
+   };
+
+   var handleInvoiceRetainageLinks = function () {
+      $(document).off('click', '#invoices-retainage-table-editable a.invoice-retainage-link');
+      $(document).on('click', '#invoices-retainage-table-editable a.invoice-retainage-link', function (e) {
+         e.preventDefault();
+         var invoice_id = $(this).data('invoice-id');
+         if (invoice_id && typeof url_invoice !== 'undefined') {
+            localStorage.setItem('invoice_id_edit', invoice_id);
+            window.location.href = url_invoice;
+         }
+      });
+   };
+
+   var cargarTablaInvoicesRetainage = function (project_id) {
+      if (!project_id) {
+         return;
+      }
+
+      var formData = new URLSearchParams();
+      formData.set('project_id', project_id);
+
+      axios
+         .post('project/listarInvoicesRetainage', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var invoices = response.invoices || [];
+                  initTableInvoicesRetainage(invoices);
+
+                  // Calcular y mostrar Total Retainage Withheld (es el último total_retainage_to_date que ya es acumulado)
+                  var totalRetainageWithheld = 0;
+                  if (invoices.length > 0) {
+                     // El último invoice tiene el total_retainage_to_date que ya es el acumulado total
+                     var lastInvoice = invoices[invoices.length - 1];
+                     totalRetainageWithheld = lastInvoice.total_retainage_to_date || 0;
+                  }
+                  $('#total-retainage-withheld').val(MyApp.formatMoney(totalRetainageWithheld));
+               } else {
+                  initTableInvoicesRetainage([]);
+                  $('#total-retainage-withheld').val(MyApp.formatMoney(0));
+                  if (response.error) {
+                     toastr.error(response.error, '');
+                  }
+               }
+            } else {
+               initTableInvoicesRetainage([]);
+               $('#total-retainage-withheld').val(MyApp.formatMoney(0));
+            }
+         })
+         .catch(function (error) {
+            console.error(error);
+            initTableInvoicesRetainage([]);
+            $('#total-retainage-withheld').val(MyApp.formatMoney(0));
+         });
    };
 
    return {

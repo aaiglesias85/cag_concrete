@@ -919,6 +919,41 @@
                            </div>
                         </div>
                      </div>
+
+                     <!-- Tabla de Invoices y Retainage -->
+                     <div class="form-group ic-form-group hide div-retainage mt-10">
+                        <label class="form-label">
+                           <span class="ic-step-number">4</span>
+                           Invoices and Retainage History
+                        </label>
+                        <div class="row mb-5">
+                           <div class="col-md-4">
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text">Total Retainage Withheld:</span>
+                                 <input type="text" class="form-control form-control-solid" id="total-retainage-withheld" disabled />
+                              </div>
+                           </div>
+                        </div>
+                        <div class="row" id="lista-invoices-retainage">
+                           <div class="col-md-12">
+                              <!--begin::Datatable-->
+                              <table id="invoices-retainage-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                 <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                       <th>Invoice Date</th>
+                                       <th>Invoice Amount</th>
+                                       <th>Retainage (%)</th>
+                                       <th>Retainage Amount</th>
+                                       <th>Total Retainage to Date</th>
+                                       <th>Retainage Adjustment</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody class="text-gray-600 fw-semibold"></tbody>
+                              </table>
+                              <!--end::Datatable-->
+                           </div>
+                        </div>
+                     </div>
                   </div>
                   <div class="tab-pane fade" id="tab-content-items" role="tabpanel">
                      <div class="row" id="lista-items">
@@ -2004,6 +2039,41 @@
                                  <span class="input-group-text">%</span>
                                  <input type="text" class="form-control form-control-validate form-control-number event-change" id="retainage_adjustment_completion-detalle" />
                               </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <!-- Tabla de Invoices y Retainage -->
+                     <div class="form-group ic-form-group hide div-retainage-detalle mt-10">
+                        <label class="form-label">
+                           <span class="ic-step-number">4</span>
+                           Invoices and Retainage History
+                        </label>
+                        <div class="row mb-5">
+                           <div class="col-md-4">
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text">Total Retainage Withheld:</span>
+                                 <input type="text" class="form-control form-control-solid" id="total-retainage-withheld-detalle" disabled />
+                              </div>
+                           </div>
+                        </div>
+                        <div class="row" id="lista-invoices-retainage-detalle">
+                           <div class="col-md-12">
+                              <!--begin::Datatable-->
+                              <table id="invoices-retainage-table-editable-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                 <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                       <th>Invoice Date</th>
+                                       <th>Invoice Amount</th>
+                                       <th>Retainage (%)</th>
+                                       <th>Retainage Amount</th>
+                                       <th>Total Retainage to Date</th>
+                                       <th>Retainage Adjustment</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody class="text-gray-600 fw-semibold"></tbody>
+                              </table>
+                              <!--end::Datatable-->
                            </div>
                         </div>
                      </div>

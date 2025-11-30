@@ -36,6 +36,11 @@ listarNotesProjectAdmin:
    path: /project/listarNotes
    defaults: { _controller: App\Controller\Admin\ProjectController::listarNotes, _format: json }
 
+#invoices retainage
+listarInvoicesRetainageProjectAdmin:
+   path: /project/listarInvoicesRetainage
+   defaults: { _controller: App\Controller\Admin\ProjectController::listarInvoicesRetainage, _format: json }
+
 salvarNotesProjectAdmin:
    path: /project/salvarNotes
    defaults: { _controller: App\Controller\Admin\ProjectController::salvarNotes, _format: json }
