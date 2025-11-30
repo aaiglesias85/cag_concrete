@@ -1332,7 +1332,8 @@ class ProjectService extends Base
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $total = $invoiceItemRepo->TotalInvoice($invoice_id);
+         // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
+         $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
 
          $invoice = [
             "invoice_id" => $invoice_id,
@@ -2698,26 +2699,35 @@ class ProjectService extends Base
       $resultado = [];
       $total_retainage_to_date = 0;
       $total_amount_accumulated = 0;
+      $total_amount_accumulated_paid = 0; // Acumulado solo de invoices pagados
       $contract_amount = $project->getContractAmount() ?? 0;
       $retainage_percentage = $project->getRetainagePercentage() ?? 0;
       $retainage_adjustment_percentage = $project->getRetainageAdjustmentPercentage() ?? 0;
       $retainage_adjustment_completion = $project->getRetainageAdjustmentCompletion() ?? 0;
 
       foreach ($invoices as $invoice) {
-         // Calcular el invoice amount (Final Amount This Period)
-         $invoice_amount = $invoiceItemRepo->TotalInvoiceBroughtForward((string) $invoice->getInvoiceId());
+         // Calcular el invoice amount (suma de Final Amount This Period de cada item)
+         // Final Amount This Period = quantityBroughtForward * price para cada item
+         $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice->getInvoiceId());
 
          // Acumular el total para calcular el porcentaje de retainage
          $total_amount_accumulated += $invoice_amount;
+
+         // Si el invoice está pagado, acumular también en el contador de pagados
+         $is_paid = $invoice->getPaid() ?? false;
+         if ($is_paid) {
+            $total_amount_accumulated_paid += $invoice_amount;
+         }
 
          // Calcular el porcentaje de retainage a aplicar
          $porciento_retainage = $retainage_percentage;
          $ajuste_aplicado = false;
 
-         // Revisar si se debe aplicar el ajuste
+         // Revisar si se debe aplicar el ajuste (solo basado en invoices pagados)
          if ($retainage_adjustment_completion > 0 && $contract_amount > 0) {
             $threshold_amount = $contract_amount * ($retainage_adjustment_completion / 100);
-            if ($total_amount_accumulated > $threshold_amount) {
+            // Solo verificar con invoices pagados
+            if ($total_amount_accumulated_paid > $threshold_amount) {
                $porciento_retainage = $retainage_adjustment_percentage;
                $ajuste_aplicado = true;
             }

@@ -821,7 +821,8 @@ class PaymentService extends Base
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $total = $invoiceItemRepo->TotalInvoice($invoice_id);
+         // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
+         $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
 
          $data[] = array(
             "id" => $invoice_id,

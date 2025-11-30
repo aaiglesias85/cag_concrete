@@ -1615,6 +1615,21 @@ var Invoices = (function () {
                groupTitle: 'Change Order in ' + group.monthYear,
                monthYear: group.monthYear,
                _groupOrder: orderCounter++,
+               // Agregar todos los campos requeridos por DataTables con valores por defecto
+               item: '',
+               unit: '',
+               price: 0,
+               contract_qty: 0,
+               contract_amount: 0,
+               quantity_completed: 0,
+               amount_completed: 0,
+               unpaid_qty: 0,
+               unpaid_amount: 0,
+               quantity: 0,
+               amount: 0,
+               quantity_brought_forward: 0,
+               quantity_final: 0,
+               amount_final: 0,
             });
             // Agregar items del grupo
             group.items.forEach(function (item) {

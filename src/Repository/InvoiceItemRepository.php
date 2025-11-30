@@ -217,6 +217,60 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * TotalInvoiceFinalAmountThisPeriod: Obtiene la suma de Final Amount This Period ((quantity + quantityBroughtForward) * price) de los items de invoice
+    *
+    * @return float
+    */
+   public function TotalInvoiceFinalAmountThisPeriod(?string $invoice_id = null, ?string $company_id = null, ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $item_id = null, ?string $status = null): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('SUM((i_i.quantity + COALESCE(i_i.quantityBroughtForward, 0)) * i_i.price)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->leftJoin('i_i.invoice', 'i')
+         ->leftJoin('p_i.project', 'p')
+         ->leftJoin('p.company', 'c');
+
+      if ($item_id) {
+         $qb->andWhere('i_i.itemId = :item_id')
+            ->setParameter('item_id', $item_id);
+      }
+
+      if ($invoice_id) {
+         $qb->andWhere('i.invoiceId = :invoice_id')
+            ->setParameter('invoice_id', $invoice_id);
+      }
+
+      if ($project_id) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
+
+      if ($company_id) {
+         $qb->andWhere('c.companyId = :company_id')
+            ->setParameter('company_id', $company_id);
+      }
+
+      if ($fecha_inicial) {
+         $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+         $qb->andWhere('i.startDate >= :inicio')
+            ->setParameter('inicio', $fecha_inicial);
+      }
+
+      if ($fecha_fin) {
+         $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+         $qb->andWhere('i.endDate <= :fin')
+            ->setParameter('fin', $fecha_fin);
+      }
+
+      if ($status !== null) {
+         $qb->andWhere('p.status = :status')
+            ->setParameter('status', $status);
+      }
+
+      return (float) $qb->getQuery()->getSingleScalarResult();
+   }
+
+   /**
     * BuscarItem: Busca un item por su factura y item de proyecto.
     *
     * @param int $invoice_id El ID de la factura

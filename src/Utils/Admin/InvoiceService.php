@@ -693,7 +693,7 @@ class InvoiceService extends Base
 
 
          $quantity_final = $quantity + $quantity_brought_forward;
-         $amount_final = $quantity_brought_forward * $price;
+         $amount_final = $quantity_final * $price;
 
          $items[] = [
             "invoice_item_id" => $value->getId(),
@@ -1154,7 +1154,8 @@ class InvoiceService extends Base
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $total = $invoiceItemRepo->TotalInvoice($invoice_id);
+         // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
+         $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod($invoice_id);
 
          $data[] = array(
             "id" => $invoice_id,
