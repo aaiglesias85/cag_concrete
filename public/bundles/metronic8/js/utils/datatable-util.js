@@ -202,7 +202,7 @@ var DatatableUtil = (function () {
       if (row.paid == 1 || row.paid === true) {
          return '';
       }
-      
+
       var edit_icon = 'dollar';
       var title = 'Mark as Paid';
 
@@ -269,7 +269,7 @@ var DatatableUtil = (function () {
    var getRenderColumnSiNo = function (data) {
       var status = {
          1: { title: 'Yes', class: 'badge-success' },
-         0: { title: 'Not', class: 'badge-danger' },
+         0: { title: 'No', class: 'badge-danger' },
       };
       var value = data ? 1 : 0;
       var html = '<span class="badge ' + status[value].class + '">' + status[value].title + '</span>';

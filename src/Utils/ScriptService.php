@@ -469,6 +469,8 @@ class ScriptService extends Base
     */
    public function DefinirNotificacionesDueDate()
    {
+      $this->writelog("=== INICIO DefinirNotificacionesDueDate ===");
+
       $em = $this->getDoctrine()->getManager();
 
       /** @var ProjectRepository $projectRepo */
@@ -479,69 +481,110 @@ class ScriptService extends Base
       $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
 
       $usuarios = $usuarioRepo->ListarUsuariosRoles([3, 4]);
+      $this->writelog("Usuarios encontrados con roles [3, 4]: " . count($usuarios));
+
       if (empty($usuarios)) {
+         $this->writelog("ERROR: No se encontraron usuarios. Terminando función.");
          return;
       }
 
       $baseDate = \DateTimeImmutable::createFromFormat('Y-m-d', $this->ObtenerFechaActual()) ?: new \DateTimeImmutable('today');
+      $this->writelog("Fecha base (hoy): " . $baseDate->format('Y-m-d'));
+
       $avisos = [10, 5];
+      $this->writelog("Avisos configurados: " . implode(', ', $avisos) . " días antes");
 
       $direccion_url = $this->ObtenerURL();
       $direccion_from = $this->getParameter('mailer_sender_address');
       $from_name = $this->getParameter('mailer_from_name');
 
       foreach ($avisos as $diasAntes) {
-         // Calcular la fecha objetivo: hoy + X días (el due date que queremos encontrar)
-         $objetivo = $baseDate->modify(sprintf('+%d days', $diasAntes));
-         $objetivoStr = $objetivo->format('Y-m-d');
+         $this->writelog("--- Procesando aviso de {$diasAntes} días antes ---");
 
-         // Buscar proyectos cuyo due date sea exactamente la fecha objetivo
-         $projects = $projectRepo->ListarProjectsParaNotificacionesDueDate($objetivoStr, $objetivoStr);
+         // Calcular el rango de fechas: hoy + X días ± 1 día de tolerancia
+         // Esto permite encontrar proyectos cuyo due date esté cerca de la fecha objetivo
+         $objetivoInicio = $baseDate->modify(sprintf('+%d days', $diasAntes - 1))->format('Y-m-d');
+         $objetivoFin = $baseDate->modify(sprintf('+%d days', $diasAntes + 1))->format('Y-m-d');
+
+         $this->writelog("Buscando proyectos con due date entre: {$objetivoInicio} y {$objetivoFin}");
+
+         // Buscar proyectos cuyo due date esté en el rango (X días ± 1 día)
+         $projects = $projectRepo->ListarProjectsParaNotificacionesDueDate($objetivoInicio, $objetivoFin);
+
+         $this->writelog("Proyectos encontrados en el rango: " . count($projects));
 
          if (empty($projects)) {
+            $this->writelog("No hay proyectos en este rango. Continuando con siguiente aviso.");
             continue;
          }
 
          foreach ($projects as $project) {
+            $projectId = $project->getProjectId();
+            $this->writelog("Procesando proyecto ID: {$projectId}");
+
             $dueDate = $project->getDueDate();
             if (!$dueDate instanceof \DateTimeInterface) {
+               $this->writelog("Proyecto {$projectId}: SKIP - No tiene due date válido");
                continue;
             }
+
+            $dueDateStr = $dueDate->format('Y-m-d');
+            $this->writelog("Proyecto {$projectId}: Due date = {$dueDateStr}");
 
             // Convertir dueDate a DateTimeImmutable para comparación
             $dueDateImmutable = $dueDate instanceof \DateTimeImmutable
                ? $dueDate
                : \DateTimeImmutable::createFromMutable($dueDate instanceof \DateTime ? $dueDate : \DateTime::createFromInterface($dueDate));
 
-            // Calcular diferencia en días
-            $diff = $baseDate->diff($dueDateImmutable);
+            // Normalizar ambas fechas a medianoche para calcular diferencia exacta en días
+            // Usar solo la parte de fecha (Y-m-d) para evitar problemas con horas
+            $baseDateStr = $baseDate->format('Y-m-d');
+            $dueDateStr = $dueDateImmutable->format('Y-m-d');
+
+            $baseDateNormalizada = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $baseDateStr . ' 00:00:00');
+            $dueDateNormalizada = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dueDateStr . ' 00:00:00');
+
+            // Calcular diferencia en días usando fechas normalizadas
+            $diff = $baseDateNormalizada->diff($dueDateNormalizada);
             $diasDiferencia = (int)$diff->days;
 
             // Si el due date está en el pasado, hacer el número negativo
-            if ($dueDateImmutable < $baseDate) {
+            if ($dueDateNormalizada < $baseDateNormalizada) {
                $diasDiferencia = -$diasDiferencia;
             }
 
+            $this->writelog("Proyecto {$projectId}: Diferencia de días = {$diasDiferencia} (objetivo: {$diasAntes})");
+
             // Validar que el due date esté exactamente a X días desde hoy (con tolerancia de ±1 día)
             // Esto asegura que solo notificamos sobre proyectos con due date próximo
-            if (abs($diasDiferencia - $diasAntes) > 1) {
+            $diferenciaAbsoluta = abs($diasDiferencia - $diasAntes);
+            if ($diferenciaAbsoluta > 1) {
+               $this->writelog("Proyecto {$projectId}: SKIP - Diferencia absoluta ({$diferenciaAbsoluta}) > 1 día de tolerancia");
                continue;
             }
 
             // No notificar sobre proyectos muy vencidos (más de 30 días en el pasado)
             // Esto evita spam de notificaciones sobre proyectos antiguos
             if ($diasDiferencia < -30) {
+               $this->writelog("Proyecto {$projectId}: SKIP - Proyecto vencido hace más de 30 días ({$diasDiferencia} días)");
                continue;
             }
 
-            $content = $this->buildDueDateNotificationContent($project, $dueDate, $diasAntes);
+            $this->writelog("Proyecto {$projectId}: PASÓ todas las validaciones. Generando notificaciones...");
 
+            $content = $this->buildDueDateNotificationContent($project, $dueDate, $diasAntes);
+            $this->writelog("Proyecto {$projectId}: Contenido notificación = {$content}");
+
+            $notificacionesEnviadas = 0;
             foreach ($usuarios as $usuario) {
+               $usuarioId = $usuario->getUsuarioId();
                if (!$usuario->getEmail()) {
+                  $this->writelog("Usuario ID {$usuarioId}: SKIP - No tiene email");
                   continue;
                }
 
                if ($this->dueDateNotificationExists($notificationRepo, $usuario, $project, $content)) {
+                  $this->writelog("Usuario {$usuario->getEmail()}: SKIP - Ya existe notificación con este contenido");
                   continue;
                }
 
@@ -566,11 +609,15 @@ class ScriptService extends Base
                );
 
                $this->writelog("Enviado recordatorio due date a " . $usuario->getEmail() . " para el proyecto " . $project->getProjectId());
+               $notificacionesEnviadas++;
             }
+
+            $this->writelog("Proyecto {$projectId}: Total notificaciones enviadas = {$notificacionesEnviadas}");
          }
       }
 
       $em->flush();
+      $this->writelog("=== FIN DefinirNotificacionesDueDate ===");
    }
 
 
