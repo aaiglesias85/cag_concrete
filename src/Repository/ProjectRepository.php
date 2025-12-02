@@ -383,6 +383,23 @@ class ProjectRepository extends ServiceEntityRepository
       return $consulta->getQuery()->getResult();
    }
 
+   /**
+    * ListarProjectsConDueDateNoCompletados: Lista todos los proyectos con due date que no estén completados
+    * Para notificaciones mensuales que ignoran el año
+    *
+    * @return Project[]
+    */
+   public function ListarProjectsConDueDateNoCompletados()
+   {
+      return $this->createQueryBuilder('p')
+         ->where('p.dueDate IS NOT NULL')
+         ->andWhere('p.status != :statusCompleted')
+         ->setParameter('statusCompleted', 2)
+         ->orderBy('p.dueDate', 'ASC')
+         ->getQuery()
+         ->getResult();
+   }
+
 
    /**
     * ListarStats: Lista para las stats
