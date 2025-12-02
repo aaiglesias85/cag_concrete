@@ -491,8 +491,12 @@ class ScriptService extends Base
       $from_name = $this->getParameter('mailer_from_name');
 
       foreach ($avisos as $diasAntes) {
-         $objetivo = $baseDate->modify(sprintf('+%d days', $diasAntes))->format('Y-m-d');
-         $projects = $projectRepo->ListarProjectsParaNotificacionesDueDate($objetivo, $objetivo);
+         // Calcular la fecha objetivo: hoy + X días (el due date que queremos encontrar)
+         $objetivo = $baseDate->modify(sprintf('+%d days', $diasAntes));
+         $objetivoStr = $objetivo->format('Y-m-d');
+
+         // Buscar proyectos cuyo due date sea exactamente la fecha objetivo
+         $projects = $projectRepo->ListarProjectsParaNotificacionesDueDate($objetivoStr, $objetivoStr);
 
          if (empty($projects)) {
             continue;
@@ -501,6 +505,32 @@ class ScriptService extends Base
          foreach ($projects as $project) {
             $dueDate = $project->getDueDate();
             if (!$dueDate instanceof \DateTimeInterface) {
+               continue;
+            }
+
+            // Convertir dueDate a DateTimeImmutable para comparación
+            $dueDateImmutable = $dueDate instanceof \DateTimeImmutable
+               ? $dueDate
+               : \DateTimeImmutable::createFromMutable($dueDate instanceof \DateTime ? $dueDate : \DateTime::createFromInterface($dueDate));
+
+            // Calcular diferencia en días
+            $diff = $baseDate->diff($dueDateImmutable);
+            $diasDiferencia = (int)$diff->days;
+
+            // Si el due date está en el pasado, hacer el número negativo
+            if ($dueDateImmutable < $baseDate) {
+               $diasDiferencia = -$diasDiferencia;
+            }
+
+            // Validar que el due date esté exactamente a X días desde hoy (con tolerancia de ±1 día)
+            // Esto asegura que solo notificamos sobre proyectos con due date próximo
+            if (abs($diasDiferencia - $diasAntes) > 1) {
+               continue;
+            }
+
+            // No notificar sobre proyectos muy vencidos (más de 30 días en el pasado)
+            // Esto evita spam de notificaciones sobre proyectos antiguos
+            if ($diasDiferencia < -30) {
                continue;
             }
 
