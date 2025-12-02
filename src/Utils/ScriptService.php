@@ -572,7 +572,9 @@ class ScriptService extends Base
 
             $this->writelog("Proyecto {$projectId}: PASÓ todas las validaciones. Generando notificaciones...");
 
-            $content = $this->buildDueDateNotificationContent($project, $dueDate, $diasAntes);
+            // Usar la diferencia real de días para el contenido de la notificación
+            $diasReales = abs($diasDiferencia);
+            $content = $this->buildDueDateNotificationContent($project, $dueDate, $diasReales);
             $this->writelog("Proyecto {$projectId}: Contenido notificación = {$content}");
 
             $notificacionesEnviadas = 0;
@@ -600,7 +602,7 @@ class ScriptService extends Base
                $this->enviarRecordatorioDueDate(
                   $usuario,
                   $project,
-                  $diasAntes,
+                  $diasReales,
                   $dueDate,
                   $direccion_url,
                   $direccion_from,
@@ -660,7 +662,7 @@ class ScriptService extends Base
       ]);
    }
 
-   private function buildDueDateNotificationContent(Project $project, \DateTimeInterface $dueDate, int $diasAntes): string
+   private function buildDueDateNotificationContent(Project $project, \DateTimeInterface $dueDate, int $diasReales): string
    {
       $projectNumber = trim((string)$project->getProjectNumber());
       $projectName = trim((string)$project->getName());
@@ -674,14 +676,14 @@ class ScriptService extends Base
          '%s invoice due date %s (in %d days)',
          $label,
          $dueDate->format('m/d/Y'),
-         $diasAntes
+         $diasReales
       );
    }
 
    private function enviarRecordatorioDueDate(
       Usuario $usuario,
       Project $project,
-      int $diasAntes,
+      int $diasReales,
       \DateTimeInterface $dueDate,
       string $direccionUrl,
       string $emailFrom,
@@ -691,7 +693,7 @@ class ScriptService extends Base
       $projectNumber = trim((string)$project->getProjectNumber());
       $subject = sprintf(
          'Invoice due date reminder (%d days) - %s',
-         $diasAntes,
+         $diasReales,
          $projectNumber !== '' ? $projectNumber : 'Project #' . $project->getProjectId()
       );
 
@@ -709,7 +711,7 @@ class ScriptService extends Base
             'project_id' => $project->getProjectId(),
             'mensaje_resumen' => $contenido,
             'due_date' => $dueDate->format('m/d/Y'),
-            'dias_restantes' => $diasAntes,
+            'dias_restantes' => $diasReales,
          ]);
 
       $this->mailer->send($mensaje);
