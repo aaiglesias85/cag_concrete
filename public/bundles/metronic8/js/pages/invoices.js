@@ -1557,44 +1557,18 @@ var Invoices = (function () {
    // Función para agrupar items por change_order_date
    var agruparItemsPorChangeOrder = function (items) {
       var items_regulares = [];
-      var items_change_order = {};
+      var items_change_order = [];
 
       // Separar items regulares y change order
       items.forEach(function (item) {
          if (item.change_order && item.change_order_date) {
-            // Parsear fecha (formato: m/d/Y)
-            var dateParts = item.change_order_date.split('/');
-            if (dateParts.length === 3) {
-               var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
-               var monthYear = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-               var keyGroup = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0');
-
-               if (!items_change_order[keyGroup]) {
-                  items_change_order[keyGroup] = {
-                     monthYear: monthYear,
-                     items: [],
-                  };
-               }
-               items_change_order[keyGroup].items.push(item);
-            } else {
-               // Si no tiene fecha válida, agregarlo al grupo por defecto
-               if (!items_change_order['no-date']) {
-                  items_change_order['no-date'] = {
-                     monthYear: 'Unknown Date',
-                     items: [],
-                  };
-               }
-               items_change_order['no-date'].items.push(item);
-            }
+            items_change_order.push(item);
          } else {
             items_regulares.push(item);
          }
       });
 
-      // Ordenar grupos por fecha (más antiguo primero)
-      var sortedGroups = Object.keys(items_change_order).sort();
-
-      // Construir array final: items regulares primero
+      // Construir array final: items regulares primero, luego change orders
       var resultado = [];
       var orderCounter = 0;
 
@@ -1604,40 +1578,11 @@ var Invoices = (function () {
          resultado.push(item);
       });
 
-      // Si hay items change order, agregar separación y grupos
-      if (sortedGroups.length > 0) {
-         // Agregar grupos de change order
-         sortedGroups.forEach(function (keyGroup) {
-            var group = items_change_order[keyGroup];
-            // Agregar encabezado del grupo con orden especial
-            resultado.push({
-               isGroupHeader: true,
-               groupTitle: 'Change Order in ' + group.monthYear,
-               monthYear: group.monthYear,
-               _groupOrder: orderCounter++,
-               // Agregar todos los campos requeridos por DataTables con valores por defecto
-               item: '',
-               unit: '',
-               price: 0,
-               contract_qty: 0,
-               contract_amount: 0,
-               quantity_completed: 0,
-               amount_completed: 0,
-               unpaid_qty: 0,
-               unpaid_amount: 0,
-               quantity: 0,
-               amount: 0,
-               quantity_brought_forward: 0,
-               quantity_final: 0,
-               amount_final: 0,
-            });
-            // Agregar items del grupo
-            group.items.forEach(function (item) {
-               item._groupOrder = orderCounter++;
-               resultado.push(item);
-            });
-         });
-      }
+      // Agregar items change order
+      items_change_order.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
 
       return resultado;
    };
@@ -1674,11 +1619,15 @@ var Invoices = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
-               // Si es encabezado de grupo, mostrar el título
-               if (row.isGroupHeader) {
-                  return '<strong>' + row.groupTitle + '</strong>';
+               // Si es change order, agregar icono de historial
+               var icono = '';
+               if (row.change_order) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
                }
-               return DatatableUtil.getRenderColumnDiv(data, 200);
+               return `<span>${DatatableUtil.getRenderColumnDiv(data, 200)}${icono}</span>`;
             },
          },
          // unit
@@ -1686,7 +1635,6 @@ var Invoices = (function () {
             targets: 1,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1695,7 +1643,6 @@ var Invoices = (function () {
             targets: 2,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1704,7 +1651,6 @@ var Invoices = (function () {
             targets: 3,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1713,7 +1659,6 @@ var Invoices = (function () {
             targets: 4,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1722,7 +1667,6 @@ var Invoices = (function () {
             targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1731,7 +1675,6 @@ var Invoices = (function () {
             targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1740,7 +1683,6 @@ var Invoices = (function () {
             targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
             },
          },
@@ -1749,7 +1691,6 @@ var Invoices = (function () {
             targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1758,7 +1699,6 @@ var Invoices = (function () {
             targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1767,7 +1707,6 @@ var Invoices = (function () {
             targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1776,7 +1715,6 @@ var Invoices = (function () {
             targets: 11,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                var value = data ?? 0;
                if (invoice === null || !invoice.paid) {
                   return `<div class="w-100px"><input type="number" class="form-control quantity_brought_forward" value="${value}" data-position="${row.posicion}" step="any" /></div>`;
@@ -1789,7 +1727,6 @@ var Invoices = (function () {
             targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1798,7 +1735,6 @@ var Invoices = (function () {
             targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1809,7 +1745,6 @@ var Invoices = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -1838,45 +1773,32 @@ var Invoices = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary y encabezados de grupo
+         // marcar secondary y aplicar colores
          createdRow: (row, data, index) => {
-            if (data.isGroupHeader) {
-               $(row).addClass('row-group-header');
-               $(row).css({
-                  'background-color': '#f5f5f5',
-                  'font-weight': 'bold',
-               });
-               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
-               var $firstCell = $(row).find('td:first');
-               $firstCell.attr('colspan', columns.length - 1);
-               // Ocultar las demás celdas
-               $(row).find('td:not(:first)').hide();
-            } else {
-               const $cells = $('td', row);
+            const $cells = $('td', row);
 
-               // 🔵 quantity_completed y amount_completed (#daeef3)
-               $cells.eq(5).css('background-color', '#daeef3');
-               $cells.eq(6).css('background-color', '#daeef3');
+            // 🔵 quantity_completed y amount_completed (#daeef3)
+            $cells.eq(5).css('background-color', '#daeef3');
+            $cells.eq(6).css('background-color', '#daeef3');
 
-               // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
-               $cells.eq(7).css('background-color', '#f79494');
-               $cells.eq(8).css('background-color', '#f79494');
+            // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
+            $cells.eq(7).css('background-color', '#f79494');
+            $cells.eq(8).css('background-color', '#f79494');
 
-               // 🟠 quantity y amount (#fcd5b4)
-               $cells.eq(9).css('background-color', '#fcd5b4');
-               $cells.eq(10).css('background-color', '#fcd5b4');
+            // 🟠 quantity y amount (#fcd5b4)
+            $cells.eq(9).css('background-color', '#fcd5b4');
+            $cells.eq(10).css('background-color', '#fcd5b4');
 
-               // 🟡 quantity_brought_forward (#f2d068)
-               $cells.eq(11).css('background-color', '#f2d068');
+            // 🟡 quantity_brought_forward (#f2d068)
+            $cells.eq(11).css('background-color', '#f2d068');
 
-               // 🟢 quantity_final y amount_final (#d8e4bc)
-               $cells.eq(12).css('background-color', '#d8e4bc');
-               $cells.eq(13).css('background-color', '#d8e4bc');
+            // 🟢 quantity_final y amount_final (#d8e4bc)
+            $cells.eq(12).css('background-color', '#d8e4bc');
+            $cells.eq(13).css('background-color', '#d8e4bc');
 
-               // Si mantienes la lógica para "row-secondary"
-               if (!data.principal) {
-                  $(row).addClass('row-secondary');
-               }
+            // Si mantienes la lógica para "row-secondary"
+            if (!data.principal) {
+               $(row).addClass('row-secondary');
             }
          },
 
@@ -1938,7 +1860,58 @@ var Invoices = (function () {
       });
 
       handleSearchDatatableItems();
+      handleChangeOrderHistory();
    };
+
+   var handleChangeOrderHistory = function () {
+      $(document).off('click', '.change-order-history-icon');
+      $(document).on('click', '.change-order-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id);
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      axios
+         .get('project/listarHistorialItem', {
+            params: { project_item_id: project_item_id },
+            responseType: 'json',
+         })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var historial = response.historial || [];
+                  var html = '';
+                  if (historial.length === 0) {
+                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                  } else {
+                     html = '<ul class="list-unstyled">';
+                     historial.forEach(function (item) {
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                     });
+                     html += '</ul>';
+                  }
+                  $('#modal-change-order-history .modal-body').html(html);
+                  ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+               } else {
+                  toastr.error(response.error || 'Error loading history', '');
+               }
+            }
+         })
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+            console.error(error);
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
+   };
+
    var handleSearchDatatableItems = function () {
       $(document).off('keyup', '#lista-items [data-table-filter="search"]');
       $(document).on('keyup', '#lista-items [data-table-filter="search"]', function (e) {
