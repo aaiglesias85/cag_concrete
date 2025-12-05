@@ -517,21 +517,39 @@ class ScriptService extends Base
                continue;
             }
 
-            // Obtener mes y día del due date (ignorar año)
-            $mesDueDate = (int)$dueDate->format('m');
+            // Obtener solo el DÍA del due date (ignorar mes y año completamente)
+            // Ejemplo: si due date es 9 de marzo de 2000, solo importa el día "9"
             $diaDueDate = (int)$dueDate->format('d');
 
-            // Calcular la próxima fecha de due date desde hoy (puede ser este año o el siguiente)
+            // Calcular la próxima fecha en que ocurra ese día desde hoy
             $añoActual = (int)$baseDate->format('Y');
             $mesActual = (int)$baseDate->format('m');
             $diaActual = (int)$baseDate->format('d');
 
-            // Crear fecha del due date en el año actual
-            $proximoDueDate = \DateTimeImmutable::createFromFormat('Y-m-d', sprintf('%d-%02d-%02d', $añoActual, $mesDueDate, $diaDueDate));
+            // Intentar crear fecha con el día del due date en el mes actual
+            $diasEnMesActual = (int)$baseDate->format('t');
 
-            // Si la fecha ya pasó este año, usar el año siguiente
-            if ($proximoDueDate < $baseDate) {
-               $proximoDueDate = $proximoDueDate->modify('+1 year');
+            // Si el día no existe en el mes actual, buscar en el siguiente mes
+            if ($diaDueDate > $diasEnMesActual) {
+               // El día no existe en este mes, pasar al siguiente mes
+               $proximoDueDate = $baseDate->modify('first day of next month')->modify(sprintf('+%d days', $diaDueDate - 1));
+            } else {
+               // Crear fecha con el día del due date en el mes actual
+               $proximoDueDate = \DateTimeImmutable::createFromFormat('Y-m-d', sprintf('%d-%02d-%02d', $añoActual, $mesActual, $diaDueDate));
+
+               // Si la fecha ya pasó este mes, pasar al mes siguiente
+               if ($proximoDueDate <= $baseDate) {
+                  // Intentar en el siguiente mes
+                  $fechaTemporal = $baseDate->modify('first day of next month');
+                  $diasEnMesSiguiente = (int)$fechaTemporal->format('t');
+
+                  if ($diaDueDate > $diasEnMesSiguiente) {
+                     // El día no existe en el siguiente mes tampoco, buscar más adelante
+                     $proximoDueDate = $fechaTemporal->modify('first day of next month')->modify(sprintf('+%d days', $diaDueDate - 1));
+                  } else {
+                     $proximoDueDate = $fechaTemporal->modify(sprintf('+%d days', $diaDueDate - 1));
+                  }
+               }
             }
 
             // Calcular diferencia en días desde hoy hasta el próximo due date
@@ -559,8 +577,8 @@ class ScriptService extends Base
 
             // Solo registrar logs para proyectos que cumplen los criterios
             $projectsEncontrados++;
-            $this->writelog("Proyecto {$projectId}: Due date original = " . $dueDate->format('Y-m-d') . " (mes-día: {$mesDueDate}-{$diaDueDate})");
-            $this->writelog("Proyecto {$projectId}: Próximo due date = " . $proximoDueDate->format('Y-m-d'));
+            $this->writelog("Proyecto {$projectId}: Due date original = " . $dueDate->format('Y-m-d') . " (día del mes: {$diaDueDate})");
+            $this->writelog("Proyecto {$projectId}: Próximo día {$diaDueDate} = " . $proximoDueDate->format('Y-m-d'));
             $this->writelog("Proyecto {$projectId}: Diferencia de días = {$diasDiferencia} (objetivo: {$diasAntes}) - PASÓ validación");
 
             // Usar la diferencia real de días para el contenido de la notificación
