@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\Company;
+use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\DataTrackingConcVendor;
@@ -1174,6 +1175,7 @@ class ProjectService extends Base
          $arreglo_resultado['project_id_number'] = $entity->getProjectIdNumber();
 
          $arreglo_resultado['vendor_id'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getVendorId() : '';
+         $arreglo_resultado['concrete_class_id'] = $entity->getConcreteClass() != null ? $entity->getConcreteClass()->getConcreteClassId() : '';
          $arreglo_resultado['concrete_vendor'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getName() : '';
          $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
          $arreglo_resultado['concrete_quote_price_escalator'] = $entity->getConcreteQuotePriceEscalator() ?? '';
@@ -1697,6 +1699,7 @@ class ProjectService extends Base
       $ajustes_precio,
       $archivos,
       $vendor_id,
+      $concrete_class_id,
       $concrete_quote_price,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
@@ -1968,6 +1971,14 @@ class ProjectService extends Base
             $vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
                ->find($vendor_id);
             $entity->setConcreteVendor($vendor);
+         }
+
+         // concrete class
+         $entity->setConcreteClass(NULL);
+         if ($concrete_class_id != '') {
+            $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
+               ->find($concrete_class_id);
+            $entity->setConcreteClass($concrete_class);
          }
 
          if ($vendor_id != $vendor_id_old) {

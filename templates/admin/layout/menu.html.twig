@@ -88,7 +88,7 @@
                   data-kt-menu-trigger="click"
                   class="menu-item menu-accordion
                             {{ activeRoute == 'company' or activeRoute == 'project' or
-                        activeRoute == 'subcontractor' or activeRoute == 'conc_vendor' ? 'here show' }}
+                        activeRoute == 'subcontractor' or activeRoute == 'conc_vendor' or activeRoute == 'concrete_class' ? 'here show' }}
                         "
                >
                   <!--begin:Menu link-->
@@ -149,6 +149,19 @@
                               <span class="bullet bullet-dot"></span>
                            </span>
                            <span class="menu-title">Concrete Vendors</span>
+                        </a>
+                     </div>
+                     {% endif %}
+                     <!--end:Menu item-->
+
+                     <!--begin:Menu item-->
+                     {% if menu.menuConcreteClass %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'concrete_class' ? 'active' }}" href="{{ url('concrete_class') }}">
+                           <span class="menu-bullet">
+                              <span class="bullet bullet-dot"></span>
+                           </span>
+                           <span class="menu-title">Concrete Classes</span>
                         </a>
                      </div>
                      {% endif %}

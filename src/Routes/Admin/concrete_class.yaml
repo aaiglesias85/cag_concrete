@@ -1,0 +1,23 @@
+concrete_class:
+   path: /concrete-classes
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::index }
+
+listarConcreteClassAdmin:
+   path: /concrete-class/listar
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::listar, _format: json }
+
+eliminarConcreteClassAdmin:
+   path: /concrete-class/eliminar
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::eliminar, _format: json }
+
+eliminarConcreteClassesAdmin:
+   path: /concrete-class/eliminarVarios
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::eliminarVarios, _format: json }
+
+salvarConcreteClassAdmin:
+   path: /concrete-class/salvar
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::salvar, _format: json }
+
+cargarDatosConcreteClassAdmin:
+   path: /concrete-class/cargarDatos
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::cargarDatos, _format: json }

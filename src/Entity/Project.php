@@ -110,6 +110,10 @@ class Project
    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
    private ?ConcreteVendor $concreteVendor;
 
+   #[ORM\ManyToOne(targetEntity: ConcreteClass::class)]
+   #[ORM\JoinColumn(name: 'concrete_class_id', referencedColumnName: 'concrete_class_id')]
+   private ?ConcreteClass $concreteClass;
+
    #[ORM\Column(name: 'updated_at_concrete_quote_price', type: 'datetime', nullable: true)]
    private ?\DateTimeInterface $updatedAtConcreteQuotePrice;
 
@@ -399,6 +403,16 @@ class Project
    public function setConcreteVendor(?ConcreteVendor $concreteVendor): void
    {
       $this->concreteVendor = $concreteVendor;
+   }
+
+   public function getConcreteClass(): ?ConcreteClass
+   {
+      return $this->concreteClass;
+   }
+
+   public function setConcreteClass(?ConcreteClass $concreteClass): void
+   {
+      $this->concreteClass = $concreteClass;
    }
 
    public function getConcreteQuotePrice(): ?float

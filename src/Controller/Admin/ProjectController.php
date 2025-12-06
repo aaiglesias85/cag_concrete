@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Company;
+use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\Equation;
@@ -59,6 +60,10 @@ class ProjectController extends AbstractController
             $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
                ->ListarOrdenados();
 
+            // concrete classes
+            $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
+               ->ListarOrdenados();
+
             return $this->render('admin/project/index.html.twig', array(
                'permiso' => $permiso[0],
                'companies' => $companies,
@@ -69,6 +74,7 @@ class ProjectController extends AbstractController
                'units' => $units,
                'countys' => $countys,
                'concrete_vendors' => $concrete_vendors,
+               'concrete_classes' => $concrete_classes,
                'direccion_url' => $this->projectService->ObtenerURL()
             ));
          }
@@ -163,6 +169,7 @@ class ProjectController extends AbstractController
       $due_date = $request->get('due_date');
 
       $vendor_id = $request->get('vendor_id');
+      $concrete_class_id = $request->get('concrete_class_id');
       $concrete_quote_price = $request->get('concrete_quote_price');
       $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
       $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
@@ -220,6 +227,7 @@ class ProjectController extends AbstractController
                $items,
                $contacts,
                $vendor_id,
+               $concrete_class_id,
                $concrete_quote_price,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,
@@ -260,6 +268,7 @@ class ProjectController extends AbstractController
                $ajustes_precio,
                $archivos,
                $vendor_id,
+               $concrete_class_id,
                $concrete_quote_price,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,

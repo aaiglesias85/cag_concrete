@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 06-12-2025 a las 15:51:46
+-- Tiempo de generación: 06-12-2025 a las 18:17:21
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -83,6 +83,18 @@ CREATE TABLE `company_contact` (
 
 INSERT INTO `company_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `company_id`) VALUES
 (1, 'Dan Schamerhorn', 'merhorn@earsnel.com', '(618)985-7850', 'Senior', ' test', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `concrete_class`
+--
+
+CREATE TABLE `concrete_class` (
+  `concrete_class_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `status` tinyint(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -564,7 +576,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (32, 'county', 'County'),
 (33, 'payment', 'Payments'),
 (34, 'race', 'Races'),
-(35, 'employee_rrhh', 'Employees');
+(35, 'employee_rrhh', 'Employees'),
+(36, 'concrete_class', 'Concrete Class');
 
 -- --------------------------------------------------------
 
@@ -1318,17 +1331,18 @@ CREATE TABLE `project` (
   `company_id` int(11) DEFAULT NULL,
   `inspector_id` int(11) DEFAULT NULL,
   `county_id` int(11) DEFAULT NULL,
-  `vendor_id` int(11) DEFAULT NULL
+  `vendor_id` int(11) DEFAULT NULL,
+  `concrete_class_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL),
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`) VALUES
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL, NULL),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1659,7 +1673,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (44, 1, 1, 1, 1, 1, 32),
 (45, 1, 1, 1, 1, 1, 33),
 (46, 1, 1, 1, 1, 1, 34),
-(47, 1, 1, 1, 1, 1, 35);
+(47, 1, 1, 1, 1, 1, 35),
+(48, 1, 1, 1, 1, 1, 36);
 
 -- --------------------------------------------------------
 
@@ -1872,7 +1887,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (36, 1, 1, 1, 1, 1, 32),
 (37, 1, 1, 1, 1, 1, 33),
 (38, 1, 1, 1, 1, 1, 34),
-(39, 1, 1, 1, 1, 1, 35);
+(39, 1, 1, 1, 1, 1, 35),
+(40, 1, 1, 1, 1, 1, 36);
 
 -- --------------------------------------------------------
 
@@ -1908,6 +1924,12 @@ ALTER TABLE `company`
 ALTER TABLE `company_contact`
   ADD PRIMARY KEY (`contact_id`),
   ADD KEY `Ref6474` (`company_id`);
+
+--
+-- Indices de la tabla `concrete_class`
+--
+ALTER TABLE `concrete_class`
+  ADD PRIMARY KEY (`concrete_class_id`);
 
 --
 -- Indices de la tabla `concrete_vendor`
@@ -2172,7 +2194,8 @@ ALTER TABLE `project`
   ADD KEY `Ref6467` (`company_id`),
   ADD KEY `Ref6573` (`inspector_id`),
   ADD KEY `county_id` (`county_id`),
-  ADD KEY `vendor_id` (`vendor_id`);
+  ADD KEY `vendor_id` (`vendor_id`),
+  ADD KEY `concrete_class_id` (`concrete_class_id`);
 
 --
 -- Indices de la tabla `project_attachment`
@@ -2374,6 +2397,12 @@ ALTER TABLE `company_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `concrete_class`
+--
+ALTER TABLE `concrete_class`
+  MODIFY `concrete_class_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `concrete_vendor`
 --
 ALTER TABLE `concrete_vendor`
@@ -2491,7 +2520,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2665,7 +2694,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2725,7 +2754,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -2923,6 +2952,7 @@ ALTER TABLE `notification`
 -- Filtros para la tabla `project`
 --
 ALTER TABLE `project`
+  ADD CONSTRAINT `Refconcreteclassid` FOREIGN KEY (`concrete_class_id`) REFERENCES `concrete_class` (`concrete_class_id`),
   ADD CONSTRAINT `Refconcretevendorid` FOREIGN KEY (`vendor_id`) REFERENCES `concrete_vendor` (`vendor_id`),
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),

@@ -1,0 +1,29 @@
+<div class="modal fade" id="modal-concrete-class" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New Concrete Class</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="concrete-class-modal-form" action="#" enctype="multipart/form-data" method="post">
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Name
+                  </label>
+                  <input type="text" class="form-control form-control-validate form-control-solid event-change" id="name-concrete-class-modal" name="name" />
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-concrete-class-modal">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<script src="{{ asset('bundles/metronic8/js/components/modal-concrete-class.js') }}?{{ 'now' | date('U') }}"></script>

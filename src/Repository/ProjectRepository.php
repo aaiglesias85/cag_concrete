@@ -142,6 +142,25 @@ class ProjectRepository extends ServiceEntityRepository
    }
 
    /**
+    * ListarProjectsDeConcreteClass: Lista los projects de un concrete class
+    *
+    * @return Project[]
+    */
+   public function ListarProjectsDeConcreteClass($concrete_class_id)
+   {
+      $qb = $this->createQueryBuilder('p')
+         ->leftJoin('p.concreteClass', 'c_c')
+         ->orderBy('p.projectId', 'ASC');
+
+      if (!empty($concrete_class_id)) {
+         $qb->andWhere('c_c.concreteClassId = :concrete_class_id')
+            ->setParameter('concrete_class_id', $concrete_class_id);
+      }
+
+      return $qb->getQuery()->getResult();
+   }
+
+   /**
     * ListarProjects: Lista los projects con filtros y paginación
     * @param int $start Inicio
     * @param int $limit Limite

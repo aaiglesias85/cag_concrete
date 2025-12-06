@@ -440,6 +440,9 @@ var Projects = (function () {
       $('#concrete-vendor').val('');
       $('#concrete-vendor').trigger('change');
 
+      $('#concrete-class').val('');
+      $('#concrete-class').trigger('change');
+
       $('#tp-unit').val('');
       $('#tp-unit').trigger('change');
 
@@ -528,7 +531,7 @@ var Projects = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 4;
+   var totalTabs = 11;
    var initWizard = function () {
       $(document).off('click', '#form-project .wizard-tab');
       $(document).on('click', '#form-project .wizard-tab', function (e) {
@@ -629,6 +632,9 @@ var Projects = (function () {
                $('#tab-general').tab('show');
                break;
             case 2:
+               $('#tab-concrete-vendor').tab('show');
+               break;
+            case 3:
                $('#tab-retainage').tab('show');
                // Cargar tabla de invoices con retainage si está activado
                var project_id = $('#project_id').val();
@@ -636,34 +642,34 @@ var Projects = (function () {
                   cargarTablaInvoicesRetainage(project_id);
                }
                break;
-            case 3:
+            case 4:
                $('#tab-items').tab('show');
                actualizarTableListaItems();
                break;
-            case 4:
+            case 5:
                $('#tab-contacts').tab('show');
                break;
-            case 5:
+            case 6:
                $('#tab-notes').tab('show');
                btnClickFiltrarNotes();
                break;
-            case 6:
+            case 7:
                $('#tab-invoices').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 7:
+            case 8:
                $('#tab-data-tracking').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 8:
+            case 9:
                $('#tab-ajustes-precio').tab('show');
                actualizarTableListaAjustesPrecio();
                break;
-            case 9:
+            case 10:
                $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 10:
+            case 11:
                $('#tab-items-completion').tab('show');
                actualizarTableListaItemsCompletion();
                break;
@@ -672,7 +678,7 @@ var Projects = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 4;
+      totalTabs = 11;
       mostrarTab();
       // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
@@ -846,6 +852,9 @@ var Projects = (function () {
 
       var vendor_id = $('#concrete-vendor').val();
       formData.set('vendor_id', vendor_id);
+
+      var concrete_class_id = $('#concrete-class').val();
+      formData.set('concrete_class_id', concrete_class_id);
 
       var concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
       formData.set('concrete_quote_price', concrete_quote_price);
@@ -1084,6 +1093,9 @@ var Projects = (function () {
 
          $('#concrete-vendor').val(project.vendor_id);
          $('#concrete-vendor').trigger('change');
+
+         $('#concrete-class').val(project.concrete_class_id);
+         $('#concrete-class').trigger('change');
 
          $('#concrete_quote_price').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
          $('#concrete_quote_price_escalator').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
@@ -3870,6 +3882,28 @@ var Projects = (function () {
       });
    };
 
+   // concrete class
+   var initAccionesConcreteClass = function () {
+      // add concrete class
+      $(document).off('click', '#btn-add-concrete-class');
+      $(document).on('click', '#btn-add-concrete-class', function (e) {
+         ModalConcreteClass.mostrarModal();
+      });
+
+      $('#modal-concrete-class').on('hidden.bs.modal', function () {
+         var concrete_class = ModalConcreteClass.getClass();
+         if (concrete_class != null) {
+            //add concrete class to select
+            $('#concrete-class').append(new Option(concrete_class.name, concrete_class.concrete_class_id, false, false));
+
+            $('#concrete-class').select2();
+
+            $('#concrete-class').val(concrete_class.concrete_class_id);
+            $('#concrete-class').trigger('change');
+         }
+      });
+   };
+
    // items
    var oTableItemsCompletion;
    var items_completion = [];
@@ -4344,6 +4378,9 @@ var Projects = (function () {
 
          // concrete vendors
          initAccionesConcVendor();
+
+         // concrete class
+         initAccionesConcreteClass();
 
          initAccionChange();
 

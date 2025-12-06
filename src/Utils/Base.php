@@ -396,6 +396,7 @@ class Base
       $menuPayment = false;
       $menuRace = false;
       $menuEmployeeRrhh = false;
+      $menuConcreteClass = false;
 
       // obtener permisos
       $permisos = $this->ListarPermisosDeUsuario($usuario_id);
@@ -507,6 +508,10 @@ class Base
          if ($permiso['funcion_id'] == 35 && $permiso['ver']) {
             $menuEmployeeRrhh = true;
          }
+
+         if ($permiso['funcion_id'] == 36 && $permiso['ver']) {
+            $menuConcreteClass = true;
+         }
       }
 
       return [
@@ -545,6 +550,7 @@ class Base
          'menuPayment' => $menuPayment,
          'menuRace' => $menuRace,
          'menuEmployeeRrhh' => $menuEmployeeRrhh,
+         'menuConcreteClass' => $menuConcreteClass,
       ];
    }
 

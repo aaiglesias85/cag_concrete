@@ -14,6 +14,9 @@ var ProjectsDetalle = (function () {
       $('#concrete-vendor-detalle').val('');
       $('#concrete-vendor-detalle').trigger('change');
 
+      $('#concrete-class-detalle').val('');
+      $('#concrete-class-detalle').trigger('change');
+
       $('#tp-unit-detalle').val('');
       $('#tp-unit-detalle').trigger('change');
 
@@ -139,6 +142,9 @@ var ProjectsDetalle = (function () {
 
          $('#concrete-vendor-detalle').val(project.vendor_id);
          $('#concrete-vendor-detalle').trigger('change');
+
+         $('#concrete-class-detalle').val(project.concrete_class_id);
+         $('#concrete-class-detalle').trigger('change');
 
          $('#concrete_quote_price-detalle').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
          $('#concrete_quote_price_escalator-detalle').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
