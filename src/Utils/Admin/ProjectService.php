@@ -1387,6 +1387,13 @@ class ProjectService extends Base
       $price = $value->getPrice();
       $total = $quantity * $price;
 
+      // Calcular porcentaje de completion
+      $project_item_id = $value->getId();
+      /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
+      $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
+
       return [
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
@@ -1403,6 +1410,7 @@ class ProjectService extends Base
          "principal" => $value->getPrincipal(),
          "change_order" => $value->getChangeOrder(),
          "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
+         "porciento_completion" => $porciento_completion,
          "posicion" => $key
       ];
    }

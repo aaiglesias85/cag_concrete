@@ -1032,8 +1032,8 @@ var DataTracking = (function () {
 
       for (var i = 0; i < items.length; i++) {
          var descripcion = `${items[i].item} - ${items[i].unit} - $${items[i].price}`;
-         if (items[i].principal) {
-            descripcion += ` (Principal)`;
+         if (items[i].change_order_date && items[i].change_order_date !== '') {
+            descripcion += ` (COD ${items[i].change_order_date})`;
          }
          $('.items-project').append(new Option(descripcion, items[i].project_item_id, false, false));
       }
@@ -1232,6 +1232,31 @@ var DataTracking = (function () {
 
       $('.select-modal-conc-vendor').select2({
          dropdownParent: $('#modal-data-tracking-conc-vendor'), // Asegúrate de que es el ID del modal
+      });
+
+      // Evento change para mostrar porcentaje de completion
+      $(document).off('change', '#item-data-tracking');
+      $(document).on('change', '#item-data-tracking', function () {
+         var item_id = $(this).val();
+         var completionInfo = $('#item-completion-info');
+         var completionPercentage = $('#item-completion-percentage');
+
+         if (item_id && item_id !== '') {
+            // Buscar el item en el array items
+            var selectedItem = items.find(function (item) {
+               return item.project_item_id == item_id;
+            });
+
+            if (selectedItem && selectedItem.porciento_completion !== undefined) {
+               var percentage = MyApp.formatearNumero(selectedItem.porciento_completion, 2, '.', ',');
+               completionPercentage.text(percentage);
+               completionInfo.show();
+            } else {
+               completionInfo.hide();
+            }
+         } else {
+            completionInfo.hide();
+         }
       });
    };
 
@@ -1504,8 +1529,8 @@ var DataTracking = (function () {
             items.push(item);
 
             var descripcion = `${item.item} - ${item.unit} - $${item.price}`;
-            if (item.principal) {
-               descripcion += ` (Principal)`;
+            if (item.change_order_date && item.change_order_date !== '') {
+               descripcion += ` (COD ${item.change_order_date})`;
             }
             $('.items-project').append(new Option(descripcion, item.project_item_id, false, false));
             $('.items-project').select2();
@@ -1583,7 +1608,10 @@ var DataTracking = (function () {
                // Si es change order, agregar icono de +
                var icono = '';
                if (row.change_order) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' + row.item_id + '" title="View change order history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.item_id +
+                     '" title="View change order history"></i>';
                }
                return `<span>${data || ''}${icono}</span>`;
             },
@@ -1996,6 +2024,9 @@ var DataTracking = (function () {
       MyUtil.resetForm('data-tracking-item-form');
 
       actualizarSelectProjectItems();
+
+      // Ocultar información de completion
+      $('#item-completion-info').hide();
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('data-tracking-item-form'));
