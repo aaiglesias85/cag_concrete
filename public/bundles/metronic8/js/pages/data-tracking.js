@@ -1572,6 +1572,15 @@ var DataTracking = (function () {
          resultado.push(item);
       });
 
+      // Agregar encabezado "Change Order" si hay items de change order
+      if (items_change_order.length > 0) {
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: 'Change Order',
+            _groupOrder: orderCounter++,
+         });
+      }
+
       // Agregar items change order
       items_change_order.forEach(function (item) {
          item._groupOrder = orderCounter++;
@@ -1605,12 +1614,17 @@ var DataTracking = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
                // Si es change order, agregar icono de +
                var icono = '';
-               if (row.change_order) {
+               if (row.change_order && !row.isGroupHeader) {
+                  var project_item_id = row.project_item_id || row.item_id;
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
-                     row.item_id +
+                     project_item_id +
                      '" title="View change order history"></i>';
                }
                return `<span>${data || ''}${icono}</span>`;
@@ -1619,36 +1633,58 @@ var DataTracking = (function () {
          {
             targets: 1,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return data || '';
             },
          },
          {
             targets: 2,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return data || '';
             },
          },
          {
             targets: 3,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+                  var project_item_id = row.project_item_id || row.item_id;
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
             },
          },
          {
             targets: 4,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          {
             targets: 5,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  var project_item_id = row.project_item_id || row.item_id;
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     project_item_id +
+                     '" title="View price history"></i>';
+               }
+               return `<span>${MyApp.formatMoney(data)}${icono}</span>`;
             },
          },
          {
             targets: 6,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1658,6 +1694,7 @@ var DataTracking = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -1677,10 +1714,27 @@ var DataTracking = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         // marcar secondary, change order y encabezados de grupo
+         createdRow: (row, data, index) => {
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
+               });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            }
+         },
       });
 
       handleSearchDatatableItems();
       handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
 
       var total = calcularTotalItemsPrice();
       $('#monto_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
@@ -1691,11 +1745,34 @@ var DataTracking = (function () {
          e.preventDefault();
          var project_item_id = $(this).data('project-item-id');
          if (project_item_id) {
-            cargarHistorialChangeOrder(project_item_id);
+            cargarHistorialChangeOrder(project_item_id, 'add');
          }
       });
    };
-   var cargarHistorialChangeOrder = function (project_item_id) {
+
+   var handleQuantityHistory = function () {
+      $(document).off('click', '.quantity-history-icon');
+      $(document).on('click', '.quantity-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_quantity');
+         }
+      });
+   };
+
+   var handlePriceHistory = function () {
+      $(document).off('click', '.price-history-icon');
+      $(document).on('click', '.price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_price');
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
       axios
          .get('project/listarHistorialItem', {
@@ -1707,9 +1784,25 @@ var DataTracking = (function () {
                var response = res.data;
                if (response.success) {
                   var historial = response.historial || [];
+
+                  // Filtrar historial según el tipo
+                  if (filterType) {
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
+                  }
+
                   var html = '';
                   if (historial.length === 0) {
-                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                     var message = 'No history available for this item.';
+                     if (filterType === 'add') {
+                        message = 'No add history available for this item.';
+                     } else if (filterType === 'update_quantity') {
+                        message = 'No quantity change history available for this item.';
+                     } else if (filterType === 'update_price') {
+                        message = 'No price change history available for this item.';
+                     }
+                     html = '<div class="alert alert-info">' + message + '</div>';
                   } else {
                      html = '<ul class="list-unstyled">';
                      historial.forEach(function (item) {
@@ -1829,14 +1922,17 @@ var DataTracking = (function () {
                items_data_tracking.push({
                   data_tracking_item_id: '',
                   item_id: item_id,
+                  project_item_id: item.project_item_id || item_id,
                   item: item.item,
                   unit: item.unit,
                   equation_id: equation_id,
                   yield_calculation: yield_calculation,
                   yield_calculation_name: yield_calculation_name,
                   quantity: quantity,
+                  quantity_old: item.quantity_old || '',
                   yield_calculation_valor: yield_calculation_valor,
                   price: price,
+                  price_old: item.price_old || '',
                   total: total,
                   notes: notes,
                   change_order: item.change_order || false,
@@ -1847,6 +1943,7 @@ var DataTracking = (function () {
                var posicion = nEditingRowItem;
                if (items_data_tracking[posicion]) {
                   items_data_tracking[posicion].item_id = item_id;
+                  items_data_tracking[posicion].project_item_id = item.project_item_id || item_id;
                   items_data_tracking[posicion].item = item.item;
                   items_data_tracking[posicion].unit = item.unit;
                   items_data_tracking[posicion].yield_calculation = yield_calculation;
@@ -1854,7 +1951,9 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].yield_calculation_valor = yield_calculation_valor;
                   items_data_tracking[posicion].equation_id = equation_id;
                   items_data_tracking[posicion].quantity = quantity;
+                  items_data_tracking[posicion].quantity_old = item.quantity_old || '';
                   items_data_tracking[posicion].price = price;
+                  items_data_tracking[posicion].price_old = item.price_old || '';
                   items_data_tracking[posicion].total = total;
                   items_data_tracking[posicion].notes = notes;
                   items_data_tracking[posicion].change_order = item.change_order || false;
@@ -3442,14 +3541,17 @@ var DataTracking = (function () {
          items_data_tracking.push({
             data_tracking_item_id: '',
             item_id: item_id,
+            project_item_id: item.project_item_id || item_id,
             item: item.item,
             unit: item.unit,
             equation_id: equation_id,
             yield_calculation: yield_calculation,
             yield_calculation_name: yield_calculation_name,
             quantity: quantity,
+            quantity_old: item.quantity_old || '',
             yield_calculation_valor: yield_calculation_valor,
             price: price,
+            price_old: item.price_old || '',
             total: total,
             notes: notes,
             change_order: item.change_order || false,

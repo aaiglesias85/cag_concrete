@@ -369,6 +369,15 @@ var ProjectsDetalle = (function () {
          resultado.push(item);
       });
 
+      // Agregar encabezado "Change Order" si hay items de change order
+      if (items_change_order.length > 0) {
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: 'Change Order',
+            _groupOrder: orderCounter++,
+         });
+      }
+
       // Agregar items change order
       items_change_order.forEach(function (item) {
          item._groupOrder = orderCounter++;
@@ -392,8 +401,6 @@ var ProjectsDetalle = (function () {
          { data: 'quantity' },
          { data: 'price' },
          { data: 'total' },
-         { data: 'quantity_old' },
-         { data: 'price_old' },
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
       ];
 
@@ -402,9 +409,13 @@ var ProjectsDetalle = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
                // Si es change order, agregar icono de +
                var icono = '';
-               if (row.change_order) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -416,42 +427,51 @@ var ProjectsDetalle = (function () {
          {
             targets: 1,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return data || '';
             },
          },
          {
             targets: 2,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return data || '';
             },
          },
          {
             targets: 3,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+                  var quantityOld = MyApp.formatearNumero(row.quantity_old, 2, '.', ',');
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
             },
          },
          {
             targets: 4,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
+                  var priceOld = MyApp.formatMoney(row.price_old);
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
+               }
+               return `<span>${MyApp.formatMoney(data)}${icono}</span>`;
             },
          },
          {
             targets: 5,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 6,
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
-            },
-         },
-         {
-            targets: 7,
-            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -461,7 +481,7 @@ var ProjectsDetalle = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[8, 'asc']];
+      const order = [[6, 'asc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
@@ -471,16 +491,31 @@ var ProjectsDetalle = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary
+         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
-            if (!data.principal) {
-               $(row).addClass('row-secondary');
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
+               });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            } else {
+               if (!data.principal) {
+                  $(row).addClass('row-secondary');
+               }
             }
          },
       });
 
       handleSearchDatatableItems();
       handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
 
       // totals
       $('#total_count_items-detalle').val(items.length);
@@ -494,11 +529,34 @@ var ProjectsDetalle = (function () {
          e.preventDefault();
          var project_item_id = $(this).data('project-item-id');
          if (project_item_id) {
-            cargarHistorialChangeOrder(project_item_id);
+            cargarHistorialChangeOrder(project_item_id, 'add');
          }
       });
    };
-   var cargarHistorialChangeOrder = function (project_item_id) {
+
+   var handleQuantityHistory = function () {
+      $(document).off('click', '.quantity-history-icon');
+      $(document).on('click', '.quantity-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_quantity');
+         }
+      });
+   };
+
+   var handlePriceHistory = function () {
+      $(document).off('click', '.price-history-icon');
+      $(document).on('click', '.price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_price');
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
       axios
          .get('project/listarHistorialItem', {
@@ -510,9 +568,25 @@ var ProjectsDetalle = (function () {
                var response = res.data;
                if (response.success) {
                   var historial = response.historial || [];
+
+                  // Filtrar historial según el tipo
+                  if (filterType) {
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
+                  }
+
                   var html = '';
                   if (historial.length === 0) {
-                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                     var message = 'No history available for this item.';
+                     if (filterType === 'add') {
+                        message = 'No add history available for this item.';
+                     } else if (filterType === 'update_quantity') {
+                        message = 'No quantity change history available for this item.';
+                     } else if (filterType === 'update_price') {
+                        message = 'No price change history available for this item.';
+                     }
+                     html = '<div class="alert alert-info">' + message + '</div>';
                   } else {
                      html = '<ul class="list-unstyled">';
                      historial.forEach(function (item) {
@@ -1168,8 +1242,54 @@ var ProjectsDetalle = (function () {
    // items
    var oTableItemsCompletion;
    var items_completion = [];
+
+   // Función para agrupar items por change_order_date
+   var agruparItemsPorChangeOrderCompletion = function (items) {
+      var items_regulares = [];
+      var items_change_order = [];
+
+      // Separar items regulares y change order
+      items.forEach(function (item) {
+         if (item.change_order && item.change_order_date) {
+            items_change_order.push(item);
+         } else {
+            items_regulares.push(item);
+         }
+      });
+
+      // Construir array final: items regulares primero, luego change orders
+      var resultado = [];
+      var orderCounter = 0;
+
+      // Agregar items regulares con orden
+      items_regulares.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
+
+      // Agregar encabezado "Change Order" si hay items de change order
+      if (items_change_order.length > 0) {
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: 'Change Order',
+            _groupOrder: orderCounter++,
+         });
+      }
+
+      // Agregar items change order
+      items_change_order.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
+
+      return resultado;
+   };
+
    var initTableItemsCompletion = function () {
       const table = '#items-completion-table-editable-detalle';
+
+      // Procesar datos para agrupar por change_order_date
+      var datosAgrupados = agruparItemsPorChangeOrderCompletion(items_completion);
 
       // columns
       const columns = [
@@ -1181,28 +1301,73 @@ var ProjectsDetalle = (function () {
          { data: 'quantity_completed' },
          { data: 'amount_completed' },
          { data: 'porciento_completion' },
+         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
       ];
 
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
+               // Si es change order, agregar icono de +
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
+               }
+               return `<span>${data || ''}${icono}</span>`;
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return data || '';
+            },
+         },
+         {
             targets: 2,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
+               return DatatableUtil.getRenderColumnDiv(html, 180);
             },
          },
          {
             targets: 3,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
+               }
+               var html = `<span>${MyApp.formatMoney(data)}${icono}</span>`;
+               return DatatableUtil.getRenderColumnDiv(html, 180);
             },
          },
          {
             targets: 4,
             className: 'text-end',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1210,6 +1375,7 @@ var ProjectsDetalle = (function () {
             targets: 5,
             className: 'text-end',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1217,6 +1383,7 @@ var ProjectsDetalle = (function () {
             targets: 6,
             className: 'text-end',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1224,6 +1391,7 @@ var ProjectsDetalle = (function () {
             targets: 7,
             className: 'text-end',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
             },
          },
@@ -1232,27 +1400,42 @@ var ProjectsDetalle = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = [[0, 'asc']];
+      // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
+      const order = [[8, 'asc']];
 
       // escapar contenido de la tabla
       oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {
-         data: items_completion,
-         displayLength: 10,
+         data: datosAgrupados,
+         displayLength: 25,
          order: order,
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary
+         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
-            // console.log(data);
-            if (!data.principal) {
-               $(row).addClass('row-secondary');
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
+               });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            } else {
+               if (!data.principal) {
+                  $(row).addClass('row-secondary');
+               }
             }
          },
       });
 
       handleSearchDatatableItemsCompletion();
+      handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
 
       // totals
       $('#total_count_items_completion-detalle').val(items_completion.length);
@@ -1337,7 +1520,7 @@ var ProjectsDetalle = (function () {
          { data: 'retainage_percentage' },
          { data: 'retainage_amount' },
          { data: 'total_retainage_to_date' },
-         { data: 'ajuste_retainage' }
+         { data: 'ajuste_retainage' },
       ];
 
       // column defs
@@ -1356,7 +1539,9 @@ var ProjectsDetalle = (function () {
                   }
                }
                var displayText = `${row.invoice_number} - ${dateFormatted}`;
-               var html = `<a href="javascript:;" class="invoice-retainage-link-detalle text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
+               var html = `<a href="javascript:;" class="invoice-retainage-link-detalle text-primary text-hover-primary" data-invoice-id="${
+                  row.invoice_id
+               }" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
                return html;
             },
          },
@@ -1451,7 +1636,7 @@ var ProjectsDetalle = (function () {
                if (response.success) {
                   var invoices = response.invoices || [];
                   initTableInvoicesRetainageDetalle(invoices);
-                  
+
                   // Calcular y mostrar Total Retainage Withheld (es el último total_retainage_to_date que ya es acumulado)
                   var totalRetainageWithheld = 0;
                   if (invoices.length > 0) {

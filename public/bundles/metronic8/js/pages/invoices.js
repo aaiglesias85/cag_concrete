@@ -1578,6 +1578,15 @@ var Invoices = (function () {
          resultado.push(item);
       });
 
+      // Agregar encabezado "Change Order" si hay items de change order
+      if (items_change_order.length > 0) {
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: 'Change Order',
+            _groupOrder: orderCounter++,
+         });
+      }
+
       // Agregar items change order
       items_change_order.forEach(function (item) {
          item._groupOrder = orderCounter++;
@@ -1619,9 +1628,13 @@ var Invoices = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
                // Si es change order, agregar icono de historial
                var icono = '';
-               if (row.change_order) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -1635,6 +1648,7 @@ var Invoices = (function () {
             targets: 1,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1643,7 +1657,16 @@ var Invoices = (function () {
             targets: 2,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
+               }
+               var html = `<span>${MyApp.formatMoney(data, 2, '.', ',')}${icono}</span>`;
+               return html;
             },
          },
          // contract_qty
@@ -1651,7 +1674,15 @@ var Invoices = (function () {
             targets: 3,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
             },
          },
          // contract_amount
@@ -1659,6 +1690,7 @@ var Invoices = (function () {
             targets: 4,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1667,6 +1699,7 @@ var Invoices = (function () {
             targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1675,6 +1708,7 @@ var Invoices = (function () {
             targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1683,6 +1717,7 @@ var Invoices = (function () {
             targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
             },
          },
@@ -1691,6 +1726,7 @@ var Invoices = (function () {
             targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1699,6 +1735,7 @@ var Invoices = (function () {
             targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1707,6 +1744,7 @@ var Invoices = (function () {
             targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1715,6 +1753,7 @@ var Invoices = (function () {
             targets: 11,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                var value = data ?? 0;
                if (invoice === null || !invoice.paid) {
                   return `<div class="w-100px"><input type="number" class="form-control quantity_brought_forward" value="${value}" data-position="${row.posicion}" step="any" /></div>`;
@@ -1727,6 +1766,7 @@ var Invoices = (function () {
             targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -1735,6 +1775,7 @@ var Invoices = (function () {
             targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
             },
          },
@@ -1745,6 +1786,7 @@ var Invoices = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -1773,32 +1815,45 @@ var Invoices = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary y aplicar colores
+         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
-            const $cells = $('td', row);
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
+               });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            } else {
+               const $cells = $('td', row);
 
-            // 🔵 quantity_completed y amount_completed (#daeef3)
-            $cells.eq(5).css('background-color', '#daeef3');
-            $cells.eq(6).css('background-color', '#daeef3');
+               // 🔵 quantity_completed y amount_completed (#daeef3)
+               $cells.eq(5).css('background-color', '#daeef3');
+               $cells.eq(6).css('background-color', '#daeef3');
 
-            // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
-            $cells.eq(7).css('background-color', '#f79494');
-            $cells.eq(8).css('background-color', '#f79494');
+               // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
+               $cells.eq(7).css('background-color', '#f79494');
+               $cells.eq(8).css('background-color', '#f79494');
 
-            // 🟠 quantity y amount (#fcd5b4)
-            $cells.eq(9).css('background-color', '#fcd5b4');
-            $cells.eq(10).css('background-color', '#fcd5b4');
+               // 🟠 quantity y amount (#fcd5b4)
+               $cells.eq(9).css('background-color', '#fcd5b4');
+               $cells.eq(10).css('background-color', '#fcd5b4');
 
-            // 🟡 quantity_brought_forward (#f2d068)
-            $cells.eq(11).css('background-color', '#f2d068');
+               // 🟡 quantity_brought_forward (#f2d068)
+               $cells.eq(11).css('background-color', '#f2d068');
 
-            // 🟢 quantity_final y amount_final (#d8e4bc)
-            $cells.eq(12).css('background-color', '#d8e4bc');
-            $cells.eq(13).css('background-color', '#d8e4bc');
+               // 🟢 quantity_final y amount_final (#d8e4bc)
+               $cells.eq(12).css('background-color', '#d8e4bc');
+               $cells.eq(13).css('background-color', '#d8e4bc');
 
-            // Si mantienes la lógica para "row-secondary"
-            if (!data.principal) {
-               $(row).addClass('row-secondary');
+               // Si mantienes la lógica para "row-secondary"
+               if (!data.principal) {
+                  $(row).addClass('row-secondary');
+               }
             }
          },
 
@@ -1861,6 +1916,8 @@ var Invoices = (function () {
 
       handleSearchDatatableItems();
       handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
    };
 
    var handleChangeOrderHistory = function () {
@@ -1869,12 +1926,34 @@ var Invoices = (function () {
          e.preventDefault();
          var project_item_id = $(this).data('project-item-id');
          if (project_item_id) {
-            cargarHistorialChangeOrder(project_item_id);
+            cargarHistorialChangeOrder(project_item_id, 'add');
          }
       });
    };
 
-   var cargarHistorialChangeOrder = function (project_item_id) {
+   var handleQuantityHistory = function () {
+      $(document).off('click', '.quantity-history-icon');
+      $(document).on('click', '.quantity-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_quantity');
+         }
+      });
+   };
+
+   var handlePriceHistory = function () {
+      $(document).off('click', '.price-history-icon');
+      $(document).on('click', '.price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_price');
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
       axios
          .get('project/listarHistorialItem', {
@@ -1886,9 +1965,25 @@ var Invoices = (function () {
                var response = res.data;
                if (response.success) {
                   var historial = response.historial || [];
+
+                  // Filtrar historial según el tipo
+                  if (filterType) {
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
+                  }
+
                   var html = '';
                   if (historial.length === 0) {
-                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                     var message = 'No history available for this item.';
+                     if (filterType === 'add') {
+                        message = 'No add history available for this item.';
+                     } else if (filterType === 'update_quantity') {
+                        message = 'No quantity change history available for this item.';
+                     } else if (filterType === 'update_price') {
+                        message = 'No price change history available for this item.';
+                     }
+                     html = '<div class="alert alert-info">' + message + '</div>';
                   } else {
                      html = '<ul class="list-unstyled">';
                      historial.forEach(function (item) {

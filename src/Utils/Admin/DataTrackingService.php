@@ -627,10 +627,13 @@ class DataTrackingService extends Base
          $items[] = [
             'data_tracking_item_id' => $value->getId(),
             "item_id" => $value->getProjectItem()->getId(),
+            "project_item_id" => $value->getProjectItem()->getId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
+            "quantity_old" => $value->getProjectItem()->getQuantityOld() ?? '',
             "price" => $price,
+            "price_old" => $value->getProjectItem()->getPriceOld() ?? '',
             "total" => $total,
             "notes" => $value->getNotes(),
             "yield_calculation" => $value->getProjectItem()->getYieldCalculation(),
