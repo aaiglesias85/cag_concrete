@@ -1,0 +1,1 @@
+ALTER TABLE `project_price_adjustment` ADD `items_id` TEXT NULL AFTER `percent`;

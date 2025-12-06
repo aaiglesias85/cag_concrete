@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-11-2025 a las 14:20:26
+-- Tiempo de generación: 06-12-2025 a las 15:51:46
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1489,6 +1489,7 @@ CREATE TABLE `project_price_adjustment` (
   `id` int(11) NOT NULL,
   `day` date DEFAULT NULL,
   `percent` decimal(8,2) DEFAULT NULL,
+  `items_id` text,
   `project_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

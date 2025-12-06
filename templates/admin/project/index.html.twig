@@ -542,8 +542,8 @@
                               <span class="number">8</span>
                            </span>
                            <div class="wizard-label">
-                              <div class="wizard-title">Price Adjustments</div>
-                              <div class="wizard-desc">List of price adjustments</div>
+                              <div class="wizard-title">Escalator</div>
+                              <div class="wizard-desc">List of escalators</div>
                            </div>
                            <span class="svg-icon ps-6">
                               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -1262,6 +1262,7 @@
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
                                     <th>Day</th>
                                     <th>Percent</th>
+                                    <th>Items</th>
                                     <th>Actions</th>
                                  </tr>
                               </thead>
@@ -1709,8 +1710,8 @@
                               <span class="number">8</span>
                            </span>
                            <div class="wizard-label">
-                              <div class="wizard-title">Price Adjustments</div>
-                              <div class="wizard-desc">List of price adjustments</div>
+                              <div class="wizard-title">Escalator</div>
+                              <div class="wizard-desc">List of escalators</div>
                            </div>
                            <span class="svg-icon ps-6">
                               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
@@ -2775,7 +2776,7 @@
    <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title">New Price Adjustment</h5>
+            <h5 class="modal-title">New Escalator</h5>
             <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
@@ -2814,6 +2815,17 @@
                      <span class="input-group-text">%</span>
                      <input type="text" class="form-control form-control-validate event-change" id="ajuste_precio_percent" name="percent" />
                   </div>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <label class="form-label">
+                     <span class="ic-step-number">3</span>
+                     Items (Optional - Leave empty for all items)
+                  </label>
+                  <select class="form-select form-select-solid" id="ajuste_precio_items" name="items" multiple="multiple">
+                     <!-- Items will be loaded dynamically -->
+                  </select>
+                  <div class="form-text">Select specific items or leave empty to apply to all items</div>
                </div>
             </form>
          </div>

@@ -200,6 +200,13 @@ class ScriptService extends Base
          // 1 + (2 / 100) = 1.02
          $factor = 1 + ($percent / 100);
 
+         // Obtener items_id del ajuste (puede estar vacío para todos los items)
+         $items_id_str = $ajuste->getItemsId();
+         $items_id_array = [];
+         if ($items_id_str && $items_id_str !== '') {
+            $items_id_array = array_map('trim', explode(',', $items_id_str));
+         }
+
          /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
          $items = $projectItemRepo->ListarItemsDeProject($projectId);
@@ -207,6 +214,14 @@ class ScriptService extends Base
          $notas = []; // acumular notas por proyecto
 
          foreach ($items as $item) {
+            $item_id = $item->getItem()->getItemId();
+
+            // Si hay items_id específicos, solo procesar esos items
+            // Si items_id está vacío, procesar todos los items
+            if (!empty($items_id_array) && !in_array($item_id, $items_id_array)) {
+               continue; // Saltar este item si no está en la lista
+            }
+
             $precioOld = (float)$item->getPrice();
             $precioNew = round($precioOld * $factor, 2);  // 2 decimales típico de moneda
 

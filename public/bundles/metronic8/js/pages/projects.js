@@ -1583,8 +1583,7 @@ var Projects = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
-                  var quantityOld = MyApp.formatearNumero(row.quantity_old, 2, '.', ',');
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -1598,8 +1597,7 @@ var Projects = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
-                  var priceOld = MyApp.formatMoney(row.price_old);
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -3155,7 +3153,17 @@ var Projects = (function () {
       const table = '#ajustes-precio-table-editable';
 
       // columns
-      const columns = [{ data: 'day' }, { data: 'percent' }, { data: null }];
+      const columns = [
+         { data: 'day' },
+         { data: 'percent' },
+         {
+            data: 'items_names',
+            render: function (data, type, row) {
+               return data || 'All items';
+            },
+         },
+         { data: null },
+      ];
 
       // column defs
       let columnDefs = [
@@ -3235,6 +3243,9 @@ var Projects = (function () {
          // reset
          resetFormAjustePrecio();
 
+         // Cargar items del proyecto en el select
+         cargarItemsEnSelectAjustePrecio();
+
          // mostar modal
          ModalUtil.show('modal-ajuste-precio', { backdrop: 'static', keyboard: true });
       });
@@ -3257,6 +3268,18 @@ var Projects = (function () {
          if (validateFormAjustePrecio()) {
             var day = FlatpickrUtil.getString('datetimepicker-ajuste-precio-day');
             var percent = $('#ajuste_precio_percent').val();
+            var items_id = $('#ajuste_precio_items').val(); // Array de items seleccionados
+            var items_id_str = items_id && items_id.length > 0 ? items_id.join(',') : ''; // Convertir a string separado por comas
+            var items_names = ''; // Nombres de los items para mostrar en la tabla
+            if (items_id && items_id.length > 0) {
+               var selectedItems = [];
+               $('#ajuste_precio_items option:selected').each(function () {
+                  selectedItems.push($(this).text());
+               });
+               items_names = selectedItems.join(', ');
+            } else {
+               items_names = 'All items';
+            }
 
             if (ExisteAjustePrecio(day)) {
                toastr.error('The selected day has already been added', '');
@@ -3268,6 +3291,8 @@ var Projects = (function () {
                   id: '',
                   day: day,
                   percent: percent,
+                  items_id: items_id_str,
+                  items_names: items_names,
                   posicion: ajustes_precio.length,
                });
             } else {
@@ -3275,6 +3300,8 @@ var Projects = (function () {
                if (ajustes_precio[posicion]) {
                   ajustes_precio[posicion].day = day;
                   ajustes_precio[posicion].percent = percent;
+                  ajustes_precio[posicion].items_id = items_id_str;
+                  ajustes_precio[posicion].items_names = items_names;
                }
             }
 
@@ -3296,6 +3323,9 @@ var Projects = (function () {
             // reset
             resetFormAjustePrecio();
 
+            // Cargar items del proyecto en el select
+            cargarItemsEnSelectAjustePrecio();
+
             nEditingRowAjustePrecio = posicion;
 
             $('#ajuste_precio_id').val(ajustes_precio[posicion].id);
@@ -3304,6 +3334,14 @@ var Projects = (function () {
             FlatpickrUtil.setDate('datetimepicker-ajuste-precio-day', day);
 
             $('#ajuste_precio_percent').val(ajustes_precio[posicion].percent);
+
+            // Cargar items seleccionados
+            if (ajustes_precio[posicion].items_id && ajustes_precio[posicion].items_id !== '') {
+               var items_id_array = ajustes_precio[posicion].items_id.split(',');
+               $('#ajuste_precio_items').val(items_id_array).trigger('change');
+            } else {
+               $('#ajuste_precio_items').val(null).trigger('change');
+            }
 
             // open modal
             ModalUtil.show('modal-ajuste-precio', { backdrop: 'static', keyboard: true });
@@ -3382,7 +3420,42 @@ var Projects = (function () {
       // reset form
       MyUtil.resetForm('ajuste-precio-form');
 
+      // Reset select de items
+      if ($('#ajuste_precio_items').length) {
+         $('#ajuste_precio_items').val(null).trigger('change');
+      }
+
       nEditingRowAjustePrecio = null;
+   };
+
+   var cargarItemsEnSelectAjustePrecio = function () {
+      // Destruir select2 si ya está inicializado
+      if ($('#ajuste_precio_items').hasClass('select2-hidden-accessible')) {
+         $('#ajuste_precio_items').select2('destroy');
+      }
+
+      // Limpiar select
+      $('#ajuste_precio_items').empty();
+
+      // Cargar items del proyecto
+      if (items && items.length > 0) {
+         for (var i = 0; i < items.length; i++) {
+            var item = items[i];
+            var itemText = item.item;
+            if (item.unit) {
+               itemText += ' - ' + item.unit;
+            }
+            $('#ajuste_precio_items').append(new Option(itemText, item.item_id, false, false));
+         }
+      }
+
+      // Inicializar select2
+      $('#ajuste_precio_items').select2({
+         dropdownParent: $('#modal-ajuste-precio'),
+         placeholder: 'Select items (optional)',
+         allowClear: true,
+         width: '100%',
+      });
    };
 
    // Archivos
@@ -3895,7 +3968,7 @@ var Projects = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -3911,7 +3984,7 @@ var Projects = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +

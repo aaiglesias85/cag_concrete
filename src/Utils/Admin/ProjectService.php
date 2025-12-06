@@ -139,8 +139,8 @@ class ProjectService extends Base
 
          //Salvar log
          $log_operacion = "Delete";
-         $log_categoria = "Project Price Adjustment";
-         $log_descripcion = "The project price adjustment is deleted: Project #: $project, Day: $day, Percent: $percent";
+         $log_categoria = "Project Escalator";
+         $log_descripcion = "The project escalator is deleted: Project #: $project, Day: $day, Percent: $percent";
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
@@ -1304,11 +1304,43 @@ class ProjectService extends Base
       /** @var ProjectPriceAdjustmentRepository $projectPriceAdjustmentRepo */
       $projectPriceAdjustmentRepo = $this->getDoctrine()->getRepository(ProjectPriceAdjustment::class);
       $project_ajustes = $projectPriceAdjustmentRepo->ListarAjustesDeProject($project_id);
+
+      // Obtener todos los items del proyecto para construir los nombres
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $project_items = $projectItemRepo->ListarItemsDeProject($project_id);
+      $items_map = [];
+      foreach ($project_items as $project_item) {
+         $item_id = $project_item->getItem()->getItemId();
+         $item_name = $project_item->getItem()->getName();
+         $unit = $project_item->getItem()->getUnit() != null ? $project_item->getItem()->getUnit()->getDescription() : '';
+         $items_map[$item_id] = $item_name . ($unit ? ' - ' . $unit : '');
+      }
+
       foreach ($project_ajustes as $key => $project_ajuste) {
+         $items_id = $project_ajuste->getItemsId();
+         $items_names = 'All items';
+
+         if ($items_id && $items_id !== '') {
+            $items_id_array = explode(',', $items_id);
+            $items_names_array = [];
+            foreach ($items_id_array as $item_id) {
+               $item_id = trim($item_id);
+               if (isset($items_map[$item_id])) {
+                  $items_names_array[] = $items_map[$item_id];
+               }
+            }
+            if (!empty($items_names_array)) {
+               $items_names = implode(', ', $items_names_array);
+            }
+         }
+
          $ajustes[] = [
             'id' => $project_ajuste->getId(),
             'day' => $project_ajuste->getDay()->format('m/d/Y'),
             'percent' => $project_ajuste->getPercent(),
+            'items_id' => $items_id ? $items_id : '',
+            'items_names' => $items_names,
             'posicion' => $key
          ];
       }
@@ -2259,6 +2291,10 @@ class ProjectService extends Base
             $day = \DateTime::createFromFormat('m/d/Y', $value->day);
             $ajuste_entity->setDay($day);
          }
+
+         // Guardar items_id (puede ser vacío para todos los items)
+         $items_id = isset($value->items_id) ? $value->items_id : '';
+         $ajuste_entity->setItemsId($items_id);
 
 
          if ($is_new_ajuste) {

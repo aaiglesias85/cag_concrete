@@ -443,8 +443,7 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
-                  var quantityOld = MyApp.formatearNumero(row.quantity_old, 2, '.', ',');
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -458,8 +457,7 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
-                  var priceOld = MyApp.formatMoney(row.price_old);
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -1337,7 +1335,7 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -1353,7 +1351,7 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
+               if (row.change_order && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +

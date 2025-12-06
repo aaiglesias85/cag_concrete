@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-11-2025 a las 14:20:21
+-- Tiempo de generación: 06-12-2025 a las 15:52:01
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -714,7 +714,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (385, '2025-02-28', '', '', NULL, NULL, 'GERARDO(21): POURED C&G, FLUME, RAMPS', NULL, NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2025-03-03 22:50:02', NULL, 257, NULL, NULL),
 (386, '2025-11-07', '4335435', 'Marcel', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 1.00, 286.00, 10.00, 10.00, 0, '2025-11-07 18:04:47', NULL, 69, 11, 1),
 (387, '2025-10-07', '4335435', '', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-11-19 00:16:21', NULL, 254, 11, NULL),
-(388, '2025-11-18', '', '', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-11-19 00:16:53', NULL, 254, 11, NULL),
+(388, '2025-11-18', '', '', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-11-19 00:16:53', '2025-12-06 15:22:14', 254, 11, NULL),
 (389, '2025-09-09', '', '', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 0, '2025-11-19 00:17:34', NULL, 254, 11, NULL);
 
 -- --------------------------------------------------------
@@ -5294,7 +5294,12 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4065, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-11-27 01:44:30', 1),
 (4066, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2025-11-29 00:30:40', 1),
 (4067, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2025-11-29 00:30:52', 1),
-(4068, 'Update', 'Project', 'The project is modified: Test', '::1', '2025-11-29 00:32:20', 1);
+(4068, 'Update', 'Project', 'The project is modified: Test', '::1', '2025-11-29 00:32:20', 1),
+(4069, 'Update', 'Employee', 'The employee is modified: \"Tate\" Vincente Bly', '::1', '2025-11-30 15:42:00', 1),
+(4070, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-02 01:09:16', 1),
+(4071, 'Update', 'Data Tracking', 'The data tracking is modified, Project: TTC00000000001 - TESTING PROJECT FOR SOFTWARE, Date: 11/18/2025', '::1', '2025-12-06 15:21:07', 1),
+(4072, 'Update', 'Data Tracking', 'The data tracking is modified, Project: TTC00000000001 - TESTING PROJECT FOR SOFTWARE, Date: 11/18/2025', '::1', '2025-12-06 15:22:14', 1),
+(4073, 'Delete', 'Data Tracking', 'The item of the data tracking is deleted, Item: C&G 6 X 24 IN, Project: TTC00000000001 - TESTING PROJECT FOR SOFTWARE, Date: 11/18/2025', '::1', '2025-12-06 15:23:04', 1);
 
 -- --------------------------------------------------------
 
@@ -5371,7 +5376,9 @@ CREATE TABLE `notification` (
 INSERT INTO `notification` (`id`, `content`, `readed`, `created_at`, `user_id`, `project_id`) VALUES
 (42, 'Project ERS05034 - 0009011 OCONEE US 441 SR 53 WIDENING is close to its due date 01/29/2025', 1, '2025-01-26 21:08:46', 1, 229),
 (72, 'Project TTC00000000001 - TESTING PROJECT FOR SOFTWARE is close to its due date 02/20/2025', 1, '2025-02-20 12:45:05', 1, 254),
-(73, 'AL22000 - TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO invoice due date 11/20/2025 (in 5 days)', 0, '2025-11-15 12:57:11', 2, 170);
+(73, 'AL22000 - TRAFFIC SIGNAL UPGRADES AT VARIOUS LOCATIONS IN RO invoice due date 11/20/2025 (in 5 days)', 0, '2025-11-15 12:57:11', 2, 170),
+(74, 'TTC00000000001 - TESTING PROJECT FOR SOFTWARE invoice due date 12/05/2025 (in 5 days)', 0, '2025-12-01 22:17:50', 2, 254),
+(75, 'TTC00000000001 - TESTING PROJECT FOR SOFTWARE invoice due date 12/05/2025 (in 4 days)', 0, '2025-12-01 22:26:18', 2, 254);
 
 -- --------------------------------------------------------
 
@@ -5727,7 +5734,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (251, '0019197', 'UIG49007', 'B3TIA2302211-0', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', NULL, 'GDOT', '2308', 855413.00, 1, 'TOOMBS', 0, '', 0, '2023-07-24', '2026-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-03 21:52:15', '2025-02-12 14:34:43', NULL, 45, NULL, 109, NULL),
 (252, '0015623', 'UIG49006', 'B1CBA2301890-0', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', NULL, 'GDOT', '2307-0004', 85330.96, 1, 'JENKINS', 0, '', 0, '2023-07-08', '2024-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 13:34:05', '2025-02-04 13:35:25', NULL, 45, NULL, 110, NULL),
 (253, '0012867', 'ERS05079', '24-213', 'AGUSTA -COA- WHEELER SUM OUT', 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', NULL, 5, NULL, 35, NULL),
-(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 442418.00, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-02-20', 'Andres Iglesias', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-11-19 02:12:47', '2025-11-19 02:09:32', 46, NULL, 8, NULL),
+(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 442518.00, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-12-05', 'Andres Iglesias', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-12-02 01:09:16', '2025-11-19 02:09:32', 46, NULL, 8, NULL),
 (255, 'M006468', 'CWM04110', 'B1CBA2402829-0', 'SR 314 MILL INLAY RESURFACE', 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', NULL, 7, NULL, 22, NULL),
 (256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', 'undefined', 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-02-10 20:26:00', '2025-11-15 15:06:27', '2025-11-15 15:06:27', 5, NULL, 73, NULL),
 (257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', NULL, 7, NULL, 11, NULL),
@@ -7377,11 +7384,11 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1695, 6.000000, 3800.00, 'same', NULL, NULL, 1, NULL, NULL, 279, 50, NULL),
 (1696, 58.000000, 3400.00, 'equation', NULL, NULL, 1, NULL, NULL, 280, 47, 24),
 (1697, 50.000000, 81.00, 'none', NULL, NULL, 1, NULL, NULL, 281, 133, NULL),
-(1698, 3.000000, 3.00, '', NULL, NULL, 1, 0, '2025-10-14 13:59:41', 254, 194, NULL),
+(1698, 3.000000, 3.00, '', NULL, NULL, 1, 0, NULL, 254, 194, NULL),
 (1699, 15.000000, 15.00, 'equation', NULL, NULL, 1, NULL, NULL, 254, 224, 41),
-(1700, 0.000000, 15.00, 'equation', NULL, NULL, 1, 0, '2025-11-22 13:59:53', 254, 72, 8),
+(1700, 10.000000, 15.00, 'equation', 5.000000, NULL, 1, 1, '2025-11-30 15:43:53', 254, 72, 8),
 (1701, 750.000000, 78.00, 'none', NULL, NULL, 1, NULL, NULL, 282, 133, NULL),
-(1702, 15.000000, 15.00, '', NULL, NULL, 1, 0, '2025-11-23 13:59:57', 254, 223, NULL),
+(1702, 10.000000, 10.00, '', 15.000000, 15.000000, 1, 1, '2025-11-29 01:09:16', 254, 223, NULL),
 (1703, 9.000000, 211.00, 'same', NULL, NULL, 1, NULL, NULL, 20, 101, NULL),
 (1704, 772.000000, 72.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 67, 36),
 (1705, 3506.000000, 36.50, 'equation', NULL, NULL, 1, NULL, NULL, 39, 31, 11),
@@ -7507,6 +7514,20 @@ CREATE TABLE `project_item_history` (
   `created_at` datetime NOT NULL,
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Volcado de datos para la tabla `project_item_history`
+--
+
+INSERT INTO `project_item_history` (`id`, `project_item_id`, `action_type`, `old_value`, `new_value`, `created_at`, `user_id`) VALUES
+(1, 1702, 'add', NULL, NULL, '2025-11-29 15:22:28', 1),
+(2, 1702, 'update_quantity', '15', '10', '2025-11-29 15:22:55', 1),
+(3, 1702, 'update_price', '15', '10', '2025-11-29 15:22:55', 1),
+(4, 1700, 'add', NULL, NULL, '2025-11-29 15:26:08', 1),
+(5, 1700, 'update_quantity', '0', '10', '2025-11-29 15:26:31', 1),
+(6, 1700, 'update_quantity', '10', '15', '2025-11-30 13:54:29', 1),
+(7, 1700, 'update_quantity', '15', '5', '2025-11-30 15:36:11', 1),
+(8, 1700, 'update_quantity', '5', '10', '2025-11-30 15:43:53', 1);
 
 -- --------------------------------------------------------
 
@@ -8228,7 +8249,15 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (766, 'Yes', '2025-11-29', 302),
 (767, 'Change retainage percentage, old value: ', '2025-11-29', 302),
 (768, 'Change retainage adjustment percentage, old value: ', '2025-11-29', 302),
-(769, 'Change retainage adjustment completion, old value: ', '2025-11-29', 302);
+(769, 'Change retainage adjustment completion, old value: ', '2025-11-29', 302),
+(770, 'Change Price Item: C&G 6 X 24 IN, Previous Price: 15, New Price: 10', '2025-11-29', 254),
+(771, 'Change Quantity Item: C&G 6 X 24 IN, Previous Quantity: 15, New Quantity: 10', '2025-11-29', 254),
+(772, 'Change Quantity Item: C&G 8X30 IN, TP2 Machine, Previous Quantity: 0, New Quantity: 10', '2025-11-29', 254),
+(773, 'Change Quantity Item: C&G 8X30 IN, TP2 Machine, Previous Quantity: 10, New Quantity: 15', '2025-11-30', 254),
+(774, 'Change contract amount, old value: 442418', '2025-12-02', 254),
+(775, 'Change due date, old value: 02/20/2025', '2025-12-02', 254),
+(776, 'Change Quantity Item: C&G 8X30 IN, TP2 Machine, Previous Quantity: 15, New Quantity: 5', '2025-12-06', 254),
+(777, 'Change Quantity Item: C&G 8X30 IN, TP2 Machine, Previous Quantity: 5, New Quantity: 10', '2025-12-06', 254);
 
 -- --------------------------------------------------------
 
@@ -8240,6 +8269,7 @@ CREATE TABLE `project_price_adjustment` (
   `id` int(11) NOT NULL,
   `day` date DEFAULT NULL,
   `percent` decimal(8,2) DEFAULT NULL,
+  `items_id` text,
   `project_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -8247,8 +8277,8 @@ CREATE TABLE `project_price_adjustment` (
 -- Volcado de datos para la tabla `project_price_adjustment`
 --
 
-INSERT INTO `project_price_adjustment` (`id`, `day`, `percent`, `project_id`) VALUES
-(1, '2025-08-16', 2.00, 6);
+INSERT INTO `project_price_adjustment` (`id`, `day`, `percent`, `items_id`, `project_id`) VALUES
+(1, '2025-08-16', 2.00, NULL, 6);
 
 -- --------------------------------------------------------
 
@@ -9994,7 +10024,7 @@ ALTER TABLE `data_tracking_conc_vendor`
 -- AUTO_INCREMENT de la tabla `data_tracking_item`
 --
 ALTER TABLE `data_tracking_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=365;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=366;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking_labor`
@@ -10126,7 +10156,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4069;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4074;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10138,7 +10168,7 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT de la tabla `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT de la tabla `overhead_price`
@@ -10186,13 +10216,13 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_item_history`
 --
 ALTER TABLE `project_item_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=770;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=778;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
