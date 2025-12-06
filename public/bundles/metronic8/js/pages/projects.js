@@ -1801,6 +1801,35 @@ var Projects = (function () {
       return result;
    };
 
+   function DevolverCantidadItemProject() {
+      var quantity = $('#item-quantity').val();
+
+      if (nEditingRowItem == null) {
+         quantity = quantity.trim().replace(/^[-+]/, '');
+      } else {
+         var old_cant = items[nEditingRowItem].quantity > 0 ? parseFloat(items[nEditingRowItem].quantity) : 0;
+         var raw_quantity = quantity.trim(); // por si tiene espacios
+         var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
+         var number = parseFloat(raw_quantity.replace(/^[-+]/, '')); // quitamos signo y convertimos a número
+
+         // Por defecto, si no tiene signo, consideramos que es una asignación directa
+         var new_quantity = 0;
+
+         if (sign === '+') {
+            new_quantity = old_cant + number;
+         } else if (sign === '-') {
+            new_quantity = old_cant - number;
+         } else {
+            new_quantity = number; // caso sin signo, se reemplaza directamente
+         }
+
+         // Si el resultado es menor que cero, lo dejamos en cero
+         quantity = new_quantity < 0 ? 0 : new_quantity;
+      }
+
+      return quantity;
+   }
+
    var initAccionesItems = function () {
       $(document).off('click', '#btn-agregar-item');
       $(document).on('click', '#btn-agregar-item', function (e) {
@@ -1809,6 +1838,16 @@ var Projects = (function () {
 
          // mostar modal
          ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });
+
+         // Initialize tooltips in modal
+         setTimeout(function () {
+            var tooltipElements = document.querySelectorAll('#modal-item [data-bs-toggle="tooltip"]');
+            tooltipElements.forEach(function (el) {
+               if (!bootstrap.Tooltip.getInstance(el)) {
+                  new bootstrap.Tooltip(el);
+               }
+            });
+         }, 100);
       });
 
       $(document).off('click', '#btn-salvar-item');
@@ -1843,7 +1882,7 @@ var Projects = (function () {
             var price = NumberUtil.getNumericValue('#item-price');
             formData.set('price', price);
 
-            var quantity = NumberUtil.getNumericValue('#item-quantity');
+            var quantity = DevolverCantidadItemProject();
             formData.set('quantity', quantity);
 
             var yield_calculation = $('#yield-calculation').val();
@@ -1978,6 +2017,16 @@ var Projects = (function () {
 
             // mostar modal
             ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });
+
+            // Initialize tooltips in modal
+            setTimeout(function () {
+               var tooltipElements = document.querySelectorAll('#modal-item [data-bs-toggle="tooltip"]');
+               tooltipElements.forEach(function (el) {
+                  if (!bootstrap.Tooltip.getInstance(el)) {
+                     new bootstrap.Tooltip(el);
+                  }
+               });
+            }, 100);
          }
       });
 

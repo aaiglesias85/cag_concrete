@@ -1880,6 +1880,16 @@ var DataTracking = (function () {
 
          // mostar modal
          ModalUtil.show('modal-data-tracking-item', { backdrop: 'static', keyboard: true });
+
+         // Initialize tooltips in modal
+         setTimeout(function () {
+            var tooltipElements = document.querySelectorAll('#modal-data-tracking-item [data-bs-toggle="tooltip"]');
+            tooltipElements.forEach(function (el) {
+               if (!bootstrap.Tooltip.getInstance(el)) {
+                  new bootstrap.Tooltip(el);
+               }
+            });
+         }, 100);
       });
 
       $(document).off('click', '#btn-salvar-data-tracking-item');
@@ -1995,6 +2005,16 @@ var DataTracking = (function () {
 
             // open modal
             ModalUtil.show('modal-data-tracking-item', { backdrop: 'static', keyboard: true });
+
+            // Initialize tooltips in modal
+            setTimeout(function () {
+               var tooltipElements = document.querySelectorAll('#modal-data-tracking-item [data-bs-toggle="tooltip"]');
+               tooltipElements.forEach(function (el) {
+                  if (!bootstrap.Tooltip.getInstance(el)) {
+                     new bootstrap.Tooltip(el);
+                  }
+               });
+            }, 100);
          }
       });
 
