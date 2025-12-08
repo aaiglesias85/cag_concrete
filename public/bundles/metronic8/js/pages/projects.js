@@ -632,7 +632,8 @@ var Projects = (function () {
                $('#tab-general').tab('show');
                break;
             case 2:
-               $('#tab-concrete-vendor').tab('show');
+               $('#tab-items').tab('show');
+               actualizarTableListaItems();
                break;
             case 3:
                $('#tab-retainage').tab('show');
@@ -643,35 +644,34 @@ var Projects = (function () {
                }
                break;
             case 4:
-               $('#tab-items').tab('show');
-               actualizarTableListaItems();
-               break;
-            case 5:
-               $('#tab-contacts').tab('show');
-               break;
-            case 6:
-               $('#tab-notes').tab('show');
-               btnClickFiltrarNotes();
-               break;
-            case 7:
-               $('#tab-invoices').tab('show');
-               actualizarTableListaInvoices();
-               break;
-            case 8:
-               $('#tab-data-tracking').tab('show');
-               btnClickFiltrarDataTracking();
-               break;
-            case 9:
                $('#tab-ajustes-precio').tab('show');
                actualizarTableListaAjustesPrecio();
                break;
-            case 10:
+            case 5:
+               $('#tab-concrete-vendor').tab('show');
+               break;
+            case 6:
+               $('#tab-contacts').tab('show');
+               break;
+            case 7:
                $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 11:
+            case 8:
                $('#tab-items-completion').tab('show');
                actualizarTableListaItemsCompletion();
+               break;
+            case 9:
+               $('#tab-data-tracking').tab('show');
+               btnClickFiltrarDataTracking();
+               break;
+            case 10:
+               $('#tab-invoices').tab('show');
+               actualizarTableListaInvoices();
+               break;
+            case 11:
+               $('#tab-notes').tab('show');
+               btnClickFiltrarNotes();
                break;
          }
       }, 0);

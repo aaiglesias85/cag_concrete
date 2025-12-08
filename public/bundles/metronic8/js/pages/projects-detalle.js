@@ -195,7 +195,7 @@ var ProjectsDetalle = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 10;
+   var totalTabs = 11;
    var initWizard = function () {
       $(document).off('click', '#form-project-detalle .wizard-tab');
       $(document).on('click', '#form-project-detalle .wizard-tab', function (e) {
@@ -221,29 +221,35 @@ var ProjectsDetalle = (function () {
 
          //bug visual de la tabla que muestra las cols corridas
          switch (activeTab) {
-            case 3:
+            case 2:
                actualizarTableListaItems();
                break;
+            case 3:
+               // Retainage - no necesita actualizar tabla aquí
+               break;
             case 4:
-               actualizarTableListaContacts();
-               break;
-            case 5:
-               btnClickFiltrarNotes();
-               break;
-            case 6:
-               actualizarTableListaInvoices();
-               break;
-            case 7:
-               btnClickFiltrarDataTracking();
-               break;
-            case 8:
                actualizarTableListaAjustesPrecio();
                break;
-            case 9:
+            case 5:
+               // Concrete - no necesita actualizar tabla aquí
+               break;
+            case 6:
+               actualizarTableListaContacts();
+               break;
+            case 7:
                actualizarTableListaArchivos();
                break;
-            case 10:
+            case 8:
                actualizarTableListaItemsCompletion();
+               break;
+            case 9:
+               btnClickFiltrarDataTracking();
+               break;
+            case 10:
+               actualizarTableListaInvoices();
+               break;
+            case 11:
+               btnClickFiltrarNotes();
                break;
          }
       });
@@ -279,6 +285,10 @@ var ProjectsDetalle = (function () {
                $('#tab-general-detalle').tab('show');
                break;
             case 2:
+               $('#tab-items-detalle').tab('show');
+               actualizarTableListaItems();
+               break;
+            case 3:
                $('#tab-retainage-detalle').tab('show');
                // Cargar tabla de invoices con retainage si está activado
                var project_id = $('#project_id_detalle').val();
@@ -286,36 +296,35 @@ var ProjectsDetalle = (function () {
                   cargarTablaInvoicesRetainageDetalle(project_id);
                }
                break;
-            case 3:
-               $('#tab-items-detalle').tab('show');
-               actualizarTableListaItems();
-               break;
             case 4:
-               $('#tab-contacts-detalle').tab('show');
-               break;
-            case 5:
-               $('#tab-notes-detalle').tab('show');
-               btnClickFiltrarNotes();
-               break;
-            case 6:
-               $('#tab-invoices-detalle').tab('show');
-               actualizarTableListaInvoices();
-               break;
-            case 7:
-               $('#tab-data-tracking-detalle').tab('show');
-               btnClickFiltrarDataTracking();
-               break;
-            case 8:
                $('#tab-ajustes-precio-detalle').tab('show');
                actualizarTableListaAjustesPrecio();
                break;
-            case 9:
+            case 5:
+               $('#tab-concrete-vendor-detalle').tab('show');
+               break;
+            case 6:
+               $('#tab-contacts-detalle').tab('show');
+               break;
+            case 7:
                $('#tab-archivo-detalle').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 10:
+            case 8:
                $('#tab-items-completion-detalle').tab('show');
                actualizarTableListaItemsCompletion();
+               break;
+            case 9:
+               $('#tab-data-tracking-detalle').tab('show');
+               btnClickFiltrarDataTracking();
+               break;
+            case 10:
+               $('#tab-invoices-detalle').tab('show');
+               actualizarTableListaInvoices();
+               break;
+            case 11:
+               $('#tab-notes-detalle').tab('show');
+               btnClickFiltrarNotes();
                break;
          }
       }, 0);
