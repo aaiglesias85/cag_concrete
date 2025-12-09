@@ -784,23 +784,11 @@ class PaymentService extends Base
                // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
                $following_item->setUnpaidFromPrevious($unpaid_from_previous);
 
-               // Recalcular unpaid_qty del invoice siguiente
-               // Unpaid Qty siempre es: Invoice Qty - Paid Qty
-               // Invoice Qty = quantity_final = quantity + quantity_brought_forward
-               // Paid Qty = cantidad pagada
-               // NOTA: unpaid_qty es solo del invoice actual, NO se suman los anteriores
-               $following_quantity = $following_item->getQuantity() ?? 0;
-               $following_quantity_brought_forward = $following_item->getQuantityBroughtForward() ?? 0;
-               $following_paid_qty = $following_item->getPaidQty() ?? 0;
-               $following_price = $following_item->getPrice() ?? 0;
-
-               // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
-               $following_quantity_final = $following_quantity + $following_quantity_brought_forward;
-
-               // Unpaid Qty = Invoice Qty - Paid Qty (solo del invoice actual)
-               $following_unpaid_qty = $following_quantity_final - $following_paid_qty;
-               $following_unpaid_qty = max(0, $following_unpaid_qty);
-
+               // Actualizar unpaid_qty del invoice siguiente
+               // En payments, cuando se actualiza después de un pago, unpaid_qty debe ser
+               // la suma de todos los unpaid_qty de los invoices anteriores
+               // Ejemplo: Si se paga invoice 3, invoice 4 debe tener unpaid_qty = suma de unpaid_qty de 1, 2, 3
+               $following_unpaid_qty = $unpaid_from_previous;
                $following_item->setUnpaidQty($following_unpaid_qty);
             }
          }
