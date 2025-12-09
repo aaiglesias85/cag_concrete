@@ -454,7 +454,7 @@ var ModalInvoice = (function () {
                            price: item.price,
                            contract_amount: item.contract_amount,
                            quantity_from_previous: item.quantity_from_previous ?? 0,
-                           unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                           unpaid_qty: item.unpaid_qty ?? 0,
                            quantity_completed: item.quantity_completed,
                            amount: item.amount,
                            total_amount: item.total_amount,
@@ -464,7 +464,6 @@ var ModalInvoice = (function () {
                            quantity_brought_forward: item.quantity_brought_forward,
                            quantity_final: item.quantity_final,
                            amount_final: item.amount_final,
-                           unpaid_qty: item.unpaid_qty,
                            unpaid_amount: item.unpaid_amount,
                            principal: item.principal,
                            change_order: item.change_order,
@@ -473,8 +472,8 @@ var ModalInvoice = (function () {
                         });
                      }
 
-                     // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
-                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+                     // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
                      // setear la posicion
                      items_lista.forEach((item, index) => {
                         item.posicion = index;
@@ -753,7 +752,7 @@ var ModalInvoice = (function () {
             $cells.eq(5).css('background-color', '#daeef3');
             $cells.eq(6).css('background-color', '#daeef3');
 
-            // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
+            // 🔴 unpaid_qty y unpaid_amount (#f79494)
             $cells.eq(7).css('background-color', '#f79494');
             $cells.eq(8).css('background-color', '#f79494');
 
@@ -961,8 +960,8 @@ var ModalInvoice = (function () {
                }
             }
 
-            // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
-            items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+            // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+            items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
             // setear la posicion
             items_lista.forEach((item, index) => {
                item.posicion = index;
@@ -1078,8 +1077,8 @@ var ModalInvoice = (function () {
             items_lista[i].posicion = i;
          }
 
-         // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
-         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+         // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
          // setear la posicion
          items_lista.forEach((item, index) => {
             item.posicion = index;
@@ -1097,7 +1096,12 @@ var ModalInvoice = (function () {
             var quantity = Number($this.val() || 0);
             items_lista[posicion].quantity_brought_forward = quantity;
             items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
-            items_lista[posicion].amount_final = items_lista[posicion].quantity_brought_forward * items_lista[posicion].price;
+            items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
+
+            // unpaid_qty ya viene correcto del backend (suma de unpaid_qty de invoices anteriores)
+            // NO recalcular porque ese valor ya está correcto
+            // Solo recalcular unpaid_amount
+            items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }
@@ -1112,8 +1116,8 @@ var ModalInvoice = (function () {
 
    // devolver todos los items
    var actualizarItems = function () {
-      // en items_sin_cant solo deben estar los que quantity y unpaid_from_previous 0
-      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_from_previous == 0);
+      // en items_sin_cant solo deben estar los que quantity y unpaid_qty 0
+      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_qty == 0);
       // unir items_lista y items_sin_cant en items
       items = items_lista.concat(items_sin_cant);
 

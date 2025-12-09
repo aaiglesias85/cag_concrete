@@ -1126,39 +1126,21 @@ class InvoiceService extends Base
          }
 
          $invoice_item_entity->setQuantityFromPrevious($value->quantity_from_previous);
-         $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
 
-         // Calcular unpaid_qty
-         // Unpaid Qty siempre es: Invoice Qty - Paid Qty
-         // Invoice Qty = quantity_final = quantity + quantity_brought_forward
-         // Paid Qty = cantidad pagada
-         // NOTA: unpaid_qty es solo del invoice actual, NO se suman los anteriores
-         $quantity = $value->quantity;
-         $quantity_brought_forward = $value->quantity_brought_forward ?? 0;
-         $quantity_final = $quantity + $quantity_brought_forward; // Invoice Qty
+         // El frontend envía unpaid_qty que representa la suma de unpaid_qty de invoices anteriores
+         // Guardar ese valor tanto en unpaid_from_previous como en unpaid_qty
+         // Leer del JSON (viene como objeto stdClass desde json_decode)
+         $unpaid_qty_value = isset($value->unpaid_qty) ? (float)$value->unpaid_qty : 0;
+         $invoice_item_entity->setUnpaidFromPrevious($unpaid_qty_value);
+         $invoice_item_entity->setUnpaidQty($unpaid_qty_value);
 
-         // Para items existentes, usar el paid_qty actual; para nuevos, será 0
-         $paid_qty = 0;
-         if (!$is_new_item && $invoice_item_entity->getPaidQty() !== null) {
-            $paid_qty = $invoice_item_entity->getPaidQty();
-         }
+         // Leer los demás valores del JSON
+         $quantity = isset($value->quantity) ? (float)$value->quantity : 0;
+         $quantity_brought_forward = isset($value->quantity_brought_forward) ? (float)$value->quantity_brought_forward : 0;
 
-         // Para el primer invoice: unpaid_qty = 0
-         // Para invoices siguientes: unpaid_qty = Invoice Qty - Paid Qty (solo del invoice actual)
-         if ($isFirstInvoice) {
-            // Es el primer invoice, unpaid_qty siempre es 0
-            $unpaid_qty = 0;
-         } else {
-            // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
-            // Solo del invoice actual, sin sumar los anteriores
-            $unpaid_qty = $quantity_final - $paid_qty;
-            $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
-         }
-
-         $invoice_item_entity->setUnpaidQty($unpaid_qty);
-         $invoice_item_entity->setQuantity($value->quantity);
-         $invoice_item_entity->setPrice($value->price);
-         $invoice_item_entity->setQuantityBroughtForward($value->quantity_brought_forward);
+         $invoice_item_entity->setQuantity($quantity);
+         $invoice_item_entity->setPrice(isset($value->price) ? (float)$value->price : 0);
+         $invoice_item_entity->setQuantityBroughtForward($quantity_brought_forward);
 
          if ($value->project_item_id != '') {
             $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($value->project_item_id);

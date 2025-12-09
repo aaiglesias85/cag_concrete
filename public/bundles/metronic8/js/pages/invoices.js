@@ -996,8 +996,8 @@ var Invoices = (function () {
          // items
          items = invoice.items;
 
-         // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
-         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+         // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+         items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
          // setear la posicion
          items_lista.forEach((item, index) => {
             item.posicion = index;
@@ -1418,7 +1418,7 @@ var Invoices = (function () {
                               price: item.price,
                               contract_amount: item.contract_amount,
                               quantity_from_previous: item.quantity_from_previous ?? 0,
-                              unpaid_from_previous: item.unpaid_from_previous ?? 0,
+                              unpaid_qty: item.unpaid_qty ?? 0,
                               quantity_completed: item.quantity_completed,
                               amount: item.amount,
                               total_amount: item.total_amount,
@@ -1436,8 +1436,8 @@ var Invoices = (function () {
                         }
                      }
 
-                     // en items_lista solo deben estar los que quantity o unpaid_from_previous sean mayor a 0
-                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_from_previous > 0);
+                     // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
                      // setear la posicion
                      items_lista.forEach((item, index) => {
                         item.posicion = index;
@@ -1733,7 +1733,7 @@ var Invoices = (function () {
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
+               return `<div class="w-100px"><span>${MyApp.formatearNumero(data ?? 0, 2, '.', ',')}</span></div>`;
             },
          },
          // unpaid_amount
@@ -1742,7 +1742,7 @@ var Invoices = (function () {
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<span>${MyApp.formatMoney(data ?? 0, 2, '.', ',')}</span>`;
             },
          },
          // quantity
@@ -1850,7 +1850,7 @@ var Invoices = (function () {
                $cells.eq(5).css('background-color', '#daeef3');
                $cells.eq(6).css('background-color', '#daeef3');
 
-               // 🔴 unpaid_from_previous y amount_unpaid (#f79494)
+               // 🔴 unpaid_qty y unpaid_amount (#f79494)
                $cells.eq(7).css('background-color', '#f79494');
                $cells.eq(8).css('background-color', '#f79494');
 
@@ -2105,22 +2105,9 @@ var Invoices = (function () {
                items_lista[posicion].quantity_final = quantity + quantity_brought_forward;
                items_lista[posicion].amount_final = items_lista[posicion].quantity_final * price;
 
-               // Unpaid Qty siempre es: Invoice Qty - Paid Qty
-               // Invoice Qty = quantity_final = quantity + quantity_brought_forward
-               // Paid Qty = cantidad pagada
-               // NOTA: unpaid_qty es solo del invoice actual, NO se suman los anteriores
-               var quantity_from_previous = items_lista[posicion].quantity_from_previous || 0;
-               var paid_qty = items_lista[posicion].paid_qty || 0;
-
-               if (quantity_from_previous == 0) {
-                  // Es el primer invoice, unpaid_qty siempre es 0
-                  items_lista[posicion].unpaid_qty = 0;
-               } else {
-                  // Hay invoices anteriores: unpaid_qty = Invoice Qty - Paid Qty
-                  // Solo del invoice actual, sin sumar los anteriores
-                  items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
-                  items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
-               }
+               // unpaid_qty ya viene correcto del backend (suma de unpaid_qty de invoices anteriores)
+               // NO recalcular porque ese valor ya está correcto
+               // Solo recalcular unpaid_amount
                items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * price;
             }
 
@@ -2239,22 +2226,9 @@ var Invoices = (function () {
             items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
             items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
 
-            // Unpaid Qty siempre es: Invoice Qty - Paid Qty
-            // Invoice Qty = quantity_final = quantity + quantity_brought_forward
-            // Paid Qty = cantidad pagada
-            // NOTA: unpaid_qty es solo del invoice actual, NO se suman los anteriores
-            var quantity_from_previous = items_lista[posicion].quantity_from_previous || 0;
-            var paid_qty = items_lista[posicion].paid_qty || 0;
-
-            if (quantity_from_previous == 0) {
-               // Es el primer invoice, unpaid_qty siempre es 0
-               items_lista[posicion].unpaid_qty = 0;
-            } else {
-               // Hay invoices anteriores: unpaid_qty = Invoice Qty - Paid Qty
-               // Solo del invoice actual, sin sumar los anteriores
-               items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
-               items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
-            }
+            // unpaid_qty ya viene correcto del backend (suma de unpaid_qty de invoices anteriores)
+            // NO recalcular porque ese valor ya está correcto
+            // Solo recalcular unpaid_amount
             items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
 
             actualizarTableListaItems();
@@ -2270,8 +2244,8 @@ var Invoices = (function () {
 
    // devolver todos los items
    var actualizarItems = function () {
-      // en items_sin_cant solo deben estar los que quantity y unpaid_from_previous 0
-      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_from_previous == 0);
+      // en items_sin_cant solo deben estar los que quantity y unpaid_qty 0
+      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_qty == 0);
       // unir items_lista y items_sin_cant en items
       items = items_lista.concat(items_sin_cant);
 
