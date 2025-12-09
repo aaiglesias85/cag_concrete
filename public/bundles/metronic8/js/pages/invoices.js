@@ -2105,11 +2105,18 @@ var Invoices = (function () {
                items_lista[posicion].quantity_final = quantity + quantity_brought_forward;
                items_lista[posicion].amount_final = items_lista[posicion].quantity_final * price;
 
-               // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
-               // quantity_final = quantity + quantity_brought_forward
+               // Si es el primer invoice (unpaid_from_previous == 0), unpaid_qty siempre es 0
+               // Si hay invoices anteriores, unpaid_qty = Invoice Final Quantity - Paid Qty
+               var unpaid_from_previous = items_lista[posicion].unpaid_from_previous || 0;
                var paid_qty = items_lista[posicion].paid_qty || 0;
-               items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
-               items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+               if (unpaid_from_previous == 0) {
+                  // Es el primer invoice, unpaid_qty siempre es 0
+                  items_lista[posicion].unpaid_qty = 0;
+               } else {
+                  // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
+                  items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
+                  items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+               }
                items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * price;
             }
 
@@ -2228,10 +2235,18 @@ var Invoices = (function () {
             items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
             items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
 
-            // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
+            // Si es el primer invoice (unpaid_from_previous == 0), unpaid_qty siempre es 0
+            // Si hay invoices anteriores, unpaid_qty = Invoice Final Quantity - Paid Qty
+            var unpaid_from_previous = items_lista[posicion].unpaid_from_previous || 0;
             var paid_qty = items_lista[posicion].paid_qty || 0;
-            items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
-            items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+            if (unpaid_from_previous == 0) {
+               // Es el primer invoice, unpaid_qty siempre es 0
+               items_lista[posicion].unpaid_qty = 0;
+            } else {
+               // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
+               items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
+               items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+            }
             items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
 
             actualizarTableListaItems();

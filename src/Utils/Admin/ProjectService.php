@@ -1056,11 +1056,16 @@ class ProjectService extends Base
          // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
          // Se calcula arriba con CalcularUnpaidQuantityFromPreviusInvoice
 
-         // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
-         // quantity_final = quantity + quantity_brought_forward
-         // Como estamos creando un invoice nuevo, paid_qty = 0
-         $paid_qty = 0;
-         $unpaid_qty = $quantity_final - $paid_qty; // quantity_final - paid_qty
+         // Si es el primer invoice (unpaid_from_previous == 0), unpaid_qty siempre es 0
+         // Si hay invoices anteriores, unpaid_qty = Invoice Final Quantity - Paid Qty
+         $paid_qty = 0; // Al crear un invoice nuevo, aún no hay pagos
+         if ($unpaid_from_previous == 0) {
+            // Es el primer invoice, unpaid_qty siempre es 0
+            $unpaid_qty = 0;
+         } else {
+            // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
+            $unpaid_qty = $quantity_final - $paid_qty;
+         }
          $unpaid_amount = $unpaid_qty * $price;
 
          $items[] = [
