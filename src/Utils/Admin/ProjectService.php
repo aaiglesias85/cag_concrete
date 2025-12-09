@@ -1049,10 +1049,18 @@ class ProjectService extends Base
 
 
          $quantity_brought_forward = 0;
+         // quantity_final = quantity + quantity_brought_forward
          $quantity_final = $quantity + $quantity_brought_forward;
-         $amount_final = $quantity_brought_forward * $price;
+         $amount_final = $quantity_final * $price;
 
-         $unpaid_qty = $unpaid_from_previous + $quantity;
+         // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
+         // Se calcula arriba con CalcularUnpaidQuantityFromPreviusInvoice
+
+         // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
+         // quantity_final = quantity + quantity_brought_forward
+         // Como estamos creando un invoice nuevo, paid_qty = 0
+         $paid_qty = 0;
+         $unpaid_qty = $quantity_final - $paid_qty; // quantity_final - paid_qty
          $unpaid_amount = $unpaid_qty * $price;
 
          $items[] = [
@@ -1108,6 +1116,10 @@ class ProjectService extends Base
 
    /**
     * CalcularUnpaidQuantityFromPreviusInvoice
+    * Suma los unpaid_qty de todos los invoices anteriores del mismo project_item
+    * unpaid_qty de cada invoice = quantity_final - paid_qty
+    * donde quantity_final = quantity + quantity_brought_forward
+    * 
     * @param $project_item_id
     * @return float|int
     */
@@ -1119,12 +1131,26 @@ class ProjectService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $value) {
-         $quantity = $value->getQuantity();
-         $paid_quantity = $value->getPaidQty();
+         // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
+         // Se usa el valor almacenado directamente, que ya fue calculado correctamente
+         $unpaid_qty = $value->getUnpaidQty();
 
-         $unpaid_quantity += $quantity - $paid_quantity;
+         // Si no está almacenado, calcular: quantity_final - paid_qty
+         if ($unpaid_qty === null) {
+            $quantity = $value->getQuantity() ?? 0;
+            $quantity_brought_forward = $value->getQuantityBroughtForward() ?? 0;
+            $paid_quantity = $value->getPaidQty() ?? 0;
+
+            // quantity_final = quantity + quantity_brought_forward
+            $quantity_final = $quantity + $quantity_brought_forward;
+
+            // unpaid_qty = quantity_final - paid_qty
+            $unpaid_qty = $quantity_final - $paid_quantity;
+            $unpaid_qty = max(0, $unpaid_qty);
+         }
+
+         $unpaid_quantity += $unpaid_qty;
       }
-
 
       return $unpaid_quantity;
    }

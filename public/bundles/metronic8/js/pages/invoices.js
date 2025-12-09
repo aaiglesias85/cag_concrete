@@ -1216,6 +1216,21 @@ var Invoices = (function () {
       $('#item').change(changeItem);
       $('#item-quantity').change(calcularTotalItem);
       $('#item-price').change(calcularTotalItem);
+
+      // Actualizar título cuando cambia el número en nuevo invoice
+      $(document).off('input change', '#number');
+      $(document).on('input change', '#number', function () {
+         var invoice_id = $('#invoice_id').val();
+         // Solo actualizar si es un nuevo invoice (invoice_id vacío)
+         if (invoice_id === '' || invoice_id === null) {
+            var number = $(this).val();
+            if (number && number.trim() !== '') {
+               KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = 'New Invoice: #' + number;
+            } else {
+               KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = 'New Invoice:';
+            }
+         }
+      });
    };
 
    var offChangeStart;
@@ -2075,16 +2090,27 @@ var Invoices = (function () {
 
                var quantity_brought_forward = Number(items_lista[posicion].quantity_brought_forward ?? 0);
                items_lista[posicion].quantity_brought_forward = quantity_brought_forward;
-               items_lista[posicion].quantity_completed = quantity + quantity_brought_forward;
 
-               var amount_from_previous = quantity_brought_forward * price;
+               var quantity_from_previous = items_lista[posicion].quantity_from_previous || 0;
+               items_lista[posicion].quantity_completed = quantity + quantity_from_previous;
+
+               var amount_from_previous = quantity_from_previous * price;
                items_lista[posicion].amount_from_previous = amount_from_previous;
 
                var total_amount = items_lista[posicion].quantity_completed * price;
                items_lista[posicion].amount_completed = total_amount;
                items_lista[posicion].total_amount = total_amount;
-               items_lista[posicion].quantity_final = items_lista[posicion].quantity_completed;
-               items_lista[posicion].amount_final = quantity_brought_forward * price;
+
+               // quantity_final = quantity + quantity_brought_forward
+               items_lista[posicion].quantity_final = quantity + quantity_brought_forward;
+               items_lista[posicion].amount_final = items_lista[posicion].quantity_final * price;
+
+               // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
+               // quantity_final = quantity + quantity_brought_forward
+               var paid_qty = items_lista[posicion].paid_qty || 0;
+               items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
+               items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+               items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * price;
             }
 
             //actualizar lista
@@ -2198,8 +2224,15 @@ var Invoices = (function () {
             var quantity = Number($this.val() || 0);
 
             items_lista[posicion].quantity_brought_forward = quantity;
+            // quantity_final = quantity + quantity_brought_forward
             items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
-            items_lista[posicion].amount_final = items_lista[posicion].quantity_brought_forward * items_lista[posicion].price;
+            items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
+
+            // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
+            var paid_qty = items_lista[posicion].paid_qty || 0;
+            items_lista[posicion].unpaid_qty = items_lista[posicion].quantity_final - paid_qty;
+            items_lista[posicion].unpaid_qty = Math.max(0, items_lista[posicion].unpaid_qty);
+            items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }

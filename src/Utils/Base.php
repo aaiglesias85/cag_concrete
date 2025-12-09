@@ -1445,11 +1445,15 @@ class Base
          $quantity_from_previous = $value->getQuantityFromPrevious();
          $unpaid_from_previous = $value->getUnpaidFromPrevious();
 
-         $quantity = $value->getQuantity() + $value->getUnpaidFromPrevious();
+         $quantity = $value->getQuantity();
+         $quantity_brought_forward = $value->getQuantityBroughtForward();
 
-         $quantity_completed = $quantity + $quantity_from_previous;
+         // quantity_final debe coincidir con Final Invoice Quantity en invoices: quantity + quantity_brought_forward
+         $quantity_final = $quantity + ($quantity_brought_forward ?? 0);
 
-         $amount = $quantity * $price;
+         $quantity_completed = ($quantity + $unpaid_from_previous) + $quantity_from_previous;
+
+         $amount = ($quantity + $unpaid_from_previous) * $price;
 
          $total_amount = $quantity_completed * $price;
 
@@ -1458,10 +1462,11 @@ class Base
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
 
-         $unpaid_qty = $value->getUnpaidQty();
-         if ($unpaid_qty == null) {
-            $unpaid_qty = $quantity - $paid_qty;
-         }
+         // En payments, Unpaid Qty = Invoice Qty - Paid Qty
+         // Invoice Qty = quantity_final (quantity + quantity_brought_forward)
+         // Por lo tanto: unpaid_qty = quantity_final - paid_qty
+         $unpaid_qty = $quantity_final - $paid_qty;
+         $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
 
          // notes
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
@@ -1478,7 +1483,7 @@ class Base
             "contract_amount" => $contract_amount,
             "quantity_from_previous" => $quantity_from_previous,
             "unpaid_from_previous" => $unpaid_from_previous,
-            "quantity" => $quantity,
+            "quantity" => $quantity_final,
             "quantity_completed" => $quantity_completed,
             "amount" => $amount,
             "total_amount" => $total_amount,

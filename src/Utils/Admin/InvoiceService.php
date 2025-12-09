@@ -1095,6 +1095,54 @@ class InvoiceService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
+      // Verificar si este invoice es el primero del proyecto (ordenado por startDate)
+      $invoice_id = $entity->getInvoiceId();
+      $project_id = $entity->getProject()->getProjectId();
+      $invoice_start_date = $entity->getStartDate();
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+
+      // Determinar si es el primer invoice (el más antiguo por startDate)
+      $isFirstInvoice = false;
+      if (empty($allInvoices)) {
+         // Si no hay invoices, este será el primero
+         $isFirstInvoice = true;
+      } else {
+         // Ordenar por startDate ascendente, luego por invoice_id
+         usort($allInvoices, function ($a, $b) {
+            /** @var Invoice $a */
+            /** @var Invoice $b */
+            $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+            if ($dateCompare != 0) {
+               return $dateCompare;
+            }
+            return $a->getInvoiceId() <=> $b->getInvoiceId();
+         });
+
+         // Si invoice_id existe (edición), comparar directamente
+         if ($invoice_id !== null) {
+            $firstInvoice = $allInvoices[0];
+            if ($firstInvoice->getInvoiceId() == $invoice_id) {
+               $isFirstInvoice = true;
+            }
+         } else {
+            // Si invoice_id no existe (nuevo invoice), verificar si este será el primero
+            // Un invoice nuevo será el primero si no hay ningún invoice con startDate anterior
+            $isFirstInvoice = true;
+            foreach ($allInvoices as $existingInvoice) {
+               /** @var Invoice $existingInvoice */
+               $existingDate = $existingInvoice->getStartDate();
+               if ($existingDate < $invoice_start_date) {
+                  // Hay un invoice con fecha anterior, este NO es el primero
+                  $isFirstInvoice = false;
+                  break;
+               }
+            }
+         }
+      }
+
       //items
 
       foreach ($items as $value) {
@@ -1114,7 +1162,25 @@ class InvoiceService extends Base
 
          $invoice_item_entity->setQuantityFromPrevious($value->quantity_from_previous);
          $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
-         $invoice_item_entity->setUnpaidQty($value->unpaid_qty);
+
+         // Calcular unpaid_qty: siempre es Invoice Final Quantity - Paid Qty
+         // quantity_final = quantity + quantity_brought_forward
+         $quantity = $value->quantity;
+         $quantity_brought_forward = $value->quantity_brought_forward ?? 0;
+         $quantity_final = $quantity + $quantity_brought_forward;
+
+         // Para items existentes, usar el paid_qty actual; para nuevos, será 0
+         $paid_qty = 0;
+         if (!$is_new_item && $invoice_item_entity->getPaidQty() !== null) {
+            $paid_qty = $invoice_item_entity->getPaidQty();
+         }
+
+         // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
+         // quantity_final = quantity + quantity_brought_forward
+         $unpaid_qty = $quantity_final - $paid_qty;
+         $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
+
+         $invoice_item_entity->setUnpaidQty($unpaid_qty);
          $invoice_item_entity->setQuantity($value->quantity);
          $invoice_item_entity->setPrice($value->price);
          $invoice_item_entity->setQuantityBroughtForward($value->quantity_brought_forward);

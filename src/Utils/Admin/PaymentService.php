@@ -757,40 +757,48 @@ class PaymentService extends Base
                      ($previous_invoice_date == $following_invoice_date && $previous_invoice_id < $following_invoice_id)
                   ) {
 
-                     $quantity = $previousItem->getQuantity() ?? 0;
-                     $paid_qty = $previousItem->getPaidQty() ?? 0;
-                     $previous_unpaid_from_previous = $previousItem->getUnpaidFromPrevious() ?? 0;
+                     // Para calcular unpaid_from_previous, se suman los unpaid_qty de los invoices anteriores
+                     // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
+                     // donde quantity_final = quantity + quantity_brought_forward
 
-                     // Calcular unpaid_qty: (quantity + unpaid_from_previous) - paid_qty
-                     $unpaid_qty = ($quantity + $previous_unpaid_from_previous) - $paid_qty;
+                     // Usar el unpaid_qty almacenado del invoice anterior
+                     $unpaid_qty = $previousItem->getUnpaidQty();
 
-                     // Sumar al unpaid_from_previous acumulado
-                     $unpaid_from_previous += max(0, $unpaid_qty);
+                     // Si no está almacenado, calcular: quantity_final - paid_qty
+                     if ($unpaid_qty === null) {
+                        $quantity = $previousItem->getQuantity() ?? 0;
+                        $quantity_brought_forward = $previousItem->getQuantityBroughtForward() ?? 0;
+                        $paid_qty = $previousItem->getPaidQty() ?? 0;
+
+                        // quantity_final = quantity + quantity_brought_forward
+                        $quantity_final = $quantity + $quantity_brought_forward;
+
+                        // unpaid_qty = quantity_final - paid_qty
+                        $unpaid_qty = $quantity_final - $paid_qty;
+                        $unpaid_qty = max(0, $unpaid_qty);
+                     }
+
+                     // Sumar al unpaid_from_previous acumulado (solo valores positivos)
+                     $unpaid_from_previous += $unpaid_qty;
                   }
                }
 
                // Actualizar unpaid_from_previous en el item siguiente
+               // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
                $following_item->setUnpaidFromPrevious($unpaid_from_previous);
 
-               // Recalcular unpaid_qty del invoice siguiente después de actualizar unpaid_from_previous
+               // Recalcular unpaid_qty del invoice siguiente
+               // Unpaid Qty siempre es: Invoice Final Quantity - Paid Qty
                $following_quantity = $following_item->getQuantity() ?? 0;
+               $following_quantity_brought_forward = $following_item->getQuantityBroughtForward() ?? 0;
                $following_paid_qty = $following_item->getPaidQty() ?? 0;
                $following_price = $following_item->getPrice() ?? 0;
 
-               // Calcular la cantidad total pagable de este invoice siguiente
-               $following_total_payable = $following_quantity + $unpaid_from_previous;
+               // quantity_final = quantity + quantity_brought_forward
+               $following_quantity_final = $following_quantity + $following_quantity_brought_forward;
 
-               // Si paid_qty es mayor que lo pagable, ajustar paid_qty
-               if ($following_paid_qty > $following_total_payable) {
-                  $following_paid_qty = $following_total_payable;
-                  $following_item->setPaidQty($following_paid_qty);
-                  $following_item->setPaidAmount($following_paid_qty * $following_price);
-               }
-
-               // Calcular unpaid_qty: (quantity + unpaid_from_previous) - paid_qty
-               $following_unpaid_qty = $following_total_payable - $following_paid_qty;
-
-               // Asegurar que unpaid_qty no sea negativo
+               // Unpaid Qty = Invoice Final Quantity - Paid Qty
+               $following_unpaid_qty = $following_quantity_final - $following_paid_qty;
                $following_unpaid_qty = max(0, $following_unpaid_qty);
 
                $following_item->setUnpaidQty($following_unpaid_qty);
@@ -881,6 +889,7 @@ class PaymentService extends Base
          foreach ($items as $item) {
             /** @var InvoiceItem $item */
             $quantity = $item->getQuantity();
+            $quantity_brought_forward = $item->getQuantityBroughtForward() ?? 0;
             $unpaidFromPrevious = $item->getUnpaidFromPrevious();
             $quantityFromPrevious = $item->getQuantityFromPrevious();
             $price = $item->getPrice();
@@ -889,17 +898,22 @@ class PaymentService extends Base
             // Guardar project_item_id para actualizar invoices siguientes
             $updated_project_item_ids[] = $project_item_id;
 
-            // Calcular cantidad pagable de este invoice (quantity + unpaid_from_previous)
-            $quantityPayable = $quantity + $unpaidFromPrevious;
+            // quantity_final = quantity + quantity_brought_forward
+            $quantity_final = $quantity + $quantity_brought_forward;
 
             // Calcular cantidad total completada (incluyendo anteriores)
-            $quantityCompleted = $quantityPayable + $quantityFromPrevious;
+            $quantityCompleted = ($quantity + $quantityFromPrevious) + $unpaidFromPrevious;
+
+            // Al marcar como pagado completamente, se paga todo quantity_final
+            // Según Regla 2: unpaid_qty = unpaid_from_previous + (quantity_final - paid_qty)
+            // Si paid_qty = quantity_final, entonces unpaid_qty = unpaid_from_previous + (quantity_final - quantity_final) = unpaid_from_previous
+            // Pero como se paga todo, el unpaid_from_previous también se paga, entonces unpaid_qty = 0
 
             // Calcular montos pagados
-            $paidQty = $quantityPayable;
-            $paidAmount = $quantityPayable * $price;
+            $paidQty = $quantity_final; // Se paga todo quantity_final
+            $paidAmount = $quantity_final * $price;
             $paidAmountTotal = $quantityCompleted * $price;
-            $unpaidQty = 0;
+            $unpaidQty = 0; // Como se paga todo, unpaid_qty = 0
 
             // Actualizar item como pagado
             $item->setPaidQty($paidQty);

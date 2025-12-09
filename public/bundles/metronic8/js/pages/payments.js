@@ -696,7 +696,7 @@ var Payments = (function () {
          });
 
       function cargarDatos(invoice) {
-         KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Invoice: #' + invoice.number;
+         KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: #' + invoice.number;
 
          // payments
          payments = invoice.payments;
@@ -1163,9 +1163,17 @@ var Payments = (function () {
          var $this = $(this);
          var posicion = $this.attr('data-position');
          if (payments[posicion]) {
-            var unpaid_qty = $this.val();
+            var unpaid_qty = parseFloat($this.val() || 0);
+            var quantity = payments[posicion].quantity; // quantity_final (Invoice Qty)
+
+            // Mantener la relación: Unpaid Qty = Invoice Qty - Paid Qty
+            // Por lo tanto: Paid Qty = Invoice Qty - Unpaid Qty
+            var paid_qty = Math.max(0, quantity - unpaid_qty);
+            var price = payments[posicion].price;
 
             payments[posicion].unpaid_qty = unpaid_qty;
+            payments[posicion].paid_qty = paid_qty;
+            payments[posicion].paid_amount = paid_qty * price;
 
             actualizarTableListaPayments();
          }

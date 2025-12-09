@@ -44,7 +44,9 @@ class InvoiceItemRepository extends ServiceEntityRepository
    {
       $qb = $this->createQueryBuilder('i_i')
          ->leftJoin('i_i.projectItem', 'p_i')
-         ->orderBy('i_i.id', 'ASC');
+         ->leftJoin('i_i.invoice', 'i')
+         ->orderBy('i.startDate', 'ASC')
+         ->addOrderBy('i.invoiceId', 'ASC');
 
       if ($project_item_id) {
          $qb->andWhere('p_i.id = :project_item_id')
