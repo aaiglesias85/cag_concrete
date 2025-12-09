@@ -2,271 +2,578 @@
 
 ## Tabla de Contenidos
 
-1. [Estructura de la Tabla `invoice_item`](#estructura-de-la-tabla-invoice_item)
-2. [Columnas de Invoice Items](#columnas-de-invoice-items)
-3. [Columnas de Payment Items](#columnas-de-payment-items)
+1. [Referencia: Estructura de la Tabla `invoice_item` (Base de Datos)](#referencia-estructura-de-la-tabla-invoice_item-base-de-datos)
+2. [Columnas de Invoice Items (Tabla Visual)](#columnas-de-invoice-items-tabla-visual)
+3. [Columnas de Payment Items (Tabla Visual)](#columnas-de-payment-items-tabla-visual)
 4. [Lógica de Creación y Edición de Invoices](#lógica-de-creación-y-edición-de-invoices)
 5. [Lógica de Creación y Edición de Payments](#lógica-de-creación-y-edición-de-payments)
 6. [Operaciones al Guardar/Actualizar](#operaciones-al-guardaractualizar)
 
 ---
 
-## Estructura de la Tabla `invoice_item`
+## Nota sobre Valores Internos
 
-La tabla `invoice_item` almacena los items asociados a cada invoice. Esta misma tabla se utiliza tanto para invoices como para payments, ya que los payments trabajan sobre los items de los invoices existentes.
-
-### Columnas Principales
-
-| Columna                    | Tipo          | Descripción                                                |
-| -------------------------- | ------------- | ---------------------------------------------------------- |
-| `id`                       | int(11)       | ID único del registro                                      |
-| `invoice_id`               | int(11)       | ID del invoice al que pertenece                            |
-| `project_item_id`          | int(11)       | ID del item del proyecto                                   |
-| `quantity_from_previous`   | decimal(18,6) | Cantidad acumulada de invoices anteriores                  |
-| `unpaid_from_previous`     | decimal(18,6) | Cantidad no pagada acumulada de invoices anteriores        |
-| `quantity`                 | decimal(18,6) | Cantidad del periodo actual (BTD - Bill To Date)           |
-| `price`                    | decimal(18,2) | Precio unitario del item                                   |
-| `quantity_brought_forward` | decimal(18,6) | Cantidad traída de periodos anteriores (puede ser NULL)    |
-| `paid_qty`                 | decimal(18,6) | Cantidad pagada en este invoice                            |
-| `unpaid_qty`               | decimal(18,6) | Cantidad no pagada en este invoice                         |
-| `paid_amount`              | decimal(18,6) | Monto pagado en este invoice                               |
-| `paid_amount_total`        | decimal(18,6) | Monto total pagado acumulado (incluye invoices anteriores) |
-| `txn_id`                   | varchar(255)  | ID de transacción de QuickBooks (puede ser NULL)           |
+> **Importante:** Las columnas `quantity_from_previous` y `unpaid_from_previous` son valores internos que se usan para calcular otras columnas visuales, pero **NO se muestran directamente** en las tablas de la interfaz. Se mencionan en esta documentación solo para explicar cómo se calculan las columnas visuales.
 
 ---
 
-## Columnas de Invoice Items
+## Columnas de Invoice Items (Tabla Visual)
 
-### 1. `quantity_from_previous`
+Las siguientes columnas se muestran en la datatable del modal de invoice (`#items-invoice-modal-table-editable`). Los nombres de las columnas corresponden exactamente a los encabezados mostrados en la interfaz:
 
-**Descripción:** Suma de todas las cantidades (`quantity`) de invoices anteriores del mismo `project_item_id`.
+### 1. `item`
+
+**Descripción:** Nombre del item del proyecto.
+
+**Origen:** `ProjectItem->Item->name`
+
+**Editable:** No
+
+---
+
+### 2. `unit`
+
+**Descripción:** Unidad de medida del item (ej: m², m³, kg, etc.).
+
+**Origen:** `ProjectItem->Item->Unit->description`
+
+**Editable:** No
+
+---
+
+### 3. `price`
+
+**Descripción:** Precio unitario del item.
+
+**Origen:** `ProjectItem->price`
+
+**Cálculo:** Se obtiene directamente del ProjectItem
+
+**Formato:** Moneda (ej: $50.00)
+
+**Editable:** No
+
+---
+
+### 4. `contract_qty`
+
+**Descripción:** Cantidad contratada del item en el proyecto.
+
+**Origen:** `ProjectItem->quantity`
+
+**Cálculo:** Se obtiene directamente del ProjectItem
+
+**Formato:** Número con 2 decimales
+
+**Editable:** No
+
+---
+
+### 5. `contract_amount`
+
+**Descripción:** Monto total del contrato para este item.
 
 **Cálculo:**
 
-```php
-$quantity_from_previous = InvoiceItemRepository->TotalPreviousQuantity($project_item_id);
+```javascript
+contract_amount = contract_qty * price;
 ```
 
--  Suma todas las `quantity` de invoices anteriores ordenados por fecha
--  Para el primer invoice, este valor es **0**
+**Ejemplo:** Si contract_qty = 100 y price = $50 → contract_amount = $5,000
+
+**Formato:** Moneda
+
+**Editable:** No (calculado automáticamente)
+
+**Total:** Se suma en el footer de la tabla (`#modal_total_contract_amount`)
+
+---
+
+### 6. `quantity_completed`
+
+**Descripción:** Cantidad total completada hasta la fecha (incluyendo invoices anteriores).
+
+**Cálculo:**
+
+```javascript
+quantity_completed = quantity + quantity_from_previous;
+```
+
+**Donde:**
+
+-  `quantity`: Cantidad del periodo actual (BTD)
+-  `quantity_from_previous`: Suma de todas las `quantity` de invoices anteriores
 
 **Ejemplo:**
 
--  Invoice 1: quantity = 10 → quantity_from_previous = 0
--  Invoice 2: quantity = 5 → quantity_from_previous = 10 (del Invoice 1)
--  Invoice 3: quantity = 3 → quantity_from_previous = 15 (10 + 5)
+-  Invoice 1: quantity = 10, quantity_from_previous = 0 → quantity_completed = 10
+-  Invoice 2: quantity = 5, quantity_from_previous = 10 → quantity_completed = 15
+
+**Formato:** Número con 2 decimales
+
+**Color de fondo:** Azul claro (#daeef3)
+
+**Editable:** No (calculado automáticamente)
 
 ---
 
-### 2. `unpaid_from_previous`
+### 7. `amount_completed`
 
-**Descripción:** Suma de todas las cantidades no pagadas (`unpaid_qty`) de invoices anteriores del mismo `project_item_id`.
+**Descripción:** Monto total completado hasta la fecha.
+
+**Cálculo:**
+
+```javascript
+amount_completed = quantity_completed * price;
+```
+
+**Ejemplo:** Si quantity_completed = 15 y price = $50 → amount_completed = $750
+
+**Formato:** Moneda
+
+**Color de fondo:** Azul claro (#daeef3)
+
+**Editable:** No (calculado automáticamente)
+
+**Total:** Se suma en el footer de la tabla (`#modal_total_amount_completed`)
+
+---
+
+### 8. `unpaid_qty`
+
+**Descripción:** Cantidad no pagada acumulada de invoices anteriores.
 
 **Cálculo:**
 
 ```php
-$unpaid_from_previous = CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
+// En el backend:
+$unpaid_qty = CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 ```
 
 **Fórmula para cada invoice anterior:**
 
-```
-unpaid_qty = quantity_final - paid_qty
-donde quantity_final = quantity + quantity_brought_forward
+```php
+unpaid_qty = (quantity + quantity_brought_forward) - paid_qty
 ```
 
 **Lógica:**
 
--  Recorre todos los invoices anteriores del mismo `project_item_id`
--  Para cada invoice anterior, calcula: `(quantity + quantity_brought_forward) - paid_qty`
--  Suma todos los `unpaid_qty` calculados
--  El resultado nunca puede ser negativo (se usa `max(0, unpaid_qty)`)
+-  Suma los `unpaid_qty` de todos los invoices anteriores del mismo `project_item_id`
+-  Para el primer invoice, este valor es **0**
 
 **Ejemplo:**
 
--  Invoice 1: quantity=10, quantity_brought_forward=0, paid_qty=4 → unpaid_qty = 10-4 = 6
--  Invoice 2: quantity=5, quantity_brought_forward=0, paid_qty=1 → unpaid_qty = 5-1 = 4
--  Invoice 3: unpaid_from_previous = 6 + 4 = 10
+-  Invoice 1: quantity=10, paid_qty=4 → unpaid_qty = 6
+-  Invoice 2: unpaid_qty = 6 (del Invoice 1)
+-  Invoice 3: unpaid_qty = suma de unpaid_qty de Invoice 1 y 2
+
+**Formato:** Número con 2 decimales
+
+**Color de fondo:** Rojo claro (#f79494)
+
+**Editable:** No (calculado automáticamente en el backend)
 
 ---
 
-### 3. `quantity`
+### 9. `unpaid_amount`
+
+**Descripción:** Monto no pagado acumulado de invoices anteriores.
+
+**Cálculo:**
+
+```javascript
+unpaid_amount = unpaid_qty * price;
+```
+
+**Ejemplo:** Si unpaid_qty = 6 y price = $50 → unpaid_amount = $300
+
+**Formato:** Moneda
+
+**Color de fondo:** Rojo claro (#f79494)
+
+**Editable:** No (calculado automáticamente)
+
+**Total:** Se suma en el footer de la tabla (`#modal_total_amount_unpaid`)
+
+---
+
+### 10. `quantity`
 
 **Descripción:** Cantidad del periodo actual (BTD - Bill To Date). Es la cantidad trabajada en el rango de fechas del invoice.
 
 **Cálculo:**
 
 ```php
+// En el backend:
 $quantity = DataTrackingItemRepository->TotalQuantity($project_item_id, $start_date, $end_date);
 ```
 
--  Se obtiene de la tabla `data_tracking_item` sumando las cantidades en el rango de fechas del invoice
--  Es la cantidad nueva del periodo, no acumulada
+**Origen:** Se obtiene de la tabla `data_tracking_item` sumando las cantidades en el rango de fechas del invoice.
 
 **Ejemplo:**
 
 -  Invoice con fechas 01/02/2025 - 28/02/2025
 -  Si en ese periodo se trabajaron 10 unidades → quantity = 10
 
+**Formato:** Número con 2 decimales
+
+**Color de fondo:** Naranja claro (#fcd5b4)
+
+**Editable:** Sí (mediante modal de edición de item)
+
+**Nota:** Al modificar `quantity`, se recalculan automáticamente:
+
+-  `amount`
+-  `quantity_completed`
+-  `amount_completed`
+-  `quantity_final`
+-  `amount_final`
+
 ---
 
-### 4. `price`
+### 11. `amount`
 
-**Descripción:** Precio unitario del item. Se obtiene del `ProjectItem` asociado.
+**Descripción:** Monto del periodo actual (BTD).
 
 **Cálculo:**
 
-```php
-$price = $projectItem->getPrice();
+```javascript
+amount = quantity * price;
 ```
 
+**Ejemplo:** Si quantity = 10 y price = $50 → amount = $500
+
+**Formato:** Moneda
+
+**Color de fondo:** Naranja claro (#fcd5b4)
+
+**Editable:** No (calculado automáticamente)
+
+**Total:** Se suma en el footer de la tabla (`#modal_total_amount_period`)
+
 ---
 
-### 5. `quantity_brought_forward`
+### 12. `quantity_brought_forward`
 
-**Descripción:** Cantidad traída de periodos anteriores. Actualmente siempre se inicializa en **0** al crear un invoice nuevo.
+**Descripción:** Cantidad traída de periodos anteriores. Permite ajustar manualmente la cantidad final.
 
-**Cálculo:**
+**Valor inicial:** 0
+
+**Cálculo inicial:**
 
 ```php
 $quantity_brought_forward = 0; // Siempre 0 al crear
 ```
 
-**Nota:** Este campo puede ser modificado manualmente después de crear el invoice, pero por defecto es 0.
+**Formato:** Número con decimales
+
+**Color de fondo:** Amarillo claro (#f2d068)
+
+**Editable:** Sí (input directo en la tabla, si el invoice no está pagado)
+
+**Nota:** Al modificar `quantity_brought_forward`, se recalculan automáticamente:
+
+-  `quantity_final`
+-  `amount_final`
+-  `unpaid_amount`
 
 ---
 
-### 6. `paid_qty` (en Invoices)
+### 13. `quantity_final`
 
-**Descripción:** Cantidad pagada en este invoice. Inicialmente es **0** cuando se crea un invoice.
+**Descripción:** Cantidad final del invoice (Invoice Qty). Es la suma de la cantidad del periodo más la cantidad traída.
 
-**Valor inicial:** 0
+**Cálculo:**
 
-**Actualización:** Se actualiza cuando se registran payments en el módulo de payments.
+```javascript
+quantity_final = quantity + quantity_brought_forward;
+```
+
+**Ejemplo:**
+
+-  quantity = 10
+-  quantity_brought_forward = 2
+-  quantity_final = 12
+
+**Formato:** Número con 2 decimales
+
+**Color de fondo:** Verde claro (#d8e4bc)
+
+**Editable:** No (calculado automáticamente)
+
+**Importante:** Este es el valor que se usa para calcular pagos en el módulo de payments.
 
 ---
 
-### 7. `unpaid_qty` (en Invoices)
+### 14. `amount_final`
 
-**Descripción:** Cantidad no pagada en este invoice. Inicialmente es igual a `unpaid_from_previous` cuando se crea un invoice.
+**Descripción:** Monto final del invoice (Final Amount This Period).
 
-**Cálculo al crear:**
+**Cálculo:**
 
-```php
-$unpaid_qty = $unpaid_from_previous;
+```javascript
+amount_final = quantity_final * price;
 ```
 
-**Fórmula general:**
+**Ejemplo:** Si quantity_final = 12 y price = $50 → amount_final = $600
 
-```
-unpaid_qty = unpaid_from_previous + (quantity_final - paid_qty)
-donde quantity_final = quantity + quantity_brought_forward
-```
+**Formato:** Moneda
+
+**Color de fondo:** Verde claro (#d8e4bc)
+
+**Editable:** No (calculado automáticamente)
+
+**Total:** Se suma en el footer de la tabla (`#modal_total_amount_final`)
+
+**Importante:** Este es el valor total que se factura en este invoice para este item.
 
 ---
 
-### 8. `paid_amount` (en Invoices)
+## Columnas de Payment Items (Tabla Visual)
 
-**Descripción:** Monto pagado en este invoice. Inicialmente es **0**.
+Las siguientes columnas se muestran en la datatable de payments (`#payments-table-editable`). Los nombres de las columnas corresponden exactamente a los encabezados mostrados en la interfaz:
+
+### 1. **Item**
+
+**Encabezado en la tabla:** "Item"
+
+**Descripción:** Nombre del item del proyecto.
+
+**Origen:** `ProjectItem->Item->name`
+
+**Editable:** No
+
+---
+
+### 2. **Unit**
+
+**Encabezado en la tabla:** "Unit"
+
+**Descripción:** Unidad de medida del item.
+
+**Origen:** `ProjectItem->Item->Unit->description`
+
+**Editable:** No
+
+---
+
+### 3. **Contract QTY**
+
+**Encabezado en la tabla:** "Contract QTY"
+
+**Descripción:** Cantidad contratada del item en el proyecto.
+
+**Origen:** `ProjectItem->quantity`
+
+**Editable:** No
+
+---
+
+### 4. **Unit Price**
+
+**Encabezado en la tabla:** "Unit Price"
+
+**Descripción:** Precio unitario del item.
+
+**Origen:** `ProjectItem->price`
+
+**Formato:** Moneda
+
+**Editable:** No
+
+---
+
+### 5. **Contract Amount**
+
+**Encabezado en la tabla:** "Contract Amount"
+
+**Descripción:** Monto total del contrato para este item.
+
+**Cálculo:**
+
+```javascript
+contract_amount = contract_qty * price;
+```
+
+**Formato:** Moneda
+
+**Editable:** No (calculado automáticamente)
+
+---
+
+### 6. **Invoiced Qty**
+
+**Encabezado en la tabla:** "Invoiced Qty"
+
+**Descripción:** Cantidad final del invoice (Invoice Qty). Es igual a `quantity_final` del invoice.
 
 **Cálculo:**
 
 ```php
-$paid_amount = $paid_qty * $price;
+// En el backend:
+$quantity = $quantity + ($quantity_brought_forward ?? 0);
+// Es decir: quantity_final del invoice
 ```
+
+**Nota:** En payments, esta columna muestra `quantity_final` del invoice, que es la cantidad total facturable.
+
+**Formato:** Número con 2 decimales
+
+**Editable:** No
 
 ---
 
-### 9. `paid_amount_total` (en Invoices)
+### 7. **Invoiced Amount $**
 
-**Descripción:** Monto total pagado acumulado, incluyendo todos los invoices anteriores más el actual.
+**Encabezado en la tabla:** "Invoiced Amount $"
+
+**Descripción:** Monto del invoice para este item.
 
 **Cálculo:**
 
 ```php
-$paid_amount_total = CalculaPaidAmountTotalFromPreviusInvoice($project_item_id) + $paid_amount;
+// En el backend:
+$amount = ($quantity + $unpaid_from_previous) * $price;
 ```
 
-**Lógica:**
+**Nota:** En payments, este `amount` incluye la cantidad del periodo más el `unpaid_from_previous` (valor interno usado para el cálculo).
 
--  Suma todos los `paid_amount` de invoices anteriores
--  Suma el `paid_amount` del invoice actual
+**Formato:** Moneda
+
+**Editable:** No
 
 ---
 
-## Columnas de Payment Items
+### 8. **Paid Qty**
 
-Los payments trabajan sobre los mismos items de invoice, pero con cálculos específicos:
+**Encabezado en la tabla:** "Paid Qty"
 
-### 1. `paid_qty` (en Payments)
+**Descripción:** Cantidad pagada en este invoice. Es editable si el invoice no está pagado.
 
-**Descripción:** Cantidad que se está pagando en este invoice. Es editable en el módulo de payments.
+**Valor inicial:** 0 (cuando se crea el invoice)
 
 **Cálculo cuando se modifica:**
 
 ```javascript
-// Si se modifica paid_qty:
+// Si el usuario modifica paid_qty:
 unpaid_qty = quantity_final - paid_qty;
-paid_amount = paid_qty * price;
-```
-
-**Cálculo cuando se modifica unpaid_qty:**
-
-```javascript
-// Si se modifica unpaid_qty:
-paid_qty = quantity_final - unpaid_qty;
 paid_amount = paid_qty * price;
 ```
 
 **Relación:**
 
 ```
-quantity_final = quantity + quantity_brought_forward (Invoice Qty)
 paid_qty + unpaid_qty = quantity_final
+donde quantity_final = quantity + quantity_brought_forward
 ```
+
+**Formato:** Número con 2 decimales
+
+**Editable:** Sí (input directo en la tabla, si el invoice no está pagado)
+
+**Validación:** `paid_qty` no puede ser mayor que `quantity_final`
+
+**Nota:** Al modificar `paid_qty`, se recalcula automáticamente `unpaid_qty` y `paid_amount`.
 
 ---
 
-### 2. `unpaid_qty` (en Payments)
+### 9. **Unpaid Qty**
 
-**Descripción:** Cantidad no pagada en este invoice. Se calcula automáticamente.
+**Encabezado en la tabla:** "Unpaid Qty"
+
+**Descripción:** Cantidad no pagada en este invoice.
 
 **Cálculo:**
 
 ```php
+// En el backend:
 $unpaid_qty = $quantity_final - $paid_qty;
 $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
 ```
 
-**Donde:**
+**Cálculo cuando se modifica (en frontend):**
 
+```javascript
+// Si el usuario modifica unpaid_qty:
+paid_qty = quantity_final - unpaid_qty;
+paid_amount = paid_qty * price;
 ```
-quantity_final = quantity + quantity_brought_forward
-```
+
+**Formato:** Número con 2 decimales
+
+**Editable:** Sí (input directo en la tabla, si el invoice no está pagado)
+
+**Validación:** `unpaid_qty` no puede ser negativo ni mayor que `quantity_final`
+
+**Nota:** Al modificar `unpaid_qty`, se recalcula automáticamente `paid_qty` y `paid_amount`.
+
+**Icono:** Incluye un botón para agregar notas al item.
 
 ---
 
-### 3. `paid_amount` (en Payments)
+### 10. **Paid Amount**
+
+**Encabezado en la tabla:** "Paid Amount"
 
 **Descripción:** Monto pagado en este invoice.
 
 **Cálculo:**
 
-```php
-$paid_amount = $paid_qty * $price;
+```javascript
+paid_amount = paid_qty * price;
 ```
+
+**Ejemplo:** Si paid_qty = 4 y price = $50 → paid_amount = $200
+
+**Formato:** Moneda
+
+**Editable:** No (calculado automáticamente)
+
+**Nota:** Se recalcula automáticamente cuando se modifica `paid_qty` o `unpaid_qty`.
 
 ---
 
-### 4. `paid_amount_total` (en Payments)
+### 11. **Paid Amount Total**
 
-**Descripción:** Monto total pagado acumulado.
+**Encabezado en la tabla:** "Paid Amount Total"
+
+**Descripción:** Monto total pagado acumulado, incluyendo todos los invoices anteriores más el actual.
 
 **Cálculo:**
 
 ```php
+// En el backend:
 $paid_amount_total = CalculaPaidAmountTotalFromPreviusInvoice($project_item_id) + $paid_amount;
 ```
+
+**Lógica:**
+
+-  Suma todos los `paid_amount` de invoices anteriores del mismo `project_item_id`
+-  Suma el `paid_amount` del invoice actual
+
+**Ejemplo:**
+
+-  Invoice 1: paid_amount = $200 → paid_amount_total = $200
+-  Invoice 2: paid_amount = $50, paid_amount_total anterior = $200 → paid_amount_total = $250
+
+**Formato:** Moneda
+
+**Editable:** No (calculado automáticamente)
+
+---
+
+### Columna de Acciones
+
+**Encabezado en la tabla:** "Actions"
+
+**Descripción:** Botón para marcar el item como completamente pagado.
+
+**Funcionalidad:**
+
+-  Si `unpaid_qty == 0` o `paid_qty > 0`: Botón verde (item pagado)
+-  Si `unpaid_qty > 0` y `paid_qty == 0`: Botón rojo (item no pagado)
+
+**Al hacer clic:** Marca el item como pagado completamente (paid_qty = quantity_final).
 
 ---
 
@@ -360,11 +667,14 @@ $unpaid_qty = max(0, $unpaid_qty);
 
    -  El usuario puede modificar `paid_qty` o `unpaid_qty`
    -  Cuando se modifica `paid_qty`:
+
       ```javascript
       unpaid_qty = quantity_final - paid_qty;
       paid_amount = paid_qty * price;
       ```
+
    -  Cuando se modifica `unpaid_qty`:
+
       ```javascript
       paid_qty = quantity_final - unpaid_qty;
       paid_amount = paid_qty * price;
@@ -396,9 +706,12 @@ Cuando se actualiza un payment, se debe recalcular `unpaid_from_previous` en tod
    ```
 
 2. **Para cada Invoice Siguiente:**
+
    -  Para cada `project_item_id` que se actualizó:
+
       -  Obtener todos los invoice items anteriores de ese `project_item_id`
       -  Calcular `unpaid_from_previous`:
+
          ```php
          $unpaid_from_previous = 0;
          foreach ($invoices_anteriores as $invoice_anterior) {
@@ -413,7 +726,9 @@ Cuando se actualiza un payment, se debe recalcular `unpaid_from_previous` en tod
              $unpaid_from_previous += $unpaid_qty;
          }
          ```
+
       -  Actualizar el invoice siguiente:
+
          ```php
          $following_item->setUnpaidFromPrevious($unpaid_from_previous);
          $following_item->setUnpaidQty($unpaid_from_previous);
