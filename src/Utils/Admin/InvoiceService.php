@@ -1095,16 +1095,16 @@ class InvoiceService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
-      // Determinar si es el primer invoice usando unpaid_from_previous
-      // Si unpaid_from_previous == 0 en todos los items, entonces es el primer invoice
-      // Esto evita acceder a invoiceId que no existe aún en invoices nuevos
+      // Determinar si es el primer invoice verificando si hay invoices anteriores en la BD
+      // Usamos quantity_from_previous del primer item para determinar si hay invoices anteriores
+      // Si quantity_from_previous == 0, no hay invoices anteriores, entonces es el primer invoice
       $isFirstInvoice = true;
-      foreach ($items as $item) {
-         $unpaid_from_previous = $item->unpaid_from_previous ?? 0;
-         if ($unpaid_from_previous > 0) {
-            // Si algún item tiene unpaid_from_previous > 0, hay invoices anteriores
+      if (!empty($items)) {
+         $first_item = $items[0];
+         $quantity_from_previous = $first_item->quantity_from_previous ?? 0;
+         // Si quantity_from_previous > 0, hay invoices anteriores, entonces NO es el primero
+         if ($quantity_from_previous > 0) {
             $isFirstInvoice = false;
-            break;
          }
       }
 
@@ -1129,11 +1129,13 @@ class InvoiceService extends Base
          $invoice_item_entity->setUnpaidFromPrevious($value->unpaid_from_previous);
 
          // Calcular unpaid_qty
-         // Si es el primer invoice, unpaid_qty siempre es 0
-         // Si hay invoices anteriores, unpaid_qty = Invoice Final Quantity - Paid Qty
+         // Unpaid Qty siempre es: Invoice Qty - Paid Qty
+         // Invoice Qty = quantity_final = quantity + quantity_brought_forward
+         // Paid Qty = cantidad pagada
+         // NOTA: unpaid_qty es solo del invoice actual, NO se suman los anteriores
          $quantity = $value->quantity;
          $quantity_brought_forward = $value->quantity_brought_forward ?? 0;
-         $quantity_final = $quantity + $quantity_brought_forward;
+         $quantity_final = $quantity + $quantity_brought_forward; // Invoice Qty
 
          // Para items existentes, usar el paid_qty actual; para nuevos, será 0
          $paid_qty = 0;
@@ -1141,14 +1143,14 @@ class InvoiceService extends Base
             $paid_qty = $invoice_item_entity->getPaidQty();
          }
 
-         // Si es el primer invoice, unpaid_qty siempre es 0
-         // Si hay invoices anteriores, unpaid_qty = quantity_final - paid_qty
-         $unpaid_from_previous = $value->unpaid_from_previous ?? 0;
-         if ($isFirstInvoice || $unpaid_from_previous == 0) {
+         // Para el primer invoice: unpaid_qty = 0
+         // Para invoices siguientes: unpaid_qty = Invoice Qty - Paid Qty (solo del invoice actual)
+         if ($isFirstInvoice) {
             // Es el primer invoice, unpaid_qty siempre es 0
             $unpaid_qty = 0;
          } else {
             // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
+            // Solo del invoice actual, sin sumar los anteriores
             $unpaid_qty = $quantity_final - $paid_qty;
             $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
          }

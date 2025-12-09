@@ -1026,16 +1026,21 @@ class ProjectService extends Base
          $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
          $quantity = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
 
-         // calcular unpaid from previous
+         // Verificar si hay invoices anteriores para determinar si es el primer invoice
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id);
+
+         // Si quantity_from_previous == 0, no hay invoices anteriores, entonces es el primer invoice
+         $isFirstInvoice = ($quantity_from_previous == 0);
+
+         // calcular unpaid from previous (suma de unpaid_qty de invoices anteriores)
          $unpaid_from_previous = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
 
          $contract_qty = $value->getQuantity();
          $price = $value->getPrice();
          $contract_amount = $contract_qty * $price;
 
-         /** @var InvoiceItemRepository $invoiceItemRepo */
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $quantity_from_previous = $invoiceItemRepo->TotalPreviousQuantity($project_item_id);
          $amount_from_previous = $invoiceItemRepo->TotalPreviousAmount($project_item_id);
 
          $quantity_completed = $quantity + $quantity_from_previous;
@@ -1049,21 +1054,27 @@ class ProjectService extends Base
 
 
          $quantity_brought_forward = 0;
-         // quantity_final = quantity + quantity_brought_forward
+         // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
          $quantity_final = $quantity + $quantity_brought_forward;
          $amount_final = $quantity_final * $price;
 
          // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
          // Se calcula arriba con CalcularUnpaidQuantityFromPreviusInvoice
+         // Este valor se usa para referencia, pero NO se suma al unpaid_qty del invoice actual
 
-         // Si es el primer invoice (unpaid_from_previous == 0), unpaid_qty siempre es 0
-         // Si hay invoices anteriores, unpaid_qty = Invoice Final Quantity - Paid Qty
+         // Unpaid Qty siempre es: Invoice Qty - Paid Qty
+         // Invoice Qty = quantity_final = quantity + quantity_brought_forward
+         // Paid Qty = cantidad pagada
          $paid_qty = 0; // Al crear un invoice nuevo, aún no hay pagos
-         if ($unpaid_from_previous == 0) {
+
+         // Para el primer invoice: unpaid_qty = 0 (no hay invoice anterior)
+         // Para invoices siguientes: unpaid_qty = quantity_final - paid_qty (solo del invoice actual)
+         if ($isFirstInvoice) {
             // Es el primer invoice, unpaid_qty siempre es 0
             $unpaid_qty = 0;
          } else {
-            // Hay invoices anteriores: unpaid_qty = quantity_final - paid_qty
+            // Hay invoices anteriores: unpaid_qty = Invoice Qty - Paid Qty
+            // unpaid_qty = quantity_final - paid_qty (solo del invoice actual, sin sumar anteriores)
             $unpaid_qty = $quantity_final - $paid_qty;
          }
          $unpaid_amount = $unpaid_qty * $price;
@@ -1122,7 +1133,8 @@ class ProjectService extends Base
    /**
     * CalcularUnpaidQuantityFromPreviusInvoice
     * Suma los unpaid_qty de todos los invoices anteriores del mismo project_item
-    * unpaid_qty de cada invoice = quantity_final - paid_qty
+    * IMPORTANTE: NO usa el campo unpaid_qty almacenado en BD, sino que recorre
+    * todos los invoices previos y aplica la fórmula: unpaid_qty = quantity_final - paid_qty
     * donde quantity_final = quantity + quantity_brought_forward
     * 
     * @param $project_item_id
@@ -1134,26 +1146,30 @@ class ProjectService extends Base
 
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      // Obtener TODOS los invoice items anteriores de este project_item
+      // Ordenados por fecha para procesarlos en orden cronológico
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-      foreach ($invoice_items as $value) {
-         // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
-         // Se usa el valor almacenado directamente, que ya fue calculado correctamente
-         $unpaid_qty = $value->getUnpaidQty();
 
-         // Si no está almacenado, calcular: quantity_final - paid_qty
-         if ($unpaid_qty === null) {
-            $quantity = $value->getQuantity() ?? 0;
-            $quantity_brought_forward = $value->getQuantityBroughtForward() ?? 0;
-            $paid_quantity = $value->getPaidQty() ?? 0;
+      // Recorrer TODOS los invoices previos y aplicar la fórmula
+      foreach ($invoice_items as $invoice_item) {
+         // NO usar el campo unpaid_qty almacenado en BD
+         // Siempre recalcular usando la fórmula: unpaid_qty = quantity_final - paid_qty
 
-            // quantity_final = quantity + quantity_brought_forward
-            $quantity_final = $quantity + $quantity_brought_forward;
+         // Obtener valores base
+         $quantity = $invoice_item->getQuantity() ?? 0;
+         $quantity_brought_forward = $invoice_item->getQuantityBroughtForward() ?? 0;
+         $paid_quantity = $invoice_item->getPaidQty() ?? 0;
 
-            // unpaid_qty = quantity_final - paid_qty
-            $unpaid_qty = $quantity_final - $paid_quantity;
-            $unpaid_qty = max(0, $unpaid_qty);
-         }
+         // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
+         $quantity_final = $quantity + $quantity_brought_forward;
 
+         // Aplicar la fórmula: unpaid_qty = quantity_final - paid_qty
+         // Esto es el unpaid_qty REAL, independientemente de lo que esté almacenado en BD
+         $unpaid_qty = $quantity_final - $paid_quantity;
+         $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
+
+         // Sumar al total acumulado
          $unpaid_quantity += $unpaid_qty;
       }
 
