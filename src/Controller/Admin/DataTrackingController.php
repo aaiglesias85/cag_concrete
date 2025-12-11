@@ -512,7 +512,7 @@ class DataTrackingController extends AbstractController
             $resultadoJson['size'] = filesize($dir . $file_name);
          } else {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = 'No se pudo subir el archivo';
+            $resultadoJson['error'] = 'Upload failed';
          }
 
          return $this->json($resultadoJson);
