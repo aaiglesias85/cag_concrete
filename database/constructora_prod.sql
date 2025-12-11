@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-12-2025 a las 15:02:39
+-- Tiempo de generación: 11-12-2025 a las 23:19:09
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -5365,7 +5365,10 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4113, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-11 14:24:10', 1),
 (4114, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-12-11 14:28:05', 1),
 (4115, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-12-11 14:29:56', 1),
-(4116, 'Add', 'Concrete Class', 'The concrete class is added: Class D', '::1', '2025-12-11 14:33:09', 1);
+(4116, 'Add', 'Concrete Class', 'The concrete class is added: Class D', '::1', '2025-12-11 14:33:09', 1),
+(4117, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:24:20', 1),
+(4118, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:24:40', 1),
+(4119, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:27:43', 1);
 
 -- --------------------------------------------------------
 
@@ -5801,7 +5804,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (251, '0019197', 'UIG49007', 'B3TIA2302211-0', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', NULL, 'GDOT', '2308', 855413.00, 1, 'TOOMBS', 0, '', 0, '2023-07-24', '2026-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-03 21:52:15', '2025-02-12 14:34:43', NULL, 45, NULL, 109, NULL, NULL),
 (252, '0015623', 'UIG49006', 'B1CBA2301890-0', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', NULL, 'GDOT', '2307-0004', 85330.96, 1, 'JENKINS', 0, '', 0, '2023-07-08', '2024-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 13:34:05', '2025-02-04 13:35:25', NULL, 45, NULL, 110, NULL, NULL),
 (253, '0012867', 'ERS05079', '24-213', 'AGUSTA -COA- WHEELER SUM OUT', 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', NULL, 5, NULL, 35, NULL, NULL),
-(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 443928.04, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', NULL, 'Andres Iglesias', 1, 'undefined', 'undefined', 10.00, 10.00, 1, 'month', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-12-11 14:08:24', '2025-12-06 18:49:37', 46, NULL, 8, 3, 1),
+(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 443928.04, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', NULL, 'Andres Iglesias', 1, 'undefined', 'undefined', 10.00, 10.00, 1, 'month', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-12-11 15:27:43', '2025-12-06 18:49:37', 46, NULL, 8, 3, 1),
 (255, 'M006468', 'CWM04110', 'B1CBA2402829-0', 'SR 314 MILL INLAY RESURFACE', 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', NULL, 7, NULL, 22, NULL, NULL),
 (256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', 'undefined', 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-02-10 20:26:00', '2025-11-15 15:06:27', '2025-11-15 15:06:27', 5, NULL, 73, NULL, NULL),
 (257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', NULL, 7, NULL, 11, NULL, NULL),
@@ -6147,7 +6150,8 @@ INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
 (274, 251, 109),
 (275, 252, 110),
 (161, 253, 35),
-(61, 254, 8),
+(515, 254, 8),
+(516, 254, 73),
 (113, 255, 22),
 (224, 256, 73),
 (74, 257, 11),
@@ -7755,9 +7759,9 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1697, 50.000000, 81.00, 'none', NULL, NULL, 1, NULL, NULL, 281, 133, NULL),
 (1698, 3.000000, 3.00, '', NULL, NULL, 1, 0, NULL, 254, 194, NULL),
 (1699, 15.000000, 15.00, 'equation', NULL, NULL, 1, NULL, NULL, 254, 224, 41),
-(1700, 10.000000, 15.00, 'equation', 5.000000, NULL, 1, 1, '2025-11-30 14:08:24', 254, 72, 8),
+(1700, 10.000000, 15.00, 'equation', 5.000000, NULL, 1, 1, '2025-11-30 15:27:43', 254, 72, 8),
 (1701, 750.000000, 78.00, 'none', NULL, NULL, 1, NULL, NULL, 282, 133, NULL),
-(1702, 10.000000, 10.00, '', 15.000000, 11.030000, 1, 1, '2025-11-29 14:08:24', 254, 223, NULL),
+(1702, 10.000000, 10.00, '', 15.000000, 11.030000, 1, 1, '2025-11-29 15:27:43', 254, 223, NULL),
 (1703, 9.000000, 211.00, 'same', NULL, NULL, 1, NULL, NULL, 20, 101, NULL),
 (1704, 772.000000, 72.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 67, 36),
 (1705, 3506.000000, 36.50, 'equation', NULL, NULL, 1, NULL, NULL, 39, 31, 11),
@@ -8641,7 +8645,10 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (788, 'Change concrete quote price, old value: 0', '2025-12-06', 254),
 (789, 'Change concrete quote price escalator, old value: 0', '2025-12-06', 254),
 (790, 'Change concrete time periodo every n, old value: 0', '2025-12-06', 254),
-(791, 'Change concrete time periodo unit, old value: ', '2025-12-06', 254);
+(791, 'Change concrete time periodo unit, old value: ', '2025-12-06', 254),
+(792, 'Change counties, old values: FULTON', '2025-12-11', 254),
+(793, 'Change counties, old values: FRANKLIN, FULTON', '2025-12-11', 254),
+(794, 'Change counties, old values: FRANKLIN', '2025-12-11', 254);
 
 -- --------------------------------------------------------
 
@@ -10565,7 +10572,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4117;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4120;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10619,7 +10626,7 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_county`
 --
 ALTER TABLE `project_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=512;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=517;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -10637,7 +10644,7 @@ ALTER TABLE `project_item_history`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=792;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=795;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
