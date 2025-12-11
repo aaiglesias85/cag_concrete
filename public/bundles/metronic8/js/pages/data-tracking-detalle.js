@@ -418,7 +418,7 @@ var DataTrackingDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+               if (row.has_quantity_history && !row.isGroupHeader) {
                   var project_item_id = row.project_item_id || row.item_id;
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
@@ -440,7 +440,7 @@ var DataTrackingDetalle = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.price_old && row.price_old !== '' && parseFloat(row.price_old) > 0) {
+               if (row.has_price_history && !row.isGroupHeader) {
                   var project_item_id = row.project_item_id || row.item_id;
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +

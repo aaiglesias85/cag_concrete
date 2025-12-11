@@ -1689,7 +1689,7 @@ var Invoices = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.change_order && !row.isGroupHeader) {
+               if (row.has_price_history && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +
@@ -1706,7 +1706,7 @@ var Invoices = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.quantity_old && row.quantity_old !== '' && parseFloat(row.quantity_old) > 0) {
+               if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
                      row.project_item_id +

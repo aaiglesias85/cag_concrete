@@ -8,9 +8,11 @@ use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 
 use App\Entity\ProjectItem;
+use App\Entity\ProjectItemHistory;
 use App\Entity\SyncQueueQbwc;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceRepository;
+use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
@@ -738,9 +740,16 @@ class InvoiceService extends Base
          $quantity_final = $quantity + $quantity_brought_forward;
          $amount_final = $quantity_final * $price;
 
+         // Verificar si hay historial de cantidad y precio
+         $project_item_id = $value->getProjectItem()->getId();
+         /** @var ProjectItemHistoryRepository $historyRepo */
+         $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
          $items[] = [
             "invoice_item_id" => $value->getId(),
-            "project_item_id" => $value->getProjectItem()->getId(),
+            "project_item_id" => $project_item_id,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
@@ -766,6 +775,8 @@ class InvoiceService extends Base
             "principal" => $value->getProjectItem()->getPrincipal(),
             "change_order" => $value->getProjectItem()->getChangeOrder(),
             "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
+            "has_quantity_history" => $has_quantity_history,
+            "has_price_history" => $has_price_history,
             "posicion" => $key
          ];
       }

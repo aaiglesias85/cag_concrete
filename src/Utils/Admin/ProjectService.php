@@ -1064,6 +1064,12 @@ class ProjectService extends Base
          // Calcular amount_unpaid
          $amount_unpaid = $unpaid_qty * $price;
 
+         // Verificar si hay historial de cantidad y precio
+         /** @var ProjectItemHistoryRepository $historyRepo */
+         $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
          // Preparar datos para el frontend
          $item_data = [
             "project_item_id" => $project_item_id,
@@ -1090,6 +1096,8 @@ class ProjectService extends Base
             "principal" => $value->getPrincipal(),
             "change_order" => $value->getChangeOrder(),
             "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
+            "has_quantity_history" => $has_quantity_history,
+            "has_price_history" => $has_price_history,
          ];
 
          $items[] = $item_data;
@@ -1299,6 +1307,12 @@ class ProjectService extends Base
          // calcular porciento de completion
          $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
+         // Verificar si hay historial de cantidad y precio
+         /** @var ProjectItemHistoryRepository $historyRepo */
+         $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
          $items[] = [
             'project_item_id' => $project_item_id,
             "item_id" => $value->getItem()->getItemId(),
@@ -1315,6 +1329,8 @@ class ProjectService extends Base
             "principal" => $value->getPrincipal(),
             "change_order" => $value->getChangeOrder(),
             "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
+            "has_quantity_history" => $has_quantity_history,
+            "has_price_history" => $has_price_history,
             "posicion" => $key
          ];
       }
@@ -1482,6 +1498,12 @@ class ProjectService extends Base
       $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
       $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
+      // Verificar si hay historial de cantidad y precio
+      /** @var ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+      $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+      $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
       return [
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
@@ -1499,6 +1521,8 @@ class ProjectService extends Base
          "change_order" => $value->getChangeOrder(),
          "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
          "porciento_completion" => $porciento_completion,
+         "has_quantity_history" => $has_quantity_history,
+         "has_price_history" => $has_price_history,
          "posicion" => $key
       ];
    }

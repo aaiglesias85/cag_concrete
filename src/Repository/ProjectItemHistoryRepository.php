@@ -44,5 +44,43 @@ class ProjectItemHistoryRepository extends ServiceEntityRepository
 
       return $consulta->getQuery()->getResult();
    }
+
+   /**
+    * TieneHistorialCantidad: Verifica si un ProjectItem tiene historial de cambios de cantidad
+    *
+    * @param int $project_item_id
+    * @return bool
+    */
+   public function TieneHistorialCantidad($project_item_id): bool
+   {
+      $consulta = $this->createQueryBuilder('h')
+         ->leftJoin('h.projectItem', 'p_i')
+         ->where('p_i.id = :project_item_id')
+         ->andWhere('h.actionType = :action_type')
+         ->setParameter('project_item_id', $project_item_id)
+         ->setParameter('action_type', 'update_quantity')
+         ->setMaxResults(1);
+
+      return count($consulta->getQuery()->getResult()) > 0;
+   }
+
+   /**
+    * TieneHistorialPrecio: Verifica si un ProjectItem tiene historial de cambios de precio
+    *
+    * @param int $project_item_id
+    * @return bool
+    */
+   public function TieneHistorialPrecio($project_item_id): bool
+   {
+      $consulta = $this->createQueryBuilder('h')
+         ->leftJoin('h.projectItem', 'p_i')
+         ->where('p_i.id = :project_item_id')
+         ->andWhere('h.actionType = :action_type')
+         ->setParameter('project_item_id', $project_item_id)
+         ->setParameter('action_type', 'update_price')
+         ->setMaxResults(1);
+
+      return count($consulta->getQuery()->getResult()) > 0;
+   }
 }
 

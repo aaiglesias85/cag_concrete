@@ -18,6 +18,7 @@ use App\Entity\Material;
 use App\Entity\OverheadPrice;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
+use App\Entity\ProjectItemHistory;
 use App\Entity\Subcontractor;
 use App\Entity\SubcontractorEmployee;
 use App\Repository\DataTrackingAttachmentRepository;
@@ -27,6 +28,7 @@ use App\Repository\DataTrackingLaborRepository;
 use App\Repository\DataTrackingMaterialRepository;
 use App\Repository\DataTrackingRepository;
 use App\Repository\DataTrackingSubcontractRepository;
+use App\Repository\ProjectItemHistoryRepository;
 use App\Utils\Base;
 
 class DataTrackingService extends Base
@@ -624,10 +626,17 @@ class DataTrackingService extends Base
 
          $yield_calculation_valor = $this->CalcularTotalConcreteYielItem($value);
 
+         // Verificar si hay historial de cantidad y precio
+         $project_item_id = $value->getProjectItem()->getId();
+         /** @var ProjectItemHistoryRepository $historyRepo */
+         $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
          $items[] = [
             'data_tracking_item_id' => $value->getId(),
-            "item_id" => $value->getProjectItem()->getId(),
-            "project_item_id" => $value->getProjectItem()->getId(),
+            "item_id" => $project_item_id,
+            "project_item_id" => $project_item_id,
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
@@ -642,6 +651,8 @@ class DataTrackingService extends Base
             "equation_id" => $value->getProjectItem()->getEquation() != null ? $value->getProjectItem()->getEquation()->getEquationId() : '',
             "change_order" => $value->getProjectItem()->getChangeOrder(),
             "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
+            "has_quantity_history" => $has_quantity_history,
+            "has_price_history" => $has_price_history,
             "posicion" => $key
          ];
       }
