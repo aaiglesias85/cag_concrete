@@ -210,6 +210,7 @@ class ConcreteClassService extends Base
       $entity = new ConcreteClass();
 
       $entity->setName($name);
+      $entity->setStatus($status);
 
       $em->persist($entity);
 
