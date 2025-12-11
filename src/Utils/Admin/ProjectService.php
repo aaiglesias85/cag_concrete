@@ -2248,7 +2248,9 @@ class ProjectService extends Base
          $entity->setConcreteVendor($conc_vendor);
       }
 
-      $entity->setConcreteQuotePrice($concrete_quote_price);
+     // $entity->setConcreteQuotePrice($concrete_quote_price);
+      $val = ($concrete_quote_price !== '' && $concrete_quote_price !== null) ? (float)$concrete_quote_price : null;
+      $entity->setConcreteQuotePrice($val);
       $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
       $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
       $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
