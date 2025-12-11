@@ -489,6 +489,11 @@ class DataTrackingController extends AbstractController
     */
    public function salvarArchivo(Request $request)
    {
+      // 1. AUMENTAR LÍMITES SOLO PARA ESTA PETICIÓN
+      // Esto evita que el script se corte si el internet es lento o el disco duro tarda en escribir
+      set_time_limit(600); // 10 minutos (en segundos)
+      ini_set('memory_limit', '512M'); // Asegurar suficiente RAM para mover el archivo
+      ini_set('max_execution_time', 600); // Reforzar el tiempo de ejecución
       $resultadoJson = array();
 
       try {
