@@ -1599,6 +1599,21 @@ var Invoices = (function () {
             isGroupHeader: true,
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
+            // Agregar todas las propiedades que DataTables espera para evitar errores
+            item: null,
+            unit: null,
+            price: null,
+            contract_qty: null,
+            contract_amount: null,
+            quantity_completed: null,
+            amount_completed: null,
+            unpaid_qty: null,
+            unpaid_amount: null,
+            quantity: null,
+            amount: null,
+            quantity_brought_forward: null,
+            quantity_final: null,
+            amount_final: null,
          });
       }
 
