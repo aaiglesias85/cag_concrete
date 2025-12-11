@@ -605,14 +605,16 @@ class Base
    }
 
    // subir un archivo
+ // src/Utils/Base.php
+
    public function upload(UploadedFile $file, $dir, $aceptedExtensions = [])
    {
       $fileName = '';
 
       $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-      $extension = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+      // CORRECCIÓN 1: Convertir extensión a minúsculas para evitar errores con "ARCHIVO.PDF"
+      $extension = strtolower(pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION));
 
-      // si es vacio poner msg
       if ($extension == '') {
          $extension = 'msg';
       }
@@ -620,13 +622,13 @@ class Base
       // validar extensiones
       $extension_valida = true;
       if (!empty($aceptedExtensions)) {
+         // Asegurarse de comparar minúsculas con minúsculas
+         $aceptedExtensions = array_map('strtolower', $aceptedExtensions);
          $extension_valida = in_array($extension, $aceptedExtensions);
       }
 
       if ($extension_valida) {
-         // slug
          $safeFilename = $this->HacerUrl($originalFilename);
-
          $fileName = $safeFilename . '.' . $extension;
 
          $i = 1;
@@ -636,17 +638,19 @@ class Base
          }
 
          try {
+            // CORRECCIÓN 2: Lanzar el error real si falla
             $file->move($dir, $fileName);
-         } catch (FileException $e) {
-            $this->writelog($e->getMessage());
-            $fileName = "";
+         } catch (\Exception $e) { // Capturar cualquier excepción
+            // ESTA ES LA CLAVE: Lanzar el error para verlo en pantalla
+            throw new \Exception("Error moving file to '$dir': " . $e->getMessage());
          }
+      } else {
+         // CORRECCIÓN 3: Avisar si la extensión no es válida
+         throw new \Exception("Extension not allowed: .$extension. Allowed: " . implode(', ', $aceptedExtensions));
       }
-
 
       return $fileName;
    }
-
    /**
     * EliminarInformacionDeUsuario
     * @param $usuario_id
