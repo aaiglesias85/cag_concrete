@@ -1431,6 +1431,10 @@ var Invoices = (function () {
                               unpaid_qty: item.unpaid_qty,
                               unpaid_amount: item.unpaid_amount,
                               principal: item.principal,
+                              change_order: item.change_order,
+                              change_order_date: item.change_order_date,
+                              has_quantity_history: item.has_quantity_history || false,
+                              has_price_history: item.has_price_history || false,
                               posicion: posicion,
                            });
                         }

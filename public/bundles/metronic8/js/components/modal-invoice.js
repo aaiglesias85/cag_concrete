@@ -468,6 +468,8 @@ var ModalInvoice = (function () {
                            principal: item.principal,
                            change_order: item.change_order,
                            change_order_date: item.change_order_date,
+                           has_quantity_history: item.has_quantity_history || false,
+                           has_price_history: item.has_price_history || false,
                            posicion: posicion,
                         });
                      }
@@ -623,7 +625,14 @@ var ModalInvoice = (function () {
             targets: 2,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               var icono = '';
+               if (row.has_price_history) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
+               }
+               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}${icono}</span>`;
             },
          },
          // contract_qty
@@ -631,7 +640,14 @@ var ModalInvoice = (function () {
             targets: 3,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               var icono = '';
+               if (row.has_quantity_history) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
             },
          },
          // contract_amount
@@ -832,6 +848,8 @@ var ModalInvoice = (function () {
 
       handleSearchDatatableItems();
       handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
    };
 
    var handleChangeOrderHistory = function () {
@@ -840,12 +858,34 @@ var ModalInvoice = (function () {
          e.preventDefault();
          var project_item_id = $(this).data('project-item-id');
          if (project_item_id) {
-            cargarHistorialChangeOrder(project_item_id);
+            cargarHistorialChangeOrder(project_item_id, 'add');
          }
       });
    };
 
-   var cargarHistorialChangeOrder = function (project_item_id) {
+   var handleQuantityHistory = function () {
+      $(document).off('click', '.quantity-history-icon');
+      $(document).on('click', '.quantity-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_quantity');
+         }
+      });
+   };
+
+   var handlePriceHistory = function () {
+      $(document).off('click', '.price-history-icon');
+      $(document).on('click', '.price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_price');
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
       axios
          .get('project/listarHistorialItem', {
@@ -857,9 +897,25 @@ var ModalInvoice = (function () {
                var response = res.data;
                if (response.success) {
                   var historial = response.historial || [];
+
+                  // Filtrar historial según el tipo
+                  if (filterType) {
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
+                  }
+
                   var html = '';
                   if (historial.length === 0) {
-                     html = '<div class="alert alert-info">No history available for this item.</div>';
+                     var message = 'No history available for this item.';
+                     if (filterType === 'add') {
+                        message = 'No add history available for this item.';
+                     } else if (filterType === 'update_quantity') {
+                        message = 'No quantity change history available for this item.';
+                     } else if (filterType === 'update_price') {
+                        message = 'No price change history available for this item.';
+                     }
+                     html = '<div class="alert alert-info">' + message + '</div>';
                   } else {
                      html = '<ul class="list-unstyled">';
                      historial.forEach(function (item) {
