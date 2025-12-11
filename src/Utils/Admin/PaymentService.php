@@ -782,14 +782,31 @@ class PaymentService extends Base
 
                // Actualizar unpaid_from_previous en el item siguiente
                // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
-               $following_item->setUnpaidFromPrevious($unpaid_from_previous);
+               //$following_item->setUnpaidFromPrevious($unpaid_from_previous);
 
                // Actualizar unpaid_qty del invoice siguiente
                // En payments, cuando se actualiza después de un pago, unpaid_qty debe ser
                // la suma de todos los unpaid_qty de los invoices anteriores
                // Ejemplo: Si se paga invoice 3, invoice 4 debe tener unpaid_qty = suma de unpaid_qty de 1, 2, 3
-               $following_unpaid_qty = $unpaid_from_previous;
-               $following_item->setUnpaidQty($following_unpaid_qty);
+               //$following_unpaid_qty = $unpaid_from_previous;
+               //$following_item->setUnpaidQty($following_unpaid_qty);
+
+               //Cambios 12/10/2025 Andres
+               // 1. Guardar la referencia de la deuda acumulada anterior (Esto está bien)
+               $following_item->setUnpaidFromPrevious($unpaid_from_previous);
+
+               // 2. CORRECCIÓN: Calcular el Unpaid Total del invoice siguiente
+               // Recuperamos los datos propios de ese invoice (lo que se trabajó en ese periodo)
+               $qty_current = $following_item->getQuantity() ?? 0;
+               $qty_brought_current = $following_item->getQuantityBroughtForward() ?? 0;
+               $paid_current = $following_item->getPaidQty() ?? 0;
+
+               // FÓRMULA: (Deuda Anterior + Trabajo de ESTE mes + Traído de ESTE mes) - Lo que ya se pagó de ESTE mes
+               // Ejemplo: 60 (Deuda) + 20 (Nuevo trabajo) - 0 (Pagado) = 80
+               $nuevo_unpaid_qty = ($unpaid_from_previous + $qty_current + $qty_brought_current) - $paid_current;
+
+               // 3. Guardar el nuevo total asegurando que no sea negativo
+               $following_item->setUnpaidQty(max(0, $nuevo_unpaid_qty));
             }
          }
       }
