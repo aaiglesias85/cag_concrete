@@ -25,6 +25,7 @@ use App\Entity\PermisoUsuario;
 use App\Entity\Project;
 use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectContact;
+use App\Entity\ProjectCounty;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Entity\ProjectNotes;
@@ -605,7 +606,7 @@ class Base
    }
 
    // subir un archivo
- // src/Utils/Base.php
+   // src/Utils/Base.php
 
    public function upload(UploadedFile $file, $dir, $aceptedExtensions = [])
    {
@@ -1343,6 +1344,29 @@ class Base
       }
 
       return $arreglo_resultado;
+   }
+
+   /**
+    * getCountiesDescriptionForProject: Obtiene la descripción de los counties de un project desde la tabla intermedia
+    * @param Project $project
+    * @return string
+    */
+   public function getCountiesDescriptionForProject($project)
+   {
+      if ($project === null || $project->getProjectId() === null) {
+         return '';
+      }
+
+      $projectCountyRepo = $this->getDoctrine()->getRepository(ProjectCounty::class);
+      $projectCounties = $projectCountyRepo->ListarCountysDeProject($project->getProjectId());
+      $descriptions = [];
+      foreach ($projectCounties as $projectCounty) {
+         $county = $projectCounty->getCounty();
+         if ($county !== null) {
+            $descriptions[] = $county->getDescription();
+         }
+      }
+      return implode(', ', $descriptions);
    }
 
    /**

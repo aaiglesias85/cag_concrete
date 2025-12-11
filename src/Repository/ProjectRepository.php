@@ -30,7 +30,6 @@ class ProjectRepository extends ServiceEntityRepository
                 p.invoiceContact LIKE :search OR
                 p.owner LIKE :search OR
                 p.manager LIKE :search OR
-                p.county LIKE :search OR
                 p.projectNumber LIKE :search OR
                 p.name LIKE :search OR
                 p.description LIKE :search OR
@@ -113,9 +112,11 @@ class ProjectRepository extends ServiceEntityRepository
    public function ListarProjectsDeCounty($county_id)
    {
       $consulta = $this->createQueryBuilder('p')
-         ->leftJoin('p.countyObj', 'c')
+         ->innerJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
+         ->innerJoin('App\Entity\County', 'c', 'WITH', 'p_c.county = c.countyId')
          ->andWhere('c.countyId = :county_id')
-         ->setParameter('county_id', $county_id);
+         ->setParameter('county_id', $county_id)
+         ->groupBy('p.projectId');
 
       $consulta->orderBy('p.name', "ASC");
 
@@ -182,8 +183,7 @@ class ProjectRepository extends ServiceEntityRepository
    ) {
       $consulta = $this->createQueryBuilder('p')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i')
-         ->leftJoin('p.countyObj', 'c_o');
+         ->leftJoin('p.inspector', 'i');
 
       // Agrupar todas las condiciones de búsqueda en una sola
       if ($sSearch !== "") {
@@ -191,13 +191,11 @@ class ProjectRepository extends ServiceEntityRepository
                 p.invoiceContact LIKE :search OR
                 p.owner LIKE :search OR
                 p.manager LIKE :search OR
-                p.county LIKE :search OR
                 p.projectNumber LIKE :search OR
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search OR
-                c_o.description LIKE :search
+                p.poCG LIKE :search
             ')
             ->setParameter('search', "%{$sSearch}%");
       }
@@ -239,7 +237,6 @@ class ProjectRepository extends ServiceEntityRepository
          'projectNumber' => 'p.projectNumber',
          'subcontract' => 'p.subcontract',
          'status' => 'p.status',
-         'county' => 'c_o.description',
          'name' => 'p.name',
          'dueDate' => 'p.dueDate',
          'company' => 'c.name',
@@ -269,8 +266,7 @@ class ProjectRepository extends ServiceEntityRepository
       $consulta = $this->createQueryBuilder('p')
          ->select('COUNT(p.projectId)')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i')
-         ->leftJoin('p.countyObj', 'c_o');
+         ->leftJoin('p.inspector', 'i');
 
       // Agrupar todas las condiciones de búsqueda en una sola
       if ($sSearch !== "") {
@@ -278,13 +274,11 @@ class ProjectRepository extends ServiceEntityRepository
                 p.invoiceContact LIKE :search OR
                 p.owner LIKE :search OR
                 p.manager LIKE :search OR
-                p.county LIKE :search OR
                 p.projectNumber LIKE :search OR
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search OR
-                c_o.description LIKE :search
+                p.poCG LIKE :search
             ')
             ->setParameter('search', "%{$sSearch}%");
       }
@@ -435,7 +429,6 @@ class ProjectRepository extends ServiceEntityRepository
       $qb = $this->createQueryBuilder('p')
          ->leftJoin('p.company', 'c')
          ->leftJoin('p.inspector', 'i')
-         ->leftJoin('p.countyObj', 'co')
          ->select([
             'COUNT(p.projectId) AS total',
             // In Progress = 1
@@ -454,13 +447,11 @@ class ProjectRepository extends ServiceEntityRepository
             p.invoiceContact LIKE :search OR
             p.owner          LIKE :search OR
             p.manager        LIKE :search OR
-            p.county         LIKE :search OR
             p.projectNumber  LIKE :search OR
             p.name           LIKE :search OR
             p.description    LIKE :search OR
             p.poNumber       LIKE :search OR
-            p.poCG           LIKE :search OR
-            co.description   LIKE :search
+            p.poCG           LIKE :search
         ')
             ->setParameter('search', "%{$sSearch}%");
       }

@@ -781,8 +781,7 @@
                         <div class="row">
                            <div class="col-md-3" id="select-county">
                               <label class="form-label required"> County </label>
-                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="county" name="county">
-                                 <option value="">Select</option>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="county" name="county" multiple>
                                  {% for item in countys %}
                                  <option value="{{ item.countyId }}">{{ item.description }}</option>
                                  {% endfor %}

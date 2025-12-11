@@ -181,7 +181,7 @@ class InvoiceService extends Base
       }
 
       // project
-      $county = $project_entity->getCountyObj() ? $project_entity->getCountyObj()->getDescription() : "";
+      $county = $this->getCountiesDescriptionForProject($project_entity);
       $objWorksheet->setCellValue("N3", $county);
 
       $objWorksheet->setCellValue("N4", $project_entity->getName());

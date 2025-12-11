@@ -21,6 +21,7 @@ use App\Entity\Project;
 use App\Entity\DataTracking;
 use App\Entity\ProjectAttachment;
 use App\Entity\ProjectContact;
+use App\Entity\ProjectCounty;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Entity\ProjectNotes;
@@ -46,6 +47,7 @@ use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectNotesRepository;
 use App\Repository\ProjectPriceAdjustmentRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\ProjectCountyRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
@@ -1210,8 +1212,24 @@ class ProjectService extends Base
          $arreglo_resultado['company'] = $entity->getCompany()->getName();
          $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';
          $arreglo_resultado['inspector'] = $entity->getInspector() != null ? $entity->getInspector()->getName() : '';
-         $arreglo_resultado['county_id'] = $entity->getCountyObj() != null ? $entity->getCountyObj()->getCountyId() : '';
-         $arreglo_resultado['county'] = $entity->getCountyObj() != null ? $entity->getCountyObj()->getDescription() : '';
+
+         // Counties - obtener desde ProjectCountyRepository
+         $projectCountyRepo = $this->getDoctrine()->getRepository(ProjectCounty::class);
+         $projectCounties = $projectCountyRepo->ListarCountysDeProject($entity->getProjectId());
+         $county_ids = [];
+         $county_descriptions = [];
+         foreach ($projectCounties as $projectCounty) {
+            $county = $projectCounty->getCounty();
+            if ($county !== null) {
+               $county_ids[] = $county->getCountyId();
+               $county_descriptions[] = $county->getDescription();
+            }
+         }
+         $arreglo_resultado['county_id'] = $county_ids;
+         $arreglo_resultado['county'] = implode(', ', $county_descriptions);
+         // Mantener compatibilidad con código existente
+         $arreglo_resultado['county_id_single'] = !empty($county_ids) ? $county_ids[0] : '';
+         $arreglo_resultado['county_single'] = !empty($county_descriptions) ? $county_descriptions[0] : '';
 
          $arreglo_resultado['number'] = $entity->getProjectNumber();
          $arreglo_resultado['name'] = $entity->getName();
@@ -1569,6 +1587,14 @@ class ProjectService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
+      // counties
+      /** @var ProjectCountyRepository $projectCountyRepo */
+      $projectCountyRepo = $this->getDoctrine()->getRepository(ProjectCounty::class);
+      $projectCounties = $projectCountyRepo->ListarCountysDeProject($project_id);
+      foreach ($projectCounties as $projectCounty) {
+         $em->remove($projectCounty);
+      }
+
       // schedules
       /** @var ScheduleRepository $scheduleRepo */
       $scheduleRepo = $this->getDoctrine()->getRepository(Schedule::class);
@@ -1760,7 +1786,7 @@ class ProjectService extends Base
       $owner,
       $subcontract,
       $federal_funding,
-      $county_id,
+      $county_ids,
       $resurfacing,
       $invoice_contact,
       $certified_payrolls,
@@ -1924,22 +1950,6 @@ class ProjectService extends Base
             $entity->setInspector($inspector);
          }
 
-         // county
-         $county_id_old = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : "";
-         $county_descripcion_old = $entity->getCountyObj() ? $entity->getCountyObj()->getDescription() : "";
-         if ($county_id != '') {
-
-            if ($county_id != $county_id_old) {
-               $notas[] = [
-                  'notes' => 'Change county, old value: ' . $county_descripcion_old,
-                  'date' => new \DateTime()
-               ];
-            }
-
-            $county = $this->getDoctrine()->getRepository(County::class)
-               ->find($county_id);
-            $entity->setCountyObj($county);
-         }
 
 
          if ($owner != $entity->getOwner()) {
@@ -2133,6 +2143,14 @@ class ProjectService extends Base
 
          $entity->setUpdatedAt(new \DateTime());
 
+         // counties
+         $county_changes = $this->SalvarCounties($entity, $county_ids, true);
+         if ($county_changes['changed']) {
+            $notas[] = [
+               'notes' => 'Change counties, old values: ' . $county_changes['old_descriptions'],
+               'date' => new \DateTime()
+            ];
+         }
          // items
          $items_new = $this->SalvarItems($entity, $items);
          // save contacts
@@ -2180,7 +2198,7 @@ class ProjectService extends Base
       $owner,
       $subcontract,
       $federal_funding,
-      $county_id,
+      $county_ids,
       $resurfacing,
       $invoice_contact,
       $certified_payrolls,
@@ -2238,11 +2256,8 @@ class ProjectService extends Base
          $entity->setInspector($inspector);
       }
 
-      if ($county_id !== "") {
-         $county = $this->getDoctrine()->getRepository(County::class)
-            ->find($county_id);
-         $entity->setCountyObj($county);
-      }
+      // counties - manejar múltiples counties
+      $this->SalvarCounties($entity, $county_ids, false);
 
       $entity->setOwner($owner);
       $entity->setSubcontract($subcontract);
@@ -2272,7 +2287,7 @@ class ProjectService extends Base
          $entity->setConcreteVendor($conc_vendor);
       }
 
-     // $entity->setConcreteQuotePrice($concrete_quote_price);
+      // $entity->setConcreteQuotePrice($concrete_quote_price);
       $val = ($concrete_quote_price !== '' && $concrete_quote_price !== null) ? (float)$concrete_quote_price : null;
       $entity->setConcreteQuotePrice($val);
       $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
@@ -2292,6 +2307,8 @@ class ProjectService extends Base
 
       $em->persist($entity);
 
+      // counties
+      $this->SalvarCounties($entity, $county_ids, false);
       // items
       $items_new = $this->SalvarItems($entity, $items);
 
@@ -2392,6 +2409,76 @@ class ProjectService extends Base
             $em->persist($ajuste_entity);
          }
       }
+   }
+
+   /**
+    * SalvarCounties
+    * @param Project $entity
+    * @param array|string $county_ids Array de IDs de counties o string separado por comas
+    * @param bool $check_changes Si es true, compara con counties existentes y retorna información de cambios
+    * @return array Información de cambios si check_changes es true, array vacío si es false
+    */
+   public function SalvarCounties($entity, $county_ids, $check_changes = false)
+   {
+      $countyRepo = $this->getDoctrine()->getRepository(County::class);
+      $projectCountyRepo = $this->getDoctrine()->getRepository(ProjectCounty::class);
+      $em = $this->getDoctrine()->getManager();
+
+      $result = [
+         'changed' => false,
+         'old_descriptions' => ''
+      ];
+
+      // Convertir $county_ids a array si viene como string o array
+      if (is_string($county_ids)) {
+         $county_ids = !empty($county_ids) ? explode(',', $county_ids) : [];
+      }
+      if (!is_array($county_ids)) {
+         $county_ids = [];
+      }
+      $county_ids = array_filter(array_map('trim', $county_ids));
+
+      // Si check_changes es true, obtener counties antiguos para comparación
+      if ($check_changes && $entity->getProjectId()) {
+         $projectCounties_old = $projectCountyRepo->ListarCountysDeProject($entity->getProjectId());
+         $county_ids_old = [];
+         $county_descriptions_old = [];
+         foreach ($projectCounties_old as $projectCounty) {
+            $county = $projectCounty->getCounty();
+            if ($county !== null) {
+               $county_ids_old[] = $county->getCountyId();
+               $county_descriptions_old[] = $county->getDescription();
+            }
+         }
+
+         // Comparar cambios
+         sort($county_ids_old);
+         sort($county_ids);
+         if ($county_ids_old != $county_ids) {
+            $result['changed'] = true;
+            $result['old_descriptions'] = implode(', ', $county_descriptions_old);
+         }
+      }
+
+      // Eliminar counties existentes (solo si el proyecto ya existe)
+      if ($entity->getProjectId()) {
+         $projectCountyRepo->EliminarCountysDeProject($entity->getProjectId());
+      }
+
+      // Agregar nuevos counties
+      foreach ($county_ids as $county_id) {
+         if (!empty($county_id)) {
+            $county = $countyRepo->find($county_id);
+            if ($county !== null) {
+               $projectCounty = new ProjectCounty();
+               $projectCounty->setProject($entity);
+               $projectCounty->setCounty($county);
+               $em->persist($projectCounty);
+            }
+         }
+      }
+
+      return $result;
    }
 
    /**
@@ -2637,7 +2724,7 @@ class ProjectService extends Base
             "name" => $value->getName(),
             "description" => $value->getDescription(),
             "company" => $value->getCompany()->getName(),
-            "county" => $value->getCountyObj() ? $value->getCountyObj()->getDescription() : "",
+            "county" => $this->getCountiesDescriptionForProject($value),
             "status" => $value->getStatus(),
             "startDate" => $value->getStartDate() != '' ? $value->getStartDate()->format('m/d/Y') : '',
             "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',

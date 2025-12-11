@@ -149,7 +149,7 @@ class ScheduleService extends Base
 
                $clave = $project->getProjectId() . '|' . $schedule->getDescription() . '|' . $vendorId;
 
-               $county = $project->getCountyObj() ? $project->getCountyObj()->getDescription() : "";
+               $county = $this->getCountiesDescriptionForProject($project);
 
                if (!isset($agregado[$clave])) {
                   $agregado[$clave] = [

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 06-12-2025 a las 18:17:21
+-- Tiempo de generación: 11-12-2025 a las 15:02:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1383,6 +1383,18 @@ INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `project_county`
+--
+
+CREATE TABLE `project_county` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `county_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `project_item`
 --
 
@@ -2212,6 +2224,15 @@ ALTER TABLE `project_contact`
   ADD KEY `Ref6475` (`project_id`);
 
 --
+-- Indices de la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_project_county` (`project_id`,`county_id`),
+  ADD KEY `project_id` (`project_id`),
+  ADD KEY `county_id` (`county_id`);
+
+--
 -- Indices de la tabla `project_item`
 --
 ALTER TABLE `project_item`
@@ -2625,6 +2646,12 @@ ALTER TABLE `project_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT de la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_item`
 --
 ALTER TABLE `project_item`
@@ -2969,6 +2996,13 @@ ALTER TABLE `project_attachment`
 --
 ALTER TABLE `project_contact`
   ADD CONSTRAINT `Refcontractor75` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  ADD CONSTRAINT `Refprojectcountycountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `Refprojectcountyprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `project_item`

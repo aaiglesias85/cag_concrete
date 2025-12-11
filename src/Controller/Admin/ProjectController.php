@@ -94,7 +94,7 @@ class ProjectController extends AbstractController
          // parsear los parametros de la tabla
          $dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'county', 'name', 'dueDate', 'company', 'nota'],
+            allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'name', 'dueDate', 'company', 'nota'],
             defaultOrderField: 'projectNumber'
          );
 
@@ -160,7 +160,14 @@ class ProjectController extends AbstractController
       $owner = $request->get('owner');
       $subcontract = $request->get('subcontract');
       $federal_funding = $request->get('federal_funding');
+      // county_id puede venir como array o string separado por comas
       $county_id = $request->get('county_id');
+      if (is_string($county_id) && !empty($county_id)) {
+         $county_id = explode(',', $county_id);
+      }
+      if (!is_array($county_id)) {
+         $county_id = [];
+      }
       $resurfacing = $request->get('resurfacing');
       $invoice_contact = $request->get('invoice_contact');
       $certified_payrolls = $request->get('certified_payrolls');

@@ -694,14 +694,14 @@ var Projects = (function () {
       var result = true;
       if (activeTab == 1) {
          var company_id = $('#company').val();
-         var county_id = $('#county').val();
-         if (!validateForm() || company_id == '' || county_id == '') {
+         var county_ids = $('#county').val();
+         if (!validateForm() || company_id == '' || !county_ids || county_ids.length == 0) {
             result = false;
 
             if (company_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
             }
-            if (county_id == '') {
+            if (!county_ids || county_ids.length == 0) {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-county'), 'This field is required');
             }
          }
@@ -760,15 +760,15 @@ var Projects = (function () {
          event_change = false;
 
          var company_id = $('#company').val();
-         var county_id = $('#county').val();
+         var county_ids = $('#county').val();
 
-         if (validateForm() && company_id != '' && county_id !== '') {
+         if (validateForm() && company_id != '' && county_ids && county_ids.length > 0) {
             SalvarProject();
          } else {
             if (company_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
             }
-            if (county_id == '') {
+            if (!county_ids || county_ids.length == 0) {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-county'), 'This field is required');
             }
          }
@@ -826,8 +826,15 @@ var Projects = (function () {
       var subcontract = $('#subcontract').val();
       formData.set('subcontract', subcontract);
 
-      var county_id = $('#county').val();
-      formData.set('county_id', county_id);
+      var county_ids = $('#county').val();
+      // Si es array, convertir a string separado por comas; si es string, dejarlo así
+      if (Array.isArray(county_ids)) {
+         formData.set('county_id', county_ids.join(','));
+      } else if (county_ids) {
+         formData.set('county_id', county_ids);
+      } else {
+         formData.set('county_id', '');
+      }
 
       var federal_funding = $('#federal_funding').prop('checked') ? 1 : 0;
       formData.set('federal_funding', federal_funding);
@@ -1048,7 +1055,15 @@ var Projects = (function () {
          $('#inspector').val(project.inspector_id);
          $('#inspector').trigger('change');
 
-         $('#county').val(project.county_id);
+         // Manejar múltiples counties
+         if (project.county_id && Array.isArray(project.county_id)) {
+            $('#county').val(project.county_id);
+         } else if (project.county_id) {
+            // Compatibilidad con formato antiguo (single county)
+            $('#county').val([project.county_id]);
+         } else {
+            $('#county').val(null);
+         }
          $('#county').trigger('change');
 
          $('#name').val(project.name);

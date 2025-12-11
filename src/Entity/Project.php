@@ -102,10 +102,6 @@ class Project
    #[ORM\JoinColumn(name: 'inspector_id', referencedColumnName: 'inspector_id')]
    private ?Inspector $inspector;
 
-   #[ORM\ManyToOne(targetEntity: 'App\Entity\County')]
-   #[ORM\JoinColumn(name: 'county_id', referencedColumnName: 'county_id')]
-   private ?County $countyObj;
-
    #[ORM\ManyToOne(targetEntity: ConcreteVendor::class)]
    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
    private ?ConcreteVendor $concreteVendor;
@@ -385,14 +381,15 @@ class Project
       $this->name = $name;
    }
 
+   // Mantener por compatibilidad con código existente - se maneja desde el servicio
    public function getCountyObj(): ?County
    {
-      return $this->countyObj;
+      return null; // Se maneja desde el servicio usando ProjectCountyRepository
    }
 
    public function setCountyObj(?County $countyObj)
    {
-      $this->countyObj = $countyObj;
+      // Se maneja desde el servicio usando ProjectCountyRepository
    }
 
    public function getConcreteVendor(): ?ConcreteVendor

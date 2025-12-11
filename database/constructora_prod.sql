@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 06-12-2025 a las 18:17:37
+-- Tiempo de generación: 11-12-2025 a las 15:02:39
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -152,7 +152,8 @@ CREATE TABLE `concrete_class` (
 INSERT INTO `concrete_class` (`concrete_class_id`, `name`, `status`) VALUES
 (1, 'Class A', 1),
 (2, 'Class B', 1),
-(3, 'Class C', 1);
+(3, 'Class C', 1),
+(5, 'Class D', 1);
 
 -- --------------------------------------------------------
 
@@ -3462,9 +3463,9 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (15, '11', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:28:09', '2025-02-10 15:46:18', 87, NULL, NULL),
 (16, '1', '2025-02-01', '2025-02-26', 'test', 0, '2025-02-26 15:23:01', '2025-09-10 22:52:19', 127, '34234443534534534555', '23423432'),
 (18, '1', '2025-10-01', '2025-10-31', 'test', 0, '2025-11-14 03:04:17', NULL, 171, NULL, NULL),
-(22, '1', '2025-09-01', '2025-09-30', '', 1, '2025-11-21 02:09:32', '2025-11-27 01:44:30', 254, NULL, NULL),
-(23, '2', '2025-10-01', '2025-10-31', '', 1, '2025-11-21 02:09:59', NULL, 254, NULL, NULL),
-(24, '3', '2025-11-01', '2025-11-30', '', 0, '2025-11-21 02:10:17', NULL, 254, NULL, NULL);
+(33, '1', '2025-09-01', '2025-09-30', '', 1, '2025-12-11 14:23:48', '2025-12-11 14:29:56', 254, NULL, NULL),
+(34, '2', '2025-10-01', '2025-10-31', '', 0, '2025-12-11 14:24:10', NULL, 254, NULL, NULL),
+(35, '3', '2025-11-01', '2025-11-30', '', 0, '2025-12-11 14:28:05', NULL, 254, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -3624,36 +3625,36 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (194, 0.000000, 0.000000, 0.000000, 175.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1077, NULL),
 (195, 0.000000, 0.000000, 0.000000, 2400.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1078, NULL),
 (196, 0.000000, 0.000000, 0.000000, 55.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1079, NULL),
-(227, 0.000000, 0.000000, 15.000000, 18.00, 15.000000, 0.000000, 0.000000, 270.000000, 270.000000, 22, 1639, NULL),
-(228, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1533, NULL),
-(229, 0.000000, 0.000000, 0.000000, 32.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1534, NULL),
-(230, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1640, NULL),
-(231, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1642, NULL),
-(232, 0.000000, 0.000000, 0.000000, 24.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1645, NULL),
-(233, 0.000000, 0.000000, 0.000000, 3.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1698, NULL),
-(234, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1699, NULL),
-(235, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1700, NULL),
-(236, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 22, 1702, NULL),
-(237, 15.000000, 0.000000, 5.000000, 18.00, 5.000000, 0.000000, 0.000000, 90.000000, 630.000000, 23, 1639, NULL),
-(238, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1533, NULL),
-(239, 0.000000, 0.000000, 0.000000, 32.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1534, NULL),
-(240, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1640, NULL),
-(241, 0.000000, 0.000000, 0.000000, 35.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1642, NULL),
-(242, 0.000000, 0.000000, 0.000000, 24.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1645, NULL),
-(243, 0.000000, 0.000000, 0.000000, 3.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1698, NULL),
-(244, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1699, NULL),
-(245, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1700, NULL),
-(246, 0.000000, 0.000000, 0.000000, 15.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 23, 1702, NULL),
-(247, 20.000000, 0.000000, 10.000000, 18.00, NULL, 10.000000, 0.000000, NULL, NULL, 24, 1639, NULL),
-(248, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1533, NULL),
-(249, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1534, NULL),
-(250, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1640, NULL),
-(251, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1642, NULL),
-(252, 0.000000, 0.000000, 0.000000, 24.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1645, NULL),
-(253, 0.000000, 0.000000, 0.000000, 3.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1698, NULL),
-(254, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1699, NULL),
-(255, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1700, NULL),
-(256, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 24, 1702, NULL);
+(337, 0.000000, 0.000000, 15.000000, 19.85, 5.000000, 10.000000, 0.000000, 99.250000, 99.250000, 33, 1639, NULL),
+(338, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1533, NULL),
+(339, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1534, NULL),
+(340, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1640, NULL),
+(341, 0.000000, 0.000000, 0.000000, 38.59, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1642, NULL),
+(342, 0.000000, 0.000000, 0.000000, 24.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1645, NULL),
+(343, 0.000000, 0.000000, 0.000000, 3.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1698, NULL),
+(344, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1699, NULL),
+(345, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1700, NULL),
+(346, 0.000000, 0.000000, 0.000000, 10.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1702, NULL),
+(347, 15.000000, 10.000000, 5.000000, 19.85, NULL, 10.000000, 0.000000, NULL, NULL, 34, 1639, NULL),
+(348, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1533, NULL),
+(349, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1534, NULL),
+(350, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1640, NULL),
+(351, 0.000000, 0.000000, 0.000000, 38.59, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1642, NULL),
+(352, 0.000000, 0.000000, 0.000000, 24.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1645, NULL),
+(353, 0.000000, 0.000000, 0.000000, 3.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1698, NULL),
+(354, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1699, NULL),
+(355, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1700, NULL),
+(356, 0.000000, 0.000000, 0.000000, 10.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1702, NULL),
+(357, 20.000000, 15.000000, 10.000000, 19.85, NULL, 15.000000, 0.000000, NULL, NULL, 35, 1639, NULL),
+(358, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1533, NULL),
+(359, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1534, NULL),
+(360, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1640, NULL),
+(361, 0.000000, 0.000000, 0.000000, 38.59, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1642, NULL),
+(362, 0.000000, 0.000000, 0.000000, 24.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1645, NULL),
+(363, 0.000000, 0.000000, 0.000000, 3.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1698, NULL),
+(364, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1699, NULL),
+(365, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1700, NULL),
+(366, 0.000000, 0.000000, 0.000000, 10.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1702, NULL);
 
 -- --------------------------------------------------------
 
@@ -5333,7 +5334,38 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4082, 'Update', 'Concrete Class', 'The concrete class is modified: test upd', '::1', '2025-12-06 18:01:50', 1),
 (4083, 'Delete', 'Concrete Class', 'The concrete class is deleted: test upd', '::1', '2025-12-06 18:01:53', 1),
 (4084, 'Update', 'Concrete Class', 'The concrete class is modified: Class A', '::1', '2025-12-06 18:08:32', 1),
-(4085, 'Update', 'Concrete Class', 'The concrete class is modified: Class A', '::1', '2025-12-06 18:08:35', 1);
+(4085, 'Update', 'Concrete Class', 'The concrete class is modified: Class A', '::1', '2025-12-06 18:08:35', 1),
+(4086, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-06 18:49:37', 1),
+(4087, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-06 18:52:33', 1),
+(4088, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-06 18:52:38', 1),
+(4089, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-12-09 01:11:38', 1),
+(4090, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-09 01:11:38', 1),
+(4091, 'Delete', 'Invoice', 'The invoice #3 is deleted', '::1', '2025-12-09 01:11:38', 1),
+(4092, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-12-09 01:17:33', 1),
+(4093, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-09 02:20:37', 1),
+(4094, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-09 02:22:18', 1),
+(4095, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-09 02:25:07', 1),
+(4096, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-09 02:26:44', 1),
+(4097, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-09 02:30:31', 1),
+(4098, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-09 02:33:29', 1),
+(4099, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-09 02:38:03', 1),
+(4100, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-12-09 02:39:57', 1),
+(4101, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-12-09 22:32:58', 1),
+(4102, 'Update', 'Invoice', 'The invoice #2 is modified', '::1', '2025-12-09 22:37:14', 1),
+(4103, 'Update', 'Invoice', 'The invoice #3 is modified', '::1', '2025-12-09 22:37:44', 1),
+(4104, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-12-11 14:07:55', 1),
+(4105, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-11 14:07:55', 1),
+(4106, 'Delete', 'Invoice', 'The invoice #3 is deleted', '::1', '2025-12-11 14:07:55', 1),
+(4107, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 14:08:24', 1),
+(4108, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-12-11 14:22:17', 1),
+(4109, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-11 14:22:47', 1),
+(4110, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2025-12-11 14:23:23', 1),
+(4111, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2025-12-11 14:23:23', 1),
+(4112, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2025-12-11 14:23:48', 1),
+(4113, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2025-12-11 14:24:10', 1),
+(4114, 'Add', 'Invoice', 'The invoice #3 is added', '::1', '2025-12-11 14:28:05', 1),
+(4115, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-12-11 14:29:56', 1),
+(4116, 'Add', 'Concrete Class', 'The concrete class is added: Class D', '::1', '2025-12-11 14:33:09', 1);
 
 -- --------------------------------------------------------
 
@@ -5769,7 +5801,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (251, '0019197', 'UIG49007', 'B3TIA2302211-0', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', 'SR 4 GREEN OAK ROAD RD EXT MCDILDA RD', NULL, 'GDOT', '2308', 855413.00, 1, 'TOOMBS', 0, '', 0, '2023-07-24', '2026-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-03 21:52:15', '2025-02-12 14:34:43', NULL, 45, NULL, 109, NULL, NULL),
 (252, '0015623', 'UIG49006', 'B1CBA2301890-0', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', 'BRIDGE AND APPROACHES ON HARRISON ROAD (CR 48)', NULL, 'GDOT', '2307-0004', 85330.96, 1, 'JENKINS', 0, '', 0, '2023-07-08', '2024-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 13:34:05', '2025-02-04 13:35:25', NULL, 45, NULL, 110, NULL, NULL),
 (253, '0012867', 'ERS05079', '24-213', 'AGUSTA -COA- WHEELER SUM OUT', 'AGUSTA -COA- WHEELER SUM OUT', NULL, 'CITY OF AUGUTA', '50449', 851574.43, 0, 'RICHMOND', 0, '', 0, '2025-02-04', '2026-08-06', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-04 19:39:53', '2025-02-28 19:46:29', NULL, 5, NULL, 35, NULL, NULL),
-(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 443928.04, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', '2025-12-05', 'Andres Iglesias', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-12-06 16:03:20', '2025-11-19 02:09:32', 46, NULL, 8, NULL, NULL),
+(254, 'TEST000001', 'TTC00000000001', 'TestTest0001', 'TESTING PROJECT FOR SOFTWARE', 'TESTING PROJECT FOR SOFTWARE', 'undefined', 'C&G CONCRETE', '00011122223333', 443928.04, 1, 'FULTON', 0, '', 1, '2024-10-01', '2025-04-01', NULL, 'Andres Iglesias', 1, 'undefined', 'undefined', 10.00, 10.00, 1, 'month', 1, 10.00, 5.00, 10.00, '2025-02-10 16:43:27', '2025-12-11 14:08:24', '2025-12-06 18:49:37', 46, NULL, 8, 3, 1),
 (255, 'M006468', 'CWM04110', 'B1CBA2402829-0', 'SR 314 MILL INLAY RESURFACE', 'SR 314 MILL INLAY RESURFACE', NULL, 'GDOT', '3186', 53916.00, 1, 'CLAYTON', 1, '', 1, '2025-02-06', '2025-12-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-10 20:16:27', '2025-02-10 20:18:25', NULL, 7, NULL, 22, NULL, NULL),
 (256, '0013939', 'ERS05031', 'B1CBA2100889-0', 'SR 59 BRIDGE', 'SR 59 BRIDGE REPLACEMENT', 'undefined', 'GDOT', '60257', 144625.00, 1, 'FRANKLIN', 0, '', 0, '2021-04-16', '2022-11-30', '2025-11-28', '', 1, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-02-10 20:26:00', '2025-11-15 15:06:27', '2025-11-15 15:06:27', 5, NULL, 73, NULL, NULL),
 (257, '0013697', 'CWM04066', 'B1CBA2201793-0', 'efrewrewr', 'CONSTRUCTION OF A ROUNDABOUT ON SR 18 @ JACKSON LAKE RD/SNAPPING SHOALS ROAD', NULL, 'GDOT', '12819', 348587.00, 1, 'HENRY', 0, '', 0, '2022-01-08', '2025-05-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-11 20:37:56', '2025-04-19 01:53:32', NULL, 7, NULL, 11, NULL, NULL),
@@ -5860,6 +5892,308 @@ INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 (6, 'Taylor Hammonds', '', '', '', '', 240),
 (7, 'Taylor Hammonds', '', '', '', '', 241),
 (8, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(324) 343-2432', 'Obrero', 'Test', 10);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_county`
+--
+
+CREATE TABLE `project_county` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `county_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `project_county`
+--
+
+INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
+(1, 6, 2),
+(14, 7, 3),
+(18, 8, 4),
+(2, 9, 2),
+(23, 10, 5),
+(30, 11, 6),
+(31, 12, 7),
+(37, 13, 8),
+(38, 14, 8),
+(65, 15, 9),
+(39, 19, 8),
+(68, 20, 10),
+(69, 21, 11),
+(75, 22, 12),
+(85, 23, 13),
+(40, 25, 8),
+(87, 28, 14),
+(92, 29, 15),
+(93, 30, 16),
+(95, 31, 17),
+(101, 32, 18),
+(102, 33, 18),
+(70, 34, 11),
+(103, 35, 19),
+(88, 36, 14),
+(41, 37, 8),
+(3, 38, 2),
+(4, 39, 2),
+(104, 40, 20),
+(107, 41, 21),
+(42, 42, 8),
+(108, 43, 22),
+(117, 44, 23),
+(109, 45, 22),
+(119, 46, 24),
+(125, 49, 27),
+(126, 50, 28),
+(139, 51, 29),
+(140, 52, 30),
+(146, 53, 31),
+(150, 54, 32),
+(152, 55, 33),
+(141, 56, 30),
+(151, 57, 32),
+(15, 58, 3),
+(154, 59, 34),
+(110, 60, 22),
+(156, 61, 35),
+(162, 62, 36),
+(16, 63, 3),
+(32, 64, 7),
+(163, 65, 37),
+(5, 66, 2),
+(17, 67, 3),
+(164, 68, 38),
+(89, 69, 14),
+(147, 70, 31),
+(165, 71, 39),
+(168, 72, 40),
+(170, 73, 41),
+(172, 74, 42),
+(173, 75, 43),
+(174, 76, 44),
+(175, 77, 45),
+(178, 78, 46),
+(181, 79, 47),
+(153, 80, 33),
+(182, 81, 48),
+(184, 82, 49),
+(187, 83, 50),
+(111, 84, 22),
+(43, 85, 8),
+(71, 86, 11),
+(166, 87, 39),
+(189, 88, 51),
+(190, 89, 52),
+(44, 90, 8),
+(191, 91, 53),
+(188, 92, 50),
+(192, 93, 54),
+(72, 94, 11),
+(86, 95, 13),
+(6, 96, 2),
+(7, 97, 2),
+(196, 98, 55),
+(66, 99, 9),
+(197, 100, 56),
+(8, 101, 2),
+(19, 102, 4),
+(198, 103, 57),
+(199, 104, 58),
+(201, 105, 59),
+(205, 106, 60),
+(207, 107, 61),
+(208, 108, 62),
+(210, 109, 63),
+(45, 110, 8),
+(183, 111, 48),
+(120, 112, 24),
+(211, 113, 64),
+(90, 114, 14),
+(46, 115, 8),
+(213, 116, 65),
+(47, 117, 8),
+(214, 118, 66),
+(96, 119, 17),
+(215, 120, 67),
+(48, 121, 8),
+(76, 122, 12),
+(216, 123, 68),
+(24, 124, 5),
+(105, 125, 20),
+(218, 126, 69),
+(25, 127, 5),
+(220, 128, 70),
+(209, 129, 62),
+(77, 130, 12),
+(221, 131, 71),
+(26, 132, 5),
+(49, 133, 8),
+(222, 134, 72),
+(127, 135, 28),
+(78, 136, 12),
+(97, 137, 17),
+(79, 138, 12),
+(167, 139, 39),
+(185, 140, 49),
+(27, 141, 5),
+(223, 142, 73),
+(73, 143, 11),
+(225, 144, 74),
+(200, 145, 58),
+(226, 146, 75),
+(176, 147, 45),
+(229, 148, 76),
+(212, 149, 64),
+(157, 150, 35),
+(233, 151, 77),
+(33, 152, 7),
+(219, 153, 69),
+(158, 154, 35),
+(128, 155, 28),
+(230, 156, 76),
+(234, 157, 78),
+(129, 158, 28),
+(20, 159, 4),
+(206, 160, 60),
+(235, 161, 79),
+(50, 162, 8),
+(236, 163, 80),
+(130, 164, 28),
+(237, 165, 81),
+(131, 166, 28),
+(51, 167, 8),
+(155, 168, 34),
+(142, 169, 30),
+(238, 170, 82),
+(239, 171, 83),
+(241, 172, 84),
+(242, 173, 84),
+(132, 174, 28),
+(243, 175, 84),
+(227, 176, 75),
+(244, 177, 85),
+(9, 178, 2),
+(80, 179, 12),
+(245, 180, 86),
+(52, 181, 8),
+(53, 182, 8),
+(143, 183, 30),
+(54, 184, 8),
+(246, 185, 87),
+(144, 186, 30),
+(248, 187, 88),
+(159, 188, 35),
+(160, 189, 35),
+(112, 190, 22),
+(249, 191, 89),
+(148, 192, 31),
+(81, 193, 12),
+(250, 194, 90),
+(202, 195, 59),
+(203, 196, 59),
+(55, 197, 8),
+(56, 198, 8),
+(251, 199, 91),
+(67, 200, 9),
+(34, 201, 7),
+(252, 202, 92),
+(240, 203, 83),
+(35, 204, 7),
+(253, 205, 93),
+(171, 206, 41),
+(57, 207, 8),
+(10, 208, 2),
+(193, 209, 54),
+(254, 210, 94),
+(231, 211, 76),
+(149, 212, 31),
+(255, 213, 95),
+(256, 214, 96),
+(257, 215, 96),
+(217, 216, 68),
+(258, 217, 97),
+(259, 218, 98),
+(179, 219, 46),
+(260, 220, 99),
+(247, 221, 87),
+(58, 222, 8),
+(261, 223, 100),
+(263, 224, 101),
+(91, 225, 14),
+(59, 226, 8),
+(265, 227, 102),
+(133, 228, 28),
+(94, 229, 16),
+(228, 230, 75),
+(262, 231, 100),
+(11, 232, 2),
+(134, 233, 28),
+(194, 237, 54),
+(266, 238, 103),
+(186, 239, 49),
+(121, 240, 24),
+(195, 241, 54),
+(267, 242, 104),
+(268, 243, 105),
+(269, 244, 106),
+(270, 245, 107),
+(271, 246, 108),
+(272, 247, 108),
+(122, 248, 24),
+(60, 249, 8),
+(273, 250, 109),
+(274, 251, 109),
+(275, 252, 110),
+(161, 253, 35),
+(61, 254, 8),
+(113, 255, 22),
+(224, 256, 73),
+(74, 257, 11),
+(135, 259, 28),
+(276, 260, 111),
+(277, 262, 112),
+(136, 263, 28),
+(114, 264, 22),
+(62, 265, 8),
+(123, 266, 24),
+(98, 268, 17),
+(278, 269, 113),
+(12, 270, 2),
+(63, 271, 8),
+(21, 272, 4),
+(22, 273, 4),
+(82, 274, 12),
+(99, 275, 17),
+(124, 276, 24),
+(100, 277, 17),
+(264, 278, 101),
+(83, 279, 12),
+(13, 280, 2),
+(137, 281, 28),
+(279, 282, 114),
+(280, 283, 115),
+(28, 284, 5),
+(106, 285, 20),
+(169, 286, 40),
+(145, 287, 30),
+(281, 288, 116),
+(29, 289, 5),
+(282, 290, 117),
+(138, 291, 28),
+(64, 292, 8),
+(283, 293, 118),
+(284, 294, 119),
+(118, 295, 23),
+(36, 296, 7),
+(232, 297, 76),
+(84, 298, 12),
+(180, 299, 46),
+(115, 300, 22),
+(116, 301, 22),
+(204, 302, 59),
+(177, 303, 45);
 
 -- --------------------------------------------------------
 
@@ -7421,9 +7755,9 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1697, 50.000000, 81.00, 'none', NULL, NULL, 1, NULL, NULL, 281, 133, NULL),
 (1698, 3.000000, 3.00, '', NULL, NULL, 1, 0, NULL, 254, 194, NULL),
 (1699, 15.000000, 15.00, 'equation', NULL, NULL, 1, NULL, NULL, 254, 224, 41),
-(1700, 10.000000, 15.00, 'equation', 5.000000, NULL, 1, 1, '2025-11-30 16:03:20', 254, 72, 8),
+(1700, 10.000000, 15.00, 'equation', 5.000000, NULL, 1, 1, '2025-11-30 14:08:24', 254, 72, 8),
 (1701, 750.000000, 78.00, 'none', NULL, NULL, 1, NULL, NULL, 282, 133, NULL),
-(1702, 10.000000, 10.00, '', 15.000000, 11.030000, 1, 1, '2025-11-29 16:03:20', 254, 223, NULL),
+(1702, 10.000000, 10.00, '', 15.000000, 11.030000, 1, 1, '2025-11-29 14:08:24', 254, 223, NULL),
 (1703, 9.000000, 211.00, 'same', NULL, NULL, 1, NULL, NULL, 20, 101, NULL),
 (1704, 772.000000, 72.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 67, 36),
 (1705, 3506.000000, 36.50, 'equation', NULL, NULL, 1, NULL, NULL, 39, 31, 11),
@@ -8302,7 +8636,12 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (783, 'Change Price Item: 12 IN HEADER CURB, Percent: 5%, Previous Price: 36.75, New Price: 38.59', '2025-12-06', 254),
 (784, 'Change Price Item: C&G 6 X 24 IN, Percent: 5%, Previous Price: 10.50, New Price: 11.03', '2025-12-06', 254),
 (785, 'Change Price Item: C&G 6 X 24 IN, Previous Price: 11.03, New Price: 10', '2025-12-06', 254),
-(786, 'Change contract amount, old value: 442443', '2025-12-06', 254);
+(786, 'Change contract amount, old value: 442443', '2025-12-06', 254),
+(787, 'Change concrete vendor, old value: ', '2025-12-06', 254),
+(788, 'Change concrete quote price, old value: 0', '2025-12-06', 254),
+(789, 'Change concrete quote price escalator, old value: 0', '2025-12-06', 254),
+(790, 'Change concrete time periodo every n, old value: 0', '2025-12-06', 254),
+(791, 'Change concrete time periodo unit, old value: ', '2025-12-06', 254);
 
 -- --------------------------------------------------------
 
@@ -9315,10 +9654,10 @@ INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`,
 (4, 'invoice', 3, 'pendiente', 0, '2025-11-07 01:01:20'),
 (6, 'invoice', 8, 'pendiente', 0, '2025-11-14 03:01:27'),
 (7, 'invoice', 18, 'pendiente', 0, '2025-11-14 03:04:17'),
-(11, 'invoice', 22, 'pendiente', 0, '2025-11-21 02:09:32'),
-(12, 'invoice', 23, 'pendiente', 0, '2025-11-21 02:09:59'),
-(13, 'invoice', 24, 'pendiente', 0, '2025-11-21 02:10:17'),
-(14, 'item', 211, 'pendiente', 0, '2025-11-29 00:30:40');
+(14, 'item', 211, 'pendiente', 0, '2025-11-29 00:30:40'),
+(23, 'invoice', 33, 'pendiente', 0, '2025-12-11 14:23:48'),
+(24, 'invoice', 34, 'pendiente', 0, '2025-12-11 14:24:10'),
+(25, 'invoice', 35, 'pendiente', 0, '2025-12-11 14:28:05');
 
 -- --------------------------------------------------------
 
@@ -9855,6 +10194,15 @@ ALTER TABLE `project_contact`
   ADD KEY `Ref6475` (`project_id`);
 
 --
+-- Indices de la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_project_county` (`project_id`,`county_id`),
+  ADD KEY `project_id` (`project_id`),
+  ADD KEY `county_id` (`county_id`);
+
+--
 -- Indices de la tabla `project_item`
 --
 ALTER TABLE `project_item`
@@ -10043,7 +10391,7 @@ ALTER TABLE `company_contact`
 -- AUTO_INCREMENT de la tabla `concrete_class`
 --
 ALTER TABLE `concrete_class`
-  MODIFY `concrete_class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `concrete_class_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `concrete_vendor`
@@ -10181,7 +10529,7 @@ ALTER TABLE `inspector`
 -- AUTO_INCREMENT de la tabla `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_attachment`
@@ -10193,7 +10541,7 @@ ALTER TABLE `invoice_attachment`
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=257;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=367;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_notes`
@@ -10217,7 +10565,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4086;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4117;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10268,6 +10616,12 @@ ALTER TABLE `project_contact`
   MODIFY `contact_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
+-- AUTO_INCREMENT de la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=512;
+
+--
 -- AUTO_INCREMENT de la tabla `project_item`
 --
 ALTER TABLE `project_item`
@@ -10283,7 +10637,7 @@ ALTER TABLE `project_item_history`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=787;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=792;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
@@ -10379,7 +10733,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -10599,6 +10953,13 @@ ALTER TABLE `project_attachment`
 --
 ALTER TABLE `project_contact`
   ADD CONSTRAINT `Refcontractor75` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `project_county`
+--
+ALTER TABLE `project_county`
+  ADD CONSTRAINT `Refprojectcountycountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `Refprojectcountyprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `project_item`
