@@ -664,6 +664,12 @@ class InvoiceService extends Base
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $lista = $invoiceItemRepo->ListarItems($invoice_id);
+
+      // Obtener el invoice actual para comparar fechas
+      $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+      $currentInvoiceDate = $currentInvoice ? $currentInvoice->getStartDate() : null;
+      $currentInvoiceId = $currentInvoice ? $currentInvoice->getInvoiceId() : null;
+
       foreach ($lista as $key => $value) {
 
          $contract_qty = $value->getProjectItem()->getQuantity();
@@ -671,7 +677,41 @@ class InvoiceService extends Base
          $contract_amount = $contract_qty * $price;
 
          $quantity_from_previous = $value->getQuantityFromPrevious();
-         $unpaid_from_previous = $value->getUnpaidFromPrevious();
+
+         // IMPORTANTE: Recalcular unpaid_from_previous sumando los unpaid_qty de los invoices anteriores
+         // El unpaid_qty de cada invoice anterior = quantity_final - paid_qty
+         $project_item_id = $value->getProjectItem()->getId();
+         $unpaid_from_previous = 0;
+
+         // Obtener todos los invoice items anteriores de este project_item
+         $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+
+         foreach ($allInvoiceItems as $previousItem) {
+            /** @var InvoiceItem $previousItem */
+            $previousInvoice = $previousItem->getInvoice();
+            $previous_invoice_id = $previousInvoice->getInvoiceId();
+            $previous_invoice_date = $previousInvoice->getStartDate();
+
+            // Solo considerar invoices anteriores al invoice actual
+            if ($currentInvoiceDate && $currentInvoiceId) {
+               if (
+                  $previous_invoice_date < $currentInvoiceDate ||
+                  ($previous_invoice_date == $currentInvoiceDate && $previous_invoice_id < $currentInvoiceId)
+               ) {
+                  // Calcular unpaid_qty del invoice anterior: quantity_final - paid_qty
+                  $prev_quantity = $previousItem->getQuantity() ?? 0;
+                  $prev_quantity_brought_forward = $previousItem->getQuantityBroughtForward() ?? 0;
+                  $prev_paid_qty = $previousItem->getPaidQty() ?? 0;
+
+                  $prev_quantity_final = $prev_quantity + $prev_quantity_brought_forward;
+                  $unpaid_qty_previous = $prev_quantity_final - $prev_paid_qty;
+                  $unpaid_qty_previous = max(0, $unpaid_qty_previous);
+
+                  // Sumar al unpaid_from_previous acumulado
+                  $unpaid_from_previous += $unpaid_qty_previous;
+               }
+            }
+         }
 
          $quantity = $value->getQuantity();
 
@@ -688,7 +728,10 @@ class InvoiceService extends Base
 
          $paid_qty = $value->getPaidQty();
 
-         $unpaid_qty = $value->getUnpaidQty();
+         // IMPORTANTE: En invoices, unpaid_qty debe ser igual a unpaid_from_previous
+         // (suma de los unpaid_qty de los payments anteriores)
+         // NO usar el valor almacenado en BD, sino recalcularlo
+         $unpaid_qty = $unpaid_from_previous;
          $unpaid_amount = $unpaid_qty * $price;
 
 
