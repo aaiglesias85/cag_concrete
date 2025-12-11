@@ -1619,22 +1619,22 @@ var Invoices = (function () {
 
       // columns
       const columns = [
-         { data: 'item' },
-         { data: 'unit' },
-         { data: 'price' },
-         { data: 'contract_qty' },
-         { data: 'contract_amount' }, // 3 (sum)
-         { data: 'quantity_completed' },
-         { data: 'amount_completed' }, // 5 (sum)
-         { data: 'unpaid_qty' },
-         { data: 'unpaid_amount' }, // 7 (sum)
-         { data: 'quantity' },
-         { data: 'amount' }, // 9 (sum)
-         { data: 'quantity_brought_forward' },
-         { data: 'quantity_final' },
-         { data: 'amount_final' }, // 12 (sum)
-         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
-         { data: null },
+         { data: 'item', defaultContent: '' },
+         { data: 'unit', defaultContent: '' },
+         { data: 'price', defaultContent: '' },
+         { data: 'contract_qty', defaultContent: '' },
+         { data: 'contract_amount', defaultContent: '' }, 
+         { data: 'quantity_completed', defaultContent: '' },
+         { data: 'amount_completed', defaultContent: '' },
+         { data: 'unpaid_qty', defaultContent: '' },
+         { data: 'unpaid_amount', defaultContent: '' },
+         { data: 'quantity', defaultContent: '' },
+         { data: 'amount', defaultContent: '' },
+         { data: 'quantity_brought_forward', defaultContent: '' },
+         { data: 'quantity_final', defaultContent: '' },
+         { data: 'amount_final', defaultContent: '' },
+         { data: '_groupOrder', visible: false }, 
+         { data: null, defaultContent: '' },
       ];
 
       // column defs
