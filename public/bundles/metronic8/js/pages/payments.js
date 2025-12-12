@@ -952,10 +952,8 @@ var Payments = (function () {
          {
             targets: 7,
             render: function (data, type, row) {
-               var output = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
-               if (invoice === null || !invoice.paid) {
-                  output = `<input type="number" class="form-control paid_qty" value="${data}" data-position="${row.posicion}" />`;
-               }
+               // Siempre mostrar input para permitir edición incluso después de pagar
+               var output = `<input type="number" class="form-control paid_qty" value="${data}" data-position="${row.posicion}" />`;
                return `<div class="w-100px">${output}</div>`;
             },
          },
@@ -963,19 +961,14 @@ var Payments = (function () {
          {
             targets: 8,
             render: function (data, type, row) {
-               // valor formateado por defecto
-               let valueHtml = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
-
-               // si la factura no está pagada, mostrar input
-               if (invoice === null || !invoice.paid) {
-                  valueHtml = `
+               // Siempre mostrar input para permitir edición incluso después de pagar
+               let valueHtml = `
                             <input type="number"
                                    class="form-control form-control-sm unpaid_qty"
                                    value="${data}"
                                    data-position="${row.posicion}" 
                                    style="width: 80px;" />
                         `;
-               }
 
                // el ícono de notas siempre visible
                return `
