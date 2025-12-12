@@ -885,8 +885,67 @@ var Payments = (function () {
    var oTablePayments;
    var payments = [];
    var nEditingRowPayment = null;
+
+   // Función para agrupar items por change_order_date
+   var agruparItemsPorChangeOrder = function (items) {
+      var items_regulares = [];
+      var items_change_order = [];
+
+      // Separar items regulares y change order
+      items.forEach(function (item) {
+         if (item.change_order && item.change_order_date) {
+            items_change_order.push(item);
+         } else {
+            items_regulares.push(item);
+         }
+      });
+
+      // Construir array final: items regulares primero, luego change orders
+      var resultado = [];
+      var orderCounter = 0;
+
+      // Agregar items regulares con orden
+      items_regulares.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
+
+      // Agregar encabezado "Change Order" solo si hay items regulares Y items de change order
+      // Si solo hay items de change order, no mostrar el header para evitar problemas de renderizado
+      if (items_change_order.length > 0 && items_regulares.length > 0) {
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: 'Change Order',
+            _groupOrder: orderCounter++,
+            // Agregar todas las propiedades que DataTables espera para evitar errores
+            item: null,
+            unit: null,
+            contract_qty: null,
+            price: null,
+            contract_amount: null,
+            quantity: null,
+            amount: null,
+            paid_qty: null,
+            unpaid_qty: null,
+            paid_amount: null,
+            paid_amount_total: null,
+         });
+      }
+
+      // Agregar items change order
+      items_change_order.forEach(function (item) {
+         item._groupOrder = orderCounter++;
+         resultado.push(item);
+      });
+
+      return resultado;
+   };
+
    var initTablePayments = function () {
       const table = '#payments-table-editable';
+
+      // Procesar datos para agrupar por change_order_date
+      var datosAgrupados = agruparItemsPorChangeOrder(payments);
 
       // columns
       const columns = [
@@ -901,15 +960,36 @@ var Payments = (function () {
          { data: 'unpaid_qty' },
          { data: 'paid_amount' },
          { data: 'paid_amount_total' },
+         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
          { data: null },
       ];
 
       // column defs
       let columnDefs = [
+         // item
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               // Si es encabezado de grupo, mostrar el título
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
+               // Si es change order, agregar icono de historial
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
+               }
+               return `<span>${DatatableUtil.getRenderColumnDiv(data, 200)}${icono}</span>`;
+            },
+         },
          // unit
          {
             targets: 1,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 50);
             },
          },
@@ -917,14 +997,30 @@ var Payments = (function () {
          {
             targets: 2,
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.has_quantity_history && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
+               }
+               return `<span>${DatatableUtil.getRenderColumnDiv(data, 100)}${icono}</span>`;
             },
          },
          // price
          {
             targets: 3,
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               if (row.isGroupHeader) return '';
+               var icono = '';
+               if (row.has_price_history && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
+               }
+               return `<span>${MyApp.formatMoney(data)}${icono}</span>`;
             },
          },
          // contract_amount
@@ -934,10 +1030,19 @@ var Payments = (function () {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
+         // contract_amount
+         {
+            targets: 4,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
          // quantity
          {
             targets: 5,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderColumnDiv(data, 100);
             },
          },
@@ -945,6 +1050,7 @@ var Payments = (function () {
          {
             targets: 6,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -952,6 +1058,7 @@ var Payments = (function () {
          {
             targets: 7,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                // Siempre mostrar input para permitir edición incluso después de pagar
                var output = `<input type="number" class="form-control paid_qty" value="${data}" data-position="${row.posicion}" />`;
                return `<div class="w-100px">${output}</div>`;
@@ -961,6 +1068,7 @@ var Payments = (function () {
          {
             targets: 8,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                // Siempre mostrar input para permitir edición incluso después de pagar
                let valueHtml = `
                             <input type="number"
@@ -988,6 +1096,7 @@ var Payments = (function () {
          {
             targets: 9,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -995,6 +1104,7 @@ var Payments = (function () {
          {
             targets: 10,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1004,6 +1114,7 @@ var Payments = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                // Un item está pagado si unpaid_qty == 0 (no hay pendiente) o si paid_qty > 0
                var isPaid = row.unpaid_qty == 0 || row.unpaid_qty == null || parseFloat(row.unpaid_qty) === 0 || parseFloat(row.paid_qty) > 0;
                var class_css = isPaid ? 'btn-success' : 'btn-danger';
@@ -1020,26 +1131,136 @@ var Payments = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = [[5, 'desc']];
+      // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
+      const order = [[11, 'asc']];
 
       // escapar contenido de la tabla
       oTablePayments = DatatableUtil.initSafeDataTable(table, {
-         data: payments,
+         data: datosAgrupados,
          displayLength: 10,
          order: order,
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         // marcar secondary, change order y encabezados de grupo
+         createdRow: (row, data, index) => {
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({
+                  'background-color': '#f5f5f5',
+                  'font-weight': 'bold',
+               });
+               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               var $firstCell = $(row).find('td:first');
+               $firstCell.attr('colspan', columns.length - 1);
+               $firstCell.css('text-align', 'left');
+               // Ocultar las demás celdas
+               $(row).find('td:not(:first)').hide();
+            } else {
+               if (!data.principal) {
+                  $(row).addClass('row-secondary');
+               }
+            }
+         },
       });
 
       handleSearchDatatablePayments();
+      handleChangeOrderHistory();
+      handleQuantityHistory();
+      handlePriceHistory();
    };
    var handleSearchDatatablePayments = function () {
       $(document).off('keyup', '#lista-payments [data-table-filter="search"]');
       $(document).on('keyup', '#lista-payments [data-table-filter="search"]', function (e) {
          oTablePayments.search(e.target.value).draw();
       });
+   };
+
+   var handleChangeOrderHistory = function () {
+      $(document).off('click', '.change-order-history-icon');
+      $(document).on('click', '.change-order-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'add');
+         }
+      });
+   };
+
+   var handleQuantityHistory = function () {
+      $(document).off('click', '.quantity-history-icon');
+      $(document).on('click', '.quantity-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_quantity');
+         }
+      });
+   };
+
+   var handlePriceHistory = function () {
+      $(document).off('click', '.price-history-icon');
+      $(document).on('click', '.price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (project_item_id) {
+            cargarHistorialChangeOrder(project_item_id, 'update_price');
+         }
+      });
+   };
+
+   var cargarHistorialChangeOrder = function (project_item_id, filterType) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      axios
+         .get('project/listarHistorialItem', {
+            params: { project_item_id: project_item_id },
+            responseType: 'json',
+         })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var historial = response.historial || [];
+
+                  // Filtrar historial según el tipo
+                  if (filterType) {
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
+                  }
+
+                  var html = '';
+                  if (historial.length === 0) {
+                     var message = 'No history available for this item.';
+                     if (filterType === 'add') {
+                        message = 'No add history available for this item.';
+                     } else if (filterType === 'update_quantity') {
+                        message = 'No quantity change history available for this item.';
+                     } else if (filterType === 'update_price') {
+                        message = 'No price change history available for this item.';
+                     }
+                     html = '<div class="alert alert-info">' + message + '</div>';
+                  } else {
+                     html = '<ul class="list-unstyled">';
+                     historial.forEach(function (item) {
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                     });
+                     html += '</ul>';
+                  }
+                  $('#modal-change-order-history .modal-body').html(html);
+                  ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+               } else {
+                  toastr.error(response.error || 'Error loading history', '');
+               }
+            }
+         })
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+            console.error(error);
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
    };
 
    var actualizarTableListaPayments = function () {
