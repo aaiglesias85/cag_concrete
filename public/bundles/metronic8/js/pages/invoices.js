@@ -1597,8 +1597,9 @@ var Invoices = (function () {
          resultado.push(item);
       });
 
-      // Agregar encabezado "Change Order" si hay items de change order
-      if (items_change_order.length > 0) {
+      // Agregar encabezado "Change Order" solo si hay items regulares Y items de change order
+      // Si solo hay items de change order, no mostrar el header para evitar problemas de renderizado
+      if (items_change_order.length > 0 && items_regulares.length > 0) {
          resultado.push({
             isGroupHeader: true,
             groupTitle: 'Change Order',
@@ -1860,6 +1861,7 @@ var Invoices = (function () {
                // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
                var $firstCell = $(row).find('td:first');
                $firstCell.attr('colspan', columns.length - 1);
+               $firstCell.css('text-align', 'left');
                // Ocultar las demás celdas
                $(row).find('td:not(:first)').hide();
             } else {
