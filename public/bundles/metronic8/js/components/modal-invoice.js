@@ -628,11 +628,11 @@ var ModalInvoice = (function () {
                var icono = '';
                if (row.has_price_history) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          // contract_qty
@@ -643,11 +643,11 @@ var ModalInvoice = (function () {
                var icono = '';
                if (row.has_quantity_history) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          // contract_amount

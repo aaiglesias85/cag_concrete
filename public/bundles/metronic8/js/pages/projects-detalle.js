@@ -440,11 +440,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<span>${data || ''}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
             },
          },
          {
@@ -468,11 +468,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          {
@@ -482,11 +482,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<span>${MyApp.formatMoney(data)}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
          },
          {
@@ -1349,11 +1349,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<span>${data || ''}${icono}</span>`;
+               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
             },
          },
          {
@@ -1371,12 +1371,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}${icono}</span>`;
-               return DatatableUtil.getRenderColumnDiv(html, 180);
+               return `<div style="width: 180px; white-space: nowrap; text-align: right;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          {
@@ -1387,12 +1386,11 @@ var ProjectsDetalle = (function () {
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               var html = `<span>${MyApp.formatMoney(data)}${icono}</span>`;
-               return DatatableUtil.getRenderColumnDiv(html, 180);
+               return `<div style="width: 180px; white-space: nowrap; text-align: right;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
          },
          {
