@@ -1157,7 +1157,8 @@ var Payments = (function () {
                // Ocultar las demás celdas
                $(row).find('td:not(:first)').hide();
             } else {
-               if (!data.principal) {
+               // Solo aplicar row-secondary si principal está definido y es false
+               if (data.hasOwnProperty('principal') && !data.principal) {
                   $(row).addClass('row-secondary');
                }
             }

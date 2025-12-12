@@ -1499,10 +1499,16 @@ class Base
          // notes
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
 
+         // Verificar si hay historial de cantidad y precio
+         $project_item_id = $value->getProjectItem()->getId();
+         /** @var \App\Repository\ProjectItemHistoryRepository $historyRepo */
+         $historyRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItemHistory::class);
+         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
 
          $payments[] = [
             "invoice_item_id" => $value->getId(),
-            "project_item_id" => $value->getProjectItem()->getId(),
+            "project_item_id" => $project_item_id,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
@@ -1519,6 +1525,11 @@ class Base
             "paid_amount" => $paid_amount,
             "paid_amount_total" => $paid_amount_total,
             "unpaid_qty" => $unpaid_qty,
+            "principal" => $value->getProjectItem()->getPrincipal(),
+            "change_order" => $value->getProjectItem()->getChangeOrder(),
+            "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
+            "has_quantity_history" => $has_quantity_history,
+            "has_price_history" => $has_price_history,
             "notes" => $notes,
             "posicion" => $key
          ];
