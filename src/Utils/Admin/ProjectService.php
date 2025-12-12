@@ -2256,9 +2256,6 @@ class ProjectService extends Base
          $entity->setInspector($inspector);
       }
 
-      // counties - manejar múltiples counties
-      $this->SalvarCounties($entity, $county_ids, false);
-
       $entity->setOwner($owner);
       $entity->setSubcontract($subcontract);
       $entity->setFederalFunding($federal_funding);
@@ -2307,13 +2304,15 @@ class ProjectService extends Base
 
       $em->persist($entity);
 
-      // counties
-      $this->SalvarCounties($entity, $county_ids, false);
+
       // items
       $items_new = $this->SalvarItems($entity, $items);
 
       // save contacts
       $this->SalvarContacts($entity, $contacts);
+
+      // counties
+      $this->SalvarCounties($entity, $county_ids, false);
 
       $em->flush();
 
