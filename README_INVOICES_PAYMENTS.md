@@ -8,6 +8,7 @@
 4. [Lógica de Creación y Edición de Invoices](#lógica-de-creación-y-edición-de-invoices)
 5. [Lógica de Creación y Edición de Payments](#lógica-de-creación-y-edición-de-payments)
 6. [Operaciones al Guardar/Actualizar](#operaciones-al-guardaractualizar)
+7. [Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`](#reglas-de-cálculo-de-unpaid_qty-con-quantity_brought_forward)
 
 ---
 
@@ -141,31 +142,55 @@ amount_completed = quantity_completed * price;
 
 ### 8. `unpaid_qty`
 
-**Descripción:** Cantidad no pagada acumulada de invoices anteriores.
+**Descripción:** Cantidad no pagada acumulada de invoices anteriores. Este valor se calcula según reglas específicas que consideran el `quantity_brought_forward` de los invoices anteriores.
 
 **Cálculo:**
 
 ```php
 // En el backend:
-$unpaid_qty = CalcularUnpaidQuantityFromPreviusInvoice($project_item_id);
+// Se calcula aplicando las reglas de quantity_brought_forward
+$unpaid_qty = CalcularUnpaidQtyConReglasQuantityBroughtForward($invoice_id, $project_item_id);
 ```
 
-**Fórmula para cada invoice anterior:**
+**Fórmula base para cada invoice anterior:**
 
 ```php
-unpaid_qty = (quantity + quantity_brought_forward) - paid_qty
+unpaid_qty_anterior = (quantity + quantity_brought_forward) - paid_qty
+```
+
+**Reglas de cálculo según `quantity_brought_forward`:**
+
+Cuando se modifica `quantity_brought_forward` en un invoice, se actualiza el `unpaid_qty` de ese invoice y de todos los invoices siguientes según estas reglas:
+
+**Regla 1 (Si no hay ningún invoice pagado):**
+
+```
+unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+```
+
+**Regla 2 (Si hay algún invoice pagado):**
+
+```
+Si paid_qty > quantity_brought_forward en los invoices anteriores:
+   unpaid_qty = suma de unpaid_qty de pagos anteriores (como está ahora)
+Sino:
+   unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
 ```
 
 **Lógica:**
 
 -  Suma los `unpaid_qty` de todos los invoices anteriores del mismo `project_item_id`
+-  Aplica las reglas según si hay invoices pagados y la relación entre `paid_qty` y `quantity_brought_forward`
 -  Para el primer invoice, este valor es **0**
+-  Cuando se modifica `quantity_brought_forward`, se actualiza en cascada el `unpaid_qty` del invoice afectado y todos los siguientes
 
 **Ejemplo:**
 
--  Invoice 1: quantity=10, paid_qty=4 → unpaid_qty = 6
+-  Invoice 1: quantity=10, quantity_brought_forward=0, paid_qty=4 → unpaid_qty = 6
 -  Invoice 2: unpaid_qty = 6 (del Invoice 1)
--  Invoice 3: unpaid_qty = suma de unpaid_qty de Invoice 1 y 2
+-  Si en Invoice 1 se modifica quantity_brought_forward=2 y no hay pagos:
+-  Invoice 1: unpaid_qty = 6 - 2 = 4
+-  Invoice 2: unpaid_qty = 4 (actualizado en cascada)
 
 **Formato:** Número con 2 decimales
 
@@ -276,6 +301,17 @@ $quantity_brought_forward = 0; // Siempre 0 al crear
 -  `quantity_final`
 -  `amount_final`
 -  `unpaid_amount`
+-  **`unpaid_qty`** (del invoice actual y todos los invoices siguientes, según las reglas definidas)
+
+**Impacto en `unpaid_qty`:**
+
+Cuando se modifica `quantity_brought_forward` en un invoice, el sistema:
+
+1. Recalcula el `unpaid_qty` del invoice actual aplicando las reglas de `quantity_brought_forward`
+2. Actualiza en cascada el `unpaid_qty` de todos los invoices siguientes del mismo proyecto
+3. Las reglas consideran si hay invoices pagados y la relación entre `paid_qty` total y `quantity_brought_forward` total de los invoices anteriores
+
+Ver la sección [Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`](#reglas-de-cálculo-de-unpaid_qty-con-quantity_brought_forward) para más detalles.
 
 ---
 
@@ -806,6 +842,84 @@ Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 
 5. **Log:**
    -  Registrar operación en log del sistema
+
+---
+
+## Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`
+
+Cuando se modifica el valor de `quantity_brought_forward` en un invoice, el sistema recalcula automáticamente el `unpaid_qty` del invoice afectado y de todos los invoices siguientes (en cascada) según las siguientes reglas:
+
+### Regla 1: Si no hay ningún invoice pagado
+
+**Fórmula:**
+
+```
+unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+```
+
+**Explicación:**
+
+-  Se calcula la suma de todos los `unpaid_qty` de los invoices anteriores (como está ahora)
+-  Se resta el total de `quantity_brought_forward` de todos los invoices anteriores
+-  El resultado no puede ser negativo (se aplica `max(0, unpaid_qty)`)
+
+**Ejemplo:**
+
+-  Invoice 1: quantity=10, quantity_brought_forward=0, paid_qty=0 → unpaid_qty = 10
+-  Invoice 2: quantity=5, quantity_brought_forward=2, paid_qty=0
+-  Suma de unpaid_qty anteriores = 10
+-  Total quantity_brought_forward anteriores = 0
+-  unpaid_qty = 10 - 0 = 10
+-  Si en Invoice 1 se modifica quantity_brought_forward=3:
+-  Invoice 1: unpaid_qty = 10 - 0 = 10 (no hay anteriores)
+-  Invoice 2: unpaid_qty = 10 - 3 = 7 (actualizado en cascada)
+
+### Regla 2: Si hay algún invoice pagado
+
+**Fórmula:**
+
+```
+Si paid_qty total > quantity_brought_forward total en los invoices anteriores:
+   unpaid_qty = suma de unpaid_qty de pagos anteriores (como está ahora)
+Sino:
+   unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+```
+
+**Explicación:**
+
+-  Si el total de `paid_qty` de los invoices anteriores es mayor que el total de `quantity_brought_forward` de los invoices anteriores, se usa la fórmula estándar (sin restar `quantity_brought_forward`)
+-  Si el total de `paid_qty` es menor o igual al total de `quantity_brought_forward`, se aplica la Regla 1 (restando `quantity_brought_forward`)
+
+**Ejemplo:**
+
+-  Invoice 1: quantity=10, quantity_brought_forward=0, paid_qty=5 → unpaid_qty = 5
+-  Invoice 2: quantity=5, quantity_brought_forward=2, paid_qty=0
+-  Suma de unpaid_qty anteriores = 5
+-  Total paid_qty anteriores = 5
+-  Total quantity_brought_forward anteriores = 0
+-  Como 5 > 0, unpaid_qty = 5 (Regla 2, caso 1)
+-  Si en Invoice 1 se modifica quantity_brought_forward=3:
+-  Total paid_qty anteriores = 5
+-  Total quantity_brought_forward anteriores = 3
+-  Como 5 > 3, unpaid_qty = 5 (Regla 2, caso 1)
+-  Si en Invoice 1 se modifica quantity_brought_forward=6:
+-  Total paid_qty anteriores = 5
+-  Total quantity_brought_forward anteriores = 6
+-  Como 5 <= 6, unpaid_qty = 5 - 6 = 0 (Regla 2, caso 2, aplicando Regla 1)
+
+### Actualización en Cascada
+
+Cuando se modifica `quantity_brought_forward` en un invoice:
+
+1. Se recalcula el `unpaid_qty` del invoice actual aplicando las reglas
+2. Se actualiza automáticamente el `unpaid_qty` de todos los invoices siguientes del mismo proyecto
+3. Los invoices siguientes se actualizan en orden cronológico (por fecha de inicio)
+
+**Implementación técnica:**
+
+-  Función: `ActualizarUnpaidQtyPorQuantityBroughtForward()` en `InvoiceService.php`
+-  Se ejecuta automáticamente después de guardar los items del invoice
+-  Actualiza tanto `unpaid_qty` como `unpaid_from_previous` en la base de datos
 
 ---
 

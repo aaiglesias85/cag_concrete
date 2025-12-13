@@ -1487,7 +1487,9 @@ class Base
 
          $quantity_completed = ($quantity + $unpaid_from_previous) + $quantity_from_previous;
 
-         $amount = ($quantity + $unpaid_from_previous) * $price;
+         // Invoiced Amount $ debe ser igual a Final Amount This Period en invoices
+         // amount_final = quantity_final * price
+         $amount = $quantity_final * $price;
 
          $total_amount = $quantity_completed * $price;
 

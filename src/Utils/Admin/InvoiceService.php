@@ -683,7 +683,10 @@ class InvoiceService extends Base
          // IMPORTANTE: Recalcular unpaid_from_previous sumando los unpaid_qty de los invoices anteriores
          // El unpaid_qty de cada invoice anterior = quantity_final - paid_qty
          $project_item_id = $value->getProjectItem()->getId();
-         $unpaid_from_previous = 0;
+         $sumUnpaidQtyFromPrevious = 0;
+         $hasPaidInvoice = false;
+         $totalPaidQty = 0;
+         $totalQuantityBroughtForward = 0;
 
          // Obtener todos los invoice items anteriores de este project_item
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
@@ -710,7 +713,15 @@ class InvoiceService extends Base
                   $unpaid_qty_previous = max(0, $unpaid_qty_previous);
 
                   // Sumar al unpaid_from_previous acumulado
-                  $unpaid_from_previous += $unpaid_qty_previous;
+                  $sumUnpaidQtyFromPrevious += $unpaid_qty_previous;
+
+                  // Acumular para verificar reglas
+                  $totalPaidQty += $prev_paid_qty;
+                  $totalQuantityBroughtForward += $prev_quantity_brought_forward;
+
+                  if ($prev_paid_qty > 0) {
+                     $hasPaidInvoice = true;
+                  }
                }
             }
          }
@@ -730,10 +741,26 @@ class InvoiceService extends Base
 
          $paid_qty = $value->getPaidQty();
 
-         // IMPORTANTE: En invoices, unpaid_qty debe ser igual a unpaid_from_previous
-         // (suma de los unpaid_qty de los payments anteriores)
-         // NO usar el valor almacenado en BD, sino recalcularlo
-         $unpaid_qty = $unpaid_from_previous;
+         // Aplicar reglas para calcular unpaid_qty
+         if (!$hasPaidInvoice) {
+            // Regla 1: Si no hay ningún invoice pagado
+            // unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+            $unpaid_qty = $sumUnpaidQtyFromPrevious - $totalQuantityBroughtForward;
+            $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
+         } else {
+            // Regla 2: Si hay algún invoice pagado
+            // Si paid_qty > quantity_brought_forward, entonces unpaid_qty = suma de unpaid_qty de pagos anteriores
+            if ($totalPaidQty > $totalQuantityBroughtForward) {
+               $unpaid_qty = $sumUnpaidQtyFromPrevious;
+            } else {
+               // Si paid_qty <= quantity_brought_forward, usar la fórmula de la Regla 1
+               $unpaid_qty = $sumUnpaidQtyFromPrevious - $totalQuantityBroughtForward;
+               $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
+            }
+         }
+
+         // unpaid_from_previous se mantiene igual a unpaid_qty para compatibilidad
+         $unpaid_from_previous = $unpaid_qty;
          $unpaid_amount = $unpaid_qty * $price;
 
 
@@ -971,6 +998,12 @@ class InvoiceService extends Base
          // items
          $this->SalvarItems($entity, $items);
 
+         // Flush para que los items estén disponibles en la BD antes de recalcular
+         $em->flush();
+
+         // Actualizar unpaid_qty cuando se modifica quantity_brought_forward
+         $this->ActualizarUnpaidQtyPorQuantityBroughtForward($entity, $items);
+
          // salvar en la cola
          $this->SalvarInvoiceQuickbook($entity);
 
@@ -1077,9 +1110,16 @@ class InvoiceService extends Base
       $entity->setCreatedAt(new \DateTime());
 
       $em->persist($entity);
+      $em->flush(); // Flush para obtener el invoice_id
 
       // items
       $this->SalvarItems($entity, $items);
+
+      // Flush para que los items estén disponibles en la BD antes de recalcular
+      $em->flush();
+
+      // Actualizar unpaid_qty cuando se modifica quantity_brought_forward
+      $this->ActualizarUnpaidQtyPorQuantityBroughtForward($entity, $items);
 
       $em->flush();
 
@@ -1181,13 +1221,6 @@ class InvoiceService extends Base
 
          $invoice_item_entity->setQuantityFromPrevious($value->quantity_from_previous);
 
-         // El frontend envía unpaid_qty que representa la suma de unpaid_qty de invoices anteriores
-         // Guardar ese valor tanto en unpaid_from_previous como en unpaid_qty
-         // Leer del JSON (viene como objeto stdClass desde json_decode)
-         $unpaid_qty_value = isset($value->unpaid_qty) ? (float)$value->unpaid_qty : 0;
-         $invoice_item_entity->setUnpaidFromPrevious($unpaid_qty_value);
-         $invoice_item_entity->setUnpaidQty($unpaid_qty_value);
-
          // Leer los demás valores del JSON
          $quantity = isset($value->quantity) ? (float)$value->quantity : 0;
          $quantity_brought_forward = isset($value->quantity_brought_forward) ? (float)$value->quantity_brought_forward : 0;
@@ -1195,6 +1228,9 @@ class InvoiceService extends Base
          $invoice_item_entity->setQuantity($quantity);
          $invoice_item_entity->setPrice(isset($value->price) ? (float)$value->price : 0);
          $invoice_item_entity->setQuantityBroughtForward($quantity_brought_forward);
+
+         // NO guardar unpaid_qty aquí - se calculará después en ActualizarUnpaidQtyPorQuantityBroughtForward
+         // El frontend envía unpaid_qty pero lo ignoramos porque debe recalcularse según las reglas de quantity_brought_forward
 
          if ($value->project_item_id != '') {
             $project_item_entity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($value->project_item_id);
@@ -1256,5 +1292,167 @@ class InvoiceService extends Base
          'data' => $data,
          'total' => $resultado['total'], // ya viene con el filtro aplicado
       ];
+   }
+
+   /**
+    * ActualizarUnpaidQtyPorQuantityBroughtForward
+    * Actualiza el unpaid_qty del invoice actual y todos los invoices siguientes cuando se modifica quantity_brought_forward
+    * 
+    * Regla 1 (Si no hay ningún invoice pagado): 
+    *   unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+    * 
+    * Regla 2 (Si hay algún invoice pagado):
+    *   Si paid_qty > quantity_brought_forward en los invoices de ese item, entonces
+    *   unpaid_qty = suma de unpaid_qty de pagos anteriores (como está ahora)
+    * 
+    * @param Invoice $currentInvoice El invoice que se está modificando
+    * @param array $items Los items modificados
+    * @return void
+    */
+   private function ActualizarUnpaidQtyPorQuantityBroughtForward($currentInvoice, $items)
+   {
+      $project_id = $currentInvoice->getProject()->getProjectId();
+      $current_invoice_id = $currentInvoice->getInvoiceId();
+      $current_invoice_start_date = $currentInvoice->getStartDate();
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+      // Obtener todos los invoices del proyecto ordenados por fecha
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+
+      // Filtrar el invoice actual y todos los siguientes
+      $invoicesToUpdate = [];
+      $currentInvoiceFound = false;
+
+      foreach ($allInvoices as $invoice) {
+         /** @var Invoice $invoice */
+         if ($invoice->getInvoiceId() == $current_invoice_id) {
+            $invoicesToUpdate[] = $invoice;
+            $currentInvoiceFound = true;
+         } elseif (
+            $invoice->getStartDate() > $current_invoice_start_date ||
+            ($invoice->getStartDate() == $current_invoice_start_date && $invoice->getInvoiceId() > $current_invoice_id)
+         ) {
+            $invoicesToUpdate[] = $invoice;
+         }
+      }
+
+      // Si el invoice actual no está en la lista (recién creado), agregarlo
+      if (!$currentInvoiceFound) {
+         $invoicesToUpdate[] = $currentInvoice;
+      }
+
+      // Ordenar por fecha de inicio ascendente, luego por ID
+      usort($invoicesToUpdate, function ($a, $b) {
+         /** @var Invoice $a */
+         /** @var Invoice $b */
+         $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+         if ($dateCompare != 0) {
+            return $dateCompare;
+         }
+         return $a->getInvoiceId() <=> $b->getInvoiceId();
+      });
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      // Para cada item modificado
+      foreach ($items as $itemData) {
+         $project_item_id = $itemData->project_item_id ?? null;
+         if (!$project_item_id) {
+            continue;
+         }
+
+         // Verificar si hay algún invoice pagado para este project_item (en invoices anteriores)
+         $hasPaidInvoice = false;
+         $totalPaidQty = 0;
+         $totalQuantityBroughtForward = 0;
+
+         // Obtener todos los invoice items de este project_item
+         $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+
+         // Calcular totales de invoices anteriores
+         foreach ($allInvoiceItems as $invoiceItem) {
+            /** @var InvoiceItem $invoiceItem */
+            $invoice = $invoiceItem->getInvoice();
+            $invoiceDate = $invoice->getStartDate();
+            $invoiceId = $invoice->getInvoiceId();
+
+            // Solo considerar invoices anteriores al invoice actual
+            if (
+               $invoiceDate < $current_invoice_start_date ||
+               ($invoiceDate == $current_invoice_start_date && $invoiceId < $current_invoice_id)
+            ) {
+               $paidQty = $invoiceItem->getPaidQty() ?? 0;
+               $quantityBroughtForward = $invoiceItem->getQuantityBroughtForward() ?? 0;
+
+               $totalPaidQty += $paidQty;
+               $totalQuantityBroughtForward += $quantityBroughtForward;
+
+               if ($paidQty > 0) {
+                  $hasPaidInvoice = true;
+               }
+            }
+         }
+
+         // Calcular suma de unpaid_qty de pagos anteriores (como está ahora)
+         // Esta es la suma de: (quantity + quantity_brought_forward - paid_qty) de cada invoice anterior
+         $sumUnpaidQtyFromPrevious = 0;
+         foreach ($allInvoiceItems as $invoiceItem) {
+            /** @var InvoiceItem $invoiceItem */
+            $invoice = $invoiceItem->getInvoice();
+            $invoiceDate = $invoice->getStartDate();
+            $invoiceId = $invoice->getInvoiceId();
+
+            // Solo considerar invoices anteriores al invoice actual
+            if (
+               $invoiceDate < $current_invoice_start_date ||
+               ($invoiceDate == $current_invoice_start_date && $invoiceId < $current_invoice_id)
+            ) {
+               $quantity = $invoiceItem->getQuantity() ?? 0;
+               $quantityBroughtForward = $invoiceItem->getQuantityBroughtForward() ?? 0;
+               $paidQty = $invoiceItem->getPaidQty() ?? 0;
+
+               $quantity_final = $quantity + $quantityBroughtForward;
+               $unpaid_qty = $quantity_final - $paidQty;
+               $unpaid_qty = max(0, $unpaid_qty);
+
+               $sumUnpaidQtyFromPrevious += $unpaid_qty;
+            }
+         }
+
+         // Para cada invoice a actualizar (actual y siguientes)
+         foreach ($invoicesToUpdate as $invoiceToUpdate) {
+            /** @var Invoice $invoiceToUpdate */
+            $invoice_item = $invoiceItemRepo->BuscarItem($invoiceToUpdate->getInvoiceId(), $project_item_id);
+
+            if ($invoice_item != null) {
+               // Aplicar reglas
+               // IMPORTANTE: quantity_brought_forward de todos los invoices anteriores = $totalQuantityBroughtForward
+               // NO incluir el quantity_brought_forward del invoice actual en el cálculo
+               if (!$hasPaidInvoice) {
+                  // Regla 1: Si no hay ningún invoice pagado
+                  // unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
+                  $unpaid_qty = $sumUnpaidQtyFromPrevious - $totalQuantityBroughtForward;
+                  $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
+               } else {
+                  // Regla 2: Si hay algún invoice pagado
+                  // Si paid_qty > quantity_brought_forward, entonces unpaid_qty = suma de unpaid_qty de pagos anteriores
+                  if ($totalPaidQty > $totalQuantityBroughtForward) {
+                     $unpaid_qty = $sumUnpaidQtyFromPrevious;
+                  } else {
+                     // Si paid_qty <= quantity_brought_forward, usar la fórmula de la Regla 1
+                     $unpaid_qty = $sumUnpaidQtyFromPrevious - $totalQuantityBroughtForward;
+                     $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
+                  }
+               }
+
+               // Actualizar unpaid_qty y unpaid_from_previous
+               $invoice_item->setUnpaidQty($unpaid_qty);
+               $invoice_item->setUnpaidFromPrevious($unpaid_qty);
+            }
+         }
+      }
    }
 }
