@@ -3,28 +3,28 @@
 namespace App\Controller\Admin;
 
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ConcreteClassService;
+use App\Utils\Admin\EmployeeRoleService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ConcreteClassController extends AbstractController
+class EmployeeRoleController extends AbstractController
 {
 
-   private $concreteClassService;
+   private $employeeRoleService;
 
-   public function __construct(ConcreteClassService $concreteClassService)
+   public function __construct(EmployeeRoleService $employeeRoleService)
    {
-      $this->concreteClassService = $concreteClassService;
+      $this->employeeRoleService = $employeeRoleService;
    }
 
    public function index()
    {
       $usuario = $this->getUser();
-      $permiso = $this->concreteClassService->BuscarPermiso($usuario->getUsuarioId(), 36);
+      $permiso = $this->employeeRoleService->BuscarPermiso($usuario->getUsuarioId(), 37);
       if (count($permiso) > 0) {
          if ($permiso[0]['ver']) {
 
-            return $this->render('admin/concrete-class/index.html.twig', array(
+            return $this->render('admin/employee-role/index.html.twig', array(
                'permiso' => $permiso[0]
             ));
          }
@@ -43,12 +43,12 @@ class ConcreteClassController extends AbstractController
          // parsear los parametros de la tabla
          $dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'name', 'status'],
-            defaultOrderField: 'name'
+            allowedOrderFields: ['id', 'description', 'status'],
+            defaultOrderField: 'description'
          );
 
          // total + data en una sola llamada a tu servicio
-         $result = $this->concreteClassService->Listar(
+         $result = $this->employeeRoleService->Listar(
             $dt['start'],
             $dt['length'],
             $dt['search'],
@@ -78,23 +78,23 @@ class ConcreteClassController extends AbstractController
     */
    public function salvar(Request $request)
    {
-      $concrete_class_id = $request->get('concrete_class_id');
+      $role_id = $request->get('role_id');
 
-      $name = $request->get('name');
+      $description = $request->get('description');
       $status = $request->get('status');
 
       try {
 
-         if ($concrete_class_id == "") {
-            $resultado = $this->concreteClassService->Salvar($name, $status);
+         if ($role_id == "") {
+            $resultado = $this->employeeRoleService->Salvar($description, $status);
          } else {
-            $resultado = $this->concreteClassService->Actualizar($concrete_class_id, $name, $status);
+            $resultado = $this->employeeRoleService->Actualizar($role_id, $description, $status);
          }
 
          if ($resultado['success']) {
 
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['concrete_class_id'] = $resultado['concrete_class_id'];
+            $resultadoJson['role_id'] = $resultado['role_id'];
             $resultadoJson['message'] = "The operation was successful";
 
             return $this->json($resultadoJson);
@@ -118,10 +118,10 @@ class ConcreteClassController extends AbstractController
     */
    public function eliminar(Request $request)
    {
-      $concrete_class_id = $request->get('concrete_class_id');
+      $role_id = $request->get('role_id');
 
       try {
-         $resultado = $this->concreteClassService->EliminarClass($concrete_class_id);
+         $resultado = $this->employeeRoleService->EliminarRole($role_id);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -148,7 +148,7 @@ class ConcreteClassController extends AbstractController
       $ids = $request->get('ids');
 
       try {
-         $resultado = $this->concreteClassService->EliminarVarios($ids);
+         $resultado = $this->employeeRoleService->EliminarVarios($ids);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -172,14 +172,14 @@ class ConcreteClassController extends AbstractController
     */
    public function cargarDatos(Request $request)
    {
-      $concrete_class_id = $request->get('concrete_class_id');
+      $role_id = $request->get('role_id');
 
       try {
-         $resultado = $this->concreteClassService->CargarDatos($concrete_class_id);
+         $resultado = $this->employeeRoleService->CargarDatos($role_id);
          if ($resultado['success']) {
 
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['class'] = $resultado['class'];
+            $resultadoJson['role'] = $resultado['role'];
 
             return $this->json($resultadoJson);
          } else {

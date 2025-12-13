@@ -11,6 +11,7 @@ use App\Repository\EmployeeRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\RaceRepository;
 use App\Entity\Race;
+use App\Entity\EmployeeRole;
 
 use App\Utils\Base;
 
@@ -99,7 +100,7 @@ class EmployeeService extends Base
 
          $arreglo_resultado['name'] = $entity->getName();
          $arreglo_resultado['hourly_rate'] = $entity->getHourlyRate();
-         $arreglo_resultado['position'] = $entity->getPosition();
+         $arreglo_resultado['role_id'] = $entity->getRole() ? $entity->getRole()->getRoleId() : '';
          $arreglo_resultado['color'] = $entity->getColor();
 
          $resultado['success'] = true;
@@ -230,7 +231,7 @@ class EmployeeService extends Base
       $employee_id,
       $name,
       $hourly_rate,
-      $position,
+      $role_id,
       $color,
    ) {
       $em = $this->getDoctrine()->getManager();
@@ -244,7 +245,15 @@ class EmployeeService extends Base
 
          $entity->setName($name);
          $entity->setHourlyRate($hourly_rate);
-         $entity->setPosition($position);
+
+         if ($role_id != "") {
+            $role = $this->getDoctrine()->getRepository(EmployeeRole::class)
+               ->find($role_id);
+            $entity->setRole($role);
+         } else {
+            $entity->setRole(null);
+         }
+
          $entity->setColor($color);
 
 
@@ -271,7 +280,7 @@ class EmployeeService extends Base
    public function SalvarEmployee(
       $name,
       $hourly_rate,
-      $position,
+      $role_id,
       $color
    ) {
       $em = $this->getDoctrine()->getManager();
@@ -280,7 +289,13 @@ class EmployeeService extends Base
 
       $entity->setName($name);
       $entity->setHourlyRate($hourly_rate);
-      $entity->setPosition($position);
+
+      if ($role_id != "") {
+         $role = $this->getDoctrine()->getRepository(EmployeeRole::class)
+            ->find($role_id);
+         $entity->setRole($role);
+      }
+
       $entity->setColor($color);
 
       $em->persist($entity);
@@ -323,7 +338,7 @@ class EmployeeService extends Base
             "id" => $employee_id,
             "name" => $value->getName(),
             "hourlyRate" => $value->getHourlyRate(),
-            "position" => $value->getPosition(),
+            "position" => $value->getRole() ? $value->getRole()->getDescription() : '',
             "color" => $value->getColor(),
 
          );

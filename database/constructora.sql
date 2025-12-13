@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-12-2025 a las 15:02:31
+-- Tiempo de generación: 12-12-2025 a las 18:58:50
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -363,6 +363,7 @@ CREATE TABLE `employee` (
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
   `color` varchar(50) DEFAULT NULL,
   `address` text,
   `phone` varchar(50) DEFAULT NULL,
@@ -390,12 +391,35 @@ CREATE TABLE `employee` (
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
-(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(2, 'Andres Iglesias', 70.00, 'Developer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(3, 'Geydis Marquez', 5.00, 'Jefe', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(4, 'Luis Miguel', 2.00, 'RRHH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(5, 'Brian Marcel', 2.00, 'Ayudante', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `role_id`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
+(1, 'Marcel Curbelo Carmona', 56.00, 'Gerente', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(2, 'Andres Iglesias', 70.00, 'Developer', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(3, 'Geydis Marquez', 5.00, 'Jefe', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(4, 'Luis Miguel', 2.00, 'RRHH', 4, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(5, 'Brian Marcel', 2.00, 'Ayudante', 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `employee_role`
+--
+
+CREATE TABLE `employee_role` (
+  `role_id` int(11) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `status` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `employee_role`
+--
+
+INSERT INTO `employee_role` (`role_id`, `description`, `status`) VALUES
+(1, 'Gerente', 1),
+(2, 'Developer', 1),
+(3, 'Jefe', 1),
+(4, 'RRHH', 1),
+(5, 'Ayudante', 1);
 
 -- --------------------------------------------------------
 
@@ -577,7 +601,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (33, 'payment', 'Payments'),
 (34, 'race', 'Races'),
 (35, 'employee_rrhh', 'Employees'),
-(36, 'concrete_class', 'Concrete Class');
+(36, 'concrete_class', 'Concrete Class'),
+(37, 'employee_role', 'Employee Role');
 
 -- --------------------------------------------------------
 
@@ -1686,7 +1711,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (45, 1, 1, 1, 1, 1, 33),
 (46, 1, 1, 1, 1, 1, 34),
 (47, 1, 1, 1, 1, 1, 35),
-(48, 1, 1, 1, 1, 1, 36);
+(48, 1, 1, 1, 1, 1, 36),
+(49, 1, 1, 1, 1, 1, 37);
 
 -- --------------------------------------------------------
 
@@ -1900,7 +1926,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (37, 1, 1, 1, 1, 1, 33),
 (38, 1, 1, 1, 1, 1, 34),
 (39, 1, 1, 1, 1, 1, 35),
-(40, 1, 1, 1, 1, 1, 36);
+(40, 1, 1, 1, 1, 1, 36),
+(41, 1, 1, 1, 1, 1, 37);
 
 -- --------------------------------------------------------
 
@@ -2033,7 +2060,15 @@ ALTER TABLE `district`
 --
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`employee_id`),
-  ADD KEY `race_id` (`race_id`);
+  ADD KEY `race_id` (`race_id`),
+  ADD KEY `idx_role_id` (`role_id`);
+
+--
+-- Indices de la tabla `employee_role`
+--
+ALTER TABLE `employee_role`
+  ADD PRIMARY KEY (`role_id`),
+  ADD UNIQUE KEY `unique_description` (`description`);
 
 --
 -- Indices de la tabla `equation`
@@ -2496,6 +2531,12 @@ ALTER TABLE `employee`
   MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- AUTO_INCREMENT de la tabla `employee_role`
+--
+ALTER TABLE `employee_role`
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT de la tabla `equation`
 --
 ALTER TABLE `equation`
@@ -2541,7 +2582,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2721,7 +2762,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -2781,7 +2822,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -2867,7 +2908,8 @@ ALTER TABLE `data_tracking_subcontract`
 -- Filtros para la tabla `employee`
 --
 ALTER TABLE `employee`
-  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`race_id`) REFERENCES `race` (`race_id`);
+  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`race_id`) REFERENCES `race` (`race_id`),
+  ADD CONSTRAINT `fk_employee_role` FOREIGN KEY (`role_id`) REFERENCES `employee_role` (`role_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estimate`

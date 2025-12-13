@@ -1,0 +1,23 @@
+employee_role:
+   path: /employee-roles
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::index }
+
+listarEmployeeRoleAdmin:
+   path: /employee-role/listar
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::listar, _format: json }
+
+eliminarEmployeeRoleAdmin:
+   path: /employee-role/eliminar
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::eliminar, _format: json }
+
+eliminarEmployeeRolesAdmin:
+   path: /employee-role/eliminarVarios
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::eliminarVarios, _format: json }
+
+salvarEmployeeRoleAdmin:
+   path: /employee-role/salvar
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::salvar, _format: json }
+
+cargarDatosEmployeeRoleAdmin:
+   path: /employee-role/cargarDatos
+   defaults: { _controller: App\Controller\Admin\EmployeeRoleController::cargarDatos, _format: json }

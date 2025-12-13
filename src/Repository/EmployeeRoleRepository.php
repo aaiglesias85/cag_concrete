@@ -2,54 +2,54 @@
 
 namespace App\Repository;
 
-use App\Entity\ConcreteClass;
+use App\Entity\EmployeeRole;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ConcreteClassRepository extends ServiceEntityRepository
+class EmployeeRoleRepository extends ServiceEntityRepository
 {
    public function __construct(ManagerRegistry $registry)
    {
-      parent::__construct($registry, ConcreteClass::class);
+      parent::__construct($registry, EmployeeRole::class);
    }
 
    /**
-    * Listar los subcontractors ordenados por nombre
+    * Listar los employee roles ordenados por descripción
     *
-    * @return ConcreteClass[]
+    * @return EmployeeRole[]
     */
    public function ListarOrdenados(): array
    {
-      return $this->createQueryBuilder('c_c')
-         ->where('c_c.status = 1 OR c_c.status IS NULL')
-         ->orderBy('c_c.name', 'ASC')
+      return $this->createQueryBuilder('e_r')
+         ->where('e_r.status = 1 OR e_r.status IS NULL')
+         ->orderBy('e_r.description', 'ASC')
          ->getQuery()
          ->getResult();
    }
 
 
    /**
-    * ListarConcreteClassesConTotal Lista los concrete classes con total
+    * ListarEmployeeRolesConTotal Lista los concrete classes con total
     *
     * @return []
     */
-   public function ListarConcreteClassesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array
+   public function ListarEmployeeRolesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array
    {
 
       // Whitelist de columnas ordenables
       $sortable = [
-         'concreteClassId'  => 'c_c.concreteClassId',
-         'name' => 'c_c.name',
-         'status' => 'c_c.status',
+         'roleId'  => 'e_r.roleId',
+         'description' => 'e_r.description',
+         'status' => 'e_r.status',
       ];
-      $orderBy = $sortable[$sortColumn] ?? 'c_c.name';
+      $orderBy = $sortable[$sortColumn] ?? 'e_r.description';
       $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
 
       // QB base con filtros (se reutiliza para datos y conteo)
-      $baseQb = $this->createQueryBuilder('c_c');
+      $baseQb = $this->createQueryBuilder('e_r');
 
       if (!empty($sSearch)) {
-         $baseQb->andWhere('c_c.name LIKE :search')
+         $baseQb->andWhere('e_r.description LIKE :search')
             ->setParameter('search', '%' . $sSearch . '%');
       }
 
@@ -64,7 +64,7 @@ class ConcreteClassRepository extends ServiceEntityRepository
       // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
       $countQb = clone $baseQb;
       $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(c_c.concreteClassId)');
+         ->select('COUNT(e_r.roleId)');
 
       $total = (int) $countQb->getQuery()->getSingleScalarResult();
 

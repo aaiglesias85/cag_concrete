@@ -353,7 +353,7 @@ class ScheduleService extends Base
          $employees[] = [
             'employee_id' => $employee->getEmployeeId(),
             'name' => $employee->getName(),
-            'role' => $employee->getPosition(),
+            'role' => $employee->getRole() ? $employee->getRole()->getDescription() : '',
             'color' => $employee->getColor(),
          ];
       }

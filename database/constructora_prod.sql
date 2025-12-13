@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-12-2025 a las 23:19:09
+-- Tiempo de generación: 12-12-2025 a las 18:59:00
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -2998,6 +2998,7 @@ CREATE TABLE `employee` (
   `name` varchar(255) NOT NULL,
   `hourly_rate` float(8,2) DEFAULT NULL,
   `position` varchar(255) DEFAULT NULL,
+  `role_id` int(11) DEFAULT NULL,
   `color` varchar(50) DEFAULT NULL,
   `address` text,
   `phone` varchar(50) DEFAULT NULL,
@@ -3025,83 +3026,104 @@ CREATE TABLE `employee` (
 -- Volcado de datos para la tabla `employee`
 --
 
-INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
-(1, 'Andres Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(2, 'Angel Orona', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(3, 'Camilo Romero', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(4, 'Carlos Arroyo', 25.00, 'Lead', '#BF3142', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(5, 'Carlos Jose Loasiga', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(6, 'Cruz Cortez', 25.00, 'Lead', '#3147BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(8, 'Dennis Alvarez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(9, 'Eliud Pazos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(10, 'Emilio Romero', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(11, 'Fernando Arredondo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(12, 'Francisco Narciso', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(15, 'Gerardo Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(16, 'Hector Camarillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(17, 'Helmer Osciel Cruz', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(18, 'Homero Mares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(19, 'Jesus Martinez Galvez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(21, 'Jose Camarillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(22, 'Jose Manuel Martinez', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(23, 'Juan Cazares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(24, 'Juan Trejo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(25, 'Kevin Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(26, 'Luis G.Cordova', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(27, 'Miguel Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(28, 'Noel Josias Mendoza', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(30, 'Oscar Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(31, 'Pedro Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(32, 'Raul Cazares', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(33, 'Roberto Alvarado', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(34, 'Ruben Murillo', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(35, '\"Tate\" Vincente Bly', 34.00, 'Laborer', '#142EC7', '123 William Street, Nueva York, EE. UU.', '(343) 243-2432', '', '4543543', 0.00, '', '', 4, '2025-11-01', '2025-11-30', '', '', 0.00, 0.00, 0.00, '', '', 1, 1, 1),
-(36, 'Wilbert Rutilio', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(37, 'Francisco Gutierrez', 25.00, 'Lead', '#34BFA3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(38, 'Jose Duarte', 25.00, 'Lead', '#BFBA31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(39, 'Julian Bautista', 25.00, 'Lead', '#BF8231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(40, 'Miguel Murillo', 25.00, 'Lead', '#AFB5C7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(41, 'Victor Cordova', 25.00, 'Lead', '#BF9231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(42, 'Victor Soriano', 25.00, 'Lead', '#BF3157', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(43, 'Victor Suarez', 25.00, 'Lead', '#BA31BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(44, 'Juan Avalos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(46, 'Jesus Avalos', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(47, 'Alfredo Chegue', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(48, 'Victorino Luna', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(49, 'Abram Sanchez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(50, 'Armando Bautista', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(51, 'Sergio Rodriguez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(52, 'Osvaldo Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(53, 'Jose Luis Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(54, 'Saul Olguin', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(55, 'Isael Olguin', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(56, 'Luis Oliver', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(57, 'Christopher Sandoval', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(58, 'Victor Garcia', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(59, 'Daniel Diaz', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(60, 'Lucas Hernandez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(61, 'Edmundo Martinez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(63, 'Guillermo Cuevas', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(64, 'Gerardo Yacxi', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(65, 'Saul Cano', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(66, 'Silvano Escorza', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(67, 'Test test', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(68, 'Francisco Duran', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(69, 'Francisco Camarillo', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(70, 'Arcadio Duran', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(71, 'Octavio Perez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(72, 'Ilse Sanchez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(73, 'Jose Covarrubias', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(74, 'Brayan Moya', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(75, 'Mauricio Lopez', 25.00, 'Subcontractor', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
-(76, 'Armando Bautista-Laborer', 20.00, 'Laborer', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `role_id`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
+(1, 'Andres Mendoza', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(2, 'Angel Orona', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(3, 'Camilo Romero', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(4, 'Carlos Arroyo', 25.00, 'Lead', 2, '#BF3142', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(5, 'Carlos Jose Loasiga', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(6, 'Cruz Cortez', 25.00, 'Lead', 2, '#3147BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(7, 'David Sendejas (Jose Perez)', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(8, 'Dennis Alvarez', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(9, 'Eliud Pazos', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(10, 'Emilio Romero', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(11, 'Fernando Arredondo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(12, 'Francisco Narciso', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(13, 'Gadiel Urias Mendoza', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(14, 'Geoffrey Fabio Restrepo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(15, 'Gerardo Alvarado', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(16, 'Hector Camarillo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(17, 'Helmer Osciel Cruz', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(18, 'Homero Mares', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(19, 'Jesus Martinez Galvez', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(20, 'Jordan Vicuna Hernandez', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(21, 'Jose Camarillo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(22, 'Jose Manuel Martinez', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(23, 'Juan Cazares', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(24, 'Juan Trejo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(25, 'Kevin Garcia', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(26, 'Luis G.Cordova', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(27, 'Miguel Garcia', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(28, 'Noel Josias Mendoza', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(29, 'Orlais Lores-Mayeta', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(30, 'Oscar Alvarado', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(31, 'Pedro Garcia', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(32, 'Raul Cazares', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(33, 'Roberto Alvarado', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(34, 'Ruben Murillo', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(35, '\"Tate\" Vincente Bly', 34.00, 'Laborer', 1, '#142EC7', '123 William Street, Nueva York, EE. UU.', '(343) 243-2432', '', '4543543', 0.00, '', '', 4, '2025-11-01', '2025-11-30', '', '', 0.00, 0.00, 0.00, '', '', 1, 1, 1),
+(36, 'Wilbert Rutilio', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(37, 'Francisco Gutierrez', 25.00, 'Lead', 2, '#34BFA3', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(38, 'Jose Duarte', 25.00, 'Lead', 2, '#BFBA31', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(39, 'Julian Bautista', 25.00, 'Lead', 2, '#BF8231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(40, 'Miguel Murillo', 25.00, 'Lead', 2, '#AFB5C7', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(41, 'Victor Cordova', 25.00, 'Lead', 2, '#BF9231', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(42, 'Victor Soriano', 25.00, 'Lead', 2, '#BF3157', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(43, 'Victor Suarez', 25.00, 'Lead', 2, '#BA31BF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(44, 'Juan Avalos', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(45, 'Juan Manuel Sanchez Garcia', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(46, 'Jesus Avalos', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(47, 'Alfredo Chegue', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(48, 'Victorino Luna', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(49, 'Abram Sanchez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(50, 'Armando Bautista', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(51, 'Sergio Rodriguez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(52, 'Osvaldo Rosales', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(53, 'Jose Luis Rosales', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(54, 'Saul Olguin', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(55, 'Isael Olguin', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(56, 'Luis Oliver', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(57, 'Christopher Sandoval', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(58, 'Victor Garcia', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(59, 'Daniel Diaz', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(60, 'Lucas Hernandez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(61, 'Edmundo Martinez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(62, 'Luis Fernando Rosales', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(63, 'Guillermo Cuevas', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(64, 'Gerardo Yacxi', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(65, 'Saul Cano', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(66, 'Silvano Escorza', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(67, 'Test test', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(68, 'Francisco Duran', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(69, 'Francisco Camarillo', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(70, 'Arcadio Duran', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(71, 'Octavio Perez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(72, 'Ilse Sanchez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(73, 'Jose Covarrubias', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(74, 'Brayan Moya', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(75, 'Mauricio Lopez', 25.00, 'Subcontractor', 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(76, 'Armando Bautista-Laborer', 20.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `employee_role`
+--
+
+CREATE TABLE `employee_role` (
+  `role_id` int(11) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `status` tinyint(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `employee_role`
+--
+
+INSERT INTO `employee_role` (`role_id`, `description`, `status`) VALUES
+(1, 'Laborer', 1),
+(2, 'Lead', 1),
+(3, 'Subcontractor', 1);
 
 -- --------------------------------------------------------
 
@@ -3378,7 +3400,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (33, 'payment', 'Payments'),
 (34, 'race', 'Races'),
 (35, 'employee_rrhh', 'Employees'),
-(36, 'concrete_class', 'Concrete Class');
+(36, 'concrete_class', 'Concrete Class'),
+(37, 'employee_role', 'Employee Role');
 
 -- --------------------------------------------------------
 
@@ -3463,7 +3486,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (15, '11', '2025-01-01', '2025-01-31', '', 0, '2025-02-05 20:28:09', '2025-02-10 15:46:18', 87, NULL, NULL),
 (16, '1', '2025-02-01', '2025-02-26', 'test', 0, '2025-02-26 15:23:01', '2025-09-10 22:52:19', 127, '34234443534534534555', '23423432'),
 (18, '1', '2025-10-01', '2025-10-31', 'test', 0, '2025-11-14 03:04:17', NULL, 171, NULL, NULL),
-(33, '1', '2025-09-01', '2025-09-30', '', 1, '2025-12-11 14:23:48', '2025-12-11 14:29:56', 254, NULL, NULL),
+(33, '1', '2025-09-01', '2025-09-30', '', 1, '2025-12-11 14:23:48', '2025-12-12 01:22:30', 254, NULL, NULL),
 (34, '2', '2025-10-01', '2025-10-31', '', 0, '2025-12-11 14:24:10', NULL, 254, NULL, NULL),
 (35, '3', '2025-11-01', '2025-11-30', '', 0, '2025-12-11 14:28:05', NULL, 254, NULL, NULL);
 
@@ -3625,7 +3648,7 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (194, 0.000000, 0.000000, 0.000000, 175.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1077, NULL),
 (195, 0.000000, 0.000000, 0.000000, 2400.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1078, NULL),
 (196, 0.000000, 0.000000, 0.000000, 55.00, NULL, NULL, 0.000000, NULL, NULL, 18, 1079, NULL),
-(337, 0.000000, 0.000000, 15.000000, 19.85, 5.000000, 10.000000, 0.000000, 99.250000, 99.250000, 33, 1639, NULL),
+(337, 0.000000, 0.000000, 15.000000, 19.85, 7.000000, 8.000000, 0.000000, 138.950000, 238.200000, 33, 1639, NULL),
 (338, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1533, NULL),
 (339, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1534, NULL),
 (340, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1640, NULL),
@@ -3635,7 +3658,7 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (344, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1699, NULL),
 (345, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1700, NULL),
 (346, 0.000000, 0.000000, 0.000000, 10.00, NULL, 0.000000, 0.000000, NULL, NULL, 33, 1702, NULL),
-(347, 15.000000, 10.000000, 5.000000, 19.85, NULL, 10.000000, 0.000000, NULL, NULL, 34, 1639, NULL),
+(347, 15.000000, 8.000000, 5.000000, 19.85, NULL, 8.000000, 0.000000, NULL, NULL, 34, 1639, NULL),
 (348, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1533, NULL),
 (349, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1534, NULL),
 (350, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1640, NULL),
@@ -3645,7 +3668,7 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (354, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1699, NULL),
 (355, 0.000000, 0.000000, 0.000000, 15.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1700, NULL),
 (356, 0.000000, 0.000000, 0.000000, 10.00, NULL, 0.000000, 0.000000, NULL, NULL, 34, 1702, NULL),
-(357, 20.000000, 15.000000, 10.000000, 19.85, NULL, 15.000000, 0.000000, NULL, NULL, 35, 1639, NULL),
+(357, 20.000000, 13.000000, 10.000000, 19.85, NULL, 13.000000, 0.000000, NULL, NULL, 35, 1639, NULL),
 (358, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1533, NULL),
 (359, 0.000000, 0.000000, 0.000000, 32.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1534, NULL),
 (360, 0.000000, 0.000000, 0.000000, 35.00, NULL, 0.000000, 0.000000, NULL, NULL, 35, 1640, NULL),
@@ -5368,7 +5391,8 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (4116, 'Add', 'Concrete Class', 'The concrete class is added: Class D', '::1', '2025-12-11 14:33:09', 1),
 (4117, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:24:20', 1),
 (4118, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:24:40', 1),
-(4119, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:27:43', 1);
+(4119, 'Update', 'Project', 'The project is modified: TESTING PROJECT FOR SOFTWARE', '::1', '2025-12-11 15:27:43', 1),
+(4120, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2025-12-12 01:22:30', 1);
 
 -- --------------------------------------------------------
 
@@ -8975,7 +8999,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (221, 1, 1, 1, 1, 1, 33),
 (222, 1, 1, 1, 1, 1, 34),
 (223, 1, 1, 1, 1, 1, 35),
-(224, 1, 1, 1, 1, 1, 36);
+(224, 1, 1, 1, 1, 1, 36),
+(225, 1, 1, 1, 1, 1, 37);
 
 -- --------------------------------------------------------
 
@@ -9864,7 +9889,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (1145, 1, 1, 1, 1, 2, 16),
 (1146, 1, 1, 1, 1, 1, 34),
 (1147, 1, 1, 1, 1, 1, 35),
-(1148, 1, 1, 1, 1, 1, 36);
+(1148, 1, 1, 1, 1, 1, 36),
+(1149, 1, 1, 1, 1, 1, 37);
 
 -- --------------------------------------------------------
 
@@ -10013,7 +10039,15 @@ ALTER TABLE `district`
 --
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`employee_id`),
-  ADD KEY `race_id` (`race_id`);
+  ADD KEY `race_id` (`race_id`),
+  ADD KEY `idx_role_id` (`role_id`);
+
+--
+-- Indices de la tabla `employee_role`
+--
+ALTER TABLE `employee_role`
+  ADD PRIMARY KEY (`role_id`),
+  ADD UNIQUE KEY `unique_description` (`description`);
 
 --
 -- Indices de la tabla `equation`
@@ -10473,6 +10507,12 @@ ALTER TABLE `employee`
   MODIFY `employee_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
+-- AUTO_INCREMENT de la tabla `employee_role`
+--
+ALTER TABLE `employee_role`
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT de la tabla `equation`
 --
 ALTER TABLE `equation`
@@ -10518,7 +10558,7 @@ ALTER TABLE `estimate_quote`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -10572,7 +10612,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4120;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4121;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -10698,7 +10738,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=226;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -10758,7 +10798,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1149;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1150;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -10844,7 +10884,8 @@ ALTER TABLE `data_tracking_subcontract`
 -- Filtros para la tabla `employee`
 --
 ALTER TABLE `employee`
-  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`race_id`) REFERENCES `race` (`race_id`);
+  ADD CONSTRAINT `Refemployee1` FOREIGN KEY (`race_id`) REFERENCES `race` (`race_id`),
+  ADD CONSTRAINT `fk_employee_role` FOREIGN KEY (`role_id`) REFERENCES `employee_role` (`role_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estimate`

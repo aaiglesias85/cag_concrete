@@ -8,6 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\RaceRepository;
 use App\Entity\Race;
+use App\Repository\EmployeeRoleRepository;
+use App\Entity\EmployeeRole;
 
 class EmployeeController extends AbstractController
 {
@@ -31,9 +33,15 @@ class EmployeeController extends AbstractController
             $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
             $races = $raceRepo->ListarOrdenados();
 
+            // employee_roles
+            /** @var EmployeeRoleRepository $employeeRoleRepo */
+            $employeeRoleRepo = $this->employeeService->getDoctrine()->getRepository(EmployeeRole::class);
+            $employee_roles = $employeeRoleRepo->ListarOrdenados();
+
             return $this->render('admin/employee/index.html.twig', array(
                'permiso' => $permiso[0],
-               'races' => $races
+               'races' => $races,
+               'employee_roles' => $employee_roles
             ));
          }
       } else {
@@ -90,15 +98,15 @@ class EmployeeController extends AbstractController
 
       $name = $request->get('name');
       $hourly_rate = $request->get('hourly_rate');
-      $position = $request->get('position');
+      $role_id = $request->get('role_id');
       $color = $request->get('color');
 
       try {
 
          if ($employee_id == "") {
-            $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $position, $color);
+            $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $role_id, $color);
          } else {
-            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $position, $color);
+            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $role_id, $color);
          }
 
          if ($resultado['success']) {

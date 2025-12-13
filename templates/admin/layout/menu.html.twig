@@ -524,7 +524,7 @@
                                 {{ activeRoute == 'unit' or activeRoute == 'equation' or activeRoute == 'item' or
                                 activeRoute == 'inspectors' or activeRoute == 'employee' or activeRoute == 'material' or
                                 activeRoute == 'overheadprice' or activeRoute == 'advertisement' or activeRoute == 'reminder' or
-                                activeRoute == 'holiday' ? 'here show' }}
+                                activeRoute == 'holiday' or activeRoute == 'employee_role' ? 'here show' }}
                             "
                >
                   <!--begin:Menu link-->
@@ -600,6 +600,20 @@
                         </a>
                      </div>
                      {% endif %}
+
+                     <!--begin:Menu item-->
+                     {% if menu.menuEmployeeRole %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'employee_role' ? 'active' }}" href="{{ url('employee_role') }}">
+                           <span class="menu-bullet">
+                              <span class="bullet bullet-dot"></span>
+                           </span>
+                           <span class="menu-title">Employee Roles</span>
+                        </a>
+                     </div>
+                     {% endif %}
+                     <!--end:Menu item-->
+
                      <!--begin:Menu item-->
                      {% if menu.menuOverhead %}
                      <div class="menu-item">

@@ -224,9 +224,14 @@
                         </label>
                         <input type="text" class="form-control form-control-validate form-control-solid event-change" id="hourly_rate" name="hourlyrate" />
                      </div>
-                     <div class="col-md-4">
+                     <div class="col-md-4" id="select-role">
                         <label class="form-label"> Position </label>
-                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="position" name="position" />
+                        <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="role_id" name="role_id">
+                           <option value="">Select</option>
+                           {% for item in employee_roles %}
+                           <option value="{{ item.roleId }}">{{ item.description }}</option>
+                           {% endfor %}
+                        </select>
                      </div>
                   </div>
                </div>

@@ -1,12 +1,12 @@
-var Employees = (function () {
+var EmployeeRole = (function () {
    var rowDelete = null;
 
    //Inicializar table
    var oTable;
    var initTable = function () {
-      const table = '#employee-table-editable';
+      const table = '#employee-role-table-editable';
       // datasource
-      const datasource = DatatableUtil.getDataTableDatasource(`employee/listar`);
+      const datasource = DatatableUtil.getDataTableDatasource(`employee-role/listar`);
 
       // columns
       const columns = getColumnsTable();
@@ -72,7 +72,7 @@ var Employees = (function () {
       if (permiso.eliminar) {
          columns.push({ data: 'id' });
       }
-      columns.push({ data: 'name' }, { data: 'hourlyRate' }, { data: 'position' }, { data: null });
+      columns.push({ data: 'description' }, { data: 'status' }, { data: null });
 
       return columns;
    };
@@ -84,38 +84,18 @@ var Employees = (function () {
             render: DatatableUtil.getRenderColumnCheck,
          },
          {
-            targets: 1,
-            render: function (data, type, row) {
-               if (type !== 'display') return data; // mantiene orden/búsqueda por texto
-
-               if (!row.color) return data;
-
-               return `
-                          <span class="d-inline-flex align-items-center">
-                            <span class="dt-color-dot" style="background:${row.color}"></span>
-                            <span>${data}</span>
-                          </span>
-                        `;
-            },
+            targets: 2,
+            className: 'text-center',
+            render: DatatableUtil.getRenderColumnEstado,
          },
       ];
 
       if (!permiso.eliminar) {
          columnDefs = [
             {
-               targets: 0,
-               render: function (data, type, row) {
-                  if (type !== 'display') return data; // mantiene orden/búsqueda por texto
-
-                  if (!color) return data;
-
-                  return `
-                          <span class="d-inline-flex align-items-center">
-                            <span class="dt-color-dot" style="background:${color}"></span>
-                            <span>${data}</span>
-                          </span>
-                        `;
-               },
+               targets: 1,
+               className: 'text-center',
+               render: DatatableUtil.getRenderColumnEstado,
             },
          ];
       }
@@ -134,7 +114,7 @@ var Employees = (function () {
       return columnDefs;
    };
    var handleSearchDatatable = function () {
-      const filterSearch = document.querySelector('#lista-employee [data-table-filter="search"]');
+      const filterSearch = document.querySelector('#lista-employee-role [data-table-filter="search"]');
       let debounceTimeout;
 
       filterSearch.addEventListener('keyup', function (e) {
@@ -149,8 +129,8 @@ var Employees = (function () {
       });
    };
    var exportButtons = () => {
-      const documentTitle = 'Employees';
-      var table = document.querySelector('#employee-table-editable');
+      const documentTitle = 'Employee Roles';
+      var table = document.querySelector('#employee-role-table-editable');
       // Excluir la columna de check y acciones
       var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
 
@@ -187,10 +167,10 @@ var Employees = (function () {
          ],
       })
          .container()
-         .appendTo($('#employee-table-editable-buttons'));
+         .appendTo($('#employee-role-table-editable-buttons'));
 
       // Hook dropdown menu click event to datatable export buttons
-      const exportButtons = document.querySelectorAll('#employee_export_menu [data-kt-export]');
+      const exportButtons = document.querySelectorAll('#employee-role_export_menu [data-kt-export]');
       exportButtons.forEach((exportButton) => {
          exportButton.addEventListener('click', (e) => {
             e.preventDefault();
@@ -246,18 +226,18 @@ var Employees = (function () {
       var selectedData = oTable.rows({ selected: true }).data().toArray();
 
       if (selectedData.length > 0) {
-         $('#btn-eliminar-employee').removeClass('hide');
+         $('#btn-eliminar-employee-role').removeClass('hide');
       } else {
-         $('#btn-eliminar-employee').addClass('hide');
+         $('#btn-eliminar-employee-role').addClass('hide');
       }
    };
 
    //Reset forms
    var resetForms = function () {
       // reset form
-      MyUtil.resetForm('employee-form');
+      MyUtil.resetForm('employee-role-form');
 
-      $('#color').minicolors('value', '#17C653');
+      KTUtil.get('estadoactivo').checked = true;
 
       event_change = false;
    };
@@ -267,13 +247,10 @@ var Employees = (function () {
       var result = false;
 
       //Validacion
-      var form = KTUtil.get('employee-form');
+      var form = KTUtil.get('employee-role-form');
 
       var constraints = {
-         name: {
-            presence: { message: 'This field is required' },
-         },
-         hourlyrate: {
+         description: {
             presence: { message: 'This field is required' },
          },
       };
@@ -294,29 +271,29 @@ var Employees = (function () {
 
    //Nuevo
    var initAccionNuevo = function () {
-      $(document).off('click', '#btn-nuevo-employee');
-      $(document).on('click', '#btn-nuevo-employee', function (e) {
+      $(document).off('click', '#btn-nuevo-employee-role');
+      $(document).on('click', '#btn-nuevo-employee-role', function (e) {
          btnClickNuevo();
       });
 
       function btnClickNuevo() {
          resetForms();
 
-         KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = 'New Employee:';
+         KTUtil.find(KTUtil.get('form-employee-role'), '.card-label').innerHTML = 'New Employee Role:';
 
          mostrarForm();
       }
    };
 
    var mostrarForm = function () {
-      KTUtil.removeClass(KTUtil.get('form-employee'), 'hide');
-      KTUtil.addClass(KTUtil.get('lista-employee'), 'hide');
+      KTUtil.removeClass(KTUtil.get('form-employee-role'), 'hide');
+      KTUtil.addClass(KTUtil.get('lista-employee-role'), 'hide');
    };
 
    //Salvar
    var initAccionSalvar = function () {
-      $(document).off('click', '#btn-salvar-employee');
-      $(document).on('click', '#btn-salvar-employee', function (e) {
+      $(document).off('click', '#btn-salvar-employee-role');
+      $(document).on('click', '#btn-salvar-employee-role', function (e) {
          btnClickSalvarForm();
       });
 
@@ -328,25 +305,19 @@ var Employees = (function () {
          if (validateForm()) {
             var formData = new URLSearchParams();
 
-            var employee_id = $('#employee_id').val();
-            formData.set('employee_id', employee_id);
-
-            var name = $('#name').val();
-            formData.set('name', name);
-
-            var hourly_rate = $('#hourly_rate').val();
-            formData.set('hourly_rate', hourly_rate);
-
             var role_id = $('#role_id').val();
             formData.set('role_id', role_id);
 
-            var color = $('#color').val();
-            formData.set('color', color);
+            var description = $('#description').val();
+            formData.set('description', description);
 
-            BlockUtil.block('#form-employee');
+            var status = $('#estadoactivo').prop('checked') ? 1 : 0;
+            formData.set('status', status);
+
+            BlockUtil.block('#form-employee-role');
 
             axios
-               .post('employee/salvarEmployee', formData, { responseType: 'json' })
+               .post('employee-role/salvar', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -365,15 +336,15 @@ var Employees = (function () {
                })
                .catch(MyUtil.catchErrorAxios)
                .then(function () {
-                  BlockUtil.unblock('#form-employee');
+                  BlockUtil.unblock('#form-employee-role');
                });
          }
       }
    };
    //Cerrar form
    var initAccionCerrar = function () {
-      $(document).off('click', '.cerrar-form-employee');
-      $(document).on('click', '.cerrar-form-employee', function (e) {
+      $(document).off('click', '.cerrar-form-employee-role');
+      $(document).on('click', '.cerrar-form-employee-role', function (e) {
          cerrarForms();
       });
    };
@@ -403,38 +374,38 @@ var Employees = (function () {
    };
    var cerrarFormsConfirmated = function () {
       resetForms();
-      $('#form-employee').addClass('hide');
-      $('#lista-employee').removeClass('hide');
+      $('#form-employee-role').addClass('hide');
+      $('#lista-employee-role').removeClass('hide');
    };
    //Editar
    var initAccionEditar = function () {
-      $(document).off('click', '#employee-table-editable a.edit');
-      $(document).on('click', '#employee-table-editable a.edit', function (e) {
+      $(document).off('click', '#employee-role-table-editable a.edit');
+      $(document).on('click', '#employee-role-table-editable a.edit', function (e) {
          e.preventDefault();
          resetForms();
 
-         var employee_id = $(this).data('id');
-         $('#employee_id').val(employee_id);
+         var role_id = $(this).data('id');
+         $('#role_id').val(role_id);
 
          mostrarForm();
 
-         editRow(employee_id);
+         editRow(role_id);
       });
 
-      function editRow(employee_id) {
+      function editRow(role_id) {
          var formData = new URLSearchParams();
-         formData.set('employee_id', employee_id);
+         formData.set('role_id', role_id);
 
-         BlockUtil.block('#form-employee');
+         BlockUtil.block('#form-employee-role');
 
          axios
-            .post('employee/cargarDatos', formData, { responseType: 'json' })
+            .post('employee-role/cargarDatos', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
                      //Datos unit
-                     cargarDatos(response.employee);
+                     cargarDatos(response.role);
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -444,16 +415,15 @@ var Employees = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#form-employee');
+               BlockUtil.unblock('#form-employee-role');
             });
 
-         function cargarDatos(employee) {
-            KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = 'Update Employee: ' + employee.name;
+         function cargarDatos(role) {
+            KTUtil.find(KTUtil.get('form-employee-role'), '.card-label').innerHTML = 'Update Employee Role: ' + role.description;
 
-            $('#name').val(employee.name);
-            $('#hourly_rate').val(employee.hourly_rate);
-            $('#role_id').val(employee.role_id).trigger('change');
-            $('#color').minicolors('value', employee.color);
+            $('#description').val(role.description);
+
+            $('#estadoactivo').prop('checked', role.status);
 
             event_change = false;
          }
@@ -461,8 +431,8 @@ var Employees = (function () {
    };
    //Eliminar
    var initAccionEliminar = function () {
-      $(document).off('click', '#employee-table-editable a.delete');
-      $(document).on('click', '#employee-table-editable a.delete', function (e) {
+      $(document).off('click', '#employee-role-table-editable a.delete');
+      $(document).on('click', '#employee-role-table-editable a.delete', function (e) {
          e.preventDefault();
 
          rowDelete = $(this).data('id');
@@ -470,8 +440,8 @@ var Employees = (function () {
          ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
       });
 
-      $(document).off('click', '#btn-eliminar-employee');
-      $(document).on('click', '#btn-eliminar-employee', function (e) {
+      $(document).off('click', '#btn-eliminar-employee-role');
+      $(document).on('click', '#btn-eliminar-employee-role', function (e) {
          btnClickEliminar();
       });
 
@@ -486,25 +456,25 @@ var Employees = (function () {
       });
 
       function btnClickEliminar() {
-         var ids = DatatableUtil.getTableSelectedRowKeys('#employee-table-editable').join(',');
+         var ids = DatatableUtil.getTableSelectedRowKeys('#employee-role-table-editable').join(',');
          if (ids != '') {
             // mostar modal
             ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
          } else {
-            toastr.error('Select employees to delete', '');
+            toastr.error('Select plan status to delete', '');
          }
       }
 
       function btnClickModalEliminar() {
-         var employee_id = rowDelete;
+         var role_id = rowDelete;
 
          var formData = new URLSearchParams();
-         formData.set('employee_id', employee_id);
+         formData.set('role_id', role_id);
 
-         BlockUtil.block('#lista-employee');
+         BlockUtil.block('#lista-employee-role');
 
          axios
-            .post('employee/eliminarEmployee', formData, { responseType: 'json' })
+            .post('employee-role/eliminar', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -521,21 +491,21 @@ var Employees = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-employee');
+               BlockUtil.unblock('#lista-employee-role');
             });
       }
 
       function btnClickModalEliminarSeleccion() {
-         var ids = DatatableUtil.getTableSelectedRowKeys('#employee-table-editable').join(',');
+         var ids = DatatableUtil.getTableSelectedRowKeys('#employee-role-table-editable').join(',');
 
          var formData = new URLSearchParams();
 
          formData.set('ids', ids);
 
-         BlockUtil.block('#lista-employee');
+         BlockUtil.block('#lista-employee-role');
 
          axios
-            .post('employee/eliminarEmployees', formData, { responseType: 'json' })
+            .post('employee-role/eliminarVarios', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -552,7 +522,7 @@ var Employees = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock('#lista-employee');
+               BlockUtil.unblock('#lista-employee-role');
             });
       }
    };
@@ -560,27 +530,12 @@ var Employees = (function () {
    var initWidgets = function () {
       // init widgets generales
       MyApp.initWidgets();
-
-      $('#color').minicolors({
-         control: 'hue',
-         format: 'hex',
-         defaultValue: '#17C653',
-         inline: false,
-         letterCase: 'uppercase',
-         opacity: false,
-         position: 'bottom left',
-         change: function (hex, opacity) {
-            if (!hex) return;
-         },
-         theme: 'bootstrap',
-      });
    };
 
    return {
       //main function to initiate the module
       init: function () {
          initWidgets();
-
          initTable();
 
          initAccionNuevo();

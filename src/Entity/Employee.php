@@ -22,6 +22,10 @@ class Employee
    #[ORM\Column(name: 'position', type: 'string', length: 255, nullable: false)]
    private ?string $position;
 
+   #[ORM\ManyToOne(targetEntity: 'App\Entity\EmployeeRole')]
+   #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'role_id')]
+   private ?EmployeeRole $role;
+
    #[ORM\Column(name: 'color', type: 'string', length: 50, nullable: false)]
    private ?string $color;
 
@@ -349,5 +353,15 @@ class Employee
    public function setStatus(?bool $status): void
    {
       $this->status = $status;
+   }
+
+   public function getRole(): ?EmployeeRole
+   {
+      return $this->role;
+   }
+
+   public function setRole(?EmployeeRole $role): void
+   {
+      $this->role = $role;
    }
 }

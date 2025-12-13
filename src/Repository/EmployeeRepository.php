@@ -17,14 +17,15 @@ class EmployeeRepository extends ServiceEntityRepository
     *
     * @return Employee[]
     */
-   public function ListarOrdenados($position = ''): array
+   public function ListarOrdenados($role_id = ''): array
    {
       $consulta = $this->createQueryBuilder('e')
+         ->leftJoin('e.role', 'r')
          ->where('e.status = 1');
 
-      if ($position != '') {
-         $consulta->andWhere('e.position = :position')
-            ->setParameter('position', $position);
+      if ($role_id != '') {
+         $consulta->andWhere('r.roleId = :role_id')
+            ->setParameter('role_id', $role_id);
       }
 
       $consulta->orderBy('e.name', 'ASC');
@@ -40,7 +41,8 @@ class EmployeeRepository extends ServiceEntityRepository
    public function ListarLeads(): array
    {
       return $this->createQueryBuilder('e')
-         ->where("e.position = 'Lead'")
+         ->leftJoin('e.role', 'r')
+         ->where("r.description = 'Lead'")
          ->orderBy('e.name', 'ASC')
          ->getQuery()
          ->getResult();
@@ -64,6 +66,23 @@ class EmployeeRepository extends ServiceEntityRepository
    }
 
    /**
+    * ListarEmployeesDeRole: Lista los employees de un role
+    *
+    * @param int $role_id Id del role
+    * @return Employee[]
+    */
+   public function ListarEmployeesDeRole($role_id): array
+   {
+      return $this->createQueryBuilder('e')
+         ->leftJoin('e.role', 'r')
+         ->where('r.roleId = :role_id')
+         ->setParameter('role_id', $role_id)
+         ->orderBy('e.name', 'ASC')
+         ->getQuery()
+         ->getResult();
+   }
+
+   /**
     * ListarEmployeesConTotal Lista los employees con total
     *
     * @return []
@@ -76,17 +95,18 @@ class EmployeeRepository extends ServiceEntityRepository
          'employeeId'  => 'e.employeeId',
          'name' => 'e.name',
          'hourlyRate' => 'e.hourlyRate',
-         'position' => 'e.position'
+         'position' => 'ro.description'
       ];
       $orderBy = $sortable[$sortColumn] ?? 'e.name';
       $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
 
       // QB base con filtros (se reutiliza para datos y conteo)
       $baseQb = $this->createQueryBuilder('e')
-         ->leftJoin('e.race', 'r');
+         ->leftJoin('e.race', 'r')
+         ->leftJoin('e.role', 'ro');
 
       if (!empty($sSearch)) {
-         $baseQb->andWhere('e.name LIKE :search OR e.position LIKE :search')
+         $baseQb->andWhere('e.name LIKE :search OR ro.description LIKE :search')
             ->setParameter('search', "%{$sSearch}%");
       }
 
@@ -135,10 +155,11 @@ class EmployeeRepository extends ServiceEntityRepository
 
       // QB base con filtros (se reutiliza para datos y conteo)
       $baseQb = $this->createQueryBuilder('e')
-         ->leftJoin('e.race', 'r');
+         ->leftJoin('e.race', 'r')
+         ->leftJoin('e.role', 'ro');
 
       if (!empty($sSearch)) {
-         $baseQb->andWhere('e.name LIKE :search OR e.position LIKE :search OR 
+         $baseQb->andWhere('e.name LIKE :search OR ro.description LIKE :search OR 
          e.address LIKE :search OR e.phone LIKE :search OR e.certRateType LIKE :search OR
           e.socialSecurityNumber LIKE :search OR e.workCode LIKE :search OR e.gender LIKE :search OR
            r.code LIKE :search OR r.description LIKE :search OR r.classification LIKE :search OR e.reasonTerminated LIKE :search OR
