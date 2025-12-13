@@ -1163,6 +1163,12 @@ var Payments = (function () {
                }
             }
          },
+         drawCallback: function () {
+            // Re-registrar event listeners después de cada redibujo
+            handleChangeOrderHistory();
+            handleQuantityHistory();
+            handlePriceHistory();
+         },
       });
 
       handleSearchDatatablePayments();
@@ -1178,9 +1184,10 @@ var Payments = (function () {
    };
 
    var handleChangeOrderHistory = function () {
-      $(document).off('click', '.change-order-history-icon');
-      $(document).on('click', '.change-order-history-icon', function (e) {
+      $(document).off('click', '#payments-table-editable .change-order-history-icon');
+      $(document).on('click', '#payments-table-editable .change-order-history-icon', function (e) {
          e.preventDefault();
+         e.stopPropagation();
          var project_item_id = $(this).data('project-item-id');
          if (project_item_id) {
             cargarHistorialChangeOrder(project_item_id, 'add');

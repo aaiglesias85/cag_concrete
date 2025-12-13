@@ -1,972 +1,824 @@
-{% extends 'admin/layout.html.twig' %}
+{% extends 'admin/layout.html.twig' %} {% block subtitle %} - Payments{% endblock %} {% block stylesheetspecific %}
 
-{% block subtitle %} - Payments{% endblock %}
+<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
 
-{% block stylesheetspecific %}
+<style>
+   .dtfc-fixed-start {
+      background: #fff !important;
+   }
 
-    <link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css"/>
+   .dtfc-fixed-end {
+      background: #fff !important;
+   }
+</style>
+{% endblock %} {% block content %}
 
-    <style>
-        .dtfc-fixed-start {
-            background: #fff !important;
-        }
-
-        .dtfc-fixed-end {
-            background: #fff !important;
-        }
-        
-    </style>
-{% endblock %}
-
-{% block content %}
-
-    <!--begin::Toolbar-->
-    <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-        <!--begin::Toolbar container-->
-        <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
-            <!--begin::Page title-->
-            <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                <!--begin::Title-->
-                <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    Payments
-                </h1>
-                <!--end::Title-->
-                <!--begin::Breadcrumb-->
-                <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
-                    <!--begin::company-->
-                    <li class="breadcrumb-item text-muted">
-                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
-                    </li>
-                    <!--end::company-->
-                    <!--begin::company-->
-                    <li class="breadcrumb-item">
-                        <span class="bullet bg-gray-500 w-5px h-2px"></span>
-                    </li>
-                    <!--end::company-->
-                    <!--begin::company-->
-                    <li class="breadcrumb-item text-muted">Manage Payments</li>
-                    <!--end::company-->
-                </ul>
-                <!--end::Breadcrumb-->
+<!--begin::Toolbar-->
+<div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
+   <!--begin::Toolbar container-->
+   <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
+      <!--begin::Page title-->
+      <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
+         <!--begin::Title-->
+         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Payments</h1>
+         <!--end::Title-->
+         <!--begin::Breadcrumb-->
+         <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
+            <!--begin::company-->
+            <li class="breadcrumb-item text-muted">
+               <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
+            </li>
+            <!--end::company-->
+            <!--begin::company-->
+            <li class="breadcrumb-item">
+               <span class="bullet bg-gray-500 w-5px h-2px"></span>
+            </li>
+            <!--end::company-->
+            <!--begin::company-->
+            <li class="breadcrumb-item text-muted">Manage Payments</li>
+            <!--end::company-->
+         </ul>
+         <!--end::Breadcrumb-->
+      </div>
+      <!--end::Page title-->
+      <!--begin::Actions-->
+      <div class="d-flex align-items-center gap-2 gap-lg-3"></div>
+      <!--end::Actions-->
+   </div>
+   <!--end::Toolbar container-->
+</div>
+<!--end::Toolbar-->
+<!--begin::Content-->
+<div id="kt_app_content" class="app-content flex-column-fluid">
+   <!--begin::Content container-->
+   <div id="kt_app_content_container" class="app-container container-fluid">
+      <!-- lista -->
+      <div id="lista-payment" class="card card-sticky">
+         <div
+            class="card-header border-0 pt-6"
+            data-kt-sticky="true"
+            data-kt-sticky-name="lista-payment"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
+            <div class="card-title">
+               <div class="d-flex align-items-center position-relative my-1">
+                  <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                  </i>
+                  <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" placeholder="Search..." />
+               </div>
             </div>
-            <!--end::Page title-->
-            <!--begin::Actions-->
-            <div class="d-flex align-items-center gap-2 gap-lg-3">
+            <div class="card-toolbar">
+               <div class="d-flex justify-content-end">
+                  <!-- paid -->
+                  <button id="btn-filter-paid" class="btn btn-success me-2">
+                     <i class="ki-duotone ki-filter-search fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">Paid</span>
+                  </button>
 
-            </div>
-            <!--end::Actions-->
-        </div>
-        <!--end::Toolbar container-->
-    </div>
-    <!--end::Toolbar-->
-    <!--begin::Content-->
-    <div id="kt_app_content" class="app-content flex-column-fluid">
-        <!--begin::Content container-->
-        <div id="kt_app_content_container" class="app-container container-fluid">
+                  <!-- unpaid -->
+                  <button id="btn-filter-unpaid" class="btn btn-danger me-2">
+                     <i class="ki-duotone ki-filter-tablet fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">Unpaid</span>
+                  </button>
 
-            <!-- lista -->
-            <div id="lista-payment" class="card card-sticky">
-                <div class="card-header border-0 pt-6"
-                     data-kt-sticky="true"
-                     data-kt-sticky-name="lista-payment"
-                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
-                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
-                     data-kt-sticky-left="auto"
-                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
-                     data-kt-sticky-animation="false"
-                     data-kt-sticky-zindex="95">
-                    <div class="card-title">
-                        <div class="d-flex align-items-center position-relative my-1">
-                            <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-                            <input type="text" data-table-filter="search"
-                                   class="form-control form-control-solid w-300px ps-13"
-                                   placeholder="Search..."/>
+                  <!--filter-->
+                  <div>
+                     <button type="button" class="btn btn-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-filter fs-2">
+                           <span class="path1"></span>
+                           <span class="path2"></span>
+                        </i>
+                        <span class="kt-hidden-mobile font-weight-bold">Filter</span>
+                     </button>
+                     <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
+                        <!--begin::Header-->
+                        <div class="px-7 py-5">
+                           <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
                         </div>
-                    </div>
-                    <div class="card-toolbar">
-                        <div class="d-flex justify-content-end">
+                        <!--end::Header-->
+                        <!--begin::Separator-->
+                        <div class="separator border-gray-200"></div>
+                        <!--end::Separator-->
+                        <!--begin::Content-->
+                        <div class="px-7 py-5">
+                           <div class="mb-3">
+                              <select id="filtro-company" class="form-select form-select2 form-select-solid fw-bold">
+                                 <option value="">Company</option>
+                                 {% for item in companies %}
+                                 <option value="{{ item.companyId }}">{{ item.name }}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
 
-                            <!-- paid -->
-                            <button id="btn-filter-paid" class="btn btn-success me-2">
-                                <i class="ki-duotone ki-filter-search fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                                <span class="kt-hidden-mobile font-weight-bold">Paid</span>
-                            </button>
+                           <div class="mb-3" id="select-filtro-project">
+                              <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-project">
+                                 <option value="">Project</option>
+                              </select>
+                           </div>
 
-                            <!-- unpaid -->
-                            <button id="btn-filter-unpaid" class="btn btn-danger me-2">
-                                <i class="ki-duotone ki-filter-tablet fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                                <span class="kt-hidden-mobile font-weight-bold">Unpaid</span>
-                            </button>
+                           <div class="mb-3">
+                              <select id="filtro-paid" class="form-select form-select2 form-select-solid fw-bold">
+                                 <option value="">Status</option>
+                                 <option value="1">Paid</option>
+                                 <option value="0">Unpaid</option>
+                              </select>
+                           </div>
 
-                            <!--filter-->
-                            <div>
-                                <button type="button" class="btn btn-primary me-3"
-                                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                                    <i class="ki-duotone ki-filter fs-2">
-                                        <span class="path1"></span>
-                                        <span class="path2"></span>
-                                    </i>
-                                    <span class="kt-hidden-mobile font-weight-bold">Filter</span>
-                                </button>
-                                <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px"
-                                     data-kt-menu="true">
-                                    <!--begin::Header-->
-                                    <div class="px-7 py-5">
-                                        <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
-                                    </div>
-                                    <!--end::Header-->
-                                    <!--begin::Separator-->
-                                    <div class="separator border-gray-200"></div>
-                                    <!--end::Separator-->
-                                    <!--begin::Content-->
-                                    <div class="px-7 py-5">
+                           <div class="mb-3">
+                              <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-desde" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                 <input type="text" class="form-control filter-date" placeholder="From" data-td-target="#datetimepicker-desde" autocomplete="off" />
+                                 <span class="input-group-text" data-td-target="#datetimepicker-desde" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="mb-3">
+                              <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-hasta" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                 <input type="text" class="form-control filter-date" placeholder="To" data-td-target="#datetimepicker-hasta" autocomplete="off" />
+                                 <span class="input-group-text" data-td-target="#datetimepicker-hasta" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
 
-                                        <div class="mb-3">
-                                            <select id="filtro-company"
-                                                    class="form-select form-select2 form-select-solid fw-bold">
-                                                <option value="">Company</option>
-                                                {% for item in companies %}
-                                                    <option value="{{ item.companyId }}">{{ item.name }}
-                                                    </option>
-                                                {% endfor %}
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3" id="select-filtro-project">
-                                            <select class="form-select form-select2 form-select-solid fw-bold"
-                                                    id="filtro-project">
-                                                <option value="">Project</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <select id="filtro-paid"
-                                                    class="form-select form-select2 form-select-solid fw-bold">
-                                                <option value="">Status</option>
-                                                <option value="1">Paid</option>
-                                                <option value="0">Unpaid</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <div class="input-group input-group-solid date-picker-filter"
-                                                 id="datetimepicker-desde" data-td-target-input="nearest"
-                                                 data-td-target-toggle="nearest">
-                                                <input type="text" class="form-control filter-date" placeholder="From"
-                                                       data-td-target="#datetimepicker-desde" autocomplete="off"/>
-                                                <span class="input-group-text" data-td-target="#datetimepicker-desde"
-                                                      data-td-toggle="datetimepicker">
-                                                  <i class="ki-duotone ki-calendar fs-2"><span
-                                                              class="path1"></span><span class="path2"></span></i>
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <div class="input-group input-group-solid date-picker-filter"
-                                                 id="datetimepicker-hasta" data-td-target-input="nearest"
-                                                 data-td-target-toggle="nearest">
-                                                <input type="text" class="form-control filter-date" placeholder="To"
-                                                       data-td-target="#datetimepicker-hasta" autocomplete="off"/>
-                                                <span class="input-group-text" data-td-target="#datetimepicker-hasta"
-                                                      data-td-toggle="datetimepicker">
-                                                  <i class="ki-duotone ki-calendar fs-2"><span
-                                                              class="path1"></span><span class="path2"></span></i>
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <!--begin::Actions-->
-                                        <div class="d-flex justify-content-end mt-10">
-                                            <button type="reset"
-                                                    class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
-                                                    data-kt-menu-dismiss="true"
-                                                    id="btn-reset-filtrar">Reset filters
-                                            </button>
-                                            <button type="submit" class="btn btn-primary fw-semibold px-6"
-                                                    data-kt-menu-dismiss="true" id="btn-filtrar">
-                                                Apply
-                                            </button>
-                                        </div>
-                                        <!--end::Actions-->
-                                    </div>
-                                    <!--end::Content-->
-                                </div>
-                            </div>
-
-                            <!-- export -->
-                            <div>
-                                <!--begin::Export buttons-->
-                                <div id="payment-table-editable-export" class="d-none"></div>
-                                <!--end::Export buttons-->
-
-                                <!--begin::Export dropdown-->
-                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
-                                        data-kt-menu-placement="bottom-end">
-                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
-                                                class="path2"></span></i>
-                                    <span class="kt-hidden-mobile font-weight-bold">Export</span>
-                                </button>
-
-                                <!--begin::Menu-->
-                                <div id="payment_export_menu"
-                                     class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
-                                     data-kt-menu="true">
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" data-kt-export="copy">
-                                            Copy to clipboard
-                                        </a>
-                                    </div>
-                                    <!--end::Menu item-->
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" data-kt-export="excel">
-                                            Export to Excel
-                                        </a>
-                                    </div>
-                                    <!--end::Menu item-->
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" data-kt-export="csv">
-                                            Export CSV
-                                        </a>
-                                    </div>
-                                    <!--end::Menu item-->
-                                    <!--begin::Menu item-->
-                                    <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" data-kt-export="pdf">
-                                            Export to PDF
-                                        </a>
-                                    </div>
-                                    <!--end::Menu item-->
-                                </div>
-                                <!--end::Menu-->
-                                <!--end::Export dropdown-->
-
-                                <!--begin::Hide default export buttons-->
-                                <div id="payment-table-editable-buttons" class="d-none"></div>
-                                <!--end::Hide default export buttons-->
-                            </div>
-
+                           <!--begin::Actions-->
+                           <div class="d-flex justify-content-end mt-10">
+                              <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" id="btn-reset-filtrar">Reset filters</button>
+                              <button type="submit" class="btn btn-primary fw-semibold px-6" data-kt-menu-dismiss="true" id="btn-filtrar">Apply</button>
+                           </div>
+                           <!--end::Actions-->
                         </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <!--begin::Datatable-->
-                    <table id="payment-table-editable"
-                           class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                        <thead>
-                        <tr class="fw-bold fs-6 text-gray-800 px-7">
-                            <th>Number</th>
-                            <th>Company</th>
-                            <th>Job No</th>
-                            <th>Project</th>
-                            <th>From</th>
-                            <th>To</th>
-                            <th>Amount</th>
-                            <th>Notes</th>
-                            <th>Created At</th>
-                            <th>Paid</th>
-                            <th class="text-end min-w-100px">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody class="text-gray-600 fw-semibold">
-                        </tbody>
-                    </table>
-                    <!--end::Datatable-->
-                </div>
-            </div>
+                        <!--end::Content-->
+                     </div>
+                  </div>
 
-            <!-- form -->
-            <div id="form-payment" class="card card-sticky hide">
-                <div class="card-header"
-                     data-kt-sticky="true"
-                     data-kt-sticky-name="form-payment"
-                     data-kt-sticky-offset="{default: '50px', xl: '70px'}"
-                     data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
-                     data-kt-sticky-left="auto"
-                     data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
-                     data-kt-sticky-animation="false"
-                     data-kt-sticky-zindex="95">
-                    <div class="card-title">
-                        <h3 class="card-label">New Payment:</h3>
-                    </div>
-                    <div class="card-toolbar">
+                  <!-- export -->
+                  <div>
+                     <!--begin::Export buttons-->
+                     <div id="payment-table-editable-export" class="d-none"></div>
+                     <!--end::Export buttons-->
 
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-payment me-2">
-                            <i class="la la-close"></i>
-                            <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-                        </a>
+                     <!--begin::Export dropdown-->
+                     <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                     </button>
 
-                        <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
-                            <i class="la la-arrow-left me-2"></i>
-                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
-                        </button>
-
-                        <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
-                            <span class="kt-hidden-mobile font-weight-bold">Next</span>
-                            <i class="la la-arrow-right ms-2"></i>
-                        </button>
-
-                        {% if permiso.agregar or permiso.editar %}
-                            <button type="button" id="btn-salvar-invoice"
-                                    class="btn btn-success me-2">
-                                <i class="la la-check"></i>
-                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
-                            </button>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <form
-                        class="form"
-                        id="payment-form"
-                        action="javascript:;"
-                        enctype="multipart/form-data"
-                        method="post"
-                >
-                    <input type="hidden" id="invoice_id" name="invoice_id"/>
-
-                    <div class="card-body">
-
-                        <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
-                            <li class="nav-item">
-                                <a class="nav-link active wizard-tab" data-item="1"
-                                   data-bs-toggle="tab" href="#tab-content-payment" id="tab-payment">
-                                    <div class="wizard-wrapper">
-                                        <span class="wizard-number">
-                                            <i class="wizard-check ki-duotone ki-check"></i>
-                                            <span class="number">1</span>
-                                        </span>
-                                        <div class="wizard-label">
-                                            <div class="wizard-title">Payments</div>
-                                            <div class="wizard-desc">List of items</div>
-                                        </div>
-                                        <span class="svg-icon ps-6">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                 width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <polygon points="0 0 24 0 24 24 0 24"></polygon>
-                                        <rect fill="#000000" opacity="0.3"
-                                              transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
-                                              x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
-                                        <path
-                                                d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
-                                                fill="#000000" fill-rule="nonzero"
-                                                transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path>
-                                    </g>
-                                </svg>
-                                        </span>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link wizard-tab" data-item="2"
-                                   data-bs-toggle="tab" href="#tab-content-archivo" id="tab-archivo">
-                                    <div class="wizard-wrapper">
-                                        <span class="wizard-number">
-                                            <i class="wizard-check ki-duotone ki-check"></i>
-                                            <span class="number">2</span>
-                                        </span>
-                                        <div class="wizard-label">
-                                            <div class="wizard-title">Attachments</div>
-                                            <div class="wizard-desc">List of attachments</div>
-                                        </div>
-                                        <span class="svg-icon ps-6 hide nav-item-hide">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
-                                                 width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                        <polygon points="0 0 24 0 24 24 0 24"></polygon>
-                                        <rect fill="#000000" opacity="0.3"
-                                              transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
-                                              x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
-                                        <path
-                                                d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
-                                                fill="#000000" fill-rule="nonzero"
-                                                transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path>
-                                    </g>
-                                </svg>
-                                        </span>
-                                    </div>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link wizard-tab" data-item="3"
-                                   data-bs-toggle="tab" href="#tab-content-notes" id="tab-notes">
-                                    <div class="wizard-wrapper">
-                                        <span class="wizard-number">
-                                            <i class="wizard-check ki-duotone ki-check"></i>
-                                            <span class="number">3</span>
-                                        </span>
-                                        <div class="wizard-label">
-                                            <div class="wizard-title">Notes</div>
-                                            <div class="wizard-desc">List of notes</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content">
-
-                            <div class="tab-pane fade show active" id="tab-content-payment" role="tabpanel">
-                                <div class="row" id="lista-payments">
-                                    <div class="col-md-12">
-                                        <!--begin::Wrapper-->
-                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
-
-                                            <!-- Acciones -->
-                                            <div class="d-flex flex-wrap gap-3">
-
-                                            </div>
-
-                                            <!-- Filtros -->
-                                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                                <!--search-->
-                                                <div class="position-relative w-250px">
-                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
-                                                                class="path1"></span><span class="path2"></span></i>
-                                                    <input type="text" data-table-filter="search"
-                                                           class="form-control form-control-solid ps-13"
-                                                           placeholder="Search..."/>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <!--end::Wrapper-->
-
-                                        <!--begin::Datatable-->
-                                        <table id="payments-table-editable"
-                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                                            <thead>
-                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                                <th>Item</th>
-                                                <th>Unit</th>
-                                                <th>Contract QTY</th>
-                                                <th>Unit Price</th>
-                                                <th>Contract Amount</th>
-                                                <th>Invoiced Qty</th>
-                                                <th>Invoiced Amount $</th>
-                                                <th>Paid Qty</th>
-                                                <th>Unpaid Qty</th>
-                                                <th>Paid Amount</th>
-                                                <th>Paid Amount Total</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="text-gray-600 fw-semibold">
-
-                                            </tbody>
-                                        </table>
-                                        <!--end::Datatable-->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="tab-content-archivo" role="tabpanel">
-                                <div class="row" id="lista-archivos">
-                                    <div class="col-md-12">
-
-                                        <!--begin::Wrapper-->
-                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
-
-                                            <!-- Acciones -->
-                                            <div class="d-flex flex-wrap gap-3">
-                                                {% if permiso.agregar or permiso.editar %}
-                                                    <button id="btn-agregar-archivo" class="btn btn-success w-125px">
-                                                        <i class="ki-duotone ki-plus-circle fs-1 me-2"><span
-                                                                    class="path1"></span><span
-                                                                    class="path2"></span><span
-                                                                    class="path3"></span><span class="path4"></span></i>
-                                                        New
-                                                    </button>
-                                                {% endif %}
-                                                {% if permiso.eliminar %}
-                                                    <button id="btn-eliminar-archivos" class="btn btn-danger w-125px">
-                                                        <i class="ki-duotone ki-trash fs-1 me-2"><span
-                                                                    class="path1"></span><span
-                                                                    class="path2"></span><span
-                                                                    class="path3"></span><span class="path4"></span></i>
-                                                        Delete
-                                                    </button>
-                                                {% endif %}
-                                            </div>
-
-                                            <!-- Filtros -->
-                                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                                <!--search-->
-                                                <div class="position-relative w-250px">
-                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
-                                                                class="path1"></span><span class="path2"></span></i>
-                                                    <input type="text" data-table-filter="search"
-                                                           class="form-control form-control-solid ps-13"
-                                                           placeholder="Search..."/>
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                        <!--end::Wrapper-->
-
-                                        <!--begin::Datatable-->
-                                        <table id="archivo-table-editable"
-                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                                            <thead>
-                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                                {% if permiso.eliminar %}
-                                                    <th class="w-10px pe-2">
-                                                        <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                                            <input class="form-check-input check-select-all"
-                                                                   type="checkbox"
-                                                                   data-kt-check="true"
-                                                                   data-kt-check-target="#archivo-table-editable .form-check-input"
-                                                                   value="1"/>
-                                                        </div>
-                                                    </th>
-                                                {% endif %}
-                                                <th>Name</th>
-                                                <th>File</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="text-gray-600 fw-semibold">
-
-                                            </tbody>
-                                        </table>
-                                        <!--end::Datatable-->
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="tab-pane fade" id="tab-content-notes" role="tabpanel">
-                                <div class="row" id="lista-notes">
-                                    <div class="col-md-12">
-                                        <!--begin::Wrapper-->
-                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
-
-                                            <!-- Acciones -->
-                                            <div class="d-flex flex-wrap gap-3">
-                                                {% if permiso.agregar or permiso.editar %}
-                                                    <button id="btn-agregar-note" class="btn btn-success w-125px">
-                                                        <i class="ki-duotone ki-plus-circle fs-1 me-2"><span
-                                                                    class="path1"></span><span
-                                                                    class="path2"></span><span
-                                                                    class="path3"></span><span class="path4"></span></i>
-                                                        New
-                                                    </button>
-                                                {% endif %}
-
-                                                {% if permiso.eliminar %}
-                                                    <button id="btn-eliminar-notes" class="btn btn-danger w-125px">
-                                                        <i class="ki-duotone ki-trash fs-1 me-2"><span
-                                                                    class="path1"></span><span
-                                                                    class="path2"></span><span
-                                                                    class="path3"></span><span class="path4"></span></i>
-                                                        Delete
-                                                    </button>
-                                                {% endif %}
-                                            </div>
-
-                                            <!-- Filtros -->
-                                            <div class="d-flex flex-wrap align-items-center gap-3">
-                                                <!-- desde -->
-                                                <div class="input-group input-group-solid date-picker-filter w-200px"
-                                                     id="datetimepicker-desde-notes"
-                                                     data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                                    <input type="text" class="form-control filter-date"
-                                                           placeholder="From"
-                                                           data-td-target="#datetimepicker-desde-notes"
-                                                           autocomplete="off"/>
-                                                    <span class="input-group-text"
-                                                          data-td-target="#datetimepicker-desde-notes"
-                                                          data-td-toggle="datetimepicker">
-                                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
-                                                                  class="path2"></span></i>
-                                                    </span>
-                                                </div>
-
-                                                <!-- hasta -->
-                                                <div class="input-group input-group-solid date-picker-filter w-200px"
-                                                     id="datetimepicker-hasta-notes"
-                                                     data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                                    <input type="text" class="form-control filter-date"
-                                                           placeholder="To"
-                                                           data-td-target="#datetimepicker-hasta-notes"
-                                                           autocomplete="off"/>
-                                                    <span class="input-group-text"
-                                                          data-td-target="#datetimepicker-hasta-notes"
-                                                          data-td-toggle="datetimepicker">
-                                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
-                                                                  class="path2"></span></i>
-                                                    </span>
-                                                </div>
-
-                                                <!--search-->
-                                                <div class="position-relative w-250px">
-                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
-                                                                class="path1"></span><span class="path2"></span></i>
-                                                    <input type="text" data-table-filter="search"
-                                                           class="form-control form-control-solid ps-13"
-                                                           placeholder="Search..."/>
-                                                </div>
-
-                                                <!-- botón -->
-                                                <button class="btn btn-primary fw-semibold w-125px"
-                                                        id="btn-filtrar-notes">
-                                                    Filter
-                                                </button>
-                                            </div>
-
-                                        </div>
-                                        <!--end::Wrapper-->
-
-                                        <!--begin::Datatable-->
-                                        <table id="notes-table-editable"
-                                               class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                                            <thead>
-                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                                <th>Date</th>
-                                                <th>Notes</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody class="text-gray-600 fw-semibold">
-
-                                            </tbody>
-                                        </table>
-                                        <!--end::Datatable-->
-                                    </div>
-                                </div>
-                            </div>
-
+                     <!--begin::Menu-->
+                     <div
+                        id="payment_export_menu"
+                        class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                        data-kt-menu="true"
+                     >
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="copy"> Copy to clipboard </a>
                         </div>
-
-                    </div>
-                </form>
-            </div>
-
-        </div>
-        <!--end::Content container-->
-    </div>
-    <!--end::Content-->
-
-    <div class="modal fade" id="modal-payment" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">New payment</h5>
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <form class="m-form" id="payment-form" action="#"
-                          enctype="multipart/form-data" method="post">
-
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">1</span>
-                                Payment
-                            </label>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label class="form-label">
-                                        Paid Qty
-                                    </label>
-                                    <input type="text"
-                                           class="form-control form-control-validate form-control-solid form-control-number"
-                                           id="item-paid-qty"
-                                           name="paidqty">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">
-                                        Paid Amount
-                                    </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                        <input type="text"
-                                               class="form-control form-control-validate form-control-solid form-control-number"
-                                               id="item-paid-amount"
-                                               name="paidamount">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">
-                                        Paid Amount Total
-                                    </label>
-                                    <div class="input-group m-input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">$</span>
-                                        </div>
-                                        <input type="text"
-                                               class="form-control form-control-validate form-control-solid form-control-number"
-                                               id="item-paid-amount-total"
-                                               name="paidamounttotal">
-                                    </div>
-                                </div>
-                            </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="excel"> Export to Excel </a>
                         </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="csv"> Export CSV </a>
+                        </div>
+                        <!--end::Menu item-->
+                        <!--begin::Menu item-->
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="pdf"> Export to PDF </a>
+                        </div>
+                        <!--end::Menu item-->
+                     </div>
+                     <!--end::Menu-->
+                     <!--end::Export dropdown-->
 
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="btn-salvar-payment">Save</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                </div>
+                     <!--begin::Hide default export buttons-->
+                     <div id="payment-table-editable-buttons" class="d-none"></div>
+                     <!--end::Hide default export buttons-->
+                  </div>
+               </div>
             </div>
-        </div>
-    </div>
+         </div>
+         <div class="card-body">
+            <!--begin::Datatable-->
+            <table id="payment-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+               <thead>
+                  <tr class="fw-bold fs-6 text-gray-800 px-7">
+                     <th>Number</th>
+                     <th>Company</th>
+                     <th>Job No</th>
+                     <th>Project</th>
+                     <th>From</th>
+                     <th>To</th>
+                     <th>Amount</th>
+                     <th>Notes</th>
+                     <th>Created At</th>
+                     <th>Paid</th>
+                     <th class="text-end min-w-100px">Actions</th>
+                  </tr>
+               </thead>
+               <tbody class="text-gray-600 fw-semibold"></tbody>
+            </table>
+            <!--end::Datatable-->
+         </div>
+      </div>
 
-    <!-- notes -->
-    <div class="modal fade" id="modal-notes" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        New Note
-                    </h5>
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <form class="m-form" id="notes-form" action="#"
-                          enctype="multipart/form-data" method="post">
+      <!-- form -->
+      <div id="form-payment" class="card card-sticky hide">
+         <div
+            class="card-header"
+            data-kt-sticky="true"
+            data-kt-sticky-name="form-payment"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '60px', xl: '60px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
+            <div class="card-title">
+               <h3 class="card-label">New Payment:</h3>
+            </div>
+            <div class="card-toolbar">
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-payment me-2">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
+               </a>
 
-                        <input type="hidden" id="notes_id" name="notes_id"/>
+               <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
+                  <i class="la la-arrow-left me-2"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
+               </button>
 
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">1</span>
-                                Date
-                            </label>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="input-group input-group-solid date-picker-filter"
-                                         id="datetimepicker-notes-date" data-td-target-input="nearest"
-                                         data-td-target-toggle="nearest">
-                                        <input type="text" class="form-control filter-date" placeholder="Select a date"
-                                               id="notes-date"
-                                               data-td-target="#datetimepicker-notes-date" autocomplete="off"
-                                               name="day"/>
-                                        <span class="input-group-text" data-td-target="#datetimepicker-notes-date"
-                                              data-td-toggle="datetimepicker">
-                                      <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span
-                                                  class="path2"></span></i>
+               <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
+                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
+                  <i class="la la-arrow-right ms-2"></i>
+               </button>
+
+               {% if permiso.agregar or permiso.editar %}
+               <button type="button" id="btn-salvar-invoice" class="btn btn-success me-2">
+                  <i class="la la-check"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Save</span>
+               </button>
+               {% endif %}
+            </div>
+         </div>
+
+         <form class="form" id="payment-form" action="javascript:;" enctype="multipart/form-data" method="post">
+            <input type="hidden" id="invoice_id" name="invoice_id" />
+
+            <div class="card-body">
+               <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
+                  <li class="nav-item">
+                     <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-payment" id="tab-payment">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">1</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Payments</div>
+                              <div class="wizard-desc">List of items</div>
+                           </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="2" data-bs-toggle="tab" href="#tab-content-archivo" id="tab-archivo">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">2</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Attachments</div>
+                              <div class="wizard-desc">List of attachments</div>
+                           </div>
+                           <span class="svg-icon ps-6 hide nav-item-hide">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="3" data-bs-toggle="tab" href="#tab-content-notes" id="tab-notes">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">3</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Notes</div>
+                              <div class="wizard-desc">List of notes</div>
+                           </div>
+                        </div>
+                     </a>
+                  </li>
+               </ul>
+
+               <div class="tab-content">
+                  <div class="tab-pane fade show active" id="tab-content-payment" role="tabpanel">
+                     <div class="row" id="lista-payments">
+                        <div class="col-md-12">
+                           <!--begin::Wrapper-->
+                           <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                              <!-- Acciones -->
+                              <div class="d-flex flex-wrap gap-3"></div>
+
+                              <!-- Filtros -->
+                              <div class="d-flex flex-wrap align-items-center gap-3">
+                                 <!--search-->
+                                 <div class="position-relative w-250px">
+                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                    <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                 </div>
+                              </div>
+                           </div>
+                           <!--end::Wrapper-->
+
+                           <!--begin::Datatable-->
+                           <table id="payments-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Item</th>
+                                    <th>Unit</th>
+                                    <th>Contract QTY</th>
+                                    <th>Unit Price</th>
+                                    <th>Contract Amount</th>
+                                    <th>Invoiced Qty</th>
+                                    <th>Invoiced Amount $</th>
+                                    <th>Paid Qty</th>
+                                    <th>Unpaid Qty</th>
+                                    <th>Paid Amount</th>
+                                    <th>Paid Amount Total</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
+                           <!--end::Datatable-->
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="tab-pane fade" id="tab-content-archivo" role="tabpanel">
+                     <div class="row" id="lista-archivos">
+                        <div class="col-md-12">
+                           <!--begin::Wrapper-->
+                           <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                              <!-- Acciones -->
+                              <div class="d-flex flex-wrap gap-3">
+                                 {% if permiso.agregar or permiso.editar %}
+                                 <button id="btn-agregar-archivo" class="btn btn-success w-125px">
+                                    <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    New
+                                 </button>
+                                 {% endif %} {% if permiso.eliminar %}
+                                 <button id="btn-eliminar-archivos" class="btn btn-danger w-125px">
+                                    <i class="ki-duotone ki-trash fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    Delete
+                                 </button>
+                                 {% endif %}
+                              </div>
+
+                              <!-- Filtros -->
+                              <div class="d-flex flex-wrap align-items-center gap-3">
+                                 <!--search-->
+                                 <div class="position-relative w-250px">
+                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                    <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                 </div>
+                              </div>
+                           </div>
+                           <!--end::Wrapper-->
+
+                           <!--begin::Datatable-->
+                           <table id="archivo-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    {% if permiso.eliminar %}
+                                    <th class="w-10px pe-2">
+                                       <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                          <input
+                                             class="form-check-input check-select-all"
+                                             type="checkbox"
+                                             data-kt-check="true"
+                                             data-kt-check-target="#archivo-table-editable .form-check-input"
+                                             value="1"
+                                          />
+                                       </div>
+                                    </th>
+                                    {% endif %}
+                                    <th>Name</th>
+                                    <th>File</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
+                           <!--end::Datatable-->
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="tab-pane fade" id="tab-content-notes" role="tabpanel">
+                     <div class="row" id="lista-notes">
+                        <div class="col-md-12">
+                           <!--begin::Wrapper-->
+                           <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                              <!-- Acciones -->
+                              <div class="d-flex flex-wrap gap-3">
+                                 {% if permiso.agregar or permiso.editar %}
+                                 <button id="btn-agregar-note" class="btn btn-success w-125px">
+                                    <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    New
+                                 </button>
+                                 {% endif %} {% if permiso.eliminar %}
+                                 <button id="btn-eliminar-notes" class="btn btn-danger w-125px">
+                                    <i class="ki-duotone ki-trash fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    Delete
+                                 </button>
+                                 {% endif %}
+                              </div>
+
+                              <!-- Filtros -->
+                              <div class="d-flex flex-wrap align-items-center gap-3">
+                                 <!-- desde -->
+                                 <div class="input-group input-group-solid date-picker-filter w-200px" id="datetimepicker-desde-notes" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control filter-date" placeholder="From" data-td-target="#datetimepicker-desde-notes" autocomplete="off" />
+                                    <span class="input-group-text" data-td-target="#datetimepicker-desde-notes" data-td-toggle="datetimepicker">
+                                       <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
                                     </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                 </div>
 
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">2</span>
-                                Notes
-                            </label>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="notes" class="h-150px"></div>
-                                </div>
-                            </div>
-                        </div>
+                                 <!-- hasta -->
+                                 <div class="input-group input-group-solid date-picker-filter w-200px" id="datetimepicker-hasta-notes" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control filter-date" placeholder="To" data-td-target="#datetimepicker-hasta-notes" autocomplete="off" />
+                                    <span class="input-group-text" data-td-target="#datetimepicker-hasta-notes" data-td-toggle="datetimepicker">
+                                       <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                 </div>
 
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="btn-salvar-note">Save</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                </div>
+                                 <!--search-->
+                                 <div class="position-relative w-250px">
+                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                    <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                 </div>
+
+                                 <!-- botón -->
+                                 <button class="btn btn-primary fw-semibold w-125px" id="btn-filtrar-notes">Filter</button>
+                              </div>
+                           </div>
+                           <!--end::Wrapper-->
+
+                           <!--begin::Datatable-->
+                           <table id="notes-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Date</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
+                           <!--end::Datatable-->
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </div>
-        </div>
-    </div>
+         </form>
+      </div>
+   </div>
+   <!--end::Content container-->
+</div>
+<!--end::Content-->
 
-    <!-- archivo -->
-    <div class="modal fade" id="modal-archivo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">New Attachment</h5>
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <form class="m-form" id="archivo-form" action="#" enctype="multipart/form-data" method="post">
-
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">1</span>
-                                Name
-                            </label>
-                            <input type="text" class="form-control form-control-solid form-control-validate"
-                                   id="archivo-name" name="name"/>
-                        </div>
-
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">2</span>
-                                Attachment
-                            </label>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="fileinput-archivo" class="fileinput fileinput-new col-md-12"
-                                         data-provides="fileinput">
-                                        <div class="input-group input-group-solid">
-                                            <div class="form-control uneditable-input input-fixed"
-                                                 data-trigger="fileinput">
-                                                <span class="fileinput-filename">
-                                                </span>
-                                            </div>
-                                            <span class="btn btn-secondary btn-file">
-                                                <span class="fileinput-new">
-                                                    Select
-                                                </span>
-                                            <span class="fileinput-exists"> Change </span>
-
-                                            <input type="file" name="file" id="fileinput"
-                                                   accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx">
-
-                                            </span>
-                                            <a href="javascript:;" class="btn btn-danger fileinput-exists btn-eliminar"
-                                               data-dismiss="fileinput">
-                                                <i class="la la-trash-o"></i>
-                                                <span class="kt-hidden-mobile">Delete</span>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <small id="file-error" class="text-danger hide mt-1"></small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" id="btn-salvar-archivo">Save</button>
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-                </div>
+<div class="modal fade" id="modal-payment" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New payment</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
-        </div>
-    </div>
-
-    <!-- notes item -->
-    <div class="modal fade" id="modal-notes-item" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        Items Note
-                    </h5>
-                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                         aria-label="Close">
-                        <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <div class="modal-body">
-                    <form class="m-form" id="notes-item-form" action="#"
-                          enctype="multipart/form-data" method="post">
-
-                        <input type="hidden" id="notes_item_id" name="notes_item_id"/>
-                        <input type="hidden" id="invoice_item_id" name="invoice_item_id"/>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                Add Note
-                            </label>
-                            <div class="row mb-2">
-                                <div class="col-md-12">
-                                    <div id="notes-item" class="h-100px"></div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-success" id="btn-salvar-note-item">Save note</button>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="payment-form" action="#" enctype="multipart/form-data" method="post">
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Payment
+                  </label>
+                  <div class="row">
+                     <div class="col-md-4">
+                        <label class="form-label"> Paid Qty </label>
+                        <input type="text" class="form-control form-control-validate form-control-solid form-control-number" id="item-paid-qty" name="paidqty" />
+                     </div>
+                     <div class="col-md-4">
+                        <label class="form-label"> Paid Amount </label>
+                        <div class="input-group m-input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="text" class="form-control form-control-validate form-control-solid form-control-number" id="item-paid-amount" name="paidamount" />
                         </div>
-
-                        <div class="form-group ic-form-group">
-                            <div class="row" id="lista-notes-item">
-                                <div class="col-md-12">
-                                    <!--begin::Wrapper-->
-                                    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
-
-                                        <!-- Acciones -->
-                                        <div class="d-flex flex-wrap gap-3">
-
-                                        </div>
-
-                                        <!-- Filtros -->
-                                        <div class="d-flex flex-wrap align-items-center gap-3">
-                                            <!--search-->
-                                            <div class="position-relative w-250px">
-                                                <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span
-                                                            class="path1"></span><span class="path2"></span></i>
-                                                <input type="text" data-table-filter="search"
-                                                       class="form-control form-control-solid ps-13"
-                                                       placeholder="Search..."/>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <!--end::Wrapper-->
-
-                                    <!--begin::Datatable-->
-                                    <table id="notes-item-table-editable"
-                                           class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                                        <thead>
-                                        <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                            <th>Notes</th>
-                                            <th>Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody class="text-gray-600 fw-semibold">
-
-                                        </tbody>
-                                    </table>
-                                    <!--end::Datatable-->
-                                </div>
-                            </div>
+                     </div>
+                     <div class="col-md-4">
+                        <label class="form-label"> Paid Amount Total </label>
+                        <div class="input-group m-input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="text" class="form-control form-control-validate form-control-solid form-control-number" id="item-paid-amount-total" name="paidamounttotal" />
                         </div>
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-payment">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
 
-                    </form>
-                </div>
+<!-- notes -->
+<div class="modal fade" id="modal-notes" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New Note</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
-        </div>
-    </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="notes-form" action="#" enctype="multipart/form-data" method="post">
+               <input type="hidden" id="notes_id" name="notes_id" />
 
-{% endblock %}
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Date
+                  </label>
+                  <div class="row">
+                     <div class="col-md-4">
+                        <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-notes-date" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                           <input type="text" class="form-control filter-date" placeholder="Select a date" id="notes-date" data-td-target="#datetimepicker-notes-date" autocomplete="off" name="day" />
+                           <span class="input-group-text" data-td-target="#datetimepicker-notes-date" data-td-toggle="datetimepicker">
+                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                           </span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
 
-{% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">2</span>
+                     Notes
+                  </label>
+                  <div class="row">
+                     <div class="col-md-12">
+                        <div id="notes" class="h-150px"></div>
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-note">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
 
-    <!-- datatable fixed column -->
-    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+<!-- archivo -->
+<div class="modal fade" id="modal-archivo" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New Attachment</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="archivo-form" action="#" enctype="multipart/form-data" method="post">
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Name
+                  </label>
+                  <input type="text" class="form-control form-control-solid form-control-validate" id="archivo-name" name="name" />
+               </div>
 
-    <script src="{{ asset('bundles/metronic8/js/pages/payments.js') }}?{{ 'now' | date('U') }}"></script>
-    <script>
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">2</span>
+                     Attachment
+                  </label>
+                  <div class="row">
+                     <div class="col-md-12">
+                        <div id="fileinput-archivo" class="fileinput fileinput-new col-md-12" data-provides="fileinput">
+                           <div class="input-group input-group-solid">
+                              <div class="form-control uneditable-input input-fixed" data-trigger="fileinput">
+                                 <span class="fileinput-filename"> </span>
+                              </div>
+                              <span class="btn btn-secondary btn-file">
+                                 <span class="fileinput-new"> Select </span>
+                                 <span class="fileinput-exists"> Change </span>
 
-        var permiso = {
-            agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
-            editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
-            eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
-        };
+                                 <input type="file" name="file" id="fileinput" accept=".png,.jpg,.jpeg,.pdf,.doc,.docx,.xls,.xlsx" />
+                              </span>
+                              <a href="javascript:;" class="btn btn-danger fileinput-exists btn-eliminar" data-dismiss="fileinput">
+                                 <i class="la la-trash-o"></i>
+                                 <span class="kt-hidden-mobile">Delete</span>
+                              </a>
+                           </div>
+                        </div>
+                        <div>
+                           <small id="file-error" class="text-danger hide mt-1"></small>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-archivo">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
 
-        var direccion_url = "{{ direccion_url }}";
+<!-- notes item -->
+<div class="modal fade" id="modal-notes-item" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">Items Note</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="notes-item-form" action="#" enctype="multipart/form-data" method="post">
+               <input type="hidden" id="notes_item_id" name="notes_item_id" />
+               <input type="hidden" id="invoice_item_id" name="invoice_item_id" />
 
-        jQuery(document).ready(function () {
-            Payments.init();
-        });
-    </script>
+               <div class="form-group">
+                  <label class="form-label"> Add Note </label>
+                  <div class="row mb-2">
+                     <div class="col-md-12">
+                        <div id="notes-item" class="h-100px"></div>
+                     </div>
+                  </div>
+                  <button type="button" class="btn btn-success" id="btn-salvar-note-item">Save note</button>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <div class="row" id="lista-notes-item">
+                     <div class="col-md-12">
+                        <!--begin::Wrapper-->
+                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                           <!-- Acciones -->
+                           <div class="d-flex flex-wrap gap-3"></div>
+
+                           <!-- Filtros -->
+                           <div class="d-flex flex-wrap align-items-center gap-3">
+                              <!--search-->
+                              <div class="position-relative w-250px">
+                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                 <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                              </div>
+                           </div>
+                        </div>
+                        <!--end::Wrapper-->
+
+                        <!--begin::Datatable-->
+                        <table id="notes-item-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                           <thead>
+                              <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                 <th>Notes</th>
+                                 <th>Date</th>
+                                 <th>Actions</th>
+                              </tr>
+                           </thead>
+                           <tbody class="text-gray-600 fw-semibold"></tbody>
+                        </table>
+                        <!--end::Datatable-->
+                     </div>
+                  </div>
+               </div>
+            </form>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Modal Change Order History -->
+<div class="modal fade" id="modal-change-order-history" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="myModalLabel">Change Order History</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <div class="text-center">
+               <div class="spinner-border" role="status">
+                  <span class="visually-hidden">Loading...</span>
+               </div>
+            </div>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+{% endblock %} {% block javascriptsspecific %}
+<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
+
+<!-- datatable fixed column -->
+<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+
+<script src="{{ asset('bundles/metronic8/js/pages/payments.js') }}?{{ 'now' | date('U') }}"></script>
+<script>
+
+   var permiso = {
+       agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
+       editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
+       eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+   };
+
+   var direccion_url = "{{ direccion_url }}";
+
+   jQuery(document).ready(function () {
+       Payments.init();
+   });
+</script>
 {% endblock %}
