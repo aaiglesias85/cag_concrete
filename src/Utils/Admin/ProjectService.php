@@ -51,6 +51,9 @@ use App\Repository\ProjectCountyRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
+use App\Repository\EmployeeRoleRepository;
+use App\Entity\EmployeeRole;
+
 use App\Utils\Base;
 
 class ProjectService extends Base
@@ -1265,6 +1268,13 @@ class ProjectService extends Base
          $arreglo_resultado['retainage_adjustment_percentage'] = $entity->getRetainageAdjustmentPercentage() ?? '';
          $arreglo_resultado['retainage_adjustment_completion'] = $entity->getRetainageAdjustmentCompletion() ?? '';
 
+         $arreglo_resultado['prevailing_wage'] = $entity->getPrevailingWage();
+         $arreglo_resultado['prevailing_county_id'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getCountyId() : '';
+         $arreglo_resultado['prevailing_county'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getDescription() : '';
+         $arreglo_resultado['prevailing_role_id'] = $entity->getPrevailingRole() != null ? $entity->getPrevailingRole()->getRoleId() : '';
+         $arreglo_resultado['prevailing_role'] = $entity->getPrevailingRole() != null ? $entity->getPrevailingRole()->getDescription() : '';
+         $arreglo_resultado['prevailing_rate'] = $entity->getPrevailingRate();
+
 
          // items
          $items = $this->ListarItemsDeProject($project_id);
@@ -1809,7 +1819,11 @@ class ProjectService extends Base
       $retainage,
       $retainage_percentage,
       $retainage_adjustment_percentage,
-      $retainage_adjustment_completion
+      $retainage_adjustment_completion,
+      $prevailing_wage,
+      $prevailing_county_id,
+      $prevailing_role_id,
+      $prevailing_rate
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2140,6 +2154,59 @@ class ProjectService extends Base
          }
          $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
 
+         if ($prevailing_wage != $entity->getPrevailingWage()) {
+            $notas[] = [
+               'notes' => 'Change prevailing wage, old value: ' . $entity->getPrevailingWage() ? 'Yes' : 'No',
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setPrevailingWage($prevailing_wage);
+
+         $prevailingCountyOld = $entity->getPrevailingCounty();
+         $prevailingCountyOldId = $prevailingCountyOld != null ? $prevailingCountyOld->getCountyId() : null;
+         if ($prevailing_county_id != $prevailingCountyOldId) {
+            $oldValue = $prevailingCountyOld != null ? $prevailingCountyOld->getDescription() : 'None';
+            $notas[] = [
+               'notes' => 'Change prevailing county, old value: ' . $oldValue,
+               'date' => new \DateTime()
+            ];
+         }
+
+         // Buscar y establecer el objeto County
+         if ($prevailing_county_id != '') {
+            $prevailing_county = $this->getDoctrine()->getRepository(County::class)
+               ->find($prevailing_county_id);
+            $entity->setPrevailingCounty($prevailing_county);
+         } else {
+            $entity->setPrevailingCounty(null);
+         }
+
+         $prevailingRoleOld = $entity->getPrevailingRole();
+         $prevailingRoleOldId = $prevailingRoleOld != null ? $prevailingRoleOld->getRoleId() : null;
+         if ($prevailing_role_id != $prevailingRoleOldId) {
+            $oldValue = $prevailingRoleOld != null ? $prevailingRoleOld->getDescription() : 'None';
+            $notas[] = [
+               'notes' => 'Change prevailing role, old value: ' . $oldValue,
+               'date' => new \DateTime()
+            ];
+         }
+
+         // Buscar y establecer el objeto EmployeeRole
+         if ($prevailing_role_id != '') {
+            $prevailing_role = $this->getDoctrine()->getRepository(EmployeeRole::class)
+               ->find($prevailing_role_id);
+            $entity->setPrevailingRole($prevailing_role);
+         } else {
+            $entity->setPrevailingRole(null);
+         }
+
+         if ($prevailing_rate != $entity->getPrevailingRate()) {
+            $notas[] = [
+               'notes' => 'Change prevailing rate, old value: ' . $entity->getPrevailingRate(),
+               'date' => new \DateTime()
+            ];
+         }
+         $entity->setPrevailingRate($prevailing_rate);
 
          $entity->setUpdatedAt(new \DateTime());
 
@@ -2218,7 +2285,11 @@ class ProjectService extends Base
       $retainage,
       $retainage_percentage,
       $retainage_adjustment_percentage,
-      $retainage_adjustment_completion
+      $retainage_adjustment_completion,
+      $prevailing_wage,
+      $prevailing_county_id,
+      $prevailing_role_id,
+      $prevailing_rate
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2299,6 +2370,22 @@ class ProjectService extends Base
       $entity->setRetainagePercentage($retainage_percentage);
       $entity->setRetainageAdjustmentPercentage($retainage_adjustment_percentage);
       $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
+
+
+      $entity->setPrevailingWage($prevailing_wage);
+      $entity->setPrevailingRate($prevailing_rate);
+
+      if ($prevailing_county_id != '') {
+         $prevailing_county = $this->getDoctrine()->getRepository(County::class)
+            ->find($prevailing_county_id);
+         $entity->setPrevailingCounty($prevailing_county);
+      }
+
+      if ($prevailing_role_id != '') {
+         $prevailing_role = $this->getDoctrine()->getRepository(EmployeeRole::class)
+            ->find($prevailing_role_id);
+         $entity->setPrevailingRole($prevailing_role);
+      }
 
       $entity->setCreatedAt(new \DateTime());
 

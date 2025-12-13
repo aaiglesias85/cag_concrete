@@ -479,6 +479,12 @@ var Projects = (function () {
       items_completion = [];
       actualizarTableListaItemsCompletion();
 
+      // prevailing wage - limpiar campos
+      $('#prevailing-wage').prop('checked', false);
+      $('#prevailing-county').val('').trigger('change');
+      $('#prevailing-role').val('').trigger('change');
+      NumberUtil.setFormattedValue('#prevailing-rate', '', { decimals: 2 });
+
       //Mostrar el primer tab
       if (reset_wizard) {
          resetWizard();
@@ -531,7 +537,7 @@ var Projects = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 11;
+   var totalTabs = 12;
    var initWizard = function () {
       $(document).off('click', '#form-project .wizard-tab');
       $(document).on('click', '#form-project .wizard-tab', function (e) {
@@ -571,24 +577,28 @@ var Projects = (function () {
                actualizarTableListaItems();
                break;
             case 4:
-               actualizarTableListaContacts();
-               break;
-            case 5:
-               btnClickFiltrarNotes();
-               break;
-            case 6:
-               actualizarTableListaInvoices();
-               break;
-            case 7:
-               btnClickFiltrarDataTracking();
-               break;
-            case 8:
                actualizarTableListaAjustesPrecio();
                break;
+            case 5:
+               // Prevailing Wage - poblar dropdown de counties
+               poblarPrevailingCounties();
+               break;
+            case 6:
+               actualizarTableListaContacts();
+               break;
+            case 7:
+               btnClickFiltrarNotes();
+               break;
+            case 8:
+               actualizarTableListaInvoices();
+               break;
             case 9:
-               actualizarTableListaArchivos();
+               btnClickFiltrarDataTracking();
                break;
             case 10:
+               actualizarTableListaArchivos();
+               break;
+            case 11:
                actualizarTableListaItemsCompletion();
                break;
          }
@@ -648,28 +658,32 @@ var Projects = (function () {
                actualizarTableListaAjustesPrecio();
                break;
             case 5:
-               $('#tab-concrete-vendor').tab('show');
+               $('#tab-prevailing-wage').tab('show');
+               poblarPrevailingCounties();
                break;
             case 6:
-               $('#tab-contacts').tab('show');
+               $('#tab-concrete-vendor').tab('show');
                break;
             case 7:
+               $('#tab-contacts').tab('show');
+               break;
+            case 8:
                $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 8:
+            case 9:
                $('#tab-items-completion').tab('show');
                actualizarTableListaItemsCompletion();
                break;
-            case 9:
+            case 10:
                $('#tab-data-tracking').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 10:
+            case 11:
                $('#tab-invoices').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 11:
+            case 12:
                $('#tab-notes').tab('show');
                btnClickFiltrarNotes();
                break;
@@ -678,7 +692,7 @@ var Projects = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 11;
+      totalTabs = 12;
       mostrarTab();
       // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
@@ -886,6 +900,18 @@ var Projects = (function () {
 
       var retainage_adjustment_completion = NumberUtil.getNumericValue('#retainage_adjustment_completion');
       formData.set('retainage_adjustment_completion', retainage_adjustment_completion);
+
+      var prevailing_wage = $('#prevailing-wage').prop('checked') ? 1 : 0;
+      formData.set('prevailing_wage', prevailing_wage);
+
+      var prevailing_county_id = $('#prevailing-county').val();
+      formData.set('prevailing_county_id', prevailing_county_id || '');
+
+      var prevailing_role_id = $('#prevailing-role').val();
+      formData.set('prevailing_role_id', prevailing_role_id || '');
+
+      var prevailing_rate = NumberUtil.getNumericValue('#prevailing-rate');
+      formData.set('prevailing_rate', prevailing_rate);
 
       formData.set('items', JSON.stringify(items));
       formData.set('contacts', JSON.stringify(contacts));
@@ -1157,8 +1183,25 @@ var Projects = (function () {
          items_completion = project.items_completion;
          actualizarTableListaItemsCompletion();
 
+         // prevailing wage
+         $('#prevailing-wage').prop('checked', project.prevailing_wage);
+
+         // Primero poblar el dropdown de counties (esto se hace automáticamente con el trigger de change en county)
+         // Luego establecer el valor seleccionado después de que se haya poblado el dropdown
+         setTimeout(function () {
+            poblarPrevailingCounties();
+            if (project.prevailing_county_id) {
+               $('#prevailing-county').val(project.prevailing_county_id);
+               $('#prevailing-county').trigger('change');
+            }
+         }, 200);
+
+         $('#prevailing-role').val(project.prevailing_role_id);
+         $('#prevailing-role').trigger('change');
+         NumberUtil.setFormattedValue('#prevailing-rate', project.prevailing_rate, { decimals: 2 });
+
          // habilitar tab
-         totalTabs = 10;
+         totalTabs = 12;
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
@@ -1307,9 +1350,9 @@ var Projects = (function () {
          $('.div-retainage').removeClass('hide').addClass('hide');
 
          // reset values
-         $('#retainage_percentage').val('');
-         $('#retainage_adjustment_percentage').val('');
-         $('#retainage_adjustment_completion').val('');
+         NumberUtil.setFormattedValue('#retainage_percentage', '', { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_percentage', '', { decimals: 2 });
+         NumberUtil.setFormattedValue('#retainage_adjustment_completion', '', { decimals: 2 });
          $('#total-retainage-withheld').val('');
 
          if ($(this).prop('checked')) {
@@ -4361,6 +4404,73 @@ var Projects = (function () {
             $('#total-retainage-withheld').val(MyApp.formatMoney(0));
          });
    };
+
+   // Función para poblar el dropdown de County en Prevailing Wage solo con los condados seleccionados en el paso 1
+   var poblarPrevailingCounties = function () {
+      var county_ids = $('#county').val();
+      var $prevailingCountySelect = $('#prevailing-county');
+      var $countySelect = $('#county');
+
+      // Guardar el valor actualmente seleccionado en Prevailing Wage
+      var currentSelectedValue = $prevailingCountySelect.val();
+
+      // Limpiar opciones actuales excepto "Select"
+      $prevailingCountySelect.html('<option value="">Select</option>');
+
+      if (!county_ids || county_ids.length === 0) {
+         // Si no hay counties seleccionados, limpiar también el valor seleccionado
+         $prevailingCountySelect.val('').trigger('change');
+         return;
+      }
+
+      // Si county_ids es un array, usar directamente; si es string, convertir
+      if (typeof county_ids === 'string') {
+         county_ids = [county_ids];
+      }
+
+      var currentSelectedStillAvailable = false;
+
+      // Agregar solo los condados que están seleccionados en el paso 1
+      $countySelect.find('option').each(function () {
+         var countyId = $(this).val();
+         var countyName = $(this).text();
+
+         // Verificar si este condado está en la lista de seleccionados
+         if (countyId) {
+            var countyIdInt = parseInt(countyId);
+            var isSelected = county_ids.some(function (id) {
+               return parseInt(id) === countyIdInt || id === countyId;
+            });
+
+            if (isSelected) {
+               var $option = $('<option></option>').attr('value', countyId).text(countyName);
+               $prevailingCountySelect.append($option);
+
+               // Verificar si el valor actualmente seleccionado aún está disponible
+               if (currentSelectedValue && (countyId == currentSelectedValue || parseInt(countyId) === parseInt(currentSelectedValue))) {
+                  currentSelectedStillAvailable = true;
+               }
+            }
+         }
+      });
+
+      // Si el valor previamente seleccionado ya no está disponible, limpiarlo
+      if (currentSelectedValue && !currentSelectedStillAvailable) {
+         $prevailingCountySelect.val('').trigger('change');
+      } else if (currentSelectedValue && currentSelectedStillAvailable) {
+         // Mantener el valor seleccionado si aún está disponible
+         $prevailingCountySelect.val(currentSelectedValue).trigger('change');
+      } else {
+         // Solo trigger change para actualizar el select2
+         $prevailingCountySelect.trigger('change');
+      }
+   };
+
+   // Listener para actualizar el dropdown de Prevailing Wage cuando cambien los condados en el paso 1
+   $(document).on('change', '#county', function () {
+      // Siempre actualizar el dropdown cuando cambien los counties, sin importar el tab actual
+      poblarPrevailingCounties();
+   });
 
    return {
       //main function to initiate the module

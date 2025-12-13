@@ -190,12 +190,18 @@ var ProjectsDetalle = (function () {
          // items completion
          items_completion = project.items_completion;
          actualizarTableListaItemsCompletion();
+
+         // prevailing wage
+         $('#prevailing-wage-detalle').prop('checked', project.prevailing_wage);
+         $('#prevailing-county-detalle').val(project.prevailing_county || '');
+         $('#prevailing-role-detalle').val(project.prevailing_role || '');
+         NumberUtil.setFormattedValue('#prevailing-rate-detalle', project.prevailing_rate, { decimals: 2 });
       }
    }
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 11;
+   var totalTabs = 12;
    var initWizard = function () {
       $(document).off('click', '#form-project-detalle .wizard-tab');
       $(document).on('click', '#form-project-detalle .wizard-tab', function (e) {
@@ -231,24 +237,27 @@ var ProjectsDetalle = (function () {
                actualizarTableListaAjustesPrecio();
                break;
             case 5:
-               // Concrete - no necesita actualizar tabla aquí
+               // Prevailing Wage - no necesita actualizar tabla aquí
                break;
             case 6:
-               actualizarTableListaContacts();
+               // Concrete - no necesita actualizar tabla aquí
                break;
             case 7:
-               actualizarTableListaArchivos();
+               actualizarTableListaContacts();
                break;
             case 8:
-               actualizarTableListaItemsCompletion();
+               actualizarTableListaArchivos();
                break;
             case 9:
-               btnClickFiltrarDataTracking();
+               actualizarTableListaItemsCompletion();
                break;
             case 10:
-               actualizarTableListaInvoices();
+               btnClickFiltrarDataTracking();
                break;
             case 11:
+               actualizarTableListaInvoices();
+               break;
+            case 12:
                btnClickFiltrarNotes();
                break;
          }
@@ -301,28 +310,31 @@ var ProjectsDetalle = (function () {
                actualizarTableListaAjustesPrecio();
                break;
             case 5:
-               $('#tab-concrete-vendor-detalle').tab('show');
+               $('#tab-prevailing-wage-detalle').tab('show');
                break;
             case 6:
-               $('#tab-contacts-detalle').tab('show');
+               $('#tab-concrete-vendor-detalle').tab('show');
                break;
             case 7:
+               $('#tab-contacts-detalle').tab('show');
+               break;
+            case 8:
                $('#tab-archivo-detalle').tab('show');
                actualizarTableListaArchivos();
                break;
-            case 8:
+            case 9:
                $('#tab-items-completion-detalle').tab('show');
                actualizarTableListaItemsCompletion();
                break;
-            case 9:
+            case 10:
                $('#tab-data-tracking-detalle').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 10:
+            case 11:
                $('#tab-invoices-detalle').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 11:
+            case 12:
                $('#tab-notes-detalle').tab('show');
                btnClickFiltrarNotes();
                break;
@@ -331,7 +343,7 @@ var ProjectsDetalle = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 10;
+      totalTabs = 12;
       mostrarTab();
       $('#btn-wizard-anterior-detalle').removeClass('hide').addClass('hide');
       $('#btn-wizard-siguiente-detalle').removeClass('hide');

@@ -43,3 +43,21 @@ VALUES (NULL, '1', '1', '1', '1', '1', '37');
 
 INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_permission`, `delete_permission`, `user_id`, `function_id`)
 VALUES (NULL, '1', '1', '1', '1', '1', '37');
+
+
+-- prevailing wage
+ALTER TABLE `project` ADD `prevailing_wage` BOOLEAN NULL AFTER `concrete_class_id`, 
+ADD `prevailing_county_id` INT(11) NULL AFTER `prevailing_wage`,
+ ADD `prevailing_role_id` INT(11) NULL AFTER `prevailing_county_id`,
+  ADD `prevailing_rate` DECIMAL(18,2) NULL AFTER `prevailing_role_id`,
+   ADD INDEX (`prevailing_county_id`), ADD INDEX (`prevailing_role_id`);
+
+
+ALTER TABLE `project` ADD CONSTRAINT `Refprojectprevailingcountyid` FOREIGN KEY (`prevailing_county_id`) REFERENCES 
+`county`(`county_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+ALTER TABLE `project` ADD CONSTRAINT `Refprojectprevailingroleid` FOREIGN KEY (`prevailing_role_id`) REFERENCES
+    `employee_role`(`role_id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+
+
+UPDATE `project` SET `county_id` = NULL;

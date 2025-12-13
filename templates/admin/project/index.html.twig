@@ -386,7 +386,7 @@
                         </div>
                      </a>
                   </li>
-                  <li class="nav-item hide nav-item-hide">
+                  <li class="nav-item">
                      <a class="nav-link wizard-tab" data-item="4" data-bs-toggle="tab" href="#tab-content-ajustes-precio" id="tab-ajustes-precio">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
@@ -424,11 +424,48 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="5" data-bs-toggle="tab" href="#tab-content-concrete-vendor" id="tab-concrete-vendor">
+                     <a class="nav-link wizard-tab" data-item="5" data-bs-toggle="tab" href="#tab-content-prevailing-wage" id="tab-prevailing-wage">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
                               <span class="number">5</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Prevailing Wage</div>
+                              <div class="wizard-desc">Davis-Bacon compliance</div>
+                           </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="6" data-bs-toggle="tab" href="#tab-content-concrete-vendor" id="tab-concrete-vendor">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">6</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Concrete</div>
@@ -461,11 +498,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="6" data-bs-toggle="tab" href="#tab-content-contacts" id="tab-contacts">
+                     <a class="nav-link wizard-tab" data-item="7" data-bs-toggle="tab" href="#tab-content-contacts" id="tab-contacts">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">6</span>
+                              <span class="number">7</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Contacts</div>
@@ -498,11 +535,11 @@
                      </a>
                   </li>
                   <li class="nav-item hide nav-item-hide">
-                     <a class="nav-link wizard-tab" data-item="7" data-bs-toggle="tab" href="#tab-content-archivo" id="tab-archivo">
+                     <a class="nav-link wizard-tab" data-item="8" data-bs-toggle="tab" href="#tab-content-archivo" id="tab-archivo">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">7</span>
+                              <span class="number">8</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Attachments</div>
@@ -586,11 +623,11 @@
                      </a>
                   </li>
                   <li class="nav-item hide nav-item-hide">
-                     <a class="nav-link wizard-tab" data-item="10" data-bs-toggle="tab" href="#tab-content-invoices" id="tab-invoices">
+                     <a class="nav-link wizard-tab" data-item="11" data-bs-toggle="tab" href="#tab-content-invoices" id="tab-invoices">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">10</span>
+                              <span class="number">11</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Invoices</div>
@@ -844,6 +881,56 @@
                                  <option value="2">Completed</option>
                                  <option value="3">Canceled</option>
                               </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="tab-pane fade" id="tab-content-prevailing-wage" role="tabpanel">
+                     <div class="form-group ic-form-group">
+                        <label class="form-label">
+                           <span class="ic-step-number">1</span>
+                           Prevailing Wage
+                        </label>
+                        <div>
+                           <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                              <input type="checkbox" id="prevailing-wage" class="form-check-input event-change" name="prevailing_wage" />
+                              <label class="form-check-label" for="prevailing-wage"> Yes / No </label>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-4" id="select-prevailing-county">
+                              <label class="form-label">
+                                 <span class="ic-step-number">2</span>
+                                 County
+                              </label>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-county" name="prevailing_county_id">
+                                 <option value="">Select</option>
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-4" id="select-prevailing-role">
+                              <label class="form-label">
+                                 <span class="ic-step-number">3</span>
+                                 Labor Type
+                              </label>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-role" name="prevailing_role_id">
+                                 <option value="">Select</option>
+                                 {% for item in employee_roles %}
+                                 <option value="{{ item.roleId }}">{{ item.description }}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Rate </label>
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text">$</span>
+                                 <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate" name="prevailing_rate" />
+                              </div>
                            </div>
                         </div>
                      </div>
@@ -1657,11 +1744,48 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="5" data-bs-toggle="tab" href="#tab-content-concrete-vendor-detalle" id="tab-concrete-vendor-detalle">
+                     <a class="nav-link wizard-tab" data-item="5" data-bs-toggle="tab" href="#tab-content-prevailing-wage-detalle" id="tab-prevailing-wage-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
                               <span class="number">5</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Prevailing Wage</div>
+                              <div class="wizard-desc">Davis-Bacon compliance</div>
+                           </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="6" data-bs-toggle="tab" href="#tab-content-concrete-vendor-detalle" id="tab-concrete-vendor-detalle">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">6</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Concrete</div>
@@ -1694,11 +1818,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="6" data-bs-toggle="tab" href="#tab-content-contacts-detalle" id="tab-contacts-detalle">
+                     <a class="nav-link wizard-tab" data-item="7" data-bs-toggle="tab" href="#tab-content-contacts-detalle" id="tab-contacts-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">6</span>
+                              <span class="number">7</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Contacts</div>
@@ -1731,11 +1855,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="7" data-bs-toggle="tab" href="#tab-content-archivo-detalle" id="tab-archivo-detalle">
+                     <a class="nav-link wizard-tab" data-item="8" data-bs-toggle="tab" href="#tab-content-archivo-detalle" id="tab-archivo-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">7</span>
+                              <span class="number">8</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Attachments</div>
@@ -1768,11 +1892,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="8" data-bs-toggle="tab" href="#tab-content-items-completion-detalle" id="tab-items-completion-detalle">
+                     <a class="nav-link wizard-tab" data-item="9" data-bs-toggle="tab" href="#tab-content-items-completion-detalle" id="tab-items-completion-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">8</span>
+                              <span class="number">9</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Completion</div>
@@ -1782,11 +1906,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="9" data-bs-toggle="tab" href="#tab-content-data-tracking-detalle" id="tab-data-tracking-detalle">
+                     <a class="nav-link wizard-tab" data-item="10" data-bs-toggle="tab" href="#tab-content-data-tracking-detalle" id="tab-data-tracking-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">9</span>
+                              <span class="number">10</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Data Tracking</div>
@@ -1819,11 +1943,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="10" data-bs-toggle="tab" href="#tab-content-invoices-detalle" id="tab-invoices-detalle">
+                     <a class="nav-link wizard-tab" data-item="11" data-bs-toggle="tab" href="#tab-content-invoices-detalle" id="tab-invoices-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">10</span>
+                              <span class="number">11</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Invoices</div>
@@ -1856,11 +1980,11 @@
                      </a>
                   </li>
                   <li class="nav-item">
-                     <a class="nav-link wizard-tab" data-item="11" data-bs-toggle="tab" href="#tab-content-notes-detalle" id="tab-notes-detalle">
+                     <a class="nav-link wizard-tab" data-item="12" data-bs-toggle="tab" href="#tab-content-notes-detalle" id="tab-notes-detalle">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">11</span>
+                              <span class="number">12</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Notes</div>
@@ -2039,6 +2163,49 @@
                                  <option value="2">Completed</option>
                                  <option value="3">Canceled</option>
                               </select>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="tab-pane fade" id="tab-content-prevailing-wage-detalle" role="tabpanel">
+                     <div class="form-group ic-form-group">
+                        <label class="form-label">
+                           <span class="ic-step-number">1</span>
+                           Prevailing Wage
+                        </label>
+                        <div>
+                           <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                              <input type="checkbox" id="prevailing-wage-detalle" class="form-check-input event-change" />
+                              <label class="form-check-label" for="prevailing-wage-detalle"> Yes / No </label>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-4" id="select-prevailing-county">
+                              <label class="form-label">
+                                 <span class="ic-step-number">2</span>
+                                 County
+                              </label>
+                              <input type="text" class="form-control form-control-solid" id="prevailing-county-detalle" disabled />
+                           </div>
+                        </div>
+                     </div>
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-4" id="select-prevailing-role">
+                              <label class="form-label">
+                                 <span class="ic-step-number">3</span>
+                                 Labor Type
+                              </label>
+                              <input type="text" class="form-control form-control-solid" id="prevailing-role-detalle" disabled />
+                           </div>
+                           <div class="col-md-2">
+                              <label class="form-label"> Rate </label>
+                              <div class="input-group input-group-solid">
+                                 <span class="input-group-text">$</span>
+                                 <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate-detalle" name="prevailing_rate" />
+                              </div>
                            </div>
                         </div>
                      </div>

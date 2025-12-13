@@ -9,6 +9,9 @@ use App\Entity\Project;
 use App\Repository\CountyRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\ProjectCountyRepository;
+use App\Entity\ProjectCounty;
+
 use App\Utils\Base;
 
 class CountyService extends Base
@@ -63,6 +66,9 @@ class CountyService extends Base
             return $resultado;
          }
 
+         // eliminar informacion relacionada
+         $this->EliminarInformacionDeCounty($county_id);
+
          $county_descripcion = $entity->getDescription();
 
 
@@ -109,6 +115,10 @@ class CountyService extends Base
                   // verificar si se puede eliminar
                   $se_puede_eliminar = $this->SePuedeEliminarCounty($county_id);
                   if ($se_puede_eliminar === '') {
+
+                     // eliminar informacion relacionada
+                     $this->EliminarInformacionDeCounty($county_id);
+
                      $county_descripcion = $entity->getDescription();
 
                      $em->remove($entity);
@@ -142,6 +152,33 @@ class CountyService extends Base
       return $resultado;
    }
 
+   /**
+    * EliminarInformacionDeCounty: Elimina la informacion relacionada con un county
+    * @param int $county_id Id
+    * @return void
+    */
+   private function EliminarInformacionDeCounty($county_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      // projects county
+      /** @var ProjectCountyRepository $projectCountyRepository */
+      $projectCountyRepository = $this->getDoctrine()->getRepository(ProjectCounty::class);
+      $projectCounties = $projectCountyRepository->ListarProjectsDeCounty($county_id);
+      foreach ($projectCounties as $projectCounty) {
+         $em->remove($projectCounty);
+      }
+
+
+      // projects prevailing county
+      /** @var ProjectRepository $projectRepository */
+      $projectRepository = $this->getDoctrine()->getRepository(Project::class);
+      $projects = $projectRepository->ListarProjectsDePrevailingCounty($county_id);
+      foreach ($projects as $project) {
+         $project->setPrevailingCounty(null);
+      }
+   }
+
 
    /**
     * SePuedeEliminarCounty
@@ -151,14 +188,6 @@ class CountyService extends Base
    private function SePuedeEliminarCounty($county_id)
    {
       $texto_error = '';
-
-      // projects
-      /** @var ProjectRepository $projectRepo */
-      $projectRepo = $this->getDoctrine()->getRepository(Project::class);
-      $projects = $projectRepo->ListarProjectsDeCounty($county_id);
-      if (count($projects) > 0) {
-         $texto_error = "The county could not be deleted because it is related to one or more projects.";
-      }
 
       // estimates
       /** @var EstimateRepository $estimateRepo */

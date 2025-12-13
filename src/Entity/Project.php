@@ -125,6 +125,19 @@ class Project
    #[ORM\Column(name: 'retainage_adjustment_completion', type: 'float', nullable: true)]
    private ?float $retainageAdjustmentCompletion;
 
+   #[ORM\Column(name: 'prevailing_wage', type: 'boolean', nullable: true)]
+   private ?bool $prevailingWage;
+
+   #[ORM\ManyToOne(targetEntity: 'App\Entity\County')]
+   #[ORM\JoinColumn(name: 'prevailing_county_id', referencedColumnName: 'county_id')]
+   private ?County $prevailingCounty;
+
+   #[ORM\ManyToOne(targetEntity: 'App\Entity\EmployeeRole')]
+   #[ORM\JoinColumn(name: 'prevailing_role_id', referencedColumnName: 'role_id')]
+   private ?EmployeeRole $prevailingRole;
+
+   #[ORM\Column(name: 'prevailing_rate', type: 'float', nullable: true)]
+   private ?float $prevailingRate;
 
    public function getProjectId(): ?int
    {
@@ -500,5 +513,45 @@ class Project
    public function setRetainageAdjustmentCompletion(?float $retainageAdjustmentCompletion): void
    {
       $this->retainageAdjustmentCompletion = $retainageAdjustmentCompletion;
+   }
+
+   public function getPrevailingWage(): ?bool
+   {
+      return $this->prevailingWage;
+   }
+
+   public function setPrevailingWage(?bool $prevailingWage): void
+   {
+      $this->prevailingWage = $prevailingWage;
+   }
+
+   public function getPrevailingCounty(): ?County
+   {
+      return $this->prevailingCounty;
+   }
+
+   public function setPrevailingCounty(?County $prevailingCounty): void
+   {
+      $this->prevailingCounty = $prevailingCounty;
+   }
+
+   public function getPrevailingRole(): ?EmployeeRole
+   {
+      return $this->prevailingRole;
+   }
+
+   public function setPrevailingRole(?EmployeeRole $prevailingRole): void
+   {
+      $this->prevailingRole = $prevailingRole;
+   }
+
+   public function getPrevailingRate(): ?float
+   {
+      return $this->prevailingRate;
+   }
+
+   public function setPrevailingRate(?float $prevailingRate): void
+   {
+      $this->prevailingRate = $prevailingRate;
    }
 }

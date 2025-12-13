@@ -6,6 +6,9 @@ use App\Entity\EmployeeRole;
 use App\Entity\Employee;
 use App\Repository\EmployeeRoleRepository;
 use App\Repository\EmployeeRepository;
+use App\Repository\ProjectRepository;
+use App\Entity\Project;
+
 use App\Utils\Base;
 
 class EmployeeRoleService extends Base
@@ -65,6 +68,9 @@ class EmployeeRoleService extends Base
             return $resultado;
          }
 
+         // eliminar informacion relacionada
+         $this->EliminarInformacionRelacionada($role_id);
+
          $description = $entity->getDescription();
 
          $em->remove($entity);
@@ -111,6 +117,10 @@ class EmployeeRoleService extends Base
                   $employeeRepo = $this->getDoctrine()->getRepository(Employee::class);
                   $employees = $employeeRepo->ListarEmployeesDeRole($role_id);
                   if (count($employees) === 0) {
+
+                     // eliminar informacion relacionada
+                     $this->EliminarInformacionRelacionada($role_id);
+
                      $description = $entity->getDescription();
 
                      $em->remove($entity);
@@ -139,6 +149,23 @@ class EmployeeRoleService extends Base
       }
 
       return $resultado;
+   }
+
+   /**
+    * EliminarInformacionRelacionada: Elimina la informacion relacionada con un employee role
+    * @param int $role_id Id
+    * @return void
+    */
+   private function EliminarInformacionRelacionada($role_id)
+   {
+
+      // projects prevailing role
+      /** @var ProjectRepository $projectRepository */
+      $projectRepository = $this->getDoctrine()->getRepository(Project::class);
+      $projects = $projectRepository->ListarProjectsDePrevailingRole($role_id);
+      foreach ($projects as $project) {
+         $project->setPrevailingRole(null);
+      }
    }
 
    /**

@@ -11,6 +11,7 @@ use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
+use App\Entity\EmployeeRole;
 use App\Utils\Admin\ProjectService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -64,6 +65,10 @@ class ProjectController extends AbstractController
             $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
                ->ListarOrdenados();
 
+            // employee roles
+            $employee_roles = $this->projectService->getDoctrine()->getRepository(EmployeeRole::class)
+               ->ListarOrdenados();
+
             return $this->render('admin/project/index.html.twig', array(
                'permiso' => $permiso[0],
                'companies' => $companies,
@@ -75,6 +80,7 @@ class ProjectController extends AbstractController
                'countys' => $countys,
                'concrete_vendors' => $concrete_vendors,
                'concrete_classes' => $concrete_classes,
+               'employee_roles' => $employee_roles,
                'direccion_url' => $this->projectService->ObtenerURL()
             ));
          }
@@ -187,6 +193,11 @@ class ProjectController extends AbstractController
       $retainage_adjustment_percentage = $request->get('retainage_adjustment_percentage');
       $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
 
+      $prevailing_wage = $request->get('prevailing_wage');
+      $prevailing_county_id = $request->get('prevailing_county_id');
+      $prevailing_role_id = $request->get('prevailing_role_id');
+      $prevailing_rate = $request->get('prevailing_rate');
+
 
       // items
       $items = $request->get('items');
@@ -242,7 +253,11 @@ class ProjectController extends AbstractController
                $retainage,
                $retainage_percentage,
                $retainage_adjustment_percentage,
-               $retainage_adjustment_completion
+               $retainage_adjustment_completion,
+               $prevailing_wage,
+               $prevailing_county_id,
+               $prevailing_role_id,
+               $prevailing_rate
             );
          } else {
             $resultado = $this->projectService->ActualizarProject(
@@ -283,7 +298,11 @@ class ProjectController extends AbstractController
                $retainage,
                $retainage_percentage,
                $retainage_adjustment_percentage,
-               $retainage_adjustment_completion
+               $retainage_adjustment_completion,
+               $prevailing_wage,
+               $prevailing_county_id,
+               $prevailing_role_id,
+               $prevailing_rate
             );
          }
 
