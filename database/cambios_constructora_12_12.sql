@@ -61,3 +61,5 @@ ALTER TABLE `project` ADD CONSTRAINT `Refprojectprevailingroleid` FOREIGN KEY (`
 
 
 UPDATE `project` SET `county_id` = NULL;
+
+ALTER TABLE `invoice_item` CHANGE `unpaid_from_previous` `unpaid_from_previous` DECIMAL(18,6) NULL;
