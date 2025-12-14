@@ -682,83 +682,100 @@ class InvoiceService extends Base
 
          // IMPORTANTE: Recalcular unpaid_qty aplicando las reglas de quantity_brought_forward
          $project_item_id = $value->getProjectItem()->getId();
-         $totalDebtAccumulated = 0; // Deuda acumulada (suma de quantity_final de anteriores)
-         $hasPaidInvoice = false;
-         $totalPaidQty = 0; // Pagos acumulados
-         $totalQuantityBroughtForward = 0; // QBF acumulado
 
-         // Obtener todos los invoice items anteriores de este project_item
+         // Obtener todos los invoices del proyecto y ordenarlos
+         $project_id = $currentInvoice->getProject()->getProjectId();
+         /** @var InvoiceRepository $invoiceRepo */
+         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+         $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+
+         // Ordenar por fecha/ID (orden determinístico)
+         usort($allInvoices, function ($a, $b) {
+            /** @var Invoice $a */
+            /** @var Invoice $b */
+            $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+            if ($dateCompare != 0) {
+               return $dateCompare;
+            }
+            return $a->getInvoiceId() <=> $b->getInvoiceId();
+         });
+
+         // Obtener todos los invoice items de este project_item
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+         $invoiceItemMap = [];
+         foreach ($allInvoiceItems as $invoiceItem) {
+            /** @var InvoiceItem $invoiceItem */
+            $invoice_id = $invoiceItem->getInvoice()->getInvoiceId();
+            $invoiceItemMap[$invoice_id] = $invoiceItem;
+         }
 
-         foreach ($allInvoiceItems as $previousItem) {
-            /** @var InvoiceItem $previousItem */
-            $previousInvoice = $previousItem->getInvoice();
-            $previous_invoice_id = $previousInvoice->getInvoiceId();
-            $previous_invoice_date = $previousInvoice->getStartDate();
+         // Encontrar el índice del invoice actual
+         $currentIndex = -1;
+         foreach ($allInvoices as $idx => $invoice) {
+            /** @var Invoice $invoice */
+            if ($invoice->getInvoiceId() == $currentInvoiceId) {
+               $currentIndex = $idx;
+               break;
+            }
+         }
 
-            // Solo considerar invoices anteriores al invoice actual
-            if ($currentInvoiceDate && $currentInvoiceId) {
-               if (
-                  $previous_invoice_date < $currentInvoiceDate ||
-                  ($previous_invoice_date == $currentInvoiceDate && $previous_invoice_id < $currentInvoiceId)
-               ) {
-                  $prev_quantity = $previousItem->getQuantity() ?? 0;
-                  $prev_quantity_brought_forward = $previousItem->getQuantityBroughtForward() ?? 0;
-                  $prev_paid_qty = $previousItem->getPaidQty() ?? 0;
+         // Calcular acumulados previos (solo invoices anteriores al actual)
+         $sumPrevItemQty = 0; // SUM(itemQty) para j < i
+         $sumPrevPaidQty = 0; // SUM(paidQty) para j < i
+         $qbfTotalPrev = 0; // SUM(qbf) para j < i
 
-                  $prev_quantity_final = $prev_quantity + $prev_quantity_brought_forward;
+         for ($j = 0; $j < $currentIndex; $j++) {
+            $prevInvoice = $allInvoices[$j];
+            /** @var Invoice $prevInvoice */
+            $prev_invoice_id = $prevInvoice->getInvoiceId();
+            $prev_invoice_item = $invoiceItemMap[$prev_invoice_id] ?? null;
 
-                  // Acumular deuda real (quantity_final de cada invoice anterior)
-                  $totalDebtAccumulated += $prev_quantity_final;
+            if ($prev_invoice_item != null) {
+               $prev_item_qty = $prev_invoice_item->getQuantity() ?? 0;
+               $prev_paid_qty = $prev_invoice_item->getPaidQty() ?? 0;
+               $prev_qbf = $prev_invoice_item->getQuantityBroughtForward() ?? 0;
 
-                  // Acumular pagos
-                  $totalPaidQty += $prev_paid_qty;
+               $sumPrevItemQty += $prev_item_qty;
+               $sumPrevPaidQty += $prev_paid_qty;
+               $qbfTotalPrev += $prev_qbf;
+            }
+         }
 
-                  // Acumular QBF
-                  $totalQuantityBroughtForward += $prev_quantity_brought_forward;
+         // Obtener QBF del invoice actual
+         $current_qbf = $value->getQuantityBroughtForward() ?? 0;
+         $qbfTotalPrevAndCurrent = $qbfTotalPrev + $current_qbf;
 
-                  if ($prev_paid_qty > 0) {
-                     $hasPaidInvoice = true;
-                  }
-               }
+         // Verificar si hay pagos en toda la cadena (hasta este invoice)
+         $hasAnyPayment = ($sumPrevPaidQty > 0);
+
+         // Aplicar reglas
+         if (!$hasAnyPayment) {
+            // Regla 1: Sin pagos
+            // unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
+            $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+         } else {
+            // Regla 2: Con pagos
+            // Deuda real previa (sin QBF)
+            $realDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
+
+            if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
+               // QBF se desactiva: usar deuda real
+               $unpaid_qty = $realDebtPrev;
+            } else {
+               // QBF sigue activo
+               $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
             }
          }
 
          $quantity = $value->getQuantity();
-
          $quantity_brought_forward = $value->getQuantityBroughtForward();
          $quantity_completed = $quantity + $quantity_from_previous;
 
          $amount = $quantity * $price;
-
          $total_amount = $quantity_completed * $price;
-
          $amount_from_previous = $quantity_from_previous * $price;
-
          $amount_completed = $quantity_completed * $price;
-
          $paid_qty = $value->getPaidQty();
-
-         // Aplicar reglas para calcular unpaid_qty
-         if (!$hasPaidInvoice) {
-            // Regla 1: Si no hay ningún invoice pagado
-            // unpaid_qty = deuda acumulada - quantity_brought_forward de todos los invoices anteriores
-            $unpaid_qty = $totalDebtAccumulated - $totalQuantityBroughtForward;
-            $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-         } else {
-            // Regla 2: Si hay algún invoice pagado
-            // Si paid_qty acumulado > QBF acumulado, entonces QBF se desactiva
-            // y unpaid_qty = deuda real acumulada - pagos acumulados (sin restar QBF)
-            if ($totalPaidQty > $totalQuantityBroughtForward) {
-               // QBF se desactiva: usar deuda real
-               $unpaid_qty = $totalDebtAccumulated - $totalPaidQty;
-               $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-            } else {
-               // QBF sigue activo: restar QBF
-               $unpaid_qty = $totalDebtAccumulated - $totalPaidQty - $totalQuantityBroughtForward;
-               $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-            }
-         }
 
          // unpaid_from_previous se mantiene igual a unpaid_qty para compatibilidad
          $unpaid_from_previous = $unpaid_qty;
@@ -1297,17 +1314,15 @@ class InvoiceService extends Base
 
    /**
     * ActualizarUnpaidQtyPorQuantityBroughtForward
-    * Actualiza el unpaid_qty del invoice actual y todos los invoices siguientes cuando se modifica quantity_brought_forward
+    * Recalcula unpaid_qty para el invoice afectado y todos los posteriores cuando se modifica QBF
     * 
-    * Regla 1 (Si no hay ningún invoice pagado): 
-    *   unpaid_qty = suma de unpaid_qty de pagos anteriores - quantity_brought_forward de todos los invoices anteriores
-    * 
-    * Regla 2 (Si hay algún invoice pagado):
-    *   Si paid_qty > quantity_brought_forward en los invoices de ese item, entonces
-    *   unpaid_qty = suma de unpaid_qty de pagos anteriores (como está ahora)
+    * Implementa las reglas:
+    * - Regla 1 (sin pagos): unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
+    * - Regla 2 (con pagos): Si sumPrevPaidQty > qbfTotalPrevAndCurrent => unpaidQty = realDebtPrev
+    *                        Sino => unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
     * 
     * @param Invoice $currentInvoice El invoice que se está modificando
-    * @param array $items Los items modificados
+    * @param array $items Los items modificados (con project_item_id)
     * @return void
     */
    private function ActualizarUnpaidQtyPorQuantityBroughtForward($currentInvoice, $items)
@@ -1318,34 +1333,14 @@ class InvoiceService extends Base
 
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
       // Obtener todos los invoices del proyecto ordenados por fecha
       $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
 
-      // Filtrar el invoice actual y todos los siguientes
-      $invoicesToUpdate = [];
-      $currentInvoiceFound = false;
-
-      foreach ($allInvoices as $invoice) {
-         /** @var Invoice $invoice */
-         if ($invoice->getInvoiceId() == $current_invoice_id) {
-            $invoicesToUpdate[] = $invoice;
-            $currentInvoiceFound = true;
-         } elseif (
-            $invoice->getStartDate() > $current_invoice_start_date ||
-            ($invoice->getStartDate() == $current_invoice_start_date && $invoice->getInvoiceId() > $current_invoice_id)
-         ) {
-            $invoicesToUpdate[] = $invoice;
-         }
-      }
-
-      // Si el invoice actual no está en la lista (recién creado), agregarlo
-      if (!$currentInvoiceFound) {
-         $invoicesToUpdate[] = $currentInvoice;
-      }
-
-      // Ordenar por fecha de inicio ascendente, luego por ID
-      usort($invoicesToUpdate, function ($a, $b) {
+      // Ordenar todos los invoices por fecha/ID (orden determinístico)
+      usort($allInvoices, function ($a, $b) {
          /** @var Invoice $a */
          /** @var Invoice $b */
          $dateCompare = $a->getStartDate() <=> $b->getStartDate();
@@ -1355,97 +1350,107 @@ class InvoiceService extends Base
          return $a->getInvoiceId() <=> $b->getInvoiceId();
       });
 
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-
-      // Para cada item modificado
+      // Para cada item modificado, recalcular desde el invoice afectado hacia adelante
       foreach ($items as $itemData) {
          $project_item_id = $itemData->project_item_id ?? null;
          if (!$project_item_id) {
             continue;
          }
 
-         // Verificar si hay algún invoice pagado para este project_item (en invoices anteriores)
-         $hasPaidInvoice = false;
-         $totalPaidQty = 0;
-         $totalQuantityBroughtForward = 0;
-
-         // Obtener todos los invoice items de este project_item
+         // Obtener todos los invoice items de este project_item ordenados
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
 
-         // Calcular totales de invoices anteriores
-         $totalDebtAccumulated = 0; // Deuda acumulada (suma de quantity_final de anteriores)
-         $totalPaidQty = 0; // Pagos acumulados
-         $totalQuantityBroughtForward = 0; // QBF acumulado
-
+         // Crear un mapa: invoice_id => invoiceItem para acceso rápido
+         $invoiceItemMap = [];
          foreach ($allInvoiceItems as $invoiceItem) {
             /** @var InvoiceItem $invoiceItem */
-            $invoice = $invoiceItem->getInvoice();
-            $invoiceDate = $invoice->getStartDate();
-            $invoiceId = $invoice->getInvoiceId();
+            $invoice_id = $invoiceItem->getInvoice()->getInvoiceId();
+            $invoiceItemMap[$invoice_id] = $invoiceItem;
+         }
 
-            // Solo considerar invoices anteriores al invoice actual
-            if (
-               $invoiceDate < $current_invoice_start_date ||
-               ($invoiceDate == $current_invoice_start_date && $invoiceId < $current_invoice_id)
-            ) {
-               $quantity = $invoiceItem->getQuantity() ?? 0;
-               $quantityBroughtForward = $invoiceItem->getQuantityBroughtForward() ?? 0;
-               $paidQty = $invoiceItem->getPaidQty() ?? 0;
-
-               $quantity_final = $quantity + $quantityBroughtForward;
-
-               // Acumular deuda real (quantity_final de cada invoice anterior)
-               $totalDebtAccumulated += $quantity_final;
-
-               // Acumular pagos
-               $totalPaidQty += $paidQty;
-
-               // Acumular QBF
-               $totalQuantityBroughtForward += $quantityBroughtForward;
-
-               if ($paidQty > 0) {
-                  $hasPaidInvoice = true;
-               }
+         // Encontrar el índice del invoice actual en la lista ordenada
+         $startIndex = -1;
+         foreach ($allInvoices as $idx => $invoice) {
+            /** @var Invoice $invoice */
+            if ($invoice->getInvoiceId() == $current_invoice_id) {
+               $startIndex = $idx;
+               break;
             }
          }
 
-         // Para cada invoice a actualizar (actual y siguientes)
-         foreach ($invoicesToUpdate as $invoiceToUpdate) {
-            /** @var Invoice $invoiceToUpdate */
-            $invoice_item = $invoiceItemRepo->BuscarItem($invoiceToUpdate->getInvoiceId(), $project_item_id);
+         if ($startIndex === -1) {
+            continue; // Invoice no encontrado, saltar este item
+         }
 
-            if ($invoice_item != null) {
-               // Aplicar reglas
-               // IMPORTANTE: 
-               // - totalDebtAccumulated = suma de quantity_final de todos los invoices anteriores
-               // - totalPaidQty = suma de paid_qty de todos los invoices anteriores
-               // - totalQuantityBroughtForward = suma de quantity_brought_forward de todos los invoices anteriores
+         // Recalcular desde el invoice actual hacia adelante
+         for ($i = $startIndex; $i < count($allInvoices); $i++) {
+            $invoice = $allInvoices[$i];
+            /** @var Invoice $invoice */
+            $invoice_id = $invoice->getInvoiceId();
 
-               if (!$hasPaidInvoice) {
-                  // Regla 1: Si no hay ningún invoice pagado
-                  // unpaid_qty = deuda acumulada - quantity_brought_forward de todos los invoices anteriores
-                  $unpaid_qty = $totalDebtAccumulated - $totalQuantityBroughtForward;
-                  $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-               } else {
-                  // Regla 2: Si hay algún invoice pagado
-                  // Si paid_qty acumulado > QBF acumulado, entonces QBF se desactiva
-                  // y unpaid_qty = deuda real acumulada - pagos acumulados (sin restar QBF)
-                  if ($totalPaidQty > $totalQuantityBroughtForward) {
-                     // QBF se desactiva: usar deuda real
-                     $unpaid_qty = $totalDebtAccumulated - $totalPaidQty;
-                     $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-                  } else {
-                     // QBF sigue activo: restar QBF
-                     $unpaid_qty = $totalDebtAccumulated - $totalPaidQty - $totalQuantityBroughtForward;
-                     $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
-                  }
-               }
-
-               // Actualizar unpaid_qty y unpaid_from_previous
-               $invoice_item->setUnpaidQty($unpaid_qty);
-               $invoice_item->setUnpaidFromPrevious($unpaid_qty);
+            // Obtener el invoice item para este invoice y project_item
+            $invoice_item = $invoiceItemMap[$invoice_id] ?? null;
+            if ($invoice_item == null) {
+               continue; // No hay item para este invoice, saltar
             }
+
+            // Calcular acumulados previos (solo invoices anteriores a este)
+            $sumPrevItemQty = 0; // SUM(itemQty) para j < i
+            $sumPrevPaidQty = 0; // SUM(paidQty) para j < i
+            $qbfTotalPrev = 0; // SUM(qbf) para j < i
+
+            for ($j = 0; $j < $i; $j++) {
+               $prevInvoice = $allInvoices[$j];
+               /** @var Invoice $prevInvoice */
+               $prev_invoice_id = $prevInvoice->getInvoiceId();
+               $prev_invoice_item = $invoiceItemMap[$prev_invoice_id] ?? null;
+
+               if ($prev_invoice_item != null) {
+                  $prev_item_qty = $prev_invoice_item->getQuantity() ?? 0;
+                  $prev_paid_qty = $prev_invoice_item->getPaidQty() ?? 0;
+                  $prev_qbf = $prev_invoice_item->getQuantityBroughtForward() ?? 0;
+
+                  $sumPrevItemQty += $prev_item_qty;
+                  $sumPrevPaidQty += $prev_paid_qty;
+                  $qbfTotalPrev += $prev_qbf;
+               }
+            }
+
+            // Obtener QBF del invoice actual
+            $current_qbf = $invoice_item->getQuantityBroughtForward() ?? 0;
+            if ($invoice_id == $current_invoice_id) {
+               // Si es el invoice que se está modificando, usar el valor del array
+               $current_qbf = isset($itemData->quantity_brought_forward) ? (float)$itemData->quantity_brought_forward : 0;
+            }
+
+            // QBF total incluyendo el invoice actual
+            $qbfTotalPrevAndCurrent = $qbfTotalPrev + $current_qbf;
+
+            // Verificar si hay pagos en toda la cadena (hasta este invoice)
+            $hasAnyPayment = ($sumPrevPaidQty > 0);
+
+            // Aplicar reglas
+            if (!$hasAnyPayment) {
+               // Regla 1: Sin pagos
+               // unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
+               $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+            } else {
+               // Regla 2: Con pagos
+               // Deuda real previa (sin QBF)
+               $realDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
+
+               if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
+                  // QBF se desactiva: usar deuda real
+                  $unpaid_qty = $realDebtPrev;
+               } else {
+                  // QBF sigue activo
+                  $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+               }
+            }
+
+            // Actualizar en la entidad
+            $invoice_item->setUnpaidQty($unpaid_qty);
+            $invoice_item->setUnpaidFromPrevious($unpaid_qty);
          }
       }
    }
