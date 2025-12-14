@@ -1275,16 +1275,6 @@ var Invoices = (function () {
          // selectedDates[0] => objeto Date nativo (si hay selección)
          console.log('Cambió la fecha:', dateStr, selectedDates[0]);
 
-         const d = selectedDates?.[0];
-         if (!d) return;
-
-         FlatpickrUtil.setMinDate('datetimepicker-end-date', d);
-
-         const hasta = FlatpickrUtil.getDate('datetimepicker-end-date');
-         if (hasta && hasta < d) {
-            FlatpickrUtil.setDate('datetimepicker-end-date', d);
-         }
-
          listarItems();
       });
 
@@ -1292,16 +1282,6 @@ var Invoices = (function () {
          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
          // selectedDates[0] => objeto Date nativo (si hay selección)
          console.log('Cambió la fecha:', dateStr, selectedDates[0]);
-
-         const d = selectedDates?.[0];
-         if (!d) return;
-
-         FlatpickrUtil.setMaxDate('datetimepicker-start-date', d);
-
-         const desde = FlatpickrUtil.getDate('datetimepicker-start-date');
-         if (desde && desde > d) {
-            FlatpickrUtil.setDate('datetimepicker-start-date', d);
-         }
 
          listarItems();
       });
@@ -1369,9 +1349,6 @@ var Invoices = (function () {
 
       FlatpickrUtil.setDate('datetimepicker-start-date', startDate);
       FlatpickrUtil.setDate('datetimepicker-end-date', endDate);
-
-      FlatpickrUtil.setMaxDate('datetimepicker-start-date', endDate);
-      FlatpickrUtil.setMinDate('datetimepicker-end-date', startDate);
    };
 
    var listarItems = function () {

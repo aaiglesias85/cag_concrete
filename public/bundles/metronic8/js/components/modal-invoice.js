@@ -24,9 +24,6 @@ var ModalInvoice = (function () {
       FlatpickrUtil.clear('start-date-invoice-modal');
       FlatpickrUtil.clear('end-date-invoice-modal');
 
-      FlatpickrUtil.setMaxDate('start-date-invoice-modal', null);
-      FlatpickrUtil.setMinDate('end-date-invoice-modal', null);
-
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('invoice-modal-form'));
 
@@ -410,9 +407,6 @@ var ModalInvoice = (function () {
 
       FlatpickrUtil.setDate('start-date-invoice-modal', startDate);
       FlatpickrUtil.setDate('end-date-invoice-modal', endDate);
-
-      FlatpickrUtil.setMaxDate('start-date-invoice-modal', endDate);
-      FlatpickrUtil.setMinDate('end-date-invoice-modal', startDate);
    };
 
    var listarItems = function () {
