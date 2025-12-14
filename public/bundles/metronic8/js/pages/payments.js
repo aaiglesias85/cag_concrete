@@ -978,11 +978,13 @@ var Payments = (function () {
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="width: 200px; white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
+               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
+                  data || ''
+               }</span>${icono}</div>`;
             },
          },
          // unit
@@ -990,7 +992,7 @@ var Payments = (function () {
             targets: 1,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return DatatableUtil.getRenderColumnDiv(data, 50);
+               return `<div style="width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // contract_qty
@@ -1001,11 +1003,16 @@ var Payments = (function () {
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="width: 100px; white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          // price
@@ -1016,18 +1023,13 @@ var Payments = (function () {
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
-            },
-         },
-         // contract_amount
-         {
-            targets: 4,
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
+                  data,
+               )}</span>${icono}</div>`;
             },
          },
          // contract_amount
@@ -1035,7 +1037,7 @@ var Payments = (function () {
             targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
          // quantity
@@ -1043,7 +1045,7 @@ var Payments = (function () {
             targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // amount
@@ -1051,7 +1053,7 @@ var Payments = (function () {
             targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
          // paid_qty
@@ -1105,7 +1107,7 @@ var Payments = (function () {
             targets: 10,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
          {

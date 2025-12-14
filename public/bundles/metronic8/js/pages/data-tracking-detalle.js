@@ -401,25 +401,27 @@ var DataTrackingDetalle = (function () {
                if (row.change_order && !row.isGroupHeader) {
                   var project_item_id = row.project_item_id || row.item_id;
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
+               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
+                  data || ''
+               }</span>${icono}</div>`;
             },
          },
          {
             targets: 1,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
             targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
@@ -430,18 +432,23 @@ var DataTrackingDetalle = (function () {
                if (row.has_quantity_history && !row.isGroupHeader) {
                   var project_item_id = row.project_item_id || row.item_id;
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          {
             targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
             },
          },
          {
@@ -452,11 +459,13 @@ var DataTrackingDetalle = (function () {
                if (row.has_price_history && !row.isGroupHeader) {
                   var project_item_id = row.project_item_id || row.item_id;
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
+                  data,
+               )}</span>${icono}</div>`;
             },
          },
          {

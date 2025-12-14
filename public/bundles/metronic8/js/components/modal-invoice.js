@@ -605,11 +605,13 @@ var ModalInvoice = (function () {
                var icono = '';
                if (row.change_order) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<span>${DatatableUtil.getRenderColumnDiv(data, 200)}${icono}</span>`;
+               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
+                  data || ''
+               }</span>${icono}</div>`;
             },
          },
          // unit
@@ -617,7 +619,7 @@ var ModalInvoice = (function () {
             targets: 1,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // price
@@ -632,7 +634,12 @@ var ModalInvoice = (function () {
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; justify-content: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          // contract_qty
@@ -643,11 +650,16 @@ var ModalInvoice = (function () {
                var icono = '';
                if (row.has_quantity_history) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; justify-content: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          // contract_amount
@@ -655,7 +667,7 @@ var ModalInvoice = (function () {
             targets: 4,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data, 2, '.', ',')}</div>`;
             },
          },
          // quantity_completed
@@ -663,7 +675,7 @@ var ModalInvoice = (function () {
             targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // amount_completed
@@ -671,7 +683,7 @@ var ModalInvoice = (function () {
             targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data, 2, '.', ',')}</div>`;
             },
          },
          // unpaid_qty
@@ -679,7 +691,7 @@ var ModalInvoice = (function () {
             targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<div class="w-100px"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span></div>`;
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
             },
          },
          // unpaid_amount
@@ -687,7 +699,7 @@ var ModalInvoice = (function () {
             targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data, 2, '.', ',')}</div>`;
             },
          },
          // quantity
@@ -695,7 +707,7 @@ var ModalInvoice = (function () {
             targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // amount
@@ -703,7 +715,7 @@ var ModalInvoice = (function () {
             targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data, 2, '.', ',')}</div>`;
             },
          },
          // quantity_brought_forward
@@ -715,7 +727,7 @@ var ModalInvoice = (function () {
                if (invoice === null || !invoice.paid) {
                   return `<div class="w-100px"><input type="number" class="form-control quantity_brought_forward" value="${value}" data-position="${row.posicion}" step="any" /></div>`;
                }
-               return DatatableUtil.getRenderColumnDiv(value, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${value}</div>`;
             },
          },
          // quantity_final
@@ -723,7 +735,7 @@ var ModalInvoice = (function () {
             targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 100);
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          // amount_final
@@ -731,7 +743,7 @@ var ModalInvoice = (function () {
             targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data, 2, '.', ',')}</span>`;
+               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data, 2, '.', ',')}</div>`;
             },
          },
 

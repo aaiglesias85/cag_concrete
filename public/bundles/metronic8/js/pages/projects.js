@@ -1635,25 +1635,27 @@ var Projects = (function () {
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
+               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
+                  data || ''
+               }</span>${icono}</div>`;
             },
          },
          {
             targets: 1,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
             targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
@@ -1663,11 +1665,16 @@ var Projects = (function () {
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          {
@@ -1677,11 +1684,13 @@ var Projects = (function () {
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
+               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
+                  data,
+               )}</span>${icono}</div>`;
             },
          },
          {
@@ -4059,18 +4068,20 @@ var Projects = (function () {
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
+               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
+                  data || ''
+               }</span>${icono}</div>`;
             },
          },
          {
             targets: 1,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
@@ -4081,11 +4092,16 @@ var Projects = (function () {
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="width: 180px; white-space: nowrap; text-align: right;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
+               return `<div style="width: 180px; overflow: hidden; white-space: nowrap; text-align: right; display: flex; align-items: center; justify-content: flex-end;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: right;">${MyApp.formatearNumero(
+                  data,
+                  2,
+                  '.',
+                  ',',
+               )}</span>${icono}</div>`;
             },
          },
          {
@@ -4096,11 +4112,13 @@ var Projects = (function () {
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View price history"></i>';
                }
-               return `<div style="width: 180px; white-space: nowrap; text-align: right;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
+               return `<div style="width: 180px; overflow: hidden; white-space: nowrap; text-align: right; display: flex; align-items: center; justify-content: flex-end;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: right;">${MyApp.formatMoney(
+                  data,
+               )}</span>${icono}</div>`;
             },
          },
          {
