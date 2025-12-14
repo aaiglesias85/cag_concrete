@@ -1242,18 +1242,36 @@ var DataTracking = (function () {
          var completionPercentage = $('#item-completion-percentage');
 
          if (item_id && item_id !== '') {
-            // Buscar el item en el array items
-            var selectedItem = items.find(function (item) {
-               return item.project_item_id == item_id;
-            });
+            // Consultar el porcentaje directamente al backend
+            var formData = new FormData();
+            formData.set('project_item_id', item_id);
 
-            if (selectedItem && selectedItem.porciento_completion !== undefined) {
-               var percentage = MyApp.formatearNumero(selectedItem.porciento_completion, 2, '.', ',');
-               completionPercentage.text(percentage);
-               completionInfo.show();
-            } else {
-               completionInfo.hide();
-            }
+            // Mostrar loading
+            completionInfo.show();
+            completionPercentage.text('...');
+
+            axios
+               .post('project/obtenerPorcentajeCompletionItem', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        var percentage = MyApp.formatearNumero(response.porcentaje_completion, 2, '.', ',');
+                        completionPercentage.text(percentage);
+                        completionInfo.show();
+                     } else {
+                        toastr.error(response.error || 'Error al obtener el porcentaje de completion', '');
+                        completionInfo.hide();
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                     completionInfo.hide();
+                  }
+               })
+               .catch(function (error) {
+                  MyUtil.catchErrorAxios(error);
+                  completionInfo.hide();
+               });
          } else {
             completionInfo.hide();
          }

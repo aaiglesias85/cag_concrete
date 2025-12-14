@@ -66,6 +66,10 @@ listarHistorialItemProjectAdmin:
    path: /project/listarHistorialItem
    defaults: { _controller: App\Controller\Admin\ProjectController::listarHistorialItem, _format: json }
 
+obtenerPorcentajeCompletionItemProjectAdmin:
+   path: /project/obtenerPorcentajeCompletionItem
+   defaults: { _controller: App\Controller\Admin\ProjectController::obtenerPorcentajeCompletionItem, _format: json }
+
 eliminarItemProjectAdmin:
    path: /project/eliminarItem
    defaults: { _controller: App\Controller\Admin\ProjectController::eliminarItem, _format: json }

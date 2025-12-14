@@ -661,6 +661,29 @@ class ProjectController extends AbstractController
    }
 
    /**
+    * obtenerPorcentajeCompletionItem Acción que obtiene el porcentaje de completion de un item
+    *
+    */
+   public function obtenerPorcentajeCompletionItem(Request $request)
+   {
+      $project_item_id = $request->get('project_item_id');
+
+      try {
+         $porcentaje = $this->projectService->ObtenerPorcentajeCompletionItem($project_item_id);
+
+         $resultadoJson['success'] = true;
+         $resultadoJson['porcentaje_completion'] = $porcentaje;
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * listarHistorialItem Acción que lista el historial de cambios de un item
     *
     */

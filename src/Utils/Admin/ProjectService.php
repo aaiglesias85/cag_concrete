@@ -1556,6 +1556,37 @@ class ProjectService extends Base
    }
 
    /**
+    * ObtenerPorcentajeCompletionItem: Obtiene el porcentaje de completion de un item específico
+    * @param int $project_item_id Id del project item
+    * @return float
+    * @author Marcel
+    */
+   public function ObtenerPorcentajeCompletionItem($project_item_id)
+   {
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $projectItem = $projectItemRepo->find($project_item_id);
+
+      if (!$projectItem) {
+         return 0;
+      }
+
+      $quantity = $projectItem->getQuantity();
+
+      if ($quantity <= 0) {
+         return 0;
+      }
+
+      /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
+
+      $porciento_completion = $quantity_completed / $quantity * 100;
+
+      return $porciento_completion;
+   }
+
+   /**
     * EliminarProject: Elimina un rol en la BD
     * @param int $project_id Id
     * @author Marcel
