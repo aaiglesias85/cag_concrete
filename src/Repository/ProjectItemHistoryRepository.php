@@ -39,7 +39,7 @@ class ProjectItemHistoryRepository extends ServiceEntityRepository
    {
       $consulta = $this->createQueryBuilder('h')
          ->leftJoin('h.user', 'u')
-         ->where('u.userId = :user_id')
+         ->where('u.usuarioId = :user_id')
          ->setParameter('user_id', $user_id);
 
       return $consulta->getQuery()->getResult();
@@ -83,4 +83,3 @@ class ProjectItemHistoryRepository extends ServiceEntityRepository
       return count($consulta->getQuery()->getResult()) > 0;
    }
 }
-
