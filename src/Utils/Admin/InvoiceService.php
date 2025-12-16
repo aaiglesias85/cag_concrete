@@ -755,15 +755,23 @@ class InvoiceService extends Base
             $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
          } else {
             // Regla 2: Con pagos
-            // Deuda real previa (sin QBF)
+            // Deuda acumulada real = suma de quantity_final de invoices anteriores
+            // quantity_final = quantity + quantity_brought_forward
+            $realDebtAccumulated = $sumPrevItemQty + $qbfTotalPrev;
+
+            // Deuda real previa (sin QBF) = quantity - paid_qty
             $realDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
 
             if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
-               // QBF se desactiva: usar deuda real
+               // QBF se desactiva: usar deuda real (quantity - paid_qty)
+               // Cuando QBF se desactiva, la deuda acumulada es solo quantity (sin QBF)
                $unpaid_qty = $realDebtPrev;
             } else {
                // QBF sigue activo
-               $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+               // unpaid_qty = deuda acumulada real - pagos acumulados
+               // Donde deuda acumulada real = sumPrevItemQty + qbfTotalPrev
+               // Los pagos ya incorporan el QBF (si fue aplicado), por lo que solo restamos los pagos
+               $unpaid_qty = max(0, $realDebtAccumulated - $sumPrevPaidQty);
             }
          }
 
@@ -1436,15 +1444,23 @@ class InvoiceService extends Base
                $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
             } else {
                // Regla 2: Con pagos
-               // Deuda real previa (sin QBF)
+               // Deuda acumulada real = suma de quantity_final de invoices anteriores
+               // quantity_final = quantity + quantity_brought_forward
+               $realDebtAccumulated = $sumPrevItemQty + $qbfTotalPrev;
+
+               // Deuda real previa (sin QBF) = quantity - paid_qty
                $realDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
 
                if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
-                  // QBF se desactiva: usar deuda real
+                  // QBF se desactiva: usar deuda real (quantity - paid_qty)
+                  // Cuando QBF se desactiva, la deuda acumulada es solo quantity (sin QBF)
                   $unpaid_qty = $realDebtPrev;
                } else {
                   // QBF sigue activo
-                  $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+                  // unpaid_qty = deuda acumulada real - pagos acumulados
+                  // Donde deuda acumulada real = sumPrevItemQty + qbfTotalPrev
+                  // Los pagos ya incorporan el QBF (si fue aplicado), por lo que solo restamos los pagos
+                  $unpaid_qty = max(0, $realDebtAccumulated - $sumPrevPaidQty);
                }
             }
 

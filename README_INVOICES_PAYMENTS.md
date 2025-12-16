@@ -180,13 +180,16 @@ Si paid_qty acumulado > QBF acumulado:
    unpaid_qty = deuda acumulada - pagos acumulados (sin restar QBF)
 Sino:
    QBF sigue activo
-   unpaid_qty = deuda acumulada - pagos acumulados - QBF acumulado
+   unpaid_qty = deuda acumulada - pagos acumulados
 
 Donde:
 - deuda acumulada = suma de quantity_final de todos los invoices anteriores
+  (quantity_final = quantity + quantity_brought_forward)
 - paid_qty acumulado = suma de paid_qty de todos los invoices anteriores
 - QBF acumulado = suma de quantity_brought_forward de todos los invoices anteriores
 ```
+
+**Nota:** Cuando QBF sigue activo, los pagos ya incorporan el QBF si fue aplicado, por lo que solo se restan los pagos acumulados. No se resta QBF dos veces.
 
 **Lógica:**
 
@@ -908,18 +911,19 @@ Si paid_qty acumulado > QBF acumulado:
    unpaid_qty = deuda acumulada - pagos acumulados (sin restar QBF)
 Sino:
    QBF sigue activo
-   unpaid_qty = deuda acumulada - pagos acumulados - QBF acumulado
+   unpaid_qty = deuda acumulada - pagos acumulados
 
 Donde:
 - deuda acumulada = suma de quantity_final de todos los invoices anteriores
+  (quantity_final = quantity + quantity_brought_forward)
 - paid_qty acumulado = suma de paid_qty de todos los invoices anteriores
 - QBF acumulado = suma de quantity_brought_forward de todos los invoices anteriores
 ```
 
 **Explicación:**
 
--  **Caso A - Pago pequeño (NO rompe QBF):** Si el total de `paid_qty` acumulado es menor o igual al total de `quantity_brought_forward` acumulado, el QBF sigue activo y se resta del cálculo
--  **Caso B - Pago grande (SÍ rompe QBF):** Si el total de `paid_qty` acumulado es mayor que el total de `quantity_brought_forward` acumulado, el QBF se desactiva y se muestra la deuda real (sin restar QBF)
+-  **Caso A - Pago pequeño (NO rompe QBF):** Si el total de `paid_qty` acumulado es menor o igual al total de `quantity_brought_forward` acumulado, el QBF sigue activo. En este caso, los pagos ya incorporan el QBF si fue aplicado, por lo que solo se restan los pagos acumulados de la deuda acumulada (que incluye QBF). **No se resta QBF dos veces.**
+-  **Caso B - Pago grande (SÍ rompe QBF):** Si el total de `paid_qty` acumulado es mayor que el total de `quantity_brought_forward` acumulado, el QBF se desactiva y se muestra la deuda real (sin restar QBF). En este caso, la deuda acumulada se calcula solo con `quantity` (sin QBF).
 
 **Ejemplo:**
 
@@ -927,23 +931,24 @@ Donde:
 
 -  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=0 → unpaid_qty = 0
 -  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 100
+-  Deuda acumulada = 100 (quantity_final del Invoice 1 = 100 + 0)
 -  Pagos acumulados = 0
 -  QBF acumulado = 0
--  Como 0 <= 0, unpaid_qty = 100 - 0 - 0 = 100
+-  Como 0 <= 0, QBF sigue activo → unpaid_qty = 100 - 0 = 100
 -  Invoice 3: quantity=100, quantity_brought_forward=30, paid_qty=150
--  Deuda acumulada = 200 (100 + 100)
+-  Deuda acumulada = 230 (quantity_final Invoice 1: 100 + quantity_final Invoice 2: 130 = 100+30)
 -  Pagos acumulados = 0 (mira hacia atrás, no incluye su propio pago)
--  QBF acumulado = 30
--  Como 0 <= 30, unpaid_qty = 200 - 0 - 30 = 170
+-  QBF acumulado = 30 (del Invoice 2)
+-  Como 0 <= 30, QBF sigue activo → unpaid_qty = 230 - 0 = 230
 -  Invoice 4: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada = 300 (100 + 100 + 100)
+-  Deuda acumulada = 330 (quantity_final Invoice 1: 100 + Invoice 2: 130 + Invoice 3: 130 = 100+30)
 -  Pagos acumulados = 150 (incluye el pago del Invoice 3)
 -  QBF acumulado = 60 (30 + 30)
 -  Como 150 > 60, **QBF se desactiva**
+-  Deuda acumulada sin QBF = 300 (100 + 100 + 100, solo quantity)
 -  unpaid_qty = 300 - 150 = 150 (deuda real, sin restar QBF)
 -  Invoice 5: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada = 400 (100 + 100 + 100 + 100)
+-  Deuda acumulada sin QBF = 400 (100 + 100 + 100 + 100, solo quantity)
 -  Pagos acumulados = 150
 -  QBF acumulado = 60
 -  Como 150 > 60, **QBF sigue desactivado**
@@ -962,6 +967,23 @@ Cuando se modifica `quantity_brought_forward` en un invoice:
 -  Función: `ActualizarUnpaidQtyPorQuantityBroughtForward()` en `InvoiceService.php`
 -  Se ejecuta automáticamente después de guardar los items del invoice
 -  Actualiza tanto `unpaid_qty` como `unpaid_from_previous` en la base de datos
+
+**Nota importante sobre la corrección:**
+
+Cuando QBF sigue activo, la fórmula correcta es `unpaid_qty = deuda acumulada - pagos acumulados` (sin restar QBF nuevamente). Esto es porque:
+
+1. La deuda acumulada ya incluye el QBF: `deuda acumulada = suma de (quantity + quantity_brought_forward)`
+2. Los pagos (`paid_qty`) ya incorporan el QBF si fue aplicado al invoice correspondiente
+3. Por lo tanto, restar QBF dos veces resultaría en un cálculo incorrecto
+
+**Ejemplo de la corrección:**
+
+-  Invoice 3: quantity=100, QBF=30, paid_qty=130 (incluye QBF)
+-  Invoice 4: quantity=100, QBF=0, paid_qty=0
+-  Deuda acumulada = 230 (100 + 130)
+-  Pagos acumulados = 130
+-  **Correcto:** unpaid_qty = 230 - 130 = 100
+-  **Incorrecto (fórmula antigua):** unpaid_qty = 230 - 130 - 30 = 70 ❌
 
 ---
 
