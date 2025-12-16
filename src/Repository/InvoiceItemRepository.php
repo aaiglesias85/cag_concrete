@@ -220,6 +220,7 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
    /**
     * TotalInvoiceFinalAmountThisPeriod: Obtiene la suma de Final Amount This Period ((quantity + quantityBroughtForward) * price) de los items de invoice
+    * Excluye los items marcados como change order
     *
     * @return float
     */
@@ -268,6 +269,9 @@ class InvoiceItemRepository extends ServiceEntityRepository
          $qb->andWhere('p.status = :status')
             ->setParameter('status', $status);
       }
+
+      // Excluir items marcados como change order
+      $qb->andWhere('p_i.changeOrder IS NULL OR p_i.changeOrder = false');
 
       return (float) $qb->getQuery()->getSingleScalarResult();
    }
