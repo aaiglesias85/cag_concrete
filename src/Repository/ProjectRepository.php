@@ -221,7 +221,9 @@ class ProjectRepository extends ServiceEntityRepository
    ) {
       $consulta = $this->createQueryBuilder('p')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i');
+         ->leftJoin('p.inspector', 'i')
+         ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
+         ->leftJoin('p_c.county', 'county');
 
       // Agrupar todas las condiciones de búsqueda en una sola
       if ($sSearch !== "") {
@@ -233,7 +235,9 @@ class ProjectRepository extends ServiceEntityRepository
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search
+                p.poCG LIKE :search OR
+                county.description LIKE :search OR
+                p.county LIKE :search
             ')
             ->setParameter('search', "%{$sSearch}%");
       }
@@ -282,7 +286,8 @@ class ProjectRepository extends ServiceEntityRepository
       $orderBy = $sortable[$iSortCol_0] ?? 'p.name';
       $dir     = strtoupper($sSortDir_0) === 'DESC' ? 'DESC' : 'ASC';
 
-      $consulta->orderBy($orderBy, $dir);
+      $consulta->groupBy('p.projectId')
+         ->orderBy($orderBy, $dir);
 
       // Paginación
       if ($limit > 0) {
@@ -302,9 +307,11 @@ class ProjectRepository extends ServiceEntityRepository
    public function TotalProjects($sSearch, $company_id = '', $inspector_id = '', $status = '', $fecha_inicial = '', $fecha_fin = '')
    {
       $consulta = $this->createQueryBuilder('p')
-         ->select('COUNT(p.projectId)')
+         ->select('COUNT(DISTINCT p.projectId)')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i');
+         ->leftJoin('p.inspector', 'i')
+         ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
+         ->leftJoin('p_c.county', 'county');
 
       // Agrupar todas las condiciones de búsqueda en una sola
       if ($sSearch !== "") {
@@ -316,7 +323,9 @@ class ProjectRepository extends ServiceEntityRepository
                 p.name LIKE :search OR
                 p.description LIKE :search OR
                 p.poNumber LIKE :search OR
-                p.poCG LIKE :search
+                p.poCG LIKE :search OR
+                county.description LIKE :search OR
+                p.county LIKE :search
             ')
             ->setParameter('search', "%{$sSearch}%");
       }

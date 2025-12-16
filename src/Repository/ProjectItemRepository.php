@@ -129,7 +129,9 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->leftJoin('p_i.project', 'p')
          ->leftJoin('p_i.item', 'it')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i');
+         ->leftJoin('p.inspector', 'i')
+         ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
+         ->leftJoin('p_c.county', 'county');
 
       // Filtro por búsqueda
       if (!empty($sSearch)) {
@@ -137,7 +139,8 @@ class ProjectItemRepository extends ServiceEntityRepository
                 OR p.manager LIKE :search OR p.projectNumber LIKE :search 
                 OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search 
                 OR p.poCG LIKE :search OR c.name LIKE :search OR p.projectIdNumber LIKE :search 
-                OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search')
+                OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search
+                OR county.description LIKE :search OR p.county LIKE :search')
             ->setParameter('search', "%{$sSearch}%");
       }
 
@@ -208,7 +211,9 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->leftJoin('p_i.project', 'p')
          ->leftJoin('p_i.item', 'it')
          ->leftJoin('p.company', 'c')
-         ->leftJoin('p.inspector', 'i');
+         ->leftJoin('p.inspector', 'i')
+         ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
+         ->leftJoin('p_c.county', 'county');
 
       // Filtro por búsqueda
       if (!empty($sSearch)) {
@@ -216,7 +221,8 @@ class ProjectItemRepository extends ServiceEntityRepository
                 OR p.manager LIKE :search OR p.projectNumber LIKE :search 
                 OR p.name LIKE :search OR p.description LIKE :search OR p.poNumber LIKE :search 
                 OR p.poCG LIKE :search OR c.name LIKE :search OR p.projectIdNumber LIKE :search 
-                OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search')
+                OR p.location LIKE :search OR p.subcontract LIKE :search OR p.proposalNumber LIKE :search
+                OR county.description LIKE :search OR p.county LIKE :search')
             ->setParameter('search', "%{$sSearch}%");
       }
 
