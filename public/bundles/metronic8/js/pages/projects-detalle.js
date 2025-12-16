@@ -1324,6 +1324,10 @@ var ProjectsDetalle = (function () {
             quantity_completed: null,
             amount_completed: null,
             porciento_completion: null,
+            invoiced_qty: null,
+            total_invoiced_amount: null,
+            paid_qty: null,
+            total_paid_amount: null,
          });
       }
 
@@ -1352,6 +1356,10 @@ var ProjectsDetalle = (function () {
          { data: 'quantity_completed' },
          { data: 'amount_completed' },
          { data: 'porciento_completion' },
+         { data: 'invoiced_qty' },
+         { data: 'total_invoiced_amount' },
+         { data: 'paid_qty' },
+         { data: 'total_paid_amount' },
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
       ];
 
@@ -1453,13 +1461,45 @@ var ProjectsDetalle = (function () {
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
             },
          },
+         {
+            targets: 8,
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<span>${MyApp.formatearNumero(data ?? 0, 2, '.', ',')}</span>`;
+            },
+         },
+         {
+            targets: 9,
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<span>${MyApp.formatMoney(data ?? 0)}</span>`;
+            },
+         },
+         {
+            targets: 10,
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<span>${MyApp.formatearNumero(data ?? 0, 2, '.', ',')}</span>`;
+            },
+         },
+         {
+            targets: 11,
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<span>${MyApp.formatMoney(data ?? 0)}</span>`;
+            },
+         },
       ];
 
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[8, 'asc']];
+      const order = [[12, 'asc']];
 
       // escapar contenido de la tabla
       oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {

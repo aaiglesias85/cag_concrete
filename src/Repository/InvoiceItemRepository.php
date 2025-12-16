@@ -328,6 +328,78 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * TotalInvoiceQuantityByProjectItem: Obtiene la suma de quantity de los invoice items de un project_item
+    *
+    * @param int $project_item_id El ID del item de proyecto
+    * @return float
+    */
+   public function TotalInvoiceQuantityByProjectItem(int $project_item_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.quantity), 0)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) $result;
+   }
+
+   /**
+    * TotalInvoiceAmountByProjectItem: Obtiene la suma de amount (quantity * price) de los invoice items de un project_item
+    *
+    * @param int $project_item_id El ID del item de proyecto
+    * @return float
+    */
+   public function TotalInvoiceAmountByProjectItem(int $project_item_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.quantity * i_i.price), 0)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) $result;
+   }
+
+   /**
+    * TotalInvoicePaidQtyByProjectItem: Obtiene la suma de paid_qty de los invoice items de un project_item
+    *
+    * @param int $project_item_id El ID del item de proyecto
+    * @return float
+    */
+   public function TotalInvoicePaidQtyByProjectItem(int $project_item_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.paidQty), 0)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) $result;
+   }
+
+   /**
+    * TotalInvoicePaidAmountByProjectItem: Obtiene la suma de paid_amount de los invoice items de un project_item
+    *
+    * @param int $project_item_id El ID del item de proyecto
+    * @return float
+    */
+   public function TotalInvoicePaidAmountByProjectItem(int $project_item_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.paidAmount), 0)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) $result;
+   }
+
+   /**
     * BuscarItem: Busca un item por su factura y item de proyecto.
     *
     * @param int $invoice_id El ID de la factura

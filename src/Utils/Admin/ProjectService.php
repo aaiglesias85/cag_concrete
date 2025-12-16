@@ -1335,6 +1335,14 @@ class ProjectService extends Base
          // calcular porciento de completion
          $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
+         // Calcular valores de invoices y payments
+         /** @var InvoiceItemRepository $invoiceItemRepo */
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $invoiced_qty = $invoiceItemRepo->TotalInvoiceQuantityByProjectItem($project_item_id);
+         $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
+         $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
+         $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
+
          // Verificar si hay historial de cantidad y precio
          /** @var ProjectItemHistoryRepository $historyRepo */
          $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
@@ -1354,6 +1362,10 @@ class ProjectService extends Base
             "quantity_completed" => $quantity_completed,
             "amount_completed" => $amount_completed,
             "porciento_completion" => $porciento_completion,
+            "invoiced_qty" => $invoiced_qty,
+            "total_invoiced_amount" => $total_invoiced_amount,
+            "paid_qty" => $paid_qty,
+            "total_paid_amount" => $total_paid_amount,
             "principal" => $value->getPrincipal(),
             "change_order" => $value->getChangeOrder(),
             "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
@@ -1526,6 +1538,14 @@ class ProjectService extends Base
       $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
       $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
+      // Calcular valores de invoices y payments
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoiced_qty = $invoiceItemRepo->TotalInvoiceQuantityByProjectItem($project_item_id);
+      $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
+      $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
+      $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
+
       // Verificar si hay historial de cantidad y precio
       /** @var ProjectItemHistoryRepository $historyRepo */
       $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
@@ -1549,6 +1569,10 @@ class ProjectService extends Base
          "change_order" => $value->getChangeOrder(),
          "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
          "porciento_completion" => $porciento_completion,
+         "invoiced_qty" => $invoiced_qty,
+         "total_invoiced_amount" => $total_invoiced_amount,
+         "paid_qty" => $paid_qty,
+         "total_paid_amount" => $total_paid_amount,
          "has_quantity_history" => $has_quantity_history,
          "has_price_history" => $has_price_history,
          "posicion" => $key
