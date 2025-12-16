@@ -3049,6 +3049,9 @@ class ProjectService extends Base
          // Final Amount This Period = quantityBroughtForward * price para cada item
          $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice->getInvoiceId());
 
+         // Calcular el paid amount (suma de Paid Amount de cada item)
+         $paid_amount = $invoiceItemRepo->TotalInvoicePaidAmount((string) $invoice->getInvoiceId());
+
          // Acumular el total para calcular el porcentaje de retainage
          $total_amount_accumulated += $invoice_amount;
 
@@ -3073,7 +3076,8 @@ class ProjectService extends Base
          }
 
          // Calcular el retainage amount para este invoice
-         $retainage_amount = $invoice_amount * ($porciento_retainage / 100);
+         // Retainage Amount = Paid Amount * Retainage %
+         $retainage_amount = $paid_amount * ($porciento_retainage / 100);
 
          // Acumular al total retainage
          $total_retainage_to_date += $retainage_amount;
@@ -3084,6 +3088,7 @@ class ProjectService extends Base
             'invoice_number' => $invoice->getNumber(),
             'invoice_date' => $invoice->getCreatedAt()->format('m/d/Y'),
             'invoice_amount' => $invoice_amount,
+            'paid_amount' => $paid_amount,
             'retainage_percentage' => $porciento_retainage,
             'retainage_amount' => $retainage_amount,
             'total_retainage_to_date' => $total_retainage_to_date,

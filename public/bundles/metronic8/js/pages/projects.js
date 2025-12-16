@@ -4276,6 +4276,7 @@ var Projects = (function () {
       const columns = [
          { data: 'invoice_date' },
          { data: 'invoice_amount' },
+         { data: 'paid_amount' },
          { data: 'retainage_percentage' },
          { data: 'retainage_amount' },
          { data: 'total_retainage_to_date' },
@@ -4315,14 +4316,14 @@ var Projects = (function () {
             targets: 2,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
+               return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
             targets: 3,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
             },
          },
          {
@@ -4334,6 +4335,13 @@ var Projects = (function () {
          },
          {
             targets: 5,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
                var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';

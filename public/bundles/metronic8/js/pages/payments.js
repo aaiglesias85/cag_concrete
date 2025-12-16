@@ -959,7 +959,6 @@ var Payments = (function () {
          { data: 'paid_qty' },
          { data: 'unpaid_qty' },
          { data: 'paid_amount' },
-         { data: 'paid_amount_total' },
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
          { data: null },
       ];
@@ -1102,14 +1101,6 @@ var Payments = (function () {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
-         // paid_amount_total
-         {
-            targets: 10,
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
-            },
-         },
          {
             targets: -1,
             data: null,
@@ -1134,7 +1125,7 @@ var Payments = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[11, 'asc']];
+      const order = [[10, 'asc']];
 
       // escapar contenido de la tabla
       oTablePayments = DatatableUtil.initSafeDataTable(table, {
@@ -1170,6 +1161,51 @@ var Payments = (function () {
             handleChangeOrderHistory();
             handleQuantityHistory();
             handlePriceHistory();
+         },
+         // totales
+         footerCallback: function (row, data, start, end, display) {
+            const api = this.api();
+
+            // Función para limpiar valores numéricos
+            const num = (v) => (typeof v === 'number' ? v : (typeof v === 'string' ? Number(v.replace(/[^\d.-]/g, '')) : 0) || 0);
+
+            // Helper para sumar columna
+            const sumCol = (idx) => ({
+               page: api
+                  .column(idx, { page: 'current' })
+                  .data()
+                  .reduce((a, b) => {
+                     // Si es un objeto con isGroupHeader, saltarlo
+                     if (typeof b === 'object' && b !== null && b.isGroupHeader) {
+                        return a;
+                     }
+                     return num(a) + num(b);
+                  }, 0),
+               total: api
+                  .column(idx)
+                  .data()
+                  .reduce((a, b) => {
+                     // Si es un objeto con isGroupHeader, saltarlo
+                     if (typeof b === 'object' && b !== null && b.isGroupHeader) {
+                        return a;
+                     }
+                     return num(a) + num(b);
+                  }, 0),
+            });
+
+            // Calcular total de Invoice Total $ (columna amount, índice 6)
+            const { total: totalInvoice } = sumCol(6);
+            const $inputInvoice = $('#total_invoice_amount');
+            if ($inputInvoice.length) {
+               $inputInvoice.val(MyApp.formatMoney(totalInvoice, 2, '.', ','));
+            }
+
+            // Calcular total de Payment Total $ (columna paid_amount, índice 9)
+            const { total: totalPayment } = sumCol(9);
+            const $inputPayment = $('#total_payment_amount');
+            if ($inputPayment.length) {
+               $inputPayment.val(MyApp.formatMoney(totalPayment, 2, '.', ','));
+            }
          },
       });
 

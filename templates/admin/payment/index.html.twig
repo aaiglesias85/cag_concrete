@@ -385,6 +385,19 @@
                                     <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
                                     <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
                                  </div>
+
+                                 <!-- totales -->
+                                 <div class="d-flex gap-3 flex-nowrap flex-grow-1 overflow-auto" style="padding-bottom: 0.25rem">
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Invoice Total $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_invoice_amount" disabled />
+                                    </div>
+
+                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
+                                       <span class="input-group-text">Payment Total $:</span>
+                                       <input type="text" class="form-control form-control-solid" id="total_payment_amount" disabled />
+                                    </div>
+                                 </div>
                               </div>
                            </div>
                            <!--end::Wrapper-->
@@ -403,7 +416,6 @@
                                     <th>Paid Qty</th>
                                     <th>Unpaid Qty</th>
                                     <th>Paid Amount</th>
-                                    <th>Paid Amount Total</th>
                                     <th>Actions</th>
                                  </tr>
                               </thead>
