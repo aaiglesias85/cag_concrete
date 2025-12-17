@@ -25,6 +25,101 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class InvoiceService extends Base
 {
+   /**
+    * Orden determinístico de invoices (fecha inicio, luego ID).
+    *
+    * @param Invoice[] $invoices
+    */
+   private function sortInvoicesByStartDateAndId(array &$invoices): void
+   {
+      usort($invoices, function ($a, $b) {
+         /** @var Invoice $a */
+         /** @var Invoice $b */
+         $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+         if ($dateCompare !== 0) {
+            return $dateCompare;
+         }
+         return $a->getInvoiceId() <=> $b->getInvoiceId();
+      });
+   }
+
+   /**
+    * Construye series (quantity/paid/qbf) y prefijos para un project_item
+    * a lo largo de la lista ordenada de invoices del proyecto.
+    *
+    * NOTA: las sumas "previas" para un índice i se leen como prefix[i]
+    * (porque prefix[0]=0 y prefix[i]=SUM(0..i-1)).
+    *
+    * @param Invoice[] $allInvoices
+    * @param array<int, InvoiceItem> $invoiceItemMap invoice_id => InvoiceItem
+    * @return array{
+    *   qbf: float[],
+    *   prefixQty: float[],
+    *   prefixPaid: float[],
+    *   prefixQbf: float[]
+    * }
+    */
+   private function buildInvoiceItemSeriesForInvoices(array $allInvoices, array $invoiceItemMap, ?int $overrideInvoiceId = null, ?float $overrideQbf = null): array
+   {
+      $qbf = [];
+      $prefixQty = [0.0];
+      $prefixPaid = [0.0];
+      $prefixQbf = [0.0];
+
+      foreach ($allInvoices as $idx => $invoice) {
+         /** @var Invoice $invoice */
+         $invoiceId = (int) $invoice->getInvoiceId();
+         $item = $invoiceItemMap[$invoiceId] ?? null;
+
+         $qty = (float) (($item?->getQuantity()) ?? 0);
+         $paid = (float) (($item?->getPaidQty()) ?? 0);
+         $qbfValue = (float) (($item?->getQuantityBroughtForward()) ?? 0);
+
+         if ($overrideInvoiceId !== null && $invoiceId === (int) $overrideInvoiceId) {
+            $qbfValue = (float) ($overrideQbf ?? 0);
+         }
+
+         $qbf[$idx] = $qbfValue;
+
+         $prefixQty[$idx + 1] = $prefixQty[$idx] + $qty;
+         $prefixPaid[$idx + 1] = $prefixPaid[$idx] + $paid;
+         $prefixQbf[$idx + 1] = $prefixQbf[$idx] + $qbfValue;
+      }
+
+      return [
+         'qbf' => $qbf,
+         'prefixQty' => $prefixQty,
+         'prefixPaid' => $prefixPaid,
+         'prefixQbf' => $prefixQbf,
+      ];
+   }
+
+   /**
+    * Calcula unpaid_qty (columna roja) para INVOICES, usando las reglas actuales:
+    * - El QBF NO se arrastra a invoices siguientes: solo afecta al invoice actual.
+    * - Regla 1 (sin pagos previos): unpaid = SUM(quantity prev) - QBF(actual)
+    * - Regla 2 (con pagos previos):
+    *   - baseDebtPrev = max(0, SUM(quantity prev) - SUM(paid_qty prev))
+    *   - si SUM(paid_qty prev) > (SUM(qbf prev) + QBF(actual)) => QBF desactivado => unpaid=baseDebtPrev
+    *   - si no => QBF activo => unpaid=max(0, baseDebtPrev - QBF(actual))
+    */
+   private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaidQty, float $sumPrevQbf, float $currentQbf): float
+   {
+      $hasAnyPayment = ($sumPrevPaidQty > 0);
+
+      if (!$hasAnyPayment) {
+         return max(0, $sumPrevQty - $currentQbf);
+      }
+
+      $qbfTotalPrevAndCurrent = $sumPrevQbf + $currentQbf;
+      $baseDebtPrev = max(0, $sumPrevQty - $sumPrevPaidQty);
+
+      if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
+         return $baseDebtPrev;
+      }
+
+      return max(0, $baseDebtPrev - $currentQbf);
+   }
 
    /**
     * ValidarInvoice: Valida un invoice en la BD
@@ -667,10 +762,25 @@ class InvoiceService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $lista = $invoiceItemRepo->ListarItems($invoice_id);
 
-      // Obtener el invoice actual para comparar fechas
+      // Obtener el invoice actual
       $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-      $currentInvoiceDate = $currentInvoice ? $currentInvoice->getStartDate() : null;
+      if (!$currentInvoice) {
+         return $items;
+      }
       $currentInvoiceId = $currentInvoice ? $currentInvoice->getInvoiceId() : null;
+
+      // Obtener todos los invoices del proyecto una sola vez (es el mismo proyecto para todos los items)
+      $project_id = $currentInvoice->getProject()->getProjectId();
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $invoiceIndexById = [];
+      foreach ($allInvoices as $idx => $invoice) {
+         /** @var Invoice $invoice */
+         $invoiceIndexById[(int) $invoice->getInvoiceId()] = (int) $idx;
+      }
 
       foreach ($lista as $key => $value) {
 
@@ -683,23 +793,6 @@ class InvoiceService extends Base
          // IMPORTANTE: Recalcular unpaid_qty aplicando las reglas de quantity_brought_forward
          $project_item_id = $value->getProjectItem()->getId();
 
-         // Obtener todos los invoices del proyecto y ordenarlos
-         $project_id = $currentInvoice->getProject()->getProjectId();
-         /** @var InvoiceRepository $invoiceRepo */
-         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-         $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
-
-         // Ordenar por fecha/ID (orden determinístico)
-         usort($allInvoices, function ($a, $b) {
-            /** @var Invoice $a */
-            /** @var Invoice $b */
-            $dateCompare = $a->getStartDate() <=> $b->getStartDate();
-            if ($dateCompare != 0) {
-               return $dateCompare;
-            }
-            return $a->getInvoiceId() <=> $b->getInvoiceId();
-         });
-
          // Obtener todos los invoice items de este project_item
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
          $invoiceItemMap = [];
@@ -710,67 +803,15 @@ class InvoiceService extends Base
          }
 
          // Encontrar el índice del invoice actual
-         $currentIndex = -1;
-         foreach ($allInvoices as $idx => $invoice) {
-            /** @var Invoice $invoice */
-            if ($invoice->getInvoiceId() == $currentInvoiceId) {
-               $currentIndex = $idx;
-               break;
-            }
-         }
+         $currentIndex = $invoiceIndexById[(int) $currentInvoiceId] ?? -1;
 
-         // Calcular acumulados previos (solo invoices anteriores al actual)
-         $sumPrevItemQty = 0; // SUM(itemQty) para j < i
-         $sumPrevPaidQty = 0; // SUM(paidQty) para j < i
-         $qbfTotalPrev = 0; // SUM(qbf) para j < i
+         $series = $this->buildInvoiceItemSeriesForInvoices($allInvoices, $invoiceItemMap);
+         $sumPrevItemQty = (float) ($series['prefixQty'][$currentIndex] ?? 0);
+         $sumPrevPaidQty = (float) ($series['prefixPaid'][$currentIndex] ?? 0);
+         $qbfTotalPrev = (float) ($series['prefixQbf'][$currentIndex] ?? 0);
 
-         for ($j = 0; $j < $currentIndex; $j++) {
-            $prevInvoice = $allInvoices[$j];
-            /** @var Invoice $prevInvoice */
-            $prev_invoice_id = $prevInvoice->getInvoiceId();
-            $prev_invoice_item = $invoiceItemMap[$prev_invoice_id] ?? null;
-
-            if ($prev_invoice_item != null) {
-               $prev_item_qty = $prev_invoice_item->getQuantity() ?? 0;
-               $prev_paid_qty = $prev_invoice_item->getPaidQty() ?? 0;
-               $prev_qbf = $prev_invoice_item->getQuantityBroughtForward() ?? 0;
-
-               $sumPrevItemQty += $prev_item_qty;
-               $sumPrevPaidQty += $prev_paid_qty;
-               $qbfTotalPrev += $prev_qbf;
-            }
-         }
-
-         // Obtener QBF del invoice actual
-         $current_qbf = $value->getQuantityBroughtForward() ?? 0;
-         $qbfTotalPrevAndCurrent = $qbfTotalPrev + $current_qbf;
-
-         // Verificar si hay pagos en toda la cadena (hasta este invoice)
-         $hasAnyPayment = ($sumPrevPaidQty > 0);
-
-         // Aplicar reglas
-         if (!$hasAnyPayment) {
-            // Regla 1: Sin pagos
-            // NOTA: para evitar que invoices posteriores descuenten el QBF,
-            // aquí solo se descuenta el QBF del invoice ACTUAL.
-            // Ej: Invoice 4 no debe descontar el QBF del Invoice 3.
-            $unpaid_qty = max(0, $sumPrevItemQty - $current_qbf);
-         } else {
-            // Regla 2: Con pagos
-            // En INVOICES, el unpaid_qty es deuda acumulada de invoices anteriores,
-            // y NO debe arrastrar QBF de invoices anteriores.
-            // Base: deuda previa real = SUM(quantity prev) - SUM(paid_qty prev)
-            $baseDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
-
-            if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
-               // Si los pagos acumulados "rompen" el QBF acumulado (anteriores + actual),
-               // el QBF se desactiva y NO se aplica al cálculo del invoice actual.
-               $unpaid_qty = $baseDebtPrev;
-            } else {
-               // QBF sigue activo: solo impacta al invoice actual (no a los siguientes)
-               $unpaid_qty = max(0, $baseDebtPrev - $current_qbf);
-            }
-         }
+         $current_qbf = (float) ($value->getQuantityBroughtForward() ?? 0);
+         $unpaid_qty = $this->calculateInvoiceUnpaidQty($sumPrevItemQty, $sumPrevPaidQty, $qbfTotalPrev, $current_qbf);
 
          $quantity = $value->getQuantity();
          $quantity_brought_forward = $value->getQuantityBroughtForward();
@@ -1334,7 +1375,6 @@ class InvoiceService extends Base
    {
       $project_id = $currentInvoice->getProject()->getProjectId();
       $current_invoice_id = $currentInvoice->getInvoiceId();
-      $current_invoice_start_date = $currentInvoice->getStartDate();
 
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
@@ -1344,16 +1384,13 @@ class InvoiceService extends Base
       // Obtener todos los invoices del proyecto ordenados por fecha
       $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
 
-      // Ordenar todos los invoices por fecha/ID (orden determinístico)
-      usort($allInvoices, function ($a, $b) {
-         /** @var Invoice $a */
-         /** @var Invoice $b */
-         $dateCompare = $a->getStartDate() <=> $b->getStartDate();
-         if ($dateCompare != 0) {
-            return $dateCompare;
-         }
-         return $a->getInvoiceId() <=> $b->getInvoiceId();
-      });
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $invoiceIndexById = [];
+      foreach ($allInvoices as $idx => $invoice) {
+         /** @var Invoice $invoice */
+         $invoiceIndexById[(int) $invoice->getInvoiceId()] = (int) $idx;
+      }
 
       // Para cada item modificado, recalcular desde el invoice afectado hacia adelante
       foreach ($items as $itemData) {
@@ -1373,91 +1410,33 @@ class InvoiceService extends Base
             $invoiceItemMap[$invoice_id] = $invoiceItem;
          }
 
-         // Encontrar el índice del invoice actual en la lista ordenada
-         $startIndex = -1;
-         foreach ($allInvoices as $idx => $invoice) {
-            /** @var Invoice $invoice */
-            if ($invoice->getInvoiceId() == $current_invoice_id) {
-               $startIndex = $idx;
-               break;
-            }
-         }
+         $startIndex = $invoiceIndexById[(int) $current_invoice_id] ?? -1;
 
          if ($startIndex === -1) {
             continue; // Invoice no encontrado, saltar este item
          }
 
-         // Recalcular desde el invoice actual hacia adelante
+         $overrideQbf = isset($itemData->quantity_brought_forward) ? (float) $itemData->quantity_brought_forward : 0.0;
+         $series = $this->buildInvoiceItemSeriesForInvoices($allInvoices, $invoiceItemMap, (int) $current_invoice_id, $overrideQbf);
+
+         // Recalcular desde el invoice actual hacia adelante (O(n) usando prefijos)
          for ($i = $startIndex; $i < count($allInvoices); $i++) {
-            $invoice = $allInvoices[$i];
             /** @var Invoice $invoice */
-            $invoice_id = $invoice->getInvoiceId();
+            $invoice = $allInvoices[$i];
+            $invoice_id = (int) $invoice->getInvoiceId();
 
-            // Obtener el invoice item para este invoice y project_item
             $invoice_item = $invoiceItemMap[$invoice_id] ?? null;
-            if ($invoice_item == null) {
-               continue; // No hay item para este invoice, saltar
+            if ($invoice_item === null) {
+               continue;
             }
 
-            // Calcular acumulados previos (solo invoices anteriores a este)
-            $sumPrevItemQty = 0; // SUM(itemQty) para j < i
-            $sumPrevPaidQty = 0; // SUM(paidQty) para j < i
-            $qbfTotalPrev = 0; // SUM(qbf) para j < i
+            $sumPrevItemQty = (float) ($series['prefixQty'][$i] ?? 0);
+            $sumPrevPaidQty = (float) ($series['prefixPaid'][$i] ?? 0);
+            $qbfTotalPrev = (float) ($series['prefixQbf'][$i] ?? 0);
+            $current_qbf = (float) ($series['qbf'][$i] ?? 0);
 
-            for ($j = 0; $j < $i; $j++) {
-               $prevInvoice = $allInvoices[$j];
-               /** @var Invoice $prevInvoice */
-               $prev_invoice_id = $prevInvoice->getInvoiceId();
-               $prev_invoice_item = $invoiceItemMap[$prev_invoice_id] ?? null;
+            $unpaid_qty = $this->calculateInvoiceUnpaidQty($sumPrevItemQty, $sumPrevPaidQty, $qbfTotalPrev, $current_qbf);
 
-               if ($prev_invoice_item != null) {
-                  $prev_item_qty = $prev_invoice_item->getQuantity() ?? 0;
-                  $prev_paid_qty = $prev_invoice_item->getPaidQty() ?? 0;
-                  $prev_qbf = $prev_invoice_item->getQuantityBroughtForward() ?? 0;
-
-                  $sumPrevItemQty += $prev_item_qty;
-                  $sumPrevPaidQty += $prev_paid_qty;
-                  $qbfTotalPrev += $prev_qbf;
-               }
-            }
-
-            // Obtener QBF del invoice actual
-            $current_qbf = $invoice_item->getQuantityBroughtForward() ?? 0;
-            if ($invoice_id == $current_invoice_id) {
-               // Si es el invoice que se está modificando, usar el valor del array
-               $current_qbf = isset($itemData->quantity_brought_forward) ? (float)$itemData->quantity_brought_forward : 0;
-            }
-
-            // QBF total incluyendo el invoice actual
-            $qbfTotalPrevAndCurrent = $qbfTotalPrev + $current_qbf;
-
-            // Verificar si hay pagos en toda la cadena (hasta este invoice)
-            $hasAnyPayment = ($sumPrevPaidQty > 0);
-
-            // Aplicar reglas
-            if (!$hasAnyPayment) {
-               // Regla 1: Sin pagos
-               // NOTA: para evitar que invoices posteriores descuenten el QBF,
-               // aquí solo se descuenta el QBF del invoice ACTUAL.
-               $unpaid_qty = max(0, $sumPrevItemQty - $current_qbf);
-            } else {
-               // Regla 2: Con pagos
-               // En INVOICES, el unpaid_qty es deuda acumulada de invoices anteriores,
-               // y NO debe arrastrar QBF de invoices anteriores.
-               // Base: deuda previa real = SUM(quantity prev) - SUM(paid_qty prev)
-               $baseDebtPrev = max(0, $sumPrevItemQty - $sumPrevPaidQty);
-
-               if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
-                  // Si los pagos acumulados "rompen" el QBF acumulado (anteriores + actual),
-                  // el QBF se desactiva y NO se aplica al cálculo del invoice actual.
-                  $unpaid_qty = $baseDebtPrev;
-               } else {
-                  // QBF sigue activo: solo impacta al invoice actual (no a los siguientes)
-                  $unpaid_qty = max(0, $baseDebtPrev - $current_qbf);
-               }
-            }
-
-            // Actualizar en la entidad
             $invoice_item->setUnpaidQty($unpaid_qty);
             $invoice_item->setUnpaidFromPrevious($unpaid_qty);
          }
