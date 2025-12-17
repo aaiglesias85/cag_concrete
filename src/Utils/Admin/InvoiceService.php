@@ -103,22 +103,29 @@ class InvoiceService extends Base
     *   - si SUM(paid_qty prev) > SUM(qbf prev) => QBF desactivado => unpaid=baseDebtPrev
     *   - si no => QBF activo => unpaid=max(0, baseDebtPrev - QBF(actual))
     */
+ /**
+    * Calcula unpaid_qty respetando Regla 1 y Regla 2.
+    */
    private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaidQty, float $sumPrevQbf, float $currentQbf): float
    {
       $hasAnyPayment = ($sumPrevPaidQty > 0);
 
+      // --- REGLA 1: Sin pagos previos ---
       if (!$hasAnyPayment) {
          return max(0, $sumPrevQty - $currentQbf);
       }
 
-      $baseDebtPrev = max(0, $sumPrevQty - $sumPrevPaidQty);
-
-      // Caso B (rompe QBF): si los pagos acumulados previos superan el QBF acumulado previo,
-      // el QBF queda desactivado y NO debe afectar el cálculo del invoice actual.
+      // --- REGLA 2: Con pagos ---
+      
+      // Verificamos si los pagos acumulados superan al QBF acumulado histórico (Regla "rompe QBF")
       if ($sumPrevPaidQty > $sumPrevQbf) {
-         return $baseDebtPrev;
+         // Esto asegura que el QBF se considere parte de la deuda a saldar antes de restar lo pagado.
+         return max(0, ($sumPrevQty + $sumPrevQbf) - $sumPrevPaidQty);
       }
 
+      // Si no supera (QBF sigue activo), usamos la lógica estándar:
+      // Deuda Base (sin QBF) - QBF Actual
+      $baseDebtPrev = max(0, $sumPrevQty - $sumPrevPaidQty);
       return max(0, $baseDebtPrev - $currentQbf);
    }
 
