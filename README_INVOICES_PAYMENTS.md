@@ -909,24 +909,31 @@ Donde:
 **Fórmula:**
 
 ```
-Si paid_qty acumulado > QBF acumulado:
-   QBF se desactiva
-   unpaid_qty = deuda previa real (sin aplicar QBF)
-Sino:
-   QBF sigue activo
-   unpaid_qty = deuda previa real - QBF del invoice actual
+Si paid_qty acumulado > QBF acumulado: // Caso "Rompe QBF" (Pagos grandes) // Se considera el QBF como parte de la deuda total a saldar. unpaid_qty = (deuda acumulada + QBF acumulado) - paid_qty acumulado
+
+Sino: // Caso estándar (Pagos pequeños) // QBF sigue activo para descontar unpaid_qty = deuda previa real - QBF del invoice actual
 
 Donde:
-- deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
-- paid_qty acumulado = SUM(paid_qty de invoices anteriores)
-- QBF del invoice actual = quantity_brought_forward del invoice que se está calculando
-- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
-```
+
+deuda acumulada = SUM(quantity de invoices anteriores)
+
+deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
+
+paid_qty acumulado = SUM(paid_qty de invoices anteriores)
+
+QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
 
 **Explicación:**
 
--  **Caso A - Pago pequeño (NO rompe QBF):** Si el total de `paid_qty` acumulado es menor o igual al total de `quantity_brought_forward` acumulado, el QBF sigue activo. En este caso, en **INVOICES** se calcula la deuda previa real y luego se descuenta únicamente el QBF del invoice actual (no se arrastra QBF de invoices anteriores).
--  **Caso B - Pago grande (SÍ rompe QBF):** Si el total de `paid_qty` acumulado es mayor que el total de `quantity_brought_forward` acumulado, el QBF se desactiva y se muestra la deuda real (sin restar QBF). En este caso, la deuda acumulada se calcula solo con `quantity` (sin QBF).
+-  **Caso A - Pago pequeño:** Si el total pagado es menor o igual al QBF histórico, se mantiene la lógica de restar el QBF actual a la deuda pendiente.
+-  **Caso B - Pago grande:** Si el total pagado supera al QBF histórico, el sistema calcula la deuda total real sumando todo lo facturado (Items + QBF) y restando todo lo pagado. Esto asegura que el resultado sea la suma exacta de los saldos pendientes de los invoices anteriores.
+
+**Ejemplo Actualizado (Caso B):**
+
+-  Invoices anteriores (suma de quantities): 300
+-  QBF acumulado: 60
+-  Pagos acumulados: 160
+-  **Cálculo:** (300 + 60) - 160 = **200**
 
 **Ejemplo:**
 
