@@ -100,7 +100,7 @@ class InvoiceService extends Base
     * - Regla 1 (sin pagos previos): unpaid = SUM(quantity prev) - QBF(actual)
     * - Regla 2 (con pagos previos):
     *   - baseDebtPrev = max(0, SUM(quantity prev) - SUM(paid_qty prev))
-    *   - si SUM(paid_qty prev) > (SUM(qbf prev) + QBF(actual)) => QBF desactivado => unpaid=baseDebtPrev
+    *   - si SUM(paid_qty prev) > SUM(qbf prev) => QBF desactivado => unpaid=baseDebtPrev
     *   - si no => QBF activo => unpaid=max(0, baseDebtPrev - QBF(actual))
     */
    private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaidQty, float $sumPrevQbf, float $currentQbf): float
@@ -111,10 +111,11 @@ class InvoiceService extends Base
          return max(0, $sumPrevQty - $currentQbf);
       }
 
-      $qbfTotalPrevAndCurrent = $sumPrevQbf + $currentQbf;
       $baseDebtPrev = max(0, $sumPrevQty - $sumPrevPaidQty);
 
-      if ($sumPrevPaidQty > $qbfTotalPrevAndCurrent) {
+      // Caso B (rompe QBF): si los pagos acumulados previos superan el QBF acumulado previo,
+      // el QBF queda desactivado y NO debe afectar el cálculo del invoice actual.
+      if ($sumPrevPaidQty > $sumPrevQbf) {
          return $baseDebtPrev;
       }
 
@@ -1363,9 +1364,11 @@ class InvoiceService extends Base
     * Recalcula unpaid_qty para el invoice afectado y todos los posteriores cuando se modifica QBF
     * 
     * Implementa las reglas:
-    * - Regla 1 (sin pagos): unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
-    * - Regla 2 (con pagos): Si sumPrevPaidQty > qbfTotalPrevAndCurrent => unpaidQty = realDebtPrev
-    *                        Sino => unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
+    * - Regla 1 (sin pagos): unpaidQty = SUM(quantity prev) - QBF(actual)
+    * - Regla 2 (con pagos):
+    *   - baseDebtPrev = max(0, SUM(quantity prev) - SUM(paid_qty prev))
+    *   - si SUM(paid_qty prev) > SUM(qbf prev) => QBF desactivado => unpaid=baseDebtPrev
+    *   - si no => QBF activo => unpaid=max(0, baseDebtPrev - QBF(actual))
     * 
     * @param Invoice $currentInvoice El invoice que se está modificando
     * @param array $items Los items modificados (con project_item_id)

@@ -185,7 +185,7 @@ Donde:
 - deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
 - paid_qty acumulado = SUM(paid_qty de invoices anteriores)
 - QBF del invoice actual = quantity_brought_forward del invoice que se está calculando
-- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores) + (QBF del invoice actual)
+- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
 ```
 
 **Nota (clave):** En **INVOICES** el `unpaid_qty` (rojo) NO debe arrastrar el QBF de invoices anteriores. El QBF solo impacta al **invoice actual**. En **PAYMENTS** sí se usa `quantity_final = quantity + QBF`, por eso los valores no coinciden.
@@ -920,7 +920,7 @@ Donde:
 - deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
 - paid_qty acumulado = SUM(paid_qty de invoices anteriores)
 - QBF del invoice actual = quantity_brought_forward del invoice que se está calculando
-- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores) + (QBF del invoice actual)
+- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
 ```
 
 **Explicación:**
