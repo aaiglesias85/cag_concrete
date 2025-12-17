@@ -11,42 +11,42 @@ class InvoiceItem
    #[ORM\Id]
    #[ORM\GeneratedValue]
    #[ORM\Column(name: 'id', type: 'integer')]
-   private ?int $id;
+   private ?int $id = null;
 
    #[ORM\Column(name: 'quantity_from_previous', type: 'float', nullable: false)]
-   private ?float $quantityFromPrevious;
+   private ?float $quantityFromPrevious = 0.0;
 
    #[ORM\Column(name: 'unpaid_from_previous', type: 'float', nullable: false)]
-   private ?float $unpaidFromPrevious;
+   private ?float $unpaidFromPrevious = 0.0;
 
    #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
-   private ?float $quantity;
+   private ?float $quantity = 0.0;
 
    #[ORM\Column(name: 'price', type: 'float', nullable: false)]
-   private ?float $price;
+   private ?float $price = 0.0;
 
    #[ORM\Column(name: 'paid_qty', type: 'float', nullable: false)]
-   private ?float $paidQty;
+   private ?float $paidQty = 0.0;
 
    #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: false)]
-   private ?float $unpaidQty;
+   private ?float $unpaidQty = 0.0;
 
    #[ORM\Column(name: 'quantity_brought_forward', type: 'float', nullable: true)]
    private ?float $quantityBroughtForward = null;
 
    #[ORM\Column(name: 'paid_amount', type: 'float', nullable: false)]
-   private ?float $paidAmount;
+   private ?float $paidAmount = 0.0;
 
    #[ORM\Column(name: 'paid_amount_total', type: 'float', nullable: false)]
-   private ?float $paidAmountTotal;
+   private ?float $paidAmountTotal = 0.0;
 
    #[ORM\ManyToOne(targetEntity: 'App\Entity\Invoice')]
    #[ORM\JoinColumn(name: 'invoice_id', referencedColumnName: 'invoice_id')]
-   private ?Invoice $invoice;
+   private ?Invoice $invoice = null;
 
    #[ORM\ManyToOne(targetEntity: 'App\Entity\ProjectItem')]
    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id')]
-   private ?ProjectItem $projectItem;
+   private ?ProjectItem $projectItem = null;
 
    #[ORM\Column(name: "txn_id", type: "string", length: 255, nullable: true)]
    private ?string $txnId = null;
