@@ -930,32 +930,38 @@ Donde:
 
 **Ejemplo:**
 
-**Escenario:** 5 invoices, Invoice #3 tiene un pago de 150
+**Escenario:** 4 invoices, con pagos previos (paid_qty) y QBF en el invoice actual.
 
--  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=0 → unpaid_qty = 0
--  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 100 (quantity del Invoice 1 = 100)
--  Pagos acumulados = 0
--  QBF acumulado = 0
--  Como 0 <= 0, QBF sigue activo → unpaid_qty = 100 - 0 = 100
--  Invoice 3: quantity=100, quantity_brought_forward=30, paid_qty=150
--  Deuda acumulada = 230 (quantity_final Invoice 1: 100 + quantity_final Invoice 2: 130 = 100+30)
--  Pagos acumulados = 0 (mira hacia atrás, no incluye su propio pago)
--  QBF acumulado = 30 (del Invoice 2)
--  Como 0 <= 30, QBF sigue activo → unpaid_qty = 230 - 0 = 230
--  Invoice 4: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada = 330 (quantity_final Invoice 1: 100 + Invoice 2: 130 + Invoice 3: 130 = 100+30)
--  Pagos acumulados = 150 (incluye el pago del Invoice 3)
--  QBF acumulado = 60 (30 + 30)
--  Como 150 > 60, **QBF se desactiva**
--  Deuda acumulada sin QBF = 300 (100 + 100 + 100, solo quantity)
--  unpaid_qty = 300 - 150 = 150 (deuda real, sin restar QBF)
--  Invoice 5: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada sin QBF = 400 (100 + 100 + 100 + 100, solo quantity)
--  Pagos acumulados = 150
--  QBF acumulado = 60
--  Como 150 > 60, **QBF sigue desactivado**
--  unpaid_qty = 400 - 150 = 250 (deuda real, sin restar QBF)
+-  Invoice 1: quantity=100, QBF=0, paid_qty=0 → unpaid_qty = 0 (no hay anteriores)
+
+-  Invoice 2: quantity=100, QBF=0, paid_qty=10
+
+   -  Deuda previa real (Invoice 2) = SUM(quantity prev) - SUM(paid_qty prev) = 100 - 0 = 100
+   -  QBF (invoice actual) = 0
+   -  unpaid_qty (Invoice 2) = 100 - 0 = 100
+
+-  Invoice 3: quantity=100, QBF=30, paid_qty=50
+
+   -  SUM(quantity prev) = 100 + 100 = 200
+   -  SUM(paid_qty prev) = 0 + 10 = 10
+   -  Deuda previa real = 200 - 10 = 190
+   -  QBF acumulado (prev + actual) = (0 + 0) + 30 = 30
+   -  Como 10 <= 30, **QBF sigue activo**
+   -  unpaid_qty (Invoice 3) = 190 - 30 = 160
+
+-  Invoice 4: quantity=100, QBF=0, paid_qty=0
+   -  SUM(quantity prev) = 100 + 100 + 100 = 300
+   -  SUM(paid_qty prev) = 0 + 10 + 50 = 60
+   -  Deuda previa real = 300 - 60 = 240
+   -  QBF acumulado (prev + actual) = (0 + 0 + 30) + 0 = 30
+   -  Como 60 > 30, **QBF se desactiva**
+   -  unpaid_qty (Invoice 4) = 240
+
+**Variación (mismo Invoice 4, pero con QBF=40 en el invoice actual):**
+
+-  QBF acumulado (prev + actual) = 30 + 40 = 70
+-  Como 60 <= 70, **QBF sigue activo**
+-  unpaid_qty (Invoice 4) = 240 - 40 = 200
 
 ### Actualización en Cascada
 
