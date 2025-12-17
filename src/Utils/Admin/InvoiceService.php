@@ -751,8 +751,10 @@ class InvoiceService extends Base
          // Aplicar reglas
          if (!$hasAnyPayment) {
             // Regla 1: Sin pagos
-            // unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
-            $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+            // NOTA: para evitar que invoices posteriores descuenten el QBF,
+            // aquí solo se descuenta el QBF del invoice ACTUAL.
+            // Ej: Invoice 4 no debe descontar el QBF del Invoice 3.
+            $unpaid_qty = max(0, $sumPrevItemQty - $current_qbf);
          } else {
             // Regla 2: Con pagos
             // Deuda acumulada real = suma de quantity_final de invoices anteriores
@@ -1440,8 +1442,9 @@ class InvoiceService extends Base
             // Aplicar reglas
             if (!$hasAnyPayment) {
                // Regla 1: Sin pagos
-               // unpaidQty = sumPrevItemQty - qbfTotalPrevAndCurrent
-               $unpaid_qty = max(0, $sumPrevItemQty - $qbfTotalPrevAndCurrent);
+               // NOTA: para evitar que invoices posteriores descuenten el QBF,
+               // aquí solo se descuenta el QBF del invoice ACTUAL.
+               $unpaid_qty = max(0, $sumPrevItemQty - $current_qbf);
             } else {
                // Regla 2: Con pagos
                // Deuda acumulada real = suma de quantity_final de invoices anteriores

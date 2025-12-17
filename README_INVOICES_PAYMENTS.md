@@ -165,7 +165,7 @@ Cuando se modifica `quantity_brought_forward` en un invoice, se actualiza el `un
 **Regla 1 (Si no hay ningún invoice pagado):**
 
 ```
-unpaid_qty = deuda acumulada - quantity_brought_forward de todos los invoices anteriores
+unpaid_qty = deuda acumulada - quantity_brought_forward del invoice actual
 
 Donde:
 - deuda acumulada = suma de quantity_final de todos los invoices anteriores
@@ -872,7 +872,7 @@ Cuando se modifica el valor de `quantity_brought_forward` en un invoice, el sist
 **Fórmula:**
 
 ```
-unpaid_qty = deuda acumulada - quantity_brought_forward de todos los invoices anteriores
+unpaid_qty = deuda acumulada - quantity_brought_forward del invoice actual
 
 Donde:
 - deuda acumulada = suma de quantity_final de todos los invoices anteriores
