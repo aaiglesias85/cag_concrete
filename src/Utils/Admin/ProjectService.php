@@ -3113,6 +3113,7 @@ class ProjectService extends Base
             'invoice_date' => $invoice->getCreatedAt()->format('m/d/Y'),
             'invoice_amount' => $invoice_amount,
             'paid_amount' => $paid_amount,
+            'paid' => $is_paid ? 1 : 0,
             'retainage_percentage' => $porciento_retainage,
             'retainage_amount' => $retainage_amount,
             'total_retainage_to_date' => $total_retainage_to_date,

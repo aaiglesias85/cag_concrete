@@ -4314,6 +4314,7 @@ var Projects = (function () {
 
       // columns
       const columns = [
+         { data: 'paid' },
          { data: 'invoice_date' },
          { data: 'invoice_amount' },
          { data: 'paid_amount' },
@@ -4327,6 +4328,17 @@ var Projects = (function () {
       let columnDefs = [
          {
             targets: 0,
+            className: 'text-center',
+            orderable: false,
+            render: function (data, type, row) {
+               var isPaid = row.paid === 1 || row.paid === true;
+               var color = isPaid ? 'success' : 'danger';
+               var tooltip = isPaid ? 'Paid' : 'Unpaid';
+               return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
+            },
+         },
+         {
+            targets: 1,
             render: function (data, type, row) {
                // Formatear fecha a formato más amigable
                var dateFormatted = data;
@@ -4346,13 +4358,6 @@ var Projects = (function () {
             },
          },
          {
-            targets: 1,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
             targets: 2,
             className: 'text-end',
             render: function (data, type, row) {
@@ -4363,14 +4368,14 @@ var Projects = (function () {
             targets: 3,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
+               return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
             targets: 4,
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
             },
          },
          {
@@ -4382,6 +4387,13 @@ var Projects = (function () {
          },
          {
             targets: 6,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
                var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
@@ -4393,8 +4405,8 @@ var Projects = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order - ordenar por fecha DESC (más reciente primero)
-      const order = [[0, 'desc']];
+      // order - ordenar por fecha ASC (más antiguo primero)
+      const order = [[1, 'asc']];
 
       // destroy if exists
       if (oTableInvoicesRetainage) {
@@ -4409,6 +4421,24 @@ var Projects = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+      });
+
+      // Inicializar tooltips para los indicadores de estado
+      function initTooltips() {
+         // Destruir tooltips existentes antes de crear nuevos
+         $(table + ' [data-bs-toggle="tooltip"]').each(function () {
+            var tooltipInstance = bootstrap.Tooltip.getInstance(this);
+            if (tooltipInstance) {
+               tooltipInstance.dispose();
+            }
+            new bootstrap.Tooltip(this);
+         });
+      }
+      initTooltips();
+
+      // Reinicializar tooltips cuando la tabla se redibuja
+      oTableInvoicesRetainage.on('draw', function () {
+         initTooltips();
       });
 
       // Agregar event handlers para los links de invoice
