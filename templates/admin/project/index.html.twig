@@ -1536,7 +1536,7 @@
                            <!--begin::Datatable-->
                            <table id="items-completion-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
-                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                               <!--  <tr class="fw-bold fs-6 text-gray-800 px-7">
                                     <th>Item</th>
                                     <th>Unit</th>
                                     <th>Contract Quantity</th>
@@ -1551,6 +1551,34 @@
                                     <th>Total Paid Amt $</th>
                                  </tr>
                               </thead>
+-->
+                             <thead>
+    <tr class="fw-bold fs-7 text-gray-800 border-bottom border-gray-200">
+        <th class="min-w-150px text-start">Item</th>
+
+        <th class="min-w-50px text-center">Unit</th>
+
+        <th class="min-w-70px text-end">Contr.<br>Qty</th>
+        
+        <th class="min-w-70px text-end">Price</th>
+        
+        <th class="min-w-90px text-end">Contr.<br>Total</th>
+        
+        <th class="min-w-70px text-end">Comp.<br>Qty To Date</th>
+        
+        <th class="min-w-90px text-end">Comp.<br>Amt ($) To Date</th>
+        
+        <th class="min-w-60px text-end">% Comp.</th>
+        
+        <th class="min-w-70px text-end">Inv.<br>Qty</th>
+        
+        <th class="min-w-90px text-end">Inv.<br>Amt ($)</th>
+        
+        <th class="min-w-70px text-end">Paid<br>Qty</th>
+        
+        <th class="min-w-90px text-end">Paid<br>Amt ($)</th>
+    </tr>
+</thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
                            </table>
                            <!--end::Datatable-->

@@ -1364,135 +1364,42 @@ var ProjectsDetalle = (function () {
       ];
 
       // column defs
+      // column defs
       let columnDefs = [
          {
-            targets: 0,
+            targets: 0, // Item
+            className: 'min-w-150px'
+         },
+         {
+            targets: 1, // Unit
+            className: 'text-center'
+         },
+         {
+            // Columnas de Dinero (Price, Total, Amt Completed, Invoiced Amt, Paid Amt)
+            targets: [3, 4, 6, 9, 11], 
+            className: 'text-end',
             render: function (data, type, row) {
-               // Si es encabezado de grupo, mostrar el título
-               if (row.isGroupHeader) {
-                  return '<strong>' + row.groupTitle + '</strong>';
+               if (type === 'display') {
+                  return data ? $.fn.dataTable.render.number(',', '.', 2, '$').display(data) : '$0.00';
                }
-               // Si es change order, agregar icono de +
-               var icono = '';
-               if (row.change_order && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View change order history"></i>';
-               }
-               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
-                  data || ''
-               }</span>${icono}</div>`;
-            },
+               return data;
+            }
          },
          {
-            targets: 1,
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
-            },
-         },
-         {
-            targets: 2,
+            // Columnas de Cantidad (Qty, Qty Completed, Invoiced Qty, Paid Qty)
+            targets: [2, 5, 8, 10], 
             className: 'text-end',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               var icono = '';
-               if (row.has_quantity_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View quantity history"></i>';
-               }
-               return `<div style="width: 180px; overflow: hidden; white-space: nowrap; text-align: right; display: flex; align-items: center; justify-content: flex-end;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: right;">${MyApp.formatearNumero(
-                  data,
-                  2,
-                  '.',
-                  ',',
-               )}</span>${icono}</div>`;
-            },
+               return data ? $.fn.dataTable.render.number(',', '.', 2, '').display(data) : '0.00';
+            }
          },
          {
-            targets: 3,
+            targets: 7, // % Completion
             className: 'text-end',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               var icono = '';
-               if (row.has_price_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View price history"></i>';
-               }
-               return `<div style="width: 180px; overflow: hidden; white-space: nowrap; text-align: right; display: flex; align-items: center; justify-content: flex-end;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; text-align: right;">${MyApp.formatMoney(
-                  data,
-               )}</span>${icono}</div>`;
-            },
-         },
-         {
-            targets: 4,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 5,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
-            },
-         },
-         {
-            targets: 6,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 7,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
-            },
-         },
-         {
-            targets: 8,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatearNumero(data ?? 0, 2, '.', ',')}</span>`;
-            },
-         },
-         {
-            targets: 9,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data ?? 0)}</span>`;
-            },
-         },
-         {
-            targets: 10,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatearNumero(data ?? 0, 2, '.', ',')}</span>`;
-            },
-         },
-         {
-            targets: 11,
-            className: 'text-end',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data ?? 0)}</span>`;
-            },
-         },
+               return data ? $.fn.dataTable.render.number(',', '.', 2, '', '%').display(data) : '0.00%';
+            }
+         }
       ];
 
       // language
