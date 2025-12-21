@@ -104,29 +104,19 @@ class InvoiceService extends Base
     *   - si no => QBF activo => unpaid=max(0, baseDebtPrev - QBF(actual))
     */
  /**
-    * Calcula unpaid_qty respetando Regla 1 y Regla 2.
+    * 
     */
-   private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaidQty, float $sumPrevQbf, float $currentQbf): float
+   /**
+    * Nueva Fórmula Simplificada:
+    * Unpaid = (Suma Qty Anteriores - Suma Paid Anteriores) - QBF Actual
+    */
+   private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaid, float $currentQbf): float
    {
-      $hasAnyPayment = ($sumPrevPaidQty > 0);
-
-      // --- REGLA 1: Sin pagos previos ---
-      if (!$hasAnyPayment) {
-         return max(0, $sumPrevQty - $currentQbf);
-      }
-
-      // --- REGLA 2: Con pagos ---
+      // (100 del inv1) - (70 del inv1) = 30.
+      // 30 - 0 (QBF) = 30.
+      $deudaNetaPrev = $sumPrevQty - $sumPrevPaid;
       
-      // Verificamos si los pagos acumulados superan al QBF acumulado histórico (Regla "rompe QBF")
-      if ($sumPrevPaidQty > $sumPrevQbf) {
-         // Esto asegura que el QBF se considere parte de la deuda a saldar antes de restar lo pagado.
-         return max(0, ($sumPrevQty + $sumPrevQbf) - $sumPrevPaidQty);
-      }
-
-      // Si no supera (QBF sigue activo), usamos la lógica estándar:
-      // Deuda Base (sin QBF) - QBF Actual
-      $baseDebtPrev = max(0, $sumPrevQty - $sumPrevPaidQty);
-      return max(0, $baseDebtPrev - $currentQbf);
+      return max(0, $deudaNetaPrev - $currentQbf);
    }
 
    /**
@@ -813,13 +803,40 @@ class InvoiceService extends Base
          // Encontrar el índice del invoice actual
          $currentIndex = $invoiceIndexById[(int) $currentInvoiceId] ?? -1;
 
-         $series = $this->buildInvoiceItemSeriesForInvoices($allInvoices, $invoiceItemMap);
-         $sumPrevItemQty = (float) ($series['prefixQty'][$currentIndex] ?? 0);
-         $sumPrevPaidQty = (float) ($series['prefixPaid'][$currentIndex] ?? 0);
-         $qbfTotalPrev = (float) ($series['prefixQbf'][$currentIndex] ?? 0);
+         
+         // --- CÁLCULO SIMPLIFICADO: (SumaQtyAnt - SumaPaidAnt) - QbfActual ---
+         $historialQty = 0.0;
+         $historialPaid = 0.0;
+         $nuevoUnpaid = 0.0;
 
-         $current_qbf = (float) ($value->getQuantityBroughtForward() ?? 0);
-         $unpaid_qty = $this->calculateInvoiceUnpaidQty($sumPrevItemQty, $sumPrevPaidQty, $qbfTotalPrev, $current_qbf);
+         for ($i = 0; $i <= $currentIndex; $i++) {
+            $invId = (int)$allInvoices[$i]->getInvoiceId();
+            $invItem = $invoiceItemMap[$invId] ?? null;
+
+            // 1. Datos del item en este invoice
+            $currentQbf = 0.0;
+            $iQty = 0.0;
+            $iPaid = 0.0;
+
+            if ($invItem) {
+               $currentQbf = (float)$invItem->getQuantityBroughtForward();
+               $iQty = (float)$invItem->getQuantity();
+               $iPaid = (float)$invItem->getPaidQty();
+            }
+
+            // 2. Calcular usando ACUMULADOS HASTA EL MOMENTO
+            // Unpaid = (TotalQty - TotalPaid) - QBF_Actual
+            $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+            
+            // 3. Actualizar ACUMULADOS para la siguiente vuelta
+            $historialQty += $iQty;
+            $historialPaid += $iPaid;
+         }
+
+         // El resultado final es el último calculado
+         $unpaid_qty = $nuevoUnpaid;
+
+
 
          $quantity = $value->getQuantity();
          $quantity_brought_forward = $value->getQuantityBroughtForward();
@@ -1404,51 +1421,43 @@ class InvoiceService extends Base
 
       // Para cada item modificado, recalcular desde el invoice afectado hacia adelante
       foreach ($items as $itemData) {
-         $project_item_id = $itemData->project_item_id ?? null;
-         if (!$project_item_id) {
-            continue;
-         }
+         // --- CAMBIO 3: CÁLCULO SIMPLIFICADO PARA GUARDAR ---
+         $historialQty = 0.0;
+         $historialPaid = 0.0;
 
-         // Obtener todos los invoice items de este project_item ordenados
-         $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+         // Recorremos SIEMPRE desde el principio (0)
+         for ($i = 0; $i < count($allInvoices); $i++) {
+            $invId = (int)$allInvoices[$i]->getInvoiceId();
+            $invItem = $invoiceItemMap[$invId] ?? null;
+            
+            // Datos actuales
+            $currentQbf = 0.0;
+            $iQty = 0.0;
+            $iPaid = 0.0;
 
-         // Crear un mapa: invoice_id => invoiceItem para acceso rápido
-         $invoiceItemMap = [];
-         foreach ($allInvoiceItems as $invoiceItem) {
-            /** @var InvoiceItem $invoiceItem */
-            $invoice_id = $invoiceItem->getInvoice()->getInvoiceId();
-            $invoiceItemMap[$invoice_id] = $invoiceItem;
-         }
-
-         $startIndex = $invoiceIndexById[(int) $current_invoice_id] ?? -1;
-
-         if ($startIndex === -1) {
-            continue; // Invoice no encontrado, saltar este item
-         }
-
-         $overrideQbf = isset($itemData->quantity_brought_forward) ? (float) $itemData->quantity_brought_forward : 0.0;
-         $series = $this->buildInvoiceItemSeriesForInvoices($allInvoices, $invoiceItemMap, (int) $current_invoice_id, $overrideQbf);
-
-         // Recalcular desde el invoice actual hacia adelante (O(n) usando prefijos)
-         for ($i = $startIndex; $i < count($allInvoices); $i++) {
-            /** @var Invoice $invoice */
-            $invoice = $allInvoices[$i];
-            $invoice_id = (int) $invoice->getInvoiceId();
-
-            $invoice_item = $invoiceItemMap[$invoice_id] ?? null;
-            if ($invoice_item === null) {
-               continue;
+            if ($invItem) {
+                 // Usamos el override si es el invoice actual del formulario
+                 $currentQbf = ($invId === (int)$current_invoice_id) 
+                     ? (isset($itemData->quantity_brought_forward) ? (float)$itemData->quantity_brought_forward : 0.0) 
+                     : (float)$invItem->getQuantityBroughtForward();
+                 
+                 $iQty = (float)$invItem->getQuantity();
+                 $iPaid = (float)$invItem->getPaidQty();
             }
 
-            $sumPrevItemQty = (float) ($series['prefixQty'][$i] ?? 0);
-            $sumPrevPaidQty = (float) ($series['prefixPaid'][$i] ?? 0);
-            $qbfTotalPrev = (float) ($series['prefixQbf'][$i] ?? 0);
-            $current_qbf = (float) ($series['qbf'][$i] ?? 0);
+            // 1. Calcular: (SumQtyPrev - SumPaidPrev) - QBF Actual
+            $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
 
-            $unpaid_qty = $this->calculateInvoiceUnpaidQty($sumPrevItemQty, $sumPrevPaidQty, $qbfTotalPrev, $current_qbf);
+            // 2. Guardar en BD (Si existe el item)
+            if ($invItem) {
+               $invItem->setUnpaidQty($nuevoUnpaid);
+               $invItem->setUnpaidFromPrevious($nuevoUnpaid);
+               $invItem->setQuantityBroughtForward($currentQbf);
+            }
 
-            $invoice_item->setUnpaidQty($unpaid_qty);
-            $invoice_item->setUnpaidFromPrevious($unpaid_qty);
+            // 3. Sumar al historial para el siguiente invoice
+            $historialQty += $iQty;
+            $historialPaid += $iPaid;
          }
       }
    }
