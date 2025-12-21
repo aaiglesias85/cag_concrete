@@ -662,7 +662,7 @@ class PaymentService extends Base
             $updated_project_item_ids[] = $value->project_item_id;
 
             // payment
-            $invoice_item_entity->setPaidQty($value->paid_qty);
+            $invoice_item_entity->setPaidQty((float)$value->paid_qty);
             $invoice_item_entity->setUnpaidQty($value->unpaid_qty);
             $invoice_item_entity->setPaidAmount($value->paid_amount);
             $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
