@@ -142,77 +142,63 @@ amount_completed = quantity_completed * price;
 
 ### 8. `unpaid_qty`
 
-**Descripción:** Cantidad no pagada acumulada de invoices anteriores. Este valor se calcula según reglas específicas que consideran el `quantity_brought_forward` de los invoices anteriores.
+**Descripción:** Cantidad no pagada acumulada de invoices anteriores. Este valor representa la deuda previa real menos el `quantity_brought_forward` del invoice actual.
 
 **Cálculo:**
 
 ```php
-// En el backend:
-// Se calcula aplicando las reglas de quantity_brought_forward
-$unpaid_qty = CalcularUnpaidQtyConReglasQuantityBroughtForward($invoice_id, $project_item_id);
+// En el backend (InvoiceService.php):
+// Fórmula simplificada aplicada en calculateInvoiceUnpaidQty()
+$deuda_neta_prev = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores);
+$unpaid_qty = max(0, $deuda_neta_prev - $quantity_brought_forward_del_invoice_actual);
 ```
 
-**Fórmula base para cada invoice anterior:**
-
-```php
-unpaid_qty_anterior = (quantity + quantity_brought_forward) - paid_qty
-```
-
-**Reglas de cálculo según `quantity_brought_forward`:**
-
-Cuando se modifica `quantity_brought_forward` en un invoice, se actualiza el `unpaid_qty` de ese invoice y de todos los invoices siguientes según estas reglas:
-
-**Regla 1 (Si no hay ningún invoice pagado):**
+**Fórmula:**
 
 ```
-unpaid_qty = deuda acumulada - quantity_brought_forward del invoice actual
-
-Donde:
-- deuda acumulada = suma de `quantity` de todos los invoices anteriores (NO incluye QBF)
+unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
+unpaid_qty = max(0, unpaid_qty) // No puede ser negativo
 ```
 
-**Regla 2 (Si hay algún invoice pagado):**
+**Donde:**
 
-```
-Si paid_qty acumulado > QBF acumulado:
-   QBF se desactiva
-   unpaid_qty = deuda previa real (sin aplicar QBF)
-Sino:
-   QBF sigue activo
-   unpaid_qty = deuda previa real - QBF del invoice actual
+-  `SUM(quantity prev)` = Suma de todas las `quantity` de los invoices anteriores (NO incluye QBF)
+-  `SUM(paid_qty prev)` = Suma de todas las `paid_qty` de los invoices anteriores
+-  `QBF(actual)` = `quantity_brought_forward` del invoice que se está calculando
 
-Donde:
-- deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
-- paid_qty acumulado = SUM(paid_qty de invoices anteriores)
-- QBF del invoice actual = quantity_brought_forward del invoice que se está calculando
-- QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
-```
-
-**Nota (clave):** En **INVOICES** el `unpaid_qty` (rojo) NO debe arrastrar el QBF de invoices anteriores. El QBF solo impacta al **invoice actual**. En **PAYMENTS** sí se usa `quantity_final = quantity + QBF`, por eso los valores no coinciden.
+**Nota (clave):** En **INVOICES** el `unpaid_qty` (rojo) NO debe arrastrar el QBF de invoices anteriores. El QBF solo impacta al **invoice actual** restando del cálculo. En **PAYMENTS** sí se usa `quantity_final = quantity + QBF`, por eso los valores no coinciden.
 
 **Lógica:**
 
--  Suma los `unpaid_qty` de todos los invoices anteriores del mismo `project_item_id`
--  Aplica las reglas según si hay invoices pagados y la relación entre `paid_qty` y `quantity_brought_forward`
--  Para el primer invoice, este valor es **0**
+-  Para el primer invoice, este valor es **0** (no hay invoices anteriores)
+-  Se calcula la deuda neta previa: suma de `quantity` menos suma de `paid_qty` de todos los invoices anteriores
+-  Se resta el `quantity_brought_forward` del invoice actual (solo impacta al invoice donde se edita)
 -  Cuando se modifica `quantity_brought_forward`, se actualiza en cascada el `unpaid_qty` del invoice afectado y todos los siguientes
 
-**Ejemplo (Regla 1 - Sin pagos):**
+**Ejemplos:**
+
+**Ejemplo 1 - Sin pagos:**
 
 -  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=0 → unpaid_qty = 0 (no hay anteriores)
 -  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 100 (del Invoice 1)
--  QBF (invoice actual) = 30
+-  Deuda neta prev = 100 - 0 = 100
 -  unpaid_qty = 100 - 30 = 70
 -  Invoice 3: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 200 (100 + 100)
--  QBF (invoice actual) = 30
+-  Deuda neta prev = (100 + 100) - (0 + 0) = 200
 -  unpaid_qty = 200 - 30 = 170
-
 -  Invoice 4: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada = 300 (100 + 100 + 100)
--  QBF (invoice actual) = 0
+-  Deuda neta prev = (100 + 100 + 100) - (0 + 0 + 0) = 300
 -  unpaid_qty = 300 - 0 = 300
+
+**Ejemplo 2 - Con pagos:**
+
+-  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=50 → unpaid_qty = 0 (no hay anteriores)
+-  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=20
+-  Deuda neta prev = 100 - 50 = 50
+-  unpaid_qty = 50 - 30 = 20
+-  Invoice 3: quantity=100, quantity_brought_forward=0, paid_qty=0
+-  Deuda neta prev = (100 + 100) - (50 + 20) = 130
+-  unpaid_qty = 130 - 0 = 130
 
 **Formato:** Número con 2 decimales
 
@@ -539,15 +525,32 @@ donde quantity_final = quantity + quantity_brought_forward
 
 **Encabezado en la tabla:** "Unpaid Qty"
 
-**Descripción:** Cantidad no pagada en este invoice.
+**Descripción:** Cantidad no pagada en este invoice. En **PAYMENTS**, este valor se calcula de forma diferente a INVOICES: es simplemente la diferencia entre la cantidad facturada y la cantidad pagada.
 
 **Cálculo:**
 
 ```php
-// En el backend:
+// En el backend (Base.php - ListarPaymentsDeInvoice):
+// En payments, Unpaid Qty = Invoice Qty - Paid Qty
+// Invoice Qty = quantity_final (quantity + quantity_brought_forward)
+// Por lo tanto: unpaid_qty = quantity_final - paid_qty
+
+$quantity_final = $quantity + ($quantity_brought_forward ?? 0);
 $unpaid_qty = $quantity_final - $paid_qty;
 $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
 ```
+
+**Fórmula:**
+
+```
+unpaid_qty = quantity_final - paid_qty
+donde quantity_final = quantity + quantity_brought_forward
+```
+
+**Diferencia clave con INVOICES:**
+
+-  **En INVOICES:** `unpaid_qty` representa la deuda acumulada de invoices anteriores menos el QBF del invoice actual. Se calcula con la fórmula: `(SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)`
+-  **En PAYMENTS:** `unpaid_qty` representa simplemente cuánto falta pagar de este invoice específico. Se calcula con la fórmula: `quantity_final - paid_qty`
 
 **Cálculo cuando se modifica (en frontend):**
 
@@ -563,7 +566,7 @@ paid_amount = paid_qty * price;
 
 **Validación:** `unpaid_qty` no puede ser negativo ni mayor que `quantity_final`
 
-**Nota:** Al modificar `unpaid_qty`, se recalcula automáticamente `paid_qty` y `paid_amount`.
+**Nota:** Al modificar `unpaid_qty`, se recalcula automáticamente `paid_qty` y `paid_amount`. Esta modificación también actualiza el `unpaid_from_previous` en todos los invoices siguientes del mismo proyecto.
 
 **Icono:** Incluye un botón para agregar notas al item.
 
@@ -713,12 +716,22 @@ Los payments se editan sobre invoices existentes. No se crean payments nuevos, s
    -  Para cada item, se calculan los valores para mostrar:
 
 ```php
+// quantity_final = quantity + quantity_brought_forward (Invoice Qty)
 $quantity_final = $quantity + ($quantity_brought_forward ?? 0);
+
+// quantity_completed: Cantidad total completada hasta la fecha
+// Nota: En payments se calcula como (quantity + unpaid_from_previous) + quantity_from_previous
 $quantity_completed = ($quantity + $unpaid_from_previous) + $quantity_from_previous;
-$amount = ($quantity + $unpaid_from_previous) * $price;
+
+// amount: Monto del invoice (Final Amount This Period) = quantity_final * price
+$amount = $quantity_final * $price;
+
+// total_amount: Monto total completado = quantity_completed * price
 $total_amount = $quantity_completed * $price;
+
+// unpaid_qty: Cantidad no pagada de este invoice = quantity_final - paid_qty
 $unpaid_qty = $quantity_final - $paid_qty;
-$unpaid_qty = max(0, $unpaid_qty);
+$unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
 ```
 
 2. **Actualización de Pagos:**
@@ -771,16 +784,25 @@ Cuando se actualiza un payment, se debe recalcular `unpaid_from_previous` en tod
       -  Calcular `unpaid_from_previous`:
 
          ```php
+         // Para calcular unpaid_from_previous, se suman los unpaid_qty de los invoices anteriores
+         // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
+         // donde quantity_final = quantity + quantity_brought_forward
+         // SIEMPRE se recalcula unpaid_qty para asegurar precisión (no usar valor almacenado)
+
          $unpaid_from_previous = 0;
          foreach ($invoices_anteriores as $invoice_anterior) {
              $quantity = $invoice_anterior->getQuantity() ?? 0;
              $quantity_brought_forward = $invoice_anterior->getQuantityBroughtForward() ?? 0;
              $paid_qty = $invoice_anterior->getPaidQty() ?? 0;
 
+             // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
              $quantity_final = $quantity + $quantity_brought_forward;
-             $unpaid_qty = $quantity_final - $paid_qty;
-             $unpaid_qty = max(0, $unpaid_qty);
 
+             // Calcular el unpaid_qty real: Invoice Qty - Paid Qty
+             $unpaid_qty = $quantity_final - $paid_qty;
+             $unpaid_qty = max(0, $unpaid_qty); // No puede ser negativo
+
+             // Sumar al unpaid_from_previous acumulado
              $unpaid_from_previous += $unpaid_qty;
          }
          ```
@@ -794,14 +816,18 @@ Cuando se actualiza un payment, se debe recalcular `unpaid_from_previous` en tod
 
 **Ejemplo:**
 
--  Invoice 1: quantity=10, paid_qty=4 → unpaid_qty = 6
--  Invoice 2: quantity=5, paid_qty=1 → unpaid_qty = 4
--  Invoice 3: unpaid_from_previous = 6 + 4 = 10
+-  Invoice 1: quantity=10, quantity_brought_forward=0, paid_qty=4
+-  quantity_final = 10 + 0 = 10
+-  unpaid_qty = 10 - 4 = 6
+-  Invoice 2: quantity=5, quantity_brought_forward=2, paid_qty=1
+-  quantity_final = 5 + 2 = 7
+-  unpaid_qty = 7 - 1 = 6
+-  Invoice 3: unpaid_from_previous = 6 + 6 = 12
 
 Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 
--  Invoice 1: unpaid_qty = 10 - 6 = 4
--  Invoice 3: unpaid_from_previous = 4 + 4 = 8 (se actualiza automáticamente)
+-  Invoice 1: quantity_final = 10, unpaid_qty = 10 - 6 = 4
+-  Invoice 3: unpaid_from_previous = 4 + 6 = 10 (se actualiza automáticamente)
 
 ---
 
@@ -817,14 +843,14 @@ Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 
 2. **Cálculo de Valores Iniciales:**
 
-   -  `quantity_from_previous`: Suma de quantities de invoices anteriores
-   -  `unpaid_from_previous`: Suma de unpaid_qty de invoices anteriores
+   -  `quantity_from_previous`: Suma de `quantity` de invoices anteriores
+   -  `unpaid_from_previous`: Se calcula sumando los `unpaid_qty` de invoices anteriores (usando la fórmula `quantity_final - paid_qty` para cada invoice anterior)
    -  `quantity`: Cantidad del periodo (de DataTrackingItem)
    -  `quantity_brought_forward`: 0 (por defecto)
    -  `paid_qty`: 0 (inicialmente)
-   -  `unpaid_qty`: `unpaid_from_previous` (inicialmente)
+   -  `unpaid_qty`: Se calcula usando la fórmula `(SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)`. Si QBF = 0, será igual a `unpaid_from_previous`
    -  `paid_amount`: 0 (inicialmente)
-   -  `paid_amount_total`: Suma de paid_amount de invoices anteriores
+   -  `paid_amount_total`: Suma de `paid_amount` de invoices anteriores
 
 3. **Persistencia:**
 
@@ -841,10 +867,10 @@ Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 
 1. **Actualización de Valores:**
 
-   -  `paid_qty`: Valor ingresado por el usuario
-   -  `unpaid_qty`: Calculado como `quantity_final - paid_qty`
+   -  `paid_qty`: Valor ingresado por el usuario (o calculado si se modifica `unpaid_qty`)
+   -  `unpaid_qty`: Calculado como `quantity_final - paid_qty` (donde `quantity_final = quantity + quantity_brought_forward`)
    -  `paid_amount`: Calculado como `paid_qty * price`
-   -  `paid_amount_total`: Suma de paid_amount anteriores + paid_amount actual
+   -  `paid_amount_total`: Suma de `paid_amount` anteriores + `paid_amount` actual
 
 2. **Marcar Invoice como Pagado:**
 
@@ -854,6 +880,7 @@ Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 3. **Actualización en Cascada:**
 
    -  **CRÍTICO:** Actualizar `unpaid_from_previous` en todos los invoices siguientes
+   -  Para cada invoice siguiente, se recalcula `unpaid_from_previous` sumando los `unpaid_qty` de todos los invoices anteriores (usando la fórmula `quantity_final - paid_qty` para cada uno)
    -  Esto asegura que los cálculos de invoices posteriores sean correctos
 
 4. **Persistencia:**
@@ -869,141 +896,72 @@ Si se paga más en Invoice 1 (paid_qty pasa de 4 a 6):
 
 ## Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`
 
-Cuando se modifica el valor de `quantity_brought_forward` en un invoice, el sistema recalcula automáticamente el `unpaid_qty` del invoice afectado y de todos los invoices siguientes (en cascada) según las siguientes reglas:
+Cuando se modifica el valor de `quantity_brought_forward` en un invoice, el sistema recalcula automáticamente el `unpaid_qty` del invoice afectado y de todos los invoices siguientes (en cascada) usando una fórmula simplificada.
 
-### Regla 1: Si no hay ningún invoice pagado
+### Fórmula Simplificada (Implementación Final)
 
-**Fórmula:**
+**Fórmula aplicada en `calculateInvoiceUnpaidQty()`:**
 
 ```
-unpaid_qty = deuda acumulada - quantity_brought_forward del invoice actual
-
-Donde:
-- deuda acumulada = suma de `quantity` de todos los invoices anteriores (sin QBF)
+unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
+unpaid_qty = max(0, unpaid_qty) // No puede ser negativo
 ```
+
+**Donde:**
+
+-  `SUM(quantity prev)` = Suma de todas las `quantity` de los invoices anteriores (NO incluye QBF)
+-  `SUM(paid_qty prev)` = Suma de todas las `paid_qty` de los invoices anteriores
+-  `QBF(actual)` = `quantity_brought_forward` del invoice que se está calculando
 
 **Explicación:**
 
--  Se calcula la deuda acumulada sumando la `quantity` de todos los invoices anteriores (sin QBF)
--  Se resta el `quantity_brought_forward` del invoice actual (solo impacta al invoice donde se edita)
+-  Se calcula la deuda neta previa: suma de `quantity` menos suma de `paid_qty` de todos los invoices anteriores
+-  Se resta el `quantity_brought_forward` del invoice actual (solo impacta al invoice donde se edita, no se arrastra)
 -  El resultado no puede ser negativo (se aplica `max(0, unpaid_qty)`)
 
-**Ejemplo:**
+**Nota importante:**
+
+En **INVOICES**, el `unpaid_qty` (columna roja) NO arrastra el QBF de invoices anteriores. El QBF solo se resta del cálculo del invoice actual. Esto es diferente a **PAYMENTS**, donde se usa `quantity_final = quantity + QBF` y `unpaid_qty = quantity_final - paid_qty`.
+
+**Ejemplos:**
+
+**Ejemplo 1 - Sin pagos:**
 
 -  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=0 → unpaid_qty = 0 (no hay anteriores)
 -  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 100 (quantity del Invoice 1)
--  QBF (invoice actual) = 30
+-  Deuda neta prev = (100) - (0) = 100
 -  unpaid_qty = 100 - 30 = 70
 -  Invoice 3: quantity=100, quantity_brought_forward=30, paid_qty=0
--  Deuda acumulada = 200 (100 del #1 + 100 del #2)
--  QBF (invoice actual) = 30
+-  Deuda neta prev = (100 + 100) - (0 + 0) = 200
 -  unpaid_qty = 200 - 30 = 170
 -  Invoice 4: quantity=100, quantity_brought_forward=0, paid_qty=0
--  Deuda acumulada = 300 (100 + 100 + 100)
--  QBF (invoice actual) = 0
+-  Deuda neta prev = (100 + 100 + 100) - (0 + 0 + 0) = 300
 -  unpaid_qty = 300 - 0 = 300
 
-### Regla 2: Si hay algún invoice pagado
+**Ejemplo 2 - Con pagos:**
 
-**Fórmula:**
-
-```
-Si paid_qty acumulado > QBF acumulado: // Caso "Rompe QBF" (Pagos grandes) // Se considera el QBF como parte de la deuda total a saldar. unpaid_qty = (deuda acumulada + QBF acumulado) - paid_qty acumulado
-
-Sino: // Caso estándar (Pagos pequeños) // QBF sigue activo para descontar unpaid_qty = deuda previa real - QBF del invoice actual
-
-Donde:
-
-deuda acumulada = SUM(quantity de invoices anteriores)
-
-deuda previa real = SUM(quantity de invoices anteriores) - SUM(paid_qty de invoices anteriores)
-
-paid_qty acumulado = SUM(paid_qty de invoices anteriores)
-
-QBF acumulado = SUM(quantity_brought_forward de invoices anteriores)
-
-**Explicación:**
-
--  **Caso A - Pago pequeño:** Si el total pagado es menor o igual al QBF histórico, se mantiene la lógica de restar el QBF actual a la deuda pendiente.
--  **Caso B - Pago grande:** Si el total pagado supera al QBF histórico, el sistema calcula la deuda total real sumando todo lo facturado (Items + QBF) y restando todo lo pagado. Esto asegura que el resultado sea la suma exacta de los saldos pendientes de los invoices anteriores.
-
-**Ejemplo Actualizado (Caso B):**
-
--  Invoices anteriores (suma de quantities): 300
--  QBF acumulado: 60
--  Pagos acumulados: 160
--  **Cálculo:** (300 + 60) - 160 = **200**
-
-**Ejemplo:**
-
-**Escenario:** 4 invoices, con pagos previos (paid_qty) y QBF en el invoice actual.
-
--  Invoice 1: quantity=100, QBF=0, paid_qty=0 → unpaid_qty = 0 (no hay anteriores)
-
--  Invoice 2: quantity=100, QBF=0, paid_qty=10
-
-   -  Deuda previa real (Invoice 2) = SUM(quantity prev) - SUM(paid_qty prev) = 100 - 0 = 100
-   -  QBF (invoice actual) = 0
-   -  unpaid_qty (Invoice 2) = 100 - 0 = 100
-
--  Invoice 3: quantity=100, QBF=30, paid_qty=50
-
-   -  SUM(quantity prev) = 100 + 100 = 200
-   -  SUM(paid_qty prev) = 0 + 10 = 10
-   -  Deuda previa real = 200 - 10 = 190
-   -  QBF acumulado (prev + actual) = (0 + 0) + 30 = 30
-   -  Como 10 <= 30, **QBF sigue activo**
-   -  unpaid_qty (Invoice 3) = 190 - 30 = 160
-
--  Invoice 4: quantity=100, QBF=0, paid_qty=0
-   -  SUM(quantity prev) = 100 + 100 + 100 = 300
-   -  SUM(paid_qty prev) = 0 + 10 + 50 = 60
-   -  Deuda previa real = 300 - 60 = 240
-   -  QBF acumulado (prev + actual) = (0 + 0 + 30) + 0 = 30
-   -  Como 60 > 30, **QBF se desactiva**
-   -  unpaid_qty (Invoice 4) = 240
-
-**Variación (mismo Invoice 4, pero con QBF=40 en el invoice actual):**
-
--  QBF acumulado (prev + actual) = 30 + 40 = 70
--  Como 60 <= 70, **QBF sigue activo**
--  unpaid_qty (Invoice 4) = 240 - 40 = 200
+-  Invoice 1: quantity=100, quantity_brought_forward=0, paid_qty=50 → unpaid_qty = 0 (no hay anteriores)
+-  Invoice 2: quantity=100, quantity_brought_forward=30, paid_qty=20
+-  Deuda neta prev = (100) - (50) = 50
+-  unpaid_qty = 50 - 30 = 20
+-  Invoice 3: quantity=100, quantity_brought_forward=0, paid_qty=0
+-  Deuda neta prev = (100 + 100) - (50 + 20) = 130
+-  unpaid_qty = 130 - 0 = 130
 
 ### Actualización en Cascada
 
 Cuando se modifica `quantity_brought_forward` en un invoice:
 
-1. Se recalcula el `unpaid_qty` del invoice actual aplicando las reglas
+1. Se recalcula el `unpaid_qty` del invoice actual aplicando la fórmula simplificada
 2. Se actualiza automáticamente el `unpaid_qty` de todos los invoices siguientes del mismo proyecto
 3. Los invoices siguientes se actualizan en orden cronológico (por fecha de inicio)
 
 **Implementación técnica:**
 
 -  Función: `ActualizarUnpaidQtyPorQuantityBroughtForward()` en `InvoiceService.php`
+-  Función de cálculo: `calculateInvoiceUnpaidQty()` en `InvoiceService.php`
 -  Se ejecuta automáticamente después de guardar los items del invoice
 -  Actualiza tanto `unpaid_qty` como `unpaid_from_previous` en la base de datos
-
-**Nota importante sobre la corrección (Regla 2):**
-
-Cuando QBF sigue activo, en **INVOICES** la fórmula correcta es:
-
-`unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF_del_invoice_actual`
-
-Esto es porque:
-
-1. El `unpaid_qty` (rojo) representa deuda previa real (sin QBF arrastrado)
-2. El QBF solo debe ajustar el invoice donde se edita (invoice actual)
-3. Restar QBF de invoices anteriores provoca los errores tipo **270/240** (se descuenta FW en invoices siguientes)
-
-**Ejemplo de la corrección:**
-
--  Invoice 3: quantity=100, QBF=30, paid_qty=130 (incluye QBF)
--  Invoice 4: quantity=100, QBF=0, paid_qty=0
--  Deuda acumulada = 230 (100 + 130)
--  Pagos acumulados = 130
--  **Correcto:** unpaid_qty = 230 - 130 = 100
--  **Incorrecto (fórmula antigua):** unpaid_qty = 230 - 130 - 30 = 70 ❌
 
 ---
 
@@ -1011,11 +969,20 @@ Esto es porque:
 
 ### Fórmulas de Cantidad
 
+**En INVOICES:**
+
 ```
 quantity_final = quantity + quantity_brought_forward (Invoice Qty)
 quantity_completed = quantity + quantity_from_previous
-unpaid_qty = quantity_final - paid_qty
+unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
 unpaid_from_previous = Σ(unpaid_qty de invoices anteriores)
+```
+
+**En PAYMENTS:**
+
+```
+quantity_final = quantity + quantity_brought_forward (Invoice Qty)
+unpaid_qty = quantity_final - paid_qty
 ```
 
 ### Fórmulas de Monto
@@ -1032,11 +999,22 @@ unpaid_amount = unpaid_qty * price
 
 ### Relaciones
 
+**En PAYMENTS (siempre válido):**
+
 ```
 paid_qty + unpaid_qty = quantity_final
 quantity_final = quantity + quantity_brought_forward
-quantity_completed = quantity + quantity_from_previous
 ```
+
+**En INVOICES:**
+
+```
+quantity_final = quantity + quantity_brought_forward
+quantity_completed = quantity + quantity_from_previous
+unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
+```
+
+**Nota:** En INVOICES, `paid_qty + unpaid_qty` NO es igual a `quantity_final` porque `unpaid_qty` representa la deuda acumulada de invoices anteriores, no la deuda del invoice actual.
 
 ---
 
