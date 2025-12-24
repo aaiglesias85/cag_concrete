@@ -995,6 +995,13 @@ var Invoices = (function () {
 
          // items
          items = invoice.items;
+         // --- CÁLCULO DE BASE AL EDITAR ---
+         items.forEach(function(item) {
+            var qbf = Number(item.quantity_brought_forward || 0);
+            var unpaid = Number(item.unpaid_qty || 0);
+            // Base = Lo que se debe + Lo que se protegió
+            item.base_debt = unpaid + qbf;
+         });
 
          // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
@@ -1384,7 +1391,12 @@ var Invoices = (function () {
 
                         // agregar si no existe en el array items el item.project_item_id
                         if (!items.some((i) => Number(i.project_item_id) === Number(item.project_item_id))) {
+                           var raw_qbf = Number(item.quantity_brought_forward || 0);
+                           var raw_unpaid = Number(item.unpaid_qty || 0);
+                           var base_debt = raw_unpaid + raw_qbf; 
+
                            items.push({
+                              base_debt: base_debt,
                               invoice_item_id: '',
                               project_item_id: item.project_item_id,
                               item_id: item.item_id,
@@ -2227,23 +2239,32 @@ var Invoices = (function () {
       $(document).on('change', '#items-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
+         
          if (items_lista[posicion]) {
-            var quantity = Number($this.val() || 0);
+            var new_qbf = Number($this.val() || 0);
+            items_lista[posicion].quantity_brought_forward = new_qbf;
 
-            items_lista[posicion].quantity_brought_forward = quantity;
-            // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
-            items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
+            // --- CÁLCULO EN VIVO
+            // Unpaid = DeudaBase - QBF Actual
+            var base = Number(items_lista[posicion].base_debt || 0);
+            var new_unpaid = Math.max(0, base - new_qbf);
+
+            items_lista[posicion].unpaid_qty = new_unpaid;
+            // ------------------------------------------------
+
+            // Actualizar totales dependientes
+            items_lista[posicion].quantity_final = Number(items_lista[posicion].quantity) + new_qbf;
             items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
-
-            // unpaid_qty ya viene correcto del backend (suma de unpaid_qty de invoices anteriores)
-            // NO recalcular porque ese valor ya está correcto
-            // Solo recalcular unpaid_amount
-            items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
+            
+            // Actualizar dinero pendiente ($)
+            items_lista[posicion].unpaid_amount = new_unpaid * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }
       });
    };
+
+
    var resetFormItem = function () {
       // reset form
       MyUtil.resetForm('item-form');
