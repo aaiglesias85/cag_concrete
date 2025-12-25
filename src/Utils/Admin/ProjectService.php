@@ -1140,58 +1140,46 @@ class ProjectService extends Base
     * @param $project_item_id
     * @return float|int
     */
+   /**
+    * CalcularUnpaidQuantityFromPreviusInvoice
+    * Suma los unpaid_qty de todos los invoices anteriores.
+    * CORRECCIÓN: Se basa estrictamente en (Total Cantidad - Total Pagado).
+    * Se IGNORA el quantity_brought_forward (QBF) para la deuda histórica,
+    * ya que el QBF es un ajuste temporal de ese invoice y no debe aumentar la deuda futura.
+    * * @param $project_item_id
+    * @return float|int
+    */
    public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id)
    {
-      $unpaid_quantity = 0;
+      $total_quantity = 0.0;
+      $total_paid = 0.0;
 
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
       // Obtener TODOS los invoice items anteriores de este project_item
-      // Ordenados por fecha para procesarlos en orden cronológico
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
 
-      // Recorrer TODOS los invoices previos y aplicar la fórmula
+      // Recorrer TODOS los invoices previos
       foreach ($invoice_items as $invoice_item) {
-         // NO usar el campo unpaid_qty almacenado en BD
-         // Siempre recalcular usando la fórmula: unpaid_qty = quantity_final - paid_qty
-
-         // Obtener valores base - asegurar que no sean NULL y convertir a float
+         // Sumar solo la cantidad real facturada (Qty This Period)
          $quantity = $invoice_item->getQuantity();
-         if ($quantity === null) {
-            $quantity = 0.0;
-         } else {
-            $quantity = (float)$quantity;
-         }
+         $quantity = ($quantity === null) ? 0.0 : (float)$quantity;
 
-         // IMPORTANTE: quantity_brought_forward puede ser NULL en la BD
-         // Si es NULL, significa 0, pero debemos leerlo correctamente
-         $quantity_brought_forward = $invoice_item->getQuantityBroughtForward();
-         if ($quantity_brought_forward === null) {
-            $quantity_brought_forward = 0.0;
-         } else {
-            $quantity_brought_forward = (float)$quantity_brought_forward;
-         }
-
+         // Sumar lo pagado
          $paid_quantity = $invoice_item->getPaidQty();
-         if ($paid_quantity === null) {
-            $paid_quantity = 0.0;
-         } else {
-            $paid_quantity = (float)$paid_quantity;
-         }
+         $paid_quantity = ($paid_quantity === null) ? 0.0 : (float)$paid_quantity;
 
-         // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
-         $quantity_final = $quantity + $quantity_brought_forward;
-
-         // Aplicar la fórmula: unpaid_qty = quantity_final - paid_qty
-         $unpaid_qty = $quantity_final - $paid_quantity;
-         $unpaid_qty = max(0.0, $unpaid_qty); // Asegurar que no sea negativo
-
-         // Sumar al total acumulado
-         $unpaid_quantity += $unpaid_qty;
+         // ACUMULAR
+         // IMPORTANTE: No sumamos quantity_brought_forward aquí.
+         $total_quantity += $quantity;
+         $total_paid += $paid_quantity;
       }
 
-      return $unpaid_quantity;
+      // La deuda total es simplemente lo facturado menos lo pagado
+      $unpaid_quantity = $total_quantity - $total_paid;
+
+      return max(0.0, $unpaid_quantity);
    }
 
    /**
