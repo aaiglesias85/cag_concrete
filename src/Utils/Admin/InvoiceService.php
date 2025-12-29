@@ -262,6 +262,51 @@ class InvoiceService extends Base
       $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
+      // A: Item #
+      $objWorksheet->getColumnDimension('A')->setWidth(8.29);
+
+      $objWorksheet->getColumnDimension('B')->setWidth(18.29);
+      $objWorksheet->getColumnDimension('C')->setWidth(24.43);
+      $objWorksheet->getColumnDimension('D')->setWidth(16.43);
+
+      // E: UNIT 
+      $objWorksheet->getColumnDimension('E')->setWidth(14.00);
+
+      // F: UNIT PRICE 
+      $objWorksheet->getColumnDimension('F')->setWidth(13.71);
+
+      // G: CONTRACT QTY 
+      $objWorksheet->getColumnDimension('G')->setWidth(13.71);
+
+      // H: CONTRACT AMOUNT 
+      $objWorksheet->getColumnDimension('H')->setWidth(18.00);
+
+      // I: CURRENT QTY 
+      $objWorksheet->getColumnDimension('I')->setWidth(18.00);
+
+      // J: CURRENT AMT 
+      $objWorksheet->getColumnDimension('J')->setWidth(17.86);
+
+      // K: PREVIOUS QTY 
+      $objWorksheet->getColumnDimension('K')->setWidth(17.86);
+
+      // L: PREVIOUS AMT 
+      $objWorksheet->getColumnDimension('L')->setWidth(18.29);
+
+      // M: COMPLETED QTY 
+      //$objWorksheet->getColumnDimension('M')->setWidth(18.29);
+
+      // N: COMPLETED AMT 
+      $objWorksheet->getColumnDimension('N')->setWidth(17.14);
+
+      // O: UNPAID QTY 
+      $objWorksheet->getColumnDimension('O')->setWidth(15.71);
+
+      // P: UNPAID AMT 
+      $objWorksheet->getColumnDimension('Q')->setWidth(21.29);
+
+      $objWorksheet->getColumnDimension('r')->setWidth(19.14);
+
       // 3. BUSCAR FOOTER AUTOMÁTICAMENTE
       $fila_footer_inicio = 0;
       for ($i = 16; $i < 150; $i++) {
@@ -430,10 +475,10 @@ class InvoiceService extends Base
             ->setCellValue('J' . $fila, $amount)          // Antes H (Current)
             ->setCellValue('K' . $fila, $quantity_from_previous) // Antes I
             ->setCellValue('L' . $fila, $amount_from_previous)   // Antes J
-            ->setCellValue('M' . $fila, $quantity_completed)     // Antes K
+            // ->setCellValue('M' . $fila, $quantity_completed)     // Antes K
             ->setCellValue('N' . $fila, $amount_completed)       // Antes L
-            ->setCellValue('O' . $fila, $unpaid_qty)             // Antes M (Balance Qty)
-            ->setCellValue('P' . $fila, $unpaid_amount);         // Antes N (Balance Amount)
+            ->setCellValue('O' . $fila, $unpaid_qty);           // Antes M (Balance Qty)
+         // ->setCellValue('P' . $fila, $unpaid_amount);         // Antes N (Balance Amount)
 
          // Borde desde A hasta P
          $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
@@ -529,10 +574,10 @@ class InvoiceService extends Base
                   ->setCellValue('J' . $fila, $amount)
                   ->setCellValue('K' . $fila, $quantity_from_previous)
                   ->setCellValue('L' . $fila, $amount_from_previous)
-                  ->setCellValue('M' . $fila, $quantity_completed)
+                  // ->setCellValue('M' . $fila, $quantity_completed)
                   ->setCellValue('N' . $fila, $amount_completed)
-                  ->setCellValue('O' . $fila, $unpaid_qty)
-                  ->setCellValue('P' . $fila, $unpaid_amount);;
+                  ->setCellValue('O' . $fila, $unpaid_qty);
+               //->setCellValue('P' . $fila, $unpaid_amount);
 
                // Aplicar bordes a toda la fila (A–P)
                $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
