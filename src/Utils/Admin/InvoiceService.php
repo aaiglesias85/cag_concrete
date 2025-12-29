@@ -216,23 +216,76 @@ class InvoiceService extends Base
     */
    public function ExportarExcel($invoice_id)
    {
-      // Configurar excel
-      Cell::setValueBinder(new AdvancedValueBinder());
 
-      // === Estilo de bordes (4 lados) ===
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $items = $invoiceItemRepo->ListarItems($invoice_id);
+
+
+      $items_regulares = [];
+      $items_change_order = [];
+
+      foreach ($items as $value) {
+         $change_order = $value->getProjectItem()->getChangeOrder();
+         if ($change_order) {
+            $change_order_date = $value->getProjectItem()->getChangeOrderDate();
+            if ($change_order_date != null) {
+               $key_group = $change_order_date->format('Y-m');
+               if (!isset($items_change_order[$key_group])) {
+                  $items_change_order[$key_group] = [];
+               }
+               $items_change_order[$key_group][] = $value;
+            } else {
+               if (!isset($items_change_order['no-date'])) {
+                  $items_change_order['no-date'] = [];
+               }
+               $items_change_order['no-date'][] = $value;
+            }
+         } else {
+            $items_regulares[] = $value;
+         }
+      }
+      ksort($items_change_order); // Ordenar change orders
+
+
+      Cell::setValueBinder(new AdvancedValueBinder());
       $styleArray = [
          'borders' => [
             'allBorders' => [
                'borderStyle' => Border::BORDER_THIN,
-               'color' => ['argb' => 'FF000000'], // negro
+               'color' => ['argb' => 'FF000000'],
             ],
          ],
       ];
 
-      // Reader
       $reader = IOFactory::createReader('Xlsx');
       $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
+
+      // 3. BUSCAR FOOTER AUTOMÁTICAMENTE
+      $fila_footer_inicio = 0;
+      for ($i = 16; $i < 150; $i++) {
+         $valor = $objWorksheet->getCell('G' . $i)->getValue();
+         if ($valor && stripos((string)$valor, 'CONTRACT AMOUNT') !== false) {
+            $fila_footer_inicio = $i;
+            break;
+         }
+      }
+
+      if ($fila_footer_inicio == 0) {
+         $fila_footer_inicio = 41; // Fallback por seguridad
+      }
+      $fila_retainage = $fila_footer_inicio + 1;
+
+      $fila = 16;
+      foreach ($items_regulares as $value) {
+         if ($fila >= ($fila_footer_inicio - 1)) {
+            $objWorksheet->insertNewRowBefore($fila_footer_inicio, 1);
+            $fila_footer_inicio++;
+            $fila_retainage++;
+         }
+         $fila++;
+      }
 
       // Datos del invoice
       $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
@@ -364,27 +417,26 @@ class InvoiceService extends Base
 
          // Escribir fila
          $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
+         // ...
          $objWorksheet
             ->setCellValue('A' . $fila, $item_number)
             ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
-            ->setCellValue('E' . $fila, $unit)
-            ->setCellValue('F' . $fila, $price)
-            ->setCellValue('G' . $fila, $contract_qty)
-            ->setCellValue('H' . $fila, $contract_amount)
-            ->setCellValue('I' . $fila, $quantity)
-            ->setCellValue('J' . $fila, $amount)
-            ->setCellValue('K' . $fila, $quantity_from_previous)
-            ->setCellValue('L' . $fila, $amount_from_previous)
-            ->setCellValue('N' . $fila, $quantity_completed)
-            ->setCellValue('O' . $fila, $amount_completed)
-            ->setCellValue('Q' . $fila, $unpaid_qty)
-            ->setCellValue('R' . $fila, $unpaid_amount)
-         ;
 
-         // Aplicar bordes a toda la fila (A–P)
-         $objWorksheet->getStyle("A{$fila}:L{$fila}")->applyFromArray($styleArray);
-         $objWorksheet->getStyle("N{$fila}:O{$fila}")->applyFromArray($styleArray);
-         $objWorksheet->getStyle("Q{$fila}:R{$fila}")->applyFromArray($styleArray);
+            ->setCellValue('E' . $fila, $unit)            // Antes C
+            ->setCellValue('F' . $fila, $price)           // Antes D
+            ->setCellValue('G' . $fila, $contract_qty)    // Antes E
+            ->setCellValue('H' . $fila, $contract_amount) // Antes F
+            ->setCellValue('I' . $fila, $quantity)        // Antes G (Current)
+            ->setCellValue('J' . $fila, $amount)          // Antes H (Current)
+            ->setCellValue('K' . $fila, $quantity_from_previous) // Antes I
+            ->setCellValue('L' . $fila, $amount_from_previous)   // Antes J
+            ->setCellValue('M' . $fila, $quantity_completed)     // Antes K
+            ->setCellValue('N' . $fila, $amount_completed)       // Antes L
+            ->setCellValue('O' . $fila, $unpaid_qty)             // Antes M (Balance Qty)
+            ->setCellValue('P' . $fila, $unpaid_amount);         // Antes N (Balance Amount)
+
+         // Borde desde A hasta P
+         $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
 
          $item_number++;
          $fila++;
@@ -464,9 +516,11 @@ class InvoiceService extends Base
 
                // Escribir fila
                $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
+               // ...
                $objWorksheet
                   ->setCellValue('A' . $fila, $item_number)
                   ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
+
                   ->setCellValue('E' . $fila, $unit)
                   ->setCellValue('F' . $fila, $price)
                   ->setCellValue('G' . $fila, $contract_qty)
@@ -475,16 +529,13 @@ class InvoiceService extends Base
                   ->setCellValue('J' . $fila, $amount)
                   ->setCellValue('K' . $fila, $quantity_from_previous)
                   ->setCellValue('L' . $fila, $amount_from_previous)
-                  ->setCellValue('N' . $fila, $quantity_completed)
-                  ->setCellValue('O' . $fila, $amount_completed)
-                  ->setCellValue('Q' . $fila, $unpaid_qty)
-                  ->setCellValue('R' . $fila, $unpaid_amount)
-               ;
+                  ->setCellValue('M' . $fila, $quantity_completed)
+                  ->setCellValue('N' . $fila, $amount_completed)
+                  ->setCellValue('O' . $fila, $unpaid_qty)
+                  ->setCellValue('P' . $fila, $unpaid_amount);;
 
                // Aplicar bordes a toda la fila (A–P)
-               $objWorksheet->getStyle("A{$fila}:L{$fila}")->applyFromArray($styleArray);
-               $objWorksheet->getStyle("N{$fila}:O{$fila}")->applyFromArray($styleArray);
-               $objWorksheet->getStyle("Q{$fila}:R{$fila}")->applyFromArray($styleArray);
+               $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
 
                $item_number++;
                $fila++;
@@ -492,109 +543,61 @@ class InvoiceService extends Base
          }
       }
 
-      // Totales
-      $objWorksheet->setCellValue("G$fila", "TOTAL CONTRACT AMOUNT:")->getStyle("G$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("H$fila", $total_contract_amount)->getStyle("H$fila")->getFont()->setBold(true);
+      $fila++;
 
-      $objWorksheet->setCellValue("I$fila", "TOTAL AMOUNT (BTD):")->getStyle("I$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("J$fila", $total_amount_invoice_todate)->getStyle("I$fila")->getFont()->setBold(true);
+      //(cierre del foreach de items)
+      $fila++;
 
-      $objWorksheet->setCellValue("K$fila", "TOTAL AMOUNT (PREVIOUS BILL):")->getStyle("K$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("L$fila", $total_amount_from_previous)->getStyle("L$fila")->getFont()->setBold(true);
-
-      $objWorksheet->setCellValue("N$fila", "TOTAL BILLED AMOUNT (THIS PERIOD):")->getStyle("N$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("O$fila", $total_amount_final)->getStyle("O$fila")->getFont()->setBold(true);
-
-      $objWorksheet->setCellValue("Q$fila", "TOTAL PENDING BALANCE (BTD):")->getStyle("Q$fila")->getFont()->setBold(true);
-      $objWorksheet->setCellValue("R$fila", $total_unpaid)->getStyle("R$fila")->getFont()->setBold(true);
-
-      // Bordes de la fila total
-      $objWorksheet->getStyle("G{$fila}:L{$fila}")->applyFromArray($styleArray);
-      $objWorksheet->getStyle("N{$fila}:O{$fila}")->applyFromArray($styleArray);
-      $objWorksheet->getStyle("Q{$fila}:R{$fila}")->applyFromArray($styleArray);
-
-      /* ===========================================
-         * COLORES DE FONDO (desde fila 6 hasta totales)
-         * =========================================== */
-      $lastRow = $fila;
-
-      //G-H (azul claro)
-      // $objWorksheet->getStyle("G{$fila_inicio}:H{$lastRow}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFDAEEF3');
-
-      // I-J (rojo claro)
-      // $objWorksheet->getStyle("I{$fila_inicio}:J{$lastRow}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFF79494');
-
-      // K-L (naranja suave)
-      // $objWorksheet->getStyle("K{$fila_inicio}:L{$lastRow}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFFCD5B4');
+      $retainage_percent = $this->CalcularPorcientoRetainage($project_entity, $total_amount_final);
 
 
-      // N-O (verde claro)
-      // $objWorksheet->getStyle("N{$fila_inicio}:O{$lastRow}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFD8E4BC');
+      $celda_texto = 'N' . $fila_retainage;
+      $texto_retainage = "CURRENT RETAINAGE @ " . number_format($retainage_percent, 2) . "%:";
 
-      // Q-R (amarillo claro)
-      // $objWorksheet->getStyle("Q{$fila_inicio}:R{$lastRow}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFF2D068');
+      $objWorksheet->setCellValue($celda_texto, $texto_retainage);
+      // Estilos
+      $estilo = $objWorksheet->getStyle($celda_texto);
+      $estilo->getFont()->setSize(10)->setBold(true);
+      $estilo->getAlignment()->setWrapText(true);
 
+      // 2. Cálculo (Columna O)
+      $celda_valor = 'O' . $fila_retainage;
 
-      // Nuevos campos bajo total
-      $fila = $fila + 2;
-      $fila_retainage_inicio = $fila;
+      $base_amount_for_retainage = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod($invoice_id);
 
-      $porciento_retainage = $this->CalcularPorcientoRetainage($project_entity, $total_amount_final);
-      $porciento_retainage = $porciento_retainage / 100;
+      $current_retainage_amount = $base_amount_for_retainage * ($retainage_percent / 100);
 
-      // LESS RETAINAGE $
-      $objWorksheet->setCellValue("N$fila", "LESS RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
+      $objWorksheet->setCellValue($celda_valor, $current_retainage_amount);
 
-      // aplicar 10 % al $total_amount_fina
-      $total_amount_final_10 = $total_amount_final * $porciento_retainage;
-      $objWorksheet->setCellValue("O$fila", $total_amount_final_10)->getStyle("O$fila")->getFont()->setBold(true);
+      $objWorksheet->getStyle($celda_valor)
+         ->getAlignment()
+         ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
-      $fila = $fila + 1;
+      // ... (Bloque anterior de Current Retainage) ...
 
-      // AMOUNT EARNED LESS RETAINAGE $
-      $objWorksheet->setCellValue("N$fila", "AMOUNT EARNED LESS RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
-      $amount_earned_less_retainage = $total_amount_final - $total_amount_final_10;
-      $objWorksheet->setCellValue("O$fila", $amount_earned_less_retainage)->getStyle("O$fila")->getFont()->setBold(true);
+      // --- CÁLCULO DE CURRENT AMOUNT DUE ---
 
-      $fila = $fila + 1;
+      $fila_amount_due = $fila_retainage + 1;
 
-      // LESS PREVIOUS APPLICATIONS $
-      $objWorksheet->setCellValue("N$fila", "LESS PREVIOUS APPLICATIONS $")->getStyle("N$fila")->getFont()->setBold(true);
-      $less_previous_applications = 0;
-      $objWorksheet->setCellValue("O$fila", $less_previous_applications)->getStyle("O$fila")->getFont()->setBold(true);
+      // 1. Etiqueta
+      $celda_texto_due = 'N' . $fila_amount_due;
+      $objWorksheet->setCellValue($celda_texto_due, "CURRENT AMOUNT DUE:");
+      $estiloDue = $objWorksheet->getStyle($celda_texto_due);
+      $estiloDue->getFont()->setSize(10)->setBold(true);
+      $estiloDue->getAlignment()->setWrapText(true);
 
-      $fila = $fila + 1;
+      $celda_valor_due = 'O' . $fila_amount_due;
 
-      // CURRENT AMOUNT DUE $
-      $objWorksheet->setCellValue("N$fila", "CURRENT AMOUNT DUE $")->getStyle("N$fila")->getFont()->setBold(true);
-      $current_amount_due = $amount_earned_less_retainage - $less_previous_applications;
-      $objWorksheet->setCellValue("O$fila", $current_amount_due)->getStyle("O$fila")->getFont()->setBold(true);
+      $fila_total_billed = $fila_retainage - 1;
 
-      $fila = $fila + 1;
+      $formula = "=O{$fila_total_billed}-O{$fila_retainage}";
 
-      // CURRENT RETAINAGE $
-      $objWorksheet->setCellValue("N$fila", "CURRENT RETAINAGE $")->getStyle("N$fila")->getFont()->setBold(true);
-      $current_retainage = $this->CalcularCurrentRetainage($project_id, $porciento_retainage);
-      $objWorksheet->setCellValue("O$fila", $current_retainage)->getStyle("O$fila")->getFont()->setBold(true);
+      $objWorksheet->setCellValue($celda_valor_due, $formula);
 
-      // aplicar borde
-      $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")->applyFromArray($styleArray);
-
-      // Color de fondo naranja para la sección final (N–O)
-      // $objWorksheet->getStyle("N{$fila_retainage_inicio}:O{$fila}")
-      //    ->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-      //    ->getStartColor()->setARGB('FFFCD5B4');
-
+      // 3. Alineación a la Derecha
+      $objWorksheet->getStyle($celda_valor_due)
+         ->getAlignment()
+         ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
       // Guardar Excel
       $fichero = "invoice-$number.xlsx";

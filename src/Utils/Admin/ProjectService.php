@@ -3064,6 +3064,9 @@ class ProjectService extends Base
          // Calcular el paid amount (suma de Paid Amount de cada item)
          $paid_amount = $invoiceItemRepo->TotalInvoicePaidAmount((string) $invoice->getInvoiceId());
 
+         $porciento_retainage = $retainage_percentage;
+         $ajuste_aplicado = false;
+
          // Acumular el total para calcular el porcentaje de retainage
          $total_amount_accumulated += $invoice_amount;
 
@@ -3087,6 +3090,7 @@ class ProjectService extends Base
             }
          }
 
+         $inv_ret_amt = $invoice_amount * ($porciento_retainage / 100);
          // Calcular el retainage amount para este invoice
          // Retainage Amount = Paid Amount * Retainage %
          $retainage_amount = $paid_amount * ($porciento_retainage / 100);
@@ -3103,6 +3107,7 @@ class ProjectService extends Base
             'paid_amount' => $paid_amount,
             'paid' => $is_paid ? 1 : 0,
             'retainage_percentage' => $porciento_retainage,
+            'inv_ret_amt' => $inv_ret_amt,
             'retainage_amount' => $retainage_amount,
             'total_retainage_to_date' => $total_retainage_to_date,
             'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No'

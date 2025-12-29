@@ -4216,99 +4216,96 @@ var Projects = (function () {
 
    // Invoices Retainage Table
    var oTableInvoicesRetainage;
-   var initTableInvoicesRetainage = function (data) {
-      const table = '#invoices-retainage-table-editable';
+  var initTableInvoicesRetainage = function (data) {
+   const table = '#invoices-retainage-table-editable';
 
-      // columns
-      const columns = [
-         { data: 'paid' },
-         { data: 'invoice_date' },
-         { data: 'invoice_amount' },
-         { data: 'paid_amount' },
-         { data: 'retainage_percentage' },
-         { data: 'retainage_amount' },
-         { data: 'total_retainage_to_date' },
-         { data: 'ajuste_retainage' },
-      ];
+   // columns (Esto está perfecto, son 9 columnas: índices 0 al 8)
+   const columns = [
+      { data: 'paid' },                    // 0
+      { data: 'invoice_date' },            // 1
+      { data: 'invoice_amount' },          // 2
+      { data: 'paid_amount' },             // 3
+      { data: 'retainage_percentage' },    // 4
+      { data: 'inv_ret_amt' },             // 5 
+      { data: 'retainage_amount' },        // 6 (Paid Ret. Amt.)
+      { data: 'total_retainage_to_date' }, // 7
+      { data: 'ajuste_retainage' },        // 8
+   ];
 
-      // column defs
-      let columnDefs = [
-         {
-            targets: 0,
-            className: 'text-center',
-            orderable: false,
-            render: function (data, type, row) {
-               var isPaid = row.paid === 1 || row.paid === true;
-               var color = isPaid ? 'success' : 'danger';
-               var tooltip = isPaid ? 'Paid' : 'Unpaid';
-               return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
-            },
+   // column defs
+   let columnDefs = [
+      {
+         targets: 0,
+         // ... (tu código del icono paid) ...
+         render: function (data, type, row) {
+             var isPaid = row.paid === 1 || row.paid === true;
+             var color = isPaid ? 'success' : 'danger';
+             var tooltip = isPaid ? 'Paid' : 'Unpaid';
+             return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
          },
-         {
-            targets: 1,
-            render: function (data, type, row) {
-               // Formatear fecha a formato más amigable
-               var dateFormatted = data;
-               if (data && data.includes('/')) {
-                  var dateParts = data.split('/');
-                  if (dateParts.length === 3) {
+      },
+      {
+         targets: 1,
+         render: function (data, type, row) {
+             var dateFormatted = data;
+             if (data && data.includes('/')) {
+                 var dateParts = data.split('/');
+                 if (dateParts.length === 3) {
                      var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
                      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                      dateFormatted = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
-                  }
-               }
-               var displayText = `${row.invoice_number} - ${dateFormatted}`;
-               var html = `<a href="javascript:;" class="invoice-retainage-link text-primary text-hover-primary" data-invoice-id="${
-                  row.invoice_id
-               }" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
-               return html;
-            },
+                 }
+             }
+             var displayText = `${row.invoice_number} - ${dateFormatted}`;
+             return `<a href="javascript:;" class="invoice-retainage-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
+         }
+      },
+      {
+         targets: 2, // Invoice Amt
+         className: 'text-end',
+         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
+      },
+      {
+         targets: 3, // Paid Amt
+         className: 'text-end',
+         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
+      },
+      {
+         targets: 4, // Ret %
+         className: 'text-end',
+         render: function (data) { return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`; },
+      },
+      
+      {
+         targets: 5, //  (Inv. Ret. Amt.)
+         className: 'text-end',
+         render: function (data) { 
+             return `<span>${MyApp.formatMoney(data)}</span>`; 
          },
-         {
-            targets: 2,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
+      },
+      {
+         targets: 6, // Paid Ret. Amt.
+         className: 'text-end',
+         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
+      },
+      {
+         targets: 7,
+         className: 'text-end',
+         render: function (data) { 
+             return `<span>${MyApp.formatMoney(data)}</span>`; 
          },
-         {
-            targets: 3,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
+      },
+      {
+         targets: 8, 
+         className: 'text-center',
+         render: function (data) {
+             var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
+             return `<span class="badge ${badgeClass}">${data}</span>`;
          },
-         {
-            targets: 4,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
-            },
-         },
-         {
-            targets: 5,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 6,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 7,
-            className: 'text-center',
-            render: function (data, type, row) {
-               var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
-               return `<span class="badge ${badgeClass}">${data}</span>`;
-            },
-         },
-      ];
+      },
+   ];
 
+   
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
