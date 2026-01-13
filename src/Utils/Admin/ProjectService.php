@@ -3117,7 +3117,8 @@ class ProjectService extends Base
          }
 
          $running_balance += $retainage_entry;
-         $saldo_visual_fila = $running_balance - $reimbursed_real;
+         $running_balance -= $reimbursed_real;
+         $saldo_visual_fila = $running_balance;
 
          $resultado[] = [
             'invoice_id' => $invoice->getInvoiceId(),
