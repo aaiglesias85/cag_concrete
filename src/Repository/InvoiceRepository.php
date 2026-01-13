@@ -390,4 +390,51 @@ class InvoiceRepository extends ServiceEntityRepository
          'total' => $total, // total con el MISMO filtro aplicado
       ];
    }
+
+   /**
+    * ObtenerTotalPagadoConRetainage: Suma LO PAGADO de items con retainage
+    */
+   public function ObtenerTotalPagadoConRetainage($project_id)
+   {
+      try {
+         return (float) $this->getEntityManager()->createQueryBuilder()
+            ->select('SUM(ii.paidAmount)') // Usamos paidAmount
+            ->from('App\Entity\InvoiceItem', 'ii')
+            ->join('ii.invoice', 'i')
+            ->join('ii.projectItem', 'pi')
+
+            ->where('i.project = :project_id')
+            ->andWhere('pi.applyRetainage = 1') // Solo items que llevan retainage
+
+            ->setParameter('project_id', $project_id)
+            ->getQuery()
+            ->getSingleScalarResult();
+      } catch (\Exception $e) {
+         return 0.00;
+      }
+   }
+   /**
+    * ObtenerTotalPagadoAnterior: Suma LO PAGADO de facturas ANTERIORES a la actual
+    */
+   public function ObtenerTotalPagadoAnterior($project_id, $current_invoice_date, $current_invoice_id)
+   {
+      try {
+         // Buscamos facturas con fecha MENOR, o misma fecha pero ID MENOR
+         return (float) $this->getEntityManager()->createQueryBuilder()
+            ->select('SUM(ii.paidAmount)')
+            ->from('App\Entity\InvoiceItem', 'ii')
+            ->join('ii.invoice', 'i')
+            ->join('ii.projectItem', 'pi')
+            ->where('i.project = :project_id')
+            ->andWhere('pi.applyRetainage = 1')
+            ->andWhere('i.startDate < :date OR (i.startDate = :date AND i.invoiceId < :id)')
+            ->setParameter('project_id', $project_id)
+            ->setParameter('date', $current_invoice_date)
+            ->setParameter('id', $current_invoice_id)
+            ->getQuery()
+            ->getSingleScalarResult();
+      } catch (\Exception $e) {
+         return 0.00;
+      }
+   }
 }

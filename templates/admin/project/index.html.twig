@@ -1095,11 +1095,10 @@
                                        <th></th>
                                        <th>Invoice Date</th>
                                        <th>Invoice Amt.</th>
-                                       <th>Paid Amt.</th>
-                                       <th>Ret. (%)</th>
-                                       <th>Inv. Ret. Amt.</th>
-                                       <th>Paid Ret. Amt.</th>
-                                       <th>Total Ret. T.D.</th>
+                                       <th>Inv. Ret. Amt.</th>                      
+                                       <th>Paid Amt</th>
+                                       <th>Actual Ret. Amt.</th>
+                                       <th>Actual Ret. T.D.</th>
                                        <th>Ret. Reimbursed</th>
                                     </tr>
                                  </thead>
@@ -1147,20 +1146,42 @@
                            <!--end::Wrapper-->
 
                            <!--begin::Datatable-->
-                           <table id="items-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                              <thead>
-                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                    <th>Item</th>
-                                    <th>Unit</th>
-                                    <th>Yield Calculation</th>
-                                    <th>Quantity</th>
-                                    <th>Price</th>
-                                    <th>Total</th>
-                                    <th>Actions</th>
-                                 </tr>
-                              </thead>
-                              <tbody class="text-gray-600 fw-semibold"></tbody>
-                           </table>
+                          <div id="barra-acciones-retainage-wizard" class="card bg-light-primary border border-primary border-dashed d-none mb-5">
+                     <div class="card-body d-flex align-items-center p-3">
+                        <div class="fs-6 fw-bold text-primary me-5">
+                              <span id="contador-items-seleccionados-wizard">0</span> Selected Items
+                        </div>
+                        <div class="ms-auto">
+                              <button type="button" class="btn btn-sm btn-primary fw-bold btn-accion-masiva-wizard" data-accion="1">
+                                 <i class="ki-duotone ki-check fs-2 me-2"></i> Retainage
+                              </button>
+                              <button type="button" class="btn btn-sm btn-danger fw-bold btn-accion-masiva-wizard" data-accion="0">
+                                 <i class="ki-duotone ki-cross fs-2 me-2"></i> Remove Retainage
+                              </button>
+                        </div>
+                     </div>
+                  </div>
+
+                  <table id="items-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                     <thead>
+                        <tr class="fw-bold fs-6 text-gray-800 px-7">
+                              <th class="w-10px pe-2 text-center">
+                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                    <input class="form-check-input" type="checkbox" id="chk-master-retainage-wizard" />
+                                 </div>
+                              </th>
+
+                              <th>Item</th>
+                              <th>Unit</th>
+                              <th>Yield Calculation</th>
+                              <th>Quantity</th>
+                              <th>Price</th>
+                              <th>Total</th>
+                              <th>Actions</th>
+                        </tr>
+                     </thead>
+                     <tbody class="text-gray-600 fw-semibold"></tbody>
+                  </table>
                            <!--end::Datatable-->
                         </div>
                      </div>
@@ -2945,26 +2966,34 @@
                   </div>
                </div>
 
-               <div class="form-group">
-                  <div class="row">
-                     <div class="col-md-6">
-                        <label class="form-label"> Change Order </label>
-                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                           <input type="checkbox" id="change-order" class="form-check-input" checked />
-                           <label class="form-check-label" for="change-order"> Yes / No </label>
-                        </div>
-                     </div>
-                     <div class="col-md-6">
-                        <label class="form-label"> Change Order Date </label>
-                        <div class="input-group input-group-solid">
-                           <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date" name="change_order_date" />
-                           <span class="input-group-text">
-                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                           </span>
-                        </div>
-                     </div>
-                  </div>
-               </div>
+              <div class="form-group">
+    <div class="row">
+        <div class="col-md-6">
+            <label class="form-label"> Change Order </label>
+            <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                <input type="checkbox" id="change-order" class="form-check-input" checked />
+                <label class="form-check-label" for="change-order"> Yes / No </label>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label"> Change Order Date </label>
+            <div class="input-group input-group-solid">
+                <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date" name="change_order_date" />
+                <span class="input-group-text">
+                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-6 mt-5"> <label class="form-label">Is Retainage?</label>
+            <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                <input class="form-check-input" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
+                <label class="form-check-label" for="item-apply-retainage"> Yes </label>
+            </div>
+        </div>
+    </div>
+</div>
             </form>
          </div>
          <div class="modal-footer">

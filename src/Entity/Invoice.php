@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\ReimbursementHistory;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\InvoiceRepository')]
 #[ORM\Table(name: 'invoice')]
@@ -43,6 +46,19 @@ class Invoice
    #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id')]
    private ?Project $project;
+
+   #[ORM\Column(type: 'boolean', nullable: true, options: ['default' => false])]
+   private ?bool $retainageReimbursed = false;
+
+   #[ORM\Column(type: 'decimal', precision: 10, scale: 2, nullable: true)]
+   private ?float $retainageReimbursedAmount = 0.00;
+
+   #[ORM\Column(type: 'date', nullable: true)]
+   private ?\DateTimeInterface $retainageReimbursedDate = null;
+
+   #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: ReimbursementHistory::class, cascade: ['persist', 'remove'])]
+   private Collection $reimbursementHistories;
+
 
    public function getInvoiceId(): ?int
    {
@@ -145,5 +161,52 @@ class Invoice
    public function getEditSequence(): ?string
    {
       return $this->editSequence;
+   }
+
+   public function getRetainageReimbursed(): ?bool
+   {
+      return $this->retainageReimbursed;
+   }
+
+   public function setRetainageReimbursed(?bool $retainageReimbursed): self
+   {
+      $this->retainageReimbursed = $retainageReimbursed;
+      return $this;
+   }
+
+   public function getRetainageReimbursedAmount(): ?float
+   {
+      return $this->retainageReimbursedAmount;
+   }
+
+   public function setRetainageReimbursedAmount(?float $retainageReimbursedAmount): self
+   {
+      $this->retainageReimbursedAmount = $retainageReimbursedAmount;
+      return $this;
+   }
+
+   public function getRetainageReimbursedDate(): ?\DateTimeInterface
+   {
+      return $this->retainageReimbursedDate;
+   }
+
+   public function setRetainageReimbursedDate(?\DateTimeInterface $retainageReimbursedDate): self
+   {
+      $this->retainageReimbursedDate = $retainageReimbursedDate;
+      return $this;
+   }
+
+   public function __construct()
+   {
+      $this->items = new ArrayCollection(); //
+      $this->reimbursementHistories = new ArrayCollection(); //
+   }
+
+   /**
+    * @return Collection<int, ReimbursementHistory>
+    */
+   public function getReimbursementHistories(): Collection
+   {
+      return $this->reimbursementHistories;
    }
 }

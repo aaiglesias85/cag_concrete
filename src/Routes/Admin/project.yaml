@@ -123,3 +123,16 @@ eliminarArchivosProjectAdmin:
 listarItemsCompletionProjectAdmin:
    path: /project/listarItemsCompletion
    defaults: { _controller: App\Controller\Admin\ProjectController::listarItemsCompletion, _format: json }
+
+project_bulk_retainage_update:
+  path: /project/bulk-retainage-update
+  defaults: { _controller: App\Controller\Admin\ProjectController::bulkRetainageUpdate, _format: json }
+
+project_get_reimbursement_history:
+    path: /project/get-reimbursement-history
+    defaults: { _controller: App\Controller\Admin\ProjectController::getReimbursementHistory, _format: json }
+
+admin_project_save_reimbursement:
+    path: /project/save-reimbursement   
+    defaults: { _controller: App\Controller\Admin\ProjectController::saveReimbursement, _format: json }
+ 

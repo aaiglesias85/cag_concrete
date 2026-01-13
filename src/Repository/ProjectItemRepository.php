@@ -256,4 +256,22 @@ class ProjectItemRepository extends ServiceEntityRepository
 
       return (int) $qb->getQuery()->getSingleScalarResult();
    }
+
+   /**
+    * Actualiza el estado de retainage para múltiples items a la vez
+    */
+   public function ActualizarRetainageMasivo(array $ids, bool $status)
+   {
+      if (empty($ids)) return;
+
+      $q = $this->getEntityManager()->createQuery(
+         'UPDATE App\Entity\ProjectItem p 
+          SET p.applyRetainage = :status 
+          WHERE p.id IN (:ids)'
+      )
+         ->setParameter('status', $status)
+         ->setParameter('ids', $ids);
+
+      return $q->execute();
+   }
 }

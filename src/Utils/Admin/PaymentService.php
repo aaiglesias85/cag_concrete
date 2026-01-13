@@ -18,6 +18,7 @@ use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use Google\Type\Date;
+use App\Entity\ReimbursementHistory;
 
 class PaymentService extends Base
 {
@@ -406,40 +407,115 @@ class PaymentService extends Base
     *
     * @author Marcel
     */
+
    public function CargarDatosPayment($invoice_id)
    {
       $resultado = array();
       $arreglo_resultado = array();
 
-      $entity = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
+      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
       /** @var Invoice $entity */
       if ($entity != null) {
+         $project = $entity->getProject();
+         $company_id = $project->getCompany()->getCompanyId();
 
-         $arreglo_resultado['project_id'] = $entity->getProject()->getProjectId();
-
-         $company_id = $entity->getProject()->getCompany()->getCompanyId();
+         // ... (asignación de datos básicos igual que antes) ...
+         $arreglo_resultado['project_id'] = $project->getProjectId();
          $arreglo_resultado['company_id'] = $company_id;
-
          $arreglo_resultado['number'] = $entity->getNumber();
          $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');
          $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
          $arreglo_resultado['notes'] = $entity->getNotes();
          $arreglo_resultado['paid'] = $entity->getPaid();
 
-         // projects
+         // --- REGLA 1: CALCULAR CONTRATO REAL ---
+         $contract_amount_retainage_base = 0;
+         $projectItems = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class)
+            ->findBy(['project' => $project]);
+
+         foreach ($projectItems as $pItem) {
+            if ($pItem->getApplyRetainage()) {
+               $contract_amount_retainage_base += ($pItem->getQuantity() * $pItem->getPrice());
+            }
+         }
+
+         $std_retainage = (float)$project->getRetainagePercentage();
+         $red_retainage = (float)$project->getRetainageAdjustmentPercentage();
+         $target_completion = (float)$project->getRetainageAdjustmentCompletion();
+
+         $arreglo_resultado['contract_amount'] = $contract_amount_retainage_base;
+         $arreglo_resultado['retainage_adjustment_percentage'] = $red_retainage;
+         $arreglo_resultado['retainage_adjustment_completion'] = $target_completion;
+         
+         // --- REGLA 2: HISTORIAL CRONOLÓGICO (SOLO ANTERIORES) ---
+         /** @var \App\Repository\InvoiceRepository $invoiceRepo */
+         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+         //  Usamos la nueva función que filtra por fecha/ID
+         $historial_previo = $invoiceRepo->ObtenerTotalPagadoAnterior(
+            $project->getProjectId(),
+            $entity->getStartDate(),
+            $entity->getInvoiceId()
+         );
+
+         // Enviamos al JS el historial puro
+         $arreglo_resultado['total_work_completed'] = $historial_previo;
+
+         // --- CALCULAR DEUDA DE ESTA FACTURA (LO ACTUAL) ---
+         $pagado_esta_factura = 0;
+         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+         $current_items = $invoiceItemRepo->findBy(['invoice' => $entity]);
+
+         foreach ($current_items as $item) {
+            if ($item->getProjectItem()->getApplyRetainage()) {
+               $pagado_esta_factura += $item->getPaidAmount();
+            }
+         }
+
+         // --- DECIDIR PORCENTAJE INICIAL ---
+         // Sumamos: (Lo pagado ANTES de esta factura) + (Lo pagado EN esta factura)
+         $total_al_momento = $historial_previo + $pagado_esta_factura;
+
+         $porciento_retainage = $std_retainage; // 10%
+
+         if ($contract_amount_retainage_base > 0 && $target_completion > 0) {
+            $threshold = $contract_amount_retainage_base * ($target_completion / 100);
+
+            if ($total_al_momento >= $threshold) {
+               $porciento_retainage = $red_retainage; // 5%
+            }
+         }
+
+         $arreglo_resultado['retainage_percentage'] = $porciento_retainage;
+
+         // ... (resto de la función igual: listar projects, items, payments, etc.) ...
          $projects = $this->ListarProjectsDeCompany($company_id);
          $arreglo_resultado['projects'] = $projects;
 
-         // items
          $items = $this->ListarItemsDeInvoice($invoice_id);
          $arreglo_resultado['items'] = $items;
 
-         // payments
          $payments = $this->ListarPaymentsDeInvoice($invoice_id);
          $arreglo_resultado['payments'] = $payments;
 
-         // archivos
+         $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
+         $arreglo_resultado['retainage_reimbursed_amount'] = $entity->getRetainageReimbursedAmount();
+
+         // Recalcular el monto visual inicial
+         $total_retainage_calc = 0;
+         foreach ($payments as $payItem) {
+            $apply_ret = isset($payItem['apply_retainage']) ? $payItem['apply_retainage'] : false;
+            $paid_amount = isset($payItem['paid_amount']) ? (float)$payItem['paid_amount'] : 0;
+
+            if (($apply_ret == 1 || $apply_ret === true) && $paid_amount > 0) {
+               $monto_ret = $paid_amount * ($porciento_retainage / 100);
+               $total_retainage_calc += $monto_ret;
+            }
+         }
+
+         $arreglo_resultado['total_retainage_amount'] = round($total_retainage_calc, 2);
+         // -----------------------------------------------------
+
          $archivos = $this->ListarArchivosDeInvoice($invoice_id);
          $arreglo_resultado['archivos'] = $archivos;
 
@@ -448,6 +524,18 @@ class PaymentService extends Base
       }
 
       return $resultado;
+   }
+
+   /**
+    * Calcula el porcentaje de retainage
+    */
+   private function CalcularPorcientoRetainage($project_entity)
+   {
+      $porciento = 0;
+      if ($project_entity->getRetainage()) {
+         $porciento = $project_entity->getRetainagePercentage();
+      }
+      return $porciento;
    }
 
    /**
@@ -513,6 +601,8 @@ class PaymentService extends Base
          $items[] = [
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
+            "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
+            "paid_amount_total" => $value->getPaidAmountTotal(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
@@ -830,8 +920,10 @@ class PaymentService extends Base
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
          $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+
+         // Llamada simple (ahora devuelve float directo)
+         $retainage_valor = $this->CalcularRetainageConRegla($invoice_id);
 
          $data[] = array(
             "id" => $invoice_id,
@@ -844,6 +936,7 @@ class PaymentService extends Base
             "endDate" => $value->getEndDate()->format('m/d/Y'),
             "notes" => $this->truncate($value->getNotes(), 50),
             "total" => $total,
+            "retainage_amount" => number_format($retainage_valor, 2),
             "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
             "paid" => $value->getPaid() ? 1 : 0
          );
@@ -851,7 +944,7 @@ class PaymentService extends Base
 
       return [
          'data' => $data,
-         'total' => $resultado['total'], // ya viene con el filtro aplicado
+         'total' => $resultado['total'],
       ];
    }
 
@@ -936,5 +1029,154 @@ class PaymentService extends Base
          $resultado['error'] = "The requested record does not exist";
       }
       return $resultado;
+   }
+
+   /**
+    * SalvarRetainageReimbursement
+    * @param $params
+    * @return array
+    */
+   public function SalvarRetainageReimbursement($params)
+   {
+      $resultado = array();
+      $em = $this->getDoctrine()->getManager();
+
+      $invoice_id = isset($params['invoice_id']) ? $params['invoice_id'] : '';
+      $reimbursed = isset($params['retainage_reimbursed']) ? (int)$params['retainage_reimbursed'] : 0;
+
+      // Aseguramos que sea float para cálculos
+      $amount = isset($params['retainage_reimbursed_amount']) ? (float)$params['retainage_reimbursed_amount'] : 0.00;
+
+      /** @var Invoice $entity */
+      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
+      if ($entity != null) {
+
+         if ($amount > 0) {
+            $history = new ReimbursementHistory();
+            $history->setAmount($amount);
+            $history->setCreatedAt(new \DateTime());
+
+            $history->setInvoice($entity);
+
+            $em->persist($history);
+         }
+
+         if (method_exists($entity, 'setRetainageReimbursed')) {
+            $entity->setRetainageReimbursed((bool)$reimbursed);
+         }
+
+         if (method_exists($entity, 'setRetainageReimbursedAmount')) {
+            $entity->setRetainageReimbursedAmount($amount);
+         }
+
+         if (method_exists($entity, 'setRetainageReimbursedDate')) {
+            $fecha = ($reimbursed == 1) ? new \DateTime() : null;
+            $entity->setRetainageReimbursedDate($fecha);
+         }
+
+         $em->persist($entity);
+         $em->flush();
+
+
+         if ($amount > 0) {
+            $log_operacion = "Update";
+            $log_categoria = "Retainage Reimbursement";
+            $log_descripcion = "Retainage reimbursed amount updated to $$amount for invoice #{$entity->getNumber()}";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+         }
+
+         $resultado['success'] = true;
+         $resultado['message'] = 'Retainage reimbursement updated.';
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = 'Invoice not found.';
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * CambiarEstadoInvoice: Cambia el estado paid (Open/Closed) manualmente
+    * @param int $invoice_id
+    * @param int $status (1 = Closed, 0 = Open)
+    */
+   public function CambiarEstadoInvoice($invoice_id, $status)
+   {
+      $resultado = array();
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+      /** @var Invoice $entity */
+
+      if ($entity != null) {
+
+         // Convertir el status numérico a booleano
+         $isPaid = ($status == 1);
+         $entity->setPaid($isPaid);
+
+         $em->flush();
+
+         // Guardar en el Log
+         $statusLabel = $isPaid ? "Closed" : "Open";
+         $log_operacion = "Update";
+         $log_categoria = "Invoice Status";
+         $log_descripcion = "Invoice #{$entity->getNumber()} status changed to $statusLabel";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "Invoice not found";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * CalcularRetainageConRegla: Calcula el retainage basado en lo PAGADO (Paid Amt)
+    */
+   public function CalcularRetainageConRegla($invoice_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $invoice = $em->getRepository(Invoice::class)->find($invoice_id);
+
+      if (!$invoice) return 0.00;
+      $project = $invoice->getProject();
+      if (!$project) return 0.00;
+
+      $contract_amount = (float)$project->getContractAmount();
+      $std_retainage = (float)$project->getRetainagePercentage();
+      $completion_target = (float)$project->getRetainageAdjustmentCompletion();
+      $reduced_retainage = (float)$project->getRetainageAdjustmentPercentage();
+
+      /** @var \App\Repository\InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $em->getRepository(Invoice::class);
+
+      // CORRECCIÓN AQUÍ: Cambia el nombre del método para que coincida con el repositorio
+      $total_paid_with_retainage = $invoiceRepo->ObtenerTotalPagadoConRetainage($project->getProjectId());
+
+      $final_percent = $std_retainage;
+
+      if ($contract_amount > 0 && $completion_target > 0) {
+         $threshold = $contract_amount * ($completion_target / 100);
+
+         // Comparamos LO COBRADO (Paid Amt) vs el Umbral
+         if ($total_paid_with_retainage >= $threshold) {
+            $final_percent = $reduced_retainage;
+         }
+      }
+
+      $invoice_retainage_base = 0;
+      $items = $em->getRepository(InvoiceItem::class)->findBy(['invoice' => $invoice]);
+
+      foreach ($items as $item) {
+         $pi = $item->getProjectItem();
+         if ($pi && $pi->getApplyRetainage()) {
+            $invoice_retainage_base += ($item->getPrice() * $item->getQuantity());
+         }
+      }
+
+      return $invoice_retainage_base * ($final_percent / 100);
    }
 }

@@ -1638,25 +1638,28 @@ var DataTracking = (function () {
 
       // column defs
       let columnDefs = [
-         {
+       {
             targets: 0,
             render: function (data, type, row) {
-               // Si es encabezado de grupo, mostrar el título
-               if (row.isGroupHeader) {
-                  return '<strong>' + row.groupTitle + '</strong>';
+            
+               var badgeRetainage = '';               
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               // Si es change order, agregar icono de +
+               
                var icono = '';
-               if (row.change_order && !row.isGroupHeader) {
-                  var project_item_id = row.project_item_id || row.item_id;
+               if (row.change_order) {
                   icono =
                      '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     project_item_id +
+                     row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
-                  data || ''
-               }</span>${icono}</div>`;
+
+               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
+                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
+                           ${badgeRetainage}
+                           ${icono}
+               </div>`;
             },
          },
          {

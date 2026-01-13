@@ -430,6 +430,7 @@ var ProjectsDetalle = (function () {
 
       // columns
       const columns = [
+         { data: 'apply_retainage' },
          { data: 'item' },
          { data: 'unit' },
          { data: 'yield_calculation_name' },
@@ -441,8 +442,22 @@ var ProjectsDetalle = (function () {
 
       // column defs
       let columnDefs = [
+
          {
             targets: 0,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+                  var checked = (data == 1 || data === true) ? 'checked' : '';
+                  return `
+                     <div class="form-check form-check-sm form-check-custom form-check-solid justify-content-center">
+                        <input class="form-check-input chk-item-retainage" type="checkbox" value="${row.id}" ${checked} />
+                     </div>`;
+            }
+         },
+         {
+            
+            targets: 1,
             render: function (data, type, row) {
                // Si es encabezado de grupo, mostrar el título
                if (row.isGroupHeader) {
@@ -460,21 +475,21 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 1,
+            targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return data || '';
             },
          },
          {
-            targets: 2,
+            targets: 3,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3,
+            targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -493,7 +508,7 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 4,
+            targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -509,7 +524,7 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 5,
+            targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
@@ -643,8 +658,7 @@ var ProjectsDetalle = (function () {
             }
          })
          .catch(function (error) {
-            toastr.error('Error loading history', '');
-            console.error(error);
+            toastr.error('Error loading history', '');            
          })
          .finally(function () {
             BlockUtil.unblock('#modal-change-order-history .modal-content');
@@ -1315,6 +1329,8 @@ var ProjectsDetalle = (function () {
             isGroupHeader: true,
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
+
+            apply_retainage: 0,
             // Agregar todas las propiedades que DataTables espera para evitar errores
             item: null,
             unit: null,
@@ -1527,8 +1543,8 @@ var ProjectsDetalle = (function () {
          { data: 'paid_amount' },
          { data: 'retainage_percentage' },
          { data: 'retainage_amount' },
-         { data: 'total_retainage_to_date' },
-         { data: 'ajuste_retainage' },
+         { data: 'total_retainage_to_date' },        
+         { data: 'retainage_reimbursed' },
       ];
 
       // column defs
@@ -1591,22 +1607,44 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
-         },
-         {
-            targets: 6,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+         },          
+
+       {
+            targets: 6, // Total Ret. T.D.
+            className: 'text-end', 
+            render: function (data, type, row) {      
+
+               var montoReembolso = parseFloat(row.reimbursed_amount || 0);             
+           
+               var amountHtml = `<span>${MyApp.formatMoney(data)}</span>`;
+             
+               if (montoReembolso > 0) {
+                                 
+                 return `
+                     <div class="d-flex align-items-center justify-content-end">
+                        <span class="fw-bold text-gray-800">${amountHtml}</span>
+                        
+                        <i class="fas fa-history text-primary ms-2 cursor-pointer btn-ver-historial-reembolso" 
+                           style="font-size: 1.1rem;"
+                           data-invoice-id="${row.id}" 
+                           title="View History"></i>
+                     </div>`;
+               }              
+             
+               return amountHtml;
             },
          },
          {
-            targets: 7,
+            targets: 7, // Ret. Reimbursed
             className: 'text-center',
-            render: function (data, type, row) {
-               var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
-               return `<span class="badge ${badgeClass}">${data}</span>`;
+            render: function (data, type, row) {              
+               var isReimbursed = (data == 1 || data === true);
+               var badgeClass = isReimbursed ? 'badge-success' : 'badge-danger';
+               var text = isReimbursed ? 'Yes' : 'No';
+               
+               return `<span class="badge ${badgeClass}">${text}</span>`;
             },
-         },
+         }
       ];
 
       // language
@@ -1702,12 +1740,14 @@ var ProjectsDetalle = (function () {
             }
          })
          .catch(function (error) {
-            console.error(error);
+           
             initTableInvoicesRetainageDetalle([]);
             $('#total-retainage-withheld-detalle').val(MyApp.formatMoney(0));
          });
    };
-
+  
+ 
+   
    return {
       //main function to initiate the module
       init: function () {
@@ -1740,6 +1780,7 @@ var ProjectsDetalle = (function () {
          // items completion
          initTableItemsCompletion();
          initAccionFiltrarItemsCompletion();
+
       },
    };
 })();

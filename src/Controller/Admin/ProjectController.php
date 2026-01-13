@@ -8,13 +8,17 @@ use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\Equation;
 use App\Entity\Inspector;
+use App\Entity\Invoice;
+use App\Entity\ReimbursementHistory;
 use App\Entity\Item;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Entity\EmployeeRole;
 use App\Utils\Admin\ProjectService;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProjectController extends AbstractController
 {
@@ -752,9 +756,12 @@ class ProjectController extends AbstractController
       // Convertir a booleano correctamente
       $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
       $change_order_date = $request->get('change_order_date');
+      $apply_retainage = $request->get('apply_retainage') ?? 0;
+
 
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage);
+
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -768,7 +775,7 @@ class ProjectController extends AbstractController
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
          $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+         $resultadoJson['error'] = $e->getMessage() . 'line ' . $e->getLine();
 
          return $this->json($resultadoJson);
       }
@@ -1089,6 +1096,114 @@ class ProjectController extends AbstractController
          $resultadoJson['error'] = $e->getMessage();
 
          return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * Actualizar los Item con Retainage
+    */
+   public function bulkRetainageUpdate(Request $request)
+   {
+
+      $ids = $request->get('ids');
+      $status = $request->get('status');
+
+
+      if (empty($ids)) {
+         $content = $request->getContent();
+         if (!empty($content)) {
+            $data = json_decode($content, true);
+            if (is_array($data)) {
+               $ids = $data['ids'] ?? [];
+               $status = $data['status'] ?? null;
+            }
+         }
+      }
+
+      // 3. Validación final
+      if (empty($ids) || !is_array($ids)) {
+         return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
+      }
+
+      try {
+         $this->projectService->ActualizarRetainageItems($ids, $status);
+         return $this->json(['success' => true]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * @param Request $request
+    * @param ManagerRegistry $doctrine  <-- Inyectamos Doctrine aquí
+    * @return JsonResponse
+    */
+   public function getReimbursementHistory(Request $request, ManagerRegistry $doctrine): JsonResponse
+   {
+      $id = $request->request->get('invoice_id');
+
+      // IMPORTANTE: 'invoiceId' es el nombre de la propiedad en tu clase Invoice.php
+      $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $id]);
+
+      if (!$invoice) {
+         return new JsonResponse(['success' => false, 'error' => 'Invoice #' . $id . ' not found']);
+      }
+
+      $historyData = [];
+      foreach ($invoice->getReimbursementHistories() as $h) {
+         $historyData[] = [
+            'date' => $h->getCreatedAt()->format('m/d/Y h:i A'),
+            'amount' => (float)$h->getAmount()
+         ];
+      }
+
+      return new JsonResponse(['success' => true, 'history' => $historyData]);
+   }
+
+   /**
+    * saveReimbursement: Guarda un nuevo reembolso sumándolo al anterior
+    */
+
+   public function saveReimbursement(Request $request, ManagerRegistry $doctrine): JsonResponse
+   {
+      $em = $doctrine->getManager();
+      $invoice_id = $request->request->get('invoice_id');
+      $amount_to_add = (float)$request->request->get('amount');
+
+      if ($amount_to_add <= 0) {
+         return new JsonResponse(['success' => false, 'error' => 'Amount must be greater than 0']);
+      }
+
+      $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $invoice_id]);
+
+      if (!$invoice) {
+         return new JsonResponse(['success' => false, 'error' => 'Invoice not found']);
+      }
+
+      try {
+         // 1. OBTENER ACUMULADO ACTUAL
+         $current_reimbursed = (float)$invoice->getRetainageReimbursedAmount();
+
+         // 2. SUMAR LO NUEVO
+         $new_total = $current_reimbursed + $amount_to_add;
+
+         // 3. ACTUALIZAR FACTURA
+         $invoice->setRetainageReimbursedAmount($new_total);
+         $invoice->setRetainageReimbursed(true);
+         $invoice->setRetainageReimbursedDate(new \DateTime());
+
+         // 4. GUARDAR HISTORIAL
+         $history = new ReimbursementHistory();
+         $history->setInvoice($invoice);
+         $history->setAmount($amount_to_add);
+         $history->setCreatedAt(new \DateTime());
+
+         $em->persist($history);
+         $em->flush();
+
+         return new JsonResponse(['success' => true]);
+      } catch (\Exception $e) {
+         return new JsonResponse(['success' => false, 'error' => $e->getMessage()]);
       }
    }
 }

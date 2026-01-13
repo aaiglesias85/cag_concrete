@@ -255,7 +255,8 @@ var Projects = (function () {
          orderable: false,
          className: 'text-center',
          render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['detalle', 'edit', 'delete']);
+            //aqui esta el ojito para solo ver, sin editar- solo add detalle            
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);         
          },
       });
 
@@ -335,32 +336,23 @@ var Projects = (function () {
 
    // select records
    var tableSelectAll = false;
-   var handleSelectRecords = function (table) {
-      // Evento para capturar filas seleccionadas
+   var handleSelectRecords = function (table) {    
       oTable.on('select', function (e, dt, type, indexes) {
-         if (type === 'row') {
-            // Obtiene los datos de las filas seleccionadas
-            // var selectedData = oTable.rows(indexes).data().toArray();
-            // console.project("Filas seleccionadas:", selectedData);
+         if (type === 'row') {          
             actualizarRecordsSeleccionados();
          }
       });
-
-      // Evento para capturar filas deseleccionadas
       oTable.on('deselect', function (e, dt, type, indexes) {
-         if (type === 'row') {
-            // var deselectedData = oTable.rows(indexes).data().toArray();
-            // console.project("Filas deseleccionadas:", deselectedData);
+         if (type === 'row') {          
             actualizarRecordsSeleccionados();
          }
       });
-
-      // Función para seleccionar todas las filas
+   
       $(`.check-select-all`).on('click', function () {
          if (!tableSelectAll) {
-            oTable.rows().select(); // Selecciona todas las filas
+            oTable.rows().select();
          } else {
-            oTable.rows().deselect(); // Deselecciona todas las filas
+            oTable.rows().deselect(); 
          }
          tableSelectAll = !tableSelectAll;
       });
@@ -1604,104 +1596,154 @@ var Projects = (function () {
       return resultado;
    };
 
-   var initTableItems = function () {
+  var initTableItems = function () {
       const table = '#items-table-editable';
 
-      // Procesar datos para agrupar por change_order_date
+      // 1. Agrupación de datos
+      var agruparItemsPorChangeOrder = function (items) {
+         var items_regulares = [];
+         var items_change_order = [];
+
+         items.forEach(function (item) {
+            if (item.change_order && item.change_order_date) {
+               items_change_order.push(item);
+            } else {
+               items_regulares.push(item);
+            }
+         });
+
+         var resultado = [];
+         var orderCounter = 0;
+
+         items_regulares.forEach(function (item) {
+            item._groupOrder = orderCounter++;
+            resultado.push(item);
+         });
+
+         if (items_change_order.length > 0 && items_regulares.length > 0) {
+            resultado.push({
+               isGroupHeader: true,
+               groupTitle: 'Change Order',
+               _groupOrder: orderCounter++,
+               apply_retainage: 0,
+               item: null,
+               unit: null,
+               yield_calculation_name: null,
+               quantity: null,
+               price: null,
+               total: null,
+            });
+         }
+
+         items_change_order.forEach(function (item) {
+            item._groupOrder = orderCounter++;
+            resultado.push(item);
+         });
+
+         return resultado;
+      };
+
       var datosAgrupados = agruparItemsPorChangeOrder(items);
 
-      // columns
+      // 2. Definición de Columnas
       const columns = [
-         { data: 'item' },
-         { data: 'unit' },
-         { data: 'yield_calculation_name' },
-         { data: 'quantity' },
-         { data: 'price' },
-         { data: 'total' },
-         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
-         { data: null },
+         { data: 'apply_retainage' }, // 0
+         { data: 'item' },            // 1
+         { data: 'unit' },            // 2
+         { data: 'yield_calculation_name' }, // 3
+         { data: 'quantity' },        // 4
+         { data: 'price' },           // 5
+         { data: 'total' },           // 6
+         { data: '_groupOrder', visible: false }, // 7
+         { data: null },              // 8
       ];
 
-      // column defs
+      // 3. Configuración de Columnas (CORREGIDO)
       let columnDefs = [
-         {
-            targets: 0,
+       {
+            targets: 0, // CHECKBOX DE SELECCIÓN
+            orderable: false,
+            className: 'text-center',
             render: function (data, type, row) {
-               // Si es encabezado de grupo, mostrar el título
-               if (row.isGroupHeader) {
-                  return '<strong>' + row.groupTitle + '</strong>';
+               if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';              
+               
+               var checked = '';           
+
+               return `
+                  <div class="form-check form-check-sm form-check-custom form-check-solid justify-content-center">
+                     <input class="form-check-input chk-item-wizard" type="checkbox" value="${row.id}" ${checked} />
+                  </div>`;
+            }
+         },
+        {  
+            targets: 1, // Item
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return ''; 
+               
+              
+               var badgeRetainage = '';
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               // Si es change order, agregar icono de +
+               
+               // 2. Iconos existentes
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View change order history"></i>';
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
                }
-               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
-                  data || ''
-               }</span>${icono}</div>`;
+
+               return `<div class="d-flex align-items-center" style="white-space: nowrap;">
+                           <span>${data || ''}</span>
+                           ${badgeRetainage} 
+                           ${icono}
+                       </div>`;
             },
          },
          {
-            targets: 1,
+            targets: 2, // Unit
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 2,
+            targets: 3, // Yield
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3,
+            targets: 4, // Quantity
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               var icono = '';
-               if (row.has_quantity_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View quantity history"></i>';
+               var icono = ''; 
+               if(row.has_quantity_history && !row.isGroupHeader) {
+                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="'+row.project_item_id+'"></i>';
                }
-               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
-                  data,
-                  2,
-                  '.',
-                  ',',
-               )}</span>${icono}</div>`;
+               return `<div style="display:flex;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          {
-            targets: 4,
+            targets: 5, // Price
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if (row.has_price_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View price history"></i>';
+               if(row.has_price_history && !row.isGroupHeader) {
+                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="'+row.project_item_id+'"></i>';
                }
-               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
-                  data,
-               )}</span>${icono}</div>`;
+               return `<div style="display:flex;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
          },
          {
-            targets: 5,
+            targets: 6, // Total
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
-            targets: -1,
+            targets: -1, // Acciones
             data: null,
             orderable: false,
             className: 'text-center',
@@ -1712,13 +1754,9 @@ var Projects = (function () {
          },
       ];
 
-      // language
       const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[7, 'asc']]; // Ordenar por _groupOrder
 
-      // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[6, 'asc']];
-
-      // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
          displayLength: 25,
@@ -1726,24 +1764,23 @@ var Projects = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
             if (data.isGroupHeader) {
                $(row).addClass('row-group-header');
-               $(row).css({
-                  'background-color': '#f5f5f5',
-                  'font-weight': 'bold',
-               });
-               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               $(row).css({ 'background-color': '#f5f5f5', 'font-weight': 'bold' });
+               
                var $firstCell = $(row).find('td:first');
-               $firstCell.attr('colspan', columns.length - 1);
-               $firstCell.css('text-align', 'left');
-               // Ocultar las demás celdas
+               
+               
+               $firstCell.removeClass('text-center'); // Quitar el centrado del checkbox
+               $firstCell.css('text-align', 'left');  // Forzar izquierda
+               $firstCell.css('padding-left', '15px'); // Darle un margen visual
+               // ------------------------------------------------------
+               
+               $firstCell.attr('colspan', 8); // Expandir para ocupar todo el ancho
                $(row).find('td:not(:first)').hide();
             } else {
-               if (!data.principal) {
-                  $(row).addClass('row-secondary');
-               }
+               if (!data.principal) $(row).addClass('row-secondary');
             }
          },
       });
@@ -1753,12 +1790,13 @@ var Projects = (function () {
       handleQuantityHistory();
       handlePriceHistory();
 
-      // totals
       $('#total_count_items').val(items.length);
-
       var total = calcularMontoTotalItems();
       $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
    };
+
+
+
    var handleChangeOrderHistory = function () {
       $(document).off('click', '.change-order-history-icon');
       $(document).on('click', '.change-order-history-icon', function (e) {
@@ -1838,8 +1876,7 @@ var Projects = (function () {
             }
          })
          .catch(function (error) {
-            toastr.error('Error loading history', '');
-            console.error(error);
+            toastr.error('Error loading history', '');          
          })
          .finally(function () {
             BlockUtil.unblock('#modal-change-order-history .modal-content');
@@ -1983,6 +2020,9 @@ var Projects = (function () {
             var change_order_date = FlatpickrUtil.getString('change-order-date');
             formData.set('change_order_date', change_order_date);
 
+            var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
+            formData.set('apply_retainage', apply_retainage);
+
             BlockUtil.block('#modal-item .modal-content');
 
             axios
@@ -2095,6 +2135,8 @@ var Projects = (function () {
             }
 
             $('#change-order').prop('checked', items[posicion].change_order);
+
+            $('#item-apply-retainage').prop('checked', items[posicion].apply_retainage);
 
             if (items[posicion].change_order_date !== '') {
                const change_order_date = MyApp.convertirStringAFecha(items[posicion].change_order_date);
@@ -2261,6 +2303,8 @@ var Projects = (function () {
       $('#select-unit').removeClass('hide').addClass('hide');
 
       $('#change-order').prop('checked', false);
+
+      $('#item-apply-retainage').prop('checked', true);
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));
@@ -3176,8 +3220,7 @@ var Projects = (function () {
          columnDefs: columnDefs,
          language: language,
          // marcar pending
-         createdRow: (row, data, index) => {
-            // console.log(data);
+         createdRow: (row, data, index) => {       
 
             const concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
 
@@ -3185,9 +3228,7 @@ var Projects = (function () {
                $(row).addClass('row-pending');
             }
          },
-      });
-
-      // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
+      });    
       oTableDataTracking.on('draw', function () {
          // init acciones
          initAccionesDataTracking();
@@ -3526,23 +3567,36 @@ var Projects = (function () {
       $('#ajuste_precio_items').empty();
 
       // Cargar items del proyecto
-      if (items && items.length > 0) {
+    if (items && items.length > 0) {
          for (var i = 0; i < items.length; i++) {
             var item = items[i];
+            
+            
             var itemText = item.item;
+
+            if (item.change_order) {
+               itemText += ' (C.O.)';
+            }
+
             if (item.unit) {
                itemText += ' - ' + item.unit;
             }
+
+            var formattedQty = MyApp.formatearNumero(item.quantity, 2, '.', ',');
+            itemText += ' - ' + formattedQty;
+
             $('#ajuste_precio_items').append(new Option(itemText, item.item_id, false, false));
          }
       }
-
+     
+   
       // Inicializar select2
       $('#ajuste_precio_items').select2({
          dropdownParent: $('#modal-ajuste-precio'),
          placeholder: 'Select items (optional)',
          allowClear: true,
          width: '100%',
+         closeOnSelect: false
       });
    };
 
@@ -3693,7 +3747,7 @@ var Projects = (function () {
                      }
                   })
                   .catch(function (err) {
-                     console.project(err);
+              
                      toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', 'Error !!!');
                   })
                   .then(function () {
@@ -4216,27 +4270,25 @@ var Projects = (function () {
 
    // Invoices Retainage Table
    var oTableInvoicesRetainage;
-  var initTableInvoicesRetainage = function (data) {
+
+   var initTableInvoicesRetainage = function (data) {
+
    const table = '#invoices-retainage-table-editable';
 
-   // columns (Esto está perfecto, son 9 columnas: índices 0 al 8)
    const columns = [
-      { data: 'paid' },                    // 0
+      { data: 'paid' },                    
       { data: 'invoice_date' },            // 1
-      { data: 'invoice_amount' },          // 2
-      { data: 'paid_amount' },             // 3
-      { data: 'retainage_percentage' },    // 4
-      { data: 'inv_ret_amt' },             // 5 
-      { data: 'retainage_amount' },        // 6 (Paid Ret. Amt.)
-      { data: 'total_retainage_to_date' }, // 7
-      { data: 'ajuste_retainage' },        // 8
+      { data: 'invoice_amount' },          // 2 <th>Invoice Amt.</th>
+      { data: 'inv_ret_amt' },             // 3 <th>Inv. Ret. Amt.</th> 
+      { data: 'paid_amount' },             // 4 <th>Paid Amt</th>
+      { data: 'retainage_amount' },        // 5 <th>Actual Ret. Amt.</th>
+      { data: 'total_retainage_to_date' }, // 6 <th>Actual Ret. T.D.</th>                                        
+      { data: 'retainage_reimbursed' },    // 7
    ];
 
-   // column defs
    let columnDefs = [
       {
          targets: 0,
-         // ... (tu código del icono paid) ...
          render: function (data, type, row) {
              var isPaid = row.paid === 1 || row.paid === true;
              var color = isPaid ? 'success' : 'danger';
@@ -4248,6 +4300,7 @@ var Projects = (function () {
          targets: 1,
          render: function (data, type, row) {
              var dateFormatted = data;
+             // Lógica de fecha existente...
              if (data && data.includes('/')) {
                  var dateParts = data.split('/');
                  if (dateParts.length === 3) {
@@ -4264,90 +4317,97 @@ var Projects = (function () {
          targets: 2, // Invoice Amt
          className: 'text-end',
          render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
-      },
+      },      
       {
-         targets: 3, // Paid Amt
+         targets: 3, //SInv. Ret. Amt. (Incluye el porcentaje)
+         className: 'text-end',
+         render: function (data, type, row) { 
+             var monto = MyApp.formatMoney(data);
+            
+             var percent = row.retainage_percentage ? MyApp.formatearNumero(row.retainage_percentage, 2, '.', ',') : '0.00';
+                       
+            return `
+               <div class="d-flex flex-column align-items-end">
+                  <span class="text-gray-800 fs-6">
+                        ${monto}
+                  </span>
+                  <span class="text-dark fs-8 mt-1">
+                        Ret. at ${percent}%
+                  </span>
+               </div>
+            `;
+         },
+      },      
+      {
+         targets: 4, // Paid Amt 
          className: 'text-end',
          render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
       },
       {
-         targets: 4, // Ret %
-         className: 'text-end',
-         render: function (data) { return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`; },
-      },
-      
-      {
-         targets: 5, //  (Inv. Ret. Amt.)
-         className: 'text-end',
-         render: function (data) { 
-             return `<span>${MyApp.formatMoney(data)}</span>`; 
-         },
-      },
-      {
-         targets: 6, // Paid Ret. Amt.
+         targets: 5, // Paid Ret. Amt. 
          className: 'text-end',
          render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
       },
       {
-         targets: 7,
-         className: 'text-end',
-         render: function (data) { 
-             return `<span>${MyApp.formatMoney(data)}</span>`; 
+         targets: 6, // Total Ret. T.D. 
+         className: 'text-end', 
+         render: function (data, type, row) {               
+            var montoReembolso = parseFloat(row.reimbursed_amount || 0);             
+            var amountHtml = `<span>${MyApp.formatMoney(data)}</span>`;
+             
+            if (montoReembolso > 0) {
+               return `
+                  <div class="d-flex align-items-center justify-content-end">
+                     <span class="fw-bold text-gray-800">${amountHtml}</span>
+                     <i class="fas fa-history text-primary ms-2 cursor-pointer btn-ver-historial-reembolso" 
+                        style="font-size: 1.1rem;"
+                        data-invoice-id="${row.invoice_id}"
+                        title="View History"></i>
+                  </div>`;
+            }              
+            return amountHtml;
          },
       },
       {
-         targets: 8, 
+         targets: 7, // Ret. Reimbursed 
          className: 'text-center',
-         render: function (data) {
-             var badgeClass = data === 'Yes' ? 'badge-success' : 'badge-secondary';
-             return `<span class="badge ${badgeClass}">${data}</span>`;
+         render: function (data, type, row) {          
+            var isReimbursed = (data == 1 || data === true);
+            var badgeClass = isReimbursed ? 'badge-success' : 'badge-danger';
+            var text = isReimbursed ? 'Yes' : 'No';
+            return `<span class="badge ${badgeClass}">${text}</span>`;
          },
-      },
+      }
    ];
 
-   
-      // language
-      const language = DatatableUtil.getDataTableLenguaje();
+   const language = DatatableUtil.getDataTableLenguaje();
+   const order = [[1, 'asc']];
 
-      // order - ordenar por fecha ASC (más antiguo primero)
-      const order = [[1, 'asc']];
+   if (oTableInvoicesRetainage) {
+      oTableInvoicesRetainage.destroy();
+   }
 
-      // destroy if exists
-      if (oTableInvoicesRetainage) {
-         oTableInvoicesRetainage.destroy();
-      }
+   oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
+      data: data || [],
+      displayLength: 10,
+      order: order,
+      columns: columns,
+      columnDefs: columnDefs,
+      language: language,
+   });
 
-      // escapar contenido de la tabla
-      oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
-         data: data || [],
-         displayLength: 10,
-         order: order,
-         columns: columns,
-         columnDefs: columnDefs,
-         language: language,
+ 
+   function initTooltips() {
+      $(table + ' [data-bs-toggle="tooltip"]').each(function () {
+         var tooltipInstance = bootstrap.Tooltip.getInstance(this);
+         if (tooltipInstance) { tooltipInstance.dispose(); }
+         new bootstrap.Tooltip(this);
       });
-
-      // Inicializar tooltips para los indicadores de estado
-      function initTooltips() {
-         // Destruir tooltips existentes antes de crear nuevos
-         $(table + ' [data-bs-toggle="tooltip"]').each(function () {
-            var tooltipInstance = bootstrap.Tooltip.getInstance(this);
-            if (tooltipInstance) {
-               tooltipInstance.dispose();
-            }
-            new bootstrap.Tooltip(this);
-         });
-      }
-      initTooltips();
-
-      // Reinicializar tooltips cuando la tabla se redibuja
-      oTableInvoicesRetainage.on('draw', function () {
-         initTooltips();
-      });
-
-      // Agregar event handlers para los links de invoice
-      handleInvoiceRetainageLinks();
-   };
+   }
+   initTooltips();
+   oTableInvoicesRetainage.on('draw', function () { initTooltips(); });
+   handleInvoiceRetainageLinks();
+};
 
    var handleInvoiceRetainageLinks = function () {
       $(document).off('click', '#invoices-retainage-table-editable a.invoice-retainage-link');
@@ -4362,50 +4422,42 @@ var Projects = (function () {
    };
 
    var cargarTablaInvoicesRetainage = function (project_id) {
-      if (!project_id) {
-         return;
-      }
+    if (!project_id) return;
 
-      var formData = new URLSearchParams();
-      formData.set('project_id', project_id);
+    var formData = new URLSearchParams();
+    formData.set('project_id', project_id);
 
-      axios
-         .post('project/listarInvoicesRetainage', formData, { responseType: 'json' })
-         .then(function (res) {
+    axios
+        .post('project/listarInvoicesRetainage', formData, { responseType: 'json' })
+        .then(function (res) {
             if (res.status === 200 || res.status === 201) {
-               var response = res.data;
-               if (response.success) {
-                  var invoices = response.invoices || [];
-                  initTableInvoicesRetainage(invoices);
+                var response = res.data;
+                
+                if (response.success) {
+                    var invoices = response.invoices || [];
 
-                  // Calcular y mostrar Total Retainage Withheld (es el último total_retainage_to_date que ya es acumulado)
-                  var totalRetainageWithheld = 0;
-                  if (invoices.length > 0) {
-                     // El último invoice tiene el total_retainage_to_date que ya es el acumulado total
-                     var lastInvoice = invoices[invoices.length - 1];
-                     totalRetainageWithheld = lastInvoice.total_retainage_to_date || 0;
-                  }
-                  $('#total-retainage-withheld').val(MyApp.formatMoney(totalRetainageWithheld));
-               } else {
-                  initTableInvoicesRetainage([]);
-                  $('#total-retainage-withheld').val(MyApp.formatMoney(0));
-                  if (response.error) {
-                     toastr.error(response.error, '');
-                  }
-               }
-            } else {
-               initTableInvoicesRetainage([]);
-               $('#total-retainage-withheld').val(MyApp.formatMoney(0));
+                    invoices.forEach(function(inv) {
+                     
+                    });
+                    
+                   initTableInvoicesRetainage(invoices);
+               
+                    var totalRetainageWithheld = 0;
+                    if (invoices.length > 0) {
+                        // El gran total es el balance de la última factura procesada
+                        var lastInvoice = invoices[invoices.length - 1];
+                        totalRetainageWithheld = lastInvoice.total_retainage_to_date || 0;
+                    }
+                    $('#total-retainage-withheld').val(MyApp.formatMoney(totalRetainageWithheld));
+                }
             }
-         })
-         .catch(function (error) {
-            console.error(error);
-            initTableInvoicesRetainage([]);
-            $('#total-retainage-withheld').val(MyApp.formatMoney(0));
-         });
-   };
+        })
+        .catch(function (error) {   
+         
+        });
+};
 
-   // Función para poblar el dropdown de County en Prevailing Wage solo con los condados seleccionados en el paso 1
+
    var poblarPrevailingCounties = function () {
       var county_ids = $('#county').val();
       var $prevailingCountySelect = $('#prevailing-county');
@@ -4472,6 +4524,220 @@ var Projects = (function () {
       poblarPrevailingCounties();
    });
 
+   // Lógica para botones de la tabla Wizard (Edición)
+   var initAccionesRetainageWizard = function() {
+       var toggleBarra = function() {
+           var seleccionados = $('.chk-item-wizard:checked').length;
+           $('#contador-items-seleccionados-wizard').text(seleccionados);
+           
+           if (seleccionados > 0) {
+               $('#barra-acciones-retainage-wizard').removeClass('d-none');
+           } else {
+               $('#barra-acciones-retainage-wizard').addClass('d-none');
+           }
+       };
+
+       // 1. Checkbox individual
+       $(document).on('change', '.chk-item-wizard', function() {
+           toggleBarra();
+           var total = $('.chk-item-wizard').length;
+           var checked = $('.chk-item-wizard:checked').length;
+           $('#chk-master-retainage-wizard').prop('checked', total === checked && total > 0);
+       });
+
+       // 2. Checkbox maestro (Select All)
+       $(document).on('change', '#chk-master-retainage-wizard', function() {
+           var isChecked = $(this).is(':checked');
+           $('.chk-item-wizard').prop('checked', isChecked);
+           toggleBarra();
+       });
+
+
+      // 3. Botones de Acción (Apply/Remove)
+       $(document).on('click', '.btn-accion-masiva-wizard', function() {
+           var accion = $(this).data('accion'); // 1 = Apply, 0 = Remove
+           var ids = [];
+           
+           // Recolectar IDs
+           $('.chk-item-wizard:checked').each(function() {
+               ids.push($(this).val());
+           });
+
+           if (ids.length === 0) {
+               toastr.warning("Please select at least one item.");
+               return;
+           }
+
+           // Bloquear pantalla
+           if (typeof BlockUtil !== 'undefined') BlockUtil.block('#items-table-editable');
+
+            axios.post('project/bulk-retainage-update', { 
+               ids: ids,
+               status: accion
+           })
+           .then(function(res) {
+               if (res.data.success) {
+                   toastr.success("Retainage updated successfully");
+                   
+                   // Limpiar selección
+                   $('.chk-item-wizard').prop('checked', false);
+                   $('#chk-master-retainage-wizard').prop('checked', false);
+                   toggleBarra();
+                   
+                   // Recargar el proyecto completo
+                   var project_id = $('#project_id').val();
+                   if(project_id) editRow(project_id, false); 
+               } else {
+                   // Mostrar el mensaje de error exacto que viene del servidor
+                   toastr.error(res.data.error || "Error updating items");
+               }
+           })
+           .catch(function(err) {
+           
+               toastr.error("Server connection error");
+           })
+           .then(function() {
+               if (typeof BlockUtil !== 'undefined') BlockUtil.unblock('#items-table-editable');
+           });
+       });
+   };
+
+ var initAccionesRetainageHistory = function () {        
+ 
+    $(document).off('click', '.btn-ver-historial-reembolso').on('click', '.btn-ver-historial-reembolso', function (e) {
+        e.preventDefault();
+        
+        var invoice_id = $(this).attr('data-invoice-id');
+        
+        // Loader inicial
+        Swal.fire({
+            title: 'Loading History...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+      
+        var formData = new FormData();
+        formData.append('invoice_id', invoice_id);
+
+        axios.post('project/get-reimbursement-history', formData) 
+            .then(function (response) {
+                var res = response.data;
+                
+                if (res.success) {
+                    try {
+                        var history = res.history;
+                        var htmlRows = '';
+
+                        if (history.length > 0) {
+                            history.forEach(function (h) {
+                                // Validamos que el formateador no rompa el código
+                                var montoFormateado = (typeof MyApp !== 'undefined' && MyApp.formatearNumero) 
+                                    ? MyApp.formatearNumero(h.amount, 2, '.', ',') 
+                                    : h.amount.toFixed(2);
+
+                                htmlRows += `
+                                    <tr>
+                                        <td>${h.date}</td>
+                                        <td class="text-end text-success fw-bold">$${montoFormateado}</td>
+                                    </tr>`;
+                            });
+                        } else {
+                            htmlRows = '<tr><td colspan="2" class="text-center text-muted">No history found</td></tr>';
+                        }
+
+                        // El modal de éxito CIERRA el loader automáticamente al abrirse
+                        Swal.fire({
+                            title: 'Reimbursement History',
+                            html: `
+                                <div class="table-responsive">
+                                    <table class="table table-row-dashed table-row-gray-300 gy-7">
+                                        <thead>
+                                            <tr class="fw-bolder fs-6 text-gray-800">
+                                                <th>Date</th>
+                                                <th class="text-end">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>${htmlRows}</tbody>
+                                    </table>
+                                </div>`,
+                            confirmButtonText: "Close",
+                            customClass: { confirmButton: "btn btn-primary" }
+                        });
+                    } catch (err) {                       
+                        Swal.fire('Error', 'Error rendering history data', 'error');
+                    }
+                } else {
+                    Swal.fire('Error', res.error || 'Invoice not found', 'error');
+                }
+            })
+            .catch(function (error) {              
+                if (error.response) {                
+                    Swal.fire('Error', 'Server error: ' + error.response.status, 'error');
+                }
+            });
+    });
+};
+
+// Función para manejar el modal de agregar pago/reembolso
+   var initAccionesReimbursement = function () {
+      
+      $(document).off('click', '.btn-add-reimbursement');
+      $(document).on('click', '.btn-add-reimbursement', function (e) {
+          e.preventDefault();
+          var invoice_id = $(this).data('invoice-id');
+          
+          // Limpiar y abrir modal
+          $('#invoice_id_reimbursement').val(invoice_id); // Input oculto en tu modal
+          $('#reimbursement_amount').val(''); // Input del monto
+          ModalUtil.show('modal-reimbursement'); // ID de tu modal
+      });
+
+      // 2. Guardar el pago (El botón "Save" de tu modal)
+      $(document).off('click', '#btn-save-reimbursement');
+      $(document).on('click', '#btn-save-reimbursement', function (e) {
+         e.preventDefault();
+
+         var invoice_id = $('#invoice_id_reimbursement').val(); // ID guardado en hidden
+         var amount = $('#reimbursement_amount').val(); // Monto escrito
+
+         if (amount && parseFloat(amount) > 0) {
+            var formData = new FormData();
+            formData.append('invoice_id', invoice_id);
+            formData.append('amount', amount);
+
+            // Bloquear el modal mientras carga
+            BlockUtil.block('#modal-reimbursement .modal-content');
+
+            // --- LLAMADA A LA NUEVA RUTA QUE SUMA ---
+            axios.post('project/save-reimbursement', formData)
+               .then(function (res) {
+                  if (res.data.success) {
+                     toastr.success(res.data.message);
+                     
+                     // Cerrar modal
+                     ModalUtil.hide('modal-reimbursement');
+                     
+                     // Recargar la tabla para ver los nuevos cálculos
+                     var project_id = $('#project_id').val();
+                     cargarTablaInvoicesRetainage(project_id);
+                     
+                  } else {
+                     toastr.error(res.data.error || "Error saving payment");
+                  }
+               })
+               .catch(function (error) {
+                  toastr.error("Server error");
+               })
+               .finally(function() {
+                  BlockUtil.unblock('#modal-reimbursement .modal-content');
+               });
+         } else {
+            toastr.error("Please enter a valid amount");
+         }
+      });
+   };
+
+
    return {
       //main function to initiate the module
       init: function () {
@@ -4529,6 +4795,12 @@ var Projects = (function () {
 
          // items completion
          initAccionFiltrarItemsCompletion();
+
+         initAccionesRetainageWizard();
+
+         initAccionesRetainageHistory();
+
+         initAccionesReimbursement();         
 
          // editar
          var project_id_edit = localStorage.getItem('project_id_edit');

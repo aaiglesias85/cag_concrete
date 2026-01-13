@@ -407,7 +407,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage)
    {
       $resultado = [];
 
@@ -452,6 +452,8 @@ class ProjectService extends Base
             $project_item_entity = new ProjectItem();
             $is_new_project_item = true;
          }
+
+         $project_item_entity->setApplyRetainage($apply_retainage);
 
          $project_item_entity->setYieldCalculation($yield_calculation);
 
@@ -1078,6 +1080,7 @@ class ProjectService extends Base
          // Preparar datos para el frontend
          $item_data = [
             "project_item_id" => $project_item_id,
+            "apply_retainage" => $value->getApplyRetainage(),
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -1541,6 +1544,9 @@ class ProjectService extends Base
       $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
 
       return [
+         'id' => $value->getId(),
+         'apply_retainage' => $value->getApplyRetainage(),
+         // ---------------------------------
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
          "item" => $value->getItem()->getName(),
@@ -2355,6 +2361,7 @@ class ProjectService extends Base
       $entity->setPoCG($po_cg);
       $entity->setManager($manager);
       $entity->setStatus($status);
+      $contract_amount = str_replace(['$', ','], '', $contract_amount);
       $entity->setContractAmount($contract_amount);
       $entity->setProposalNumber($proposal_number);
       $entity->setProjectIdNumber($project_id_number);
@@ -2759,6 +2766,14 @@ class ProjectService extends Base
       return $items_news;
    }
 
+   public function ActualizarRetainageItems(array $ids, $status)
+   {
+      /** @var \App\Repository\ProjectItemRepository $repo */
+      $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+      return $repo->ActualizarRetainageMasivo($ids, (bool)$status);
+   }
+
 
    /**
     * ListarProjects: Listar los projects
@@ -3022,98 +3037,108 @@ class ProjectService extends Base
     * @param int $project_id
     * @return array
     */
+
    public function ListarInvoicesConRetainage($project_id)
    {
       if (empty($project_id)) {
          return [];
       }
 
-      /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-      /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-
-      // Obtener el proyecto
       $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
+
       if (!$project || !$project->getRetainage()) {
          return [];
       }
 
-      // Obtener todos los invoices del proyecto ordenados por fecha de creación (ASC para calcular acumulados)
       $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
 
-      // Ordenar por fecha ASC para calcular acumulados correctamente
+      // 1. Ordenamos por fecha para que el acumulado histórico sea cronológico
       usort($invoices, function ($a, $b) {
          return $a->getCreatedAt() <=> $b->getCreatedAt();
       });
 
       $resultado = [];
-      $total_retainage_to_date = 0;
-      $total_amount_accumulated = 0;
-      $total_amount_accumulated_paid = 0; // Acumulado solo de invoices pagados
-      $contract_amount = $project->getContractAmount() ?? 0;
-      $retainage_percentage = $project->getRetainagePercentage() ?? 0;
-      $retainage_adjustment_percentage = $project->getRetainageAdjustmentPercentage() ?? 0;
-      $retainage_adjustment_completion = $project->getRetainageAdjustmentCompletion() ?? 0;
+      $running_balance = 0;
+
+      // ACUMULADOR: Sumaremos aquí solo lo pagado de items con "R"
+      $total_paid_accumulated_retainage_items = 0;
+
+      $contract_amount = (float)$project->getContractAmount();
+      $retainage_percentage = (float)$project->getRetainagePercentage();
+      $retainage_adjustment_percentage = (float)$project->getRetainageAdjustmentPercentage();
+      $retainage_adjustment_completion = (float)$project->getRetainageAdjustmentCompletion();
 
       foreach ($invoices as $invoice) {
-         // Calcular el invoice amount (suma de Final Amount This Period de cada item)
-         // Final Amount This Period = quantityBroughtForward * price para cada item
-         $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice->getInvoiceId());
+         $invoice_id_str = (string) $invoice->getInvoiceId();
 
-         // Calcular el paid amount (suma de Paid Amount de cada item)
-         $paid_amount = $invoiceItemRepo->TotalInvoicePaidAmount((string) $invoice->getInvoiceId());
+         // Valores visuales generales de la factura
+         $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id_str);
+         $paid_amount_total_invoice = $invoiceItemRepo->TotalInvoicePaidAmount($invoice_id_str);
 
-         $porciento_retainage = $retainage_percentage;
-         $ajuste_aplicado = false;
+         // --- LÓGICA DE FILTRADO ÍTEM POR ÍTEM ---
+         $items = $invoiceItemRepo->findBy(['invoice' => $invoice]);
+         $paid_base_this_invoice = 0; // Dinero pagado en esta factura SOLO de items con R
 
-         // Acumular el total para calcular el porcentaje de retainage
-         $total_amount_accumulated += $invoice_amount;
-
-         // Si el invoice está pagado, acumular también en el contador de pagados
-         $is_paid = $invoice->getPaid() ?? false;
-         if ($is_paid) {
-            $total_amount_accumulated_paid += $invoice_amount;
+         foreach ($items as $item) {
+            $pi = $item->getProjectItem();
+            // Solo sumamos si el ítem tiene el switch de Retainage activado
+            if ($pi && $pi->getApplyRetainage()) {
+               $paid_base_this_invoice += $item->getPaidAmount();
+            }
          }
 
-         // Calcular el porcentaje de retainage a aplicar
-         $porciento_retainage = $retainage_percentage;
+         // 2. Sumamos al histórico del proyecto (Previous + Current)
+         $total_paid_accumulated_retainage_items += $paid_base_this_invoice;
+
+         // 3. Evaluar la Regla del 50%
+         $porciento_retainage = $retainage_percentage; // Empieza en 10%
          $ajuste_aplicado = false;
 
-         // Revisar si se debe aplicar el ajuste (solo basado en invoices pagados)
          if ($retainage_adjustment_completion > 0 && $contract_amount > 0) {
-            $threshold_amount = $contract_amount * ($retainage_adjustment_completion / 100);
-            // Solo verificar con invoices pagados
-            if ($total_amount_accumulated_paid > $threshold_amount) {
-               $porciento_retainage = $retainage_adjustment_percentage;
+            $threshold = $contract_amount * ($retainage_adjustment_completion / 100);
+
+            // Comparamos el ACUMULADO FILTRADO contra el umbral
+            if ($total_paid_accumulated_retainage_items >= $threshold) {
+               $porciento_retainage = $retainage_adjustment_percentage; // Baja al 5%
                $ajuste_aplicado = true;
             }
          }
 
-         $inv_ret_amt = $invoice_amount * ($porciento_retainage / 100);
-         // Calcular el retainage amount para este invoice
-         // Retainage Amount = Paid Amount * Retainage %
-         $retainage_amount = $paid_amount * ($porciento_retainage / 100);
+         // 4. Calcular Retainage ($) de esta factura
+         // Base Filtrada * Porcentaje Decidido
+         $retainage_entry = $paid_base_this_invoice * ($porciento_retainage / 100);
 
-         // Acumular al total retainage
-         $total_retainage_to_date += $retainage_amount;
+         // Manejo de Reembolsos
+         $reimbursed_real = 0;
+         foreach ($invoice->getReimbursementHistories() as $history) {
+            $reimbursed_real += (float)$history->getAmount();
+         }
 
-         // Preparar datos para la tabla
+         $running_balance += $retainage_entry;
+         $saldo_visual_fila = $running_balance - $reimbursed_real;
+
          $resultado[] = [
             'invoice_id' => $invoice->getInvoiceId(),
             'invoice_number' => $invoice->getNumber(),
             'invoice_date' => $invoice->getCreatedAt()->format('m/d/Y'),
             'invoice_amount' => $invoice_amount,
-            'paid_amount' => $paid_amount,
-            'paid' => $is_paid ? 1 : 0,
+            'paid_amount' => $paid_amount_total_invoice, // Mostramos lo que se pagó en total
+            'paid' => $invoice->getPaid() ? 1 : 0,
             'retainage_percentage' => $porciento_retainage,
-            'inv_ret_amt' => $inv_ret_amt,
-            'retainage_amount' => $retainage_amount,
-            'total_retainage_to_date' => $total_retainage_to_date,
-            'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No'
+            'inv_ret_amt' => $retainage_entry,
+            'retainage_amount' => $retainage_entry,
+            'paid_ret_amt' => $retainage_entry, // Columna clave calculada correctamente
+            'total_retainage_to_date' => $saldo_visual_fila,
+            'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No',
+            'retainage_reimbursed' => ($reimbursed_real > 0) ? 1 : 0,
+            'reimbursed_amount' => $reimbursed_real,
+            'reimbursed_date' => $invoice->getRetainageReimbursedDate() ? $invoice->getRetainageReimbursedDate()->format('m/d/Y') : ''
          ];
       }
 
-      return $resultado;
+      // Revertimos para mostrar la más reciente arriba 
+      return array_reverse($resultado);
    }
 }

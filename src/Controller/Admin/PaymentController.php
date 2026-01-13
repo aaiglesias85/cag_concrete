@@ -8,6 +8,7 @@ use App\Http\DataTablesHelper;
 use App\Utils\Admin\PaymentService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PaymentController extends AbstractController
 {
@@ -510,6 +511,44 @@ class PaymentController extends AbstractController
          $resultadoJson['success'] = false;
          $resultadoJson['error'] = $e->getMessage();
 
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * salvarRetainageReimbursement
+    */
+   public function salvarRetainageReimbursement(Request $request, PaymentService $paymentService)
+   {
+
+      $params = $request->request->all();
+      $resultado = $paymentService->SalvarRetainageReimbursement($params);
+      return new JsonResponse($resultado);
+   }
+
+   /**
+    * cambiarEstado Acción para cambiar el estado (Open/Closed) de un invoice
+    */
+   public function cambiarEstado(Request $request)
+   {
+      $invoice_id = $request->get('invoice_id');
+      $status = $request->get('status'); // 1 = Closed, 0 = Open
+
+      try {
+         $resultado = $this->paymentService->CambiarEstadoInvoice($invoice_id, $status);
+
+         if ($resultado['success']) {
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = "Status updated successfully";
+            return $this->json($resultadoJson);
+         } else {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $resultado['error'];
+            return $this->json($resultadoJson);
+         }
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
          return $this->json($resultadoJson);
       }
    }

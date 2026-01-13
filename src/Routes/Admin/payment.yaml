@@ -60,3 +60,11 @@ eliminarNotesItemPaymentAdmin:
 paidInvoiceAdmin:
    path: /payment/paid
    defaults: { _controller: App\Controller\Admin\PaymentController::paid, _format: json }
+
+salvarRetainageReimbursementPaymentAdmin:
+   path: /payment/salvarRetainageReimbursement
+   defaults: { _controller: App\Controller\Admin\PaymentController::salvarRetainageReimbursement, _format: json }
+
+cambiarEstadoPaymentAdmin:
+   path: /payment/cambiarEstado
+   defaults: { _controller: App\Controller\Admin\PaymentController::cambiarEstado, _format: json }

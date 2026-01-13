@@ -1517,6 +1517,12 @@ class Base
          $payments[] = [
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
+
+            "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
+            "paid_qty"        => $value->getPaidQty(),
+            "paid_amount"     => $value->getPaidAmount(),
+            "paid_amount_total" => $value->getPaidAmountTotal(),
+            // ------------------------------------------
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',

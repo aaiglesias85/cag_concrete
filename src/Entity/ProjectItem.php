@@ -37,6 +37,9 @@ class ProjectItem
    #[ORM\Column(name: "change_order_date", type: "datetime", nullable: true)]
    private ?\DateTimeInterface $changeOrderDate = null;
 
+   #[ORM\Column(name: "apply_retainage", type: "boolean", nullable: false, options: ["default" => 0])]
+   private ?bool $applyRetainage = false;
+
    #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
    private ?Project $project;
@@ -48,6 +51,19 @@ class ProjectItem
    #[ORM\ManyToOne(targetEntity: "App\Entity\Equation")]
    #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
    private ?Equation $equation = null;
+
+
+   public function getApplyRetainage(): ?bool
+   {
+      return $this->applyRetainage;
+   }
+
+   public function setApplyRetainage(bool $applyRetainage): self
+   {
+      $this->applyRetainage = $applyRetainage;
+
+      return $this;
+   }
 
    public function getId(): ?int
    {

@@ -210,452 +210,432 @@ class InvoiceService extends Base
 
    /**
     * ExportarExcel: Exporta a excel el invoice
-    *
-    *
     * @author Marcel
     */
    public function ExportarExcel($invoice_id)
    {
+      $em = $this->getDoctrine()->getManager();
+      $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
+      $invoiceRepo = $em->getRepository(Invoice::class);
 
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      // 1. OBTENER DATOS
+      $invoice_entity = $invoiceRepo->find($invoice_id);
+      if (!$invoice_entity) return null;
+
+      $project_entity = $invoice_entity->getProject();
+      $project_id = $project_entity->getProjectId();
+      $currentInvoiceId = $invoice_id;
+
+      $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoicesHistory);
+
+      // 2. SEPARAR ITEMS
       $items = $invoiceItemRepo->ListarItems($invoice_id);
-
-
       $items_regulares = [];
       $items_change_order = [];
 
       foreach ($items as $value) {
          $change_order = $value->getProjectItem()->getChangeOrder();
          if ($change_order) {
-            $change_order_date = $value->getProjectItem()->getChangeOrderDate();
-            if ($change_order_date != null) {
-               $key_group = $change_order_date->format('Y-m');
-               if (!isset($items_change_order[$key_group])) {
-                  $items_change_order[$key_group] = [];
-               }
-               $items_change_order[$key_group][] = $value;
-            } else {
-               if (!isset($items_change_order['no-date'])) {
-                  $items_change_order['no-date'] = [];
-               }
-               $items_change_order['no-date'][] = $value;
-            }
+            $date = $value->getProjectItem()->getChangeOrderDate();
+            $key = ($date) ? $date->format('Y-m') : 'no-date';
+            $items_change_order[$key][] = $value;
          } else {
             $items_regulares[] = $value;
          }
       }
-      ksort($items_change_order); // Ordenar change orders
+      ksort($items_change_order);
 
-
+      // 3. CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
-      $styleArray = [
-         'borders' => [
-            'allBorders' => [
-               'borderStyle' => Border::BORDER_THIN,
-               'color' => ['argb' => 'FF000000'],
-            ],
-         ],
+
+      // ESTILO 1: TEXTO A LA IZQUIERDA (Fondo Blanco) - Para Descripción y Unidades
+      $styleLeft = [
+         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
+         'font' => ['name' => 'Arial', 'size' => 10, 'bold' => false],
+         'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true],
+         'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFFFFFF']] // Blanco
+      ];
+
+      // ESTILO 2: NÚMEROS A LA DERECHA (Fondo Blanco) - Para Precios y Cantidades
+      $styleRight = [
+         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
+         'font' => ['name' => 'Arial', 'size' => 10, 'bold' => false],
+         'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT, 'vertical' => Alignment::VERTICAL_CENTER],
+         'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFFFFFFF']] // Blanco
       ];
 
       $reader = IOFactory::createReader('Xlsx');
       $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
-      // A: Item #
-      $objWorksheet->getColumnDimension('A')->setWidth(8.29);
+      // Dimensiones
+      $dims = ['A' => 8.29, 'B' => 25, 'C' => 12, 'D' => 12, 'E' => 10, 'F' => 14, 'G' => 14, 'H' => 16, 'I' => 14, 'J' => 16, 'K' => 14, 'L' => 16, 'N' => 14, 'O' => 16, 'Q' => 14, 'R' => 16];
+      foreach ($dims as $col => $val) $objWorksheet->getColumnDimension($col)->setWidth($val);
 
-      $objWorksheet->getColumnDimension('B')->setWidth(18.29);
-      $objWorksheet->getColumnDimension('C')->setWidth(24.43);
-      $objWorksheet->getColumnDimension('D')->setWidth(16.43);
 
-      // E: UNIT 
-      $objWorksheet->getColumnDimension('E')->setWidth(14.00);
-
-      // F: UNIT PRICE 
-      $objWorksheet->getColumnDimension('F')->setWidth(13.71);
-
-      // G: CONTRACT QTY 
-      $objWorksheet->getColumnDimension('G')->setWidth(13.71);
-
-      // H: CONTRACT AMOUNT 
-      $objWorksheet->getColumnDimension('H')->setWidth(18.00);
-
-      // I: CURRENT QTY 
-      $objWorksheet->getColumnDimension('I')->setWidth(18.00);
-
-      // J: CURRENT AMT 
-      $objWorksheet->getColumnDimension('J')->setWidth(17.86);
-
-      // K: PREVIOUS QTY 
-      $objWorksheet->getColumnDimension('K')->setWidth(17.86);
-
-      // L: PREVIOUS AMT 
-      $objWorksheet->getColumnDimension('L')->setWidth(18.29);
-
-      // M: COMPLETED QTY 
-      //$objWorksheet->getColumnDimension('M')->setWidth(18.29);
-
-      // N: COMPLETED AMT 
-      $objWorksheet->getColumnDimension('N')->setWidth(17.14);
-
-      // O: UNPAID QTY 
-      $objWorksheet->getColumnDimension('O')->setWidth(15.71);
-
-      // P: UNPAID AMT 
-      $objWorksheet->getColumnDimension('Q')->setWidth(21.29);
-
-      $objWorksheet->getColumnDimension('r')->setWidth(19.14);
-
-      // 3. BUSCAR FOOTER AUTOMÁTICAMENTE
+      // ======================================================================
+      // CALCULO DE ESPACIO
+      // ======================================================================
+      $start_row_data = 16;
       $fila_footer_inicio = 0;
-      for ($i = 16; $i < 150; $i++) {
-         $valor = $objWorksheet->getCell('G' . $i)->getValue();
-         if ($valor && stripos((string)$valor, 'CONTRACT AMOUNT') !== false) {
+
+      // Buscar Footer
+      for ($i = $start_row_data; $i < 200; $i++) {
+         $valE = strtoupper((string)$objWorksheet->getCell('E' . $i)->getValue());
+         $valG = strtoupper((string)$objWorksheet->getCell('G' . $i)->getValue());
+         if (strpos($valG, 'CONTRACT AMOUNT') !== false || strpos($valE, 'TOTAL') !== false) {
             $fila_footer_inicio = $i;
             break;
          }
       }
+      if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      if ($fila_footer_inicio == 0) {
-         $fila_footer_inicio = 41; // Fallback por seguridad
+      // Calcular filas necesarias
+      $filas_necesarias = count($items_regulares);
+      if (!empty($items_change_order)) {
+         $filas_necesarias++; // Espacio separador
+         foreach ($items_change_order as $group) {
+            $filas_necesarias++; // Titulo
+            $filas_necesarias += count($group); // Items
+         }
       }
+
+      // Ajustar Excel
+      $filas_disponibles = $fila_footer_inicio - $start_row_data;
+      if ($filas_necesarias > $filas_disponibles) {
+         $a_insertar = $filas_necesarias - $filas_disponibles;
+         $objWorksheet->insertNewRowBefore($fila_footer_inicio, $a_insertar);
+         $fila_footer_inicio += $a_insertar;
+      } elseif ($filas_necesarias < $filas_disponibles) {
+         $a_borrar = $filas_disponibles - $filas_necesarias;
+         // Dejamos 0 filas extras para que se pegue bien
+         if ($a_borrar > 0) {
+            $objWorksheet->removeRow($start_row_data + $filas_necesarias, $a_borrar);
+            $fila_footer_inicio -= $a_borrar;
+         }
+      }
+
       $fila_retainage = $fila_footer_inicio + 1;
 
-      $fila = 16;
-      foreach ($items_regulares as $value) {
-         if ($fila >= ($fila_footer_inicio - 1)) {
-            $objWorksheet->insertNewRowBefore($fila_footer_inicio, 1);
-            $fila_footer_inicio++;
-            $fila_retainage++;
-         }
-         $fila++;
+      // ======================================================================
+
+      // 4. DATOS CABECERA
+      $objWorksheet->setCellValueExplicit("Q4", date('m/d/Y'), DataType::TYPE_STRING);
+      $objWorksheet->setCellValue("R4", $invoice_entity->getNumber());
+      $objWorksheet->setCellValueExplicit("Q6", $invoice_entity->getStartDate()->format('m/d/Y'), DataType::TYPE_STRING);
+      $objWorksheet->setCellValueExplicit("R6", $invoice_entity->getEndDate()->format('m/d/Y'), DataType::TYPE_STRING);
+
+      $company = $project_entity->getCompany();
+      $objWorksheet->setCellValue("G5", $company->getName());
+      $objWorksheet->setCellValue("G7", $company->getPhone());
+      $objWorksheet->setCellValue("H8", $company->getContactName());
+      $objWorksheet->setCellValue("H9", $company->getContactEmail());
+
+      if ($insp = $project_entity->getInspector()) {
+         $objWorksheet->setCellValue("I5", $insp->getName());
+         $objWorksheet->setCellValue("I7", $insp->getPhone());
       }
 
-      // Datos del invoice
-      $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-      /** @var Invoice $invoice_entity */
-      $project_entity = $invoice_entity->getProject();
-      /** @var Project $project_entity */
-      $project_id = $project_entity->getProjectId();
-
-      // fecha actual
-      $fecha_actual = date('m/d/Y');
-      $objWorksheet->setCellValueExplicit("Q4", $fecha_actual, DataType::TYPE_STRING);
-
-      $project_entity = $invoice_entity->getProject();
-      $project_number = $project_entity->getProjectNumber();
-
-      $number = $invoice_entity->getNumber();
-
-      $objWorksheet->setCellValue("R4", $number);
-
-      $start_date = $invoice_entity->getStartDate()->format('m/d/Y');
-      $objWorksheet->setCellValueExplicit("Q6", $start_date, DataType::TYPE_STRING);
-
-      $end_date = $invoice_entity->getEndDate()->format('m/d/Y');
-      $objWorksheet->setCellValueExplicit("R6", $end_date, DataType::TYPE_STRING);
-
-      // company
-      $company_entity = $invoice_entity->getProject()->getCompany();
-      $objWorksheet->setCellValue("G5", $company_entity->getName());
-      $objWorksheet->setCellValue("G7", $company_entity->getPhone());
-      $objWorksheet->setCellValue("H8", $company_entity->getContactName());
-      $objWorksheet->setCellValue("H9", $company_entity->getContactEmail());
-
-      // inspector
-      $inspector_entity = $invoice_entity->getProject()->getInspector();
-      if ($inspector_entity != null) {
-         $objWorksheet->setCellValue("I5", $inspector_entity->getName());
-         $objWorksheet->setCellValue("I7", $inspector_entity->getPhone());
-         // $objWorksheet->setCellValue("D15", $inspector_entity->getEmail());
-      }
-
-      // project
-      $county = $this->getCountiesDescriptionForProject($project_entity);
-      $objWorksheet->setCellValue("N3", $county);
-
+      $objWorksheet->setCellValue("N3", $this->getCountiesDescriptionForProject($project_entity));
       $objWorksheet->setCellValue("N4", $project_entity->getName());
       $objWorksheet->setCellValue("N6", $project_entity->getProjectIdNumber());
       $objWorksheet->setCellValue("N7", $project_entity->getSubcontract());
-      $objWorksheet->setCellValue("N8", $project_number);
-
-      // notes
+      $objWorksheet->setCellValue("N8", $project_entity->getProjectNumber());
       $objWorksheet->setCellValue("B11", $invoice_entity->getNotes());
 
-      // Totales
-      $total_contract_amount = 0;
-      $total_amount_invoice_todate = 0;
-      $total_unpaid = 0;
-      $total_amount_from_previous = 0;
       $total_amount_final = 0;
-
-      $fila_inicio = 16;
-      $fila = $fila_inicio;
-
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      $items = $invoiceItemRepo->ListarItems($invoice_id);
-
-      // Separar items regulares y change order
-      $items_regulares = [];
-      $items_change_order = [];
-
-      foreach ($items as $value) {
-         $change_order = $value->getProjectItem()->getChangeOrder();
-         if ($change_order) {
-            $change_order_date = $value->getProjectItem()->getChangeOrderDate();
-            if ($change_order_date != null) {
-               // Agrupar por mes/año (formato: "Y-m" para ordenar correctamente)
-               $key_group = $change_order_date->format('Y-m');
-               if (!isset($items_change_order[$key_group])) {
-                  $items_change_order[$key_group] = [];
-               }
-               $items_change_order[$key_group][] = $value;
-            } else {
-               // Si no tiene fecha, agregarlo al grupo por defecto
-               if (!isset($items_change_order['no-date'])) {
-                  $items_change_order['no-date'] = [];
-               }
-               $items_change_order['no-date'][] = $value;
-            }
-         } else {
-            $items_regulares[] = $value;
-         }
-      }
-
-      // Ordenar los grupos de change order por fecha (más antiguo primero)
-      ksort($items_change_order);
-
       $item_number = 1;
+      $fila = $start_row_data;
 
-      // Escribir primero los items regulares
+      // Formatos de Moneda
+      $currencyFormat = '"$"#,##0.00';
+      $qtyFormat = '#,##0.00';
+
+      // --- FUNCIÓN HELPER LOCAL PARA APLICAR FORMATO A LA FILA ---
+      $aplicarFormatoFila = function ($sheet, $f) use ($styleLeft, $styleRight, $currencyFormat, $qtyFormat) {
+         // 1. Aplicar estilo Izquierda (Blanco) a columnas A hasta E
+         $sheet->getStyle("A{$f}:E{$f}")->applyFromArray($styleLeft);
+         // 2. Aplicar estilo Derecha (Blanco) a columnas F hasta R
+         $sheet->getStyle("F{$f}:R{$f}")->applyFromArray($styleRight);
+
+         // 3. Forzar altura
+         $sheet->getRowDimension($f)->setRowHeight(18);
+
+         // 4. Aplicar formato de moneda y número explícitamente
+         // Precios y Montos ($)
+         $colsMoney = ['F', 'H', 'J', 'L', 'O', 'R'];
+         foreach ($colsMoney as $col) $sheet->getStyle($col . $f)->getNumberFormat()->setFormatCode($currencyFormat);
+
+         // Cantidades (#)
+         $colsQty = ['G', 'I', 'K', 'N', 'Q'];
+         foreach ($colsQty as $col) $sheet->getStyle($col . $f)->getNumberFormat()->setFormatCode($qtyFormat);
+      };
+
+      // 5. ESCRIBIR ITEMS REGULARES
       foreach ($items_regulares as $value) {
-         $project_item_id = $value->getProjectItem()->getId();
+         $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
-         $contract_qty = $value->getProjectItem()->getQuantity();
-         $price = $value->getPrice();
-         $contract_amount = $contract_qty * $price;
-         $total_contract_amount += $contract_amount;
+         // APLICAR FORMATO LIMPIO Y MONEDA
+         $aplicarFormatoFila($objWorksheet, $fila);
 
-         $quantity_brought_forward = $value->getQuantityBroughtForward();
-         $quantity = $value->getQuantity();
-
-         $amount = $quantity * $price;
-         $total_amount_invoice_todate += $amount;
-
-         $quantity_from_previous = $value->getQuantityFromPrevious();
-
-         $quantity_completed = $quantity + $quantity_from_previous;
-
-         $amount_from_previous = $quantity_from_previous * $price;
-
-         $total_amount_from_previous += $amount_from_previous;
-
-         $amount_completed = $quantity_completed * $price;
-         $total_amount_final += $amount_completed;
-
-         $paid_qty = $value->getPaidQty();
-         $unpaid_qty = $value->getUnpaidQty();
-         $unpaid_amount = $unpaid_qty * $price;
-         $total_unpaid += $unpaid_amount;
-
-         // Escribir fila
-         $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
-         // ...
-         $objWorksheet
-            ->setCellValue('A' . $fila, $item_number)
-            ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
-
-            ->setCellValue('E' . $fila, $unit)            // Antes C
-            ->setCellValue('F' . $fila, $price)           // Antes D
-            ->setCellValue('G' . $fila, $contract_qty)    // Antes E
-            ->setCellValue('H' . $fila, $contract_amount) // Antes F
-            ->setCellValue('I' . $fila, $quantity)        // Antes G (Current)
-            ->setCellValue('J' . $fila, $amount)          // Antes H (Current)
-            ->setCellValue('K' . $fila, $quantity_from_previous) // Antes I
-            ->setCellValue('L' . $fila, $amount_from_previous)   // Antes J
-            // ->setCellValue('M' . $fila, $quantity_completed)     // Antes K
-            ->setCellValue('N' . $fila, $amount_completed)       // Antes L
-            ->setCellValue('O' . $fila, $unpaid_qty);           // Antes M (Balance Qty)
-         // ->setCellValue('P' . $fila, $unpaid_amount);         // Antes N (Balance Amount)
-
-         // Borde desde A hasta P
-         $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
-
+         $total_amount_final += ($value->getQuantity() + $value->getQuantityFromPrevious()) * $value->getPrice();
          $item_number++;
          $fila++;
       }
 
-      // Si hay items change order, agregar separación y escribirlos
+      // 6. ESCRIBIR CHANGE ORDERS
       if (!empty($items_change_order)) {
-         // Agregar fila en blanco para separar
-         $fila++;
 
-         // Escribir items change order agrupados por mes/año
+
+         $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleLeft);
+
+         $objWorksheet->setCellValue("A{$fila}", ""); // Asegurar vacía
+         $fila++; // Saltar fila
+
          foreach ($items_change_order as $group_key => $group_items) {
-            // Obtener mes y año para el encabezado
-            $month_name = '';
+            $month = '';
             $year = '';
             if ($group_key !== 'no-date' && !empty($group_items)) {
-               $first_item_date = $group_items[0]->getProjectItem()->getChangeOrderDate();
-               if ($first_item_date != null) {
-                  // Nombres de meses en inglés
-                  $months = [
-                     'January',
-                     'February',
-                     'March',
-                     'April',
-                     'May',
-                     'June',
-                     'July',
-                     'August',
-                     'September',
-                     'October',
-                     'November',
-                     'December'
-                  ];
-                  $month_name = $months[(int)$first_item_date->format('n') - 1];
-                  $year = $first_item_date->format('Y');
+               $d = $group_items[0]->getProjectItem()->getChangeOrderDate();
+               if ($d) {
+                  $month = $d->format('F');
+                  $year = $d->format('Y');
                }
             }
+            if ($month) {
+               $objWorksheet->setCellValue('B' . $fila, "Change Order in {$month} {$year}");
 
-            // Escribir encabezado del grupo (solo si tiene fecha válida)
-            if ($month_name && $year) {
-               $objWorksheet
-                  ->setCellValue('B' . $fila, "Change Order in {$month_name} {$year}");
+               // Estilo Título: Todo blanco, texto negrita a la izquierda
+               $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleLeft);
                $objWorksheet->getStyle("B{$fila}")->getFont()->setBold(true);
+               $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+               $objWorksheet->getRowDimension($fila)->setRowHeight(18);
+
                $fila++;
             }
-
-            // Escribir items del grupo
             foreach ($group_items as $value) {
-               $project_item_id = $value->getProjectItem()->getId();
+               $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
-               $contract_qty = $value->getProjectItem()->getQuantity();
-               $price = $value->getPrice();
-               $contract_amount = $contract_qty * $price;
-               $total_contract_amount += $contract_amount;
+               // APLICAR FORMATO LIMPIO Y MONEDA
+               $aplicarFormatoFila($objWorksheet, $fila);
 
-               $quantity_brought_forward = $value->getQuantityBroughtForward();
-               $quantity = $value->getQuantity();
-
-               $amount = $quantity * $price;
-               $total_amount_invoice_todate += $amount;
-
-               $quantity_from_previous = $value->getQuantityFromPrevious();
-
-               $quantity_completed = $quantity + $quantity_from_previous;
-
-               $amount_from_previous = $quantity_from_previous * $price;
-
-               $total_amount_from_previous += $amount_from_previous;
-
-               $amount_completed = $quantity_completed * $price;
-               $total_amount_final += $amount_completed;
-
-               $paid_qty = $value->getPaidQty();
-               $unpaid_qty = $value->getUnpaidQty();
-               $unpaid_amount = $unpaid_qty * $price;
-               $total_unpaid += $unpaid_amount;
-
-               // Escribir fila
-               $unit = $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
-               // ...
-               $objWorksheet
-                  ->setCellValue('A' . $fila, $item_number)
-                  ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
-
-                  ->setCellValue('E' . $fila, $unit)
-                  ->setCellValue('F' . $fila, $price)
-                  ->setCellValue('G' . $fila, $contract_qty)
-                  ->setCellValue('H' . $fila, $contract_amount)
-                  ->setCellValue('I' . $fila, $quantity)
-                  ->setCellValue('J' . $fila, $amount)
-                  ->setCellValue('K' . $fila, $quantity_from_previous)
-                  ->setCellValue('L' . $fila, $amount_from_previous)
-                  // ->setCellValue('M' . $fila, $quantity_completed)
-                  ->setCellValue('N' . $fila, $amount_completed)
-                  ->setCellValue('O' . $fila, $unpaid_qty);
-               //->setCellValue('P' . $fila, $unpaid_amount);
-
-               // Aplicar bordes a toda la fila (A–P)
-               $objWorksheet->getStyle("A{$fila}:P{$fila}")->applyFromArray($styleArray);
-
+               $total_amount_final += ($value->getQuantity() + $value->getQuantityFromPrevious()) * $value->getPrice();
                $item_number++;
                $fila++;
             }
          }
       }
 
-      $fila++;
+      // --- ACTUALIZAR FORMULAS DE TOTALES ---
+      $last_data_row = $fila_footer_inicio - 1;
+      if ($last_data_row < $start_row_data) $last_data_row = $start_row_data;
 
-      //(cierre del foreach de items)
-      $fila++;
+      // Aseguramos que las sumas tengan formato moneda también
+      $objWorksheet->setCellValue('H' . $fila_footer_inicio, "=SUM(H{$start_row_data}:H{$last_data_row})");
+      $objWorksheet->setCellValue('J' . $fila_footer_inicio, "=SUM(J{$start_row_data}:J{$last_data_row})");
+      $objWorksheet->setCellValue('L' . $fila_footer_inicio, "=SUM(L{$start_row_data}:L{$last_data_row})");
+      $objWorksheet->setCellValue('O' . $fila_footer_inicio, "=SUM(O{$start_row_data}:O{$last_data_row})");
+      $objWorksheet->setCellValue('R' . $fila_footer_inicio, "=SUM(R{$start_row_data}:R{$last_data_row})");
+
+
+      // ---------------- RETAINAGE ---------------- //
 
       $retainage_percent = $this->CalcularPorcientoRetainage($project_entity, $total_amount_final);
 
+      $current_retainage_amount = 0;
 
-      $celda_texto = 'N' . $fila_retainage;
-      $texto_retainage = "CURRENT RETAINAGE @ " . number_format($retainage_percent, 2) . "%:";
+      foreach ($items as $itemItem) {
+         $apply_ret = $itemItem->getProjectItem()->getApplyRetainage();
+         $paid_amount = $itemItem->getPaidAmount();
 
-      $objWorksheet->setCellValue($celda_texto, $texto_retainage);
-      // Estilos
-      $estilo = $objWorksheet->getStyle($celda_texto);
-      $estilo->getFont()->setSize(10)->setBold(true);
-      $estilo->getAlignment()->setWrapText(true);
+         if (($apply_ret == 1 || $apply_ret === true) && $paid_amount > 0) {
+            $current_retainage_amount += $paid_amount * ($retainage_percent / 100);
+         }
+      }
 
-      // 2. Cálculo (Columna O)
-      $celda_valor = 'O' . $fila_retainage;
+      // SECTION RETAINAGE
+      $objWorksheet->setCellValue('N' . $fila_retainage, "CURRENT RETAINAGE @ " . number_format($retainage_percent, 2) . "%");
+      $objWorksheet->getStyle('N' . $fila_retainage)->getFont()->setSize(10)->setBold(true);
+      $objWorksheet->getStyle('N' . $fila_retainage)->getAlignment()->setWrapText(true);
+      $objWorksheet->getRowDimension($fila_retainage)->setRowHeight(40);
 
-      $base_amount_for_retainage = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod($invoice_id);
+      $objWorksheet->setCellValue('O' . $fila_retainage, $current_retainage_amount);
+      $objWorksheet->getStyle('O' . $fila_retainage)->applyFromArray(['numberFormat' => ['formatCode' => $currencyFormat], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
 
-      $current_retainage_amount = $base_amount_for_retainage * ($retainage_percent / 100);
-
-      $objWorksheet->setCellValue($celda_valor, $current_retainage_amount);
-
-      $objWorksheet->getStyle($celda_valor)
-         ->getAlignment()
-         ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-
-      // ... (Bloque anterior de Current Retainage) ...
-
-      // --- CÁLCULO DE CURRENT AMOUNT DUE ---
-
+      // CURRENT AMOUNT DUE
       $fila_amount_due = $fila_retainage + 1;
+      $objWorksheet->setCellValue('N' . $fila_amount_due, "CURRENT AMOUNT DUE:");
+      $objWorksheet->getStyle('N' . $fila_amount_due)->getFont()->setSize(10)->setBold(true);
 
-      // 1. Etiqueta
-      $celda_texto_due = 'N' . $fila_amount_due;
-      $objWorksheet->setCellValue($celda_texto_due, "CURRENT AMOUNT DUE:");
-      $estiloDue = $objWorksheet->getStyle($celda_texto_due);
-      $estiloDue->getFont()->setSize(10)->setBold(true);
-      $estiloDue->getAlignment()->setWrapText(true);
+      $objWorksheet->setCellValue('O' . $fila_amount_due, "=O{$fila_footer_inicio}-O{$fila_retainage}");
+      $objWorksheet->getStyle('O' . $fila_amount_due)->applyFromArray(['numberFormat' => ['formatCode' => $currencyFormat], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
 
-      $celda_valor_due = 'O' . $fila_amount_due;
+      //Less Retainage
+      $total_retainage_accumulated = 0;
+      $running_paid_accumulated = 0; // Para controlar el umbral de cambio de %
 
-      $fila_total_billed = $fila_retainage - 1;
+      // 1. Obtener todas las facturas ordenadas por fecha (hasta la actual o todas)
+      $allInvoices = $invoiceRepo->findBy(
+         ['project' => $project_id],
+         ['startDate' => 'ASC', 'invoiceId' => 'ASC']
+      );
 
-      $formula = "=O{$fila_total_billed}-O{$fila_retainage}";
+      // 2. Definir Umbrales del Proyecto
+      $std_retainage = (float)$project_entity->getRetainagePercentage();
+      $red_retainage = (float)$project_entity->getRetainageAdjustmentPercentage();
+      $target_completion = (float)$project_entity->getRetainageAdjustmentCompletion();
+      $contract_amount = (float)$project_entity->getContractAmount();
 
-      $objWorksheet->setCellValue($celda_valor_due, $formula);
+      $threshold_amount = 0;
+      if ($contract_amount > 0 && $target_completion > 0) {
+         $threshold_amount = $contract_amount * ($target_completion / 100);
+      }
 
-      // 3. Alineación a la Derecha
-      $objWorksheet->getStyle($celda_valor_due)
-         ->getAlignment()
-         ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+      // 3. Bucle acumulativo (simulando la historia)
+      foreach ($allInvoices as $inv) {
 
-      // Guardar Excel
-      $fichero = "invoice-$number.xlsx";
+         $paid_this_invoice_retainage_base = 0;
+
+         $invItems = $invoiceItemRepo->findBy(['invoice' => $inv]);
+
+         foreach ($invItems as $item) {
+            // Filtrar solo items que aplican retainage, como en PaymentService
+            if ($item->getProjectItem()->getApplyRetainage()) {
+               $paid_this_invoice_retainage_base += $item->getPaidAmount();
+            }
+         }
+
+         // Determinar el porcentaje a aplicar en ESE momento histórico
+         // Regla: Si (Acumulado Anterior + Pagado Hoy) >= Umbral -> Usar % Reducido
+         $pct_to_use = $std_retainage;
+         if ($threshold_amount > 0 && ($running_paid_accumulated + $paid_this_invoice_retainage_base) >= $threshold_amount) {
+            $pct_to_use = $red_retainage;
+         }
+
+         // Calcular Retainage de esta factura
+         $retainage_calculated = $paid_this_invoice_retainage_base * ($pct_to_use / 100);
+
+         // Restar reembolsos (si hubo liberación de retainage en esa factura)
+         foreach ($inv->getReimbursementHistories() as $history) {
+            $retainage_calculated -= (float)$history->getAmount();
+         }
+
+         // Sumar al total acumulado
+         $total_retainage_accumulated += $retainage_calculated;
+
+         // Actualizar el acumulado de pagos para la siguiente vuelta del bucle
+         $running_paid_accumulated += $paid_this_invoice_retainage_base;
+
+         // IMPORTANTE: Detenernos exactamente después de procesar la factura actual
+         if ($inv->getInvoiceId() == $invoice_id) {
+            break;
+         }
+      }
+
+      // Si la celda J representa el "Total Retainage to Date" (Anterior + Actual)
+      $objWorksheet->setCellValue('J' . $fila_retainage, $total_retainage_accumulated);
+
+      // Estilos
+      $objWorksheet->getStyle('J' . $fila_retainage)->applyFromArray([
+         'numberFormat' => ['formatCode' => $currencyFormat],
+         'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]
+      ]);
+
+
+      // --- Calculo Amount Earned less Retainage ---
+      $columna_btd = 'J';
+      $fila_C = $fila_retainage + 1;
+      $celda_C_valor = $columna_btd . $fila_C; // Ejemplo: J47
+
+      // 2. Definimos las filas origen para la fórmula
+      $fila_A = $fila_retainage - 1; // 
+      $fila_B = $fila_retainage;     // 
+
+      // 3. Creamos la fórmula Excel: =J45 - J46
+      $formula_C = "={$columna_btd}{$fila_A}-{$columna_btd}{$fila_B}";
+
+      // 4. Escribimos la fórmula en la celda
+      $objWorksheet->setCellValue($celda_C_valor, $formula_C);
+
+      // 5. Aplicamos formato de moneda y alineación derecha
+      $objWorksheet->getStyle($celda_C_valor)->applyFromArray([
+         'numberFormat' => [
+            'formatCode' => '"$"#,##0.00'
+         ],
+         'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT
+         ]
+      ]);
+
+
+
+      // 8. GUARDAR
+      $fichero = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber() . ".xlsx";
       $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
       $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero);
-
       $objPHPExcel->disconnectWorksheets();
       unset($objPHPExcel);
 
-      $ruta = $this->ObtenerURL();
-      $url = $ruta . 'uploads/invoice/' . $fichero;
+      return $this->ObtenerURL() . 'uploads/invoice/' . $fichero;
+   }
 
-      return $url;
+   // Función auxiliar
+   private function EscribirFilaItem($objWorksheet, $fila, $item_number, $value, $styleArray, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId)
+   {
+      $price = $value->getPrice();
+      $contract_qty = $value->getProjectItem()->getQuantity();
+
+      $qty = $value->getQuantity();
+      $qbf = $value->getQuantityBroughtForward();
+      $final_qty = $qty + $qbf;
+
+      $qty_prev = $value->getQuantityFromPrevious();
+      $qty_completed = $qty + $qty_prev;
+
+      // Cálculo Unpaid Dinámico
+      $project_item_id = $value->getProjectItem()->getId();
+      $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+      $map = [];
+      foreach ($allInvoiceItems as $i) $map[$i->getInvoice()->getInvoiceId()] = $i;
+
+      $hQty = 0.0;
+      $hPaid = 0.0;
+      $unpaid_qty = 0.0;
+      foreach ($allInvoicesHistory as $invHist) {
+         $lid = $invHist->getInvoiceId();
+         $iItem = $map[$lid] ?? null;
+         $cQbf = ($iItem) ? (float)$iItem->getQuantityBroughtForward() : 0.0;
+         $tempUnpaid = $this->calculateInvoiceUnpaidQty($hQty, $hPaid, $cQbf);
+
+         if ($lid == $currentInvoiceId) $unpaid_qty = $tempUnpaid;
+
+         if ($iItem) {
+            $hQty += (float)$iItem->getQuantity();
+            $hPaid += (float)$iItem->getPaidQty();
+         }
+      }
+
+      $unit = $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
+
+      $objWorksheet
+         ->setCellValue('A' . $fila, $item_number)
+         ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
+         ->setCellValue('E' . $fila, $unit)
+         ->setCellValue('F' . $fila, $price)
+         ->setCellValue('G' . $fila, $contract_qty)
+         ->setCellValue('H' . $fila, $contract_qty * $price)
+         ->setCellValue('I' . $fila, $qty_completed)
+         ->setCellValue('J' . $fila, $qty_completed * $price)
+         ->setCellValue('K' . $fila, $qty_prev)
+         ->setCellValue('L' . $fila, $qty_prev * $price)
+         ->setCellValue('N' . $fila, $final_qty)
+         ->setCellValue('O' . $fila, $final_qty * $price)
+         ->setCellValue('Q' . $fila, $unpaid_qty)
+         ->setCellValue('R' . $fila, $unpaid_qty * $price);
+
+      $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+      $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleArray);
    }
 
    /**
@@ -674,8 +654,6 @@ class InvoiceService extends Base
          $porciento_adjustment_completion = $project_entity->getRetainageAdjustmentCompletion();
          $contract_amount = $project_entity->getContractAmount();
 
-         // revisar el total_amount_final sobre pasa al contract_amount en el porciento_adjustment_completion configurado
-         // si eso pasa entonces el porciento = porciento_adjustment_percentage
          if ($total_amount_final > $contract_amount * ($porciento_adjustment_completion / 100)) {
             $porciento = $porciento_adjustment_percentage;
          }
@@ -904,9 +882,11 @@ class InvoiceService extends Base
          $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
          $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
 
+
          $items[] = [
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
+            "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',

@@ -271,7 +271,7 @@ class InvoiceItemRepository extends ServiceEntityRepository
       }
 
       // Excluir items marcados como change order
-      $qb->andWhere('p_i.changeOrder IS NULL OR p_i.changeOrder = false');
+      //$qb->andWhere('p_i.changeOrder IS NULL OR p_i.changeOrder = false');
 
       return (float) $qb->getQuery()->getSingleScalarResult();
    }
@@ -428,5 +428,27 @@ class InvoiceItemRepository extends ServiceEntityRepository
       }
 
       return $qb->getQuery()->getOneOrNullResult();
+   }
+
+   /**
+    * Calcula el total del invoice (Final Amount This Period) SOLO de los items con Retainage activo
+    */
+   public function TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id)
+   {
+      $em = $this->getEntityManager();
+      $connection = $em->getConnection();
+
+      $sql = "
+         SELECT SUM((ii.quantity + ii.quantity_brought_forward) * ii.price)
+         FROM invoice_item ii
+         JOIN project_item pi ON ii.project_item_id = pi.id
+         WHERE ii.invoice_id = :invoice_id
+         AND pi.apply_retainage = 1
+      ";
+
+      $stmt = $connection->prepare($sql);
+      $resultado = $stmt->executeQuery(['invoice_id' => $invoice_id])->fetchOne();
+
+      return $resultado ? (float)$resultado : 0;
    }
 }

@@ -3,6 +3,10 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\ReimbursementHistory;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 #[ORM\Entity(repositoryClass: 'App\Repository\InvoiceItemRepository')]
 #[ORM\Table(name: 'invoice_item')]
