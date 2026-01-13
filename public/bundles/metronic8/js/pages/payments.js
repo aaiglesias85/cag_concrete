@@ -165,19 +165,21 @@ var Payments = (function () {
                      </div>`;
             }
          },
-         // --- MODIFICACIÓN AQUÍ: Columna de Acciones ---
          {
             targets: -1,
             data: null,
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               // Lista de acciones por defecto
-               var actions = ['edit', 'paid', 'exportar_excel'];
+               // Lista de acciones por defecto              
+               var actions = ['edit', 'paid'];
                
                // Si está pagado/cerrado (1), se va la acción 'edit'
                if (row.paid == 1) {
-                  actions = actions.filter(action => action !== 'edit');
+                  //actions = actions.filter(action => action !== 'edit');
+              return `<a href="javascript:;" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 view-payment" data-id="${row.id}" title="View Details">
+                              <i class="fas fa-eye fs-3"></i>
+                          </a>`;
                }
 
                return DatatableUtil.getRenderAcciones(data, type, row, permiso, actions);
@@ -524,7 +526,8 @@ var Payments = (function () {
    };
 
    var invoice = null;
-   var initAccionEditar = function () {
+  var initAccionEditar = function () {
+      // Acción EDITAR (Lápiz) - Comportamiento normal
       $(document).off('click', '#payment-table-editable a.edit');
       $(document).on('click', '#payment-table-editable a.edit', function (e) {
          e.preventDefault();
@@ -532,11 +535,23 @@ var Payments = (function () {
          var invoice_id = $(this).data('id');
          $('#invoice_id').val(invoice_id);
          mostrarForm();
-         editRow(invoice_id);
+         editRow(invoice_id, false); 
+      });
+
+      // Acción VER (Ojito) - Nuevo comportamiento
+      $(document).off('click', '#payment-table-editable a.view-payment');
+      $(document).on('click', '#payment-table-editable a.view-payment', function (e) {
+         e.preventDefault();
+         resetForms();
+         var invoice_id = $(this).data('id');
+         $('#invoice_id').val(invoice_id);
+         mostrarForm();
+         editRow(invoice_id, true); // true = Modo Solo Lectura
       });
    };
 
-   var editRow = function (invoice_id) {
+ // Agregamos el parámetro isReadOnly con valor por defecto false
+   var editRow = function (invoice_id, isReadOnly = false) {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
 
@@ -559,22 +574,41 @@ var Payments = (function () {
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
             BlockUtil.unblock('#form-payment');
+            
+            if (isReadOnly) {
+               // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario
+               $('#form-payment').find('input, select, textarea, button').prop('disabled', true);
+               
+               // 2. Ocultar botones de guardar específicamente
+               $('#btn-salvar-invoice, #btn-save-changes, #btn-wizard-siguiente, .btn-wizard-finalizar').addClass('hide');
+               
+               // 3. Asegurar que los botones de cerrar/cancelar sigan funcionando y visibles
+               $('.cerrar-form-payment, #btn-wizard-anterior').prop('disabled', false).removeClass('hide');
+               
+               // 4. Deshabilitar clicks en la tabla de items (para que no abran modales internos)
+               $('#payments-table-editable').find('a, input').addClass('disabled').prop('disabled', true).css('pointer-events', 'none');
+
+               // Título visual para saber que es modo vista
+               KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'View Payment: #' + invoice.number + ' (Read Only)';
+            } else {
+               // Asegurar que los botones de guardar sean visibles si es edición normal
+               $('#btn-salvar-invoice').removeClass('hide');
+               // Habilitar todo por si acaso venía de un view
+               $('#form-payment').find('input, select, textarea, button').prop('disabled', false);
+            }
          });
 
       function cargarDatos(invoice) {
-    
-        KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: #' + invoice.number;
-         
-         // --- GUARDAR DATOS PARA LA REGLA DINÁMICA ---
+         KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: #' + invoice.number;
+        
          var $retAmt = $('#total_retainage_amount');
          $retAmt.val(MyApp.formatMoney(invoice.total_retainage_amount, 2, '.', ','));
          
-         // Guardamos todo en atributos 'data-' para que el recalcular los use
-         $retAmt.data('std-percentage', invoice.retainage_percentage); // El 10%
-         $retAmt.data('red-percentage', invoice.retainage_adjustment_percentage || 5); // El 5%
+         $retAmt.data('std-percentage', invoice.retainage_percentage);
+         $retAmt.data('red-percentage', invoice.retainage_adjustment_percentage || 5);
          $retAmt.data('contract-amount', invoice.contract_amount || 0);
          $retAmt.data('target-completion', invoice.retainage_adjustment_completion || 50);
-         $retAmt.data('total-work-completed', invoice.total_work_completed || 0); // Acumulado previo
+         $retAmt.data('total-work-completed', invoice.total_work_completed || 0);
          // --------------------------------------------
 
          var isReimbursed = (invoice.retainage_reimbursed == 1 || invoice.retainage_reimbursed === true);                 
