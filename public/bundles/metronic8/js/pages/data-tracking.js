@@ -2308,32 +2308,53 @@ var DataTracking = (function () {
       $(document).on('click', '#btn-salvar-data-tracking-labor', function (e) {
          e.preventDefault();
 
-         var employee_id = $('#employee').val();
-         var subcontractor_employee_id = $('#employee-subcontractor').val();
+         var raw_val = $('#employee').val();         
+       
+         var employee_id = '';
+         var employee_name_input = '';
+         // Si es numérico, es un empleado existente
+         if ($.isNumeric(raw_val)) {
+             employee_id = raw_val;
+         } else {
+             // Si es texto, es un nombre nuevo
+             employee_name_input = raw_val;
+         }
 
-         if (validateFormLabor() && (employee_id !== '' || subcontractor_employee_id !== '')) {
+         var subcontractor_employee_id = $('#employee-subcontractor').val();
+        
+         if (validateFormLabor() && (employee_id !== '' || employee_name_input !== '' || subcontractor_employee_id !== '')) {
             var subcontractor_id = $('#subcontractor-labor').val();
-            var employee = employee_id !== '' ? $('#employee option:selected').text() : '';
+            
+            var employee = '';
+            if (employee_id !== '') {
+                employee = $('#employee option:selected').text();
+            } else if (employee_name_input !== '') {
+                employee = employee_name_input; // Usamos el nombre escrito
+            }
+
             var subcontractor = subcontractor_id !== '' ? $('#subcontractor-labor option:selected').text() : '';
-            if (employee === '') {
-               employee = subcontractor_employee_id !== '' ? $('#employee-subcontractor option:selected').text() : '';
+            if (employee === '' && subcontractor_employee_id !== '') {
+               employee = $('#employee-subcontractor option:selected').text();
             }
 
             var hours = NumberUtil.getNumericValue('#hours');
             var role = $('#labor-role').val();
             var color = $('#labor-color').val();
 
-            var hourly_rate = $('#employee option[value="' + employee_id + '"]').attr('data-rate');
-            if (employee_id === '') {
-               hourly_rate = $('#employee-subcontractor option[value="' + subcontractor_employee_id + '"]').attr('data-rate');
+            var hourly_rate = 0;
+            if (employee_id !== '') {
+                 hourly_rate = $('#employee option[value="' + employee_id + '"]').attr('data-rate');
+            } else if (subcontractor_employee_id !== '') {
+                 hourly_rate = $('#employee-subcontractor option[value="' + subcontractor_employee_id + '"]').attr('data-rate');
             }
-
+            
             var total = hours * hourly_rate;
 
             if (nEditingRowLabor == null) {
                labor.push({
                   data_tracking_labor_id: '',
-                  employee_id: employee_id,
+                  employee_id: employee_id, 
+                  employee_name: employee,  
                   subcontractor_id: subcontractor_id,
                   subcontractor: subcontractor,
                   subcontractor_employee_id: subcontractor_employee_id,
@@ -2349,6 +2370,7 @@ var DataTracking = (function () {
                var posicion = nEditingRowLabor;
                if (labor[posicion]) {
                   labor[posicion].employee_id = employee_id;
+                  labor[posicion].employee_name = employee; 
                   labor[posicion].employee = employee;
                   labor[posicion].subcontractor_id = subcontractor_id;
                   labor[posicion].subcontractor = subcontractor;
@@ -2371,14 +2393,15 @@ var DataTracking = (function () {
             // reset
             resetFormLabor();
          } else {
-            if (employee_id === '') {
+            if (employee_id === '' && employee_name_input === '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-employee'), 'This field is required');
             }
-            if (subcontractor_employee_id === '') {
+            if (subcontractor_employee_id === '' && $('#employee-type-subcontractor').is(':checked')) {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-employee-subcontractor'), 'This field is required');
             }
          }
       });
+
 
       $(document).off('click', '#labor-table-editable a.edit');
       $(document).on('click', '#labor-table-editable a.edit', function (e) {

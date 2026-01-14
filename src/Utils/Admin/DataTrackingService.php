@@ -1070,11 +1070,14 @@ class DataTrackingService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
+
+      $employeeRepo = $this->getDoctrine()->getRepository(Employee::class);
+
       foreach ($labor as $value) {
 
          $data_tracking_labor_entity = null;
 
-         if (is_numeric($value->data_tracking_labor_id)) {
+         if (isset($value->data_tracking_labor_id) && is_numeric($value->data_tracking_labor_id)) {
             $data_tracking_labor_entity = $this->getDoctrine()->getRepository(DataTrackingLabor::class)
                ->find($value->data_tracking_labor_id);
          }
@@ -1090,13 +1093,38 @@ class DataTrackingService extends Base
          $data_tracking_labor_entity->setRole($value->role);
          $data_tracking_labor_entity->setColor($value->color);
 
-         if ($value->employee_id != '') {
-            $employee_entity = $this->getDoctrine()->getRepository(Employee::class)
-               ->find($value->employee_id);
-            $data_tracking_labor_entity->setEmployee($employee_entity);
+         if (!empty($value->employee_id)) {
+            $employee_entity = $employeeRepo->find($value->employee_id);
+            if ($employee_entity) {
+               $data_tracking_labor_entity->setEmployee($employee_entity);
+            }
+         } elseif (!empty($value->employee) || !empty($value->employee_name)) {
+
+
+            $nombreBusqueda = !empty($value->employee_name) ? $value->employee_name : $value->employee;
+            $nombreLimpio = trim($nombreBusqueda);
+
+            if ($nombreLimpio != '') {
+               // A. Buscamos si ya existe para EVITAR DUPLICADOS
+               $existingEmployee = $employeeRepo->findOneBy(['name' => $nombreLimpio]);
+
+               if ($existingEmployee) {
+
+                  $data_tracking_labor_entity->setEmployee($existingEmployee);
+               } else {
+
+                  $newEmployee = new Employee();
+                  $newEmployee->setName($nombreLimpio);
+
+                  $em->persist($newEmployee);
+                  $em->flush();
+
+                  $data_tracking_labor_entity->setEmployee($newEmployee);
+               }
+            }
          }
 
-         if ($value->subcontractor_employee_id != '') {
+         if (!empty($value->subcontractor_employee_id)) {
             $employee_entity = $this->getDoctrine()->getRepository(SubcontractorEmployee::class)
                ->find($value->subcontractor_employee_id);
             $data_tracking_labor_entity->setEmployeeSubcontractor($employee_entity);
@@ -1104,7 +1132,6 @@ class DataTrackingService extends Base
 
          if ($is_new_data_tracking_labor) {
             $data_tracking_labor_entity->setDataTracking($entity);
-
             $em->persist($data_tracking_labor_entity);
          }
       }
