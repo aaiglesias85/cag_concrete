@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 13-12-2025 a las 00:46:05
+-- Tiempo de generación: 17-01-2026 a las 16:56:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -692,7 +692,7 @@ CREATE TABLE `invoice_attachment` (
 CREATE TABLE `invoice_item` (
   `id` int(11) NOT NULL,
   `quantity_from_previous` decimal(18,6) DEFAULT NULL,
-  `unpaid_from_previous` decimal(18,6) NOT NULL,
+  `unpaid_from_previous` decimal(18,6) DEFAULT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
   `price` decimal(18,2) DEFAULT NULL,
   `paid_qty` decimal(18,6) DEFAULT NULL,
@@ -1389,6 +1389,19 @@ CREATE TABLE `project_attachment` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `project_concrete_class`
+--
+
+CREATE TABLE `project_concrete_class` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `concrete_class_id` int(11) NOT NULL,
+  `concrete_quote_price` decimal(18,2) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `project_contact`
 --
 
@@ -1864,6 +1877,10 @@ CREATE TABLE `user` (
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
+  `player_id` varchar(255) DEFAULT NULL,
+  `push_token` varchar(255) DEFAULT NULL,
+  `plataforma` varchar(255) DEFAULT NULL,
+  `imagen` varchar(255) DEFAULT NULL,
   `rol_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1871,8 +1888,21 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `phone`, `created_at`, `updated_at`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_access_token`
+--
+
+CREATE TABLE `user_access_token` (
+  `id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -2258,6 +2288,14 @@ ALTER TABLE `project_attachment`
   ADD KEY `Refproject_attachment1` (`project_id`);
 
 --
+-- Indices de la tabla `project_concrete_class`
+--
+ALTER TABLE `project_concrete_class`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `project_id` (`project_id`),
+  ADD KEY `concrete_class_id` (`concrete_class_id`);
+
+--
 -- Indices de la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
@@ -2422,6 +2460,14 @@ ALTER TABLE `user`
   ADD KEY `Ref156` (`rol_id`);
 
 --
+-- Indices de la tabla `user_access_token`
+--
+ALTER TABLE `user_access_token`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_user_id` (`user_id`),
+  ADD KEY `idx_token` (`token`);
+
+--
 -- Indices de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
@@ -2540,7 +2586,7 @@ ALTER TABLE `employee`
 -- AUTO_INCREMENT de la tabla `employee_role`
 --
 ALTER TABLE `employee_role`
-  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `role_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `equation`
@@ -2687,6 +2733,12 @@ ALTER TABLE `project_attachment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `project_concrete_class`
+--
+ALTER TABLE `project_concrete_class`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
@@ -2823,6 +2875,12 @@ ALTER TABLE `unit`
 --
 ALTER TABLE `user`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `user_access_token`
+--
+ALTER TABLE `user_access_token`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `user_permission`
@@ -3042,6 +3100,13 @@ ALTER TABLE `project_attachment`
   ADD CONSTRAINT `Refproject_attachment1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
 
 --
+-- Filtros para la tabla `project_concrete_class`
+--
+ALTER TABLE `project_concrete_class`
+  ADD CONSTRAINT `Refprojectconcreteclassclassid` FOREIGN KEY (`concrete_class_id`) REFERENCES `concrete_class` (`concrete_class_id`),
+  ADD CONSTRAINT `Refprojectconcreteclassprojectid` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
@@ -3135,6 +3200,12 @@ ALTER TABLE `subcontractor_notes`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `Refrol6` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
+
+--
+-- Filtros para la tabla `user_access_token`
+--
+ALTER TABLE `user_access_token`
+  ADD CONSTRAINT `fk_user_access_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `user_permission`

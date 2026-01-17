@@ -4,93 +4,110 @@
 #  prefix:   /
 
 admin:
-  resource: '../src/Routes/Admin/'
-  type:     directory
-  prefix:   /admin
+   resource: '../src/Routes/Admin/'
+   type: directory
+   prefix: /admin
+
+# API routes - Token authentication
+api:
+   resource: '../src/Routes/App/'
+   type: directory
+   prefix: /api
+
+# Swagger UI Documentation
+app.swagger_ui:
+   path: /api/doc
+   methods: GET
+   defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+
+# OpenAPI JSON Specification
+app.swagger_json:
+   path: /api/doc.json
+   methods: GET
+   defaults: { _controller: nelmio_api_doc.controller.swagger }
 
 auntenticarUsuario:
-  path:  /usuario/autenticar
-  defaults: { _controller: App\Controller\Admin\UsuarioController::autenticar, _format: json }
+   path: /usuario/autenticar
+   defaults: { _controller: App\Controller\Admin\UsuarioController::autenticar, _format: json }
 
 forgetPass:
-  path:  /usuario/olvidoContrasenna
-  defaults: { _controller: App\Controller\Admin\UsuarioController::olvidoContrasenna, _format: json }
+   path: /usuario/olvidoContrasenna
+   defaults: { _controller: App\Controller\Admin\UsuarioController::olvidoContrasenna, _format: json }
 
 login:
-  path:  /login
-  defaults: { _controller: App\Controller\Admin\UsuarioController::login }
+   path: /login
+   defaults: { _controller: App\Controller\Admin\UsuarioController::login }
 
 forgotpass:
-  path:  /forgot-password
-  defaults: { _controller: App\Controller\Admin\UsuarioController::forgotpass }
+   path: /forgot-password
+   defaults: { _controller: App\Controller\Admin\UsuarioController::forgotpass }
 
 login_check:
-  path: /check
+   path: /check
 
 logout:
-  path: /logout
+   path: /logout
 
 denegado:
-  path:  /denegado
-  defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
+   path: /denegado
+   defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
 
 #test
 testemail:
-  path: /test-email
-  defaults: { _controller: App\Controller\DefaultController::testemail, _format: json }
+   path: /test-email
+   defaults: { _controller: App\Controller\DefaultController::testemail, _format: json }
 
 #crons
 crondefinirnotificacionesduedate:
-  path:  /definir-notificaciones-duedate
-  defaults: { _controller: App\Controller\ScriptController::definirnotificacionesduedate }
+   path: /definir-notificaciones-duedate
+   defaults: { _controller: App\Controller\ScriptController::definirnotificacionesduedate }
 
 cronreminders:
-  path:  /cron-reminders
-  defaults: { _controller: App\Controller\ScriptController::cronreminders }
+   path: /cron-reminders
+   defaults: { _controller: App\Controller\ScriptController::cronreminders }
 
 cronajusteprecio:
-  path:  /cron-price-adjustment
-  defaults: { _controller: App\Controller\ScriptController::cronajusteprecio }
+   path: /cron-price-adjustment
+   defaults: { _controller: App\Controller\ScriptController::cronajusteprecio }
 
 cronajusteconcretequoteprecio:
-  path:  /cron-concrete-quote-price-adjustment
-  defaults: { _controller: App\Controller\ScriptController::cronajusteconcretequoteprecio }
+   path: /cron-concrete-quote-price-adjustment
+   defaults: { _controller: App\Controller\ScriptController::cronajusteconcretequoteprecio }
 
 #scripts
 definirpendingdatatracking:
-  path:  /definir-pending-datatracking
-  defaults: { _controller: App\Controller\ScriptController::definirpendingdatatracking }
+   path: /definir-pending-datatracking
+   defaults: { _controller: App\Controller\ScriptController::definirpendingdatatracking }
 
 definiryieldcalculationitem:
-  path:  /definir-yield-calculation-item
-  defaults: { _controller: App\Controller\ScriptController::definiryieldcalculationitem }
+   path: /definir-yield-calculation-item
+   defaults: { _controller: App\Controller\ScriptController::definiryieldcalculationitem }
 
 definirsubcontractordatatrackingprojectitem:
-  path:  /definir-subcontractor-datatracking-project-item
-  defaults: { _controller: App\Controller\ScriptController::definirsubcontractordatatrackingprojectitem }
+   path: /definir-subcontractor-datatracking-project-item
+   defaults: { _controller: App\Controller\ScriptController::definirsubcontractordatatrackingprojectitem }
 
 definirconcretevendordatatracking:
-  path:  /definir-concrete-vendor-datatracking
-  defaults: { _controller: App\Controller\ScriptController::definirconcretevendordatatracking }
+   path: /definir-concrete-vendor-datatracking
+   defaults: { _controller: App\Controller\ScriptController::definirconcretevendordatatracking }
 
 definircountyprojectestimate:
-  path:  /definir-county-project-estimate
-  defaults: { _controller: App\Controller\ScriptController::definircountyprojectestimate }
+   path: /definir-county-project-estimate
+   defaults: { _controller: App\Controller\ScriptController::definircountyprojectestimate }
 
 definircompanyestimate:
-  path:  /definir-company-estimate
-  defaults: { _controller: App\Controller\ScriptController::definircompanyestimate }
+   path: /definir-company-estimate
+   defaults: { _controller: App\Controller\ScriptController::definircompanyestimate }
 
 definiritemprincipal:
-  path:  /definir-item-principal
-  defaults: { _controller: App\Controller\ScriptController::definiritemprincipal }
-
+   path: /definir-item-principal
+   defaults: { _controller: App\Controller\ScriptController::definiritemprincipal }
 
 #qbwc
 qbwcconfig:
-  path: /qbwc-config
-  defaults: { _controller: App\Controller\QbwcController::config, _format: json }
+   path: /qbwc-config
+   defaults: { _controller: App\Controller\QbwcController::config, _format: json }
 
 qbwc:
-  path: /qbwc
-  defaults: { _controller: App\Controller\QbwcController::qbwc, _format: json }
+   path: /qbwc
+   defaults: { _controller: App\Controller\QbwcController::qbwc, _format: json }

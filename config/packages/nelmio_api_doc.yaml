@@ -1,0 +1,25 @@
+nelmio_api_doc:
+  documentation:
+    info:
+      title: Concrete Construction API
+      description: API REST for mobile application - Complete documentation of endpoints
+      version: 1.0.0
+    servers:
+      - url: http://localhost/constructora/public
+        description: Local development server
+      - url: https://data-tracking-test.cagconcrete.net/public
+        description: Production server
+    components:
+      securitySchemes:
+        Bearer:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+          description: Token JWT obtained through the /api/login/autenticar endpoint
+    security:
+      - Bearer: []
+  areas:
+    path_patterns:
+      - ^/api(?!/doc)
+    host_patterns:
+      - ^api\.|^$

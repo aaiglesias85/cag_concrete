@@ -111,7 +111,7 @@ class UsuarioService extends Base
          $entity->setTelefono($telefono);
 
          if ($contrasenna != "") {
-            $entity->setContrasenna($contrasenna);
+            $entity->setContrasenna($this->CodificarPassword($contrasenna));
          }
 
          $entity->setUpdatedAt(new \DateTime());
@@ -604,5 +604,110 @@ class UsuarioService extends Base
          'data'  => $data,
          'total' => $resultado['total'], // ya viene con el filtro aplicado
       ];
+   }
+
+   /**
+    * ActualizarImagenPerfil: Actualiza la imagen del perfil del usuario
+    *
+    * @param int $usuario_id Id del usuario
+    * @param string $imagen Nombre del archivo de imagen
+    * @return array
+    * @author Marcel
+    */
+   public function ActualizarImagenPerfil($usuario_id, $imagen)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $resultado = array();
+      $entity = $this->getDoctrine()->getRepository(Usuario::class)->find($usuario_id);
+
+      /** @var Usuario $entity */
+      if ($entity != null) {
+         // Eliminar foto anterior
+         $imagenOld = $entity->getImagen();
+         if ($imagenOld != "" && $imagen != $imagenOld) {
+            $dir = 'uploads/usuario/';
+            if (is_file($dir . $imagenOld)) {
+               unlink($dir . $imagenOld);
+            }
+         }
+
+         $entity->setImagen($imagen);
+         $em->flush();
+
+         // Salvar log
+         $nombreCompleto = $entity->getNombreCompleto();
+         $log_operacion = "Update";
+         $log_categoria = "User";
+         $log_descripcion = "The user profile image is modified: $nombreCompleto";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+         $resultado['imagen'] = $imagen;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * EliminarImagenPerfil: Elimina la imagen del perfil del usuario
+    *
+    * @param int $usuario_id Id del usuario
+    * @return array
+    * @author Marcel
+    */
+   public function EliminarImagenPerfil($usuario_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $resultado = array();
+      $entity = $this->getDoctrine()->getRepository(Usuario::class)->find($usuario_id);
+
+      /** @var Usuario $entity */
+      if ($entity != null) {
+         // Eliminar foto del servidor
+         $imagen = $entity->getImagen();
+         if ($imagen != "") {
+            $dir = 'uploads/usuario/';
+            if (is_file($dir . $imagen)) {
+               unlink($dir . $imagen);
+            }
+         }
+
+         $entity->setImagen(null);
+         $em->flush();
+
+         // Salvar log
+         $nombreCompleto = $entity->getNombreCompleto();
+         $log_operacion = "Update";
+         $log_categoria = "User";
+         $log_descripcion = "The user profile image is deleted: $nombreCompleto";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * Generar cadena aleatoria para nombres de archivo
+    *
+    * @param int $limit Longitud de la cadena
+    * @return string
+    */
+   public function generarCadenaAleatoria($limit = 6): string
+   {
+      $codigo = "";
+      // Letras
+      $codigo .= substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $limit);
+      // Números
+      $codigo .= "-" . substr(str_shuffle("0123456789"), 0, $limit);
+
+      return $codigo;
    }
 }

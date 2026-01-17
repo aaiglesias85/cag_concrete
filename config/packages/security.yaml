@@ -1,46 +1,87 @@
 security:
-  password_hashers:
-    Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+   password_hashers:
+      Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
-  providers:
-    app_user_provider:
-      entity:
-        class: App\Entity\Usuario
-        property: email
+   providers:
+      app_user_provider:
+         entity:
+            class: App\Entity\Usuario
+            property: email
 
-  role_hierarchy:
-    ROLE_ADMIN: ROLE_USER
-    ROLE_SUPER_ADMIN: [ ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
+   role_hierarchy:
+      ROLE_ADMIN: ROLE_USER
+      ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
-  firewalls:
-    dev:
-      pattern: ^/(_(profiler|wdt)|css|images|js)/
-      security: false
+   firewalls:
+      dev:
+         pattern: ^/(_(profiler|wdt)|css|images|js)/
+         security: false
 
-    main:
-      lazy: true
-      pattern: ^/
-      provider: app_user_provider
-      # by default, the feature allows 5 login attempts per minute
-      login_throttling: null
-      form_login:
-        login_path: /login
-        check_path: /check
-        username_parameter: _username
-        password_parameter: _password
-        #failure_path: /login_failure
-        remember_me: true
-      logout:
-        path: /logout
-        target: /login
-      remember_me:
-        secret: '%kernel.secret%'
-        lifetime: 604800 # 7 días
-        path: /admin
+      # API login routes - Only autenticar is public, cerrar-sesion requires auth
+      api_login_public:
+         pattern: ^/api/login/autenticar
+         security: false
 
-  access_control:
-    #- { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    #- { path: ^/logout, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    #- { path: ^/usuario/olvidoContrasenna, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    #- { path: ^/usuario/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-    - { path: ^/admin, roles: [ ROLE_ADMIN, ROLE_USER ] }
+      # Public user authentication routes - must be before main firewall
+      usuario_login:
+         pattern: ^/usuario/(autenticar|olvidoContrasenna)
+         security: false
+
+      # Swagger documentation - public access
+      api_doc:
+         pattern: ^/api/doc
+         security: false
+
+      # API firewall - Token authentication (includes /api/login/cerrar-sesion)
+      api:
+         pattern: ^/api
+         lazy: true
+         provider: app_user_provider
+         stateless: true
+         custom_authenticators:
+            - App\Security\TokenAuthenticator
+
+      # Admin firewall - Form login authentication
+      # Must include /admin, /check, and /logout in pattern for form_login and logout to work
+      main:
+         lazy: true
+         pattern: ^/(admin|check|logout)
+         provider: app_user_provider
+         login_throttling: null
+         form_login:
+            login_path: /login
+            check_path: /check
+            username_parameter: _username
+            password_parameter: _password
+            remember_me: true
+         logout:
+            path: /logout
+            target: /login
+            invalidate_session: true
+         remember_me:
+            secret: '%kernel.secret%'
+            lifetime: 604800 # 7 días
+            path: /admin
+
+   access_control:
+      # Public routes (no authentication required) - must be first
+      - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/logout, roles: PUBLIC_ACCESS }
+      - { path: ^/check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/usuario/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/usuario/olvidoContrasenna, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+      # Swagger documentation - public access
+      - { path: ^/api/doc, roles: PUBLIC_ACCESS }
+
+      # API login autenticar route (public - no authentication required)
+      - { path: ^/api/login/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+
+      # API login cerrar-sesion route (requires authentication)
+      - { path: ^/api/login/cerrar-sesion, roles: [ROLE_ADMIN, ROLE_USER] }
+
+      # Admin routes require authentication
+      - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }
+
+      # API routes require authentication
+      - { path: ^/api, roles: [ROLE_ADMIN, ROLE_USER] }

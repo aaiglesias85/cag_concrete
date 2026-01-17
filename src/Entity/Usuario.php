@@ -42,6 +42,18 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
     private ?\DateTime $updatedAt;
 
+    #[ORM\Column(name: "player_id", type: "string", length: 255, nullable: true)]
+    private ?string $playerId;
+
+    #[ORM\Column(name: "push_token", type: "string", length: 255, nullable: true)]
+    private ?string $pushToken;
+
+    #[ORM\Column(name: "plataforma", type: "string", length: 255, nullable: true)]
+    private ?string $plataforma;
+
+    #[ORM\Column(name: "imagen", type: "string", length: 255, nullable: true)]
+    private ?string $imagen;
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Rol")]
     #[ORM\JoinColumn(name: "rol_id", referencedColumnName: "rol_id", nullable: true)]
     private ?Rol $rol;
@@ -247,5 +259,49 @@ class Usuario implements UserInterface, EquatableInterface
     public function setEstimator(?bool $estimator): void
     {
         $this->estimator = $estimator;
+    }
+
+    public function getPlayerId(): ?string
+    {
+        return $this->playerId;
+    }
+
+    public function setPlayerId(?string $playerId): self
+    {
+        $this->playerId = $playerId;
+        return $this;
+    }
+
+    public function getPushToken(): ?string
+    {
+        return $this->pushToken;
+    }
+
+    public function setPushToken(?string $pushToken): self
+    {
+        $this->pushToken = $pushToken;
+        return $this;
+    }
+
+    public function getPlataforma(): ?string
+    {
+        return $this->plataforma;
+    }
+
+    public function setPlataforma(?string $plataforma): self
+    {
+        $this->plataforma = $plataforma;
+        return $this;
+    }
+
+    public function getImagen(): ?string
+    {
+        return $this->imagen;
+    }
+
+    public function setImagen(?string $imagen): self
+    {
+        $this->imagen = $imagen;
+        return $this;
     }
 }
