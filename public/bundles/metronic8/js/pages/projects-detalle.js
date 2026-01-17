@@ -14,9 +14,6 @@ var ProjectsDetalle = (function () {
       $('#concrete-vendor-detalle').val('');
       $('#concrete-vendor-detalle').trigger('change');
 
-      $('#concrete-class-detalle').val('');
-      $('#concrete-class-detalle').trigger('change');
-
       $('#tp-unit-detalle').val('');
       $('#tp-unit-detalle').trigger('change');
 
@@ -31,6 +28,10 @@ var ProjectsDetalle = (function () {
       //contacts
       contacts = [];
       actualizarTableListaContacts();
+
+      // concrete_classes
+      concrete_classes = [];
+      actualizarTableListaConcreteClasses();
 
       // invoices
       invoices = [];
@@ -143,10 +144,6 @@ var ProjectsDetalle = (function () {
          $('#concrete-vendor-detalle').val(project.vendor_id);
          $('#concrete-vendor-detalle').trigger('change');
 
-         $('#concrete-class-detalle').val(project.concrete_class_id);
-         $('#concrete-class-detalle').trigger('change');
-
-         $('#concrete_quote_price-detalle').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
          $('#concrete_quote_price_escalator-detalle').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
          $('#tp-every-n-detalle').val(project.concrete_time_period_every_n);
@@ -174,6 +171,25 @@ var ProjectsDetalle = (function () {
          // contacts
          contacts = project.contacts;
          actualizarTableListaContacts();
+
+         // concrete_classes
+         concrete_classes = project.concrete_classes || [];
+         // Asegurar que cada elemento tenga posicion
+         if (concrete_classes && concrete_classes.length > 0) {
+            concrete_classes.forEach(function (cc, index) {
+               cc.posicion = index;
+            });
+         }
+         actualizarTableListaConcreteClasses();
+         
+         // Calcular el total de concrete_quote_price para compatibilidad con data tracking
+         var totalConcreteQuotePrice = 0;
+         if (concrete_classes && concrete_classes.length > 0) {
+            concrete_classes.forEach(function (cc) {
+               totalConcreteQuotePrice += parseFloat(cc.concrete_quote_price || 0);
+            });
+         }
+         $('#concrete_quote_price-detalle').val(totalConcreteQuotePrice);
 
          // invoices
          invoices = project.invoices;
@@ -240,7 +256,7 @@ var ProjectsDetalle = (function () {
                // Prevailing Wage - no necesita actualizar tabla aquí
                break;
             case 6:
-               // Concrete - no necesita actualizar tabla aquí
+               actualizarTableListaConcreteClasses();
                break;
             case 7:
                actualizarTableListaContacts();
@@ -314,6 +330,7 @@ var ProjectsDetalle = (function () {
                break;
             case 6:
                $('#tab-concrete-vendor-detalle').tab('show');
+               actualizarTableListaConcreteClasses();
                break;
             case 7:
                $('#tab-contacts-detalle').tab('show');
@@ -767,6 +784,58 @@ var ProjectsDetalle = (function () {
       oTableNotes.search(search).draw();
    };
 
+   // Concrete Classes
+   var concrete_classes = [];
+   var oTableConcreteClasses;
+   var initTableConcreteClasses = function () {
+      const table = '#concrete-classes-table-editable-detalle';
+
+      // columns
+      const columns = [{ data: 'concrete_class_name' }, { data: 'concrete_quote_price' }];
+
+      // column defs
+      let columnDefs = [
+         {
+            targets: 1,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+      ];
+
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
+
+      // order
+      const order = [[0, 'asc']];
+
+      // escapar contenido de la tabla
+      oTableConcreteClasses = DatatableUtil.initSafeDataTable(table, {
+         data: concrete_classes,
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableConcreteClasses();
+   };
+   var handleSearchDatatableConcreteClasses = function () {
+      $(document).off('keyup', '#lista-concrete-classes-detalle [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-concrete-classes-detalle [data-table-filter="search"]', function (e) {
+         oTableConcreteClasses.search(e.target.value).draw();
+      });
+   };
+   var actualizarTableListaConcreteClasses = function () {
+      if (oTableConcreteClasses) {
+         oTableConcreteClasses.destroy();
+      }
+
+      initTableConcreteClasses();
+   };
+
    // Contacts
    var contacts = [];
    var oTableContacts;
@@ -827,7 +896,7 @@ var ProjectsDetalle = (function () {
       const table = '#invoices-table-editable-detalle';
 
       // columns
-      const columns = [{ data: 'number' }, { data: 'startDate' }, { data: 'endDate' }, { data: 'total' }, { data: 'notes' }, { data: 'paid' }, { data: 'createdAt' }, { data: null }];
+      const columns = [{ data: 'number' }, { data: 'startDate' }, { data: 'endDate' }, { data: 'total' }, { data: 'notes' }, { data: 'paid' }, { data: 'createdAt' }];
 
       // column defs
       let columnDefs = [
@@ -848,15 +917,6 @@ var ProjectsDetalle = (function () {
                   0: { title: 'No', class: 'badge-danger' },
                };
                return `<span class="badge ${status[data].class}">${status[data].title}</span>`;
-            },
-         },
-         {
-            targets: -1,
-            data: null,
-            orderable: false,
-            className: 'text-center',
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['detalle']);
             },
          },
       ];
@@ -959,7 +1019,6 @@ var ProjectsDetalle = (function () {
          { data: 'totalLabor' },
          { data: 'total_daily_today' },
          { data: 'profit' },
-         { data: null },
       ];
 
       // column defs
@@ -1040,15 +1099,6 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                var html = `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
                return DatatableUtil.getRenderColumnDiv(html, 100);
-            },
-         },
-         {
-            targets: -1,
-            data: null,
-            orderable: false,
-            className: 'text-center',
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit']);
             },
          },
       ];
@@ -1148,7 +1198,16 @@ var ProjectsDetalle = (function () {
       const table = '#ajustes-precio-table-editable-detalle';
 
       // columns
-      const columns = [{ data: 'day' }, { data: 'percent' }];
+      const columns = [
+         { data: 'day' },
+         { data: 'percent' },
+         {
+            data: 'items_names',
+            render: function (data, type, row) {
+               return data || 'All items';
+            },
+         },
+      ];
 
       // column defs
       let columnDefs = [];
@@ -1535,24 +1594,21 @@ var ProjectsDetalle = (function () {
    var initTableInvoicesRetainageDetalle = function (data) {
       const table = '#invoices-retainage-table-editable-detalle';
 
-      // columns
       const columns = [
          { data: 'paid' },
-         { data: 'invoice_date' },
-         { data: 'invoice_amount' },
-         { data: 'paid_amount' },
-         { data: 'retainage_percentage' },
-         { data: 'retainage_amount' },
-         { data: 'total_retainage_to_date' },        
-         { data: 'retainage_reimbursed' },
+         { data: 'invoice_date' }, // 1
+         { data: 'invoice_amount' }, // 2 <th>Invoice Amt.</th>
+         { data: 'inv_ret_amt' }, // 3 <th>Inv. Ret. Amt.</th>
+         { data: 'paid_amount' }, // 4 <th>Paid Amt</th>
+         { data: 'retainage_amount' }, // 5 <th>Actual Ret. Amt.</th>
+         { data: 'total_retainage_to_date' }, // 6 <th>Actual Ret. T.D.</th>
+         { data: 'retainage_reimbursed' }, // 7
       ];
 
       // column defs
       let columnDefs = [
          {
             targets: 0,
-            className: 'text-center',
-            orderable: false,
             render: function (data, type, row) {
                var isPaid = row.paid === 1 || row.paid === true;
                var color = isPaid ? 'success' : 'danger';
@@ -1581,35 +1637,47 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 2,
+            targets: 2, // Invoice Amt
             className: 'text-end',
-            render: function (data, type, row) {
+            render: function (data) {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
-            targets: 3,
+            targets: 3, //SInv. Ret. Amt. (Incluye el porcentaje)
             className: 'text-end',
             render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },
-         {
-            targets: 4,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}%</span>`;
-            },
-         },
-         {
-            targets: 5,
-            className: 'text-end',
-            render: function (data, type, row) {
-               return `<span>${MyApp.formatMoney(data)}</span>`;
-            },
-         },          
+               var monto = MyApp.formatMoney(data);
 
-       {
+               var percent = row.retainage_percentage ? MyApp.formatearNumero(row.retainage_percentage, 2, '.', ',') : '0.00';
+
+               return `
+               <div class="d-flex flex-column align-items-end">
+                  <span class="text-gray-800 fs-6">
+                        ${monto}
+                  </span>
+                  <span class="text-dark fs-8 mt-1">
+                        Ret. at ${percent}%
+                  </span>
+               </div>
+            `;
+            },
+         },
+         {
+            targets: 4, // Paid Amt
+            className: 'text-end',
+            render: function (data) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 5, // Paid Ret. Amt.
+            className: 'text-end',
+            render: function (data) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
             targets: 6, // Total Ret. T.D.
             className: 'text-end', 
             render: function (data, type, row) {      
@@ -1626,7 +1694,7 @@ var ProjectsDetalle = (function () {
                         
                         <i class="fas fa-history text-primary ms-2 cursor-pointer btn-ver-historial-reembolso" 
                            style="font-size: 1.1rem;"
-                           data-invoice-id="${row.id}" 
+                           data-invoice-id="${row.invoice_id}" 
                            title="View History"></i>
                      </div>`;
                }              
@@ -1776,6 +1844,9 @@ var ProjectsDetalle = (function () {
 
          // archivos
          initAccionesArchivo();
+
+         // concrete classes
+         initTableConcreteClasses();
 
          // items completion
          initTableItemsCompletion();

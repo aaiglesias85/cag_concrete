@@ -211,6 +211,10 @@ class ProjectController extends AbstractController
       $contacts = $request->get('contacts');
       $contacts = json_decode($contacts);
 
+      // concrete_classes
+      $concrete_classes = $request->get('concrete_classes');
+      $concrete_classes = json_decode($concrete_classes);
+
       // ajustes_precio
       $ajustes_precio = $request->get('ajustes_precio');
       $ajustes_precio = json_decode($ajustes_precio);
@@ -248,6 +252,7 @@ class ProjectController extends AbstractController
                $project_id_number,
                $items,
                $contacts,
+               $concrete_classes,
                $vendor_id,
                $concrete_class_id,
                $concrete_quote_price,
@@ -291,6 +296,7 @@ class ProjectController extends AbstractController
                $project_id_number,
                $items,
                $contacts,
+               $concrete_classes,
                $ajustes_precio,
                $archivos,
                $vendor_id,
@@ -791,6 +797,33 @@ class ProjectController extends AbstractController
 
       try {
          $resultado = $this->projectService->EliminarContact($contact_id);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = "The operation was successful";
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * eliminarConcreteClass Acción que elimina una concrete class en la BD
+    *
+    */
+   public function eliminarConcreteClass(Request $request)
+   {
+      $concrete_class_id = $request->get('concrete_class_id');
+
+      try {
+         $resultado = $this->projectService->EliminarConcreteClass($concrete_class_id);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";

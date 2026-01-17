@@ -17,6 +17,7 @@ use App\Entity\Item;
 use App\Entity\Material;
 use App\Entity\OverheadPrice;
 use App\Entity\Project;
+use App\Entity\ProjectConcreteClass;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Entity\Subcontractor;
@@ -28,6 +29,7 @@ use App\Repository\DataTrackingLaborRepository;
 use App\Repository\DataTrackingMaterialRepository;
 use App\Repository\DataTrackingRepository;
 use App\Repository\DataTrackingSubcontractRepository;
+use App\Repository\ProjectConcreteClassRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Utils\Base;
 
@@ -314,7 +316,19 @@ class DataTrackingService extends Base
 
          $arreglo_resultado['project_vendor_id'] = $entity->getProject()->getConcreteVendor() != null ? $entity->getProject()->getConcreteVendor()->getVendorId() : '';
          $arreglo_resultado['project_concrete_vendor'] = $entity->getProject()->getConcreteVendor() != null ? $entity->getProject()->getConcreteVendor()->getName() : '';
-         $arreglo_resultado['project_concrete_quote_price'] = $entity->getProject()->getConcreteQuotePrice() ?? '';
+         
+         // Calcular la suma de concrete_quote_price desde project_concrete_class
+         /** @var ProjectConcreteClassRepository $projectConcreteClassRepo */
+         $projectConcreteClassRepo = $this->getDoctrine()->getRepository(ProjectConcreteClass::class);
+         $project_concrete_classes = $projectConcreteClassRepo->ListarConcreteClassesDeProject($project_id);
+         $total_concrete_quote_price = 0;
+         foreach ($project_concrete_classes as $project_concrete_class) {
+            $price = $project_concrete_class->getConcreteQuotePrice();
+            if ($price !== null) {
+               $total_concrete_quote_price += $price;
+            }
+         }
+         $arreglo_resultado['project_concrete_quote_price'] = $total_concrete_quote_price;
 
          $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
          $arreglo_resultado['inspector_id'] = $entity->getInspector() != null ? $entity->getInspector()->getInspectorId() : '';

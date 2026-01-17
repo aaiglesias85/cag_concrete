@@ -255,8 +255,8 @@ var Projects = (function () {
          orderable: false,
          className: 'text-center',
          render: function (data, type, row) {
-            //aqui esta el ojito para solo ver, sin editar- solo add detalle            
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);         
+            //aqui esta el ojito para solo ver, sin editar- solo add detalle
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['detalle', 'edit', 'delete']);
          },
       });
 
@@ -336,23 +336,23 @@ var Projects = (function () {
 
    // select records
    var tableSelectAll = false;
-   var handleSelectRecords = function (table) {    
+   var handleSelectRecords = function (table) {
       oTable.on('select', function (e, dt, type, indexes) {
-         if (type === 'row') {          
+         if (type === 'row') {
             actualizarRecordsSeleccionados();
          }
       });
       oTable.on('deselect', function (e, dt, type, indexes) {
-         if (type === 'row') {          
+         if (type === 'row') {
             actualizarRecordsSeleccionados();
          }
       });
-   
+
       $(`.check-select-all`).on('click', function () {
          if (!tableSelectAll) {
             oTable.rows().select();
          } else {
-            oTable.rows().deselect(); 
+            oTable.rows().deselect();
          }
          tableSelectAll = !tableSelectAll;
       });
@@ -432,9 +432,6 @@ var Projects = (function () {
       $('#concrete-vendor').val('');
       $('#concrete-vendor').trigger('change');
 
-      $('#concrete-class').val('');
-      $('#concrete-class').trigger('change');
-
       $('#tp-unit').val('');
       $('#tp-unit').trigger('change');
 
@@ -454,6 +451,10 @@ var Projects = (function () {
       //contacts
       contacts = [];
       actualizarTableListaContacts();
+
+      //concrete_classes
+      concrete_classes = [];
+      actualizarTableListaConcreteClasses();
 
       // invoices
       invoices = [];
@@ -655,6 +656,7 @@ var Projects = (function () {
                break;
             case 6:
                $('#tab-concrete-vendor').tab('show');
+               actualizarTableListaConcreteClasses();
                break;
             case 7:
                $('#tab-contacts').tab('show');
@@ -866,12 +868,6 @@ var Projects = (function () {
       var vendor_id = $('#concrete-vendor').val();
       formData.set('vendor_id', vendor_id);
 
-      var concrete_class_id = $('#concrete-class').val();
-      formData.set('concrete_class_id', concrete_class_id);
-
-      var concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
-      formData.set('concrete_quote_price', concrete_quote_price);
-
       var concrete_quote_price_escalator = NumberUtil.getNumericValue('#concrete_quote_price_escalator');
       formData.set('concrete_quote_price_escalator', concrete_quote_price_escalator);
 
@@ -907,6 +903,7 @@ var Projects = (function () {
 
       formData.set('items', JSON.stringify(items));
       formData.set('contacts', JSON.stringify(contacts));
+      formData.set('concrete_classes', JSON.stringify(concrete_classes));
       formData.set('ajustes_precio', JSON.stringify(ajustes_precio));
       formData.set('archivos', JSON.stringify(archivos));
 
@@ -1127,10 +1124,6 @@ var Projects = (function () {
          $('#concrete-vendor').val(project.vendor_id);
          $('#concrete-vendor').trigger('change');
 
-         $('#concrete-class').val(project.concrete_class_id);
-         $('#concrete-class').trigger('change');
-
-         $('#concrete_quote_price').val(MyApp.formatearNumero(project.concrete_quote_price, 2, '.', ','));
          $('#concrete_quote_price_escalator').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
          $('#tp-every-n').val(project.concrete_time_period_every_n);
@@ -1158,6 +1151,10 @@ var Projects = (function () {
          // contacts
          contacts = project.contacts;
          actualizarTableListaContacts();
+
+         // concrete_classes
+         concrete_classes = project.concrete_classes || [];
+         actualizarTableListaConcreteClasses();
 
          // invoices
          invoices = project.invoices;
@@ -1596,7 +1593,7 @@ var Projects = (function () {
       return resultado;
    };
 
-  var initTableItems = function () {
+   var initTableItems = function () {
       const table = '#items-table-editable';
 
       // 1. Agrupación de datos
@@ -1648,48 +1645,50 @@ var Projects = (function () {
       // 2. Definición de Columnas
       const columns = [
          { data: 'apply_retainage' }, // 0
-         { data: 'item' },            // 1
-         { data: 'unit' },            // 2
+         { data: 'item' }, // 1
+         { data: 'unit' }, // 2
          { data: 'yield_calculation_name' }, // 3
-         { data: 'quantity' },        // 4
-         { data: 'price' },           // 5
-         { data: 'total' },           // 6
+         { data: 'quantity' }, // 4
+         { data: 'price' }, // 5
+         { data: 'total' }, // 6
          { data: '_groupOrder', visible: false }, // 7
-         { data: null },              // 8
+         { data: null }, // 8
       ];
 
       // 3. Configuración de Columnas (CORREGIDO)
       let columnDefs = [
-       {
+         {
             targets: 0, // CHECKBOX DE SELECCIÓN
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';              
-               
-               var checked = '';           
+               if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';
+
+               var checked = '';
 
                return `
                   <div class="form-check form-check-sm form-check-custom form-check-solid justify-content-center">
                      <input class="form-check-input chk-item-wizard" type="checkbox" value="${row.id}" ${checked} />
                   </div>`;
-            }
+            },
          },
-        {  
+         {
             targets: 1, // Item
             render: function (data, type, row) {
-               if (row.isGroupHeader) return ''; 
-               
-              
+               if (row.isGroupHeader) return '';
+
                var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               
+
                // 2. Iconos existentes
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
                }
 
                return `<div class="d-flex align-items-center" style="white-space: nowrap;">
@@ -1717,9 +1716,9 @@ var Projects = (function () {
             targets: 4, // Quantity
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               var icono = ''; 
-               if(row.has_quantity_history && !row.isGroupHeader) {
-                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="'+row.project_item_id+'"></i>';
+               var icono = '';
+               if (row.has_quantity_history && !row.isGroupHeader) {
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
                return `<div style="display:flex;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
@@ -1729,8 +1728,8 @@ var Projects = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
-               if(row.has_price_history && !row.isGroupHeader) {
-                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="'+row.project_item_id+'"></i>';
+               if (row.has_price_history && !row.isGroupHeader) {
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
                return `<div style="display:flex;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
@@ -1768,15 +1767,14 @@ var Projects = (function () {
             if (data.isGroupHeader) {
                $(row).addClass('row-group-header');
                $(row).css({ 'background-color': '#f5f5f5', 'font-weight': 'bold' });
-               
+
                var $firstCell = $(row).find('td:first');
-               
-               
+
                $firstCell.removeClass('text-center'); // Quitar el centrado del checkbox
-               $firstCell.css('text-align', 'left');  // Forzar izquierda
+               $firstCell.css('text-align', 'left'); // Forzar izquierda
                $firstCell.css('padding-left', '15px'); // Darle un margen visual
                // ------------------------------------------------------
-               
+
                $firstCell.attr('colspan', 8); // Expandir para ocupar todo el ancho
                $(row).find('td:not(:first)').hide();
             } else {
@@ -1794,8 +1792,6 @@ var Projects = (function () {
       var total = calcularMontoTotalItems();
       $('#total_total_items').val(MyApp.formatearNumero(total, 2, '.', ','));
    };
-
-
 
    var handleChangeOrderHistory = function () {
       $(document).off('click', '.change-order-history-icon');
@@ -1876,7 +1872,7 @@ var Projects = (function () {
             }
          })
          .catch(function (error) {
-            toastr.error('Error loading history', '');          
+            toastr.error('Error loading history', '');
          })
          .finally(function () {
             BlockUtil.unblock('#modal-change-order-history .modal-content');
@@ -2955,6 +2951,266 @@ var Projects = (function () {
       nEditingRowContact = null;
    };
 
+   // Concrete Classes
+   var concrete_classes = [];
+   var oTableConcreteClasses;
+   var nEditingRowConcreteClass = null;
+   var initTableConcreteClasses = function () {
+      const table = '#concrete-classes-table-editable';
+
+      // columns
+      const columns = [{ data: 'concrete_class_name' }, { data: 'concrete_quote_price' }, { data: null }];
+
+      // column defs
+      let columnDefs = [
+         {
+            targets: 1,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+            },
+         },
+      ];
+
+      // language
+      const language = DatatableUtil.getDataTableLenguaje();
+
+      // order
+      const order = [[0, 'asc']];
+
+      // escapar contenido de la tabla
+      oTableConcreteClasses = DatatableUtil.initSafeDataTable(table, {
+         data: concrete_classes,
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableConcreteClasses();
+   };
+   var handleSearchDatatableConcreteClasses = function () {
+      $(document).off('keyup', '#lista-concrete-classes [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-concrete-classes [data-table-filter="search"]', function (e) {
+         if (oTableConcreteClasses) {
+            oTableConcreteClasses.search(e.target.value).draw();
+         }
+      });
+   };
+   var actualizarTableListaConcreteClasses = function () {
+      if (oTableConcreteClasses) {
+         oTableConcreteClasses.destroy();
+      }
+
+      initTableConcreteClasses();
+   };
+   var validateFormConcreteClass = function () {
+      var form = KTUtil.get('concrete-class-form');
+      var constraints = {
+         price: {
+            presence: {
+               allowEmpty: false,
+               message: 'This field is required',
+            },
+         },
+      };
+
+      var errors = validate(form, constraints);
+      var result = false;
+
+      if (!errors) {
+         result = true;
+      } else {
+         MyApp.showErrorsValidateForm(form, errors);
+      }
+
+      //attach change
+      MyUtil.attachChangeValidacion(form, constraints);
+
+      return result;
+   };
+   var isValidConcreteClass = function () {
+      var valid = true;
+
+      var concrete_class_id = $('#concrete-class-modal').val();
+
+      if (concrete_class_id == '') {
+         valid = false;
+      }
+
+      return valid;
+   };
+   var initAccionesConcreteClasses = function () {
+      $(document).off('click', '#btn-agregar-concrete-class');
+      $(document).on('click', '#btn-agregar-concrete-class', function (e) {
+         // reset
+         resetFormConcreteClass();
+
+         // inicializar select2 en el modal
+         $('#concrete-class-modal').select2({
+            dropdownParent: $('#modal-concrete-class'),
+         });
+
+         // mostar modal
+         ModalUtil.show('modal-concrete-class', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-concrete-class');
+      $(document).on('click', '#btn-salvar-concrete-class', function (e) {
+         e.preventDefault();
+
+         if (validateFormConcreteClass() && isValidConcreteClass()) {
+            var concrete_class_id = $('#concrete-class-modal').val();
+            var concrete_class_name = $('#concrete-class-modal option:selected').text();
+            var concrete_quote_price = NumberUtil.getNumericValue('#concrete-class-price');
+
+            if (nEditingRowConcreteClass == null) {
+               concrete_classes.push({
+                  id: '',
+                  concrete_class_id: concrete_class_id,
+                  concrete_class_name: concrete_class_name,
+                  concrete_quote_price: concrete_quote_price,
+                  posicion: concrete_classes.length,
+               });
+            } else {
+               var posicion = nEditingRowConcreteClass;
+               if (concrete_classes[posicion]) {
+                  concrete_classes[posicion].concrete_class_id = concrete_class_id;
+                  concrete_classes[posicion].concrete_class_name = concrete_class_name;
+                  concrete_classes[posicion].concrete_quote_price = concrete_quote_price;
+               }
+            }
+
+            //actualizar lista
+            actualizarTableListaConcreteClasses();
+
+            // reset
+            resetFormConcreteClass();
+            // hide modal
+            ModalUtil.hide('modal-concrete-class');
+         } else {
+            if (!isValidConcreteClass()) {
+               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-concrete-class'), 'This field is required');
+            }
+         }
+      });
+
+      $(document).off('click', '#concrete-classes-table-editable a.edit');
+      $(document).on('click', '#concrete-classes-table-editable a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (concrete_classes[posicion]) {
+            // reset
+            resetFormConcreteClass();
+
+            nEditingRowConcreteClass = posicion;
+
+            $('#concrete_class_id').val(concrete_classes[posicion].id);
+
+            // inicializar select2 en el modal
+            $('#concrete-class-modal').select2({
+               dropdownParent: $('#modal-concrete-class'),
+            });
+
+            $('#concrete-class-modal').val(concrete_classes[posicion].concrete_class_id);
+            $('#concrete-class-modal').trigger('change');
+            NumberUtil.setFormattedValue('#concrete-class-price', concrete_classes[posicion].concrete_quote_price, { decimals: 2 });
+
+            // mostar modal
+            ModalUtil.show('modal-concrete-class', { backdrop: 'static', keyboard: true });
+         }
+      });
+
+      $(document).off('click', '#concrete-classes-table-editable a.delete');
+      $(document).on('click', '#concrete-classes-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (concrete_classes[posicion]) {
+            Swal.fire({
+               text: 'Are you sure you want to delete the concrete class?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               cancelButtonText: 'No, cancel',
+               customClass: {
+                  confirmButton: 'btn fw-bold btn-success',
+                  cancelButton: 'btn fw-bold btn-danger',
+               },
+            }).then(function (result) {
+               if (result.value) {
+                  eliminarConcreteClass(posicion);
+               }
+            });
+         }
+      });
+
+      function eliminarConcreteClass(posicion) {
+         if (concrete_classes[posicion].id != '') {
+            var formData = new URLSearchParams();
+            formData.set('concrete_class_id', concrete_classes[posicion].id);
+
+            BlockUtil.block('#lista-concrete-classes');
+
+            axios
+               .post('project/eliminarConcreteClass', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
+
+                        deleteConcreteClass(posicion);
+                     } else {
+                        toastr.error(response.error, '');
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#lista-concrete-classes');
+               });
+         } else {
+            deleteConcreteClass(posicion);
+         }
+      }
+
+      function deleteConcreteClass(posicion) {
+         //Eliminar
+         concrete_classes.splice(posicion, 1);
+         //actualizar posiciones
+         for (var i = 0; i < concrete_classes.length; i++) {
+            concrete_classes[i].posicion = i;
+         }
+         //actualizar lista
+         actualizarTableListaConcreteClasses();
+      }
+   };
+   var resetFormConcreteClass = function () {
+      // reset form
+      MyUtil.resetForm('concrete-class-form');
+
+      // reset select
+      $('#concrete-class-modal').val('');
+      $('#concrete-class-modal').trigger('change');
+
+      // tooltips selects
+      MyApp.resetErrorMessageValidateSelect(KTUtil.get('concrete-class-form'));
+
+      nEditingRowConcreteClass = null;
+   };
+
    // invoices
    var oTableInvoices;
    var invoices = [];
@@ -3102,10 +3358,16 @@ var Projects = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
-               const concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
+               // Calcular el total de concrete_quote_price desde el array concrete_classes
+               var totalConcreteQuotePrice = 0;
+               if (concrete_classes && concrete_classes.length > 0) {
+                  concrete_classes.forEach(function (cc) {
+                     totalConcreteQuotePrice += parseFloat(cc.concrete_quote_price || 0);
+                  });
+               }
 
                const icon =
-                  concrete_quote_price && concrete_quote_price < row.total_concrete
+                  totalConcreteQuotePrice && totalConcreteQuotePrice < row.total_concrete
                      ? '<i class="ki-duotone ki-arrow-up-right fs-2 text-danger me-2">\n' +
                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path1"></span>\n' +
                        '\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<span class="path2"></span>\n' +
@@ -3220,15 +3482,20 @@ var Projects = (function () {
          columnDefs: columnDefs,
          language: language,
          // marcar pending
-         createdRow: (row, data, index) => {       
+         createdRow: (row, data, index) => {
+            // Calcular el total de concrete_quote_price desde el array concrete_classes
+            var totalConcreteQuotePrice = 0;
+            if (concrete_classes && concrete_classes.length > 0) {
+               concrete_classes.forEach(function (cc) {
+                  totalConcreteQuotePrice += parseFloat(cc.concrete_quote_price || 0);
+               });
+            }
 
-            const concrete_quote_price = NumberUtil.getNumericValue('#concrete_quote_price');
-
-            if (data.pending === 1 || (concrete_quote_price && concrete_quote_price < data.total_concrete)) {
+            if (data.pending === 1 || (totalConcreteQuotePrice && totalConcreteQuotePrice < data.total_concrete)) {
                $(row).addClass('row-pending');
             }
          },
-      });    
+      });
       oTableDataTracking.on('draw', function () {
          // init acciones
          initAccionesDataTracking();
@@ -3567,11 +3834,10 @@ var Projects = (function () {
       $('#ajuste_precio_items').empty();
 
       // Cargar items del proyecto
-    if (items && items.length > 0) {
+      if (items && items.length > 0) {
          for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            
-            
+
             var itemText = item.item;
 
             if (item.change_order) {
@@ -3588,15 +3854,14 @@ var Projects = (function () {
             $('#ajuste_precio_items').append(new Option(itemText, item.item_id, false, false));
          }
       }
-     
-   
+
       // Inicializar select2
       $('#ajuste_precio_items').select2({
          dropdownParent: $('#modal-ajuste-precio'),
          placeholder: 'Select items (optional)',
          allowClear: true,
          width: '100%',
-         closeOnSelect: false
+         closeOnSelect: false,
       });
    };
 
@@ -3747,7 +4012,6 @@ var Projects = (function () {
                      }
                   })
                   .catch(function (err) {
-              
                      toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', 'Error !!!');
                   })
                   .then(function () {
@@ -4023,13 +4287,15 @@ var Projects = (function () {
       $('#modal-concrete-class').on('hidden.bs.modal', function () {
          var concrete_class = ModalConcreteClass.getClass();
          if (concrete_class != null) {
-            //add concrete class to select
-            $('#concrete-class').append(new Option(concrete_class.name, concrete_class.concrete_class_id, false, false));
+            //add concrete class to select in modal
+            $('#concrete-class-modal').append(new Option(concrete_class.name, concrete_class.concrete_class_id, false, false));
 
-            $('#concrete-class').select2();
+            $('#concrete-class-modal').select2({
+               dropdownParent: $('#modal-concrete-class'),
+            });
 
-            $('#concrete-class').val(concrete_class.concrete_class_id);
-            $('#concrete-class').trigger('change');
+            $('#concrete-class-modal').val(concrete_class.concrete_class_id);
+            $('#concrete-class-modal').trigger('change');
          }
       });
    };
@@ -4118,42 +4384,42 @@ var Projects = (function () {
       ];
 
       // column defs
-     // column defs
+      // column defs
       let columnDefs = [
          {
             targets: 0, // Item
-            className: 'min-w-150px'
+            className: 'min-w-150px',
          },
          {
             targets: 1, // Unit
-            className: 'text-center'
+            className: 'text-center',
          },
          {
             // Columnas de Dinero (Price, Total, Amt Completed, Invoiced Amt, Paid Amt)
-            targets: [3, 4, 6, 9, 11], 
+            targets: [3, 4, 6, 9, 11],
             className: 'text-end',
             render: function (data, type, row) {
                if (type === 'display') {
                   return data ? $.fn.dataTable.render.number(',', '.', 2, '$').display(data) : '$0.00';
                }
                return data;
-            }
+            },
          },
          {
             // Columnas de Cantidad (Qty, Qty Completed, Invoiced Qty, Paid Qty)
-            targets: [2, 5, 8, 10], 
+            targets: [2, 5, 8, 10],
             className: 'text-end',
             render: function (data, type, row) {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '').display(data) : '0.00';
-            }
+            },
          },
          {
             targets: 7, // % Completion
             className: 'text-end',
             render: function (data, type, row) {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '', '%').display(data) : '0.00%';
-            }
-         }
+            },
+         },
       ];
 
       // language
@@ -4272,61 +4538,64 @@ var Projects = (function () {
    var oTableInvoicesRetainage;
 
    var initTableInvoicesRetainage = function (data) {
+      const table = '#invoices-retainage-table-editable';
 
-   const table = '#invoices-retainage-table-editable';
+      const columns = [
+         { data: 'paid' },
+         { data: 'invoice_date' }, // 1
+         { data: 'invoice_amount' }, // 2 <th>Invoice Amt.</th>
+         { data: 'inv_ret_amt' }, // 3 <th>Inv. Ret. Amt.</th>
+         { data: 'paid_amount' }, // 4 <th>Paid Amt</th>
+         { data: 'retainage_amount' }, // 5 <th>Actual Ret. Amt.</th>
+         { data: 'total_retainage_to_date' }, // 6 <th>Actual Ret. T.D.</th>
+         { data: 'retainage_reimbursed' }, // 7
+      ];
 
-   const columns = [
-      { data: 'paid' },                    
-      { data: 'invoice_date' },            // 1
-      { data: 'invoice_amount' },          // 2 <th>Invoice Amt.</th>
-      { data: 'inv_ret_amt' },             // 3 <th>Inv. Ret. Amt.</th> 
-      { data: 'paid_amount' },             // 4 <th>Paid Amt</th>
-      { data: 'retainage_amount' },        // 5 <th>Actual Ret. Amt.</th>
-      { data: 'total_retainage_to_date' }, // 6 <th>Actual Ret. T.D.</th>                                        
-      { data: 'retainage_reimbursed' },    // 7
-   ];
-
-   let columnDefs = [
-      {
-         targets: 0,
-         render: function (data, type, row) {
-             var isPaid = row.paid === 1 || row.paid === true;
-             var color = isPaid ? 'success' : 'danger';
-             var tooltip = isPaid ? 'Paid' : 'Unpaid';
-             return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
+      let columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               var isPaid = row.paid === 1 || row.paid === true;
+               var color = isPaid ? 'success' : 'danger';
+               var tooltip = isPaid ? 'Paid' : 'Unpaid';
+               return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
+            },
          },
-      },
-      {
-         targets: 1,
-         render: function (data, type, row) {
-             var dateFormatted = data;
-             // Lógica de fecha existente...
-             if (data && data.includes('/')) {
-                 var dateParts = data.split('/');
-                 if (dateParts.length === 3) {
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               var dateFormatted = data;
+               // Lógica de fecha existente...
+               if (data && data.includes('/')) {
+                  var dateParts = data.split('/');
+                  if (dateParts.length === 3) {
                      var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
                      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                      dateFormatted = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
-                 }
-             }
-             var displayText = `${row.invoice_number} - ${dateFormatted}`;
-             return `<a href="javascript:;" class="invoice-retainage-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
-         }
-      },
-      {
-         targets: 2, // Invoice Amt
-         className: 'text-end',
-         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
-      },      
-      {
-         targets: 3, //SInv. Ret. Amt. (Incluye el porcentaje)
-         className: 'text-end',
-         render: function (data, type, row) { 
-             var monto = MyApp.formatMoney(data);
-            
-             var percent = row.retainage_percentage ? MyApp.formatearNumero(row.retainage_percentage, 2, '.', ',') : '0.00';
-                       
-            return `
+                  }
+               }
+               var displayText = `${row.invoice_number} - ${dateFormatted}`;
+               return `<a href="javascript:;" class="invoice-retainage-link text-primary text-hover-primary" data-invoice-id="${
+                  row.invoice_id
+               }" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
+            },
+         },
+         {
+            targets: 2, // Invoice Amt
+            className: 'text-end',
+            render: function (data) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 3, //SInv. Ret. Amt. (Incluye el porcentaje)
+            className: 'text-end',
+            render: function (data, type, row) {
+               var monto = MyApp.formatMoney(data);
+
+               var percent = row.retainage_percentage ? MyApp.formatearNumero(row.retainage_percentage, 2, '.', ',') : '0.00';
+
+               return `
                <div class="d-flex flex-column align-items-end">
                   <span class="text-gray-800 fs-6">
                         ${monto}
@@ -4336,27 +4605,31 @@ var Projects = (function () {
                   </span>
                </div>
             `;
+            },
          },
-      },      
-      {
-         targets: 4, // Paid Amt 
-         className: 'text-end',
-         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
-      },
-      {
-         targets: 5, // Paid Ret. Amt. 
-         className: 'text-end',
-         render: function (data) { return `<span>${MyApp.formatMoney(data)}</span>`; },
-      },
-      {
-         targets: 6, // Total Ret. T.D. 
-         className: 'text-end', 
-         render: function (data, type, row) {               
-            var montoReembolso = parseFloat(row.reimbursed_amount || 0);             
-            var amountHtml = `<span>${MyApp.formatMoney(data)}</span>`;
-             
-            if (montoReembolso > 0) {
-               return `
+         {
+            targets: 4, // Paid Amt
+            className: 'text-end',
+            render: function (data) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 5, // Paid Ret. Amt.
+            className: 'text-end',
+            render: function (data) {
+               return `<span>${MyApp.formatMoney(data)}</span>`;
+            },
+         },
+         {
+            targets: 6, // Total Ret. T.D.
+            className: 'text-end',
+            render: function (data, type, row) {
+               var montoReembolso = parseFloat(row.reimbursed_amount || 0);
+               var amountHtml = `<span>${MyApp.formatMoney(data)}</span>`;
+
+               if (montoReembolso > 0) {
+                  return `
                   <div class="d-flex align-items-center justify-content-end">
                      <span class="fw-bold text-gray-800">${amountHtml}</span>
                      <i class="fas fa-history text-primary ms-2 cursor-pointer btn-ver-historial-reembolso" 
@@ -4364,50 +4637,53 @@ var Projects = (function () {
                         data-invoice-id="${row.invoice_id}"
                         title="View History"></i>
                   </div>`;
-            }              
-            return amountHtml;
+               }
+               return amountHtml;
+            },
          },
-      },
-      {
-         targets: 7, // Ret. Reimbursed 
-         className: 'text-center',
-         render: function (data, type, row) {          
-            var isReimbursed = (data == 1 || data === true);
-            var badgeClass = isReimbursed ? 'badge-success' : 'badge-danger';
-            var text = isReimbursed ? 'Yes' : 'No';
-            return `<span class="badge ${badgeClass}">${text}</span>`;
+         {
+            targets: 7, // Ret. Reimbursed
+            className: 'text-center',
+            render: function (data, type, row) {
+               var isReimbursed = data == 1 || data === true;
+               var badgeClass = isReimbursed ? 'badge-success' : 'badge-danger';
+               var text = isReimbursed ? 'Yes' : 'No';
+               return `<span class="badge ${badgeClass}">${text}</span>`;
+            },
          },
+      ];
+
+      const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[1, 'asc']];
+
+      if (oTableInvoicesRetainage) {
+         oTableInvoicesRetainage.destroy();
       }
-   ];
 
-   const language = DatatableUtil.getDataTableLenguaje();
-   const order = [[1, 'asc']];
-
-   if (oTableInvoicesRetainage) {
-      oTableInvoicesRetainage.destroy();
-   }
-
-   oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
-      data: data || [],
-      displayLength: 10,
-      order: order,
-      columns: columns,
-      columnDefs: columnDefs,
-      language: language,
-   });
-
- 
-   function initTooltips() {
-      $(table + ' [data-bs-toggle="tooltip"]').each(function () {
-         var tooltipInstance = bootstrap.Tooltip.getInstance(this);
-         if (tooltipInstance) { tooltipInstance.dispose(); }
-         new bootstrap.Tooltip(this);
+      oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
+         data: data || [],
+         displayLength: 10,
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
       });
-   }
-   initTooltips();
-   oTableInvoicesRetainage.on('draw', function () { initTooltips(); });
-   handleInvoiceRetainageLinks();
-};
+
+      function initTooltips() {
+         $(table + ' [data-bs-toggle="tooltip"]').each(function () {
+            var tooltipInstance = bootstrap.Tooltip.getInstance(this);
+            if (tooltipInstance) {
+               tooltipInstance.dispose();
+            }
+            new bootstrap.Tooltip(this);
+         });
+      }
+      initTooltips();
+      oTableInvoicesRetainage.on('draw', function () {
+         initTooltips();
+      });
+      handleInvoiceRetainageLinks();
+   };
 
    var handleInvoiceRetainageLinks = function () {
       $(document).off('click', '#invoices-retainage-table-editable a.invoice-retainage-link');
@@ -4422,41 +4698,36 @@ var Projects = (function () {
    };
 
    var cargarTablaInvoicesRetainage = function (project_id) {
-    if (!project_id) return;
+      if (!project_id) return;
 
-    var formData = new URLSearchParams();
-    formData.set('project_id', project_id);
+      var formData = new URLSearchParams();
+      formData.set('project_id', project_id);
 
-    axios
-        .post('project/listarInvoicesRetainage', formData, { responseType: 'json' })
-        .then(function (res) {
+      axios
+         .post('project/listarInvoicesRetainage', formData, { responseType: 'json' })
+         .then(function (res) {
             if (res.status === 200 || res.status === 201) {
-                var response = res.data;
-                
-                if (response.success) {
-                    var invoices = response.invoices || [];
+               var response = res.data;
 
-                    invoices.forEach(function(inv) {
-                     
-                    });
-                    
-                   initTableInvoicesRetainage(invoices);
-               
-                    var totalRetainageWithheld = 0;
-                    if (invoices.length > 0) {
-                        // El gran total es el balance de la última factura procesada
-                        var lastInvoice = invoices[invoices.length - 1];
-                        totalRetainageWithheld = lastInvoice.total_retainage_to_date || 0;
-                    }
-                    $('#total-retainage-withheld').val(MyApp.formatMoney(totalRetainageWithheld));
-                }
+               if (response.success) {
+                  var invoices = response.invoices || [];
+
+                  invoices.forEach(function (inv) {});
+
+                  initTableInvoicesRetainage(invoices);
+
+                  var totalRetainageWithheld = 0;
+                  if (invoices.length > 0) {
+                     // El gran total es el balance de la última factura procesada
+                     var lastInvoice = invoices[invoices.length - 1];
+                     totalRetainageWithheld = lastInvoice.total_retainage_to_date || 0;
+                  }
+                  $('#total-retainage-withheld').val(MyApp.formatMoney(totalRetainageWithheld));
+               }
             }
-        })
-        .catch(function (error) {   
-         
-        });
-};
-
+         })
+         .catch(function (error) {});
+   };
 
    var poblarPrevailingCounties = function () {
       var county_ids = $('#county').val();
@@ -4525,130 +4796,131 @@ var Projects = (function () {
    });
 
    // Lógica para botones de la tabla Wizard (Edición)
-   var initAccionesRetainageWizard = function() {
-       var toggleBarra = function() {
-           var seleccionados = $('.chk-item-wizard:checked').length;
-           $('#contador-items-seleccionados-wizard').text(seleccionados);
-           
-           if (seleccionados > 0) {
-               $('#barra-acciones-retainage-wizard').removeClass('d-none');
-           } else {
-               $('#barra-acciones-retainage-wizard').addClass('d-none');
-           }
-       };
+   var initAccionesRetainageWizard = function () {
+      var toggleBarra = function () {
+         var seleccionados = $('.chk-item-wizard:checked').length;
+         $('#contador-items-seleccionados-wizard').text(seleccionados);
 
-       // 1. Checkbox individual
-       $(document).on('change', '.chk-item-wizard', function() {
-           toggleBarra();
-           var total = $('.chk-item-wizard').length;
-           var checked = $('.chk-item-wizard:checked').length;
-           $('#chk-master-retainage-wizard').prop('checked', total === checked && total > 0);
-       });
+         if (seleccionados > 0) {
+            $('#barra-acciones-retainage-wizard').removeClass('d-none');
+         } else {
+            $('#barra-acciones-retainage-wizard').addClass('d-none');
+         }
+      };
 
-       // 2. Checkbox maestro (Select All)
-       $(document).on('change', '#chk-master-retainage-wizard', function() {
-           var isChecked = $(this).is(':checked');
-           $('.chk-item-wizard').prop('checked', isChecked);
-           toggleBarra();
-       });
+      // 1. Checkbox individual
+      $(document).on('change', '.chk-item-wizard', function () {
+         toggleBarra();
+         var total = $('.chk-item-wizard').length;
+         var checked = $('.chk-item-wizard:checked').length;
+         $('#chk-master-retainage-wizard').prop('checked', total === checked && total > 0);
+      });
 
+      // 2. Checkbox maestro (Select All)
+      $(document).on('change', '#chk-master-retainage-wizard', function () {
+         var isChecked = $(this).is(':checked');
+         $('.chk-item-wizard').prop('checked', isChecked);
+         toggleBarra();
+      });
 
       // 3. Botones de Acción (Apply/Remove)
-       $(document).on('click', '.btn-accion-masiva-wizard', function() {
-           var accion = $(this).data('accion'); // 1 = Apply, 0 = Remove
-           var ids = [];
-           
-           // Recolectar IDs
-           $('.chk-item-wizard:checked').each(function() {
-               ids.push($(this).val());
-           });
+      $(document).on('click', '.btn-accion-masiva-wizard', function () {
+         var accion = $(this).data('accion'); // 1 = Apply, 0 = Remove
+         var ids = [];
 
-           if (ids.length === 0) {
-               toastr.warning("Please select at least one item.");
-               return;
-           }
+         // Recolectar IDs
+         $('.chk-item-wizard:checked').each(function () {
+            ids.push($(this).val());
+         });
 
-           // Bloquear pantalla
-           if (typeof BlockUtil !== 'undefined') BlockUtil.block('#items-table-editable');
+         if (ids.length === 0) {
+            toastr.warning('Please select at least one item.');
+            return;
+         }
 
-            axios.post('project/bulk-retainage-update', { 
+         // Bloquear pantalla
+         if (typeof BlockUtil !== 'undefined') BlockUtil.block('#items-table-editable');
+
+         axios
+            .post('project/bulk-retainage-update', {
                ids: ids,
-               status: accion
-           })
-           .then(function(res) {
+               status: accion,
+            })
+            .then(function (res) {
                if (res.data.success) {
-                   toastr.success("Retainage updated successfully");
-                   
-                   // Limpiar selección
-                   $('.chk-item-wizard').prop('checked', false);
-                   $('#chk-master-retainage-wizard').prop('checked', false);
-                   toggleBarra();
-                   
-                   // Recargar el proyecto completo
-                   var project_id = $('#project_id').val();
-                   if(project_id) editRow(project_id, false); 
+                  toastr.success('Retainage updated successfully');
+
+                  // Limpiar selección
+                  $('.chk-item-wizard').prop('checked', false);
+                  $('#chk-master-retainage-wizard').prop('checked', false);
+                  toggleBarra();
+
+                  // Recargar el proyecto completo
+                  var project_id = $('#project_id').val();
+                  if (project_id) editRow(project_id, false);
                } else {
-                   // Mostrar el mensaje de error exacto que viene del servidor
-                   toastr.error(res.data.error || "Error updating items");
+                  // Mostrar el mensaje de error exacto que viene del servidor
+                  toastr.error(res.data.error || 'Error updating items');
                }
-           })
-           .catch(function(err) {
-           
-               toastr.error("Server connection error");
-           })
-           .then(function() {
+            })
+            .catch(function (err) {
+               toastr.error('Server connection error');
+            })
+            .then(function () {
                if (typeof BlockUtil !== 'undefined') BlockUtil.unblock('#items-table-editable');
-           });
-       });
+            });
+      });
    };
 
- var initAccionesRetainageHistory = function () {        
- 
-    $(document).off('click', '.btn-ver-historial-reembolso').on('click', '.btn-ver-historial-reembolso', function (e) {
-        e.preventDefault();
-        
-        var invoice_id = $(this).attr('data-invoice-id');
-        
-        // Loader inicial
-        Swal.fire({
-            title: 'Loading History...',
-            allowOutsideClick: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-      
-        var formData = new FormData();
-        formData.append('invoice_id', invoice_id);
+   var initAccionesRetainageHistory = function () {
+      $(document)
+         .off('click', '.btn-ver-historial-reembolso')
+         .on('click', '.btn-ver-historial-reembolso', function (e) {
+            e.preventDefault();
 
-        axios.post('project/get-reimbursement-history', formData) 
-            .then(function (response) {
-                var res = response.data;
-                
-                if (res.success) {
-                    try {
+            var invoice_id = $(this).attr('data-invoice-id');
+
+            // Loader inicial
+            Swal.fire({
+               title: 'Loading History...',
+               allowOutsideClick: false,
+               didOpen: () => {
+                  Swal.showLoading();
+               },
+            });
+
+            var formData = new FormData();
+            formData.append('invoice_id', invoice_id);
+
+            axios
+               .post('project/get-reimbursement-history', formData)
+               .then(function (response) {
+                  var res = response.data;
+
+                  if (res.success) {
+                     try {
                         var history = res.history;
                         var htmlRows = '';
 
                         if (history.length > 0) {
-                            history.forEach(function (h) {
-                                // Validamos que el formateador no rompa el código
-                                var montoFormateado = (typeof MyApp !== 'undefined' && MyApp.formatearNumero) 
-                                    ? MyApp.formatearNumero(h.amount, 2, '.', ',') 
-                                    : h.amount.toFixed(2);
+                           history.forEach(function (h) {
+                              // Validamos que el formateador no rompa el código
+                              var montoFormateado = typeof MyApp !== 'undefined' && MyApp.formatearNumero ? MyApp.formatearNumero(h.amount, 2, '.', ',') : h.amount.toFixed(2);
 
-                                htmlRows += `
+                              htmlRows += `
                                     <tr>
                                         <td>${h.date}</td>
                                         <td class="text-end text-success fw-bold">$${montoFormateado}</td>
                                     </tr>`;
-                            });
+                           });
                         } else {
-                            htmlRows = '<tr><td colspan="2" class="text-center text-muted">No history found</td></tr>';
+                           htmlRows = '<tr><td colspan="2" class="text-center text-muted">No history found</td></tr>';
                         }
 
                         // El modal de éxito CIERRA el loader automáticamente al abrirse
                         Swal.fire({
-                            title: 'Reimbursement History',
-                            html: `
+                           title: 'Reimbursement History',
+                           html: `
                                 <div class="table-responsive">
                                     <table class="table table-row-dashed table-row-gray-300 gy-7">
                                         <thead>
@@ -4660,36 +4932,35 @@ var Projects = (function () {
                                         <tbody>${htmlRows}</tbody>
                                     </table>
                                 </div>`,
-                            confirmButtonText: "Close",
-                            customClass: { confirmButton: "btn btn-primary" }
+                           confirmButtonText: 'Close',
+                           customClass: { confirmButton: 'btn btn-primary' },
                         });
-                    } catch (err) {                       
+                     } catch (err) {
                         Swal.fire('Error', 'Error rendering history data', 'error');
-                    }
-                } else {
-                    Swal.fire('Error', res.error || 'Invoice not found', 'error');
-                }
-            })
-            .catch(function (error) {              
-                if (error.response) {                
-                    Swal.fire('Error', 'Server error: ' + error.response.status, 'error');
-                }
-            });
-    });
-};
+                     }
+                  } else {
+                     Swal.fire('Error', res.error || 'Invoice not found', 'error');
+                  }
+               })
+               .catch(function (error) {
+                  if (error.response) {
+                     Swal.fire('Error', 'Server error: ' + error.response.status, 'error');
+                  }
+               });
+         });
+   };
 
-// Función para manejar el modal de agregar pago/reembolso
+   // Función para manejar el modal de agregar pago/reembolso
    var initAccionesReimbursement = function () {
-      
       $(document).off('click', '.btn-add-reimbursement');
       $(document).on('click', '.btn-add-reimbursement', function (e) {
-          e.preventDefault();
-          var invoice_id = $(this).data('invoice-id');
-          
-          // Limpiar y abrir modal
-          $('#invoice_id_reimbursement').val(invoice_id); // Input oculto en tu modal
-          $('#reimbursement_amount').val(''); // Input del monto
-          ModalUtil.show('modal-reimbursement'); // ID de tu modal
+         e.preventDefault();
+         var invoice_id = $(this).data('invoice-id');
+
+         // Limpiar y abrir modal
+         $('#invoice_id_reimbursement').val(invoice_id); // Input oculto en tu modal
+         $('#reimbursement_amount').val(''); // Input del monto
+         ModalUtil.show('modal-reimbursement'); // ID de tu modal
       });
 
       // 2. Guardar el pago (El botón "Save" de tu modal)
@@ -4709,34 +4980,33 @@ var Projects = (function () {
             BlockUtil.block('#modal-reimbursement .modal-content');
 
             // --- LLAMADA A LA NUEVA RUTA QUE SUMA ---
-            axios.post('project/save-reimbursement', formData)
+            axios
+               .post('project/save-reimbursement', formData)
                .then(function (res) {
                   if (res.data.success) {
                      toastr.success(res.data.message);
-                     
+
                      // Cerrar modal
                      ModalUtil.hide('modal-reimbursement');
-                     
+
                      // Recargar la tabla para ver los nuevos cálculos
                      var project_id = $('#project_id').val();
                      cargarTablaInvoicesRetainage(project_id);
-                     
                   } else {
-                     toastr.error(res.data.error || "Error saving payment");
+                     toastr.error(res.data.error || 'Error saving payment');
                   }
                })
                .catch(function (error) {
-                  toastr.error("Server error");
+                  toastr.error('Server error');
                })
-               .finally(function() {
+               .finally(function () {
                   BlockUtil.unblock('#modal-reimbursement .modal-content');
                });
          } else {
-            toastr.error("Please enter a valid amount");
+            toastr.error('Please enter a valid amount');
          }
       });
    };
-
 
    return {
       //main function to initiate the module
@@ -4770,6 +5040,9 @@ var Projects = (function () {
          // contacts
          initAccionesContacts();
 
+         // concrete classes
+         initAccionesConcreteClasses();
+
          // invoices
          initTableInvoices();
          initAccionesInvoices();
@@ -4800,7 +5073,7 @@ var Projects = (function () {
 
          initAccionesRetainageHistory();
 
-         initAccionesReimbursement();         
+         initAccionesReimbursement();
 
          // editar
          var project_id_edit = localStorage.getItem('project_id_edit');

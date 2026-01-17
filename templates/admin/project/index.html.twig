@@ -670,29 +670,6 @@
                               <div class="wizard-title">Notes</div>
                               <div class="wizard-desc">List of notes</div>
                            </div>
-                           <span class="svg-icon ps-6">
-                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
-                                    <rect
-                                       fill="#000000"
-                                       opacity="0.3"
-                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
-                                       x="7.5"
-                                       y="7.5"
-                                       width="2"
-                                       height="9"
-                                       rx="1"
-                                    ></rect>
-                                    <path
-                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
-                                       fill="#000000"
-                                       fill-rule="nonzero"
-                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
-                                    ></path>
-                                 </g>
-                              </svg>
-                           </span>
                         </div>
                      </a>
                   </li>
@@ -991,33 +968,50 @@
                            </div>
                         </div>
                         <div class="row mb-3">
-                           <div class="col-md-3" id="select-concrete-class">
+                           <div class="col-md-12">
                               <label class="form-label">
                                  <span class="ic-step-number">3</span>
                                  Concrete Quote
                               </label>
-                              <div class="input-group input-group-solid flex-nowrap">
-                                 <div class="overflow-hidden flex-grow-1">
-                                    <select id="concrete-class" class="form-control form-select form-select2 select-validate form-select-solid rounded-end-0 border-end event-change">
-                                       <option value="">Concrete Class</option>
-                                       {% for item in concrete_classes %}
-                                       <option value="{{ item.concreteClassId }}">
-                                          {{ item.name }}
-                                       </option>
-                                       {% endfor %}
-                                    </select>
-                                 </div>
-                                 <span class="input-group-text" title="Add Concrete Class" id="btn-add-concrete-class" style="cursor: pointer">
-                                    <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                                 </span>
-                              </div>
                            </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Price </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text">$</span>
-                                 <input type="text" class="form-control form-control-validate form-control-number event-change" id="concrete_quote_price" />
+                        </div>
+                        <div class="row" id="lista-concrete-classes">
+                           <div class="col-md-12">
+                              <!--begin::Wrapper-->
+                              <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                 <!-- Acciones -->
+                                 <div class="d-flex flex-wrap gap-3">
+                                    {% if permiso.agregar or permiso.editar %}
+                                    <button id="btn-agregar-concrete-class" class="btn btn-success w-125px">
+                                       <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                       Add
+                                    </button>
+                                    {% endif %}
+                                 </div>
+
+                                 <!-- Filtros -->
+                                 <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <!--search-->
+                                    <div class="position-relative w-250px">
+                                       <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                       <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                    </div>
+                                 </div>
                               </div>
+                              <!--end::Wrapper-->
+
+                              <!--begin::Datatable-->
+                              <table id="concrete-classes-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                 <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                       <th>Concrete Class</th>
+                                       <th>Price</th>
+                                       <th>Actions</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody class="text-gray-600 fw-semibold"></tbody>
+                              </table>
+                              <!--end::Datatable-->
                            </div>
                         </div>
                      </div>
@@ -1095,7 +1089,7 @@
                                        <th></th>
                                        <th>Invoice Date</th>
                                        <th>Invoice Amt.</th>
-                                       <th>Inv. Ret. Amt.</th>                      
+                                       <th>Inv. Ret. Amt.</th>
                                        <th>Paid Amt</th>
                                        <th>Actual Ret. Amt.</th>
                                        <th>Actual Ret. T.D.</th>
@@ -1146,42 +1140,40 @@
                            <!--end::Wrapper-->
 
                            <!--begin::Datatable-->
-                          <div id="barra-acciones-retainage-wizard" class="card bg-light-primary border border-primary border-dashed d-none mb-5">
-                     <div class="card-body d-flex align-items-center p-3">
-                        <div class="fs-6 fw-bold text-primary me-5">
-                              <span id="contador-items-seleccionados-wizard">0</span> Selected Items
-                        </div>
-                        <div class="ms-auto">
-                              <button type="button" class="btn btn-sm btn-primary fw-bold btn-accion-masiva-wizard" data-accion="1">
-                                 <i class="ki-duotone ki-check fs-2 me-2"></i> Retainage
-                              </button>
-                              <button type="button" class="btn btn-sm btn-danger fw-bold btn-accion-masiva-wizard" data-accion="0">
-                                 <i class="ki-duotone ki-cross fs-2 me-2"></i> Remove Retainage
-                              </button>
-                        </div>
-                     </div>
-                  </div>
-
-                  <table id="items-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                     <thead>
-                        <tr class="fw-bold fs-6 text-gray-800 px-7">
-                              <th class="w-10px pe-2 text-center">
-                                 <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                    <input class="form-check-input" type="checkbox" id="chk-master-retainage-wizard" />
+                           <div id="barra-acciones-retainage-wizard" class="card bg-light-primary border border-primary border-dashed d-none mb-5">
+                              <div class="card-body d-flex align-items-center p-3">
+                                 <div class="fs-6 fw-bold text-primary me-5"><span id="contador-items-seleccionados-wizard">0</span> Selected Items</div>
+                                 <div class="ms-auto">
+                                    <button type="button" class="btn btn-sm btn-primary fw-bold btn-accion-masiva-wizard" data-accion="1">
+                                       <i class="ki-duotone ki-check fs-2 me-2"></i> Retainage
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger fw-bold btn-accion-masiva-wizard" data-accion="0">
+                                       <i class="ki-duotone ki-cross fs-2 me-2"></i> Remove Retainage
+                                    </button>
                                  </div>
-                              </th>
+                              </div>
+                           </div>
 
-                              <th>Item</th>
-                              <th>Unit</th>
-                              <th>Yield Calculation</th>
-                              <th>Quantity</th>
-                              <th>Price</th>
-                              <th>Total</th>
-                              <th>Actions</th>
-                        </tr>
-                     </thead>
-                     <tbody class="text-gray-600 fw-semibold"></tbody>
-                  </table>
+                           <table id="items-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th class="w-10px pe-2 text-center">
+                                       <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                          <input class="form-check-input" type="checkbox" id="chk-master-retainage-wizard" />
+                                       </div>
+                                    </th>
+
+                                    <th>Item</th>
+                                    <th>Unit</th>
+                                    <th>Yield Calculation</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
                            <!--end::Datatable-->
                         </div>
                      </div>
@@ -1558,7 +1550,7 @@
                            <!--begin::Datatable-->
                            <table id="items-completion-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
-                               <!--  <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                 <!--  <tr class="fw-bold fs-6 text-gray-800 px-7">
                                     <th>Item</th>
                                     <th>Unit</th>
                                     <th>Contract Quantity</th>
@@ -1574,33 +1566,35 @@
                                  </tr>
                               </thead>
 -->
-                             <thead>
-    <tr class="fw-bold fs-7 text-gray-800 border-bottom border-gray-200">
-        <th class="min-w-150px text-start">Item</th>
+                                 <thead>
+                                    <tr class="fw-bold fs-7 text-gray-800 border-bottom border-gray-200">
+                                       <th class="min-w-150px text-start">Item</th>
 
-        <th class="min-w-50px text-center">Unit</th>
+                                       <th class="min-w-50px text-center">Unit</th>
 
-        <th class="min-w-70px text-end">Contr.<br>Qty</th>
-        
-        <th class="min-w-70px text-end">Price</th>
-        
-        <th class="min-w-90px text-end">Contr.<br>Total</th>
-        
-        <th class="min-w-70px text-end">Comp.<br>Qty To Date</th>
-        
-        <th class="min-w-90px text-end">Comp.<br>Amt ($) To Date</th>
-        
-        <th class="min-w-60px text-end">% Comp.</th>
-        
-        <th class="min-w-70px text-end">Inv.<br>Qty</th>
-        
-        <th class="min-w-90px text-end">Inv.<br>Amt ($)</th>
-        
-        <th class="min-w-70px text-end">Paid<br>Qty</th>
-        
-        <th class="min-w-90px text-end">Paid<br>Amt ($)</th>
-    </tr>
-</thead>
+                                       <th class="min-w-70px text-end">Contr.<br />Qty</th>
+
+                                       <th class="min-w-70px text-end">Price</th>
+
+                                       <th class="min-w-90px text-end">Contr.<br />Total</th>
+
+                                       <th class="min-w-70px text-end">Comp.<br />Qty To Date</th>
+
+                                       <th class="min-w-90px text-end">Comp.<br />Amt ($) To Date</th>
+
+                                       <th class="min-w-60px text-end">% Comp.</th>
+
+                                       <th class="min-w-70px text-end">Inv.<br />Qty</th>
+
+                                       <th class="min-w-90px text-end">Inv.<br />Amt ($)</th>
+
+                                       <th class="min-w-70px text-end">Paid<br />Qty</th>
+
+                                       <th class="min-w-90px text-end">Paid<br />Amt ($)</th>
+                                    </tr>
+                                 </thead>
+                              </thead>
+
                               <tbody class="text-gray-600 fw-semibold"></tbody>
                            </table>
                            <!--end::Datatable-->
@@ -2046,29 +2040,6 @@
                               <div class="wizard-title">Notes</div>
                               <div class="wizard-desc">List of notes</div>
                            </div>
-                           <span class="svg-icon ps-6">
-                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
-                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
-                                    <rect
-                                       fill="#000000"
-                                       opacity="0.3"
-                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
-                                       x="7.5"
-                                       y="7.5"
-                                       width="2"
-                                       height="9"
-                                       rx="1"
-                                    ></rect>
-                                    <path
-                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
-                                       fill="#000000"
-                                       fill-rule="nonzero"
-                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
-                                    ></path>
-                                 </g>
-                              </svg>
-                           </span>
                         </div>
                      </a>
                   </li>
@@ -2315,25 +2286,41 @@
                            </div>
                         </div>
                         <div class="row mb-3">
-                           <div class="col-md-3">
+                           <div class="col-md-12">
                               <label class="form-label">
                                  <span class="ic-step-number">3</span>
                                  Concrete Quote
                               </label>
-                              <select id="concrete-class-detalle" disabled class="form-control form-select form-select2 select-validate form-select-solid">
-                                 <option value="">Concrete Class</option>
-                                 {% for item in concrete_classes %}
-                                 <option value="{{ item.concreteClassId }}">
-                                    {{ item.name }}
-                                 </option>
-                                 {% endfor %}
-                              </select>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Price </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text">$</span>
-                                 <input type="text" class="form-control form-control-validate form-control-number" id="concrete_quote_price-detalle" disabled />
+                              <input type="hidden" id="concrete_quote_price-detalle" />
+                              <div class="row mt-5" id="lista-concrete-classes-detalle">
+                                 <div class="col-md-12">
+                                    <!--begin::Wrapper-->
+                                    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                       <!-- Filtros -->
+                                       <div class="d-flex flex-wrap align-items-center gap-3">
+                                          <!--search-->
+                                          <div class="position-relative w-250px">
+                                             <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"
+                                                ><span class="path1"></span><span class="path2"></span
+                                             ></i>
+                                             <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <!--end::Wrapper-->
+
+                                    <!--begin::Datatable-->
+                                    <table id="concrete-classes-table-editable-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                       <thead>
+                                          <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                             <th>Concrete Class</th>
+                                             <th>Price</th>
+                                          </tr>
+                                       </thead>
+                                       <tbody class="text-gray-600 fw-semibold"></tbody>
+                                    </table>
+                                    <!--end::Datatable-->
+                                 </div>
                               </div>
                            </div>
                         </div>
@@ -2411,12 +2398,12 @@
                                     <tr class="fw-bold fs-6 text-gray-800 px-7">
                                        <th></th>
                                        <th>Invoice Date</th>
-                                       <th>Invoice Amount</th>
-                                       <th>Paid Amount</th>
-                                       <th>Retainage (%)</th>
-                                       <th>Retainage Amount</th>
-                                       <th>Total Retainage to Date</th>
-                                       <th>Retainage Adjustment</th>
+                                       <th>Invoice Amt.</th>
+                                       <th>Inv. Ret. Amt.</th>
+                                       <th>Paid Amt</th>
+                                       <th>Actual Ret. Amt.</th>
+                                       <th>Actual Ret. T.D.</th>
+                                       <th>Ret. Reimbursed</th>
                                     </tr>
                                  </thead>
                                  <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -2595,7 +2582,6 @@
                                     <th>Notes</th>
                                     <th>Paid</th>
                                     <th>Created At</th>
-                                    <th>Actions</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -2673,7 +2659,6 @@
                                     <th>Labor Total ($)</th>
                                     <th>Daily Total ($)</th>
                                     <th>Profit ($)</th>
-                                    <th>Actions</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -2707,6 +2692,7 @@
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
                                     <th>Day</th>
                                     <th>Percent</th>
+                                    <th>Items</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -2800,19 +2786,30 @@
                            <!--begin::Datatable-->
                            <table id="items-completion-table-editable-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
-                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                    <th>Item</th>
-                                    <th>Unit</th>
-                                    <th>Contract Quantity</th>
-                                    <th>Price</th>
-                                    <th>Contract Total</th>
-                                    <th>Completed Qty To Date</th>
-                                    <th>Total Amount Completed To Date</th>
-                                    <th>% of Contract Completed</th>
-                                    <th>Invoiced Qty</th>
-                                    <th>Total Invoiced Amt $</th>
-                                    <th>Paid Qty</th>
-                                    <th>Total Paid Amt $</th>
+                                 <tr class="fw-bold fs-7 text-gray-800 border-bottom border-gray-200">
+                                    <th class="min-w-150px text-start">Item</th>
+
+                                    <th class="min-w-50px text-center">Unit</th>
+
+                                    <th class="min-w-70px text-end">Contr.<br />Qty</th>
+
+                                    <th class="min-w-70px text-end">Price</th>
+
+                                    <th class="min-w-90px text-end">Contr.<br />Total</th>
+
+                                    <th class="min-w-70px text-end">Comp.<br />Qty To Date</th>
+
+                                    <th class="min-w-90px text-end">Comp.<br />Amt ($) To Date</th>
+
+                                    <th class="min-w-60px text-end">% Comp.</th>
+
+                                    <th class="min-w-70px text-end">Inv.<br />Qty</th>
+
+                                    <th class="min-w-90px text-end">Inv.<br />Amt ($)</th>
+
+                                    <th class="min-w-70px text-end">Paid<br />Qty</th>
+
+                                    <th class="min-w-90px text-end">Paid<br />Amt ($)</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -2966,34 +2963,35 @@
                   </div>
                </div>
 
-              <div class="form-group">
-    <div class="row">
-        <div class="col-md-6">
-            <label class="form-label"> Change Order </label>
-            <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                <input type="checkbox" id="change-order" class="form-check-input" checked />
-                <label class="form-check-label" for="change-order"> Yes / No </label>
-            </div>
-        </div>
+               <div class="form-group">
+                  <div class="row">
+                     <div class="col-md-6">
+                        <label class="form-label"> Change Order </label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input type="checkbox" id="change-order" class="form-check-input" checked />
+                           <label class="form-check-label" for="change-order"> Yes / No </label>
+                        </div>
+                     </div>
 
-        <div class="col-md-6">
-            <label class="form-label"> Change Order Date </label>
-            <div class="input-group input-group-solid">
-                <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date" name="change_order_date" />
-                <span class="input-group-text">
-                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                </span>
-            </div>
-        </div>
+                     <div class="col-md-6">
+                        <label class="form-label"> Change Order Date </label>
+                        <div class="input-group input-group-solid">
+                           <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date" name="change_order_date" />
+                           <span class="input-group-text">
+                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                           </span>
+                        </div>
+                     </div>
 
-        <div class="col-md-6 mt-5"> <label class="form-label">Is Retainage?</label>
-            <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                <input class="form-check-input" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
-                <label class="form-check-label" for="item-apply-retainage"> Yes </label>
-            </div>
-        </div>
-    </div>
-</div>
+                     <div class="col-md-6 mt-5">
+                        <label class="form-label">Is Retainage?</label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input class="form-check-input" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
+                           <label class="form-check-label" for="item-apply-retainage"> Yes </label>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </form>
          </div>
          <div class="modal-footer">
@@ -3126,6 +3124,55 @@
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-success" id="btn-salvar-contact">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- concrete class -->
+<div class="modal fade" id="modal-concrete-class" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New Concrete Class</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="concrete-class-form" action="#" enctype="multipart/form-data" method="post">
+               <input type="hidden" id="concrete_class_id" name="concrete_class_id" />
+
+               <div class="form-group ic-form-group" id="select-concrete-class">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Concrete Class
+                  </label>
+                  <select id="concrete-class-modal" class="form-control form-select form-select2 select-validate form-select-solid">
+                     <option value="">Concrete Class</option>
+                     {% for item in concrete_classes %}
+                     <option value="{{ item.concreteClassId }}">
+                        {{ item.name }}
+                     </option>
+                     {% endfor %}
+                  </select>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">2</span>
+                     Price
+                  </label>
+                  <div class="input-group input-group-solid">
+                     <span class="input-group-text">$</span>
+                     <input type="text" class="form-control form-control-validate form-control-number" id="concrete-class-price" name="price" />
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-concrete-class">Save</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
          </div>
       </div>

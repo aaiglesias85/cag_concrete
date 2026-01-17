@@ -87,6 +87,10 @@ eliminarContactProjectAdmin:
    path: /project/eliminarContact
    defaults: { _controller: App\Controller\Admin\ProjectController::eliminarContact, _format: json }
 
+eliminarConcreteClassProjectAdmin:
+   path: /project/eliminarConcreteClass
+   defaults: { _controller: App\Controller\Admin\ProjectController::eliminarConcreteClass, _format: json }
+
 #subcontractors
 listarSubcontractorsDeProjectAdmin:
    path: /project/listarSubcontractors

@@ -22,6 +22,7 @@ use App\Entity\DataTracking;
 use App\Entity\ProjectAttachment;
 use App\Entity\ProjectContact;
 use App\Entity\ProjectCounty;
+use App\Entity\ProjectConcreteClass;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Entity\ProjectNotes;
@@ -48,6 +49,7 @@ use App\Repository\ProjectNotesRepository;
 use App\Repository\ProjectPriceAdjustmentRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ProjectCountyRepository;
+use App\Repository\ProjectConcreteClassRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
@@ -385,6 +387,40 @@ class ProjectService extends Base
          $log_operacion = "Delete";
          $log_categoria = "Contact";
          $log_descripcion = "The project contact is deleted: $contact_name";
+         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+         $resultado['success'] = true;
+      } else {
+         $resultado['success'] = false;
+         $resultado['error'] = "The requested record does not exist";
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * EliminarConcreteClass: Elimina una concrete class en la BD
+    * @param int $concrete_class_id Id
+    * @author Marcel
+    */
+   public function EliminarConcreteClass($concrete_class_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      $entity = $this->getDoctrine()->getRepository(ProjectConcreteClass::class)
+         ->find($concrete_class_id);
+      /**@var ProjectConcreteClass $entity */
+      if ($entity != null) {
+
+         $concrete_class_name = $entity->getConcreteClass() ? $entity->getConcreteClass()->getName() : '';
+
+         $em->remove($entity);
+         $em->flush();
+
+         //Salvar log
+         $log_operacion = "Delete";
+         $log_categoria = "Concrete Class";
+         $log_descripcion = "The project concrete class is deleted: $concrete_class_name";
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
@@ -1275,6 +1311,10 @@ class ProjectService extends Base
          $contacts = $this->ListarContactsDeProject($project_id);
          $arreglo_resultado['contacts'] = $contacts;
 
+         // concrete classes
+         $concrete_classes = $this->ListarConcreteClassesDeProject($project_id);
+         $arreglo_resultado['concrete_classes'] = $concrete_classes;
+
          // ajustes precio
          $ajustes_precio = $this->ListarAjustesPrecioDeProject($project_id);
          $arreglo_resultado['ajustes_precio'] = $ajustes_precio;
@@ -1447,6 +1487,61 @@ class ProjectService extends Base
       }
 
       return $ajustes;
+   }
+
+   /**
+    * ListarContactsDeProject
+    * @param $project_id
+    * @return array
+    */
+   public function ListarContactsDeProject($project_id)
+   {
+      $contacts = [];
+
+      /** @var ProjectContactRepository $projectContactRepo */
+      $projectContactRepo = $this->getDoctrine()->getRepository(ProjectContact::class);
+      $project_contacts = $projectContactRepo->ListarContacts($project_id);
+
+      foreach ($project_contacts as $key => $project_contact) {
+         $contacts[] = [
+            'contact_id' => $project_contact->getContactId(),
+            'name' => $project_contact->getName(),
+            'email' => $project_contact->getEmail(),
+            'phone' => $project_contact->getPhone(),
+            'role' => $project_contact->getRole(),
+            'notes' => $project_contact->getNotes(),
+            'posicion' => $key
+         ];
+      }
+
+      return $contacts;
+   }
+
+   /**
+    * ListarConcreteClassesDeProject
+    * @param $project_id
+    * @return array
+    */
+   public function ListarConcreteClassesDeProject($project_id)
+   {
+      $concrete_classes = [];
+
+      /** @var ProjectConcreteClassRepository $projectConcreteClassRepo */
+      $projectConcreteClassRepo = $this->getDoctrine()->getRepository(ProjectConcreteClass::class);
+      $project_concrete_classes = $projectConcreteClassRepo->ListarConcreteClassesDeProject($project_id);
+
+      foreach ($project_concrete_classes as $key => $project_concrete_class) {
+         $concrete_class = $project_concrete_class->getConcreteClass();
+         $concrete_classes[] = [
+            'id' => $project_concrete_class->getId(),
+            'concrete_class_id' => $concrete_class ? $concrete_class->getConcreteClassId() : '',
+            'concrete_class_name' => $concrete_class ? $concrete_class->getName() : '',
+            'concrete_quote_price' => $project_concrete_class->getConcreteQuotePrice(),
+            'posicion' => $key
+         ];
+      }
+
+      return $concrete_classes;
    }
 
    /**
@@ -1702,6 +1797,14 @@ class ProjectService extends Base
          $em->remove($contact);
       }
 
+      // concrete classes
+      /** @var ProjectConcreteClassRepository $projectConcreteClassRepo */
+      $projectConcreteClassRepo = $this->getDoctrine()->getRepository(ProjectConcreteClass::class);
+      $concrete_classes = $projectConcreteClassRepo->ListarConcreteClassesDeProject($project_id);
+      foreach ($concrete_classes as $concrete_class) {
+         $em->remove($concrete_class);
+      }
+
       // items
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
@@ -1857,6 +1960,7 @@ class ProjectService extends Base
       $project_id_number,
       $items,
       $contacts,
+      $concrete_classes,
       $ajustes_precio,
       $archivos,
       $vendor_id,
@@ -2271,6 +2375,8 @@ class ProjectService extends Base
          $items_new = $this->SalvarItems($entity, $items);
          // save contacts
          $this->SalvarContacts($entity, $contacts);
+         // save concrete classes
+         $this->SalvarConcreteClasses($entity, $concrete_classes);
          // save ajustes de precio
          $this->SalvarAjustesPrecio($entity, $ajustes_precio);
          // save archivos
@@ -2326,7 +2432,9 @@ class ProjectService extends Base
       $project_id_number,
       $items,
       $contacts,
+      $concrete_classes,
       $vendor_id,
+      $concrete_class_id,
       $concrete_quote_price,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
@@ -2405,6 +2513,12 @@ class ProjectService extends Base
          $entity->setConcreteVendor($conc_vendor);
       }
 
+      if ($concrete_class_id !== "") {
+         $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
+            ->find($concrete_class_id);
+         $entity->setConcreteClass($concrete_class);
+      }
+
       // $entity->setConcreteQuotePrice($concrete_quote_price);
       $val = ($concrete_quote_price !== '' && $concrete_quote_price !== null) ? (float)$concrete_quote_price : null;
       $entity->setConcreteQuotePrice($val);
@@ -2447,6 +2561,9 @@ class ProjectService extends Base
 
       // save contacts
       $this->SalvarContacts($entity, $contacts);
+
+      // save concrete classes
+      $this->SalvarConcreteClasses($entity, $concrete_classes);
 
       // counties
       $this->SalvarCounties($entity, $county_ids, false);
@@ -2653,6 +2770,50 @@ class ProjectService extends Base
             $contact_entity->setProject($entity);
 
             $em->persist($contact_entity);
+         }
+      }
+   }
+
+   /**
+    * SalvarConcreteClasses
+    * @param $concrete_classes
+    * @param Project $entity
+    * @return void
+    */
+   public function SalvarConcreteClasses($entity, $concrete_classes)
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      if (!is_array($concrete_classes)) {
+         return;
+      }
+
+      foreach ($concrete_classes as $value) {
+         $concrete_class_entity = null;
+
+         if (is_numeric($value->id)) {
+            $concrete_class_entity = $this->getDoctrine()->getRepository(ProjectConcreteClass::class)
+               ->find($value->id);
+         }
+
+         $is_new_concrete_class = false;
+         if ($concrete_class_entity == null) {
+            $concrete_class_entity = new ProjectConcreteClass();
+            $is_new_concrete_class = true;
+         }
+
+         if ($value->concrete_class_id != '') {
+            $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
+               ->find($value->concrete_class_id);
+            $concrete_class_entity->setConcreteClass($concrete_class);
+         }
+
+         $concrete_quote_price = ($value->concrete_quote_price !== '' && $value->concrete_quote_price !== null) ? (float)$value->concrete_quote_price : null;
+         $concrete_class_entity->setConcreteQuotePrice($concrete_quote_price);
+
+         if ($is_new_concrete_class) {
+            $concrete_class_entity->setProject($entity);
+            $em->persist($concrete_class_entity);
          }
       }
    }
