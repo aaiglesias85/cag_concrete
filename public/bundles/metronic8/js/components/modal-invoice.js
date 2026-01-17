@@ -75,21 +75,21 @@ var ModalInvoice = (function () {
 
          activeTab = parseInt(item);
 
-         /*if (activeTab < totalTabs) {
-                $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
-            }
-            if (activeTab == 1) {
-                $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
-            }
-            if (activeTab > 1) {
-                $('#btn-wizard-anterior').removeClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
-            }
-            if (activeTab == totalTabs) {
-                $('.btn-wizard-finalizar').removeClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
-            }*/
+         if (activeTab < totalTabs) {
+            $('#modal-invoice .btn-wizard-finalizar').removeClass('hide').addClass('hide');
+         }
+         if (activeTab == 1) {
+            $('#modal-invoice #btn-wizard-anterior').removeClass('hide').addClass('hide');
+            $('#modal-invoice #btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab > 1) {
+            $('#modal-invoice #btn-wizard-anterior').removeClass('hide');
+            $('#modal-invoice #btn-wizard-siguiente').removeClass('hide');
+         }
+         if (activeTab == totalTabs) {
+            $('#modal-invoice .btn-wizard-finalizar').removeClass('hide');
+            $('#modal-invoice #btn-wizard-siguiente').removeClass('hide').addClass('hide');
+         }
 
          // marcar los pasos validos
          marcarPasosValidosWizard();
@@ -100,6 +100,36 @@ var ModalInvoice = (function () {
                actualizarTableListaItems();
                break;
          }
+      });
+
+      //siguiente
+      $(document).off('click', '#modal-invoice #btn-wizard-siguiente');
+      $(document).on('click', '#modal-invoice #btn-wizard-siguiente', function (e) {
+         e.preventDefault();
+         if (validWizard()) {
+            activeTab++;
+            $('#modal-invoice #btn-wizard-anterior').removeClass('hide');
+            if (activeTab == totalTabs) {
+               $('#modal-invoice .btn-wizard-finalizar').removeClass('hide');
+               $('#modal-invoice #btn-wizard-siguiente').addClass('hide');
+            }
+
+            mostrarTab();
+         }
+      });
+      //anterior
+      $(document).off('click', '#modal-invoice #btn-wizard-anterior');
+      $(document).on('click', '#modal-invoice #btn-wizard-anterior', function (e) {
+         e.preventDefault();
+         activeTab--;
+         if (activeTab == 1) {
+            $('#modal-invoice #btn-wizard-anterior').addClass('hide');
+         }
+         if (activeTab < totalTabs) {
+            $('#modal-invoice .btn-wizard-finalizar').addClass('hide');
+            $('#modal-invoice #btn-wizard-siguiente').removeClass('hide');
+         }
+         mostrarTab();
       });
    };
    var mostrarTab = function () {
@@ -119,14 +149,9 @@ var ModalInvoice = (function () {
       activeTab = 1;
       totalTabs = 2;
       mostrarTab();
-      /*
-        $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
-        $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
-        $('#btn-wizard-siguiente').removeClass('hide');
-
-        $('.nav-item-hide').removeClass('hide').addClass('hide');
-        
-         */
+      $('#modal-invoice .btn-wizard-finalizar').removeClass('hide').addClass('hide');
+      $('#modal-invoice #btn-wizard-anterior').removeClass('hide').addClass('hide');
+      $('#modal-invoice #btn-wizard-siguiente').removeClass('hide');
 
       // reset valid
       KTUtil.findAll(KTUtil.get('invoice-modal-form'), '.nav-link').forEach(function (element, index) {

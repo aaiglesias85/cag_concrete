@@ -3,9 +3,31 @@
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title">New Invoice</h5>
+            <div class="d-flex align-items-center gap-2">
+               <a href="javascript:;" class="btn btn-secondary cerrar-modal-invoice me-2" data-bs-dismiss="modal">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
+               </a>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
-               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+               <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
+                  <i class="la la-arrow-left me-2"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
+               </button>
+
+               <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
+                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
+                  <i class="la la-arrow-right ms-2"></i>
+               </button>
+
+               <button type="button" id="btn-salvar-invoice-modal" class="btn btn-success btn-wizard-finalizar me-2 hide">
+                  <i class="la la-check"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Save</span>
+               </button>
+
+               <button type="button" id="btn-salvar-exportar-invoice-modal" class="btn btn-primary btn-wizard-finalizar hide">
+                  <i class="la la-file-excel-o"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Save and Export</span>
+               </button>
             </div>
          </div>
          <div class="modal-body">
@@ -207,11 +229,6 @@
                   </div>
                </div>
             </form>
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-success" id="btn-salvar-invoice-modal">Save</button>
-            <button type="button" class="btn btn-primary" id="btn-salvar-exportar-invoice-modal">Save and Export</button>
-            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
          </div>
       </div>
    </div>
