@@ -72,7 +72,10 @@ class LoginService extends Base
             $em->persist($token);
             $em->flush();
 
-            // Preparar datos del usuario para la respuesta
+            // Obtener permisos del usuario
+            $permisos = $this->ListarPermisosDeUsuario($usuario->getUsuarioId());
+
+            // Preparar datos del usuario para la respuesta (solo permisos, sin menú ni page config)
             $usuario_data = [
                'usuario_id' => $usuario->getUsuarioId(),
                'email' => $usuario->getEmail(),
@@ -82,6 +85,7 @@ class LoginService extends Base
                'telefono' => $usuario->getTelefono(),
                'rol_id' => $usuario->getRol()?->getRolId(),
                'rol' => $usuario->getRol()?->getNombre(),
+               'permisos' => $permisos,
             ];
 
             $resultado['success'] = true;

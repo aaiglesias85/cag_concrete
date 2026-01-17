@@ -80,8 +80,25 @@ class UsuarioController extends AbstractController
             $session->set('_security_main', serialize($token));
             $session->save();
 
+            // Obtener permisos del usuario (solo permisos, sin menú ni page config)
+            $permisos = $this->usuarioService->ListarPermisosDeUsuario($entity->getUsuarioId());
+
+            // Preparar datos del usuario con permisos (mismo formato que API)
+            $usuario_data = [
+               'usuario_id' => $entity->getUsuarioId(),
+               'email' => $entity->getEmail(),
+               'nombre' => $entity->getNombre(),
+               'apellidos' => $entity->getApellidos(),
+               'nombre_completo' => $entity->getNombreCompleto(),
+               'telefono' => $entity->getTelefono(),
+               'rol_id' => $entity->getRol()?->getRolId(),
+               'rol' => $entity->getRol()?->getNombre(),
+               'permisos' => $permisos,
+            ];
+
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['url'] = $this->generateUrl($target_path);
+            $resultadoJson['usuario'] = $usuario_data;
             return $this->json($resultadoJson);
          } else {
             $resultadoJson['success'] = $resultado['success'];
