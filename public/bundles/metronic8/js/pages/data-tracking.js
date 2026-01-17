@@ -1918,6 +1918,14 @@ var DataTracking = (function () {
          // reset
          resetFormItem();
 
+         // obtener y mostrar la fecha
+         var date = FlatpickrUtil.getString('datetimepicker-date');
+         if (date) {
+            $('#modal-data-tracking-item-date').text(date);
+         } else {
+            $('#modal-data-tracking-item-date').text('');
+         }
+
          // mostar modal
          ModalUtil.show('modal-data-tracking-item', { backdrop: 'static', keyboard: true });
 
@@ -2042,6 +2050,14 @@ var DataTracking = (function () {
             $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
 
             $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
+
+            // obtener y mostrar la fecha
+            var date = FlatpickrUtil.getString('datetimepicker-date');
+            if (date) {
+               $('#modal-data-tracking-item-date').text(date);
+            } else {
+               $('#modal-data-tracking-item-date').text('');
+            }
 
             // open modal
             ModalUtil.show('modal-data-tracking-item', { backdrop: 'static', keyboard: true });
