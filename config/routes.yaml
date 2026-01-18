@@ -48,10 +48,6 @@ login_check:
 logout:
    path: /logout
 
-denegado:
-   path: /denegado
-   defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
-
 #test
 testemail:
    path: /test-email

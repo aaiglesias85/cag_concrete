@@ -37,3 +37,7 @@ perfilAdmin:
 listarTodosUsuariosAdmin:
   path:  /usuario/listarOrdenados
   defaults: { _controller: App\Controller\Admin\UsuarioController::listarOrdenados, _format: json }
+
+denegado:
+   path: /denegado
+   defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
