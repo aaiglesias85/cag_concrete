@@ -28,10 +28,3 @@ eliminarImagenUsuarioApp:
    requirements:
       lang: es|en
    methods: [POST]
-
-sincronizarUsuarioApp:
-   path: /{lang}/usuario/sincronizar
-   defaults: { _controller: App\Controller\App\UsuarioController::sincronizar, _format: json }
-   requirements:
-      lang: es|en
-   methods: [POST]
