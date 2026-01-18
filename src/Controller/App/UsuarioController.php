@@ -366,4 +366,152 @@ class UsuarioController extends AbstractController
          return $this->json($resultadoJson, 500);
       }
    }
+
+   /**
+    * sincronizar Sincroniza los datos offline del perfil del usuario
+    */
+   #[OA\Post(
+      path: '/api/usuario/sincronizar',
+      summary: 'Synchronize offline user profile data',
+      description: 'Synchronizes offline user profile data that was saved locally when there was no connection. Requires authentication via Bearer token.',
+      security: [['Bearer' => []]],
+      requestBody: new OA\RequestBody(
+         required: false,
+         content: new OA\MediaType(
+            mediaType: 'multipart/form-data',
+            schema: new OA\Schema(
+               properties: [
+                  new OA\Property(
+                     property: 'profile_offline',
+                     type: 'string',
+                     description: 'JSON string containing offline profile data with fields: nombre, apellidos, email, telefono, passwordactual, password, imagen'
+                  ),
+               ]
+            )
+         )
+      ),
+      responses: [
+         new OA\Response(
+            response: 200,
+            description: 'Data synchronized successfully',
+            content: new OA\JsonContent(
+               properties: [
+                  new OA\Property(property: 'success', type: 'boolean', example: true),
+                  new OA\Property(property: 'message', type: 'string', example: 'Data synchronized successfully'),
+                  new OA\Property(
+                     property: 'usuario',
+                     type: 'object',
+                     description: 'Updated user data'
+                  ),
+               ]
+            )
+         ),
+         new OA\Response(
+            response: 400,
+            description: 'Error synchronizing data',
+            content: new OA\JsonContent(
+               properties: [
+                  new OA\Property(property: 'success', type: 'boolean', example: false),
+                  new OA\Property(property: 'error', type: 'string', example: 'Error synchronizing data'),
+               ]
+            )
+         ),
+         new OA\Response(response: 401, description: 'Unauthorized - Invalid or missing token'),
+         new OA\Response(response: 500, description: 'Internal server error'),
+      ]
+   )]
+   public function sincronizar(Request $request): JsonResponse
+   {
+      try {
+         // Leer datos desde form data
+         $profile_offline_json = $request->request->get('profile_offline');
+         
+         if (empty($profile_offline_json)) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'No hay datos para sincronizar';
+            return $this->json($resultadoJson, 400);
+         }
+
+         $profile_offline = json_decode($profile_offline_json, true);
+         
+         if (json_last_error() !== JSON_ERROR_NONE) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Error al decodificar los datos offline';
+            return $this->json($resultadoJson, 400);
+         }
+
+         // Actualizar datos del perfil
+         $nombre = $profile_offline['nombre'] ?? null;
+         $apellidos = $profile_offline['apellidos'] ?? null;
+         $email = $profile_offline['email'] ?? null;
+         $telefono = $profile_offline['telefono'] ?? null;
+         $password_actual = $profile_offline['passwordactual'] ?? '';
+         $password = $profile_offline['password'] ?? '';
+
+         $resultado = $this->usuarioService->ActualizarMisDatos(
+            $nombre,
+            $apellidos,
+            $email,
+            $telefono,
+            $password_actual,
+            $password
+         );
+
+         if (!$resultado['success']) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $resultado['error'] ?? 'Error al sincronizar los datos';
+            return $this->json($resultadoJson, 400);
+         }
+
+         // Si hay imagen en los datos offline, sincronizarla también
+         if (!empty($profile_offline['imagen'])) {
+            $imagen = $profile_offline['imagen'];
+            
+            // Decodificar imagen base64
+            $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+
+            if ($data !== false) {
+               // Crear directorio si no existe
+               $dir = 'uploads/usuario/';
+               if (!is_dir($dir)) {
+                  mkdir($dir, 0755, true);
+               }
+
+               // Generar nombre único para la imagen
+               $foto = $this->usuarioService->generarCadenaAleatoria() . ".jpeg";
+               $ruta_completa = $dir . $foto;
+
+               file_put_contents($ruta_completa, $data);
+
+               // Actualizar imagen del usuario en BD
+               $resultadoImagen = $this->usuarioService->ActualizarImagenPerfil($foto);
+               
+               if (!$resultadoImagen['success']) {
+                  // Si falla la imagen, continuar pero registrar el error
+                  $this->loginService->writelogerror('Error al sincronizar imagen: ' . ($resultadoImagen['error'] ?? 'Unknown error'));
+               }
+            }
+         }
+
+         // Obtener datos actualizados del usuario
+         $resultadoUsuario = $this->usuarioService->CargarDatosUsuario();
+
+         if ($resultadoUsuario['success']) {
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = 'Los datos se sincronizaron correctamente';
+            $resultadoJson['usuario'] = $resultadoUsuario['usuario'];
+         } else {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Error al cargar los datos actualizados';
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = 'Ha ocurrido un error al procesar la solicitud';
+         $this->loginService->writelogerror($e->getMessage());
+
+         return $this->json($resultadoJson, 500);
+      }
+   }
 }
