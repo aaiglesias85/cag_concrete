@@ -371,23 +371,41 @@ class UsuarioController extends AbstractController
     * sincronizar Sincroniza los datos offline del perfil del usuario
     */
    #[OA\Post(
-      path: '/api/usuario/sincronizar',
+      path: '/api/{lang}/usuario/sincronizar',
       summary: 'Synchronize offline user profile data',
-      description: 'Synchronizes offline user profile data that was saved locally when there was no connection. Requires authentication via Bearer token.',
+      description: 'Synchronizes offline user profile data that was saved locally when there was no connection. Requires authentication via Bearer token. The profile_offline parameter must be a JSON string containing the offline profile data.',
       security: [['Bearer' => []]],
+      parameters: [
+         new OA\Parameter(
+            name: 'lang',
+            in: 'path',
+            required: true,
+            description: 'Language code (es or en)',
+            schema: new OA\Schema(type: 'string', enum: ['es', 'en'])
+         ),
+      ],
       requestBody: new OA\RequestBody(
-         required: false,
+         required: true,
+         description: 'Form data with offline profile information',
          content: new OA\MediaType(
             mediaType: 'multipart/form-data',
             schema: new OA\Schema(
+               required: ['profile_offline'],
                properties: [
                   new OA\Property(
                      property: 'profile_offline',
                      type: 'string',
-                     description: 'JSON string containing offline profile data with fields: nombre, apellidos, email, telefono, passwordactual, password, imagen'
+                     format: 'json',
+                     description: 'JSON string containing offline profile data. Example: {"nombre":"John","apellidos":"Doe","email":"user@example.com","telefono":"+1234567890","passwordactual":"oldpass","password":"newpass","imagen":"data:image/jpeg;base64,..."}',
+                     example: '{"nombre":"John","apellidos":"Doe","email":"user@example.com","telefono":"+1234567890","passwordactual":"oldpassword123","password":"newpassword123","imagen":"data:image/jpeg;base64,/9j/4AAQSkZJRg..."}'
                   ),
                ]
-            )
+            ),
+            encoding: [
+               'profile_offline' => new OA\Encoding(
+                  contentType: 'application/json'
+               )
+            ]
          )
       ),
       responses: [
@@ -397,11 +415,19 @@ class UsuarioController extends AbstractController
             content: new OA\JsonContent(
                properties: [
                   new OA\Property(property: 'success', type: 'boolean', example: true),
-                  new OA\Property(property: 'message', type: 'string', example: 'Data synchronized successfully'),
+                  new OA\Property(property: 'message', type: 'string', example: 'Los datos se sincronizaron correctamente'),
                   new OA\Property(
                      property: 'usuario',
                      type: 'object',
-                     description: 'Updated user data'
+                     description: 'Updated user data',
+                     properties: [
+                        new OA\Property(property: 'usuario_id', type: 'integer', example: 1),
+                        new OA\Property(property: 'email', type: 'string', example: 'user@example.com'),
+                        new OA\Property(property: 'nombre', type: 'string', example: 'John'),
+                        new OA\Property(property: 'apellidos', type: 'string', example: 'Doe'),
+                        new OA\Property(property: 'telefono', type: 'string', nullable: true, example: '+1234567890'),
+                        new OA\Property(property: 'imagen', type: 'string', nullable: true, example: 'photo123.jpeg'),
+                     ]
                   ),
                ]
             )
@@ -412,7 +438,7 @@ class UsuarioController extends AbstractController
             content: new OA\JsonContent(
                properties: [
                   new OA\Property(property: 'success', type: 'boolean', example: false),
-                  new OA\Property(property: 'error', type: 'string', example: 'Error synchronizing data'),
+                  new OA\Property(property: 'error', type: 'string', example: 'No hay datos para sincronizar'),
                ]
             )
          ),
