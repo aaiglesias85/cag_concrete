@@ -1,12 +1,23 @@
 # Login API Routes - Authentication endpoints for mobile app
-# All routes here are prefixed with /api/login
+# All routes here are prefixed with /api/{lang}/login
 
 autenticar:
-   path: /login/autenticar
+   path: /{lang}/login/autenticar
    defaults: { _controller: App\Controller\App\LoginController::autenticar, _format: json }
+   requirements:
+      lang: es|en
+   methods: [POST]
+
+olvidoContrasenna:
+   path: /{lang}/login/olvido-Contrasenna
+   defaults: { _controller: App\Controller\App\LoginController::olvidoContrasenna, _format: json }
+   requirements:
+      lang: es|en
    methods: [POST]
 
 cerrarSesion:
-   path: /login/cerrar-sesion
+   path: /{lang}/login/cerrar-sesion
    defaults: { _controller: App\Controller\App\LoginController::cerrarSesion, _format: json }
+   requirements:
+      lang: es|en
    methods: [POST]

@@ -9,10 +9,12 @@ use App\Utils\Base;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginService extends Base
 {
    private RequestStack $requestStack;
+   private TranslatorInterface $translator;
 
    public function __construct(
       \Symfony\Component\DependencyInjection\ContainerInterface $container,
@@ -20,10 +22,12 @@ class LoginService extends Base
       \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
       \Symfony\Bundle\SecurityBundle\Security $security,
       \Psr\Log\LoggerInterface $logger,
-      RequestStack $requestStack
+      RequestStack $requestStack,
+      TranslatorInterface $translator
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->requestStack = $requestStack;
+      $this->translator = $translator;
    }
    /**
     * AutenticarLogin: Chequear el login y generar token
@@ -35,7 +39,7 @@ class LoginService extends Base
     * @param string|null $plataforma Plataforma (mobile/web)
     * @return array
     */
-   public function AutenticarLogin($email, $pass, $player_id = null, $push_token = null, $plataforma = null): array
+   public function AutenticarLogin($email, $pass, $player_id = null, $push_token = null, $plataforma = null, $lang = 'es'): array
    {
       $resultado = array();
       $em = $this->getDoctrine()->getManager();
@@ -86,21 +90,28 @@ class LoginService extends Base
                'rol_id' => $usuario->getRol()?->getRolId(),
                'rol' => $usuario->getRol()?->getNombre(),
                'permisos' => $permisos,
+               'token' => $access_token, // Agregar token al usuario para compatibilidad
             ];
+
+            // Codificar usuario en base64 para la app móvil
+            $usuario_json = json_encode($usuario_data);
+            $usuario_base64 = base64_encode($usuario_json);
 
             $resultado['success'] = true;
             $resultado['access_token'] = $access_token;
             $resultado['expires'] = $expires;
-            $resultado['usuario'] = $usuario_data;
+            $resultado['usuario'] = $usuario_base64;
          } else {
             // Usuario bloqueado
             $resultado['success'] = false;
-            $resultado['error'] = "Su usuario ha sido bloqueado, por favor contacte con su administrador";
+            $this->translator->setLocale($lang);
+            $resultado['error'] = $this->translator->trans('login.autenticar.usuario_bloqueado', [], 'messages', $lang);
          }
       } else {
          // Credenciales incorrectas
          $resultado['success'] = false;
-         $resultado['error'] = "Los datos de acceso son incorrectos";
+         $this->translator->setLocale($lang);
+         $resultado['error'] = $this->translator->trans('login.autenticar.error_login', [], 'messages', $lang);
       }
 
       return $resultado;

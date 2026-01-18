@@ -17,9 +17,16 @@ security:
          pattern: ^/(_(profiler|wdt)|css|images|js)/
          security: false
 
-      # API login routes - Only autenticar is public, cerrar-sesion requires auth
+      # Swagger documentation - public access (must be before api firewall)
+      api_doc:
+         pattern: ^/api/doc
+         security: false
+
+      # API login routes - Only autenticar and olvido-Contrasenna are public, cerrar-sesion requires auth
+      # Pattern must match /api/{lang}/login/{endpoint} where {lang} can be es|en
+      # MUST BE BEFORE 'api' firewall to have priority
       api_login_public:
-         pattern: ^/api/login/autenticar
+         pattern: ^/api/(es|en)/login/(autenticar|olvido-Contrasenna)
          security: false
 
       # Public user authentication routes - must be before main firewall
@@ -27,12 +34,8 @@ security:
          pattern: ^/usuario/(autenticar|olvidoContrasenna)
          security: false
 
-      # Swagger documentation - public access
-      api_doc:
-         pattern: ^/api/doc
-         security: false
-
-      # API firewall - Token authentication (includes /api/login/cerrar-sesion)
+      # API firewall - Token authentication (includes /api/{lang}/login/cerrar-sesion)
+      # This captures all /api routes except those matched by api_login_public above
       api:
          pattern: ^/api
          lazy: true
@@ -74,11 +77,13 @@ security:
       # Swagger documentation - public access
       - { path: ^/api/doc, roles: PUBLIC_ACCESS }
 
-      # API login autenticar route (public - no authentication required)
-      - { path: ^/api/login/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      # API login autenticar and olvido-Contrasenna routes (public - no authentication required)
+      # Pattern must match /api/{lang}/login/{endpoint} where {lang} can be es|en
+      - { path: ^/api/(es|en)/login/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/api/(es|en)/login/olvido-Contrasenna, roles: IS_AUTHENTICATED_ANONYMOUSLY }
 
       # API login cerrar-sesion route (requires authentication)
-      - { path: ^/api/login/cerrar-sesion, roles: [ROLE_ADMIN, ROLE_USER] }
+      - { path: ^/api/(es|en)/login/cerrar-sesion, roles: [ROLE_ADMIN, ROLE_USER] }
 
       # Admin routes require authentication
       - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }

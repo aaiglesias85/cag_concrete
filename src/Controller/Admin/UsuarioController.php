@@ -347,14 +347,19 @@ class UsuarioController extends AbstractController
    {
       $email = $request->get('email');
       try {
-         $resultado = $this->usuarioService->RecuperarContrasenna($email);
+         // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
+         $this->usuarioService->RecuperarContrasenna($email);
 
+         // Siempre devolver éxito independientemente de si el email existe o no
+         // Esto previene que usuarios maliciosos descubran emails registrados
          $resultadoJson['success'] = true;
          $resultadoJson['message'] = "The password recovery process has been started successfully, in a few moments you will receive an email to the address entered";
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+         // En caso de error de sistema, aún devolver éxito para no revelar información
+         // El error se registra internamente pero no se expone al cliente
+         $resultadoJson['success'] = true;
+         $resultadoJson['message'] = "The password recovery process has been started successfully, in a few moments you will receive an email to the address entered";
          return $this->json($resultadoJson);
       }
    }

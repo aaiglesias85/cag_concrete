@@ -1,22 +1,30 @@
 # Usuario API Routes - User profile endpoints for mobile app
-# All routes here are prefixed with /api/usuario
+# All routes here are prefixed with /api/{lang}/usuario
 
 cargarDatosUsuarioApp:
-   path: /usuario/cargarDatos
+   path: /{lang}/usuario/cargarDatos
    defaults: { _controller: App\Controller\App\UsuarioController::cargarDatos, _format: json }
+   requirements:
+      lang: es|en
    methods: [GET]
 
 actualizarDatosUsuarioApp:
-   path: /usuario/actualizarDatos
+   path: /{lang}/usuario/actualizarDatos
    defaults: { _controller: App\Controller\App\UsuarioController::actualizarDatos, _format: json }
+   requirements:
+      lang: es|en
    methods: [POST]
 
 salvarImagenUsuarioApp:
-   path: /usuario/salvarImagen
+   path: /{lang}/usuario/salvarImagen
    defaults: { _controller: App\Controller\App\UsuarioController::salvarImagen, _format: json }
+   requirements:
+      lang: es|en
    methods: [POST]
 
 eliminarImagenUsuarioApp:
-   path: /usuario/eliminarImagen
+   path: /{lang}/usuario/eliminarImagen
    defaults: { _controller: App\Controller\App\UsuarioController::eliminarImagen, _format: json }
+   requirements:
+      lang: es|en
    methods: [POST]
