@@ -931,39 +931,7 @@ var Payments = (function () {
                return `<div class="d-flex align-items-center gap-2 w-100px">${valueHtml}<a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
             },
          },
-         // Target 10: Status (Agregar lógica checked manual)
-        {
-            targets: 10,
-            className: 'text-center',
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-
-               // Prioridad: Estado manual > Estado automático
-               var isClosed;
-               if (typeof row.is_closed_manual !== 'undefined') {
-                   isClosed = row.is_closed_manual;
-               } else {
-                   isClosed = (row.unpaid_qty == null || parseFloat(row.unpaid_qty) <= 0);
-               }
-
-               var isChecked = isClosed ? 'checked' : '';
-
-               return `<div class="form-check form-switch form-check-custom form-check-solid justify-content-center" style="min-height: auto;">
-                        <input class="form-check-input item-status-toggle cursor-pointer" type="checkbox" 
-                           value="1" ${isChecked} 
-                           data-posicion="${row.posicion}" />
-                     </div>`;
-            },
-         },
-         {
-            targets: 8,
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               var safeValue = (data !== null && data !== undefined) ? data : 0;
-               let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" />`;
-               return `<div class="d-flex align-items-center gap-2 w-100px">${valueHtml}<a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
-            },
-         },
+          
          {
             targets: 9,
             render: function (data, type, row) {
@@ -1310,6 +1278,8 @@ var Payments = (function () {
             nEditingRowPayment = posicion;
             $('#invoice_item_id').val(payments[posicion].invoice_item_id);
             notes_item = payments[posicion].notes;
+            var currentUnpaid = payments[posicion].unpaid_qty;
+            $('#manual-unpaid-qty').val(currentUnpaid);
             actualizarTableListaNotesItem();
             ModalUtil.show('modal-notes-item', { backdrop: 'static', keyboard: true });
          }
@@ -1369,107 +1339,146 @@ var Payments = (function () {
       initTableNotesItem();
    };
 
-   var initAccionesNotesItem = function () {
-      $(document).off('click', '#btn-salvar-note-item');
-      $(document).on('click', '#btn-salvar-note-item', function (e) {
-         e.preventDefault();
-         var notes = QuillUtil.getHtml('#notes-item');
-         var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
-         if (!notesIsEmpty) {
-            var formData = new URLSearchParams();
-            var notes_id = $('#notes_item_id').val();
-            formData.set('notes_id', notes_id);
-            var invoice_item_id = $('#invoice_item_id').val();
-            formData.set('invoice_item_id', invoice_item_id);
-            formData.set('notes', notes);
-            BlockUtil.block('#modal-notes-item .modal-content');
-            axios.post('payment/salvarNotesItem', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
-                        QuillUtil.setHtml('#notes-item', '');
-                        if (nEditingRowNotesItem == null) {
-                           notes_item.push({ id: response.note.id, notes: notes, date: response.note.date, posicion: notes_item.length });
-                        } else {
-                           var posicion = nEditingRowNotesItem;
-                           if (notes_item[posicion]) notes_item[posicion].notes = notes;
-                        }
-                        actualizarTableListaNotesItem();
+  var initAccionesNotesItem = function () {
+   $(document).off('click', '#btn-salvar-note-item');
+   $(document).on('click', '#btn-salvar-note-item', function (e) {
+      e.preventDefault();
+      var notes = QuillUtil.getHtml('#notes-item');
+      var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
+      
+      if (!notesIsEmpty) {
+         var formData = new URLSearchParams();
+         var notes_id = $('#notes_item_id').val();
+         formData.set('notes_id', notes_id);
+         var invoice_item_id = $('#invoice_item_id').val();
+         formData.set('invoice_item_id', invoice_item_id);
+         formData.set('notes', notes);
+         
+         BlockUtil.block('#modal-notes-item .modal-content');
+         
+         axios.post('payment/salvarNotesItem', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     // 1. Limpieza y lógica de Notas (Original)
+                     QuillUtil.setHtml('#notes-item', '');
+                     if (nEditingRowNotesItem == null) {
+                        notes_item.push({ id: response.note.id, notes: notes, date: response.note.date, posicion: notes_item.length });
+                     } else {
+                        var posicion = nEditingRowNotesItem;
+                        if (notes_item[posicion]) notes_item[posicion].notes = notes;
+                     }
+                     actualizarTableListaNotesItem();
+                     
+                     // Actualizar notas en memoria global
+                     if (payments[nEditingRowPayment]) {
                         payments[nEditingRowPayment].notes = notes_item;
-                     } else {
-                        toastr.error(response.error, '');
                      }
-                  } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
-                  }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () { BlockUtil.unblock('#modal-notes-item .modal-content'); });
-         } else {
-            if (notesIsEmpty) toastr.error('The note cannot be empty.', '');
-         }
-      });
-      $(document).off('click', '#notes-item-table-editable a.edit');
-      $(document).on('click', '#notes-item-table-editable a.edit', function () {
-         var posicion = $(this).data('posicion');
-         if (notes_item[posicion]) {
-            nEditingRowNotesItem = posicion;
-            $('#notes_item_id').val(notes_item[posicion].id);
-            $('#invoice_item_id').val(payments[nEditingRowPayment].invoice_item_id);
-            QuillUtil.setHtml('#notes-item', notes_item[posicion].notes);
-         }
-      });
-      $(document).off('click', '#notes-item-table-editable a.delete');
-      $(document).on('click', '#notes-item-table-editable a.delete', function (e) {
-         e.preventDefault();
-         var posicion = $(this).data('posicion');
-         if (notes_item[posicion]) {
-            Swal.fire({
-               text: 'Are you sure you want to delete the notes?',
-               icon: 'warning',
-               showCancelButton: true,
-               buttonsStyling: false,
-               confirmButtonText: 'Yes, delete it!',
-               cancelButtonText: 'No, cancel',
-               customClass: { confirmButton: 'btn fw-bold btn-success', cancelButton: 'btn fw-bold btn-danger' },
-            }).then(function (result) {
-               if (result.value) eliminarNote(posicion);
-            });
-         }
-      });
-      function eliminarNote(posicion) {
-         if (notes_item[posicion].id != '') {
-            var formData = new URLSearchParams();
-            formData.set('notes_id', notes_item[posicion].id);
-            BlockUtil.block('#lista-notes-item');
-            axios.post('payment/eliminarNotesItem', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
-                        deleteNote(posicion);
-                     } else {
-                        toastr.error(response.error, '');
+
+                     var valorManual = parseFloat($('#manual-unpaid-qty').val());
+
+                     // Verificamos si es un número válido y si estamos editando una fila
+                     if (!isNaN(valorManual) && nEditingRowPayment !== null) {
+                        
+                        // A. Actualizamos la memoria (payments) para que persista al reabrir el modal
+                        if (payments[nEditingRowPayment]) {
+                            payments[nEditingRowPayment].unpaid_qty = valorManual;
+                        }
+
+                        // B. Actualizamos la tabla visualmente (Input de la fila correspondiente)
+                        var $inputUnpaid = $('#payments-table-editable input.unpaid_qty').filter(function() {
+                            return $(this).attr('data-position') == nEditingRowPayment;
+                        });
+
+                        if ($inputUnpaid.length > 0) {
+                            $inputUnpaid.val(valorManual);
+                            // Efecto visual verde para confirmar
+                            $inputUnpaid.addClass('bg-light-success');
+                            setTimeout(function() { $inputUnpaid.removeClass('bg-light-success'); }, 1000);
+                        }
                      }
+                     // =======================================================
+
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () { BlockUtil.unblock('#lista-notes-item'); });
-         } else {
-            deleteNote(posicion);
-         }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () { BlockUtil.unblock('#modal-notes-item .modal-content'); });
+      } else {
+         if (notesIsEmpty) toastr.error('The note cannot be empty.', '');
       }
-      function deleteNote(posicion) {
-         notes_item.splice(posicion, 1);
-         for (var i = 0; i < notes_item.length; i++) notes_item[i].posicion = i;
-         actualizarTableListaNotesItem();
+   });
+
+   // Eventos Edit y Delete de la tabla de notas (Sin cambios)
+   $(document).off('click', '#notes-item-table-editable a.edit');
+   $(document).on('click', '#notes-item-table-editable a.edit', function () {
+      var posicion = $(this).data('posicion');
+      if (notes_item[posicion]) {
+         nEditingRowNotesItem = posicion;
+         $('#notes_item_id').val(notes_item[posicion].id);
+         $('#invoice_item_id').val(payments[nEditingRowPayment].invoice_item_id);
+         QuillUtil.setHtml('#notes-item', notes_item[posicion].notes);
       }
-   };
+   });
+
+   $(document).off('click', '#notes-item-table-editable a.delete');
+   $(document).on('click', '#notes-item-table-editable a.delete', function (e) {
+      e.preventDefault();
+      var posicion = $(this).data('posicion');
+      if (notes_item[posicion]) {
+         Swal.fire({
+            text: 'Are you sure you want to delete the notes?',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: { confirmButton: 'btn fw-bold btn-success', cancelButton: 'btn fw-bold btn-danger' },
+         }).then(function (result) {
+            if (result.value) eliminarNote(posicion);
+         });
+      }
+   });
+
+   function eliminarNote(posicion) {
+      if (notes_item[posicion].id != '') {
+         var formData = new URLSearchParams();
+         formData.set('notes_id', notes_item[posicion].id);
+         BlockUtil.block('#lista-notes-item');
+         axios.post('payment/eliminarNotesItem', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+                     deleteNote(posicion);
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () { BlockUtil.unblock('#lista-notes-item'); });
+      } else {
+         deleteNote(posicion);
+      }
+   }
+
+   function deleteNote(posicion) {
+      notes_item.splice(posicion, 1);
+      for (var i = 0; i < notes_item.length; i++) notes_item[i].posicion = i;
+      actualizarTableListaNotesItem();
+   }
+};
 
    var resetFormNoteItem = function () {
       MyUtil.resetForm('notes-item-form');

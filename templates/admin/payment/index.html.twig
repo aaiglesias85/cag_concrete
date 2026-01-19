@@ -831,8 +831,13 @@
                <input type="hidden" id="notes_item_id" name="notes_item_id" />
                <input type="hidden" id="invoice_item_id" name="invoice_item_id" />
 
-               <div class="form-group">
-                  <label class="form-label"> Add Note </label>
+               <div class="form-group">                
+                  <div class="row mb-3">
+                     <div class="col-md-6">
+                        <label class="form-label fw-bold">Override Unpaid Qty:</label>
+                        <input type="number" id="manual-unpaid-qty" class="form-control form-control-solid" placeholder="0.00" />
+                     </div>
+                  </div>
                   <div class="row mb-2">
                      <div class="col-md-12">
                         <div id="notes-item" class="h-100px"></div>
