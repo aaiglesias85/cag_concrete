@@ -1211,16 +1211,9 @@ class EstimateService extends Base
 
          $bidDeadline = $value->getBidDeadline() ? $value->getBidDeadline()->format('m/d/Y H:i') : "Not set";
 
-         $project_number = '';
+
          $project_id = $value->getProjectId();
-
-         if (!empty($project_id)) {
-            $project_entity = $this->getDoctrine()->getRepository(\App\Entity\Project::class)->find($project_id);
-
-            if ($project_entity) {
-               $project_number = $project_entity->getProjectNumber();
-            }
-         }
+         $project_number = $project_id;
 
          $proposal_number = $value->getBidNo();
          // companies
