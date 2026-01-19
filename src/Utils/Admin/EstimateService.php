@@ -1211,11 +1211,30 @@ class EstimateService extends Base
 
          $bidDeadline = $value->getBidDeadline() ? $value->getBidDeadline()->format('m/d/Y H:i') : "Not set";
 
+         $project_number = '';
+         $project_id = $value->getProjectId();
+
+         if (!empty($project_id)) {
+            $project_entity = $this->getDoctrine()->getRepository(\App\Entity\Project::class)->find($project_id);
+
+            if ($project_entity) {
+               $project_number = $project_entity->getProjectNumber();
+            }
+         }
+
+         $proposal_number = $value->getBidNo();
          // companies
          $companies = $this->ListarCompaniesParaListado($value);
 
          // estimators
          $estimators = $this->ListarEstimatorsParaListado($estimate_id);
+
+         $county_name = '';
+         if (method_exists($value, 'getCountyObj') && $value->getCountyObj()) {
+            $county_name = $value->getCountyObj()->getDescription();
+         } elseif (method_exists($value, 'getCounty') && $value->getCounty()) {
+            $county_name = $value->getCounty();
+         }
 
          // stage
          $stage = $this->DevolverStageParaListado($estimate_id, $value->getStage());
@@ -1228,6 +1247,9 @@ class EstimateService extends Base
          $arreglo_resultado[$cont] = array(
             "id" => $estimate_id,
             "name" => $name,
+            "proposal_number" => $proposal_number,
+            "project_id" => $project_number,
+            "county" => $county_name,
             "company" => $companies,
             "bidDeadline" => $bidDeadline,
             "estimators" => $estimators,

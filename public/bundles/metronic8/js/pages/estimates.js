@@ -99,97 +99,75 @@ var Estimates = (function () {
          columns.push({ data: 'id' });
       }
 
-      columns.push({ data: 'name' }, { data: 'company' }, { data: 'bidDeadline' }, { data: 'estimators' }, { data: 'stage' }, { data: null });
+      columns.push(
+         { data: 'name' },          
+         { data: 'proposal_number' }, 
+         { data: 'project_id' },      
+         { data: 'county' },
+         { data: 'company' },
+         { data: 'bidDeadline' }, 
+         { data: 'estimators' }, 
+         { data: 'stage' }, 
+         { data: null });
 
       return columns;
    };
-   var getColumnsDefTable = function () {
-      let columnDefs = [
-         {
+  var getColumnsDefTable = function () {
+    let columnDefs = [
+        {
             targets: 0,
             orderable: false,
             render: DatatableUtil.getRenderColumnCheck,
-         },
-         {
-            targets: 1,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 300);
-            },
-         },
-         {
-            targets: 2,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 300);
-            },
-         },
-         {
-            targets: 3,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 150);
-            },
-         },
-         {
-            targets: 4,
-            render: function (data, type, row) {
-               return `<div class="d-flex w-200px" style="gap: 5px;">${data}</div>`;
-            },
-         },
-         {
-            targets: 5,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 150);
-            },
-         },
-      ];
+        }
+    ];
+    if (!permiso.eliminar) columnDefs = [];
 
-      if (!permiso.eliminar) {
-         columnDefs = [
-            {
-               targets: 0,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(data, 300);
-               },
-            },
-            {
-               targets: 1,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(data, 300);
-               },
-            },
-            {
-               targets: 2,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(data, 150);
-               },
-            },
-            {
-               targets: 3,
-               render: function (data, type, row) {
-                  return `<div class="d-flex w-200px" style="gap: 5px;">${data}</div>`;
-               },
-            },
-            {
-               targets: 4,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(data, 150);
-               },
-            },
-         ];
-      }
+    var i = permiso.eliminar ? 1 : 0;
 
-      // acciones
-      columnDefs.push({
-         targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
-         },
-      });
+    columnDefs.push(
+        // 1. Name
+        {
+            targets: i++, 
+            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); }
+        },
+        
+        // 2. Proposal
+        { targets: i++, visible: false, render: function(d){ return d;} }, 
+        // 3. Project
+        { targets: i++, visible: false, render: function(d){ return d;} },
+        // 4. County
+        { targets: i++, visible: false, render: function(d){ return d;} },        
+        {
+            targets: i++, 
+            render: function (data) { return DatatableUtil.getRenderColumnDiv(data,250); }
+        },
+        // 6. BidDeadline
+        {
+            targets: i++, 
+            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 120); }
+        },
+        // 7. Estimators
+        {
+            targets: i++, 
+            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 50); }
+        },
+        // 8. Stage
+        {
+            targets: i++, 
+            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 100); }
+        },
+        // 9. Acciones 
+        {
+            targets: -1,
+            orderable: false,
+            className: 'text-center', 
+            render: function (data, type, row) { return row.acciones; }
+        }
+    );
+    return columnDefs;
+};
 
-      return columnDefs;
-   };
+
    var handleSearchDatatable = function () {
       let debounceTimeout;
 
