@@ -92,6 +92,8 @@ var Estimates = (function () {
       // export
       exportButtons();
    };
+
+
    var getColumnsTable = function () {
       const columns = [];
 
@@ -108,11 +110,11 @@ var Estimates = (function () {
          { data: 'bidDeadline' }, 
          { data: 'estimators' }, 
          { data: 'stage' }, 
-         { data: null });
+         { data: 'acciones' });
 
       return columns;
    };
-  var getColumnsDefTable = function () {
+   var getColumnsDefTable = function () {
     let columnDefs = [
         {
             targets: 0,
@@ -161,11 +163,13 @@ var Estimates = (function () {
             targets: -1,
             orderable: false,
             className: 'text-center', 
-            render: function (data, type, row) { return row.acciones; }
+            render: function (data, type, row) {                 
+                return row.acciones; 
+            }
         }
     );
     return columnDefs;
-};
+   };
 
 
    var handleSearchDatatable = function () {
@@ -183,6 +187,8 @@ var Estimates = (function () {
          }, 300); // 300ms de debounce
       });
    };
+
+
    var exportButtons = () => {
       const documentTitle = 'Estimates';
       var table = document.querySelector('#estimate-table-editable');

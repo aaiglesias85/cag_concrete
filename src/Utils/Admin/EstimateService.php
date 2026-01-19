@@ -1449,13 +1449,16 @@ class EstimateService extends Base
       $acciones = '';
 
       if (count($permiso) > 0) {
+
          if ($permiso[0]['editar']) {
-            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
+            $acciones .= '<a href="javascript:;" class="edit btn btn-icon btn-light-success btn-sm me-1" title="Edit record" data-id="' . $id . '"><i class="la la-edit fs-2"></i></a>';
          } else {
-            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
+
+            $acciones .= '<a href="javascript:;" class="edit btn btn-icon btn-light-success btn-sm me-1" title="View record" data-id="' . $id . '"><i class="la la-eye fs-2"></i></a>';
          }
+
          if ($permiso[0]['eliminar']) {
-            $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
+            $acciones .= '<a href="javascript:;" class="delete btn btn-icon btn-light-danger btn-sm" title="Delete record" data-id="' . $id . '"><i class="la la-trash fs-2"></i></a>';
          }
       }
 
