@@ -331,18 +331,36 @@
 
                      <div class="form-group ic-form-group">
                         <div class="row">
-                           <div class="col-md-4">
+                           <div class="col-md-3">
                               <label class="form-label">
                                  <span class="ic-step-number">5</span>
                                  Status
                               </label>
                               <div>
                                  <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                                    <input type="checkbox" id="estadoactivo" class="form-check-input" checked />
-                                    <label class="form-check-label" for="estadoactivo"> Active / Inactive </label>
+                                    <input type="checkbox" id="estadoactivo" class="form-check-input status-active-toggle" checked />
                                  </div>
                               </div>
                            </div>
+                           {% if usuario_bone %}
+                           <div class="col-md-3">
+                              <label class="form-label"> Bone </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="bone" class="form-check-input yesno-toggle" />
+                                 </div>
+                              </div>
+                           </div>
+                           {% else %}
+                           <div class="col-md-3" id="div-bone-readonly" style="display: none;">
+                              <label class="form-label"> Bone </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="bone" class="form-check-input yesno-toggle" disabled />
+                                 </div>
+                              </div>
+                           </div>
+                           {% endif %}
                         </div>
                      </div>
                   </div>
@@ -396,7 +414,8 @@
    var permiso = {
        agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %}, // 1 o 0
        editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
-       eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
+       eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %},
+       usuario_bone: {% if usuario_bone %}true{% else %}false{% endif %}
    };
    jQuery(document).ready(function () {
 

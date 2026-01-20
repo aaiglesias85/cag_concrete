@@ -764,7 +764,6 @@ class ProjectController extends AbstractController
       $change_order_date = $request->get('change_order_date');
       $apply_retainage = $request->get('apply_retainage') ?? 0;
 
-
       try {
          $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage);
 

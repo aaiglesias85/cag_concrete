@@ -233,6 +233,7 @@ class UsuarioController extends AbstractController
       $telefono = $request->get('telefono');
 
       $estimator = $request->get('estimator');
+      $bone = $request->get('bone');
 
       $resultadoJson = array();
 
@@ -247,7 +248,8 @@ class UsuarioController extends AbstractController
                $email,
                $permisos,
                $telefono,
-               $estimator
+               $estimator,
+               $bone
             );
          } else {
             $resultado = $this->usuarioService->ActualizarUsuario(
@@ -260,7 +262,8 @@ class UsuarioController extends AbstractController
                $email,
                $permisos,
                $telefono,
-               $estimator
+               $estimator,
+               $bone
             );
          }
 

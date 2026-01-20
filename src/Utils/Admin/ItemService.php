@@ -45,6 +45,7 @@ class ItemService extends Base
          $arreglo_resultado['descripcion'] = $entity->getDescription();
          // $arreglo_resultado['price'] = $entity->getPrice();
          $arreglo_resultado['status'] = $entity->getStatus();
+         $arreglo_resultado['bone'] = $entity->getBone();
          $arreglo_resultado['unit_id'] = $entity->getUnit() != null ? $entity->getUnit()->getUnitId() : '';
          $arreglo_resultado['yield_calculation'] = $entity->getYieldCalculation();
          $arreglo_resultado['equation_id'] = $entity->getEquation() != null ? $entity->getEquation()->getEquationId() : '';
@@ -277,7 +278,7 @@ class ItemService extends Base
     * @param int $item_id Id
     * @author Marcel
     */
-   public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $yield_calculation, $equation_id)
+   public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -298,6 +299,7 @@ class ItemService extends Base
          $entity->setDescription($description);
          // $entity->setPrice($price);
          $entity->setStatus($status);
+         $entity->setBone($bone);
 
          $yield_calculation_old = $entity->getYieldCalculation();
          $entity->setYieldCalculation($yield_calculation);
@@ -363,7 +365,7 @@ class ItemService extends Base
     * @param string $description Descripción
     * @author Marcel
     */
-   public function SalvarItem($unit_id, $name, $description, $status, $yield_calculation, $equation_id)
+   public function SalvarItem($unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -382,6 +384,7 @@ class ItemService extends Base
       $entity->setDescription($description);
       // $entity->setPrice($price);
       $entity->setStatus($status);
+      $entity->setBone($bone);
       $entity->setYieldCalculation($yield_calculation);
 
       if ($unit_id != '') {
@@ -477,6 +480,7 @@ class ItemService extends Base
             "description" => $value->getDescription(),
             // "price" => number_format($value->getPrice(), 2, '.', ','),
             "status" => $value->getStatus() ? 1 : 0,
+            "bone" => $value->getBone() ? 1 : 0,
             "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
             "yieldCalculation" => $yield_calculation,
          );

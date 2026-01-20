@@ -84,6 +84,19 @@ var Items = (function () {
             render: DatatableUtil.getRenderColumnCheck,
          },
          {
+            targets: 1, // Name column
+            render: function (data, type, row) {
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               return `<div class="d-flex align-items-center" style="white-space: nowrap;">
+                           <span>${data || ''}</span>
+                           ${badgeBone}
+                       </div>`;
+            },
+         },
+         {
             targets: 4,
             className: 'text-center',
             render: DatatableUtil.getRenderColumnEstado,
@@ -92,6 +105,19 @@ var Items = (function () {
 
       if (!permiso.eliminar) {
          columnDefs = [
+            {
+               targets: 0, // Name column (when no checkbox)
+               render: function (data, type, row) {
+                  var badgeBone = '';
+                  if (row.bone == 1 || row.bone === true) {
+                     badgeBone = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+                  }
+                  return `<div class="d-flex align-items-center" style="white-space: nowrap;">
+                              <span>${data || ''}</span>
+                              ${badgeBone}
+                          </div>`;
+               },
+            },
             {
                targets: 3,
                className: 'text-center',
@@ -238,6 +264,13 @@ var Items = (function () {
       MyUtil.resetForm('item-form');
 
       KTUtil.get('estadoactivo').checked = true;
+      
+      // Ocultar campo bone si el usuario no tiene permiso (nuevo item)
+      if (!permiso.usuario_bone) {
+         $('#div-bone-readonly').hide();
+      } else {
+         KTUtil.get('bone').checked = false;
+      }
 
       $('#unit').val('');
       $('#unit').trigger('change');
@@ -465,6 +498,13 @@ var Items = (function () {
             var status = $('#estadoactivo').prop('checked') ? 1 : 0;
             formData.set('status', status);
 
+            // Solo enviar bone si el usuario tiene permiso
+            var bone = 0;
+            if (permiso.usuario_bone) {
+               bone = $('#bone').prop('checked') ? 1 : 0;
+            }
+            formData.set('bone', bone);
+
             var yield_calculation = $('#yield-calculation').val();
             formData.set('yield_calculation', yield_calculation);
 
@@ -604,6 +644,18 @@ var Items = (function () {
             $('#unit').trigger('change');
 
             $('#estadoactivo').prop('checked', item.status);
+            
+            // Si el usuario no tiene permiso pero el item tiene bone, mostrar campo deshabilitado (solo lectura)
+            if (!permiso.usuario_bone) {
+               if (item.bone == 1 || item.bone === true) {
+                  $('#div-bone-readonly').show();
+                  $('#bone').prop('checked', true);
+               } else {
+                  $('#div-bone-readonly').hide();
+               }
+            } else {
+               $('#bone').prop('checked', item.bone);
+            }
 
             // yield
             $('#yield-calculation').off('change', changeYield);

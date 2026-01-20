@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 17-01-2026 a las 16:56:31
+-- Tiempo de generación: 20-01-2026 a las 02:02:40
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -765,6 +765,7 @@ CREATE TABLE `item` (
   `price` float(8,2) DEFAULT NULL,
   `yield_calculation` varchar(50) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL,
+  `bone` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `unit_id` int(11) DEFAULT NULL,
@@ -777,30 +778,30 @@ CREATE TABLE `item` (
 -- Volcado de datos para la tabla `item`
 --
 
-INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculation`, `status`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
-(1, 'CONC MEDIAN 4IN', 'CONC MEDIAN 4IN', 29.00, NULL, 1, '2024-04-12 20:18:17', NULL, 1, NULL, NULL, NULL),
-(2, 'CONC MEDIAN 6IN', 'CONC MEDIAN 6IN', 70.00, NULL, 1, '2024-04-12 20:18:40', NULL, 1, NULL, NULL, NULL),
-(3, 'CONCRETE V GUTTER', 'CONCRETE V GUTTER', 25.00, NULL, 1, '2024-04-12 20:19:00', NULL, 2, NULL, NULL, NULL),
-(4, 'CONC VALLEY GUTTER 6IN', 'CONC VALLEY GUTTER 6IN', 58.00, NULL, 1, '2024-04-12 20:19:26', NULL, 1, NULL, NULL, NULL),
-(5, 'CONC VALLEY GUTTER 8IN', 'CONC VALLEY GUTTER 8IN', 77.00, NULL, 1, '2024-04-12 20:19:51', NULL, 1, NULL, NULL, NULL),
-(6, 'CONC CURB & GUTTEER 8INX30IN TP2', 'CONC CURB & GUTTEER 8INX30IN TP2', 16.50, NULL, 1, '2024-04-12 20:20:29', NULL, 2, NULL, NULL, NULL),
-(7, 'CONC CURB & GUTTEER 8INX30IN TP7', 'CONC CURB & GUTTEER 8INX30IN TP7', 16.50, NULL, 1, '2024-04-12 20:22:07', NULL, 2, NULL, NULL, NULL),
-(8, 'CLASS B CONCRETE', 'CLASS B CONCRETE', 700.00, NULL, 1, '2024-04-12 20:22:31', NULL, 3, NULL, NULL, NULL),
-(9, 'CLASS B CONCRETE, INCL REINF STEEL', 'CLASS B CONCRETE, INCL REINF STEEL', 0.00, NULL, 1, '2024-04-12 20:23:08', NULL, 3, NULL, NULL, NULL),
-(10, 'CLASS B CONC, BASE OR PVMT WIDENING', 'CLASS B CONC, BASE OR PVMT WIDENING', 253.00, NULL, 1, '2024-04-12 20:23:35', NULL, 3, NULL, NULL, NULL),
-(11, 'BAR REINF. STEEL ', 'BAR REINF. STEEL ', 0.00, NULL, 1, '2024-04-12 20:23:52', NULL, 4, NULL, NULL, NULL),
-(12, 'CONC DRIVEWAY 8IN', 'CONC DRIVEWAY 8IN', 70.00, NULL, 1, '2024-04-12 20:24:09', NULL, 1, NULL, NULL, NULL),
-(13, 'CONC SLOPE DRAIN ', 'CONC SLOPE DRAIN ', 100.00, NULL, 1, '2024-04-12 20:24:29', NULL, 1, NULL, NULL, NULL),
-(14, 'CONC SIDEWALK 4IN', 'CONC SIDEWALK 4IN', 30.00, NULL, 1, '2024-04-12 20:25:08', NULL, 1, NULL, NULL, NULL),
-(15, 'CONC SIDEWALK 8IN', 'CONC SIDEWALK 8IN', 63.00, NULL, 1, '2024-04-12 20:25:30', NULL, 1, NULL, NULL, NULL),
-(16, 'CONC SPILLWAY TP3', 'CONC SPILLWAY TP3', 2100.00, 'none', 1, '2024-04-12 20:25:50', '2024-05-12 19:18:34', 5, NULL, NULL, NULL),
-(17, 'PLAIN CONC DITCH PAVING', 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2, NULL, NULL),
-(18, 'EXTRA CONCRETE', 'EXTRA CONCRETE', 208.00, NULL, 1, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL, NULL, NULL),
-(19, 'EXTRA LABOR', 'EXTRA LABOR', 1500.00, 'same', 1, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL, NULL, NULL),
-(20, 'Cubic Yards of Concrete', 'Cubic Yards of Concrete', 150.00, 'none', 1, '2024-04-12 20:28:15', '2025-01-25 17:25:02', 3, NULL, NULL, NULL),
-(21, 'Test', 'Test', 100.00, 'none', 1, '2025-02-16 17:49:58', NULL, 3, NULL, NULL, NULL),
-(22, 'Test 2', 'Test 2', NULL, NULL, 1, '2025-02-16 19:46:08', NULL, 3, NULL, NULL, NULL),
-(23, 'Test 3', 'Test 3', NULL, NULL, 1, '2025-02-16 19:47:33', NULL, 3, NULL, NULL, NULL);
+INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculation`, `status`, `bone`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
+(1, 'CONC MEDIAN 4IN', 'CONC MEDIAN 4IN', 29.00, NULL, 1, NULL, '2024-04-12 20:18:17', NULL, 1, NULL, NULL, NULL),
+(2, 'CONC MEDIAN 6IN', 'CONC MEDIAN 6IN', 70.00, NULL, 1, NULL, '2024-04-12 20:18:40', NULL, 1, NULL, NULL, NULL),
+(3, 'CONCRETE V GUTTER', 'CONCRETE V GUTTER', 25.00, NULL, 1, NULL, '2024-04-12 20:19:00', NULL, 2, NULL, NULL, NULL),
+(4, 'CONC VALLEY GUTTER 6IN', 'CONC VALLEY GUTTER 6IN', 58.00, NULL, 1, NULL, '2024-04-12 20:19:26', NULL, 1, NULL, NULL, NULL),
+(5, 'CONC VALLEY GUTTER 8IN', 'CONC VALLEY GUTTER 8IN', 77.00, NULL, 1, NULL, '2024-04-12 20:19:51', NULL, 1, NULL, NULL, NULL),
+(6, 'CONC CURB & GUTTEER 8INX30IN TP2', 'CONC CURB & GUTTEER 8INX30IN TP2', 16.50, NULL, 1, NULL, '2024-04-12 20:20:29', NULL, 2, NULL, NULL, NULL),
+(7, 'CONC CURB & GUTTEER 8INX30IN TP7', 'CONC CURB & GUTTEER 8INX30IN TP7', 16.50, NULL, 1, NULL, '2024-04-12 20:22:07', NULL, 2, NULL, NULL, NULL),
+(8, 'CLASS B CONCRETE', 'CLASS B CONCRETE', 700.00, NULL, 1, NULL, '2024-04-12 20:22:31', NULL, 3, NULL, NULL, NULL),
+(9, 'CLASS B CONCRETE, INCL REINF STEEL', 'CLASS B CONCRETE, INCL REINF STEEL', 0.00, NULL, 1, NULL, '2024-04-12 20:23:08', NULL, 3, NULL, NULL, NULL),
+(10, 'CLASS B CONC, BASE OR PVMT WIDENING', 'CLASS B CONC, BASE OR PVMT WIDENING', 253.00, NULL, 1, NULL, '2024-04-12 20:23:35', NULL, 3, NULL, NULL, NULL),
+(11, 'BAR REINF. STEEL ', 'BAR REINF. STEEL ', 0.00, NULL, 1, NULL, '2024-04-12 20:23:52', NULL, 4, NULL, NULL, NULL),
+(12, 'CONC DRIVEWAY 8IN', 'CONC DRIVEWAY 8IN', 70.00, NULL, 1, NULL, '2024-04-12 20:24:09', NULL, 1, NULL, NULL, NULL),
+(13, 'CONC SLOPE DRAIN ', 'CONC SLOPE DRAIN ', 100.00, NULL, 1, NULL, '2024-04-12 20:24:29', NULL, 1, NULL, NULL, NULL),
+(14, 'CONC SIDEWALK 4IN', 'CONC SIDEWALK 4IN', 30.00, NULL, 1, NULL, '2024-04-12 20:25:08', NULL, 1, NULL, NULL, NULL),
+(15, 'CONC SIDEWALK 8IN', 'CONC SIDEWALK 8IN', 63.00, NULL, 1, NULL, '2024-04-12 20:25:30', NULL, 1, NULL, NULL, NULL),
+(16, 'CONC SPILLWAY TP3', 'CONC SPILLWAY TP3', 2100.00, 'none', 1, NULL, '2024-04-12 20:25:50', '2024-05-12 19:18:34', 5, NULL, NULL, NULL),
+(17, 'PLAIN CONC DITCH PAVING', 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, NULL, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2, NULL, NULL),
+(18, 'EXTRA CONCRETE', 'EXTRA CONCRETE', 208.00, NULL, 1, NULL, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL, NULL, NULL),
+(19, 'EXTRA LABOR', 'EXTRA LABOR', 1500.00, 'same', 1, NULL, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL, NULL, NULL),
+(20, 'Cubic Yards of Concrete', 'Cubic Yards of Concrete', 150.00, 'none', 1, NULL, '2024-04-12 20:28:15', '2025-01-25 17:25:02', 3, NULL, NULL, NULL),
+(21, 'Test', 'Test', 100.00, 'none', 1, NULL, '2025-02-16 17:49:58', NULL, 3, NULL, NULL, NULL),
+(22, 'Test 2', 'Test 2', NULL, NULL, 1, NULL, '2025-02-16 19:46:08', NULL, 3, NULL, NULL, NULL),
+(23, 'Test 3', 'Test 3', NULL, NULL, 1, NULL, '2025-02-16 19:47:33', NULL, 3, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1874,6 +1875,7 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `status` tinyint(1) DEFAULT NULL,
   `estimator` tinyint(1) DEFAULT NULL,
+  `bone` tinyint(1) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -1888,8 +1890,8 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bone`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 

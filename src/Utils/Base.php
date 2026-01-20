@@ -934,6 +934,10 @@ class Base
       $item_entity->setPrice($value->price);
       $item_entity->setStatus(1);
       $item_entity->setYieldCalculation($value->yield_calculation);
+      
+      if (isset($value->bone)) {
+         $item_entity->setBone($value->bone == 1 || $value->bone === '1' || $value->bone === true);
+      }
 
       if ($value->unit_id != '') {
          $unit = $this->getDoctrine()->getRepository(Unit::class)->find($value->unit_id);

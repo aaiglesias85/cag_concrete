@@ -38,7 +38,8 @@ class ItemController extends AbstractController
                'permiso' => $permiso[0],
                'units' => $units,
                'equations' => $equations,
-               'yields_calculation' => $yields_calculation
+               'yields_calculation' => $yields_calculation,
+               'usuario_bone' => $usuario->getBone() ? true : false
             ));
          }
       } else {
@@ -98,15 +99,24 @@ class ItemController extends AbstractController
       $description = $request->get('description');
       // $price = $request->get('price');
       $status = $request->get('status');
+      $bone = $request->get('bone');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
+
+      // Validar que solo usuarios con bone activo puedan marcar items como bone
+      $usuario = $this->getUser();
+      if (!$usuario->getBone() && ($bone == 1 || $bone === '1' || $bone === true)) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = "You don't have permission to mark items as bone.";
+         return $this->json($resultadoJson);
+      }
 
       try {
 
          if ($item_id == "") {
-            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id);
          } else {
-            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id);
          }
 
          if ($resultado['success']) {
