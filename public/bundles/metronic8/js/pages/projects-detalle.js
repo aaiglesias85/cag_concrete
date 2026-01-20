@@ -480,6 +480,17 @@ var ProjectsDetalle = (function () {
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
+               
+               var badgeRetainage = '';
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
+               }
+               
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                // Si es change order, agregar icono de +
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -488,7 +499,7 @@ var ProjectsDetalle = (function () {
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap;"><span>${data || ''}</span>${icono}</div>`;
+               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${icono}</div>`;
             },
          },
          {
@@ -1443,7 +1454,30 @@ var ProjectsDetalle = (function () {
       let columnDefs = [
          {
             targets: 0, // Item
-            className: 'min-w-150px'
+            className: 'min-w-150px',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';
+               
+               var badgeRetainage = '';
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
+               }
+               
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
+               }
+               
+               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${icono}</div>`;
+            }
          },
          {
             targets: 1, // Unit

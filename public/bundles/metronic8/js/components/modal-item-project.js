@@ -58,6 +58,23 @@ var ModalItemProject = (function () {
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
 
+      // mostrar/ocultar campo Bone según el tipo de item
+      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+         if (!state) {
+            // item nuevo - mostrar campo editable
+            $('#div-bone-new-item').removeClass('hide');
+            $('#div-bone-existing-item').addClass('hide');
+            $('#bone').prop('checked', false);
+            $('#bone-existing').prop('checked', false);
+         } else {
+            // item existente - ocultar ambos campos (se mostrarán cuando se seleccione un item)
+            $('#div-bone-new-item').addClass('hide');
+            $('#div-bone-existing-item').addClass('hide');
+            $('#bone').prop('checked', false);
+            $('#bone-existing').prop('checked', false);
+         }
+      }
+
       if (!state) {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
@@ -80,6 +97,7 @@ var ModalItemProject = (function () {
 
    var changeItem = function () {
       var item_id = $('#item').val();
+      var item_type = $('#item-type-existing').prop('checked');
 
       // reset
 
@@ -89,6 +107,14 @@ var ModalItemProject = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
 
+      // reset campos bone
+      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+         $('#div-bone-new-item').addClass('hide');
+         $('#div-bone-existing-item').addClass('hide');
+         $('#bone').prop('checked', false);
+         $('#bone-existing').prop('checked', false);
+      }
+
       if (item_id != '') {
          var yield = $('#item option[value="' + item_id + '"]').data('yield');
          $('#yield-calculation').val(yield);
@@ -97,6 +123,15 @@ var ModalItemProject = (function () {
          var equation = $('#item option[value="' + item_id + '"]').data('equation');
          $('#equation').val(equation);
          $('#equation').trigger('change');
+
+         // mostrar campo bone si el item tiene bone=true
+         if (item_type && $('#div-bone-existing-item').length > 0) {
+            var bone = $('#item option[value="' + item_id + '"]').data('bone');
+            if (bone == 1 || bone === '1' || bone === true) {
+               $('#div-bone-existing-item').removeClass('hide');
+               $('#bone-existing').prop('checked', true);
+            }
+         }
       }
    };
 
@@ -186,6 +221,15 @@ var ModalItemProject = (function () {
 
             var change_order_date = FlatpickrUtil.getString('change-order-date');
             formData.set('change_order_date', change_order_date);
+
+            var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
+            formData.set('apply_retainage', apply_retainage);
+
+            // bone solo se envía si es un item nuevo
+            if (!item_type && $('#bone').length > 0) {
+               var bone = $('#bone').prop('checked');
+               formData.set('bone', bone);
+            }
 
             BlockUtil.block('#modal-item .modal-content');
 
@@ -294,6 +338,18 @@ var ModalItemProject = (function () {
       $('#change-order').prop('checked', false);
 
       FlatpickrUtil.clear('change-order-date');
+
+      $('#item-apply-retainage').prop('checked', true);
+
+      // reset bone
+      if ($('#bone').length > 0) {
+         $('#bone').prop('checked', false);
+         $('#div-bone-new-item').addClass('hide');
+      }
+      if ($('#bone-existing').length > 0) {
+         $('#bone-existing').prop('checked', false);
+         $('#div-bone-existing-item').addClass('hide');
+      }
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));

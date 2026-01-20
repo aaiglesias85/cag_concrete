@@ -1495,6 +1495,23 @@ var Projects = (function () {
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
 
+      // mostrar/ocultar campo bone según el tipo de item
+      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+         if (!state) {
+            // item nuevo - mostrar campo editable
+            $('#div-bone-new-item').removeClass('hide');
+            $('#div-bone-existing-item').addClass('hide');
+            $('#bone').prop('checked', false);
+            $('#bone-existing').prop('checked', false);
+         } else {
+            // item existente - ocultar ambos campos (se mostrarán cuando se seleccione un item)
+            $('#div-bone-new-item').addClass('hide');
+            $('#div-bone-existing-item').addClass('hide');
+            $('#bone').prop('checked', false);
+            $('#bone-existing').prop('checked', false);
+         }
+      }
+
       if (!state) {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
@@ -1517,6 +1534,7 @@ var Projects = (function () {
 
    var changeItem = function () {
       var item_id = $('#item').val();
+      var item_type = $('#item-type-existing').prop('checked');
 
       // reset
 
@@ -1526,6 +1544,14 @@ var Projects = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
 
+      // reset campos bone
+      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+         $('#div-bone-new-item').addClass('hide');
+         $('#div-bone-existing-item').addClass('hide');
+         $('#bone').prop('checked', false);
+         $('#bone-existing').prop('checked', false);
+      }
+
       if (item_id != '') {
          var yield = $('#item option[value="' + item_id + '"]').data('yield');
          $('#yield-calculation').val(yield);
@@ -1534,6 +1560,15 @@ var Projects = (function () {
          var equation = $('#item option[value="' + item_id + '"]').data('equation');
          $('#equation').val(equation);
          $('#equation').trigger('change');
+
+         // mostrar campo bone si el item tiene bone=true
+         if (item_type && $('#div-bone-existing-item').length > 0) {
+            var bone = $('#item option[value="' + item_id + '"]').data('bone');
+            if (bone == 1 || bone === '1' || bone === true) {
+               $('#div-bone-existing-item').removeClass('hide');
+               $('#bone-existing').prop('checked', true);
+            }
+         }
       }
    };
 
@@ -1682,6 +1717,11 @@ var Projects = (function () {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
 
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
+
                // 2. Iconos existentes
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -1694,6 +1734,7 @@ var Projects = (function () {
                return `<div class="d-flex align-items-center" style="white-space: nowrap;">
                            <span>${data || ''}</span>
                            ${badgeRetainage} 
+                           ${badgeBone}
                            ${icono}
                        </div>`;
             },
@@ -2019,6 +2060,12 @@ var Projects = (function () {
             var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
             formData.set('apply_retainage', apply_retainage);
 
+            // bone solo se envía si es un item nuevo
+            if (!item_type && $('#bone').length > 0) {
+               var bone = $('#bone').prop('checked');
+               formData.set('bone', bone);
+            }
+
             BlockUtil.block('#modal-item .modal-content');
 
             axios
@@ -2128,6 +2175,31 @@ var Projects = (function () {
 
                $('#unit').val(items[posicion].unit_id);
                $('#unit').trigger('change');
+            } else {
+               // item existente - asegurar que item-type-existing esté marcado
+               $('#item-type-existing').prop('checked', true);
+            }
+
+            // actualizar visibilidad del campo bone según el tipo de item
+            if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+               if (items[posicion].item_id == '') {
+                  // item nuevo - mostrar campo bone editable
+                  $('#div-bone-new-item').removeClass('hide');
+                  $('#div-bone-existing-item').addClass('hide');
+                  $('#bone').prop('checked', items[posicion].bone == 1 || items[posicion].bone === '1' || items[posicion].bone === true);
+                  $('#bone-existing').prop('checked', false);
+               } else {
+                  // item existente - mostrar campo bone solo si es true
+                  $('#div-bone-new-item').addClass('hide');
+                  $('#bone').prop('checked', false);
+                  if (items[posicion].bone == 1 || items[posicion].bone === '1' || items[posicion].bone === true) {
+                     $('#div-bone-existing-item').removeClass('hide');
+                     $('#bone-existing').prop('checked', true);
+                  } else {
+                     $('#div-bone-existing-item').addClass('hide');
+                     $('#bone-existing').prop('checked', false);
+                  }
+               }
             }
 
             $('#change-order').prop('checked', items[posicion].change_order);
@@ -2301,6 +2373,16 @@ var Projects = (function () {
       $('#change-order').prop('checked', false);
 
       $('#item-apply-retainage').prop('checked', true);
+
+      // reset bone
+      if ($('#bone').length > 0) {
+         $('#bone').prop('checked', false);
+         $('#div-bone-new-item').addClass('hide');
+      }
+      if ($('#bone-existing').length > 0) {
+         $('#bone-existing').prop('checked', false);
+         $('#div-bone-existing-item').addClass('hide');
+      }
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));

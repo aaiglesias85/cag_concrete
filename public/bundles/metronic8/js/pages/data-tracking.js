@@ -1647,6 +1647,11 @@ var DataTracking = (function () {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
                
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                var icono = '';
                if (row.change_order) {
                   icono =
@@ -1658,6 +1663,7 @@ var DataTracking = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
+                           ${badgeBone}
                            ${icono}
                </div>`;
             },
@@ -1956,6 +1962,11 @@ var DataTracking = (function () {
                return val.project_item_id == item_id;
             });
 
+            if (!item) {
+               toastr.error('Item not found', '');
+               return;
+            }
+
             var quantity = DevolverCantidadItemDataTracking();
             var notes = $('#notes-item-data-tracking').val();
 
@@ -1995,6 +2006,8 @@ var DataTracking = (function () {
                   notes: notes,
                   change_order: item.change_order || false,
                   change_order_date: item.change_order_date || '',
+                  apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
+                  bone: item.bone == 1 || item.bone === true,
                   posicion: items_data_tracking.length,
                });
             } else {
@@ -2016,6 +2029,8 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].notes = notes;
                   items_data_tracking[posicion].change_order = item.change_order || false;
                   items_data_tracking[posicion].change_order_date = item.change_order_date || '';
+                  items_data_tracking[posicion].apply_retainage = item.apply_retainage == 1 || item.apply_retainage === true;
+                  items_data_tracking[posicion].bone = item.bone == 1 || item.bone === true;
                }
             }
 
@@ -3620,6 +3635,11 @@ var DataTracking = (function () {
             return val.project_item_id == item_id;
          });
 
+         if (!item) {
+            console.error('Item not found for item_id:', item_id);
+            return;
+         }
+
          var price = item.price;
          var total = quantity * price;
 
@@ -3655,6 +3675,8 @@ var DataTracking = (function () {
             notes: notes,
             change_order: item.change_order || false,
             change_order_date: item.change_order_date || '',
+            apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
+            bone: item.bone == 1 || item.bone === true,
             posicion: items_data_tracking.length,
          });
 

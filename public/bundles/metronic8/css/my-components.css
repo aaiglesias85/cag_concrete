@@ -606,6 +606,7 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    width: 120px !important;
    height: 30px !important;
    position: relative;
+   overflow: visible !important;
 }
 
 /* Rojo / Inactive */
@@ -624,6 +625,8 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    font-weight: 700; 
    font-size: 11px;
    white-space: nowrap;
+   z-index: 1;
+   pointer-events: none;
 }
 
 /* Verde / Active */
@@ -641,6 +644,8 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    font-weight: 700; 
    font-size: 11px;
    white-space: nowrap;
+   z-index: 1;
+   pointer-events: none;
 }
 
 /* =========================================
@@ -650,6 +655,7 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    width: 90px !important;
    height: 30px !important;
    position: relative;
+   overflow: visible !important;
 }
 
 /* Rojo / No */
@@ -668,6 +674,8 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    font-weight: 700; 
    font-size: 11px;
    white-space: nowrap;
+   z-index: 1;
+   pointer-events: none;
 }
 
 /* Verde / Yes */
@@ -685,4 +693,43 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    font-weight: 700; 
    font-size: 11px;
    white-space: nowrap;
+   z-index: 1;
+   pointer-events: none;
+}
+
+/* Asegurar que los modales no se vean afectados por los toggles */
+.modal-content {
+   position: relative;
+   z-index: auto;
+   overflow: visible;
+}
+
+.modal-footer {
+   position: relative;
+   z-index: auto;
+   background-color: var(--bs-modal-footer-bg, #fff) !important;
+   opacity: 1 !important;
+   overflow: visible;
+}
+
+.modal-backdrop {
+   position: fixed;
+   z-index: 1050;
+   background-color: #000;
+   opacity: 0.4;
+}
+
+/* Asegurar que el form-check contenga el ::after */
+.form-check.form-switch {
+   position: relative;
+   overflow: visible;
+}
+
+.form-check-input.status-active-toggle::after,
+.form-check-input.yesno-toggle::after {
+   display: block;
+   position: absolute;
+   z-index: 1;
+   pointer-events: none;
+   line-height: 1;
 }

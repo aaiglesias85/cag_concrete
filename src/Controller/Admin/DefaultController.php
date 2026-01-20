@@ -159,6 +159,7 @@ class DefaultController extends AbstractController
 
    public function renderModalItemProject()
    {
+      $usuario = $this->getUser();
 
       // items
       $items = $this->defaultService->getDoctrine()->getRepository(Item::class)
@@ -176,7 +177,8 @@ class DefaultController extends AbstractController
          'items' => $items,
          'equations' => $equations,
          'yields_calculation' => $yields_calculation,
-         'units' => $units
+         'units' => $units,
+         'usuario_bone' => $usuario->getBone() ? true : false
       ));
    }
 

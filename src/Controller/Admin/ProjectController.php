@@ -85,7 +85,8 @@ class ProjectController extends AbstractController
                'concrete_vendors' => $concrete_vendors,
                'concrete_classes' => $concrete_classes,
                'employee_roles' => $employee_roles,
-               'direccion_url' => $this->projectService->ObtenerURL()
+               'direccion_url' => $this->projectService->ObtenerURL(),
+               'usuario_bone' => $usuario->getBone() ? true : false
             ));
          }
       } else {
@@ -763,9 +764,24 @@ class ProjectController extends AbstractController
       $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
       $change_order_date = $request->get('change_order_date');
       $apply_retainage = $request->get('apply_retainage') ?? 0;
+      $bone = $request->get('bone') ?? false;
+      // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+      if (is_string($bone)) {
+         $bone = strtolower($bone) === 'true' || $bone === '1';
+      } else {
+         $bone = (bool)$bone;
+      }
+
+      // Validar que solo usuarios con permiso bone puedan crear items con bone=true
+      $usuario = $this->getUser();
+      $usuario_bone = $usuario->getBone() ? true : false;
+      if ($bone && !$usuario_bone) {
+         // Si el usuario intenta crear un item con bone=true pero no tiene permiso, forzar a false
+         $bone = false;
+      }
 
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone);
 
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];

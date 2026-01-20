@@ -51,6 +51,7 @@
                               data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}"
                               data-yield="{{ item.yieldCalculation }}"
                               data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
+                              data-bone="{% if item.bone %}1{% else %}0{% endif %}"
                            >
                               {{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                            </option>
@@ -129,8 +130,7 @@
                      <div class="col-md-6">
                         <label class="form-label"> Change Order </label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                           <input type="checkbox" id="change-order" class="form-check-input" checked />
-                           <label class="form-check-label" for="change-order"> Yes / No </label>
+                           <input type="checkbox" id="change-order" class="form-check-input yesno-toggle" checked />
                         </div>
                      </div>
                      <div class="col-md-6">
@@ -142,6 +142,28 @@
                            </span>
                         </div>
                      </div>
+
+                     <div class="col-md-6 mt-5">
+                        <label class="form-label">Is Retainage?</label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
+                        </div>
+                     </div>
+
+                     {% if usuario_bone %}
+                     <div class="col-md-6 mt-5 hide" id="div-bone-new-item">
+                        <label class="form-label"> Bone </label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input type="checkbox" id="bone" class="form-check-input yesno-toggle" />
+                        </div>
+                     </div>
+                     <div class="col-md-6 mt-5 hide" id="div-bone-existing-item">
+                        <label class="form-label"> Bone </label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input type="checkbox" id="bone-existing" class="form-check-input yesno-toggle" disabled />
+                        </div>
+                     </div>
+                     {% endif %}
                   </div>
                </div>
             </form>

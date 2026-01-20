@@ -833,6 +833,10 @@ var Payments = (function () {
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
+               var badgeBone = '';
+               if (row.bone == 1 || row.bone === true) {
+                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               }
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
@@ -840,6 +844,7 @@ var Payments = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
+                           ${badgeBone}
                            ${icono}
                        </div>`;
             },

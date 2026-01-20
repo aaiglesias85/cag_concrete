@@ -443,7 +443,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone = false)
    {
       $resultado = [];
 
@@ -533,7 +533,8 @@ class ProjectService extends Base
                'item' => $item_name,
                'price' => $price,
                'yield_calculation' => $yield_calculation,
-               'unit_id' => $unit_id
+               'unit_id' => $unit_id,
+               'bone' => $bone
             ]);
             $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
 
@@ -1117,6 +1118,7 @@ class ProjectService extends Base
          $item_data = [
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
+            "bone" => $value->getItem()->getBone() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -1382,6 +1384,8 @@ class ProjectService extends Base
 
          $items[] = [
             'project_item_id' => $project_item_id,
+            "apply_retainage" => $value->getApplyRetainage(),
+            "bone" => $value->getItem()->getBone() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -1657,6 +1661,7 @@ class ProjectService extends Base
          "principal" => $value->getPrincipal(),
          "change_order" => $value->getChangeOrder(),
          "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
+         "bone" => $value->getItem()->getBone() ? 1 : 0,
          "porciento_completion" => $porciento_completion,
          "invoiced_qty" => $invoiced_qty,
          "total_invoiced_amount" => $total_invoiced_amount,
