@@ -1523,6 +1523,7 @@ class Base
             "project_item_id" => $project_item_id,
 
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
+            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
             "paid_qty"        => $value->getPaidQty(),
             "paid_amount"     => $value->getPaidAmount(),
             "paid_amount_total" => $value->getPaidAmountTotal(),

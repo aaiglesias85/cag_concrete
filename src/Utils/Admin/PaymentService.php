@@ -601,6 +601,7 @@ class PaymentService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
+            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
             "bone" => $value->getProjectItem()->getItem()->getBone() ? 1 : 0,
             "paid_amount_total" => $value->getPaidAmountTotal(),
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),

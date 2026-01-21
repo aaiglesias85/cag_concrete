@@ -225,6 +225,12 @@ var ModalItemProject = (function () {
             var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
             formData.set('apply_retainage', apply_retainage);
 
+            // boned solo se envía si el usuario tiene permiso bone
+            if ($('#item-boned').length > 0) {
+               var boned = $('#item-boned').prop('checked') ? 1 : 0;
+               formData.set('boned', boned);
+            }
+
             // bone solo se envía si es un item nuevo
             if (!item_type && $('#bone').length > 0) {
                var bone = $('#bone').prop('checked');

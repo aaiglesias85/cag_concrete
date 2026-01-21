@@ -403,6 +403,11 @@ var DataTrackingDetalle = (function () {
                   badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
                }
                
+               var badgeBoned = '';
+               if (row.boned == 1 || row.boned === true) {
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                var icono = '';
                if (row.change_order) {
                   icono =
@@ -415,6 +420,7 @@ var DataTrackingDetalle = (function () {
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
                            ${badgeBone}
+                           ${badgeBoned}
                            ${icono}
                </div>`;
             },

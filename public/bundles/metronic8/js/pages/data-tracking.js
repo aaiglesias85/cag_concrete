@@ -1652,6 +1652,11 @@ var DataTracking = (function () {
                   badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
                }
                
+               var badgeBoned = '';
+               if (row.boned == 1 || row.boned === true) {
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                var icono = '';
                if (row.change_order) {
                   icono =
@@ -1664,6 +1669,7 @@ var DataTracking = (function () {
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
                            ${badgeBone}
+                           ${badgeBoned}
                            ${icono}
                </div>`;
             },
@@ -2007,6 +2013,7 @@ var DataTracking = (function () {
                   change_order: item.change_order || false,
                   change_order_date: item.change_order_date || '',
                   apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
+                  boned: item.boned == 1 || item.boned === true,
                   bone: item.bone == 1 || item.bone === true,
                   posicion: items_data_tracking.length,
                });
@@ -2030,6 +2037,7 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].change_order = item.change_order || false;
                   items_data_tracking[posicion].change_order_date = item.change_order_date || '';
                   items_data_tracking[posicion].apply_retainage = item.apply_retainage == 1 || item.apply_retainage === true;
+                  items_data_tracking[posicion].boned = item.boned == 1 || item.boned === true;
                   items_data_tracking[posicion].bone = item.bone == 1 || item.bone === true;
                }
             }
@@ -3676,6 +3684,7 @@ var DataTracking = (function () {
             change_order: item.change_order || false,
             change_order_date: item.change_order_date || '',
             apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
+            boned: item.boned == 1 || item.boned === true,
             bone: item.bone == 1 || item.bone === true,
             posicion: items_data_tracking.length,
          });

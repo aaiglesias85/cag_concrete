@@ -40,6 +40,9 @@ class ProjectItem
    #[ORM\Column(name: "apply_retainage", type: "boolean", nullable: false, options: ["default" => 0])]
    private ?bool $applyRetainage = false;
 
+   #[ORM\Column(name: "boned", type: "boolean", nullable: true)]
+   private ?bool $boned = null;
+
    #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
    private ?Project $project;
@@ -61,6 +64,18 @@ class ProjectItem
    public function setApplyRetainage(bool $applyRetainage): self
    {
       $this->applyRetainage = $applyRetainage;
+
+      return $this;
+   }
+
+   public function getBoned(): ?bool
+   {
+      return $this->boned;
+   }
+
+   public function setBoned(?bool $boned): self
+   {
+      $this->boned = $boned;
 
       return $this;
    }

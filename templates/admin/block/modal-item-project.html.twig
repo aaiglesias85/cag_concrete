@@ -143,7 +143,7 @@
                         </div>
                      </div>
 
-                     <div class="col-md-6 mt-5">
+                     <div class="col-md-4 mt-5">
                         <label class="form-label">Is Retainage?</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
@@ -151,13 +151,20 @@
                      </div>
 
                      {% if usuario_bone %}
-                     <div class="col-md-6 mt-5 hide" id="div-bone-new-item">
+                     <div class="col-md-4 mt-5">
+                        <label class="form-label">Is Boned?</label>
+                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                           <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-boned" />
+                        </div>
+                     </div>
+
+                     <div class="col-md-4 mt-5 hide" id="div-bone-new-item">
                         <label class="form-label"> Bone </label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input type="checkbox" id="bone" class="form-check-input yesno-toggle" />
                         </div>
                      </div>
-                     <div class="col-md-6 mt-5 hide" id="div-bone-existing-item">
+                     <div class="col-md-4 mt-5 hide" id="div-bone-existing-item">
                         <label class="form-label"> Bone </label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input type="checkbox" id="bone-existing" class="form-check-input yesno-toggle" disabled />

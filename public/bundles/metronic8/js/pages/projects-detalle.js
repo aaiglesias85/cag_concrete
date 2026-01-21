@@ -491,6 +491,11 @@ var ProjectsDetalle = (function () {
                   badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
                }
                
+               var badgeBoned = '';
+               if (row.boned == 1 || row.boned === true) {
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                // Si es change order, agregar icono de +
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -499,7 +504,7 @@ var ProjectsDetalle = (function () {
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${icono}</div>`;
+               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${badgeBoned}${icono}</div>`;
             },
          },
          {
@@ -1401,6 +1406,7 @@ var ProjectsDetalle = (function () {
             _groupOrder: orderCounter++,
 
             apply_retainage: 0,
+            boned: 0,
             // Agregar todas las propiedades que DataTables espera para evitar errores
             item: null,
             unit: null,
@@ -1468,6 +1474,11 @@ var ProjectsDetalle = (function () {
                   badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
                }
                
+               var badgeBoned = '';
+               if (row.boned == 1 || row.boned === true) {
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
@@ -1476,7 +1487,7 @@ var ProjectsDetalle = (function () {
                      '" title="View change order history"></i>';
                }
                
-               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${icono}</div>`;
+               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBone}${badgeBoned}${icono}</div>`;
             }
          },
          {

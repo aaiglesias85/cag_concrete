@@ -887,6 +887,7 @@ class InvoiceService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
+            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
             "bone" => $value->getProjectItem()->getItem()->getBone() ? 1 : 0,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),

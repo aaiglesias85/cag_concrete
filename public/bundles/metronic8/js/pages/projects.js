@@ -1658,6 +1658,7 @@ var Projects = (function () {
                groupTitle: 'Change Order',
                _groupOrder: orderCounter++,
                apply_retainage: 0,
+               boned: 0,
                item: null,
                unit: null,
                yield_calculation_name: null,
@@ -1722,6 +1723,11 @@ var Projects = (function () {
                   badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
                }
 
+               var badgeBoned = '';
+               if (row.boned == 1 || row.boned === true) {
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               }
+
                // 2. Iconos existentes
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -1735,6 +1741,7 @@ var Projects = (function () {
                            <span>${data || ''}</span>
                            ${badgeRetainage} 
                            ${badgeBone}
+                           ${badgeBoned}
                            ${icono}
                        </div>`;
             },
@@ -2060,6 +2067,12 @@ var Projects = (function () {
             var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
             formData.set('apply_retainage', apply_retainage);
 
+            // boned solo se envía si el usuario tiene permiso bone
+            if ($('#item-boned').length > 0) {
+               var boned = $('#item-boned').prop('checked') ? 1 : 0;
+               formData.set('boned', boned);
+            }
+
             // bone solo se envía si es un item nuevo
             if (!item_type && $('#bone').length > 0) {
                var bone = $('#bone').prop('checked');
@@ -2205,6 +2218,11 @@ var Projects = (function () {
             $('#change-order').prop('checked', items[posicion].change_order);
 
             $('#item-apply-retainage').prop('checked', items[posicion].apply_retainage);
+
+            // boned solo se establece si el usuario tiene permiso bone
+            if ($('#item-boned').length > 0) {
+               $('#item-boned').prop('checked', items[posicion].boned == 1 || items[posicion].boned === true);
+            }
 
             if (items[posicion].change_order_date !== '') {
                const change_order_date = MyApp.convertirStringAFecha(items[posicion].change_order_date);
@@ -4931,6 +4949,54 @@ var Projects = (function () {
             .then(function (res) {
                if (res.data.success) {
                   toastr.success('Retainage updated successfully');
+
+                  // Limpiar selección
+                  $('.chk-item-wizard').prop('checked', false);
+                  $('#chk-master-retainage-wizard').prop('checked', false);
+                  toggleBarra();
+
+                  // Recargar el proyecto completo
+                  var project_id = $('#project_id').val();
+                  if (project_id) editRow(project_id, false);
+               } else {
+                  // Mostrar el mensaje de error exacto que viene del servidor
+                  toastr.error(res.data.error || 'Error updating items');
+               }
+            })
+            .catch(function (err) {
+               toastr.error('Server connection error');
+            })
+            .then(function () {
+               if (typeof BlockUtil !== 'undefined') BlockUtil.unblock('#items-table-editable');
+            });
+      });
+
+      // 4. Botones de Acción para Boned (Apply/Remove)
+      $(document).on('click', '.btn-accion-masiva-boned-wizard', function () {
+         var accion = $(this).data('accion'); // 1 = Apply, 0 = Remove
+         var ids = [];
+
+         // Recolectar IDs
+         $('.chk-item-wizard:checked').each(function () {
+            ids.push($(this).val());
+         });
+
+         if (ids.length === 0) {
+            toastr.warning('Please select at least one item.');
+            return;
+         }
+
+         // Bloquear pantalla
+         if (typeof BlockUtil !== 'undefined') BlockUtil.block('#items-table-editable');
+
+         axios
+            .post('project/bulk-boned-update', {
+               ids: ids,
+               status: accion,
+            })
+            .then(function (res) {
+               if (res.data.success) {
+                  toastr.success('Boned updated successfully');
 
                   // Limpiar selección
                   $('.chk-item-wizard').prop('checked', false);

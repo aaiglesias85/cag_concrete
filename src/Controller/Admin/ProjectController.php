@@ -772,6 +772,14 @@ class ProjectController extends AbstractController
          $bone = (bool)$bone;
       }
 
+      $boned = $request->get('boned') ?? false;
+      // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+      if (is_string($boned)) {
+         $boned = strtolower($boned) === 'true' || $boned === '1';
+      } else {
+         $boned = (bool)$boned;
+      }
+
       // Validar que solo usuarios con permiso bone puedan crear items con bone=true
       $usuario = $this->getUser();
       $usuario_bone = $usuario->getBone() ? true : false;
@@ -780,8 +788,14 @@ class ProjectController extends AbstractController
          $bone = false;
       }
 
+      // Validar que solo usuarios con permiso bone puedan marcar items como boned=true
+      if ($boned && !$usuario_bone) {
+         // Si el usuario intenta marcar un item como boned=true pero no tiene permiso, forzar a false
+         $boned = false;
+      }
+
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone, $boned);
 
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
@@ -1175,6 +1189,45 @@ class ProjectController extends AbstractController
 
       try {
          $this->projectService->ActualizarRetainageItems($ids, $status);
+         return $this->json(['success' => true]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * Actualizar los Item con Boned
+    */
+   public function bulkBonedUpdate(Request $request)
+   {
+      // Validar que solo usuarios con permiso bone puedan actualizar boned
+      $usuario = $this->getUser();
+      $usuario_bone = $usuario->getBone() ? true : false;
+      if (!$usuario_bone) {
+         return $this->json(['success' => false, 'error' => 'You do not have permission to update boned items.']);
+      }
+
+      $ids = $request->get('ids');
+      $status = $request->get('status');
+
+      if (empty($ids)) {
+         $content = $request->getContent();
+         if (!empty($content)) {
+            $data = json_decode($content, true);
+            if (is_array($data)) {
+               $ids = $data['ids'] ?? [];
+               $status = $data['status'] ?? null;
+            }
+         }
+      }
+
+      // 3. Validación final
+      if (empty($ids) || !is_array($ids)) {
+         return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
+      }
+
+      try {
+         $this->projectService->ActualizarBonedItems($ids, $status);
          return $this->json(['success' => true]);
       } catch (\Exception $e) {
          return $this->json(['success' => false, 'error' => $e->getMessage()]);

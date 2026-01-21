@@ -274,4 +274,22 @@ class ProjectItemRepository extends ServiceEntityRepository
 
       return $q->execute();
    }
+
+   /**
+    * Actualiza el estado de boned para múltiples items a la vez
+    */
+   public function ActualizarBonedMasivo(array $ids, bool $status)
+   {
+      if (empty($ids)) return;
+
+      $q = $this->getEntityManager()->createQuery(
+         'UPDATE App\Entity\ProjectItem p 
+          SET p.boned = :status 
+          WHERE p.id IN (:ids)'
+      )
+         ->setParameter('status', $status)
+         ->setParameter('ids', $ids);
+
+      return $q->execute();
+   }
 }

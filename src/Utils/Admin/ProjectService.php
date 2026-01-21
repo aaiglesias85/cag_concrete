@@ -443,7 +443,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone = false)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone = false, $boned = false)
    {
       $resultado = [];
 
@@ -490,6 +490,7 @@ class ProjectService extends Base
          }
 
          $project_item_entity->setApplyRetainage($apply_retainage);
+         $project_item_entity->setBoned($boned);
 
          $project_item_entity->setYieldCalculation($yield_calculation);
 
@@ -1118,6 +1119,7 @@ class ProjectService extends Base
          $item_data = [
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
+            "boned" => $value->getBoned() ? 1 : 0,
             "bone" => $value->getItem()->getBone() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
@@ -1385,6 +1387,7 @@ class ProjectService extends Base
          $items[] = [
             'project_item_id' => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
+            "boned" => $value->getBoned() ? 1 : 0,
             "bone" => $value->getItem()->getBone() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
@@ -1645,6 +1648,7 @@ class ProjectService extends Base
       return [
          'id' => $value->getId(),
          'apply_retainage' => $value->getApplyRetainage(),
+         'boned' => $value->getBoned() ? 1 : 0,
          // ---------------------------------
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
@@ -2938,6 +2942,14 @@ class ProjectService extends Base
       $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
       return $repo->ActualizarRetainageMasivo($ids, (bool)$status);
+   }
+
+   public function ActualizarBonedItems(array $ids, $status)
+   {
+      /** @var \App\Repository\ProjectItemRepository $repo */
+      $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+      return $repo->ActualizarBonedMasivo($ids, (bool)$status);
    }
 
 
