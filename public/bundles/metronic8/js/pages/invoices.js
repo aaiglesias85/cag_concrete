@@ -1665,8 +1665,8 @@ var Invoices = (function () {
               
                var badgeBone = '';
                if (row.bone == 1 || row.bone === true) {
-                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
-               }
+                 badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+   }
                
                var badgeBoned = '';
                if (row.boned == 1 || row.boned === true) {
