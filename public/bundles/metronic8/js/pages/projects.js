@@ -4897,6 +4897,11 @@ var Projects = (function () {
 
    // Lógica para botones de la tabla Wizard (Edición)
    var initAccionesRetainageWizard = function () {
+
+      $('.btn-accion-masiva-wizard[data-accion="1"]')
+         .removeClass('btn-primary')
+         .addClass('btn-success');
+         
       var toggleBarra = function () {
          var seleccionados = $('.chk-item-wizard:checked').length;
          $('#contador-items-seleccionados-wizard').text(seleccionados);
