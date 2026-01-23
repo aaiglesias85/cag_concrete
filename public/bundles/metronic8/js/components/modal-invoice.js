@@ -471,6 +471,11 @@ var ModalInvoice = (function () {
                      // Guardar sum_boned_project y bone_price para cálculo de X e Y
                      sum_boned_project = Number(response.sum_boned_project || 0);
                      bone_price = Number(response.bone_price || 0);
+                     
+                     console.log('--- Datos cargados desde backend (MODAL - project/listarItemsParaInvoice) ---');
+                     console.log('sum_boned_project:', sum_boned_project);
+                     console.log('bone_price:', bone_price);
+                     console.log('Total items recibidos:', response.items ? response.items.length : 0);
 
                      //Llenar select
                      for (let item of response.items) {
@@ -907,35 +912,78 @@ var ModalInvoice = (function () {
 
    // Función para calcular y mostrar X e Y (Boned) en JavaScript (modal)
    var calcularYMostrarXBonedEnJSModal = function () {
+      console.log('=== INICIO CÁLCULO X e Y BONED (MODAL) ===');
+      
       // SUM_BONED_INVOICES: Suma de amount_final de items con boned=1 en el invoice actual
       // Para invoices nuevos, usar items_lista (items que están en la tabla)
       // Para invoices existentes, usar items (todos los items del invoice)
       var items_a_calcular = items_lista.length > 0 ? items_lista : items;
+      console.log('Items a calcular (modal):', items_a_calcular.length, 'items');
+      console.log('Usando (modal):', items_lista.length > 0 ? 'items_lista' : 'items');
       
       var sum_boned_invoices = 0;
-      items_a_calcular.forEach(function(item) {
+      var items_boned_count = 0;
+      
+      items_a_calcular.forEach(function(item, index) {
          if (item.boned == 1 || item.boned === true) {
+            items_boned_count++;
             // amount_final = (quantity + quantity_brought_forward) * price
             var quantity = Number(item.quantity || 0);
             var quantity_brought_forward = Number(item.quantity_brought_forward || 0);
             var price = Number(item.price || 0);
             var amount_final = (quantity + quantity_brought_forward) * price;
+            
+            console.log(`Item boned #${items_boned_count} (índice ${index}) - MODAL:`, {
+               item_name: item.item || 'N/A',
+               project_item_id: item.project_item_id,
+               quantity: quantity,
+               quantity_brought_forward: quantity_brought_forward,
+               price: price,
+               amount_final: amount_final,
+               calculo: `(${quantity} + ${quantity_brought_forward}) * ${price} = ${amount_final}`
+            });
+            
             sum_boned_invoices += amount_final;
          }
       });
 
+      console.log('--- Resumen SUM_BONED_INVOICES (MODAL) ---');
+      console.log('Items boned encontrados:', items_boned_count);
+      console.log('SUM_BONED_INVOICES:', sum_boned_invoices);
+
       // Calcular X = SUM_BONED_INVOICES / SUM_BONED_PROJECT
+      console.log('--- Cálculo de X (MODAL) ---');
+      console.log('SUM_BONED_INVOICES:', sum_boned_invoices);
+      console.log('sum_boned_project:', sum_boned_project);
+      
       var x = 0;
       if (sum_boned_project > 0) {
          x = sum_boned_invoices / sum_boned_project;
+         console.log('X =', sum_boned_invoices, '/', sum_boned_project, '=', x);
+      } else {
+         console.log('X = 0 (sum_boned_project es 0 o no definido)');
       }
 
       // Calcular Y = Bone Price * X
+      console.log('--- Cálculo de Y (MODAL) ---');
+      console.log('bone_price:', bone_price);
+      console.log('X:', x);
+      
       var y = bone_price * x;
+      console.log('Y =', bone_price, '*', x, '=', y);
 
       // Mostrar valores
-      $('#modal_total_boned_x').val(MyApp.formatMoney(x, 6, '.', ','));
-      $('#modal_total_boned_y').val(MyApp.formatMoney(y, 2, '.', ','));
+      var x_formatted = MyApp.formatMoney(x, 6, '.', ',');
+      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
+      
+      console.log('--- Valores finales mostrados (MODAL) ---');
+      console.log('X formateado:', x_formatted);
+      console.log('Y formateado:', y_formatted);
+      
+      $('#modal_total_boned_x').val(x_formatted);
+      $('#modal_total_boned_y').val(y_formatted);
+      
+      console.log('=== FIN CÁLCULO X e Y BONED (MODAL) ===\n');
    };
 
    var handleChangeOrderHistory = function () {

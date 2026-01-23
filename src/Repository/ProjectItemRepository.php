@@ -317,8 +317,9 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * TotalBonePriceProjectItems: Obtiene la suma de precios de los Items 
-    * que tienen bone=true y están asociados a ProjectItems del proyecto
+    * TotalBonePriceProjectItems: Obtiene la suma de precios de los ProjectItems 
+    * donde el Item maestro tiene bone=true
+    * El precio se toma de project_item (p_i.price), no de item (i.price)
     * Agrupa por item_id para evitar duplicar precios si hay múltiples ProjectItems con el mismo Item
     * 
     * @param int $project_id El ID del proyecto
@@ -327,11 +328,11 @@ class ProjectItemRepository extends ServiceEntityRepository
    public function TotalBonePriceProjectItems(?int $project_id = null): float
    {
       $qb = $this->createQueryBuilder('p_i')
-         ->select('i.itemId, i.price')
+         ->select('i.itemId, p_i.price')
          ->leftJoin('p_i.item', 'i')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('i.bone = 1') // Solo items con bone = true
-         ->groupBy('i.itemId', 'i.price'); // Agrupar por item para evitar duplicados
+         ->andWhere('i.bone = 1') // Solo items con bone = true (del Item maestro)
+         ->groupBy('i.itemId', 'p_i.price'); // Agrupar por item y precio de project_item para evitar duplicados
 
       if ($project_id) {
          $qb->andWhere('p.projectId = :project_id')
@@ -340,10 +341,10 @@ class ProjectItemRepository extends ServiceEntityRepository
 
       $results = $qb->getQuery()->getResult();
       
-      // Sumar los precios únicos
+      // Sumar los precios únicos de project_item
       $total = 0.0;
       foreach ($results as $row) {
-         $total += (float) $row['price'];
+         $total += (float) $row['price']; // Precio de project_item, no de item
       }
 
       return $total;

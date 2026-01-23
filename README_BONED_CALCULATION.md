@@ -125,17 +125,23 @@ Y = Bone Price * X
 
 #### Bone Price
 
-**Descripción**: Suma de precios de los Items que tienen `bone = true` y están asociados a ProjectItems del proyecto.
+**Descripción**: Suma de precios de los ProjectItems donde el Item maestro tiene `bone = true`. **El precio se toma de la tabla `project_item` (p_i.price), no de la tabla `item` (i.price)**.
 
 **Cálculo**:
 ```sql
-SUM(DISTINCT item.price) WHERE item.bone = 1
+SELECT i.itemId, p_i.price
+FROM project_item p_i
+LEFT JOIN item i ON p_i.item_id = i.item_id
+LEFT JOIN project p ON p_i.project_id = p.project_id
+WHERE i.bone = 1
+GROUP BY i.itemId, p_i.price
+-- Luego se suman los precios únicos en PHP
 ```
 
 **Filtros aplicados**:
-- Solo items donde `item.bone = 1` (campo del Item maestro)
-- Solo items asociados a ProjectItems del proyecto especificado
-- Se agrupa por `item_id` para evitar duplicar precios si hay múltiples ProjectItems con el mismo Item
+- Solo ProjectItems donde el Item maestro tiene `item.bone = 1`
+- Solo ProjectItems del proyecto especificado
+- Se agrupa por `item_id` y `p_i.price` para manejar casos donde el mismo Item tiene diferentes precios en diferentes ProjectItems
 
 **Método**: `ProjectItemRepository::TotalBonePriceProjectItems()`
 
@@ -144,8 +150,13 @@ SUM(DISTINCT item.price) WHERE item.bone = 1
 **En el Frontend**:
 - Se calcula en el backend y se envía como `bone_price` en la respuesta
 - Se almacena en variable global JavaScript para usarlo en el cálculo de Y
+- Se aplica tanto en la página principal (`invoices.js`) como en el modal (`modal-invoice.js`)
 
-**Nota**: Si hay múltiples ProjectItems con el mismo Item que tiene `bone = true`, el precio del Item se cuenta solo una vez.
+**Importante**: 
+- **El precio se toma de `project_item.price`, no de `item.price`**. Esto es crucial porque el precio puede variar entre proyectos.
+- Si hay múltiples ProjectItems con el mismo Item que tiene `bone = true` pero con precios diferentes, se sumarán todos esos precios
+- Si hay múltiples ProjectItems con el mismo Item y el mismo precio, el precio se cuenta solo una vez (gracias al GROUP BY)
+- Este cálculo se aplica automáticamente tanto en la página principal de invoices como en el modal, ya que ambos usan los mismos métodos del backend
 
 ### Interpretación de Y
 
@@ -166,7 +177,7 @@ Y representa el monto proporcional que debe asignarse al ítem BONED en la invoi
 
 **ProjectItemRepository**:
 - `TotalBonedProjectItems()`: Calcula SUM_BONED_PROJECT
-- `TotalBonePriceProjectItems()`: Calcula Bone Price
+- `TotalBonePriceProjectItems()`: Calcula Bone Price (toma el precio de `project_item.price`, no de `item.price`)
 
 #### 2. Servicios
 
@@ -284,14 +295,16 @@ Y = Bone Price * 0.2727 = 272.70
 ### Ejemplo 2: Múltiples Items con bone=true
 
 **Proyecto**:
-- Item Bone 1: price = 500, bone=true
-- Item Bone 2: price = 300, bone=true
-- **Bone Price = 500 + 300 = 800**
+- ProjectItem 1: Item Bone 1 (bone=true), price en project_item = 500
+- ProjectItem 2: Item Bone 2 (bone=true), price en project_item = 300
+- **Bone Price = 500 + 300 = 800** (suma de precios de project_item)
 
 **Con X = 0.5**:
 ```
 Y = 800 * 0.5 = 400.00
 ```
+
+**Nota**: Los precios se toman de la tabla `project_item`, no de la tabla `item`.
 
 ### Ejemplo 3: Sin Items Boned
 
@@ -361,8 +374,9 @@ Y = 800 * 0.5 = 400.00
    - ✅ División por cero protegida (X = 0 si SUM_BONED_PROJECT = 0)
 
 2. **Cálculo de Y**:
-   - ✅ Bone Price suma precios de Items con `bone = true`
-   - ✅ Agrupa por item_id para evitar duplicados
+   - ✅ Bone Price suma precios de ProjectItems donde el Item tiene `bone = true`
+   - ✅ **Toma el precio de `project_item.price`, no de `item.price`**
+   - ✅ Agrupa por item_id y precio para evitar duplicados
    - ✅ Multiplica correctamente Bone Price * X
 
 3. **Frontend**:
@@ -387,11 +401,13 @@ Y = 800 * 0.5 = 400.00
 
 2. **Cálculo en JavaScript**: El cálculo de X e Y se realiza completamente en JavaScript usando los datos proporcionados por el backend:
    - **SUM_BONED_PROJECT** y **Bone Price** se calculan en el backend y se envían en la respuesta
+   - **Bone Price** se calcula tomando el precio de `project_item.price` (no de `item.price`), lo cual es importante porque el precio puede variar entre proyectos
    - **SUM_BONED_INVOICES** se calcula en JavaScript de la siguiente manera:
      - Para cada item con `boned = 1` en la tabla, se calcula: `amount_final = (quantity + quantity_brought_forward) * price`
      - Se suman todos esos `amount_final` para obtener `SUM_BONED_INVOICES`
    - Para **invoices nuevos**: Se calcula en tiempo real mientras el usuario edita los items, sin necesidad de guardar
    - Para **invoices existentes**: Se calcula usando los items cargados del invoice
+   - **Se aplica automáticamente** tanto en la página principal (`invoices.js`) como en el modal (`modal-invoice.js`), ya que ambos usan los mismos endpoints del backend
 
 3. **Items con bone=true**: Idealmente debería haber solo un Item con `bone = true` por proyecto, pero el sistema soporta múltiples y suma sus precios correctamente.
 
@@ -484,7 +500,10 @@ R: Cada vez que se actualiza la tabla (`actualizarTableListaItems()`), se llama 
 R: Sí, si se ha facturado más del monto total de items boned del proyecto (por ejemplo, por ajustes o cambios).
 
 **P: ¿Se puede tener más de un Item con bone=true?**
-R: Sí, el sistema soporta múltiples Items con `bone = true`. El Bone Price será la suma de todos sus precios.
+R: Sí, el sistema soporta múltiples Items con `bone = true`. El Bone Price será la suma de todos los precios de los ProjectItems asociados, donde cada precio se toma de `project_item.price` (no de `item.price`).
+
+**P: ¿Por qué el precio se toma de project_item y no de item?**
+R: Porque el precio puede variar entre proyectos. Un mismo Item puede tener diferentes precios en diferentes proyectos, por lo que es importante usar el precio específico del `project_item` para calcular correctamente el Bone Price.
 
 **P: ¿Los valores de X e Y se guardan en la base de datos?**
 R: No, X e Y son valores calculados dinámicamente en JavaScript y **no se almacenan en la BD**. Se calculan cada vez que se necesita mostrarlos, usando:
