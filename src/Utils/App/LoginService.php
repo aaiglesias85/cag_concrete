@@ -87,6 +87,7 @@ class LoginService extends Base
                'apellidos' => $usuario->getApellidos(),
                'nombre_completo' => $usuario->getNombreCompleto(),
                'telefono' => $usuario->getTelefono(),
+               'imagen' => $usuario->getImagen(),
                'rol_id' => $usuario->getRol()?->getRolId(),
                'rol' => $usuario->getRol()?->getNombre(),
                'permisos' => $permisos,
