@@ -292,4 +292,60 @@ class ProjectItemRepository extends ServiceEntityRepository
 
       return $q->execute();
    }
+
+   /**
+    * TotalBonedProjectItems: Obtiene la suma total de (quantity * price) 
+    * de todos los items BONED del proyecto
+    * 
+    * @param int $project_id El ID del proyecto
+    * @return float
+    */
+   public function TotalBonedProjectItems(?int $project_id = null): float
+   {
+      $qb = $this->createQueryBuilder('p_i')
+         ->select('SUM(p_i.quantity * p_i.price)')
+         ->leftJoin('p_i.project', 'p')
+         ->andWhere('p_i.boned = 1'); // Solo items con boned = true
+
+      if ($project_id) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
+
+   /**
+    * TotalBonePriceProjectItems: Obtiene la suma de precios de los Items 
+    * que tienen bone=true y están asociados a ProjectItems del proyecto
+    * Agrupa por item_id para evitar duplicar precios si hay múltiples ProjectItems con el mismo Item
+    * 
+    * @param int $project_id El ID del proyecto
+    * @return float
+    */
+   public function TotalBonePriceProjectItems(?int $project_id = null): float
+   {
+      $qb = $this->createQueryBuilder('p_i')
+         ->select('i.itemId, i.price')
+         ->leftJoin('p_i.item', 'i')
+         ->leftJoin('p_i.project', 'p')
+         ->andWhere('i.bone = 1') // Solo items con bone = true
+         ->groupBy('i.itemId', 'i.price'); // Agrupar por item para evitar duplicados
+
+      if ($project_id) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
+
+      $results = $qb->getQuery()->getResult();
+      
+      // Sumar los precios únicos
+      $total = 0.0;
+      foreach ($results as $row) {
+         $total += (float) $row['price'];
+      }
+
+      return $total;
+   }
 }

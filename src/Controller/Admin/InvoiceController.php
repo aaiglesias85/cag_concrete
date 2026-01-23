@@ -357,4 +357,5 @@ class InvoiceController extends AbstractController
          return $this->json($resultadoJson);
       }
    }
+
 }

@@ -1151,7 +1151,22 @@ class ProjectService extends Base
          $items[] = $item_data;
       }
 
-      return $items;
+      // Calcular SUM_BONED_PROJECT y Bone Price para que JavaScript pueda calcular X e Y
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $sum_boned_project = $projectItemRepo->TotalBonedProjectItems($project_id);
+      $bone_price = $projectItemRepo->TotalBonePriceProjectItems($project_id);
+
+      // Agregar estos valores al final del array para que JavaScript los use
+      // Los agregamos como propiedades del array de items (no como items individuales)
+      // JavaScript accederá a ellos desde response.items._sum_boned_project y response.items._bone_price
+      // O mejor, los agregamos como campos adicionales en la respuesta
+      
+      return [
+         'items' => $items,
+         'sum_boned_project' => $sum_boned_project,
+         'bone_price' => $bone_price
+      ];
    }
 
    /**

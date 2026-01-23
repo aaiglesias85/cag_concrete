@@ -451,4 +451,36 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
       return $resultado ? (float)$resultado : 0;
    }
+
+   /**
+    * TotalInvoiceFinalAmountThisPeriodBonedOnly: Obtiene la suma de Final Amount This Period 
+    * de items BONED en el invoice especificado.
+    * 
+    * IMPORTANTE: Solo calcula para el invoice actual. Para invoices nuevos (sin invoice_id), retorna 0
+    * porque los items aún no están guardados en la BD.
+    * 
+    * @param int|null $invoice_id El ID del invoice (requerido para calcular)
+    * @param int|null $project_id El ID del proyecto (no se usa si invoice_id está presente)
+    * @param string|null $fecha_inicial Fecha inicial (no se usa si invoice_id está presente)
+    * @param string|null $fecha_fin Fecha final (no se usa si invoice_id está presente)
+    * @return float
+    */
+   public function TotalInvoiceFinalAmountThisPeriodBonedOnly(?int $invoice_id = null, ?int $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null): float
+   {
+      // Si no hay invoice_id, retornar 0 (invoice nuevo, items aún no guardados)
+      if (!$invoice_id) {
+         return 0.0;
+      }
+
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('SUM((i_i.quantity + COALESCE(i_i.quantityBroughtForward, 0)) * i_i.price)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->leftJoin('i_i.invoice', 'i')
+         ->andWhere('p_i.boned = 1') // Solo items con boned = true
+         ->andWhere('i.invoiceId = :invoice_id') // Solo el invoice actual
+         ->setParameter('invoice_id', $invoice_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
 }

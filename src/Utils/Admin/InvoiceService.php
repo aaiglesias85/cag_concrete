@@ -13,6 +13,7 @@ use App\Entity\SyncQueueQbwc;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
+use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
@@ -762,6 +763,15 @@ class InvoiceService extends Base
          $items = $this->ListarItemsDeInvoice($invoice_id);
          $arreglo_resultado['items'] = $items;
 
+         // Agregar sum_boned_project y bone_price para cálculo de X e Y en JavaScript
+         if (!empty($items)) {
+            $arreglo_resultado['sum_boned_project'] = $items[0]['sum_boned_project'] ?? 0;
+            $arreglo_resultado['bone_price'] = $items[0]['bone_price'] ?? 0;
+         } else {
+            $arreglo_resultado['sum_boned_project'] = 0;
+            $arreglo_resultado['bone_price'] = 0;
+         }
+
          // payments
          $payments = $this->ListarPaymentsDeInvoice($invoice_id);
          $arreglo_resultado['payments'] = $payments;
@@ -918,6 +928,18 @@ class InvoiceService extends Base
             "has_price_history" => $has_price_history,
             "posicion" => $key
          ];
+      }
+
+      // Calcular SUM_BONED_PROJECT y Bone Price para que JavaScript pueda calcular X e Y
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $sum_boned_project = $projectItemRepo->TotalBonedProjectItems($project_id);
+      $bone_price = $projectItemRepo->TotalBonePriceProjectItems($project_id);
+
+      // Agregar estos valores a cada item para que JavaScript los use
+      foreach ($items as &$item) {
+         $item['sum_boned_project'] = $sum_boned_project;
+         $item['bone_price'] = $bone_price;
       }
 
       return $items;

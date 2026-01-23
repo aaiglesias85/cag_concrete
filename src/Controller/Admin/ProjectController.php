@@ -464,10 +464,12 @@ class ProjectController extends AbstractController
       $fecha_fin = $request->get('end_date');
 
       try {
-         $items = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
+         $result = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
 
          $resultadoJson['success'] = true;
-         $resultadoJson['items'] = $items;
+         $resultadoJson['items'] = $result['items'];
+         $resultadoJson['sum_boned_project'] = $result['sum_boned_project'];
+         $resultadoJson['bone_price'] = $result['bone_price'];
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {

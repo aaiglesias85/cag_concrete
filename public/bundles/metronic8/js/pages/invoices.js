@@ -1010,6 +1010,19 @@ var Invoices = (function () {
             item.posicion = index;
          });
 
+         // Guardar sum_boned_project y bone_price si vienen en los items
+         if (items.length > 0) {
+            if (items[0].sum_boned_project !== undefined) {
+               sum_boned_project = Number(items[0].sum_boned_project || 0);
+            }
+            if (items[0].bone_price !== undefined) {
+               bone_price = Number(items[0].bone_price || 0);
+            }
+         }
+
+         // Calcular y mostrar X e Y (Boned) en JavaScript
+         calcularYMostrarXBonedEnJS();
+
          actualizarTableListaItems();
 
          event_change = false;
@@ -1296,6 +1309,14 @@ var Invoices = (function () {
 
    // change project
    var changeProject = function () {
+      var project_id = $('#project').val();
+      
+      // Si no hay proyecto seleccionado, resetear X e Y
+      if (!project_id) {
+         $('#total_boned_x').val('0.000000');
+         $('#total_boned_y').val('0.00');
+      }
+
       // definir fechas
       definirFechasDueDate();
 
@@ -1367,6 +1388,8 @@ var Invoices = (function () {
       var invoice_id = $('#invoice_id').val();
       if (invoice_id == '') {
          items = [];
+         $('#total_boned_x').val('0.000000');
+         $('#total_boned_y').val('0.00');
          actualizarTableListaItems();
       }
 
@@ -1385,6 +1408,10 @@ var Invoices = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
+                     // Guardar sum_boned_project y bone_price para cálculo de X e Y
+                     sum_boned_project = Number(response.sum_boned_project || 0);
+                     bone_price = Number(response.bone_price || 0);
+
                      //Llenar select
                      for (let item of response.items) {
                         var posicion = items.length;
@@ -1424,6 +1451,7 @@ var Invoices = (function () {
                               change_order_date: item.change_order_date,
                               has_quantity_history: item.has_quantity_history || false,
                               has_price_history: item.has_price_history || false,
+                              boned: item.boned || 0, // Agregar campo boned
                               posicion: posicion,
                            });
                         }
@@ -1435,6 +1463,9 @@ var Invoices = (function () {
                      items_lista.forEach((item, index) => {
                         item.posicion = index;
                      });
+
+                     // Calcular y mostrar X e Y (Boned) en JavaScript
+                     calcularYMostrarXBonedEnJS();
 
                      actualizarTableListaItems();
                   } else {
@@ -1457,6 +1488,8 @@ var Invoices = (function () {
 
       // reset
       MyUtil.limpiarSelect('#project');
+      $('#total_boned_x').val('0.000000');
+      $('#total_boned_y').val('0.00');
 
       if (company_id != '') {
          var formData = new URLSearchParams();
@@ -1559,6 +1592,8 @@ var Invoices = (function () {
    var oTableItems;
    var items = [];
    var items_lista = [];
+   var sum_boned_project = 0; // Suma de (quantity * price) de items boned del proyecto
+   var bone_price = 0; // Suma de precios de Items con bone=true
    var nEditingRowItem = null;
    var rowDeleteItem = null;
 
@@ -1979,6 +2014,39 @@ var Invoices = (function () {
       handlePriceHistory();
    };
 
+   // Función para calcular y mostrar X e Y (Boned) en JavaScript
+   var calcularYMostrarXBonedEnJS = function () {
+      // SUM_BONED_INVOICES: Suma de amount_final de items con boned=1 en el invoice actual
+      // Para invoices nuevos, usar items_lista (items que están en la tabla)
+      // Para invoices existentes, usar items (todos los items del invoice)
+      var items_a_calcular = items_lista.length > 0 ? items_lista : items;
+      
+      var sum_boned_invoices = 0;
+      items_a_calcular.forEach(function(item) {
+         if (item.boned == 1 || item.boned === true) {
+            // amount_final = (quantity + quantity_brought_forward) * price
+            var quantity = Number(item.quantity || 0);
+            var quantity_brought_forward = Number(item.quantity_brought_forward || 0);
+            var price = Number(item.price || 0);
+            var amount_final = (quantity + quantity_brought_forward) * price;
+            sum_boned_invoices += amount_final;
+         }
+      });
+
+      // Calcular X = SUM_BONED_INVOICES / SUM_BONED_PROJECT
+      var x = 0;
+      if (sum_boned_project > 0) {
+         x = sum_boned_invoices / sum_boned_project;
+      }
+
+      // Calcular Y = Bone Price * X
+      var y = bone_price * x;
+
+      // Mostrar valores
+      $('#total_boned_x').val(MyApp.formatMoney(x, 6, '.', ','));
+      $('#total_boned_y').val(MyApp.formatMoney(y, 2, '.', ','));
+   };
+
    var handleChangeOrderHistory = function () {
       $(document).off('click', '.change-order-history-icon');
       $(document).on('click', '.change-order-history-icon', function (e) {
@@ -2078,6 +2146,9 @@ var Invoices = (function () {
       }
 
       initTableItems();
+      
+      // Recalcular X e Y después de actualizar la tabla
+      calcularYMostrarXBonedEnJS();
    };
    var validateFormItem = function () {
       var result = false;
