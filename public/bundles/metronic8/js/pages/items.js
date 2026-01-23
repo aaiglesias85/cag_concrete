@@ -88,8 +88,8 @@ var Items = (function () {
             render: function (data, type, row) {
                var badgeBone = '';
                if (row.bone == 1 || row.bone === true) {
-                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
-               }
+                  badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+   }
                return `<div class="d-flex align-items-center" style="white-space: nowrap;">
                            <span>${data || ''}</span>
                            ${badgeBone}
