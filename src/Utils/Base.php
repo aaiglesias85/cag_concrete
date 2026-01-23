@@ -934,7 +934,7 @@ class Base
       $item_entity->setPrice($value->price);
       $item_entity->setStatus(1);
       $item_entity->setYieldCalculation($value->yield_calculation);
-      
+
       if (isset($value->bone)) {
          $item_entity->setBone($value->bone == 1 || $value->bone === '1' || $value->bone === true);
       }
@@ -1502,11 +1502,13 @@ class Base
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
 
-         // En payments, Unpaid Qty = Invoice Qty - Paid Qty
-         // Invoice Qty = quantity_final (quantity + quantity_brought_forward)
-         // Por lo tanto: unpaid_qty = quantity_final - paid_qty
-         $unpaid_qty = $quantity_final - $paid_qty;
-         $unpaid_qty = max(0, $unpaid_qty); // Asegurar que no sea negativo
+         $unpaid_qty = $value->getUnpaidQty();
+         if ($unpaid_qty === null) {
+            $unpaid_qty = $quantity_final - $paid_qty;
+            $unpaid_qty = max(0, $unpaid_qty);
+         }
+
+         $unpaid_qty = max(0, $unpaid_qty);
 
          // notes
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
