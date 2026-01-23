@@ -297,6 +297,10 @@ var Payments = (function () {
    var resetForms = function () {
       MyUtil.resetForm('payment-form');
       payments = [];
+      $('#total_boned_x').val('');
+      $('#total_boned_y').val('');
+      sum_boned_project = 0;
+      bone_price = 0;
       actualizarTableListaPayments();
       archivos = [];
       actualizarTableListaArchivos();
@@ -621,6 +625,20 @@ var Payments = (function () {
          calcularTotalPaymentGlobal();
 
          payments = invoice.payments;
+         if (payments.length > 0) {
+             if (payments[0].sum_boned_project !== undefined) {
+                 sum_boned_project = Number(payments[0].sum_boned_project || 0);
+             }
+             if (payments[0].bone_price !== undefined) {
+                 bone_price = Number(payments[0].bone_price || 0);
+             }
+         } else {
+             sum_boned_project = 0;
+             bone_price = 0;
+         }
+         
+         calcularYMostrarXBonedEnJS();
+
          actualizarTableListaPayments();
          archivos = invoice.archivos;
          actualizarTableListaArchivos();
@@ -762,6 +780,8 @@ var Payments = (function () {
    var oTablePayments;
    var payments = [];
    var nEditingRowPayment = null;
+   var sum_boned_project = 0;
+   var bone_price = 0;
 
    var agruparItemsPorChangeOrder = function (items) {
       var items_regulares = [];
@@ -2281,6 +2301,35 @@ var initAccionRecalcularRetainage = function () {
       }
       // Actualizamos el input visual del total
       $('#total_payment_amount').val(MyApp.formatMoney(total, 2, '.', ','));
+   };
+
+   // Función para calcular y mostrar X e Y (Boned) en Payment
+   var calcularYMostrarXBonedEnJS = function () {      
+     
+      var sum_boned_invoices = 0;
+      
+      payments.forEach(function(item) {
+         // Ignorar cabeceras de grupo si existen
+         if (!item.isGroupHeader) {
+             if (item.boned == 1 || item.boned === true) {                
+                var amount = Number(item.amount || 0);  
+                sum_boned_invoices += amount;
+             }
+         }
+      });
+      
+      var x = 0;
+      if (sum_boned_project > 0) {
+         x = sum_boned_invoices / sum_boned_project;
+      }
+      
+      var y = bone_price * x;  
+ 
+      var x_formatted = MyApp.formatMoney(x, 6, '.', ',');
+      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
+      
+      $('#total_boned_x').val(x_formatted);
+      $('#total_boned_y').val(y_formatted);      
    };
 
 

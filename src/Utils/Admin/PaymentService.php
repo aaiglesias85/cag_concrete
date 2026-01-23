@@ -486,15 +486,31 @@ class PaymentService extends Base
          }
 
          $arreglo_resultado['retainage_percentage'] = $porciento_retainage;
-
-         // ... (resto de la función igual: listar projects, items, payments, etc.) ...
          $projects = $this->ListarProjectsDeCompany($company_id);
          $arreglo_resultado['projects'] = $projects;
 
          $items = $this->ListarItemsDeInvoice($invoice_id);
          $arreglo_resultado['items'] = $items;
 
+         // 1. Obtenemos los pagos
          $payments = $this->ListarPaymentsDeInvoice($invoice_id);
+
+         // Calcular Bond ---
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+         $sum_boned_project = method_exists($projectItemRepo, 'TotalBonedProjectItems')
+            ? $projectItemRepo->TotalBonedProjectItems($project->getProjectId())
+            : 0;
+
+         $bone_price = method_exists($projectItemRepo, 'TotalBonePriceProjectItems')
+            ? $projectItemRepo->TotalBonePriceProjectItems($project->getProjectId())
+            : 0;
+         foreach ($payments as &$p) {
+            $p['sum_boned_project'] = $sum_boned_project;
+            $p['bone_price'] = $bone_price;
+         }
+         unset($p);
          $arreglo_resultado['payments'] = $payments;
 
          $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
@@ -623,6 +639,26 @@ class PaymentService extends Base
             "has_price_history" => $has_price_history,
             "posicion" => $key
          ];
+      }
+      $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
+      if ($currentInvoice) {
+         $project_id = $currentInvoice->getProject()->getProjectId();
+         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+         $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+         $sum_boned_project = method_exists($projectItemRepo, 'TotalBonedProjectItems')
+            ? $projectItemRepo->TotalBonedProjectItems($project_id)
+            : 0;
+
+         $bone_price = method_exists($projectItemRepo, 'TotalBonePriceProjectItems')
+            ? $projectItemRepo->TotalBonePriceProjectItems($project_id)
+            : 0;
+
+         foreach ($items as &$item) {
+            $item['sum_boned_project'] = $sum_boned_project;
+            $item['bone_price'] = $bone_price;
+         }
       }
 
       return $items;
