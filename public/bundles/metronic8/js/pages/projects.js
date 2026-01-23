@@ -1106,19 +1106,16 @@ var Projects = (function () {
          $('#status').val(project.status);
          $('#status').trigger('change');
 
-         if (project.start_date !== '') {
-            const start_date = MyApp.convertirStringAFecha(project.start_date);
-            FlatpickrUtil.setDate('datetimepicker-start-date', start_date);
+         if (project.start_date && project.start_date !== '') {
+            FlatpickrUtil.setDate('datetimepicker-start-date', project.start_date.split(' ')[0]);
          }
 
-         if (project.end_date !== '') {
-            const end_date = MyApp.convertirStringAFecha(project.end_date);
-            FlatpickrUtil.setDate('datetimepicker-end-date', end_date);
+         if (project.end_date && project.end_date !== '') {
+            FlatpickrUtil.setDate('datetimepicker-end-date', project.end_date.split(' ')[0]);
          }
 
-         if (project.due_date !== '') {
-            const due_date = MyApp.convertirStringAFecha(project.due_date);
-            FlatpickrUtil.setDate('datetimepicker-due-date', due_date);
+         if (project.due_date && project.due_date !== '') {
+            FlatpickrUtil.setDate('datetimepicker-due-date', project.due_date.split(' ')[0]);
          }
 
          $('#concrete-vendor').val(project.vendor_id);
@@ -2224,9 +2221,8 @@ var Projects = (function () {
                $('#item-boned').prop('checked', items[posicion].boned == 1 || items[posicion].boned === true);
             }
 
-            if (items[posicion].change_order_date !== '') {
-               const change_order_date = MyApp.convertirStringAFecha(items[posicion].change_order_date);
-               FlatpickrUtil.setDate('change-order-date', change_order_date);
+            if (items[posicion].change_order_date && items[posicion].change_order_date !== '') {
+               FlatpickrUtil.setDate('change-order-date', items[posicion].change_order_date.split(' ')[0]);
             }
 
             // mostar modal
@@ -2758,9 +2754,10 @@ var Projects = (function () {
       function cargarDatos(notes) {
          $('#notes_id').val(notes.notes_id);
 
-         const date = MyApp.convertirStringAFecha(notes.date);
-         FlatpickrUtil.setDate('datetimepicker-notes-date', date);
-
+         if (notes.date) {
+             FlatpickrUtil.setDate('datetimepicker-notes-date', notes.date.split(' ')[0]);
+         }
+      
          QuillUtil.setHtml('#notes', notes.notes);
       }
    };
