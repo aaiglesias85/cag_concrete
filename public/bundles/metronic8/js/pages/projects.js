@@ -1312,9 +1312,30 @@ var Projects = (function () {
       // Quill SIN variables: se gestiona por selector
       QuillUtil.init('#notes');
 
+      // 1. Definimos la función de formato (La "B" Roja)
+      var formatItemState = function (state) {
+         if (!state.id) { return state.text; }
+         
+         var $element = $(state.element);
+         var bone = $element.data('bone'); // Obtenemos el dato 'bone'
+         
+         var $state = $('<span>' + state.text + '</span>');
+         
+         // Si es Bone, agregamos la insignia roja
+         if (bone == 1 || bone === '1' || bone === true) {
+            $state.append('<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8">B</span>');
+         }
+         
+         return $state;
+      };
+
+      // 2. Inicializamos el Select2 usando esa función
       $('.select-modal-item').select2({
-         dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
+         dropdownParent: $('#modal-item'),
+         templateResult: formatItemState,    // Formato visual en la lista
+         templateSelection: formatItemState  // Formato visual al seleccionarlo
       });
+      // --------------------------------------------------------
 
       Inputmask({
          mask: '(999) 999-9999',
@@ -1475,6 +1496,7 @@ var Projects = (function () {
          // OK
          $error.addClass('hide').text('');
       }
+      
    };
 
    var changeItemType = function () {
