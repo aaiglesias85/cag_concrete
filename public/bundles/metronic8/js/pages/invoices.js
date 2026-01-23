@@ -1020,11 +1020,7 @@ var Invoices = (function () {
             if (items[0].bone_price !== undefined) {
                bone_price = Number(items[0].bone_price || 0);
             }
-            
-            console.log('--- Datos cargados desde backend (invoice/cargarDatos) ---');
-            console.log('sum_boned_project:', sum_boned_project);
-            console.log('bone_price:', bone_price);
-            console.log('Total items del invoice:', items.length);
+                        
          }
 
          // Calcular y mostrar X e Y (Boned) en JavaScript
@@ -1419,11 +1415,6 @@ var Invoices = (function () {
                      sum_boned_project = Number(response.sum_boned_project || 0);
                      bone_price = Number(response.bone_price || 0);
                      
-                     console.log('--- Datos cargados desde backend (project/listarItemsParaInvoice) ---');
-                     console.log('sum_boned_project:', sum_boned_project);
-                     console.log('bone_price:', bone_price);
-                     console.log('Total items recibidos:', response.items ? response.items.length : 0);
-
                      //Llenar select
                      for (let item of response.items) {
                         var posicion = items.length;
@@ -1712,12 +1703,12 @@ var Invoices = (function () {
               
                var badgeBone = '';
                if (row.bone == 1 || row.bone === true) {
-                 badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+                 badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
    }
                
                var badgeBoned = '';
                if (row.boned == 1 || row.boned === true) {
-                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
               
                // Si es change order, agregar icono de historial
@@ -2027,15 +2018,12 @@ var Invoices = (function () {
    };
 
    // Función para calcular y mostrar X e Y (Boned) en JavaScript
-   var calcularYMostrarXBonedEnJS = function () {
-      console.log('=== INICIO CÁLCULO X e Y BONED ===');
+   var calcularYMostrarXBonedEnJS = function () { 
       
       // SUM_BONED_INVOICES: Suma de amount_final de items con boned=1 en el invoice actual
       // Para invoices nuevos, usar items_lista (items que están en la tabla)
       // Para invoices existentes, usar items (todos los items del invoice)
       var items_a_calcular = items_lista.length > 0 ? items_lista : items;
-      console.log('Items a calcular:', items_a_calcular.length, 'items');
-      console.log('Usando:', items_lista.length > 0 ? 'items_lista' : 'items');
       
       var sum_boned_invoices = 0;
       var items_boned_count = 0;
@@ -2048,58 +2036,30 @@ var Invoices = (function () {
             var quantity_brought_forward = Number(item.quantity_brought_forward || 0);
             var price = Number(item.price || 0);
             var amount_final = (quantity + quantity_brought_forward) * price;
-            
-            console.log(`Item boned #${items_boned_count} (índice ${index}):`, {
-               item_name: item.item || 'N/A',
-               project_item_id: item.project_item_id,
-               quantity: quantity,
-               quantity_brought_forward: quantity_brought_forward,
-               price: price,
-               amount_final: amount_final,
-               calculo: `(${quantity} + ${quantity_brought_forward}) * ${price} = ${amount_final}`
-            });
+         
             
             sum_boned_invoices += amount_final;
          }
       });
 
-      console.log('--- Resumen SUM_BONED_INVOICES ---');
-      console.log('Items boned encontrados:', items_boned_count);
-      console.log('SUM_BONED_INVOICES:', sum_boned_invoices);
-
-      // Calcular X = SUM_BONED_INVOICES / SUM_BONED_PROJECT
-      console.log('--- Cálculo de X ---');
-      console.log('SUM_BONED_INVOICES:', sum_boned_invoices);
-      console.log('sum_boned_project:', sum_boned_project);
       
       var x = 0;
       if (sum_boned_project > 0) {
          x = sum_boned_invoices / sum_boned_project;
-         console.log('X =', sum_boned_invoices, '/', sum_boned_project, '=', x);
+        
       } else {
-         console.log('X = 0 (sum_boned_project es 0 o no definido)');
+       
       }
-
-      // Calcular Y = Bone Price * X
-      console.log('--- Cálculo de Y ---');
-      console.log('bone_price:', bone_price);
-      console.log('X:', x);
       
-      var y = bone_price * x;
-      console.log('Y =', bone_price, '*', x, '=', y);
+      var y = bone_price * x;  
 
       // Mostrar valores
       var x_formatted = MyApp.formatMoney(x, 6, '.', ',');
-      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
-      
-      console.log('--- Valores finales mostrados ---');
-      console.log('X formateado:', x_formatted);
-      console.log('Y formateado:', y_formatted);
+      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
       
       $('#total_boned_x').val(x_formatted);
-      $('#total_boned_y').val(y_formatted);
-      
-      console.log('=== FIN CÁLCULO X e Y BONED ===\n');
+      $('#total_boned_y').val(y_formatted);      
+ 
    };
 
    var handleChangeOrderHistory = function () {
