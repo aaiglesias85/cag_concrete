@@ -924,6 +924,8 @@ var Invoices = (function () {
          editRow(invoice_id);
       });
    };
+
+
    var editRow = function (invoice_id) {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
@@ -974,15 +976,15 @@ var Invoices = (function () {
 
          $('#project').val(invoice.project_id);
          $('#project').trigger('change');
-
-         if (invoice.start_date !== '') {
-            const start_date = MyApp.convertirStringAFecha(invoice.start_date);
-            FlatpickrUtil.setDate('datetimepicker-start-date', start_date);
+     
+         if (invoice.start_date && invoice.start_date !== '') {   
+            let cleanStartDate = invoice.start_date.split(' ')[0]; 
+            FlatpickrUtil.setDate('datetimepicker-start-date', cleanStartDate);
          }
 
-         if (invoice.end_date !== '') {
-            const end_date = MyApp.convertirStringAFecha(invoice.end_date);
-            FlatpickrUtil.setDate('datetimepicker-end-date', end_date);
+         if (invoice.end_date && invoice.end_date !== '') {         
+            let cleanEndDate = invoice.end_date.split(' ')[0];
+            FlatpickrUtil.setDate('datetimepicker-end-date', cleanEndDate);
          }
 
          $('#notes').val(invoice.notes);
