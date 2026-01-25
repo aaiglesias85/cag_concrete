@@ -230,7 +230,7 @@ class InvoiceService extends Base
          // Unpaid actual como el Previous
          $mapa_datos_web[$dato['invoice_item_id']] = [
             'unpaid_qty' => $dato['unpaid_qty'],
-            'unpaid_from_previous' => $dato['unpaid_from_previous'] // <--- ESTO ES NUEVO
+            'unpaid_from_previous' => $dato['unpaid_from_previous']
          ];
       }
       //dd($mapa_datos_web);
