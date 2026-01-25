@@ -1188,11 +1188,13 @@ var Invoices = (function () {
                   var response = res.data;
                   if (response.success) {
                      var url = response.url;
-                     const archivo = url.split('/').pop();
-
+                     const archivo = url.split('/').pop();                 
+ 
                      // crear link para que se descargue el archivo
                      const link = document.createElement('a');
-                     link.href = url;
+                     //para cache
+                     link.href = url + '?t=' + new Date().getTime();
+                 
                      link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
                      document.body.appendChild(link);
                      link.click();
