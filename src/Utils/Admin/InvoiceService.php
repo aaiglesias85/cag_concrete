@@ -369,6 +369,8 @@ class InvoiceService extends Base
       $aplicarFormatoFila = function ($sheet, $f) use ($styleLeft, $styleRight, $currencyFormat, $qtyFormat) {
          $sheet->getStyle("A{$f}:E{$f}")->applyFromArray($styleLeft);
          $sheet->getStyle("F{$f}:S{$f}")->applyFromArray($styleRight);
+         $sheet->getStyle("A{$f}:S{$f}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE);
+         $sheet->getStyle("E{$f}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
          $sheet->getRowDimension($f)->setRowHeight(18);
          $colsMoney = ['F', 'H', 'J', 'L', 'N', 'P', 'S'];
          foreach ($colsMoney as $col) $sheet->getStyle($col . $f)->getNumberFormat()->setFormatCode($currencyFormat);
@@ -442,7 +444,7 @@ class InvoiceService extends Base
                // B. Título
                $titulo = strtoupper("CHANGE ORDER IN {$month} {$year}");
                $objWorksheet->setCellValue('B' . $fila, $titulo);
-               $objWorksheet->mergeCells("B{$fila}:S{$fila}");
+               $objWorksheet->mergeCells("B{$fila}:D{$fila}");
                $objWorksheet->getStyle("B{$fila}:S{$fila}")->applyFromArray($styleHeaderCO);
                $objWorksheet->getStyle("A{$fila}")->applyFromArray(['borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]]);
                $objWorksheet->getRowDimension($fila)->setRowHeight(22);
@@ -649,6 +651,7 @@ class InvoiceService extends Base
       $objWorksheet->mergeCells("B{$fila}:D{$fila}");
       if (!empty($styleArray)) {
          $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleArray);
+         $objWorksheet->getStyle("A{$fila}:R{$fila}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE);
       }
    }
 
