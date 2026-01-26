@@ -33,6 +33,38 @@
       color: red !important;
       font-weight: bold;
    }
+
+/* Ajuste de Diseño Slim para Invoices */
+#form-invoice .card {
+    min-height: 55px !important; /* Altura más baja */
+    justify-content: center;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Forzar que los inputs no tomen espacio extra */
+#form-invoice .card input {
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    pointer-events: none;
+    line-height: 1.1;
+}
+
+/* Ajuste de etiquetas micro */
+.fs-9 {
+    font-size: 0.65rem !important;
+}
+
+/* Fondo claro exacto (opacity 10) */
+.bg-opacity-10 {
+    --bs-bg-opacity: 0.1 !important; /* Esto hace el fondo claro y elegante */
+}
+
+#form-invoice .card {
+    min-height: 55px !important;
+    border-radius: 8px !important;
+}
 </style>
 {% endblock %} {% block content %}
 
@@ -488,32 +520,44 @@
                                  </div>
 
                                  <!-- totales -->
-                                 <div class="d-flex gap-3 flex-nowrap flex-grow-1 overflow-auto" style="padding-bottom: 0.25rem">
-                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                       <span class="input-group-text">Contract $:</span>
-                                       <input type="text" class="form-control form-control-solid" id="total_contract_amount" disabled />
-                                    </div>
+<div class="d-flex flex-nowrap align-items-center gap-3 mb-6 mt-1 overflow-auto pb-2">
+    <div class="card card-dashed flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Contract $</span>
+        <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_contract_amount" readonly value="$0.00" />
+    </div>
 
-                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                       <span class="input-group-text">Total $:</span>
-                                       <input type="text" class="form-control form-control-solid" id="total_amount_completed" disabled />
-                                    </div>
+    <div class="card bg-info bg-opacity-10 flex-center min-w-130px p-2 border border-info border-opacity-10">
+        <span class="fs-9 fw-bolder text-info text-uppercase d-block mb-n1">Total $</span>
+        <input type="text" class="text-info fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_completed" readonly value="$0.00" />
+    </div>
 
-                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                       <span class="input-group-text">Unpaid $:</span>
-                                       <input type="text" class="form-control form-control-solid" id="total_amount_unpaid" disabled />
-                                    </div>
+    <div class="card bg-danger bg-opacity-10 flex-center min-w-130px p-2 border border-danger border-opacity-10">
+        <span class="fs-9 fw-bolder text-danger text-uppercase d-block mb-n1">Unpaid $</span>
+        <input type="text" class="text-danger fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_unpaid" readonly value="$0.00" />
+    </div>
 
-                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                       <span class="input-group-text">This Period $:</span>
-                                       <input type="text" class="form-control form-control-solid" id="total_amount_period" disabled />
-                                    </div>
+    <div class="card bg-primary bg-opacity-10 flex-center min-w-130px p-2 border border-primary border-opacity-10">
+        <span class="fs-9 fw-bolder text-primary text-uppercase d-block mb-n1">This Period</span>
+        <input type="text" class="text-primary fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_period" readonly value="$0.00" />
+    </div>
 
-                                    <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                       <span class="input-group-text">Invoices Total $:</span>
-                                       <input type="text" class="form-control form-control-solid" id="total_amount_final" disabled />
-                                    </div>
-                                 </div>
+    <div class="card bg-dark bg-opacity-10 flex-center min-w-130px p-2 border border-gray-600 border-opacity-10">
+        <span class="fs-9 fw-bolder text-gray-700 text-uppercase d-block mb-n1">Final Period</span>
+        <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
+    </div>
+
+    <div class="card card-dashed bg-warning bg-opacity-10 flex-row align-items-center min-w-260px p-2 px-4 border border-warning border-opacity-10">
+        <div class="me-4 text-center">
+            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount:</span>
+            <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100px" id="total_boned_y" readonly value="$0.00" />
+        </div>
+        <div class="border-start border-warning border-opacity-30 ps-4 text-center">
+            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Qty:</span>
+            <span id="display_bond_qty" class="text-gray-700 fw-bold fs-7">0.00</span>
+            <input type="hidden" id="total_boned_x" />
+        </div>
+    </div>
+</div>
                               </div>
                            </div>
                            <!--end::Wrapper-->
@@ -542,18 +586,6 @@
                               <tbody class="text-gray-600 fw-semibold"></tbody>
                            </table>
                            <!--end::Datatable-->
-
-                           <!-- Fila de totales BONED X e Y -->
-                           <div class="d-flex gap-3 flex-nowrap flex-grow-1 overflow-auto mt-3" style="padding-bottom: 0.25rem">
-                              <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                 <span class="input-group-text">Bond Qty:</span>
-                                 <input type="text" class="form-control form-control-solid" id="total_boned_x" disabled />
-                              </div>
-                              <div class="input-group input-group-solid w-250px flex-shrink-0">
-                                 <span class="input-group-text">Bond Total Amount:</span>
-                                 <input type="text" class="form-control form-control-solid" id="total_boned_y" disabled />
-                              </div>
-                           </div>
                         </div>
                      </div>
                   </div>

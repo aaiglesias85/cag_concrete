@@ -2056,11 +2056,12 @@ var Invoices = (function () {
       var y = bone_price * x;  
 
       // Mostrar valores
-      var x_formatted = MyApp.formatMoney(x, 6, '.', ',');
+      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
       var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
       
       $('#total_boned_x').val(x_formatted);
-      $('#total_boned_y').val(y_formatted);      
+      $('#total_boned_y').val(y_formatted);     
+      $('#display_bond_qty').text(x_formatted); 
  
    };
 
