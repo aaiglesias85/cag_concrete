@@ -87,9 +87,8 @@ class EmployeeRepository extends ServiceEntityRepository
     *
     * @return []
     */
-   public function ListarEmployeesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array
+   public function ListarEmployeesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
    {
-
       // Whitelist de columnas ordenables
       $sortable = [
          'employeeId'  => 'e.employeeId',
@@ -100,17 +99,20 @@ class EmployeeRepository extends ServiceEntityRepository
       $orderBy = $sortable[$sortColumn] ?? 'e.name';
       $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
 
-      // QB base con filtros (se reutiliza para datos y conteo)
+      // QB base con filtros
       $baseQb = $this->createQueryBuilder('e')
          ->leftJoin('e.race', 'r')
          ->leftJoin('e.role', 'ro');
+
+      // Aplicamos el GroupBy al base para que los datos ($dataQb) salgan limpios (sin duplicados)
+      $baseQb->groupBy('e.employeeId');
 
       if (!empty($sSearch)) {
          $baseQb->andWhere('e.name LIKE :search OR ro.description LIKE :search')
             ->setParameter('search', "%{$sSearch}%");
       }
 
-      // 1) Datos
+      // 1) Datos (Hereda el GroupBy, esto está BIEN para la lista)
       $dataQb = clone $baseQb;
       $dataQb->orderBy($orderBy, $dir)
          ->setFirstResult($start)
@@ -118,16 +120,19 @@ class EmployeeRepository extends ServiceEntityRepository
 
       $data = $dataQb->getQuery()->getResult();
 
-      // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+      // 2) Conteo (Hereda el GroupBy, esto está MAL para el total)
+      //  Quitamos el group by y usamos DISTINCT
       $countQb = clone $baseQb;
-      $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(e.employeeId)');
+      $countQb->resetDQLPart('orderBy');
+      $countQb->resetDQLPart('groupBy'); //Quitar el agrupamiento
+
+      $countQb->select('COUNT(DISTINCT e.employeeId)'); // <--- Contar IDs únicos
 
       $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
       return [
-         'data'  => $data,   // array<Rol>
-         'total' => $total,  // total con el MISMO filtro 'search'
+         'data'  => $data,
+         'total' => $total,
       ];
    }
 

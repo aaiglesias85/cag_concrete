@@ -285,10 +285,21 @@ class EmployeeService extends Base
    ) {
       $em = $this->getDoctrine()->getManager();
 
+      $existe = $this->getDoctrine()->getRepository(Employee::class)->findOneBy(['name' => $name]);
+
+      if ($existe) {
+         return [
+            'success' => false,
+            'error' => 'An employee with this name already exists ' . $name
+         ];
+      }
+
       $entity = new Employee();
 
       $entity->setName($name);
+      $entity->setStatus(1);
       $entity->setHourlyRate($hourly_rate);
+
 
       if ($role_id != "") {
          $role = $this->getDoctrine()->getRepository(EmployeeRole::class)

@@ -314,9 +314,10 @@ var Employees = (function () {
    };
 
    //Salvar
-   var initAccionSalvar = function () {
+  var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-employee');
       $(document).on('click', '#btn-salvar-employee', function (e) {
+         e.preventDefault(); // Prevenir comportamientos por defecto
          btnClickSalvarForm();
       });
 
@@ -326,6 +327,12 @@ var Employees = (function () {
          event_change = false;
 
          if (validateForm()) {
+            // 1. OBTENER EL BOTÓN Y DESHABILITARLO
+            var btn = $('#btn-salvar-employee');
+            btn.prop('disabled', true); 
+            // Opcional: Agregar clase de carga si tu tema lo soporta (ej. Metronic)
+            btn.addClass('spinner spinner-white spinner-right'); 
+
             var formData = new URLSearchParams();
 
             var employee_id = $('#employee_id').val();
@@ -365,11 +372,16 @@ var Employees = (function () {
                })
                .catch(MyUtil.catchErrorAxios)
                .then(function () {
+                  // 2. SIEMPRE DESBLOQUEAR EL BOTÓN AL FINALIZAR
                   BlockUtil.unblock('#form-employee');
+                  btn.prop('disabled', false);
+                  btn.removeClass('spinner spinner-white spinner-right');
                });
          }
       }
    };
+
+
    //Cerrar form
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-employee');
