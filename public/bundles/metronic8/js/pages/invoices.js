@@ -2433,6 +2433,53 @@ columnDefs.push({
       });
    };
 
+  
+   var initAccionExportar = function () {
+      $(document).off('click', '#invoice-table-editable a.excel');
+      $(document).on('click', '#invoice-table-editable a.excel', function (e) {
+         e.preventDefault();
+
+         var invoice_id = $(this).data('id');
+         var formData = new URLSearchParams();
+         formData.set('invoice_id', invoice_id);
+         
+
+         BlockUtil.block('#lista-invoice');
+
+         axios
+            .post('invoice/exportarExcel', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     var url = response.url;
+                     
+                     // Lógica de descarga
+                     const link = document.createElement('a');
+                     link.href = url + '?t=' + new Date().getTime(); 
+                     
+                    
+                     const archivo = url.split('/').pop() || 'Invoice.xlsx';
+                     link.setAttribute('download', archivo);
+                     
+                     link.target = '_blank';
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-invoice');
+            });
+      });
+   };
+
     var initAccionExportarPdf = function () {
       $(document).off('click', '#invoice-table-editable a.pdf-export-btn');
       $(document).on('click', '#invoice-table-editable a.pdf-export-btn', function (e) {
