@@ -13,3 +13,25 @@ login:
   autenticar:
     usuario_bloqueado: Your user has been blocked, please contact your administrator
     error_login: The access data is incorrect
+
+usuario:
+  error:
+    cargar_datos: Could not load user data
+    usuario_no_existe: User does not exist
+    no_imagen: No image was provided
+    decodificar_imagen: Error decoding image
+    actualizar_imagen: Error updating image
+    eliminar_imagen: Error deleting image
+  message:
+    actualizado: Data was updated successfully
+    imagen_guardada: The operation was successful
+    imagen_eliminada: The operation was successful
+
+offline:
+  error:
+    no_datos: No data to synchronize
+    sincronizar_perfil: Error synchronizing profile data
+    cargar_actualizados: Error loading updated data
+    tipo_no_reconocido: Unrecognized data type
+  message:
+    sincronizado: Data was synchronized successfully

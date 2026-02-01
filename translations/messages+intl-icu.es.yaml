@@ -13,3 +13,25 @@ login:
   autenticar:
     usuario_bloqueado: Su usuario ha sido bloqueado, por favor contacte con su administrador
     error_login: Los datos de acceso son incorrectos
+
+usuario:
+  error:
+    cargar_datos: No se pudieron cargar los datos del usuario
+    usuario_no_existe: No existe el usuario
+    no_imagen: No se proporcionó una imagen
+    decodificar_imagen: Error al decodificar la imagen
+    actualizar_imagen: Error al actualizar la imagen
+    eliminar_imagen: Error al eliminar la imagen
+  message:
+    actualizado: Los datos se actualizaron correctamente
+    imagen_guardada: La operación se realizó correctamente
+    imagen_eliminada: La operación se realizó correctamente
+
+offline:
+  error:
+    no_datos: No hay datos para sincronizar
+    sincronizar_perfil: Error al sincronizar los datos del perfil
+    cargar_actualizados: Error al cargar los datos actualizados
+    tipo_no_reconocido: Tipo de datos no reconocido
+  message:
+    sincronizado: Los datos se sincronizaron correctamente

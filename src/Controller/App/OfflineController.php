@@ -9,6 +9,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'Offline', description: 'Offline data synchronization endpoints')]
 class OfflineController extends AbstractController
@@ -16,11 +17,13 @@ class OfflineController extends AbstractController
    use JsonRequestTrait;
    private LoginService $loginService;
    private OfflineService $offlineService;
+   private TranslatorInterface $translator;
 
-   public function __construct(LoginService $loginService, OfflineService $offlineService)
+   public function __construct(LoginService $loginService, OfflineService $offlineService, TranslatorInterface $translator)
    {
       $this->loginService = $loginService;
       $this->offlineService = $offlineService;
+      $this->translator = $translator;
    }
 
    /**
@@ -101,8 +104,11 @@ class OfflineController extends AbstractController
          new OA\Response(response: 500, description: 'Internal server error'),
       ]
    )]
-   public function sincronizar(Request $request): JsonResponse
+   public function sincronizar(Request $request, string $lang = 'es'): JsonResponse
    {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+
       try {
          // Leer datos desde JSON body
          $data = $this->getRequestData($request);
@@ -111,7 +117,7 @@ class OfflineController extends AbstractController
 
          if (empty($profile_offline)) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = 'No hay datos para sincronizar';
+            $resultadoJson['error'] = $this->translator->trans('offline.error.no_datos', [], 'messages', $lang);
             return $this->json($resultadoJson, 400);
          }
 
@@ -119,13 +125,15 @@ class OfflineController extends AbstractController
          $resultado = $this->offlineService->SincronizarPerfilUsuario($profile_offline);
 
          if ($resultado['success']) {
+            $resultado['message'] = $this->translator->trans('offline.message.sincronizado', [], 'messages', $lang);
             return $this->json($resultado);
          } else {
+            $resultado['error'] = $resultado['error'] ?? $this->translator->trans('offline.error.sincronizar_perfil', [], 'messages', $lang);
             return $this->json($resultado, 400);
          }
       } catch (\Exception $e) {
          $resultadoJson['success'] = false;
-         $resultadoJson['error'] = 'Ha ocurrido un error al procesar la solicitud';
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
          $this->loginService->writelogerror($e->getMessage());
 
          return $this->json($resultadoJson, 500);

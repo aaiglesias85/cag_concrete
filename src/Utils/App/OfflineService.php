@@ -3,10 +3,12 @@
 namespace App\Utils\App;
 
 use App\Utils\Base;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OfflineService extends Base
 {
    private UsuarioService $usuarioService;
+   private TranslatorInterface $translator;
 
    public function __construct(
       \Symfony\Component\DependencyInjection\ContainerInterface $container,
@@ -14,10 +16,12 @@ class OfflineService extends Base
       \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
       \Symfony\Bundle\SecurityBundle\Security $security,
       \Psr\Log\LoggerInterface $logger,
-      UsuarioService $usuarioService
+      UsuarioService $usuarioService,
+      TranslatorInterface $translator
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->usuarioService = $usuarioService;
+      $this->translator = $translator;
    }
 
    /**
@@ -49,7 +53,7 @@ class OfflineService extends Base
          );
 
          if (!$resultadoActualizar['success']) {
-            $resultado['error'] = $resultadoActualizar['error'] ?? 'Error al sincronizar los datos del perfil';
+            $resultado['error'] = $resultadoActualizar['error'] ?? $this->translator->trans('offline.error.sincronizar_perfil', [], 'messages');
             return $resultado;
          }
 
@@ -88,14 +92,14 @@ class OfflineService extends Base
 
          if ($resultadoUsuario['success']) {
             $resultado['success'] = true;
-            $resultado['message'] = 'Los datos se sincronizaron correctamente';
+            $resultado['message'] = $this->translator->trans('offline.message.sincronizado', [], 'messages');
             $resultado['usuario'] = $resultadoUsuario['usuario'];
          } else {
-            $resultado['error'] = 'Error al cargar los datos actualizados';
+            $resultado['error'] = $this->translator->trans('offline.error.cargar_actualizados', [], 'messages');
          }
 
       } catch (\Exception $e) {
-         $resultado['error'] = 'Ha ocurrido un error al procesar la sincronización';
+         $resultado['error'] = $this->translator->trans('message.exception', [], 'messages');
          $this->logger->error($e->getMessage());
       }
 
@@ -126,11 +130,11 @@ class OfflineService extends Base
             //    break;
             
             default:
-               $resultado['error'] = 'Tipo de datos no reconocido: ' . $tipo;
+               $resultado['error'] = $this->translator->trans('offline.error.tipo_no_reconocido', [], 'messages') . ': ' . $tipo;
                break;
          }
       } catch (\Exception $e) {
-         $resultado['error'] = 'Ha ocurrido un error al procesar la sincronización';
+         $resultado['error'] = $this->translator->trans('message.exception', [], 'messages');
          $this->logger->error($e->getMessage());
       }
 

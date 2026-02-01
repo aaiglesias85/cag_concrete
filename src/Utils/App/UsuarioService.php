@@ -5,10 +5,12 @@ namespace App\Utils\App;
 use App\Entity\Usuario;
 use App\Utils\Admin\UsuarioService as AdminUsuarioService;
 use App\Utils\Base;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UsuarioService extends Base
 {
    private AdminUsuarioService $adminUsuarioService;
+   private TranslatorInterface $translator;
 
    public function __construct(
       \Symfony\Component\DependencyInjection\ContainerInterface $container,
@@ -16,10 +18,12 @@ class UsuarioService extends Base
       \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
       \Symfony\Bundle\SecurityBundle\Security $security,
       \Psr\Log\LoggerInterface $logger,
-      AdminUsuarioService $adminUsuarioService
+      AdminUsuarioService $adminUsuarioService,
+      TranslatorInterface $translator
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->adminUsuarioService = $adminUsuarioService;
+      $this->translator = $translator;
    }
 
    /**
@@ -45,11 +49,11 @@ class UsuarioService extends Base
             $resultado['usuario'] = $resultadoAdmin['usuario'];
          } else {
             $resultado['success'] = false;
-            $resultado['error'] = $resultadoAdmin['error'] ?? 'No se pudieron cargar los datos del usuario';
+            $resultado['error'] = $resultadoAdmin['error'] ?? $this->translator->trans('usuario.error.cargar_datos', [], 'messages');
          }
       } else {
          $resultado['success'] = false;
-         $resultado['error'] = "No existe el usuario";
+         $resultado['error'] = $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages');
       }
 
       return $resultado;
@@ -74,7 +78,7 @@ class UsuarioService extends Base
       if ($usuario == null) {
          return [
             'success' => false,
-            'error' => "No existe el usuario"
+            'error' => $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages')
          ];
       }
 
@@ -105,7 +109,7 @@ class UsuarioService extends Base
       if ($usuario == null) {
          return [
             'success' => false,
-            'error' => "No existe el usuario"
+            'error' => $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages')
          ];
       }
 
@@ -127,7 +131,7 @@ class UsuarioService extends Base
       if ($usuario == null) {
          return [
             'success' => false,
-            'error' => "No existe el usuario"
+            'error' => $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages')
          ];
       }
 

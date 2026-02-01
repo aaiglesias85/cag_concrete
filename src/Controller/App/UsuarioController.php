@@ -9,6 +9,7 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'User', description: 'User profile management endpoints')]
 class UsuarioController extends AbstractController
@@ -16,11 +17,13 @@ class UsuarioController extends AbstractController
    use JsonRequestTrait;
    private LoginService $loginService;
    private UsuarioService $usuarioService;
+   private TranslatorInterface $translator;
 
-   public function __construct(LoginService $loginService, UsuarioService $usuarioService)
+   public function __construct(LoginService $loginService, UsuarioService $usuarioService, TranslatorInterface $translator)
    {
       $this->loginService = $loginService;
       $this->usuarioService = $usuarioService;
+      $this->translator = $translator;
    }
 
    /**
@@ -71,8 +74,11 @@ class UsuarioController extends AbstractController
          new OA\Response(response: 500, description: 'Internal server error'),
       ]
    )]
-   public function cargarDatos(): JsonResponse
+   public function cargarDatos(Request $request, string $lang = 'es'): JsonResponse
    {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+
       try {
          $resultado = $this->usuarioService->CargarDatosUsuario();
 
@@ -81,13 +87,13 @@ class UsuarioController extends AbstractController
             $resultadoJson['usuario'] = $resultado['usuario'];
          } else {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $resultado['error'] ?? 'No se pudieron cargar los datos del usuario';
+            $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.cargar_datos', [], 'messages', $lang);
          }
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
          $resultadoJson['success'] = false;
-         $resultadoJson['error'] = 'Ha ocurrido un error al procesar la solicitud';
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
          $this->loginService->writelogerror($e->getMessage());
 
          return $this->json($resultadoJson, 500);
@@ -141,8 +147,11 @@ class UsuarioController extends AbstractController
          new OA\Response(response: 500, description: 'Internal server error'),
       ]
    )]
-   public function actualizarDatos(Request $request): JsonResponse
+   public function actualizarDatos(Request $request, string $lang = 'es'): JsonResponse
    {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+
       try {
          // Leer parámetros desde JSON body solamente
          $data = $this->getRequestData($request);
@@ -168,7 +177,7 @@ class UsuarioController extends AbstractController
 
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['message'] = $this->translator->trans('usuario.message.actualizado', [], 'messages', $lang);
          } else {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
@@ -184,7 +193,7 @@ class UsuarioController extends AbstractController
             return $this->json($resultadoJson, 400);
          }
          
-         $resultadoJson['error'] = 'An error occurred while processing the request';
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
          $this->loginService->writelogerror($e->getMessage());
 
          return $this->json($resultadoJson, 500);
@@ -240,13 +249,16 @@ class UsuarioController extends AbstractController
          new OA\Response(response: 500, description: 'Internal server error'),
       ]
    )]
-   public function salvarImagen(Request $request): JsonResponse
+   public function salvarImagen(Request $request, string $lang = 'es'): JsonResponse
    {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+
       try {
          $usuario = $this->getUser();
          if ($usuario == null) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = "No existe el usuario";
+            $resultadoJson['error'] = $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages', $lang);
             return $this->json($resultadoJson);
          }
 
@@ -258,7 +270,7 @@ class UsuarioController extends AbstractController
 
          if (empty($imagen)) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = "No se proporcionó una imagen";
+            $resultadoJson['error'] = $this->translator->trans('usuario.error.no_imagen', [], 'messages', $lang);
             return $this->json($resultadoJson);
          }
 
@@ -266,7 +278,7 @@ class UsuarioController extends AbstractController
 
          if ($data === false) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = "Error al decodificar la imagen";
+            $resultadoJson['error'] = $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages', $lang);
             return $this->json($resultadoJson);
          }
 
@@ -288,16 +300,16 @@ class UsuarioController extends AbstractController
          if ($resultado['success']) {
             $resultadoJson['success'] = true;
             $resultadoJson['imagen'] = $foto;
-            $resultadoJson['message'] = "La operación se realizó correctamente";
+            $resultadoJson['message'] = $this->translator->trans('usuario.message.imagen_guardada', [], 'messages', $lang);
          } else {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $resultado['error'] ?? 'Error al actualizar la imagen';
+            $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.actualizar_imagen', [], 'messages', $lang);
          }
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
          $resultadoJson['success'] = false;
-         $resultadoJson['error'] = 'Ha ocurrido un error al procesar la solicitud';
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
          $this->loginService->writelogerror($e->getMessage());
 
          return $this->json($resultadoJson, 500);
@@ -337,17 +349,20 @@ class UsuarioController extends AbstractController
          new OA\Response(response: 500, description: 'Internal server error'),
       ]
    )]
-   public function eliminarImagen(Request $request): JsonResponse
+   public function eliminarImagen(Request $request, string $lang = 'es'): JsonResponse
    {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+
       try {
          $resultado = $this->usuarioService->EliminarImagenPerfil();
 
          if ($resultado['success']) {
             $resultadoJson['success'] = true;
-            $resultadoJson['message'] = "La operación se realizó correctamente";
+            $resultadoJson['message'] = $this->translator->trans('usuario.message.imagen_eliminada', [], 'messages', $lang);
          } else {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $resultado['error'] ?? 'Error al eliminar la imagen';
+            $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.eliminar_imagen', [], 'messages', $lang);
          }
 
          return $this->json($resultadoJson);
@@ -360,7 +375,7 @@ class UsuarioController extends AbstractController
             return $this->json($resultadoJson, 400);
          }
          
-         $resultadoJson['error'] = 'An error occurred while processing the request';
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
          $this->loginService->writelogerror($e->getMessage());
 
          return $this->json($resultadoJson, 500);
