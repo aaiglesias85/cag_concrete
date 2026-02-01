@@ -266,12 +266,12 @@ class InvoiceService extends Base
 
       $styleLeft = [
          'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-         'font' => ['name' => 'Arial', 'size' => 10, 'bold' => false],
+         'font' => ['name' => 'Calibri', 'size' => 11, 'bold' => false],
          'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true]
       ];
       $styleRight = [
          'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-         'font' => ['name' => 'Arial', 'size' => 10, 'bold' => false],
+         'font' => ['name' => 'Calibri', 'size' => 11, 'bold' => false],
          'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT, 'vertical' => Alignment::VERTICAL_CENTER]
       ];
 
