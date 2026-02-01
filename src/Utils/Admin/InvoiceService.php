@@ -634,7 +634,13 @@ class InvoiceService extends Base
       $objWorksheet->getStyle($celda_C_valor)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle($celda_C_valor)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
+      // Usamos "A1" como inicio y "T" + la última fila como final.
+      $rango_impresion = "A1:T{$fila_amount_due}";
 
+      $objWorksheet->getPageSetup()->setPrintArea($rango_impresion);
+
+      // Opcional: Centrar en la página al imprimir
+      $objWorksheet->getPageSetup()->setHorizontalCentered(true);
       $nombre_base = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber();
 
       // ==========================================
@@ -659,7 +665,7 @@ class InvoiceService extends Base
             $objWorksheet->getPageMargins()->setBottom(0.5);
 
             // [AJUSTE] Definir área de impresión exacta
-            $objWorksheet->getPageSetup()->setPrintArea("A1:S{$fila_amount_due}");
+            $objWorksheet->getPageSetup()->setPrintArea("A1:T{$fila_amount_due}");
 
             // [AJUSTE] Escala para que quepa en 1 página de ancho
             $objWorksheet->getPageSetup()->setFitToPage(true);

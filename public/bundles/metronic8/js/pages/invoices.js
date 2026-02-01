@@ -1228,10 +1228,10 @@ columnDefs.push({
                var response = res.data;
                if (response.success) {
                   var url = response.url; 
+                  var filename = url.substring(url.lastIndexOf('/') + 1);
                   const link = document.createElement('a');
-                  // Agregamos un timestamp para evitar caché del navegador
                   link.href = url + '?t=' + new Date().getTime();
-                  link.setAttribute('download', 'Invoice.pdf');
+                  link.setAttribute('download', filename);
                   link.target = '_blank';
                   document.body.appendChild(link);
                   link.click();
