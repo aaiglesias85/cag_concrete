@@ -290,15 +290,54 @@ var Invoices = (function () {
       }
 
       // acciones
-      columnDefs.push({
-         targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete', 'exportar_excel']);
-         },
-      });
+
+columnDefs.push({
+    targets: -1,
+    data: null,
+    orderable: false,
+    className: 'text-center', // 
+    render: function (data, type, row) {
+
+        let html = '<div class="d-flex justify-content-center flex-shrink-0">';
+
+        // 1. Botón EDITAR 
+        if (permiso.editar) {
+            html += `
+                <a href="javascript:;" class="btn btn-icon btn-light-success btn-sm me-1 edit" data-id="${row.id}" title="Edit" data-bs-toggle="tooltip">
+                    <i class="ki-duotone ki-pencil fs-3">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </a>`;
+        }
+
+        // 2. Botón EXCEL 
+        html += `
+            <a href="javascript:;" class="btn btn-icon btn-light-warning btn-sm me-1 excel" data-id="${row.id}" title="Export Excel" data-bs-toggle="tooltip">
+                <i class="ki-duotone ki-file-down fs-3">
+                    <span class="path1"></span><span class="path2"></span>
+                </i>
+            </a>`;
+
+        // 3. Botón PDF 
+        html += `
+            <a href="javascript:;" class="btn btn-icon btn-light-danger btn-sm me-1 pdf-export-btn" data-id="${row.id}" title="Export PDF" data-bs-toggle="tooltip">
+                <i class="bi bi-file-earmark-pdf-fill fs-3 text-danger"></i>
+            </a>`;
+
+        // 4. Botón Eliminar
+        if (permiso.eliminar) {
+            html += `
+                <a href="javascript:;" class="btn btn-icon btn-light-danger btn-sm delete" data-id="${row.id}" title="Delete" data-bs-toggle="tooltip">
+                    <i class="ki-duotone ki-trash fs-3">
+                        <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
+                    </i>
+                </a>`;
+        }
+
+        html += '</div>';
+        return html;
+    },
+});
 
       return columnDefs;
    };
@@ -1168,51 +1207,48 @@ var Invoices = (function () {
    };
 
    // exportar excel
-   var initAccionExportar = function () {
-      $(document).off('click', '#invoice-table-editable a.excel');
-      $(document).on('click', '#invoice-table-editable a.excel', function (e) {
-         e.preventDefault();
+  var initAccionExportarPdf = function () {
+   $(document).off('click', '#invoice-table-editable a.pdf-export-btn');
+   $(document).on('click', '#invoice-table-editable a.pdf-export-btn', function (e) {
+      e.preventDefault();
 
-         var invoice_id = $(this).data('id');
+      var invoice_id = $(this).data('id');
+      var formData = new URLSearchParams();
+      formData.set('invoice_id', invoice_id);
 
-         var formData = new URLSearchParams();
+      formData.set('format', 'pdf'); 
+      // -----------------------------------
 
-         formData.set('invoice_id', invoice_id);
+      BlockUtil.block('#lista-invoice');
 
-         BlockUtil.block('#lista-invoice');
-
-         axios
-            .post('invoice/exportarExcel', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     var url = response.url;
-                     const archivo = url.split('/').pop();                 
- 
-                     // crear link para que se descargue el archivo
-                     const link = document.createElement('a');
-                     //para cache
-                     link.href = url + '?t=' + new Date().getTime();
-                 
-                     link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
-                     document.body.appendChild(link);
-                     link.click();
-                     document.body.removeChild(link);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
+      axios
+         .post('invoice/exportarExcel', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var url = response.url; 
+                  const link = document.createElement('a');
+                  // Agregamos un timestamp para evitar caché del navegador
+                  link.href = url + '?t=' + new Date().getTime();
+                  link.setAttribute('download', 'Invoice.pdf');
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
                } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
+                  toastr.error(response.error, '');
                }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#lista-invoice');
-            });
-      });
-   };
-
+            } else {
+               toastr.error('Error interno.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#lista-invoice');
+         });
+   });
+};
    // proyecto
    var initAccionProject = function () {
       $(document).off('click', '#invoice-table-editable a.project-link');
@@ -2397,6 +2433,48 @@ var Invoices = (function () {
       });
    };
 
+    var initAccionExportarPdf = function () {
+      $(document).off('click', '#invoice-table-editable a.pdf-export-btn');
+      $(document).on('click', '#invoice-table-editable a.pdf-export-btn', function (e) {
+         e.preventDefault();
+
+         var invoice_id = $(this).data('id');
+         var formData = new URLSearchParams();
+         formData.set('invoice_id', invoice_id);
+
+         formData.set('format', 'pdf');
+
+         BlockUtil.block('#lista-invoice');
+
+         axios
+            .post('invoice/exportarExcel', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     var url = response.url; 
+                     const link = document.createElement('a');
+                     link.href = url + '?t=' + new Date().getTime();
+                     link.setAttribute('download', 'Invoice.pdf');
+                     link.target = '_blank';
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('Error interno.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-invoice');
+            });
+      });
+   };
+
+
    return {
       //main function to initiate the module
       init: function () {
@@ -2411,8 +2489,8 @@ var Invoices = (function () {
          initAccionCerrar();
 
          initAccionFiltrar();
-
-         // items
+         
+         initAccionExportarPdf();
          initTableItems();
          initAccionesItems();
 

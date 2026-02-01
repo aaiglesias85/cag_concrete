@@ -213,8 +213,12 @@ class InvoiceService extends Base
     * ExportarExcel: Exporta a excel el invoice
     * @author Marcel
     */
-   public function ExportarExcel($invoice_id)
+   public function ExportarExcel($invoice_id, $format = 'excel')
    {
+      // 0. OPTIMIZACIÓN: Aumentar recursos para evitar timeout en local
+      set_time_limit(300);
+      ini_set('memory_limit', '512M');
+
       $em = $this->getDoctrine()->getManager();
       $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
       $invoiceRepo = $em->getRepository(Invoice::class);
@@ -227,14 +231,11 @@ class InvoiceService extends Base
       $datos_web = $this->ListarItemsDeInvoice($invoice_id);
       $mapa_datos_web = [];
       foreach ($datos_web as $dato) {
-         // Unpaid actual como el Previous
          $mapa_datos_web[$dato['invoice_item_id']] = [
             'unpaid_qty' => $dato['unpaid_qty'],
             'unpaid_from_previous' => $dato['unpaid_from_previous']
          ];
       }
-      //dd($mapa_datos_web);
-      // ---------------------------------------------------------------
 
       $project_entity = $invoice_entity->getProject();
       $project_id = $project_entity->getProjectId();
@@ -278,9 +279,7 @@ class InvoiceService extends Base
       $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
-      // ======================================================================
       // CALCULO DE ESPACIO
-      // ======================================================================
       $start_row_data = 16;
       $fila_footer_inicio = 0;
       for ($i = $start_row_data; $i < 200; $i++) {
@@ -293,28 +292,24 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // --- CÁLCULO EXACTO DE FILAS ---
+      // CÁLCULO EXACTO DE FILAS
       $filas_necesarias = count($items_regulares);
-
       if (!empty($items_change_order)) {
          $esPrimerGrupoCalculo = true;
-
          foreach ($items_change_order as $group_key => $group) {
             $filas_necesarias += count($group);
-
             if ($group_key !== 'no-date') {
                if ($esPrimerGrupoCalculo) {
-                  $filas_necesarias += 2; // 1 Fila Blanca + 1 Fila Título
+                  $filas_necesarias += 2;
                   $esPrimerGrupoCalculo = false;
                } else {
-                  $filas_necesarias += 1; // Solo 1 Fila Título
+                  $filas_necesarias += 1;
                }
             }
          }
       }
 
       $filas_disponibles = $fila_footer_inicio - $start_row_data;
-
       if ($filas_necesarias > $filas_disponibles) {
          $a_insertar = $filas_necesarias - $filas_disponibles;
          $objWorksheet->insertNewRowBefore($fila_footer_inicio, $a_insertar);
@@ -378,23 +373,43 @@ class InvoiceService extends Base
          foreach ($colsQty as $col) $sheet->getStyle($col . $f)->getNumberFormat()->setFormatCode($qtyFormat);
       };
 
+      // --- INICIALIZAR VARIABLES DE SUMA PARA PDF ---
+      $sum_H_contract      = 0;
+      $sum_J_completed     = 0;
+      $sum_L_unpaid_prev   = 0;
+      $sum_N_pending       = 0;
+      $sum_P_this_period   = 0;
+      $sum_S_billed        = 0;
+
       // 5. ESCRIBIR ITEMS REGULARES
       foreach ($items_regulares as $value) {
          $em->refresh($value);
 
-         // ---Inyectar Unpaid Actual y Previo desde la Web ---
          if (isset($mapa_datos_web[$value->getId()])) {
             $d = $mapa_datos_web[$value->getId()];
             $value->setUnpaidQty($d['unpaid_qty']);
-            $value->setUnpaidFromPrevious($d['unpaid_from_previous']); // Inyectamos el previo correcto
+            $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
          }
-         // ----------------------------------------------------------------
 
          $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
+         // Datos para el Excel
          $qty_this_period = $value->getQuantity();
          $qty_brought_forward = $value->getQuantityBroughtForward() ? $value->getQuantityBroughtForward() : 0;
          $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
+
+         // --- ACUMULAR PARA PDF (Cálculo manual) ---
+         $price = $value->getPrice();
+         $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
+         $unpaid_prev_qty = $value->getUnpaidFromPrevious() ?: 0;
+
+         $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
+         $sum_J_completed     += ($qty_completed * $price);
+         $sum_L_unpaid_prev   += ($unpaid_prev_qty * $price);
+         $sum_N_pending       += ($value->getUnpaidQty() * $price);
+         $sum_P_this_period   += ($value->getQuantity() * $price);
+         $sum_S_billed        += ($final_invoiced_qty * $price);
+         // ------------------------------------------
 
          $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
          $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
@@ -406,8 +421,6 @@ class InvoiceService extends Base
 
       // 6. ESCRIBIR CHANGE ORDERS
       if (!empty($items_change_order)) {
-
-         // Estilos
          $styleHeaderCO = [
             'font' => ['bold' => true, 'size' => 10, 'color' => ['argb' => '000000']],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'E7E7E7']],
@@ -433,15 +446,12 @@ class InvoiceService extends Base
             }
 
             if ($month) {
-               // A. Fila Separadora (Solo 1 vez)
                if ($esPrimerGrupo) {
                   $objWorksheet->getStyle("A{$fila}:S{$fila}")->applyFromArray($styleSeparator);
                   $objWorksheet->getRowDimension($fila)->setRowHeight(10);
                   $fila++;
                   $esPrimerGrupo = false;
                }
-
-               // B. Título
                $titulo = strtoupper("CHANGE ORDER IN {$month} {$year}");
                $objWorksheet->setCellValue('B' . $fila, $titulo);
                $objWorksheet->mergeCells("B{$fila}:D{$fila}");
@@ -451,23 +461,32 @@ class InvoiceService extends Base
                $fila++;
             }
 
-            // C. Items
             foreach ($group_items as $value) {
                $em->refresh($value);
-
-               // --- [CORRECCIÓN] Inyectar Unpaid Actual y Previo ---
                if (isset($mapa_datos_web[$value->getId()])) {
                   $d = $mapa_datos_web[$value->getId()];
                   $value->setUnpaidQty($d['unpaid_qty']);
-                  $value->setUnpaidFromPrevious($d['unpaid_from_previous']); // Inyectamos el previo correcto
+                  $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
                }
-               // ----------------------------------------------------
 
                $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
+               $price = $value->getPrice();
                $qty_this_period = $value->getQuantity();
                $qty_brought_forward = $value->getQuantityBroughtForward() ? $value->getQuantityBroughtForward() : 0;
                $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
+
+               // --- ACUMULAR PARA PDF (Igual que arriba) ---
+               $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
+               $unpaid_prev_qty = $value->getUnpaidFromPrevious() ?: 0;
+
+               $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
+               $sum_J_completed     += ($qty_completed * $price);
+               $sum_L_unpaid_prev   += ($unpaid_prev_qty * $price);
+               $sum_N_pending       += ($value->getUnpaidQty() * $price);
+               $sum_P_this_period   += ($value->getQuantity() * $price);
+               $sum_S_billed        += ($final_invoiced_qty * $price);
+               // --------------------------------------------
 
                $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
                $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
@@ -483,30 +502,41 @@ class InvoiceService extends Base
       $last_data_row = $fila_footer_inicio - 1;
       if ($last_data_row < $start_row_data) $last_data_row = $start_row_data;
 
-      // Sumas Excel existentes
-      $objWorksheet->setCellValue('H' . $fila_footer_inicio, "=SUM(H{$start_row_data}:H{$last_data_row})");
-      $objWorksheet->setCellValue('J' . $fila_footer_inicio, "=SUM(J{$start_row_data}:J{$last_data_row})");
-      $objWorksheet->setCellValue('L' . $fila_footer_inicio, "=SUM(L{$start_row_data}:L{$last_data_row})");
+      // ==========================================
+      // BIFURCACIÓN: PDF (Valores) vs EXCEL (Fórmulas)
+      // ==========================================
+      if ($format === 'pdf') {
+         // USAMOS LAS VARIABLES PHP (Sin Fórmulas)
+         $objWorksheet->setCellValue('H' . $fila_footer_inicio, $sum_H_contract);
+         $objWorksheet->setCellValue('J' . $fila_footer_inicio, $sum_J_completed);
+         $objWorksheet->setCellValue('L' . $fila_footer_inicio, $sum_L_unpaid_prev);
+         $objWorksheet->setCellValue('N' . $fila_footer_inicio, $sum_N_pending);
+         $objWorksheet->setCellValue('P' . $fila_footer_inicio, $sum_P_this_period);
+         $objWorksheet->setCellValue('S' . $fila_footer_inicio, $sum_S_billed);
+      } else {
+         // USAMOS FÓRMULAS DE EXCEL
+         $objWorksheet->setCellValue('H' . $fila_footer_inicio, "=SUM(H{$start_row_data}:H{$last_data_row})");
+         $objWorksheet->setCellValue('J' . $fila_footer_inicio, "=SUM(J{$start_row_data}:J{$last_data_row})");
+         $objWorksheet->setCellValue('L' . $fila_footer_inicio, "=SUM(L{$start_row_data}:L{$last_data_row})");
+         $objWorksheet->setCellValue('N' . $fila_footer_inicio, "=SUM(N{$start_row_data}:N{$last_data_row})");
+         $objWorksheet->setCellValue('P' . $fila_footer_inicio, "=SUM(P{$start_row_data}:P{$last_data_row})");
+         $objWorksheet->setCellValue('S' . $fila_footer_inicio, "=SUM(S{$start_row_data}:S{$last_data_row})");
+      }
+
+      // Etiquetas y Estilos comunes
       $objWorksheet->setCellValue('O' . $fila_footer_inicio, "=SUM(O{$start_row_data}:O{$last_data_row})");
+      $objWorksheet->setCellValue('M' . $fila_footer_inicio, "TOTAL PENDING BALANCE:");
+      $objWorksheet->getStyle('N' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
       $objWorksheet->setCellValue('O' . $fila_footer_inicio, "TOTAL AMT THIS PERIOD:");
       $objWorksheet->getStyle('O' . $fila_footer_inicio)->getFont()->setBold(true);
       $objWorksheet->getStyle('O' . $fila_footer_inicio)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-      $objWorksheet->setCellValue('P' . $fila_footer_inicio, "=SUM(P{$start_row_data}:P{$last_data_row})");
       $objWorksheet->getStyle('P' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
       $objWorksheet->setCellValue('R' . $fila_footer_inicio, "TOTAL BILLED AMOUNT:");
       $objWorksheet->getStyle('R' . $fila_footer_inicio)->getFont()->setBold(true);
       $objWorksheet->getStyle('R' . $fila_footer_inicio)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-      $objWorksheet->setCellValue('S' . $fila_footer_inicio, "=SUM(S{$start_row_data}:S{$last_data_row})");
       $objWorksheet->getStyle('S' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
-
-      // ---TOTAL PENDING BALANCE  ---
-      $objWorksheet->setCellValue('M' . $fila_footer_inicio, "TOTAL PENDING BALANCE:");
-      $objWorksheet->setCellValue('N' . $fila_footer_inicio, "=SUM(N{$start_row_data}:N{$last_data_row})");
-      $objWorksheet->getStyle('N' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
 
       // 8. RETAINAGE Y GUARDAR
@@ -525,32 +555,24 @@ class InvoiceService extends Base
       $running_paid_accumulated = 0;
       $current_retainage_amount = 0;
 
-      $allInvoices = $invoiceRepo->findBy(
-         ['project' => $project_id],
-         ['startDate' => 'ASC', 'invoiceId' => 'ASC']
-      );
+      $allInvoices = $invoiceRepo->findBy(['project' => $project_id], ['startDate' => 'ASC', 'invoiceId' => 'ASC']);
 
       foreach ($allInvoices as $inv) {
          $paid_this_invoice_retainage_base = 0;
          $invItems = $invoiceItemRepo->findBy(['invoice' => $inv]);
-
          foreach ($invItems as $item) {
             if ($item->getProjectItem()->getApplyRetainage()) {
                $paid_this_invoice_retainage_base += $item->getPaidAmount();
             }
          }
-
          $pct_to_use = $std_retainage;
          if ($threshold_amount > 0 && ($running_paid_accumulated + $paid_this_invoice_retainage_base) >= $threshold_amount) {
             $pct_to_use = $red_retainage;
          }
-
          $retainage_calculated = $paid_this_invoice_retainage_base * ($pct_to_use / 100);
-
          foreach ($inv->getReimbursementHistories() as $history) {
             $retainage_calculated -= (float)$history->getAmount();
          }
-
          $total_retainage_accumulated += $retainage_calculated;
          $running_paid_accumulated += $paid_this_invoice_retainage_base;
 
@@ -561,6 +583,7 @@ class InvoiceService extends Base
          }
       }
 
+      // Escritura
       $objWorksheet->setCellValue('R' . $fila_retainage, "CURRENT RETAINAGE @ " . number_format($percentage_used_for_display, 2) . "%");
       $objWorksheet->getStyle('R' . $fila_retainage)->getFont()->setSize(10)->setBold(true);
       $objWorksheet->getStyle('R' . $fila_retainage)->getAlignment()->setWrapText(true);
@@ -575,29 +598,108 @@ class InvoiceService extends Base
       $objWorksheet->getStyle('J' . $fila_retainage)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle('J' . $fila_retainage)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
+      // Amount Due (Bifurcado)
       $fila_amount_due = $fila_retainage + 1;
       $objWorksheet->setCellValue('R' . $fila_amount_due, "CURRENT AMOUNT DUE:");
       $objWorksheet->getStyle('R' . $fila_amount_due)->getFont()->setSize(10)->setBold(true);
       $objWorksheet->getStyle('R' . $fila_amount_due)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-      $objWorksheet->setCellValue('S' . $fila_amount_due, "=S{$fila_footer_inicio}-S{$fila_retainage}");
+      if ($format === 'pdf') {
+         // MODO PDF: Resta manual con variables ($sum_S_billed)
+         $amount_due_val = $sum_S_billed - $current_retainage_amount;
+         $objWorksheet->setCellValue('S' . $fila_amount_due, $amount_due_val);
+      } else {
+         // MODO EXCEL: Fórmula
+         $objWorksheet->setCellValue('S' . $fila_amount_due, "=S{$fila_footer_inicio}-S{$fila_retainage}");
+      }
       $objWorksheet->getStyle('S' . $fila_amount_due)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle('S' . $fila_amount_due)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
+      // Columna J Balance (Bifurcado)
       $columna_btd = 'J';
       $fila_C = $fila_retainage + 1;
       $celda_C_valor = $columna_btd . $fila_C;
-      $fila_A = $fila_retainage - 1;
-      $fila_B = $fila_retainage;
-      $formula_C = "={$columna_btd}{$fila_A}-{$columna_btd}{$fila_B}";
 
-      $objWorksheet->setCellValue($celda_C_valor, $formula_C);
+      if ($format === 'pdf') {
+         // MODO PDF
+         $balance_j_val = $sum_J_completed - $total_retainage_accumulated;
+         $objWorksheet->setCellValue($celda_C_valor, $balance_j_val);
+      } else {
+         // MODO EXCEL
+         $fila_A = $fila_retainage - 1;
+         $fila_B = $fila_retainage;
+         $formula_C = "={$columna_btd}{$fila_A}-{$columna_btd}{$fila_B}";
+         $objWorksheet->setCellValue($celda_C_valor, $formula_C);
+      }
       $objWorksheet->getStyle($celda_C_valor)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle($celda_C_valor)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-      $fichero = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber() . ".xlsx";
-      $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-      $objWriter->save("uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero);
+
+      $nombre_base = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber();
+
+      // ==========================================
+      // GENERACIÓN DEL ARCHIVO
+      // ==========================================
+      if ($format === 'pdf') {
+         $fichero = $nombre_base . ".pdf";
+
+         try {
+            if (!class_exists('\Mpdf\Mpdf')) {
+               throw new \Exception('La librería MPDF no está instalada.');
+            }
+
+            // Configuración Visual PDF
+            $objWorksheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
+            $objWorksheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
+
+            // [AJUSTE] Márgenes superiores mayores para evitar solapamiento con el logo
+            $objWorksheet->getPageMargins()->setTop(1.0);
+            $objWorksheet->getPageMargins()->setRight(0.2);
+            $objWorksheet->getPageMargins()->setLeft(0.2);
+            $objWorksheet->getPageMargins()->setBottom(0.5);
+
+            // [AJUSTE] Definir área de impresión exacta
+            $objWorksheet->getPageSetup()->setPrintArea("A1:S{$fila_amount_due}");
+
+            // [AJUSTE] Escala para que quepa en 1 página de ancho
+            $objWorksheet->getPageSetup()->setFitToPage(true);
+            $objWorksheet->getPageSetup()->setFitToWidth(1);
+            $objWorksheet->getPageSetup()->setFitToHeight(0);
+
+            // [AJUSTE] Anchos de columna para que el texto "Retainage" no se corte
+            $objWorksheet->getColumnDimension('R')->setWidth(32);
+            $objWorksheet->getColumnDimension('S')->setWidth(25);
+
+            $objWorksheet->setShowGridlines(false);
+            $objWorksheet->getPageSetup()->setHorizontalCentered(true);
+
+            while (ob_get_level()) {
+               ob_end_clean();
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf($objPHPExcel);
+            // Fórmulas desactivadas (ya las calculamos manualmente)
+            $writer->setPreCalculateFormulas(false);
+
+            $path_archivo = "uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero;
+            $directorio = dirname($path_archivo);
+            if (!is_dir($directorio)) {
+               mkdir($directorio, 0777, true);
+            }
+
+            $writer->save($path_archivo);
+         } catch (\Exception $e) {
+            error_log("Error PDF: " . $e->getMessage());
+            return null;
+         }
+      } else {
+         // EXCEL NORMAL
+         $fichero = $nombre_base . ".xlsx";
+         $path_archivo = "uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero;
+         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($objPHPExcel, 'Xlsx');
+         $writer->save($path_archivo);
+      }
+
       $objPHPExcel->disconnectWorksheets();
       unset($objPHPExcel);
 

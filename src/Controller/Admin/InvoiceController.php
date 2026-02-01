@@ -250,23 +250,29 @@ class InvoiceController extends AbstractController
    }
 
    /**
-    * exportarExcel Acción para la exportacion en excel
-    *
+    * ExportarExcel: Acción para generar Excel o PDF
+    * @param Request $request
     */
    public function exportarExcel(Request $request)
    {
-
+      // 1. Obtener el ID de la factura
       $invoice_id = $request->get('invoice_id');
 
-      try {
-         $url = $this->invoiceService->ExportarExcel($invoice_id);
 
+      $format = $request->get('format') ? $request->get('format') : 'excel';
+
+      try {
+
+         $url = $this->invoiceService->ExportarExcel($invoice_id, $format);
+
+         // 4. Devolver la URL del archivo generado
          $resultadoJson['success'] = true;
          $resultadoJson['message'] = "The operation was successful";
          $resultadoJson['url'] = $url;
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
+
          $resultadoJson['success'] = false;
          $resultadoJson['error'] = $e->getMessage();
 
@@ -357,5 +363,4 @@ class InvoiceController extends AbstractController
          return $this->json($resultadoJson);
       }
    }
-
 }
