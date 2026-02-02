@@ -279,6 +279,30 @@ class InvoiceService extends Base
       $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
+      // ============================================================
+      //  >>> APLICAR DIMENSIONES DEL ENCABEZADO Para el Logo <<<
+      // ============================================================
+
+      // Fila 1: 10px / 7.50
+      $objWorksheet->getRowDimension('1')->setRowHeight(7.50);
+
+      // Fila 2: 29px / 21.75
+      $objWorksheet->getRowDimension('2')->setRowHeight(21.75);
+
+      // Filas 3 a 9: 28px / 21.00 (Donde va el Logo)
+      for ($i = 3; $i <= 9; $i++) {
+         $objWorksheet->getRowDimension($i)->setRowHeight(21.00);
+      }
+
+      // Fila 10: 21px / 15.75
+      $objWorksheet->getRowDimension('10')->setRowHeight(15.75);
+
+      // Fila 11: 63px / 47.25 (Donde dice "NOTES")
+      $objWorksheet->getRowDimension('11')->setRowHeight(47.25);
+
+      // Fila 12: 20px / 15.00
+      $objWorksheet->getRowDimension('12')->setRowHeight(15.00);
+
       // CALCULO DE ESPACIO
       $start_row_data = 16;
       $fila_footer_inicio = 0;
