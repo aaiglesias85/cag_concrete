@@ -1208,6 +1208,7 @@ columnDefs.push({
 
    // exportar excel
   var initAccionExportarPdf = function () {
+   
    $(document).off('click', '#invoice-table-editable a.pdf-export-btn');
    $(document).on('click', '#invoice-table-editable a.pdf-export-btn', function (e) {
       e.preventDefault();
@@ -1228,7 +1229,7 @@ columnDefs.push({
                var response = res.data;
                if (response.success) {
                   var url = response.url; 
-                  var filename = url.substring(url.lastIndexOf('/') + 1);
+                  var filename = url.substring(url.lastIndexOf('/') + 1);                  
                   const link = document.createElement('a');
                   link.href = url + '?t=' + new Date().getTime();
                   link.setAttribute('download', filename);
@@ -1333,8 +1334,7 @@ columnDefs.push({
    var initChangeFlatpickr = function () {
       offChangeStart = FlatpickrUtil.on('datetimepicker-start-date', 'change', ({ selectedDates, dateStr, instance }) => {
          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
-         // selectedDates[0] => objeto Date nativo (si hay selección)
-         console.log('Cambió la fecha:', dateStr, selectedDates[0]);
+         // selectedDates[0] => objeto Date nativo (si hay selección)     
 
          listarItems();
       });
@@ -1342,8 +1342,7 @@ columnDefs.push({
       offChangeEnd = FlatpickrUtil.on('datetimepicker-end-date', 'change', ({ selectedDates, dateStr, instance }) => {
          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
          // selectedDates[0] => objeto Date nativo (si hay selección)
-         console.log('Cambió la fecha:', dateStr, selectedDates[0]);
-
+       
          listarItems();
       });
    };
@@ -2180,8 +2179,7 @@ columnDefs.push({
             }
          })
          .catch(function (error) {
-            toastr.error('Error loading history', '');
-            console.error(error);
+            toastr.error('Error loading history', '');           
          })
          .finally(function () {
             BlockUtil.unblock('#modal-change-order-history .modal-content');
@@ -2480,46 +2478,6 @@ columnDefs.push({
       });
    };
 
-    var initAccionExportarPdf = function () {
-      $(document).off('click', '#invoice-table-editable a.pdf-export-btn');
-      $(document).on('click', '#invoice-table-editable a.pdf-export-btn', function (e) {
-         e.preventDefault();
-
-         var invoice_id = $(this).data('id');
-         var formData = new URLSearchParams();
-         formData.set('invoice_id', invoice_id);
-
-         formData.set('format', 'pdf');
-
-         BlockUtil.block('#lista-invoice');
-
-         axios
-            .post('invoice/exportarExcel', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     var url = response.url; 
-                     const link = document.createElement('a');
-                     link.href = url + '?t=' + new Date().getTime();
-                     link.setAttribute('download', 'Invoice.pdf');
-                     link.target = '_blank';
-                     document.body.appendChild(link);
-                     link.click();
-                     document.body.removeChild(link);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
-               } else {
-                  toastr.error('Error interno.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#lista-invoice');
-            });
-      });
-   };
 
 
    return {
