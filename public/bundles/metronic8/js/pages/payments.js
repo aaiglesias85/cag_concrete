@@ -1228,38 +1228,41 @@ var Payments = (function () {
          }
       });
 
-    // Escuchar 'keyup' e 'input' para actualización en tiempo real, además de 'change'
-      $(document).off('keyup change input', '#payments-table-editable input.paid_qty');
-      $(document).on('keyup change input', '#payments-table-editable input.paid_qty', function (e) {
+    // Regla: Solo en evento change (al salir del campo). Paid Quantity modificado -> Unpaid Quantity = Paid Quantity.
+      $(document).off('change', '#payments-table-editable input.paid_qty');
+      $(document).on('change', '#payments-table-editable input.paid_qty', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
-         
-         if (payments[posicion]) {
-            // Obtenemos el valor actual mientras escribes
-            var valorInput = $this.val();
-            // Si está vacío o es solo un signo negativo, usamos 0 temporalmente para el cálculo
-            var paid_qty = parseFloat(valorInput.toString().replace(/,/g, '')) || 0;
-            
-            var price = parseFloat(payments[posicion].price || 0);
-            var quantity = parseFloat(payments[posicion].quantity || 0);
+         if (!payments[posicion]) return;
 
-            // Cálculos
-            var unpaid_qty = quantity - paid_qty;
-            var paid_amount = paid_qty * price;
+         var valorInput = String($this.val() || '').trim();
+         var paid_qty = parseFloat(valorInput.replace(/,/g, ''));
 
-            // Actualizamos la memoria MAESTRA inmediatamente
-            payments[posicion].paid_qty = paid_qty;
-            payments[posicion].unpaid_qty = unpaid_qty;
-            payments[posicion].paid_amount = paid_amount;
-            
-            // Actualizamos visualmente los otros campos de la fila (Unpaid y Amount $)
+         // Campo vacío: restaurar valor anterior (operación inversa / no aplicar cambio)
+         if (valorInput === '' || isNaN(paid_qty)) {
+            $this.val(payments[posicion].paid_qty);
             var $row = $this.closest('tr');
-            $row.find('input.unpaid_qty').val(unpaid_qty);
-            $row.find('span.paid_amount_text').text(MyApp.formatMoney(paid_amount));
-
-            // Recalculamos el GRAN TOTAL usando la memoria actualizada
-            calcularTotalPaymentGlobal();
+            $row.find('input.unpaid_qty').val(payments[posicion].unpaid_qty);
+            $row.find('span.paid_amount_text').text(MyApp.formatMoney(payments[posicion].paid_amount));
+            return;
          }
+
+         paid_qty = Math.max(0, paid_qty);
+         var price = parseFloat(payments[posicion].price || 0);
+         var quantity = parseFloat(payments[posicion].quantity || 0);
+         // Unpaid siempre = cantidad original (quantity) menos lo pagado: unpaid = quantity - paid
+         var unpaid_qty = Math.max(0, quantity - paid_qty);
+         var paid_amount = paid_qty * price;
+
+         payments[posicion].paid_qty = paid_qty;
+         payments[posicion].unpaid_qty = unpaid_qty;
+         payments[posicion].paid_amount = paid_amount;
+
+         var $row = $this.closest('tr');
+         $row.find('input.unpaid_qty').val(unpaid_qty);
+         $row.find('span.paid_amount_text').text(MyApp.formatMoney(paid_amount));
+
+         calcularTotalPaymentGlobal();
       });
 
       $(document).off('change', '#payments-table-editable input.unpaid_qty');
@@ -1308,8 +1311,7 @@ var Payments = (function () {
             nEditingRowPayment = posicion;
             $('#invoice_item_id').val(payments[posicion].invoice_item_id);
             notes_item = payments[posicion].notes;
-            var currentUnpaid = payments[posicion].unpaid_qty;
-            $('#manual-unpaid-qty').val(currentUnpaid);
+            $('#manual-unpaid-qty').val('');
             actualizarTableListaNotesItem();
             ModalUtil.show('modal-notes-item', { backdrop: 'static', keyboard: true });
          }
@@ -1326,12 +1328,25 @@ var Payments = (function () {
    var nEditingRowNotesItem = null;
    var initTableNotesItem = function () {
       const table = '#notes-item-table-editable';
-      const columns = [{ data: 'notes' }, { data: 'date' }, { data: null }];
+      const columns = [{ data: 'notes' }, { data: 'date' }, { data: 'override_unpaid_qty' }, { data: null }];
       let columnDefs = [
          {
             targets: 0,
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 400);
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               return data || '';
+            },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               var val = (data !== null && data !== undefined && data !== '') ? data : '—';
+               return typeof val === 'number' ? MyApp.formatearNumero(val, 2, '.', ',') : val;
             },
          },
          {
@@ -1383,6 +1398,10 @@ var Payments = (function () {
          var invoice_item_id = $('#invoice_item_id').val();
          formData.set('invoice_item_id', invoice_item_id);
          formData.set('notes', notes);
+         var overrideUnpaidQty = $('#manual-unpaid-qty').val();
+         if (overrideUnpaidQty !== '' && overrideUnpaidQty !== undefined) {
+            formData.set('override_unpaid_qty', overrideUnpaidQty);
+         }
          
          BlockUtil.block('#modal-notes-item .modal-content');
          
@@ -1396,10 +1415,19 @@ var Payments = (function () {
                      // 1. Limpieza y lógica de Notas (Original)
                      QuillUtil.setHtml('#notes-item', '');
                      if (nEditingRowNotesItem == null) {
-                        notes_item.push({ id: response.note.id, notes: notes, date: response.note.date, posicion: notes_item.length });
+                        notes_item.push({
+                           id: response.note.id,
+                           notes: notes,
+                           date: response.note.date,
+                           override_unpaid_qty: response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null,
+                           posicion: notes_item.length
+                        });
                      } else {
                         var posicion = nEditingRowNotesItem;
-                        if (notes_item[posicion]) notes_item[posicion].notes = notes;
+                        if (notes_item[posicion]) {
+                           notes_item[posicion].notes = notes;
+                           notes_item[posicion].override_unpaid_qty = response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null;
+                        }
                      }
                      actualizarTableListaNotesItem();
                      
@@ -1408,28 +1436,21 @@ var Payments = (function () {
                         payments[nEditingRowPayment].notes = notes_item;
                      }
 
+                     // Regla: Si se ingresó Override Unpaid Qty en Notas, solo sobrescribir Unpaid Qty; Paid Qty no se modifica.
                      var valorManual = parseFloat($('#manual-unpaid-qty').val());
-
-                     // Verificamos si es un número válido y si estamos editando una fila
-                     if (!isNaN(valorManual) && nEditingRowPayment !== null) {
-                        
-                        // A. Actualizamos la memoria (payments) para que persista al reabrir el modal
-                        if (payments[nEditingRowPayment]) {
-                            payments[nEditingRowPayment].unpaid_qty = valorManual;
-                        }
-
-                        // B. Actualizamos la tabla visualmente (Input de la fila correspondiente)
+                     if (!isNaN(valorManual) && nEditingRowPayment !== null && payments[nEditingRowPayment]) {
+                        payments[nEditingRowPayment].unpaid_qty = valorManual;
                         var $inputUnpaid = $('#payments-table-editable input.unpaid_qty').filter(function() {
                             return $(this).attr('data-position') == nEditingRowPayment;
                         });
-
                         if ($inputUnpaid.length > 0) {
                             $inputUnpaid.val(valorManual);
-                            // Efecto visual verde para confirmar
                             $inputUnpaid.addClass('bg-light-success');
                             setTimeout(function() { $inputUnpaid.removeClass('bg-light-success'); }, 1000);
                         }
                      }
+                     $('#manual-unpaid-qty').val('');
+                     // Si no se ingresó valor en Notas, Paid Qty y Unpaid Qty permanecen sin cambios (no hacemos nada).
                      // =======================================================
 
                   } else {
@@ -1455,6 +1476,8 @@ var Payments = (function () {
          $('#notes_item_id').val(notes_item[posicion].id);
          $('#invoice_item_id').val(payments[nEditingRowPayment].invoice_item_id);
          QuillUtil.setHtml('#notes-item', notes_item[posicion].notes);
+         var overrideVal = notes_item[posicion].override_unpaid_qty;
+         $('#manual-unpaid-qty').val(overrideVal !== null && overrideVal !== undefined && overrideVal !== '' ? overrideVal : '');
       }
    });
 

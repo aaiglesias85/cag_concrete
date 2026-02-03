@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-01-2026 a las 01:06:53
+-- Tiempo de generación: 03-02-2026 a las 00:55:52
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -736,7 +736,8 @@ CREATE TABLE `invoice_item_notes` (
   `id` int(11) NOT NULL,
   `notes` text,
   `date` date DEFAULT NULL,
-  `invoice_item_id` int(11) DEFAULT NULL
+  `invoice_item_id` int(11) DEFAULT NULL,
+  `override_unpaid_qty` decimal(18,6) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

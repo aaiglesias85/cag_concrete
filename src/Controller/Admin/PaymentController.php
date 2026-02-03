@@ -435,10 +435,11 @@ class PaymentController extends AbstractController
 
       $invoice_item_id = $request->get('invoice_item_id');
       $notes = $request->get('notes');
+      $override_unpaid_qty = $request->get('override_unpaid_qty');
 
       try {
 
-         $resultado = $this->paymentService->SalvarNotesItem($notes_id, $invoice_item_id, $notes);
+         $resultado = $this->paymentService->SalvarNotesItem($notes_id, $invoice_item_id, $notes, $override_unpaid_qty);
 
          if ($resultado['success']) {
 

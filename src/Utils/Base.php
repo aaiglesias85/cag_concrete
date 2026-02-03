@@ -1495,16 +1495,14 @@ class Base
          $amount = $quantity_final * $price;
          $total_amount = $quantity_completed * $price;
 
-         // payment
+         // payment (unpaid_qty viene de BD; puede estar sobrescrito desde Notas)
          $paid_qty = $value->getPaidQty();
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
-
-
-         // Forzamos el cálculo: Total Facturado - Pagado
-         $unpaid_qty = $quantity_final - $paid_qty;
-         $unpaid_qty = max(0, $unpaid_qty);
-         // -----------------------
+         $unpaid_qty = $value->getUnpaidQty();
+         if ($unpaid_qty === null) {
+            $unpaid_qty = max(0, $quantity_final - $paid_qty);
+         }
 
          // notes
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
@@ -1573,6 +1571,7 @@ class Base
             "id" => $value->getId(),
             "notes" => $note,
             "date" => $value->getDate()->format('m/d/Y'),
+            "override_unpaid_qty" => $value->getOverrideUnpaidQty(),
             "posicion" => $key
          ];
       }

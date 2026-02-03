@@ -23,6 +23,9 @@ class InvoiceItemNotes
     #[ORM\JoinColumn(name: "invoice_item_id", referencedColumnName: "id", nullable: true)]
     private ?InvoiceItem $invoiceItem;
 
+    #[ORM\Column(name: "override_unpaid_qty", type: "decimal", precision: 18, scale: 6, nullable: true)]
+    private ?float $overrideUnpaidQty = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -56,5 +59,15 @@ class InvoiceItemNotes
     public function setInvoiceItem(?InvoiceItem $invoiceItem): void
     {
         $this->invoiceItem = $invoiceItem;
+    }
+
+    public function getOverrideUnpaidQty(): ?float
+    {
+        return $this->overrideUnpaidQty;
+    }
+
+    public function setOverrideUnpaidQty(?float $overrideUnpaidQty): void
+    {
+        $this->overrideUnpaidQty = $overrideUnpaidQty;
     }
 }

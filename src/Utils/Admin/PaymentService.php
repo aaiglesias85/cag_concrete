@@ -63,9 +63,10 @@ class PaymentService extends Base
     * @param $notes_id
     * @param $invoice_item_id
     * @param $notes
+    * @param float|null $override_unpaid_qty
     * @return array
     */
-   public function SalvarNotesItem($notes_id, $invoice_item_id, $notes)
+   public function SalvarNotesItem($notes_id, $invoice_item_id, $notes, $override_unpaid_qty = null)
    {
 
       $em = $this->getDoctrine()->getManager();
@@ -93,8 +94,9 @@ class PaymentService extends Base
          }
 
          $entity->setNotes($notes);
-
-
+         if ($override_unpaid_qty !== null && $override_unpaid_qty !== '') {
+            $entity->setOverrideUnpaidQty((float) $override_unpaid_qty);
+         }
 
          $log_operacion = "Add";
          $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
@@ -120,7 +122,8 @@ class PaymentService extends Base
          $resultado['note'] = [
             'id' => $entity->getId(),
             'notes' => mb_convert_encoding($notes, 'UTF-8', 'UTF-8'),
-            'date' => $entity->getDate()->format('m/d/Y')
+            'date' => $entity->getDate()->format('m/d/Y'),
+            'override_unpaid_qty' => $entity->getOverrideUnpaidQty()
          ];
       } else {
          $resultado['success'] = false;
@@ -791,9 +794,9 @@ class PaymentService extends Base
             // Guardar project_item_id para actualizar invoices siguientes
             $updated_project_item_ids[] = $value->project_item_id;
 
-            // payment
+            // payment (unpaid_qty puede venir sobrescrito desde Notas; persistir tal cual)
             $invoice_item_entity->setPaidQty((float)$value->paid_qty);
-            $invoice_item_entity->setUnpaidQty($value->unpaid_qty);
+            $invoice_item_entity->setUnpaidQty(\is_numeric($value->unpaid_qty ?? null) ? (float)$value->unpaid_qty : $invoice_item_entity->getUnpaidQty());
             $invoice_item_entity->setPaidAmount($value->paid_amount);
             $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
          }
