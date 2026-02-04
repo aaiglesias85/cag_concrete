@@ -1161,7 +1161,7 @@ class ProjectService extends Base
       // Los agregamos como propiedades del array de items (no como items individuales)
       // JavaScript accederá a ellos desde response.items._sum_boned_project y response.items._bone_price
       // O mejor, los agregamos como campos adicionales en la respuesta
-      
+
       return [
          'items' => $items,
          'sum_boned_project' => $sum_boned_project,
@@ -2537,10 +2537,25 @@ class ProjectService extends Base
          $entity->setConcreteVendor($conc_vendor);
       }
 
-      if ($concrete_class_id !== "") {
-         $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
-            ->find($concrete_class_id);
-         $entity->setConcreteClass($concrete_class);
+
+      if ($concrete_class_id != '') {
+
+         $id_class = $concrete_class_id;
+
+         if (is_object($id_class)) {
+            $id_class = isset($id_class->concreteClassId) ? $id_class->concreteClassId : (isset($id_class->id) ? $id_class->id : null);
+         } elseif (is_array($id_class)) {
+
+            $id_class = isset($id_class['concreteClassId']) ? $id_class['concreteClassId'] : (isset($id_class['id']) ? $id_class['id'] : null);
+         }
+
+         if ($id_class) {
+            $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
+               ->find($id_class);
+
+
+            $entity->setConcreteClass($concrete_class);
+         }
       }
 
       // $entity->setConcreteQuotePrice($concrete_quote_price);
