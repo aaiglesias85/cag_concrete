@@ -45,7 +45,8 @@ Después de un cambio en Data T, para el invoice afectado y los posteriores se r
 - **Unpaid Qty / Unpaid From Previous** – según las reglas de deuda y QBF (ver `README_INVOICES_PAYMENTS.md`).
 - **Amounts** – derivados de quantity y price.
 
-Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** del invoice de ese periodo. No importa si la línea estaba pagada: se elimina igual.
+Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** del invoice de ese periodo. No importa si la línea estaba pagada: se elimina igual.  
+**Importante:** Esa eliminación aplica **solo al invoice de ese periodo** (p. ej. invoice #5). No se elimina la línea en los invoices posteriores (#6, #7, #8…): cada uno tiene su propio periodo y su propia cantidad; si en #6 ese ítem tiene cantidad en su periodo, la línea sigue en #6.
 
 ---
 
@@ -55,9 +56,9 @@ Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** de
    - Al **guardar** un Data T: `DataTrackingService::SalvarDataTracking` → después del `flush` llama a `InvoiceService::ActualizarInvoicesPorCambioDataTracking(project_id, date, project_item_ids)`.  
    - Al **eliminar** un ítem o un Data T: `EliminarItemDataTracking` / `EliminarDataTracking` / `EliminarDataTrackings` → después del `flush` llaman a `ActualizarInvoicesPorCambioDataTracking`.
 
-2. **Actualizar invoices del periodo**  
-   - `InvoiceRepository::FindInvoicesContainingDate(project_id, date)` obtiene los invoices cuyo `[start_date, end_date]` contiene esa fecha (normalmente uno por fecha).
-   - Para cada invoice y cada `project_item_id` afectado:
+2. **Actualizar solo el invoice de ese periodo**  
+   - `InvoiceRepository::FindInvoicesContainingDate(project_id, date)` obtiene **solo** los invoices cuyo `[start_date, end_date]` contiene esa fecha (normalmente uno, p. ej. el #5). No se tocan los invoices posteriores (#6, #7, …) para quitar líneas.
+   - Para cada invoice devuelto y cada `project_item_id` afectado:
      - Nueva cantidad = `DataTrackingItemRepository::TotalQuantity(project_item_id, invoice.start_date, invoice.end_date)`.
      - Si cantidad = 0 → se **elimina** el `InvoiceItem` (sin importar si tenía pago).
      - Si no → se actualiza `InvoiceItem::quantity`.

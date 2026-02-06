@@ -1666,8 +1666,9 @@ class InvoiceService extends Base
 
    /**
     * ActualizarInvoicesPorCambioDataTracking
-    * Cuando se elimina(n) item(s) del datatracking, recalcula las cantidades del invoice
-    * para ese periodo y elimina la línea del invoice si la cantidad queda en 0 (y no hay pago).
+    * Cuando se elimina(n) o modifica(n) item(s) del datatracking, recalcula las cantidades
+    * solo en el/los invoice(s) cuyo periodo contiene esa fecha. Si la cantidad queda en 0
+    * se elimina la línea solo en ese invoice (no en los posteriores #6, #7, etc.).
     *
     * @param int $project_id
     * @param \DateTimeInterface $date Fecha del datatracking afectado
