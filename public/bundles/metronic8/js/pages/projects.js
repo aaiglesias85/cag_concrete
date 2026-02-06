@@ -4683,12 +4683,13 @@ var Projects = (function () {
 {
     targets: 1,
     render: function (data, type, row) {
-        var f = function(d) {
-            if (!d) return '';
-            var date = new Date(d);
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[date.getMonth()] + ' ' + date.getDate();
-        };
+       var f = function(d) {
+    if (!d) return '';     
+    var parts = d.split('-');     
+    var date = new Date(parts[0], parts[1] - 1, parts[2]);
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[date.getMonth()] + ' ' + date.getDate();
+};
 
         var periodo = (row.startDate && row.endDate) 
                       ? `${f(row.startDate)} - ${f(row.endDate)}` 
