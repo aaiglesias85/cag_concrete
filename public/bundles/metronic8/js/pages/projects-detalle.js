@@ -1664,17 +1664,41 @@ var ProjectsDetalle = (function () {
 {
     targets: 1,
     render: function (data, type, row) {
-         var f = function(d) {
-    if (!d) return '';     
-    var parts = d.split('-');     
-    var date = new Date(parts[0], parts[1] - 1, parts[2]);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return months[date.getMonth()] + ' ' + date.getDate();
-};
+        var periodo = '';        
+     
+        if (row.startDate && row.endDate) {
+      
+            var startParts = row.startDate.split('-');
+            var endParts = row.endDate.split('-');
+            
+        
+            var s = {
+                y: startParts[0],
+                m: parseInt(startParts[1]) - 1,
+                d: startParts[2]
+            };
+            var e = {
+                y: endParts[0],
+                m: parseInt(endParts[1]) - 1,
+                d: endParts[2]
+            };
 
-        var periodo = (row.startDate && row.endDate) 
-                      ? `${f(row.startDate)} - ${f(row.endDate)}` 
-                      : row.invoice_date;
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+       
+            if (s.y === e.y && s.m === e.m) {
+                periodo = months[s.m] + ' ' + s.d + ' - ' + e.d + ', ' + s.y;
+            } 
+     
+            else {
+            
+                periodo = months[s.m] + ' ' + s.d + ' - ' + months[e.m] + ' ' + e.d + ', ' + e.y;
+            }
+
+        } else {
+      
+            periodo = row.invoice_date;
+        }
 
         return `
             <div class="d-flex flex-column">
