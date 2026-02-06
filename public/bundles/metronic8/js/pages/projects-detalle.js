@@ -1664,14 +1664,12 @@ var ProjectsDetalle = (function () {
 {
     targets: 1,
     render: function (data, type, row) {
-        var periodo = '';        
-     
+        var periodo = '';
+        
         if (row.startDate && row.endDate) {
-      
             var startParts = row.startDate.split('-');
             var endParts = row.endDate.split('-');
             
-        
             var s = {
                 y: startParts[0],
                 m: parseInt(startParts[1]) - 1,
@@ -1684,19 +1682,19 @@ var ProjectsDetalle = (function () {
             };
 
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-       
-            if (s.y === e.y && s.m === e.m) {
-                periodo = months[s.m] + ' ' + s.d + ' - ' + e.d + ', ' + s.y;
-            } 
-     
-            else {
             
-                periodo = months[s.m] + ' ' + s.d + ' - ' + months[e.m] + ' ' + e.d + ', ' + e.y;
+   
+            var shortYear = e.y.slice(-2); 
+
+            if (s.y === e.y && s.m === e.m) {
+                periodo = months[s.m] + ' ' + s.d + ' - ' + e.d + ', ' + shortYear;
+            } 
+          
+            else {
+                periodo = months[s.m] + ' ' + s.d + ' - ' + months[e.m] + ' ' + e.d + ', ' + shortYear;
             }
 
         } else {
-      
             periodo = row.invoice_date;
         }
 
@@ -1706,7 +1704,7 @@ var ProjectsDetalle = (function () {
                    data-invoice-id="${row.invoice_id}">
                    Inv. #${row.invoice_number}
                 </a>
-                <span class="text-gray-800 fw-bold fs-7">
+                <span class="text-gray-800 fw-bold fs-7" style="white-space: nowrap;">
                    <i class="ki-outline ki-calendar fs-8 text-gray-500"></i> ${periodo}
                 </span>
             </div>

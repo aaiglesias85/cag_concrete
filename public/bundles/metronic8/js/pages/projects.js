@@ -4683,16 +4683,15 @@ var Projects = (function () {
 {
     targets: 1,
     render: function (data, type, row) {
-        var periodo = '';        
-   
+        var periodo = '';
+        
         if (row.startDate && row.endDate) {
-            
             var startParts = row.startDate.split('-');
-            var endParts = row.endDate.split('-');           
-         
+            var endParts = row.endDate.split('-');
+            
             var s = {
                 y: startParts[0],
-                m: parseInt(startParts[1]) - 1, // Mes base 0 para el array
+                m: parseInt(startParts[1]) - 1,
                 d: startParts[2]
             };
             var e = {
@@ -4702,18 +4701,19 @@ var Projects = (function () {
             };
 
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+ 
+            var shortYear = e.y.slice(-2); 
 
             if (s.y === e.y && s.m === e.m) {
-                periodo = months[s.m] + ' ' + s.d + ' - ' + e.d + ', ' + s.y;
+                periodo = months[s.m] + ' ' + s.d + ' - ' + e.d + ', ' + shortYear;
             } 
-        
+    
             else {
-              
-                periodo = months[s.m] + ' ' + s.d + ' - ' + months[e.m] + ' ' + e.d + ', ' + e.y;
+                periodo = months[s.m] + ' ' + s.d + ' - ' + months[e.m] + ' ' + e.d + ', ' + shortYear;
             }
 
         } else {
-      
             periodo = row.invoice_date;
         }
 
@@ -4723,14 +4723,13 @@ var Projects = (function () {
                    data-invoice-id="${row.invoice_id}">
                    Inv. #${row.invoice_number}
                 </a>
-                <span class="text-gray-800 fw-bold fs-7">
+                <span class="text-gray-800 fw-bold fs-7" style="white-space: nowrap;">
                    <i class="ki-outline ki-calendar fs-8 text-gray-500"></i> ${periodo}
                 </span>
             </div>
         `;
     },
-},
-         
+},       
          {
             targets: 2, // Invoice Amt
             className: 'text-end',
