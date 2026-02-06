@@ -1,4 +1,62 @@
 var Invoices = (function () {
+
+   // Función para animar números
+   var animateValue = function (selector, endValue, duration, isCurrency) {
+      var $obj = $(selector);
+      if ($obj.length === 0) return;
+
+      // 1. Obtener valor inicial limpio (quitamos $ y comas)
+      var currentText = $obj.is('input') ? $obj.val() : $obj.text();
+      var startValue = parseFloat(currentText.replace(/[^0-9.-]+/g, "")) || 0;
+      
+      // 2. Si el valor final es el mismo que el actual, no hacemos nada
+      if (startValue === endValue) return;
+
+      // 3. Efecto visual en la tarjeta 
+      var $card = $obj.closest('.card');
+      $card.removeClass('anim-update');
+      void $card.width(); // Reiniciar animación CSS
+      $card.addClass('anim-update');
+
+      // 4. Animación del número
+      var startTime = null;
+      
+      var step = function (timestamp) {
+         if (!startTime) startTime = timestamp;
+         var progress = Math.min((timestamp - startTime) / duration, 1);
+
+         // Calcular valor actual
+         var currentVal = progress * (endValue - startValue) + startValue;
+
+         // Formatear
+         var formattedVal = isCurrency 
+            ? MyApp.formatMoney(currentVal, 2, '.', ',') 
+            : MyApp.formatearNumero(currentVal, 2, '.', ',');
+
+         // Aplicar al elemento
+         if ($obj.is('input')) {
+            $obj.val(formattedVal);
+         } else {
+            $obj.text(formattedVal);
+         }
+
+         if (progress < 1) {
+            window.requestAnimationFrame(step);
+         } else {
+             // Asegurar que el valor final sea exacto al terminar
+             var finalFormatted = isCurrency 
+                ? MyApp.formatMoney(endValue, 2, '.', ',') 
+                : MyApp.formatearNumero(endValue, 2, '.', ',');
+             
+             if ($obj.is('input')) $obj.val(finalFormatted);
+             else $obj.text(finalFormatted);
+         }
+      };
+      
+      window.requestAnimationFrame(step);
+   };
+ // Función para animar números end
+
    var rowDelete = null;
 
    //Inicializar table
@@ -2057,48 +2115,75 @@ columnDefs.push({
    // Función para calcular y mostrar X e Y (Boned) en JavaScript
    var calcularYMostrarXBonedEnJS = function () { 
       
-      // SUM_BONED_INVOICES: Suma de amount_final de items con boned=1 en el invoice actual
-      // Para invoices nuevos, usar items_lista (items que están en la tabla)
-      // Para invoices existentes, usar items (todos los items del invoice)
-      var items_a_calcular = items_lista.length > 0 ? items_lista : items;
+      // 1. OBTENER DATOS
+      var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       
       var sum_boned_invoices = 0;
-      var items_boned_count = 0;
       
-      items_a_calcular.forEach(function(item, index) {
-         if (item.boned == 1 || item.boned === true) {
-            items_boned_count++;
-            // amount_final = (quantity + quantity_brought_forward) * price
-            var quantity = Number(item.quantity || 0);
-            var quantity_brought_forward = Number(item.quantity_brought_forward || 0);
-            var price = Number(item.price || 0);
-            var amount_final = (quantity + quantity_brought_forward) * price;
-         
+      items_a_calcular.forEach(function(item) {
+         if (item.boned == 1 || item.boned === true || item.boned === '1') {
+            var quantity = parseFloat(item.quantity) || 0;
+            var qbf = parseFloat(item.quantity_brought_forward) || 0;
+            var price = parseFloat(item.price) || 0;
             
+            var amount_final = (quantity + qbf) * price;
             sum_boned_invoices += amount_final;
          }
       });
 
-      
+      // Calcular X (Ratio)
       var x = 0;
-      if (sum_boned_project > 0) {
-         x = sum_boned_invoices / sum_boned_project;
-        
-      } else {
-       
+      if (sum_boned_project && parseFloat(sum_boned_project) > 0) {
+         x = sum_boned_invoices / parseFloat(sum_boned_project);
       }
       
-      var y = bone_price * x;  
+      // Calcular Y (Monto)
+      var y = (parseFloat(bone_price) || 0) * x;  
 
-      // Mostrar valores
-      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
-      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
-      
-      $('#total_boned_x').val(x_formatted);
-      $('#total_boned_y').val(y_formatted);     
-      $('#display_bond_qty').text(x_formatted); 
- 
+      // 2. CONTROLAR VISIBILIDAD
+      var $inputY = $('#total_boned_y');
+      var $card = $inputY.closest('.card'); // Seleccionamos la tarjeta amarilla
+
+      // Si los valores son prácticamente 0, ocultamos la tarjeta y salimos
+      if (x <= 0.0001 && y <= 0.0001) {
+          $card.hide(); // Ocultar para ganar espacio
+          
+          // Limpiamos valores por si acaso
+          $('#total_boned_x').val('0.000000');
+          $inputY.val('$0.00');
+          $('#display_bond_qty').text('0.00');
+          return; // Terminamos aquí, no hace falta animar nada
+      }
+
+      // 3. SI HAY VALORES: MOSTRAR Y ANIMAR
+      $card.removeClass('d-none').show();
+
+      // Configuración de animación (Lenta: 4 segundos)
+      var duracion = 4000; 
+
+      // A. Efecto "Snake Border" (Borde viajero)
+      $card.addClass('card-loading-effect');
+
+      // B. Animar los números (Count Up)
+      // Usamos animateValue si existe, si no, seteamos directo
+      if (typeof animateValue === 'function') {
+          animateValue('#display_bond_qty', x, duracion, false); 
+          animateValue('#total_boned_y', y, duracion, true);
+      } else {
+          $('#display_bond_qty').text(MyApp.formatearNumero(x, 2, '.', ','));
+          $inputY.val(MyApp.formatMoney(y, 2, '.', ','));
+      }
+
+      // C. Guardar valor oculto
+      $('#total_boned_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+
+     // Quitar el efecto del borde al terminar la animación
+      setTimeout(function() {
+          $card.removeClass('card-loading-effect');
+          $card.addClass('anim-update'); 
+      }, duracion);
    };
+
 
    var handleChangeOrderHistory = function () {
       $(document).off('click', '.change-order-history-icon');

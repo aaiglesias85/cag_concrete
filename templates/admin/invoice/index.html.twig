@@ -64,7 +64,43 @@
 #form-invoice .card {
     min-height: 55px !important;
     border-radius: 8px !important;
+
 }
+
+@keyframes pulse-yellow {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.7); }
+    50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255, 199, 0, 0); background-color: rgba(255, 199, 0, 0.2) !important; }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0); }
+}
+
+.anim-update {
+    animation: pulse-yellow 0.6s ease-out;
+}
+
+/* Agrega esto en tu <style> */
+
+/* 1. Definimos el movimiento del brillo */
+@keyframes border-travel {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* 2. Clase que activa el efecto "Snake" */
+.card-loading-effect {
+    position: relative;
+    /* Gradiente dorado que se mueve */
+    background: linear-gradient(90deg, rgba(255, 199, 0, 0.05) 0%, rgba(255, 199, 0, 0.5) 50%, rgba(255, 199, 0, 0.05) 100%);
+    background-size: 300% 300%; /* Tamaño grande movimiento */
+    
+    /*VELOCIDAD:*/
+    animation: border-travel 4s ease infinite !important;
+    
+    border-color: #ffc700 !important;
+    box-shadow: 0 0 10px rgba(255, 199, 0, 0.3);
+    transition: all 0.3s;
+}
+
 </style>
 {% endblock %} {% block content %}
 
@@ -546,7 +582,7 @@
         <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
     </div>
 
-    <div class="card card-dashed bg-warning bg-opacity-10 flex-row align-items-center min-w-260px p-2 px-4 border border-warning border-opacity-10">
+    <div id="card-bond" class= "card card-dashed bg-warning bg-opacity-10 flex-row align-items-center min-w-260px p-2 px-4 border border-warning border-opacity-10">
         <div class="me-4 text-center">
             <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount:</span>
             <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100px" id="total_boned_y" readonly value="$0.00" />
