@@ -89,9 +89,9 @@ var DatatableUtil = (function () {
       return menus_actions;
    };
 
-   // render acciones
+   // render acciones (estilo unificado: btn-light-* btn-sm fs-3 me-1)
    var getRenderAcciones = function (data, type, row, permiso, acciones, witdh = 50) {
-      var html = `<div class="div-acciones" style="width: ${acciones.length * witdh}px;">`;
+      var html = '<div class="d-flex justify-content-center flex-shrink-0">';
 
       // detalle
       if (acciones.includes('detalle')) {
@@ -113,9 +113,14 @@ var DatatableUtil = (function () {
          html += _getRenderAccionPaid(row);
       }
 
-      // exportar
+      // exportar excel
       if (acciones.includes('exportar_excel')) {
          html += _getRenderAccionExportarExcel(row);
+      }
+
+      // exportar pdf
+      if (acciones.includes('exportar_pdf')) {
+         html += _getRenderAccionExportarPdf(row);
       }
 
       // eliminar
@@ -180,11 +185,11 @@ var DatatableUtil = (function () {
    };
 
    var _getRenderAccionEditar = function (row, permiso) {
-      var edit_icon = permiso.editar ? 'notepad-edit' : 'eye';
+      var edit_icon = permiso.editar ? 'pencil' : 'eye';
       var title = permiso.editar ? 'Edit' : 'View';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
-              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="edit btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-${edit_icon} fs-3"><span class="path1"></span><span class="path2"></span></i>
             </a>`;
    };
 
@@ -192,31 +197,36 @@ var DatatableUtil = (function () {
       var edit_icon = 'copy';
       var title = 'Clone';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="clonar btn btn-sm btn-icon btn-outline btn-outline-warning btn-active-light-warning">
-              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="clonar btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-${edit_icon} fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
    };
 
    var _getRenderAccionPaid = function (row, permiso) {
-      // Si ya está pagado, no mostrar el botón
       if (row.paid == 1 || row.paid === true) {
          return '';
       }
-
       var edit_icon = 'dollar';
       var title = 'Mark as Paid';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="paid btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
-              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="paid btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-${edit_icon} fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
    };
 
    var _getRenderAccionExportarExcel = function (row, permiso) {
-      var edit_icon = 'file-down';
-      var title = 'Export';
+      var title = 'Export Excel';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} excel" class="excel btn btn-sm btn-icon btn-outline btn-outline-warning btn-active-light-warning">
-              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="excel btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-file-down fs-3"><span class="path1"></span><span class="path2"></span></i>
+            </a>`;
+   };
+
+   var _getRenderAccionExportarPdf = function (row) {
+      var title = 'Export PDF';
+
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="pdf-export-btn btn btn-icon btn-light-danger btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="bi bi-file-earmark-pdf-fill fs-3 text-danger"></i>
             </a>`;
    };
 
@@ -224,22 +234,22 @@ var DatatableUtil = (function () {
       var edit_icon = 'eye';
       var title = 'View';
 
-      return `<a href="javascript:" data-id="${row.id}" title="${title} record" class="detalle btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary ">
-              <i class="ki-duotone ki-${edit_icon} fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="detalle btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-${edit_icon} fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
    };
 
    var _getRenderAccionEliminar = function (row) {
-      return `<a href="javascript:" data-id="${row.id}" title="Delete record" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger">
-              <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" title="Delete" class="delete btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
             </a>`;
    };
 
    var _getRenderAccionEstado = function (row) {
       const title = row.estado === 1 ? 'Disable' : 'Enable';
 
-      return `<a href="javascript:" data-id="${row.id}" data-estado="${row.estado}" title="${title} record" class="estado btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
-              <i class="ki-duotone ki-lock-3 fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+      return `<a href="javascript:;" data-id="${row.id}" data-estado="${row.estado}" title="${title}" class="estado btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-lock-3 fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
              </a>`;
    };
 
@@ -277,49 +287,43 @@ var DatatableUtil = (function () {
       return html;
    };
 
-   // render acciones
+   // render acciones (datasource local - mismo estilo btn-light-* btn-sm fs-3 me-1)
    var getRenderAccionesDataSourceLocal = function (data, type, row, acciones, witdh = 50) {
-      var html = `<div class="div-acciones" style="width: ${acciones.length * witdh}px;">`;
+      var html = '<div class="d-flex justify-content-center flex-shrink-0">';
 
       // editar
       if (acciones.includes('edit')) {
-         html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Editar record" class="edit btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
-              <i class="ki-duotone ki-notepad-edit fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-            </a>
-      `;
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Editar" class="edit btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
+            </a>`;
       }
 
       // detalles
       if (acciones.includes('detalle')) {
-         html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Detalles record" class="detalle btn btn-sm btn-icon btn-outline btn-outline-success btn-active-light-success">
-              <i class="ki-duotone ki-eye fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-            </a>
-      `;
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Detalles" class="detalle btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-eye fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+            </a>`;
       }
 
       // download
       if (acciones.includes('download')) {
-         html += `<a href="javascript:" data-posicion="${row.posicion}" target="_blank" title="Descargar" class="download btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
-              <i class="ki-duotone ki-cloud-download fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" target="_blank" title="Descargar" class="download btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-cloud-download fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 
       // eliminar
       if (acciones.includes('delete')) {
-         html += `<a href="javascript:" data-posicion="${row.posicion}" title="Eliminar record" class="delete btn btn-sm btn-icon btn-outline btn-outline-danger btn-active-light-danger">
-              <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Eliminar" class="delete btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 
       // clonar
       if (acciones.includes('clonar')) {
-         html += `
-      <a href="javascript:" data-posicion="${row.posicion}" title="Clonar record" class="clonar btn btn-sm btn-icon btn-outline btn-outline-primary btn-active-light-primary">
-              <i class="ki-duotone ki-copy fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-            </a>
-      `;
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Clonar" class="clonar btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-copy fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+            </a>`;
       }
 
       html += '</div>';

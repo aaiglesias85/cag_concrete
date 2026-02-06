@@ -347,55 +347,20 @@ var Invoices = (function () {
          ];
       }
 
-      // acciones
+      // acciones (mismo método que el resto de tablas: DatatableUtil.getRenderAcciones)
+      var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
+      if (permiso.editar) accionesInvoice.push('edit');
+      if (permiso.eliminar) accionesInvoice.push('delete');
 
-columnDefs.push({
-    targets: -1,
-    data: null,
-    orderable: false,
-    className: 'text-center', // 
-    render: function (data, type, row) {
-
-        let html = '<div class="d-flex justify-content-center flex-shrink-0">';
-
-        // 1. Botón EDITAR 
-        if (permiso.editar) {
-            html += `
-                <a href="javascript:;" class="btn btn-icon btn-light-success btn-sm me-1 edit" data-id="${row.id}" title="Edit" data-bs-toggle="tooltip">
-                    <i class="ki-duotone ki-pencil fs-3">
-                        <span class="path1"></span><span class="path2"></span>
-                    </i>
-                </a>`;
-        }
-
-        // 2. Botón EXCEL 
-        html += `
-            <a href="javascript:;" class="btn btn-icon btn-light-warning btn-sm me-1 excel" data-id="${row.id}" title="Export Excel" data-bs-toggle="tooltip">
-                <i class="ki-duotone ki-file-down fs-3">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-            </a>`;
-
-        // 3. Botón PDF 
-        html += `
-            <a href="javascript:;" class="btn btn-icon btn-light-danger btn-sm me-1 pdf-export-btn" data-id="${row.id}" title="Export PDF" data-bs-toggle="tooltip">
-                <i class="bi bi-file-earmark-pdf-fill fs-3 text-danger"></i>
-            </a>`;
-
-        // 4. Botón Eliminar
-        if (permiso.eliminar) {
-            html += `
-                <a href="javascript:;" class="btn btn-icon btn-light-danger btn-sm delete" data-id="${row.id}" title="Delete" data-bs-toggle="tooltip">
-                    <i class="ki-duotone ki-trash fs-3">
-                        <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
-                    </i>
-                </a>`;
-        }
-
-        html += '</div>';
-        return html;
-    },
-});
+      columnDefs.push({
+         targets: -1,
+         data: null,
+         orderable: false,
+         className: 'text-center',
+         render: function (data, type, row) {
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, accionesInvoice);
+         },
+      });
 
       return columnDefs;
    };
