@@ -46,6 +46,69 @@ class InvoiceService extends Base
    }
 
    /**
+    * RecalcularBonProyecto: Aplica la regla de Bon (suma Bon Quantity ≤ 1) a todos los invoices del proyecto.
+    * Orden: por start_date e invoice_id. Por cada invoice: applied = min(requested, 1 - used), bon_amount = bon_general * applied.
+    *
+    * @param int|string $project_id
+    */
+   public function RecalcularBonProyecto($project_id): void
+   {
+      $project_id = (int) $project_id;
+      $em = $this->getDoctrine()->getManager();
+      /** @var Project|null $project */
+      $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
+      if (!$project) {
+         return;
+      }
+      $bonGeneral = $project->getBonGeneral();
+      if ($bonGeneral === null) {
+         $bonGeneral = 0.0;
+      } else {
+         $bonGeneral = (float) $bonGeneral;
+      }
+
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $MAX_BON_QUANTITY = 1.0;
+      $bonQuantityUsed = 0.0;
+
+      foreach ($allInvoices as $invoice) {
+         /** @var Invoice $invoice */
+         if ($bonQuantityUsed >= $MAX_BON_QUANTITY) {
+            $invoice->setBonQuantity(0.0);
+            $invoice->setBonAmount(0.0);
+            $em->persist($invoice);
+            continue;
+         }
+
+         $requested = $invoice->getBonQuantityRequested();
+         if ($requested === null || $requested < 0) {
+            $requested = 0.0;
+         } else {
+            $requested = (float) $requested;
+         }
+         if ($requested > 1.0) {
+            $requested = 1.0;
+         }
+
+         $availableBonQty = $MAX_BON_QUANTITY - $bonQuantityUsed;
+         $appliedBonQty = min($requested, $availableBonQty);
+         $bonAmount = $bonGeneral * $appliedBonQty;
+
+         $invoice->setBonQuantity($appliedBonQty);
+         $invoice->setBonAmount(round($bonAmount, 2));
+         $em->persist($invoice);
+
+         $bonQuantityUsed += $appliedBonQty;
+      }
+
+      $em->flush();
+   }
+
+   /**
     * Construye series (quantity/paid/qbf) y prefijos para un project_item
     * a lo largo de la lista ordenada de invoices del proyecto.
     *
@@ -277,7 +340,8 @@ class InvoiceService extends Base
       ];
 
       $reader = IOFactory::createReader('Xlsx');
-      $objPHPExcel = $reader->load("bundles/metronic8/excel" . DIRECTORY_SEPARATOR . 'invoice.xlsx');
+      $templatePath = $this->getParameter('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'bundles' . DIRECTORY_SEPARATOR . 'metronic8' . DIRECTORY_SEPARATOR . 'excel' . DIRECTORY_SEPARATOR . 'invoice.xlsx';
+      $objPHPExcel = $reader->load($templatePath);
       $objWorksheet = $objPHPExcel->setActiveSheetIndex(0);
 
       // ============================================================
@@ -548,8 +612,7 @@ class InvoiceService extends Base
          $objWorksheet->setCellValue('S' . $fila_footer_inicio, "=SUM(S{$start_row_data}:S{$last_data_row})");
       }
 
-      // Etiquetas y Estilos comunes
-      $objWorksheet->setCellValue('O' . $fila_footer_inicio, "=SUM(O{$start_row_data}:O{$last_data_row})");
+      // Etiquetas y Estilos comunes (O se usa para la etiqueta "TOTAL AMT THIS PERIOD:", no para la suma)
       $objWorksheet->setCellValue('M' . $fila_footer_inicio, "TOTAL PENDING BALANCE:");
       $objWorksheet->getStyle('N' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
@@ -894,8 +957,10 @@ class InvoiceService extends Base
          ->find($invoice_id);
       /** @var Invoice $entity */
       if ($entity != null) {
+         $project_id = $entity->getProject()->getProjectId();
+         $this->RecalcularBonProyecto($project_id);
 
-         $arreglo_resultado['project_id'] = $entity->getProject()->getProjectId();
+         $arreglo_resultado['project_id'] = $project_id;
 
          $company_id = $entity->getProject()->getCompany()->getCompanyId();
          $arreglo_resultado['company_id'] = $company_id;
@@ -905,6 +970,11 @@ class InvoiceService extends Base
          $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
          $arreglo_resultado['notes'] = $entity->getNotes();
          $arreglo_resultado['paid'] = $entity->getPaid();
+
+         $arreglo_resultado['bon_general'] = $entity->getProject()->getBonGeneral() !== null ? (float) $entity->getProject()->getBonGeneral() : null;
+         $arreglo_resultado['bon_quantity_requested'] = $entity->getBonQuantityRequested() !== null ? (float) $entity->getBonQuantityRequested() : null;
+         $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
+         $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
 
          // projects
          $projects = $this->ListarProjectsDeCompany($company_id);
@@ -1221,7 +1291,7 @@ class InvoiceService extends Base
     * @param int $invoice_id Id
     * @author Marcel
     */
-   public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+   public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested = null)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -1229,6 +1299,9 @@ class InvoiceService extends Base
          ->find($invoice_id);
       /** @var Invoice $entity */
       if ($entity != null) {
+         if ($bon_quantity_requested !== null && $bon_quantity_requested !== '') {
+            $entity->setBonQuantityRequested((float) $bon_quantity_requested);
+         }
 
          // verificar fechas
          /** @var InvoiceRepository $invoiceRepo */
@@ -1295,6 +1368,8 @@ class InvoiceService extends Base
          // Actualizar unpaid_qty cuando se modifica quantity_brought_forward
          $this->ActualizarUnpaidQtyPorQuantityBroughtForward($entity, $items);
 
+         $this->RecalcularBonProyecto($project_id);
+
          // salvar en la cola
          $this->SalvarInvoiceQuickbook($entity);
 
@@ -1327,7 +1402,7 @@ class InvoiceService extends Base
     * @param string $description Nombre
     * @author Marcel
     */
-   public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+   public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested = null)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -1385,6 +1460,9 @@ class InvoiceService extends Base
       $entity = new Invoice();
 
       $entity->setNumber($number);
+      if ($bon_quantity_requested !== null && $bon_quantity_requested !== '') {
+         $entity->setBonQuantityRequested((float) $bon_quantity_requested);
+      }
 
       $entity->setStartDate($start_date);
       $entity->setEndDate($end_date);
@@ -1411,6 +1489,8 @@ class InvoiceService extends Base
 
       // Actualizar unpaid_qty cuando se modifica quantity_brought_forward
       $this->ActualizarUnpaidQtyPorQuantityBroughtForward($entity, $items);
+
+      $this->RecalcularBonProyecto($project_id);
 
       $em->flush();
 

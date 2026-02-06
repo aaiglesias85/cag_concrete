@@ -108,13 +108,14 @@ class InvoiceController extends AbstractController
       $items = json_decode($items);
 
       $exportar = $request->get('exportar');
+      $bon_quantity_requested = $request->get('bon_quantity_requested');
 
       try {
 
          if ($invoice_id == "") {
-            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested);
          } else {
-            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested);
          }
 
          if ($resultado['success']) {
@@ -264,6 +265,12 @@ class InvoiceController extends AbstractController
       try {
 
          $url = $this->invoiceService->ExportarExcel($invoice_id, $format);
+
+         if ($url === null) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'No se pudo generar el archivo. Compruebe que la plantilla existe y que la librería PDF está instalada.';
+            return $this->json($resultadoJson);
+         }
 
          // 4. Devolver la URL del archivo generado
          $resultadoJson['success'] = true;

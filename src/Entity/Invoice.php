@@ -59,6 +59,15 @@ class Invoice
    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: ReimbursementHistory::class, cascade: ['persist', 'remove'])]
    private Collection $reimbursementHistories;
 
+   #[ORM\Column(name: 'bon_quantity_requested', type: 'decimal', precision: 10, scale: 6, nullable: true)]
+   private ?float $bonQuantityRequested = null;
+
+   #[ORM\Column(name: 'bon_quantity', type: 'decimal', precision: 10, scale: 6, nullable: true)]
+   private ?float $bonQuantity = null;
+
+   #[ORM\Column(name: 'bon_amount', type: 'decimal', precision: 18, scale: 2, nullable: true)]
+   private ?float $bonAmount = null;
+
 
    public function getInvoiceId(): ?int
    {
@@ -193,6 +202,39 @@ class Invoice
    public function setRetainageReimbursedDate(?\DateTimeInterface $retainageReimbursedDate): self
    {
       $this->retainageReimbursedDate = $retainageReimbursedDate;
+      return $this;
+   }
+
+   public function getBonQuantityRequested(): ?float
+   {
+      return $this->bonQuantityRequested;
+   }
+
+   public function setBonQuantityRequested(?float $bonQuantityRequested): self
+   {
+      $this->bonQuantityRequested = $bonQuantityRequested;
+      return $this;
+   }
+
+   public function getBonQuantity(): ?float
+   {
+      return $this->bonQuantity;
+   }
+
+   public function setBonQuantity(?float $bonQuantity): self
+   {
+      $this->bonQuantity = $bonQuantity;
+      return $this;
+   }
+
+   public function getBonAmount(): ?float
+   {
+      return $this->bonAmount;
+   }
+
+   public function setBonAmount(?float $bonAmount): self
+   {
+      $this->bonAmount = $bonAmount;
       return $this;
    }
 

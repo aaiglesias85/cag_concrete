@@ -244,7 +244,7 @@ var ModalInvoice = (function () {
          if (validateForm() && project_id != '' && isValidNumber() && start_date != '' && end_date != '') {
             var formData = new URLSearchParams();
 
-            var invoice_id = '';
+            var invoice_id = $('#modal-invoice [name="invoice_id"]').val() || '';
             formData.set('invoice_id', invoice_id);
 
             formData.set('project_id', project_id);
@@ -265,6 +265,9 @@ var ModalInvoice = (function () {
             formData.set('items', JSON.stringify(items));
 
             formData.set('exportar', exportar ? 1 : 0);
+
+            var bonQtyRequested = $('#modal_bon_quantity_requested').val();
+            formData.set('bon_quantity_requested', bonQtyRequested !== undefined && bonQtyRequested !== '' ? bonQtyRequested : '');
 
             BlockUtil.block('#modal-invoice .modal-content');
 
@@ -471,7 +474,15 @@ var ModalInvoice = (function () {
                      // Guardar sum_boned_project y bone_price para cálculo de X e Y
                      sum_boned_project = Number(response.sum_boned_project || 0);
                      bone_price = Number(response.bone_price || 0);
-                     
+                     if (response.bon_general != null && response.bon_general !== '') {
+                        $('#modal_bon_general').val(MyApp.formatMoney(response.bon_general, 2, '.', ','));
+                     } else {
+                        $('#modal_bon_general').val('');
+                     }
+                     $('#modal_bon_quantity_requested').val('');
+                     $('#modal_bon_quantity').val('');
+                     $('#modal_bon_amount').val('');
+
                      console.log('--- Datos cargados desde backend (MODAL - project/listarItemsParaInvoice) ---');
                      console.log('sum_boned_project:', sum_boned_project);
                      console.log('bone_price:', bone_price);

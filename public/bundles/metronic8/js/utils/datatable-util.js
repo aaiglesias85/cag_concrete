@@ -226,7 +226,7 @@ var DatatableUtil = (function () {
       var title = 'Export PDF';
 
       return `<a href="javascript:;" data-id="${row.id}" title="${title}" class="pdf-export-btn btn btn-icon btn-light-danger btn-sm me-1" data-bs-toggle="tooltip">
-              <i class="bi bi-file-earmark-pdf-fill fs-3 text-danger"></i>
+              <i class="bi bi-file-earmark-pdf-fill fs-3"></i>
             </a>`;
    };
 

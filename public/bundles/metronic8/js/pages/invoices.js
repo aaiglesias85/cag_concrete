@@ -564,6 +564,11 @@ var Invoices = (function () {
       items_lista = [];
       actualizarTableListaItems();
 
+      $('#bon_general_display').val('');
+      $('#bon_quantity_requested').val('');
+      $('#bon_quantity_display').val('');
+      $('#bon_amount_display').val('');
+
       //Mostrar el primer tab
       resetWizard();
 
@@ -879,6 +884,9 @@ var Invoices = (function () {
 
             formData.set('exportar', exportar ? 1 : 0);
 
+            var bonQtyRequested = $('#bon_quantity_requested').val();
+            formData.set('bon_quantity_requested', bonQtyRequested !== undefined && bonQtyRequested !== '' ? bonQtyRequested : '');
+
             BlockUtil.block('#form-invoice');
 
             axios
@@ -1052,6 +1060,17 @@ var Invoices = (function () {
          $('#notes').val(invoice.notes);
 
          $('#paidactivo').prop('checked', invoice.paid);
+
+         if (invoice.bon_general != null && invoice.bon_general !== '') {
+            $('#bon_general_display').val(MyApp.formatMoney(invoice.bon_general, 2, '.', ','));
+            $('#card-bond').show();
+         } else {
+            $('#bon_general_display').val('');
+            $('#card-bond').show();
+         }
+         $('#bon_quantity_requested').val(invoice.bon_quantity_requested != null && invoice.bon_quantity_requested !== '' ? invoice.bon_quantity_requested : '');
+         $('#bon_quantity_display').val(invoice.bon_quantity != null && invoice.bon_quantity !== '' ? MyApp.formatearNumero(invoice.bon_quantity, 6, '.', ',') : '');
+         $('#bon_amount_display').val(invoice.bon_amount != null && invoice.bon_amount !== '' ? MyApp.formatMoney(invoice.bon_amount, 2, '.', ',') : '');
 
          $('#company').on('change', changeCompany);
          $('#project').on('change', changeProject);
@@ -1474,6 +1493,15 @@ var Invoices = (function () {
                      // Guardar sum_boned_project y bone_price para cálculo de X e Y
                      sum_boned_project = Number(response.sum_boned_project || 0);
                      bone_price = Number(response.bone_price || 0);
+                     if (response.bon_general != null && response.bon_general !== '') {
+                        $('#bon_general_display').val(MyApp.formatMoney(response.bon_general, 2, '.', ','));
+                        $('#card-bond').show();
+                     } else {
+                        $('#bon_general_display').val('');
+                     }
+                     $('#bon_quantity_requested').val('');
+                     $('#bon_quantity_display').val('');
+                     $('#bon_amount_display').val('');
                      
                      //Llenar select
                      for (let item of response.items) {
@@ -2107,54 +2135,9 @@ var Invoices = (function () {
       // Calcular Y (Monto Monetario)
       var y = (parseFloat(bone_price) || 0) * x;  
 
-      // 2. CONFIGURACIÓN VISUAL
-      var $inputY = $('#total_boned_y');
-      var $card = $inputY.closest('.card'); // La tarjeta amarilla
-      
-      // Nombre de la clase CSS 
-      var efectoClase = 'card-shine-effect'; 
-      var duracion = 3000; // 3000ms = 3 segundos (sincronizado con CSS)
-
-      // Si los valores son casi cero, ocultamos la tarjeta para limpiar la pantalla
-      if (x <= 0.0001 && y <= 0.0001) {
-          $card.hide();
-          
-          // Limpiamos valores internos
-          $('#total_boned_x').val('0.000000');
-          $inputY.val('$0.00');
-          $('#display_bond_qty').text('0.00');
-          
-          // Quitamos la animación por seguridad
-          $card.removeClass(efectoClase);
-          return; 
-      }
-
-      // 4. SI HAY DATOS: MOSTRAR Y ANIMAR
-      $card.removeClass('d-none').show();
-      
-      // Activamos el efecto de brillo
-      $card.addClass(efectoClase);
-
-      // Animar los números subiendo
-      if (typeof animateValue === 'function') {
-          animateValue('#display_bond_qty', x, duracion, false); 
-          animateValue('#total_boned_y', y, duracion, true);
-      } else {
-          // Fallback por si no existe la función animateValue
-          $('#display_bond_qty').text(MyApp.formatearNumero(x, 2, '.', ','));
-          $inputY.val(MyApp.formatMoney(y, 2, '.', ','));
-      }
-
-      // Guardar valor en el input hidden
+      // Valores guardados en hidden (Boned X/Y por items - se mantiene por compatibilidad)
       $('#total_boned_x').val(MyApp.formatearNumero(x, 2, '.', ','));
-
-     
-      // Quitamos el efecto de brillo después de 3 segundos
-      setTimeout(function() {
-          $card.removeClass(efectoClase);
-          // Pequeño efecto final de "listo"
-          $card.addClass('anim-update'); 
-      }, duracion);
+      $('#total_boned_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
 
    var handleChangeOrderHistory = function () {

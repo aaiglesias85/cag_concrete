@@ -15,6 +15,7 @@
       "firebase/php-jwt": "*",
       "nelmio/api-doc-bundle": "*",
       "nelmio/cors-bundle": "^2.5",
+      "mpdf/mpdf": "^8.2",
       "phpoffice/phpspreadsheet": "^4.1",
       "symfony/asset": "7.2.*",
       "symfony/asset-mapper": "7.2.*",

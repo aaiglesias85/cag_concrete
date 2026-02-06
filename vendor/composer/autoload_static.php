@@ -20,10 +20,11 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
-        '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
         '4c903e653868d3c4bb9191776b7008a1' => __DIR__ . '/..' . '/eskrano/quickbooks-php-8/QuickBooks.php',
+        'db356362850385d08a5381de2638b5fd' => __DIR__ . '/..' . '/mpdf/mpdf/src/functions.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '92c8763cd6170fce6fcfe7e26b4e8c10' => __DIR__ . '/..' . '/symfony/phpunit-bridge/bootstrap.php',
         '04b6576f786ea6b5b4b577af08f8e4d1' => __DIR__ . '/..' . '/symfony/polyfill-intl-messageformatter/bootstrap.php',
@@ -32,6 +33,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
     );
 
     public static $prefixLengthsPsr4 = array (
+        's' =>
+        array (
+            'setasign\\Fpdi\\' => 14,
+        ),
         'p' =>
         array (
             'phpDocumentor\\Reflection\\' => 25,
@@ -155,6 +160,9 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         ),
         'M' =>
         array (
+            'Mpdf\\PsrLogAwareTrait\\' => 22,
+            'Mpdf\\PsrHttpMessageShim\\' => 24,
+            'Mpdf\\' => 5,
             'Monolog\\' => 8,
             'Matrix\\' => 7,
             'Masterminds\\' => 12,
@@ -199,6 +207,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
     );
 
     public static $prefixDirsPsr4 = array (
+        'setasign\\Fpdi\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/setasign/fpdi/src',
+        ),
         'phpDocumentor\\Reflection\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
@@ -589,6 +601,18 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'Nelmio\\ApiDocBundle\\' =>
         array (
             0 => __DIR__ . '/..' . '/nelmio/api-doc-bundle/src',
+        ),
+        'Mpdf\\PsrLogAwareTrait\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mpdf/psr-log-aware-trait/src',
+        ),
+        'Mpdf\\PsrHttpMessageShim\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mpdf/psr-http-message-shim/src',
+        ),
+        'Mpdf\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/mpdf/mpdf/src',
         ),
         'Monolog\\' =>
         array (

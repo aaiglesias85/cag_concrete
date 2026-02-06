@@ -51,6 +51,27 @@
     line-height: 1.1;
 }
 
+/* Excepción: card Bon tiene input editable (Bon Qty Requested) */
+#card-bond input {
+    pointer-events: auto;
+}
+#card-bond input#bon_quantity_requested {
+    padding: 0.25rem 0.5rem !important;
+    height: auto !important;
+}
+
+/* Card Bon: mismo aspecto que bg-warning/border-warning (clases que quitamos para que el input funcione) */
+#card-bond {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 /* Ajuste de etiquetas micro */
 .fs-9 {
     font-size: 0.65rem !important;
@@ -592,16 +613,25 @@
         <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
     </div>
 
-    <div id="card-bond" class= "card card-dashed bg-warning bg-opacity-10 flex-row align-items-center min-w-260px p-2 px-4 border border-warning border-opacity-10">
-        <div class="me-4 text-center">
-            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount:</span>
-            <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100px" id="total_boned_y" readonly value="$0.00" />
+    <div id="card-bond" class="min-w-280px">
+        <div class="text-center">
+            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bon General</span>
+            <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="bon_general_display" readonly value="" />
         </div>
-        <div class="border-start border-warning border-opacity-30 ps-4 text-center">
-            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Qty:</span>
-            <span id="display_bond_qty" class="text-gray-700 fw-bold fs-7">0.00</span>
-            <input type="hidden" id="total_boned_x" />
+        <div class="text-center">
+            <label class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1" for="bon_quantity_requested">Bon Qty Requested (0-1)</label>
+            <input type="number" class="form-control form-control-solid form-control-sm text-center w-90px event-change" id="bon_quantity_requested" name="bon_quantity_requested" min="0" max="1" step="0.01" placeholder="0" inputmode="decimal" autocomplete="off" />
         </div>
+        <div class="text-center">
+            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bon Qty Applied</span>
+            <input type="text" class="form-control form-control-solid form-control-sm text-center w-90px" id="bon_quantity_display" readonly value="" />
+        </div>
+        <div class="text-center">
+            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bon Amount</span>
+            <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="bon_amount_display" readonly value="" />
+        </div>
+        <input type="hidden" id="total_boned_x" />
+        <input type="hidden" id="total_boned_y" />
     </div>
 </div>
                               </div>

@@ -203,7 +203,7 @@ class ProjectController extends AbstractController
       $prevailing_county_id = $request->get('prevailing_county_id');
       $prevailing_role_id = $request->get('prevailing_role_id');
       $prevailing_rate = $request->get('prevailing_rate');
-
+      $bon_general = $request->get('bon_general');
 
       // items
       $items = $request->get('items');
@@ -268,7 +268,8 @@ class ProjectController extends AbstractController
                $prevailing_wage,
                $prevailing_county_id,
                $prevailing_role_id,
-               $prevailing_rate
+               $prevailing_rate,
+               $bon_general
             );
          } else {
             $resultado = $this->projectService->ActualizarProject(
@@ -314,7 +315,8 @@ class ProjectController extends AbstractController
                $prevailing_wage,
                $prevailing_county_id,
                $prevailing_role_id,
-               $prevailing_rate
+               $prevailing_rate,
+               $bon_general
             );
          }
 
@@ -471,6 +473,7 @@ class ProjectController extends AbstractController
          $resultadoJson['items'] = $result['items'];
          $resultadoJson['sum_boned_project'] = $result['sum_boned_project'];
          $resultadoJson['bone_price'] = $result['bone_price'];
+         $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {

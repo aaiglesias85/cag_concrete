@@ -477,6 +477,7 @@ var Projects = (function () {
       $('#prevailing-county').val('').trigger('change');
       $('#prevailing-role').val('').trigger('change');
       NumberUtil.setFormattedValue('#prevailing-rate', '', { decimals: 2 });
+      NumberUtil.setFormattedValue('#bon-general', '', { decimals: 2 });
 
       //Mostrar el primer tab
       if (reset_wizard) {
@@ -901,6 +902,9 @@ var Projects = (function () {
       var prevailing_rate = NumberUtil.getNumericValue('#prevailing-rate');
       formData.set('prevailing_rate', prevailing_rate);
 
+      var bon_general = NumberUtil.getNumericValue('#bon-general');
+      formData.set('bon_general', bon_general !== '' && bon_general !== null ? bon_general : '');
+
       formData.set('items', JSON.stringify(items));
       formData.set('contacts', JSON.stringify(contacts));
       formData.set('concrete_classes', JSON.stringify(concrete_classes));
@@ -1185,6 +1189,7 @@ var Projects = (function () {
          $('#prevailing-role').val(project.prevailing_role_id);
          $('#prevailing-role').trigger('change');
          NumberUtil.setFormattedValue('#prevailing-rate', project.prevailing_rate, { decimals: 2 });
+         NumberUtil.setFormattedValue('#bon-general', project.bon_general != null ? project.bon_general : '', { decimals: 2 });
 
          // habilitar tab
          totalTabs = 12;
