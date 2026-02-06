@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 03-02-2026 a las 00:55:52
+-- Tiempo de generación: 06-02-2026 a las 18:38:32
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1879,6 +1879,7 @@ CREATE TABLE `user` (
   `status` tinyint(1) DEFAULT NULL,
   `estimator` tinyint(1) DEFAULT NULL,
   `bone` tinyint(1) DEFAULT NULL,
+  `retainage` tinyint(1) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -1893,8 +1894,8 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bone`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bone`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------
 

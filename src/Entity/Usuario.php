@@ -39,6 +39,9 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "bone", type: "boolean", nullable: true)]
     private ?bool $bone;
 
+    #[ORM\Column(name: "retainage", type: "boolean", nullable: true)]
+    private ?bool $retainage;
+
     #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
     private ?\DateTime $createdAt;
 
@@ -272,6 +275,16 @@ class Usuario implements UserInterface, EquatableInterface
     public function setBone(?bool $bone): void
     {
         $this->bone = $bone;
+    }
+
+    public function getRetainage(): ?bool
+    {
+        return $this->retainage;
+    }
+
+    public function setRetainage(?bool $retainage): void
+    {
+        $this->retainage = $retainage;
     }
 
     public function getPlayerId(): ?string

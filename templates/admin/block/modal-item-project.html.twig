@@ -143,12 +143,14 @@
                         </div>
                      </div>
 
+                     {% if usuario_retainage is defined and usuario_retainage %}
                      <div class="col-md-4 mt-5">
                         <label class="form-label">Is Retainage?</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
                         </div>
                      </div>
+                     {% endif %}
 
                      {% if usuario_bone %}
                      <div class="col-md-4 mt-5">

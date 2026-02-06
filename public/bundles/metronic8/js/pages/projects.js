@@ -2111,8 +2111,13 @@ var Projects = (function () {
             var change_order_date = FlatpickrUtil.getString('change-order-date');
             formData.set('change_order_date', change_order_date);
 
-            var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
-            formData.set('apply_retainage', apply_retainage);
+            // apply_retainage solo se envía si el usuario tiene permiso retainage
+            if ($('#item-apply-retainage').length > 0) {
+               var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
+               formData.set('apply_retainage', apply_retainage);
+            } else {
+               formData.set('apply_retainage', 0);
+            }
 
             // boned solo se envía si el usuario tiene permiso bone
             if ($('#item-boned').length > 0) {
@@ -2264,7 +2269,10 @@ var Projects = (function () {
 
             $('#change-order').prop('checked', items[posicion].change_order);
 
-            $('#item-apply-retainage').prop('checked', items[posicion].apply_retainage);
+            // apply_retainage solo se establece si el usuario tiene permiso retainage
+            if ($('#item-apply-retainage').length > 0) {
+               $('#item-apply-retainage').prop('checked', items[posicion].apply_retainage == 1 || items[posicion].apply_retainage === true);
+            }
 
             // boned solo se establece si el usuario tiene permiso bone
             if ($('#item-boned').length > 0) {

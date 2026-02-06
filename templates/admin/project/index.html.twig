@@ -1144,12 +1144,14 @@
                               <div class="card-body d-flex align-items-center p-3">
                                  <div class="fs-6 fw-bold text-primary me-5"><span id="contador-items-seleccionados-wizard">0</span> Selected Items</div>
                                  <div class="ms-auto">
+                                    {% if usuario_retainage %}
                                     <button type="button" class="btn btn-sm btn-primary fw-bold btn-accion-masiva-wizard" data-accion="1">
                                        <i class="ki-duotone ki-check fs-2 me-2"></i> Retainage
                                     </button>
                                     <button type="button" class="btn btn-sm btn-danger fw-bold btn-accion-masiva-wizard" data-accion="0">
                                        <i class="ki-duotone ki-cross fs-2 me-2"></i> Remove Retainage
                                     </button>
+                                    {% endif %}
                                     {% if usuario_bone %}
                                     <button type="button" class="btn btn-sm btn-primary fw-bold btn-accion-masiva-boned-wizard" data-accion="1">
                                        <i class="ki-duotone ki-check fs-2 me-2"></i> Bonded
@@ -3001,12 +3003,14 @@
                         </div>
                      </div>
 
+                     {% if usuario_retainage %}
                      <div class="col-md-4 mt-5">
                         <label class="form-label">Is Retainage?</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
                            <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-apply-retainage" checked="checked" />
                         </div>
                      </div>
+                     {% endif %}
 
                      {% if usuario_bone %}
                      <div class="col-md-4 mt-5">

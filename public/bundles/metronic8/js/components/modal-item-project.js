@@ -222,8 +222,13 @@ var ModalItemProject = (function () {
             var change_order_date = FlatpickrUtil.getString('change-order-date');
             formData.set('change_order_date', change_order_date);
 
-            var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
-            formData.set('apply_retainage', apply_retainage);
+            // apply_retainage solo se envía si el usuario tiene permiso retainage
+            if ($('#item-apply-retainage').length > 0) {
+               var apply_retainage = $('#item-apply-retainage').prop('checked') ? 1 : 0;
+               formData.set('apply_retainage', apply_retainage);
+            } else {
+               formData.set('apply_retainage', 0);
+            }
 
             // boned solo se envía si el usuario tiene permiso bone
             if ($('#item-boned').length > 0) {
@@ -345,7 +350,9 @@ var ModalItemProject = (function () {
 
       FlatpickrUtil.clear('change-order-date');
 
-      $('#item-apply-retainage').prop('checked', true);
+      if ($('#item-apply-retainage').length > 0) {
+         $('#item-apply-retainage').prop('checked', true);
+      }
 
       // reset bone
       if ($('#bone').length > 0) {

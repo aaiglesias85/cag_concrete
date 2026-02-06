@@ -86,7 +86,8 @@ class ProjectController extends AbstractController
                'concrete_classes' => $concrete_classes,
                'employee_roles' => $employee_roles,
                'direccion_url' => $this->projectService->ObtenerURL(),
-               'usuario_bone' => $usuario->getBone() ? true : false
+               'usuario_bone' => $usuario->getBone() ? true : false,
+               'usuario_retainage' => $usuario->getRetainage() ? true : false
             ));
          }
       } else {
@@ -766,6 +767,10 @@ class ProjectController extends AbstractController
       $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
       $change_order_date = $request->get('change_order_date');
       $apply_retainage = $request->get('apply_retainage') ?? 0;
+      $apply_retainage = (int) $apply_retainage;
+      if ($apply_retainage !== 0) {
+         $apply_retainage = 1;
+      }
       $bone = $request->get('bone') ?? false;
       // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
       if (is_string($bone)) {
@@ -794,6 +799,12 @@ class ProjectController extends AbstractController
       if ($boned && !$usuario_bone) {
          // Si el usuario intenta marcar un item como boned=true pero no tiene permiso, forzar a false
          $boned = false;
+      }
+
+      $usuario_retainage = $usuario->getRetainage() ? true : false;
+      if ($apply_retainage && !$usuario_retainage) {
+         // Si el usuario intenta marcar apply_retainage pero no tiene permiso, forzar a 0
+         $apply_retainage = 0;
       }
 
       try {
@@ -1168,6 +1179,11 @@ class ProjectController extends AbstractController
     */
    public function bulkRetainageUpdate(Request $request)
    {
+      $usuario = $this->getUser();
+      $usuario_retainage = $usuario->getRetainage() ? true : false;
+      if (!$usuario_retainage) {
+         return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
+      }
 
       $ids = $request->get('ids');
       $status = $request->get('status');

@@ -157,6 +157,7 @@ class UsuarioService extends Base
          $arreglo_resultado['habilitado'] = $usuario->getHabilitado();
          $arreglo_resultado['estimator'] = $usuario->getEstimator();
          $arreglo_resultado['bone'] = $usuario->getBone();
+         $arreglo_resultado['retainage'] = $usuario->getRetainage();
 
          $permisos = $this->ListarPermisos($usuario_id);
          $arreglo_resultado['permisos'] = $permisos;
@@ -393,7 +394,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone)
+   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone, $retainage)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -421,6 +422,7 @@ class UsuarioService extends Base
          $entity->setTelefono($telefono);
          $entity->setEstimator($estimator);
          $entity->setBone($bone);
+         $entity->setRetainage($retainage);
 
          if ($contrasenna != "") {
             $entity->setContrasenna($this->CodificarPassword($contrasenna));
@@ -494,7 +496,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone)
+   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone, $retainage)
    {
       $resultado = array();
       $em = $this->getDoctrine()->getManager();
@@ -518,6 +520,7 @@ class UsuarioService extends Base
       $entity->setHabilitado($habilitado);
       $entity->setEstimator($estimator);
       $entity->setBone($bone);
+      $entity->setRetainage($retainage);
 
       if ($rol_id != '') {
          $rol = $this->getDoctrine()->getRepository(Rol::class)
