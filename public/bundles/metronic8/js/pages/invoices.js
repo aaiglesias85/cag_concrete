@@ -2115,19 +2115,21 @@ columnDefs.push({
    // Función para calcular y mostrar X e Y (Boned) en JavaScript
    var calcularYMostrarXBonedEnJS = function () { 
       
-      // 1. OBTENER DATOS
+      // 1. OBTENER DATOS 
+      // Usamos items_lista si existe, si no, el array general
       var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       
       var sum_boned_invoices = 0;
       
+      // Sumar solo items con boned activo
       items_a_calcular.forEach(function(item) {
          if (item.boned == 1 || item.boned === true || item.boned === '1') {
             var quantity = parseFloat(item.quantity) || 0;
             var qbf = parseFloat(item.quantity_brought_forward) || 0;
             var price = parseFloat(item.price) || 0;
             
-            var amount_final = (quantity + qbf) * price;
-            sum_boned_invoices += amount_final;
+            // Sumar al total
+            sum_boned_invoices += ((quantity + qbf) * price);
          }
       });
 
@@ -2137,53 +2139,58 @@ columnDefs.push({
          x = sum_boned_invoices / parseFloat(sum_boned_project);
       }
       
-      // Calcular Y (Monto)
+      // Calcular Y (Monto Monetario)
       var y = (parseFloat(bone_price) || 0) * x;  
 
-      // 2. CONTROLAR VISIBILIDAD
+      // 2. CONFIGURACIÓN VISUAL
       var $inputY = $('#total_boned_y');
-      var $card = $inputY.closest('.card'); // Seleccionamos la tarjeta amarilla
+      var $card = $inputY.closest('.card'); // La tarjeta amarilla
+      
+      // Nombre de la clase CSS 
+      var efectoClase = 'card-shine-effect'; 
+      var duracion = 3000; // 3000ms = 3 segundos (sincronizado con CSS)
 
-      // Si los valores son prácticamente 0, ocultamos la tarjeta y salimos
+      // Si los valores son casi cero, ocultamos la tarjeta para limpiar la pantalla
       if (x <= 0.0001 && y <= 0.0001) {
-          $card.hide(); // Ocultar para ganar espacio
+          $card.hide();
           
-          // Limpiamos valores por si acaso
+          // Limpiamos valores internos
           $('#total_boned_x').val('0.000000');
           $inputY.val('$0.00');
           $('#display_bond_qty').text('0.00');
-          return; // Terminamos aquí, no hace falta animar nada
+          
+          // Quitamos la animación por seguridad
+          $card.removeClass(efectoClase);
+          return; 
       }
 
-      // 3. SI HAY VALORES: MOSTRAR Y ANIMAR
+      // 4. SI HAY DATOS: MOSTRAR Y ANIMAR
       $card.removeClass('d-none').show();
+      
+      // Activamos el efecto de brillo
+      $card.addClass(efectoClase);
 
-      // Configuración de animación (Lenta: 4 segundos)
-      var duracion = 4000; 
-
-      // A. Efecto "Snake Border" (Borde viajero)
-      $card.addClass('card-loading-effect');
-
-      // B. Animar los números (Count Up)
-      // Usamos animateValue si existe, si no, seteamos directo
+      // Animar los números subiendo
       if (typeof animateValue === 'function') {
           animateValue('#display_bond_qty', x, duracion, false); 
           animateValue('#total_boned_y', y, duracion, true);
       } else {
+          // Fallback por si no existe la función animateValue
           $('#display_bond_qty').text(MyApp.formatearNumero(x, 2, '.', ','));
           $inputY.val(MyApp.formatMoney(y, 2, '.', ','));
       }
 
-      // C. Guardar valor oculto
+      // Guardar valor en el input hidden
       $('#total_boned_x').val(MyApp.formatearNumero(x, 2, '.', ','));
 
-     // Quitar el efecto del borde al terminar la animación
+     
+      // Quitamos el efecto de brillo después de 3 segundos
       setTimeout(function() {
-          $card.removeClass('card-loading-effect');
+          $card.removeClass(efectoClase);
+          // Pequeño efecto final de "listo"
           $card.addClass('anim-update'); 
       }, duracion);
    };
-
 
    var handleChangeOrderHistory = function () {
       $(document).off('click', '.change-order-history-icon');
