@@ -2016,6 +2016,34 @@ var Projects = (function () {
       return quantity;
    }
 
+   function DevolverPrecioItemProject() {
+      var price = $('#item-price').val();
+
+      if (nEditingRowItem == null) {
+         price = price.trim().replace(/^[-+]/, '').replace(/,/g, '');
+         price = parseFloat(price) || 0;
+      } else {
+         var old_price = items[nEditingRowItem].price > 0 ? parseFloat(items[nEditingRowItem].price) : 0;
+         var raw_price = price.trim();
+         var sign = raw_price.charAt(0);
+         var number = parseFloat(raw_price.replace(/^[-+]/, '').replace(/,/g, '')) || 0;
+
+         var new_price = 0;
+
+         if (sign === '+') {
+            new_price = old_price + number;
+         } else if (sign === '-') {
+            new_price = old_price - number;
+         } else {
+            new_price = number;
+         }
+
+         price = new_price < 0 ? 0 : new_price;
+      }
+
+      return price;
+   }
+
    var initAccionesItems = function () {
       $(document).off('click', '#btn-agregar-item');
       $(document).on('click', '#btn-agregar-item', function (e) {
@@ -2065,7 +2093,7 @@ var Projects = (function () {
             var unit_id = $('#unit').val();
             formData.set('unit_id', unit_id);
 
-            var price = NumberUtil.getNumericValue('#item-price');
+            var price = DevolverPrecioItemProject();
             formData.set('price', price);
 
             var quantity = DevolverCantidadItemProject();
