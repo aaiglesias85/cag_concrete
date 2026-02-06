@@ -35,6 +35,13 @@ use App\Utils\Base;
 
 class DataTrackingService extends Base
 {
+   /** @var InvoiceService */
+   private $invoiceService;
+
+   public function __construct(InvoiceService $invoiceService)
+   {
+      $this->invoiceService = $invoiceService;
+   }
 
    /**
     * EliminarArchivos: Elimina un archivos en la BD
@@ -266,14 +273,19 @@ class DataTrackingService extends Base
       /**@var DataTrackingItem $entity */
       if ($entity != null) {
 
+         $project_id = $entity->getProjectItem()->getProject()->getProjectId();
+         $dateObj = $entity->getDataTracking()->getDate();
+         $project_item_id = $entity->getProjectItem()->getId();
 
          $project_name = $entity->getProjectItem()->getProject()->getProjectNumber() . " - " . $entity->getProjectItem()->getProject()->getName();
-         $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
+         $date = $dateObj->format('m/d/Y');
 
          $item_name = $entity->getProjectItem()->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
+
+         $this->invoiceService->ActualizarInvoicesPorCambioDataTracking($project_id, $dateObj, [$project_item_id]);
 
          //Salvar log
          $log_operacion = "Delete";
@@ -691,15 +703,28 @@ class DataTrackingService extends Base
       /**@var DataTracking $entity */
       if ($entity != null) {
 
+         $project_id = $entity->getProject()->getProjectId();
+         $dateObj = $entity->getDate();
+
+         /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         $items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
+         $project_item_ids = array_map(function (DataTrackingItem $dtItem) {
+            return $dtItem->getProjectItem()->getId();
+         }, $items);
+
          // eliminar informacion relacionada
          $this->EliminarInformacionRelacionadaDataTracking($data_tracking_id);
 
-
          $project_name = $entity->getProject()->getProjectNumber() . " - " . $entity->getProject()->getName();
-         $date = $entity->getDate()->format('m/d/Y');
+         $date = $dateObj->format('m/d/Y');
 
          $em->remove($entity);
          $em->flush();
+
+         if (!empty($project_item_ids)) {
+            $this->invoiceService->ActualizarInvoicesPorCambioDataTracking($project_id, $dateObj, $project_item_ids);
+         }
 
          //Salvar log
          $log_operacion = "Delete";
@@ -724,11 +749,15 @@ class DataTrackingService extends Base
    public function EliminarDataTrackings($ids)
    {
       $em = $this->getDoctrine()->getManager();
+      $updatesForInvoice = [];
 
       if ($ids != "") {
          $ids = explode(',', $ids);
          $cant_eliminada = 0;
          $cant_total = 0;
+         /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+
          foreach ($ids as $data_tracking_id) {
             if ($data_tracking_id != "") {
                $cant_total++;
@@ -737,14 +766,32 @@ class DataTrackingService extends Base
                /**@var DataTracking $entity */
                if ($entity != null) {
 
+                  $project_id = $entity->getProject()->getProjectId();
+                  $dateObj = $entity->getDate();
+                  $items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
+                  $project_item_ids = array_map(function (DataTrackingItem $dtItem) {
+                     return $dtItem->getProjectItem()->getId();
+                  }, $items);
+
                   // eliminar informacion relacionada
                   $this->EliminarInformacionRelacionadaDataTracking($data_tracking_id);
 
                   $project_name = $entity->getProject()->getProjectNumber() . " - " . $entity->getProject()->getName();
-                  $date = $entity->getDate()->format('m/d/Y');
+                  $date = $dateObj->format('m/d/Y');
 
                   $em->remove($entity);
                   $cant_eliminada++;
+
+                  if (!empty($project_item_ids)) {
+                     $key = $project_id . '_' . $dateObj->format('Y-m-d');
+                     if (!isset($updatesForInvoice[$key])) {
+                        $updatesForInvoice[$key] = ['project_id' => $project_id, 'date' => $dateObj, 'project_item_ids' => []];
+                     }
+                     $updatesForInvoice[$key]['project_item_ids'] = array_unique(array_merge(
+                        $updatesForInvoice[$key]['project_item_ids'],
+                        $project_item_ids
+                     ));
+                  }
 
                   //Salvar log
                   $log_operacion = "Delete";
@@ -756,6 +803,14 @@ class DataTrackingService extends Base
          }
       }
       $em->flush();
+
+      foreach ($updatesForInvoice as $update) {
+         $this->invoiceService->ActualizarInvoicesPorCambioDataTracking(
+            $update['project_id'],
+            $update['date'],
+            $update['project_item_ids']
+         );
+      }
 
       if ($cant_eliminada == 0) {
          $resultado['success'] = false;
@@ -924,6 +979,20 @@ class DataTrackingService extends Base
       $this->SalvarArchivos($entity, $archivos);
 
       $em->flush();
+
+      // Sincronizar invoices del periodo: si se cambió cantidad o precio en Data T, actualizar el invoice de ese periodo y los posteriores
+      $project_id = $entity->getProject()->getProjectId();
+      $dateObj = $entity->getDate();
+      $project_item_ids = [];
+      foreach ($items as $value) {
+         if (!empty($value->item_id)) {
+            $project_item_ids[] = $value->item_id;
+         }
+      }
+      $project_item_ids = array_unique($project_item_ids);
+      if (!empty($project_item_ids)) {
+         $this->invoiceService->ActualizarInvoicesPorCambioDataTracking($project_id, $dateObj, $project_item_ids);
+      }
 
       //Salvar log
       $log_categoria = "Data Tracking";

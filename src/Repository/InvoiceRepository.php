@@ -31,6 +31,28 @@ class InvoiceRepository extends ServiceEntityRepository
    }
 
    /**
+    * FindInvoicesContainingDate: Invoices del proyecto cuyo periodo [startDate, endDate] contiene la fecha dada.
+    *
+    * @param int $project_id
+    * @param \DateTimeInterface $date
+    * @return Invoice[]
+    */
+   public function FindInvoicesContainingDate(int $project_id, \DateTimeInterface $date): array
+   {
+      $dateStr = $date->format('Y-m-d');
+      return $this->createQueryBuilder('i')
+         ->leftJoin('i.project', 'p')
+         ->where('p.projectId = :project_id')
+         ->andWhere('i.startDate <= :date')
+         ->andWhere('i.endDate >= :date')
+         ->setParameter('project_id', $project_id)
+         ->setParameter('date', $dateStr)
+         ->orderBy('i.startDate', 'ASC')
+         ->getQuery()
+         ->getResult();
+   }
+
+   /**
     * ListarInvoices: Lista los invoices con filtros y paginación
     *
     * @return Invoice[]

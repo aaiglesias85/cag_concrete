@@ -10,6 +10,7 @@ use App\Entity\InvoiceItem;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Entity\SyncQueueQbwc;
+use App\Repository\DataTrackingItemRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
@@ -1661,5 +1662,126 @@ class InvoiceService extends Base
             $historialPaid += $iPaid;
          }
       }
+   }
+
+   /**
+    * ActualizarInvoicesPorCambioDataTracking
+    * Cuando se elimina(n) item(s) del datatracking, recalcula las cantidades del invoice
+    * para ese periodo y elimina la línea del invoice si la cantidad queda en 0 (y no hay pago).
+    *
+    * @param int $project_id
+    * @param \DateTimeInterface $date Fecha del datatracking afectado
+    * @param array|null $project_item_ids IDs de project_item afectados; si null, actualiza todos los items de los invoices encontrados
+    */
+   public function ActualizarInvoicesPorCambioDataTracking(int $project_id, \DateTimeInterface $date, ?array $project_item_ids = null): void
+   {
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+      $dataTrackingItemRepo = $this->getDoctrine()->getRepository(\App\Entity\DataTrackingItem::class);
+
+      $invoices = $invoiceRepo->FindInvoicesContainingDate($project_id, $date);
+      if (empty($invoices)) {
+         return;
+      }
+
+      $em = $this->getDoctrine()->getManager();
+
+      foreach ($invoices as $invoice) {
+         /** @var Invoice $invoice */
+         $invoiceId = $invoice->getInvoiceId();
+         $startDate = $invoice->getStartDate()->format('m/d/Y');
+         $endDate = $invoice->getEndDate()->format('m/d/Y');
+
+         $itemsToUpdate = $project_item_ids;
+         if ($itemsToUpdate === null) {
+            $invoiceItems = $invoiceItemRepo->ListarItems($invoiceId);
+            $itemsToUpdate = array_map(function (InvoiceItem $ii) {
+               return $ii->getProjectItem()->getId();
+            }, $invoiceItems);
+            $itemsToUpdate = array_unique($itemsToUpdate);
+         }
+
+         foreach ($itemsToUpdate as $project_item_id) {
+            $invoiceItem = $invoiceItemRepo->BuscarItem($invoiceId, $project_item_id);
+            if ($invoiceItem === null) {
+               continue;
+            }
+
+            $newQuantity = $dataTrackingItemRepo->TotalQuantity('', $project_item_id, $startDate, $endDate);
+
+            if ($newQuantity == 0.0) {
+               $em->remove($invoiceItem);
+            } else {
+               $invoiceItem->setQuantity($newQuantity);
+            }
+         }
+      }
+
+      $em->flush();
+      $this->RecalcularUnpaidQtyProyecto($project_id);
+   }
+
+   /**
+    * RecalcularUnpaidQtyProyecto
+    * Recalcula quantity_from_previous, unpaid_qty y unpaid_from_previous para todos los invoice items del proyecto.
+    * Así, si cambió la cantidad en un invoice anterior (ej. #5), los invoices posteriores (#6, #7, ...)
+    * quedan con el total acumulado correcto.
+    */
+   public function RecalcularUnpaidQtyProyecto(int $project_id): void
+   {
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $projectItemIds = [];
+      foreach ($allInvoices as $inv) {
+         foreach ($invoiceItemRepo->ListarItems($inv->getInvoiceId()) as $ii) {
+            $projectItemIds[$ii->getProjectItem()->getId()] = true;
+         }
+      }
+      $projectItemIds = array_keys($projectItemIds);
+
+      foreach ($projectItemIds as $project_item_id) {
+         $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+         $invoiceItemMap = [];
+         foreach ($allInvoiceItems as $ii) {
+            $invoiceItemMap[(int) $ii->getInvoice()->getInvoiceId()] = $ii;
+         }
+
+         $historialQty = 0.0;
+         $historialPaid = 0.0;
+
+         for ($i = 0; $i < count($allInvoices); $i++) {
+            $invId = (int) $allInvoices[$i]->getInvoiceId();
+            $invItem = $invoiceItemMap[$invId] ?? null;
+
+            if ($invItem) {
+               $invItem->setQuantityFromPrevious($historialQty);
+            }
+
+            $currentQbf = $invItem ? (float) $invItem->getQuantityBroughtForward() : 0.0;
+            $iQty = $invItem ? (float) $invItem->getQuantity() : 0.0;
+            $iPaid = $invItem ? (float) $invItem->getPaidQty() : 0.0;
+
+            $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+
+            if ($invItem) {
+               $invItem->setUnpaidQty($nuevoUnpaid);
+               $invItem->setUnpaidFromPrevious($nuevoUnpaid);
+            }
+
+            $historialQty += $iQty;
+            $historialPaid += $iPaid;
+         }
+      }
+
+      $this->getDoctrine()->getManager()->flush();
    }
 }
