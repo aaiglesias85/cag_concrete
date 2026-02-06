@@ -32,14 +32,26 @@ use App\Repository\DataTrackingSubcontractRepository;
 use App\Repository\ProjectConcreteClassRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Utils\Base;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class DataTrackingService extends Base
 {
    /** @var InvoiceService */
    private $invoiceService;
 
-   public function __construct(InvoiceService $invoiceService)
-   {
+   public function __construct(
+      ContainerInterface $container,
+      MailerInterface $mailer,
+      ContainerBagInterface $containerBag,
+      Security $security,
+      LoggerInterface $logger,
+      InvoiceService $invoiceService
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->invoiceService = $invoiceService;
    }
 
