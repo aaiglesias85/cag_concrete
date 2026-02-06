@@ -3343,6 +3343,8 @@ class ProjectService extends Base
             'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No',
             'retainage_reimbursed' => ($reimbursed_real > 0) ? 1 : 0,
             'reimbursed_amount' => $reimbursed_real,
+            'startDate' => $invoice->getStartDate() ? $invoice->getStartDate()->format('Y-m-d') : '',
+            'endDate' => $invoice->getEndDate() ? $invoice->getEndDate()->format('Y-m-d') : '',
             'reimbursed_date' => $invoice->getRetainageReimbursedDate() ? $invoice->getRetainageReimbursedDate()->format('m/d/Y') : ''
          ];
       }

@@ -1661,26 +1661,33 @@ var ProjectsDetalle = (function () {
                return `<span class="badge badge-circle badge-${color}" data-bs-toggle="tooltip" data-bs-placement="top" title="${tooltip}" style="width: 12px; height: 12px; padding: 0; display: inline-block;"></span>`;
             },
          },
-         {
-            targets: 1,
-            render: function (data, type, row) {
-               // Formatear fecha a formato más amigable
-               var dateFormatted = data;
-               if (data && data.includes('/')) {
-                  var dateParts = data.split('/');
-                  if (dateParts.length === 3) {
-                     var date = new Date(parseInt(dateParts[2]), parseInt(dateParts[0]) - 1, parseInt(dateParts[1]));
-                     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                     dateFormatted = months[date.getMonth()] + ' ' + date.getDate() + ', ' + date.getFullYear();
-                  }
-               }
-               var displayText = `${row.invoice_number} - ${dateFormatted}`;
-               var html = `<a href="javascript:;" class="invoice-retainage-link-detalle text-primary text-hover-primary" data-invoice-id="${
-                  row.invoice_id
-               }" style="cursor: pointer;" title="View Invoice">${DatatableUtil.escapeHtml(displayText)}</a>`;
-               return html;
-            },
-         },
+{
+    targets: 1,
+    render: function (data, type, row) {
+        var f = function(d) {
+            if (!d) return '';
+            var date = new Date(d);
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            return months[date.getMonth()] + ' ' + date.getDate();
+        };
+
+        var periodo = (row.startDate && row.endDate) 
+                      ? `${f(row.startDate)} - ${f(row.endDate)}` 
+                      : row.invoice_date;
+
+        return `
+            <div class="d-flex flex-column">
+                <a href="javascript:;" class="invoice-retainage-link text-primary fw-bold text-hover-primary mb-1" 
+                   data-invoice-id="${row.invoice_id}">
+                   Inv. #${row.invoice_number}
+                </a>
+                <span class="text-gray-800 fw-bold fs-7">
+                   <i class="ki-outline ki-calendar fs-8 text-gray-500"></i> ${periodo}
+                </span>
+            </div>
+        `;
+    },
+},
          {
             targets: 2, // Invoice Amt
             className: 'text-end',
