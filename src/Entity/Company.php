@@ -29,6 +29,12 @@ class Company
     #[ORM\Column(name: 'contact_email', type: 'string', length: 255, nullable: true)]
     private ?string $contactEmail = null;
 
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: true)]
+    private ?string $email = null;
+
+    #[ORM\Column(name: 'website', type: 'string', length: 500, nullable: true)]
+    private ?string $website = null;
+
     #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
@@ -92,6 +98,28 @@ class Company
     public function setContactEmail(?string $contactEmail): self
     {
         $this->contactEmail = $contactEmail;
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(?string $website): self
+    {
+        $this->website = $website;
         return $this;
     }
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-02-2026 a las 14:07:14
+-- Tiempo de generación: 07-02-2026 a las 14:52:19
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -50,16 +50,18 @@ CREATE TABLE `company` (
   `contact_name` varchar(255) DEFAULT NULL,
   `contact_email` varchar(255) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL
+  `updated_at` datetime DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL COMMENT 'Email de la compañía',
+  `website` varchar(500) DEFAULT NULL COMMENT 'Sitio web de la compañía'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `company`
 --
 
-INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`, `contact_email`, `created_at`, `updated_at`) VALUES
-(1, 'CONTRACTOR, INC', '(618)985-7850', '', NULL, NULL, '2024-04-13 19:10:40', '2024-10-18 23:59:37'),
-(3, 'Disrupsoft', '(653)289-6532', '', NULL, NULL, '2024-04-24 04:23:31', '2024-10-11 19:55:35');
+INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`, `contact_email`, `created_at`, `updated_at`, `email`, `website`) VALUES
+(1, 'CONTRACTOR, INC', '(618)985-7850', '', NULL, NULL, '2024-04-13 19:10:40', '2024-10-18 23:59:37', NULL, NULL),
+(3, 'Disrupsoft', '(653)289-6532', '', NULL, NULL, '2024-04-24 04:23:31', '2024-10-11 19:55:35', NULL, NULL);
 
 -- --------------------------------------------------------
 

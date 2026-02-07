@@ -265,7 +265,7 @@ var Companies = (function () {
    var validateForm = function () {
       var result = false;
 
-      //Validacion
+      //Validacion (validate.js: presence, email, url - email y website opcionales, validan formato si tienen valor)
       var form = KTUtil.get('company-form');
 
       var constraints = {
@@ -273,6 +273,19 @@ var Companies = (function () {
             presence: { message: 'This field is required' },
          },
       };
+
+      var emailVal = ($('#email').val() || '').trim();
+      var websiteVal = ($('#website').val() || '').trim();
+      if (emailVal.length > 0) {
+         constraints.email = {
+            email: { message: 'Please enter a valid email address' },
+         };
+      }
+      if (websiteVal.length > 0) {
+         constraints.website = {
+            url: { message: 'Please enter a valid URL (e.g. https://example.com)' },
+         };
+      }
 
       var errors = validate(form, constraints);
 
@@ -468,6 +481,12 @@ var Companies = (function () {
             var address = $('#address').val();
             formData.set('address', address);
 
+            var email = $('#email').val();
+            formData.set('email', email);
+
+            var website = $('#website').val();
+            formData.set('website', website);
+
             formData.set('contacts', JSON.stringify(contacts));
 
             BlockUtil.block('#form-company');
@@ -580,6 +599,8 @@ var Companies = (function () {
             $('#name').val(company.name);
             $('#phone').val(company.phone);
             $('#address').val(company.address);
+            $('#email').val(company.email || '');
+            $('#website').val(company.website || '');
 
             // contacts
             contacts = company.contacts;

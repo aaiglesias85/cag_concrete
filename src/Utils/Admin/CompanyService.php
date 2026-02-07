@@ -134,6 +134,8 @@ class CompanyService extends Base
          $arreglo_resultado['address'] = $entity->getAddress();
          $arreglo_resultado['contactName'] = $entity->getContactName();
          $arreglo_resultado['contactEmail'] = $entity->getContactEmail();
+         $arreglo_resultado['email'] = $entity->getEmail();
+         $arreglo_resultado['website'] = $entity->getWebsite();
 
          // contacts
          $contacts = $this->ListarContactsDeCompany($company_id);
@@ -344,7 +346,7 @@ class CompanyService extends Base
     * @param int $company_id Id
     * @author Marcel
     */
-   public function ActualizarCompany($company_id, $name, $phone, $address, $contactName, $contactEmail, $contacts)
+   public function ActualizarCompany($company_id, $name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -366,6 +368,8 @@ class CompanyService extends Base
          $entity->setAddress($address);
          $entity->setContactName($contactName);
          $entity->setContactEmail($contactEmail);
+         $entity->setEmail($email);
+         $entity->setWebsite($website);
 
          $entity->setUpdatedAt(new \DateTime());
 
@@ -392,7 +396,7 @@ class CompanyService extends Base
     * @param string $description Nombre
     * @author Marcel
     */
-   public function SalvarCompany($name, $phone, $address, $contactName, $contactEmail, $contacts)
+   public function SalvarCompany($name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -412,6 +416,8 @@ class CompanyService extends Base
       $entity->setAddress($address);
       $entity->setContactName($contactName);
       $entity->setContactEmail($contactEmail);
+      $entity->setEmail($email);
+      $entity->setWebsite($website);
 
       $entity->setCreatedAt(new \DateTime());
 
