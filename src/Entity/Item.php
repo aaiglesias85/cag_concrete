@@ -25,8 +25,8 @@ class Item
    #[ORM\Column(name: 'status', type: 'boolean', nullable: false)]
    private ?bool $status;
 
-   #[ORM\Column(name: 'bone', type: 'boolean', nullable: true)]
-   private ?bool $bone;
+   #[ORM\Column(name: 'bond', type: 'boolean', nullable: true)]
+   private ?bool $bond;
 
    #[ORM\Column(name: 'yield_calculation', type: 'string', length: 50, nullable: false)]
    private ?string $yieldCalculation;
@@ -88,14 +88,14 @@ class Item
       $this->status = $status;
    }
 
-   public function getBone(): ?bool
+   public function getBond(): ?bool
    {
-      return $this->bone;
+      return $this->bond;
    }
 
-   public function setBone(?bool $bone): void
+   public function setBond(?bool $bond): void
    {
-      $this->bone = $bone;
+      $this->bond = $bond;
    }
 
    public function getPrice(): ?float

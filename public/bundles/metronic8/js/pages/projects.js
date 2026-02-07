@@ -1322,12 +1322,12 @@ var Projects = (function () {
          if (!state.id) { return state.text; }
          
          var $element = $(state.element);
-         var bone = $element.data('bone'); // Obtenemos el dato 'bone'
+         var bond = $element.data('bond'); // Obtenemos el dato 'bond'
          
          var $state = $('<span>' + state.text + '</span>');
          
          // Si es Bone, agregamos la insignia roja
-         if (bone == 1 || bone === '1' || bone === true) {
+         if (bond == 1 || bond === '1' || bond === true) {
             $state.append('<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8">B</span>');
          }
          
@@ -1519,20 +1519,20 @@ var Projects = (function () {
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
 
-      // mostrar/ocultar campo bone según el tipo de item
-      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+      // mostrar/ocultar campo bond según el tipo de item
+      if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
          if (!state) {
             // item nuevo - mostrar campo editable
-            $('#div-bone-new-item').removeClass('hide');
-            $('#div-bone-existing-item').addClass('hide');
-            $('#bone').prop('checked', false);
-            $('#bone-existing').prop('checked', false);
+            $('#div-bond-new-item').removeClass('hide');
+            $('#div-bond-existing-item').addClass('hide');
+            $('#bond').prop('checked', false);
+            $('#bond-existing').prop('checked', false);
          } else {
             // item existente - ocultar ambos campos (se mostrarán cuando se seleccione un item)
-            $('#div-bone-new-item').addClass('hide');
-            $('#div-bone-existing-item').addClass('hide');
-            $('#bone').prop('checked', false);
-            $('#bone-existing').prop('checked', false);
+            $('#div-bond-new-item').addClass('hide');
+            $('#div-bond-existing-item').addClass('hide');
+            $('#bond').prop('checked', false);
+            $('#bond-existing').prop('checked', false);
          }
       }
 
@@ -1568,12 +1568,12 @@ var Projects = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
 
-      // reset campos bone
-      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
-         $('#div-bone-new-item').addClass('hide');
-         $('#div-bone-existing-item').addClass('hide');
-         $('#bone').prop('checked', false);
-         $('#bone-existing').prop('checked', false);
+      // reset campos bond
+      if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
+         $('#div-bond-new-item').addClass('hide');
+         $('#div-bond-existing-item').addClass('hide');
+         $('#bond').prop('checked', false);
+         $('#bond-existing').prop('checked', false);
       }
 
       if (item_id != '') {
@@ -1585,13 +1585,11 @@ var Projects = (function () {
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
-         // mostrar campo bone si el item tiene bone=true
-         if (item_type && $('#div-bone-existing-item').length > 0) {
-            var bone = $('#item option[value="' + item_id + '"]').data('bone');
-            if (bone == 1 || bone === '1' || bone === true) {
-               $('#div-bone-existing-item').removeClass('hide');
-               $('#bone-existing').prop('checked', true);
-            }
+         // mostrar campo bond editable para items existentes (usuario con permiso bond)
+         if (item_type && $('#div-bond-existing-item').length > 0) {
+            var bond = $('#item option[value="' + item_id + '"]').data('bond');
+            $('#div-bond-existing-item').removeClass('hide');
+            $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
       }
    };
@@ -1682,7 +1680,7 @@ var Projects = (function () {
                groupTitle: 'Change Order',
                _groupOrder: orderCounter++,
                apply_retainage: 0,
-               boned: 0,
+               bonded: 0,
                item: null,
                unit: null,
                yield_calculation_name: null,
@@ -1743,12 +1741,12 @@ var Projects = (function () {
                }
 
                var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
+               if (row.bond == 1 || row.bond === true) {
                   badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
 
                var badgeBoned = '';
-               if (row.boned == 1 || row.boned === true) {
+               if (row.bonded == 1 || row.bonded === true) {
                   badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
 
@@ -2124,16 +2122,19 @@ var Projects = (function () {
                formData.set('apply_retainage', 0);
             }
 
-            // boned solo se envía si el usuario tiene permiso bone
-            if ($('#item-boned').length > 0) {
-               var boned = $('#item-boned').prop('checked') ? 1 : 0;
-               formData.set('boned', boned);
+            // bonded solo se envía si el usuario tiene permiso bond
+            if ($('#item-bonded').length > 0) {
+               var bonded = $('#item-bonded').prop('checked') ? 1 : 0;
+               formData.set('bonded', bonded);
             }
 
-            // bone solo se envía si es un item nuevo
-            if (!item_type && $('#bone').length > 0) {
-               var bone = $('#bone').prop('checked');
-               formData.set('bone', bone);
+            // bond: item nuevo usa #bond, item existente usa #bond-existing (ambos requieren permiso usuario)
+            if (!item_type && $('#bond').length > 0) {
+               var bond = $('#bond').prop('checked');
+               formData.set('bond', bond);
+            } else if (item_type && $('#bond-existing').length > 0) {
+               var bond = $('#bond-existing').prop('checked') ? 1 : 0;
+               formData.set('bond', bond);
             }
 
             BlockUtil.block('#modal-item .modal-content');
@@ -2250,25 +2251,20 @@ var Projects = (function () {
                $('#item-type-existing').prop('checked', true);
             }
 
-            // actualizar visibilidad del campo bone según el tipo de item
-            if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+            // actualizar visibilidad del campo bond según el tipo de item
+            if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
                if (items[posicion].item_id == '') {
-                  // item nuevo - mostrar campo bone editable
-                  $('#div-bone-new-item').removeClass('hide');
-                  $('#div-bone-existing-item').addClass('hide');
-                  $('#bone').prop('checked', items[posicion].bone == 1 || items[posicion].bone === '1' || items[posicion].bone === true);
-                  $('#bone-existing').prop('checked', false);
+                  // item nuevo - mostrar campo bond editable
+                  $('#div-bond-new-item').removeClass('hide');
+                  $('#div-bond-existing-item').addClass('hide');
+                  $('#bond').prop('checked', items[posicion].bond == 1 || items[posicion].bond === '1' || items[posicion].bond === true);
+                  $('#bond-existing').prop('checked', false);
                } else {
-                  // item existente - mostrar campo bone solo si es true
-                  $('#div-bone-new-item').addClass('hide');
-                  $('#bone').prop('checked', false);
-                  if (items[posicion].bone == 1 || items[posicion].bone === '1' || items[posicion].bone === true) {
-                     $('#div-bone-existing-item').removeClass('hide');
-                     $('#bone-existing').prop('checked', true);
-                  } else {
-                     $('#div-bone-existing-item').addClass('hide');
-                     $('#bone-existing').prop('checked', false);
-                  }
+                  // item existente - mostrar campo bond editable
+                  $('#div-bond-new-item').addClass('hide');
+                  $('#bond').prop('checked', false);
+                  $('#div-bond-existing-item').removeClass('hide');
+                  $('#bond-existing').prop('checked', items[posicion].bond == 1 || items[posicion].bond === '1' || items[posicion].bond === true);
                }
             }
 
@@ -2279,9 +2275,9 @@ var Projects = (function () {
                $('#item-apply-retainage').prop('checked', items[posicion].apply_retainage == 1 || items[posicion].apply_retainage === true);
             }
 
-            // boned solo se establece si el usuario tiene permiso bone
-            if ($('#item-boned').length > 0) {
-               $('#item-boned').prop('checked', items[posicion].boned == 1 || items[posicion].boned === true);
+            // bonded solo se establece si el usuario tiene permiso bond
+            if ($('#item-bonded').length > 0) {
+               $('#item-bonded').prop('checked', items[posicion].bonded == 1 || items[posicion].bonded === true);
             }
 
             if (items[posicion].change_order_date && items[posicion].change_order_date !== '') {
@@ -2451,14 +2447,14 @@ var Projects = (function () {
 
       $('#item-apply-retainage').prop('checked', true);
 
-      // reset bone
-      if ($('#bone').length > 0) {
-         $('#bone').prop('checked', false);
-         $('#div-bone-new-item').addClass('hide');
+      // reset bond
+      if ($('#bond').length > 0) {
+         $('#bond').prop('checked', false);
+         $('#div-bond-new-item').addClass('hide');
       }
-      if ($('#bone-existing').length > 0) {
-         $('#bone-existing').prop('checked', false);
-         $('#div-bone-existing-item').addClass('hide');
+      if ($('#bond-existing').length > 0) {
+         $('#bond-existing').prop('checked', false);
+         $('#div-bond-existing-item').addClass('hide');
       }
 
       // tooltips selects
@@ -5068,7 +5064,7 @@ var Projects = (function () {
       });
 
       // 4. Botones de Acción para Boned (Apply/Remove)
-      $(document).on('click', '.btn-accion-masiva-boned-wizard', function () {
+      $(document).on('click', '.btn-accion-masiva-bonded-wizard', function () {
          var accion = $(this).data('accion'); // 1 = Apply, 0 = Remove
          var ids = [];
 
@@ -5086,7 +5082,7 @@ var Projects = (function () {
          if (typeof BlockUtil !== 'undefined') BlockUtil.block('#items-table-editable');
 
          axios
-            .post('project/bulk-boned-update', {
+            .post('project/bulk-bonded-update', {
                ids: ids,
                status: accion,
             })

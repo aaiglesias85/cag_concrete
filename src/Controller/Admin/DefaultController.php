@@ -178,7 +178,7 @@ class DefaultController extends AbstractController
          'equations' => $equations,
          'yields_calculation' => $yields_calculation,
          'units' => $units,
-         'usuario_bone' => $usuario->getBone() ? true : false,
+         'usuario_bond' => $usuario->getBond() ? true : false,
          'usuario_retainage' => $usuario->getRetainage() ? true : false
       ));
    }

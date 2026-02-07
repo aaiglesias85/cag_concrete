@@ -39,7 +39,7 @@ class ItemController extends AbstractController
                'units' => $units,
                'equations' => $equations,
                'yields_calculation' => $yields_calculation,
-               'usuario_bone' => $usuario->getBone() ? true : false
+               'usuario_bond' => $usuario->getBond() ? true : false
             ));
          }
       } else {
@@ -99,24 +99,24 @@ class ItemController extends AbstractController
       $description = $request->get('description');
       // $price = $request->get('price');
       $status = $request->get('status');
-      $bone = $request->get('bone');
+      $bond = $request->get('bond');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
 
-      // Validar que solo usuarios con bone activo puedan marcar items como bone
+      // Validar que solo usuarios con bond activo puedan marcar items como bond
       $usuario = $this->getUser();
-      if (!$usuario->getBone() && ($bone == 1 || $bone === '1' || $bone === true)) {
+      if (!$usuario->getBond() && ($bond == 1 || $bond === '1' || $bond === true)) {
          $resultadoJson['success'] = false;
-         $resultadoJson['error'] = "You don't have permission to mark items as bone.";
+         $resultadoJson['error'] = "You don't have permission to mark items as bond.";
          return $this->json($resultadoJson);
       }
 
       try {
 
          if ($item_id == "") {
-            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
          } else {
-            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bone, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
          }
 
          if ($resultado['success']) {

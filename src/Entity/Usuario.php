@@ -36,8 +36,8 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "estimator", type: "boolean", nullable: true)]
     private ?bool $estimator;
 
-    #[ORM\Column(name: "bone", type: "boolean", nullable: true)]
-    private ?bool $bone;
+    #[ORM\Column(name: "bond", type: "boolean", nullable: true)]
+    private ?bool $bond;
 
     #[ORM\Column(name: "retainage", type: "boolean", nullable: true)]
     private ?bool $retainage;
@@ -267,14 +267,14 @@ class Usuario implements UserInterface, EquatableInterface
         $this->estimator = $estimator;
     }
 
-    public function getBone(): ?bool
+    public function getBond(): ?bool
     {
-        return $this->bone;
+        return $this->bond;
     }
 
-    public function setBone(?bool $bone): void
+    public function setBond(?bool $bond): void
     {
-        $this->bone = $bone;
+        $this->bond = $bond;
     }
 
     public function getRetainage(): ?bool

@@ -233,7 +233,7 @@ class UsuarioController extends AbstractController
       $telefono = $request->get('telefono');
 
       $estimator = $request->get('estimator');
-      $bone = $request->get('bone');
+      $bond = $request->get('bond');
       $retainage = $request->get('retainage');
 
       $resultadoJson = array();
@@ -250,7 +250,7 @@ class UsuarioController extends AbstractController
                $permisos,
                $telefono,
                $estimator,
-               $bone,
+               $bond,
                $retainage
             );
          } else {
@@ -265,7 +265,7 @@ class UsuarioController extends AbstractController
                $permisos,
                $telefono,
                $estimator,
-               $bone,
+               $bond,
                $retainage
             );
          }

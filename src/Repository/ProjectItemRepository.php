@@ -276,15 +276,15 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * Actualiza el estado de boned para múltiples items a la vez
+    * Actualiza el estado de bonded para múltiples items a la vez
     */
-   public function ActualizarBonedMasivo(array $ids, bool $status)
+   public function ActualizarBondedMasivo(array $ids, bool $status)
    {
       if (empty($ids)) return;
 
       $q = $this->getEntityManager()->createQuery(
          'UPDATE App\Entity\ProjectItem p 
-          SET p.boned = :status 
+          SET p.bonded = :status 
           WHERE p.id IN (:ids)'
       )
          ->setParameter('status', $status)
@@ -294,18 +294,18 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * TotalBonedProjectItems: Obtiene la suma total de (quantity * price) 
-    * de todos los items BONED del proyecto
+    * TotalBondedProjectItems: Obtiene la suma total de (quantity * price) 
+    * de todos los items BONDED del proyecto
     * 
     * @param int $project_id El ID del proyecto
     * @return float
     */
-   public function TotalBonedProjectItems(?int $project_id = null): float
+   public function TotalBondedProjectItems(?int $project_id = null): float
    {
       $qb = $this->createQueryBuilder('p_i')
          ->select('SUM(p_i.quantity * p_i.price)')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('p_i.boned = 1'); // Solo items con boned = true
+         ->andWhere('p_i.bonded = 1'); // Solo items con bonded = true
 
       if ($project_id) {
          $qb->andWhere('p.projectId = :project_id')
@@ -317,21 +317,44 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * TotalBonePriceProjectItems: Obtiene la suma de precios de los ProjectItems 
-    * donde el Item maestro tiene bone=true
+    * ListarBondProjectItems: Lista los ProjectItems donde el Item maestro tiene bond=true.
+    * Útil para incluir items Bond en exportaciones (Excel/PDF) aunque no estén en el invoice.
+    *
+    * @param int $project_id
+    * @return ProjectItem[]
+    */
+   public function ListarBondProjectItems(?int $project_id = null): array
+   {
+      $qb = $this->createQueryBuilder('p_i')
+         ->leftJoin('p_i.item', 'i')
+         ->leftJoin('p_i.project', 'p')
+         ->andWhere('i.bond = 1')
+         ->orderBy('p_i.id', 'ASC');
+
+      if ($project_id) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
+
+      return $qb->getQuery()->getResult();
+   }
+
+   /**
+    * TotalBondPriceProjectItems: Obtiene la suma de precios de los ProjectItems 
+    * donde el Item maestro tiene bond=true
     * El precio se toma de project_item (p_i.price), no de item (i.price)
     * Agrupa por item_id para evitar duplicar precios si hay múltiples ProjectItems con el mismo Item
     * 
     * @param int $project_id El ID del proyecto
     * @return float
     */
-   public function TotalBonePriceProjectItems(?int $project_id = null): float
+   public function TotalBondPriceProjectItems(?int $project_id = null): float
    {
       $qb = $this->createQueryBuilder('p_i')
          ->select('i.itemId, p_i.price')
          ->leftJoin('p_i.item', 'i')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('i.bone = 1') // Solo items con bone = true (del Item maestro)
+         ->andWhere('i.bond = 1') // Solo items con bond = true (del Item maestro)
          ->groupBy('i.itemId', 'p_i.price'); // Agrupar por item y precio de project_item para evitar duplicados
 
       if ($project_id) {

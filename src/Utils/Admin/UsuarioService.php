@@ -156,7 +156,7 @@ class UsuarioService extends Base
          $arreglo_resultado['telefono'] = $usuario->getTelefono();
          $arreglo_resultado['habilitado'] = $usuario->getHabilitado();
          $arreglo_resultado['estimator'] = $usuario->getEstimator();
-         $arreglo_resultado['bone'] = $usuario->getBone();
+         $arreglo_resultado['bond'] = $usuario->getBond();
          $arreglo_resultado['retainage'] = $usuario->getRetainage();
 
          $permisos = $this->ListarPermisos($usuario_id);
@@ -394,7 +394,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone, $retainage)
+   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -421,7 +421,7 @@ class UsuarioService extends Base
          $entity->setHabilitado($habilitado);
          $entity->setTelefono($telefono);
          $entity->setEstimator($estimator);
-         $entity->setBone($bone);
+         $entity->setBond($bond);
          $entity->setRetainage($retainage);
 
          if ($contrasenna != "") {
@@ -496,7 +496,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bone, $retainage)
+   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage)
    {
       $resultado = array();
       $em = $this->getDoctrine()->getManager();
@@ -519,7 +519,7 @@ class UsuarioService extends Base
       $entity->setTelefono($telefono);
       $entity->setHabilitado($habilitado);
       $entity->setEstimator($estimator);
-      $entity->setBone($bone);
+      $entity->setBond($bond);
       $entity->setRetainage($retainage);
 
       if ($rol_id != '') {

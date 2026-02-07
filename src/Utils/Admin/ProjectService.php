@@ -443,7 +443,7 @@ class ProjectService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone = false, $boned = false)
+   public function AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond = false, $bonded = false)
    {
       $resultado = [];
 
@@ -490,7 +490,7 @@ class ProjectService extends Base
          }
 
          $project_item_entity->setApplyRetainage($apply_retainage);
-         $project_item_entity->setBoned($boned);
+         $project_item_entity->setBonded($bonded);
 
          $project_item_entity->setYieldCalculation($yield_calculation);
 
@@ -528,6 +528,8 @@ class ProjectService extends Base
          $is_new_item = false;
          if ($item_id != '') {
             $item_entity = $this->getDoctrine()->getRepository(Item::class)->find($item_id);
+            // Actualizar bond del item del catálogo cuando el usuario con permiso bond lo modifica desde el proyecto
+            $item_entity->setBond($bond);
          } else {
             // add new item
             $new_item_data = json_encode([
@@ -535,7 +537,7 @@ class ProjectService extends Base
                'price' => $price,
                'yield_calculation' => $yield_calculation,
                'unit_id' => $unit_id,
-               'bone' => $bone
+               'bond' => $bond
             ]);
             $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
 
@@ -1119,8 +1121,8 @@ class ProjectService extends Base
          $item_data = [
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
-            "boned" => $value->getBoned() ? 1 : 0,
-            "bone" => $value->getItem()->getBone() ? 1 : 0,
+            "bonded" => $value->getBonded() ? 1 : 0,
+            "bond" => $value->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -1151,11 +1153,11 @@ class ProjectService extends Base
          $items[] = $item_data;
       }
 
-      // Calcular SUM_BONED_PROJECT y Bone Price para que JavaScript pueda calcular X e Y
+      // Calcular SUM_BONDED_PROJECT y Bond Price para que JavaScript pueda calcular X e Y
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
-      $sum_boned_project = $projectItemRepo->TotalBonedProjectItems($project_id);
-      $bone_price = $projectItemRepo->TotalBonePriceProjectItems($project_id);
+      $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
+      $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
 
       $bon_general = null;
       $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
@@ -1165,8 +1167,8 @@ class ProjectService extends Base
 
       return [
          'items' => $items,
-         'sum_boned_project' => $sum_boned_project,
-         'bone_price' => $bone_price,
+         'sum_bonded_project' => $sum_bonded_project,
+         'bond_price' => $bond_price,
          'bon_general' => $bon_general
       ];
    }
@@ -1404,8 +1406,8 @@ class ProjectService extends Base
          $items[] = [
             'project_item_id' => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
-            "boned" => $value->getBoned() ? 1 : 0,
-            "bone" => $value->getItem()->getBone() ? 1 : 0,
+            "bonded" => $value->getBonded() ? 1 : 0,
+            "bond" => $value->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -1665,7 +1667,7 @@ class ProjectService extends Base
       return [
          'id' => $value->getId(),
          'apply_retainage' => $value->getApplyRetainage(),
-         'boned' => $value->getBoned() ? 1 : 0,
+         'bonded' => $value->getBonded() ? 1 : 0,
          // ---------------------------------
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
@@ -1682,7 +1684,7 @@ class ProjectService extends Base
          "principal" => $value->getPrincipal(),
          "change_order" => $value->getChangeOrder(),
          "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
-         "bone" => $value->getItem()->getBone() ? 1 : 0,
+         "bond" => $value->getItem()->getBond() ? 1 : 0,
          "porciento_completion" => $porciento_completion,
          "invoiced_qty" => $invoiced_qty,
          "total_invoiced_amount" => $total_invoiced_amount,
@@ -2993,7 +2995,7 @@ class ProjectService extends Base
       /** @var \App\Repository\ProjectItemRepository $repo */
       $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-      return $repo->ActualizarBonedMasivo($ids, (bool)$status);
+      return $repo->ActualizarBondedMasivo($ids, (bool)$status);
    }
 
 

@@ -330,6 +330,16 @@ class InvoiceService extends Base
       }
       ksort($items_change_order);
 
+      // 2b. OBTENER ITEMS BOND (no están en data tracking ni en invoice, pero deben aparecer en Excel/PDF)
+      $projectItemIdsEnInvoice = array_map(function ($ii) { return $ii->getProjectItem()->getId(); }, $items);
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $em->getRepository(ProjectItem::class);
+      $bondProjectItems = array_filter(
+         $projectItemRepo->ListarBondProjectItems($project_id),
+         function ($pi) use ($projectItemIdsEnInvoice) { return !in_array($pi->getId(), $projectItemIdsEnInvoice); }
+      );
+      $bondProjectItems = array_values($bondProjectItems);
+
       // 3. CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
 
@@ -402,6 +412,7 @@ class InvoiceService extends Base
             }
          }
       }
+      $filas_necesarias += count($bondProjectItems);
 
       $filas_disponibles = $fila_footer_inicio - $start_row_data;
       if ($filas_necesarias > $filas_disponibles) {
@@ -588,6 +599,21 @@ class InvoiceService extends Base
                $fila++;
             }
          }
+      }
+
+      // 6b. ESCRIBIR ITEMS BOND (no están en invoice pero sí en Excel/PDF con description, unit, price, contract qty, contract amount, pending qty btd, pending balance; el resto en 0)
+      foreach ($bondProjectItems as $projectItem) {
+         $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
+
+         $sum_H_contract   += $bondResult['contract_amount'];
+         $sum_N_pending    += $bondResult['pending_balance_btd'];
+
+         $objWorksheet->setCellValue("R{$fila}", 0);
+         $objWorksheet->setCellValue("S{$fila}", 0);
+
+         $aplicarFormatoFila($objWorksheet, $fila);
+         $item_number++;
+         $fila++;
       }
 
       // 7. TOTALES FOOTER
@@ -881,7 +907,46 @@ class InvoiceService extends Base
       return [$previous_bill_qty, $previous_bill_amount, $pending_qty_btd, $pending_balance_btd];
    }
 
+   /**
+    * EscribirFilaItemBond: Escribe una fila de ítem BOND en el Excel/PDF.
+    * Los items Bond no tienen data tracking ni InvoiceItem; solo aparecen en la exportación.
+    * Columnas con valor: description, unit, price, contract qty, contract amount, pending qty btd, pending balance.
+    * El resto (I, J, K, L, O, P, R, S) en 0.
+    *
+    * @return array ['contract_amount', 'pending_balance_btd'] para totales del footer
+    */
+   private function EscribirFilaItemBond($objWorksheet, $fila, $item_number, ProjectItem $projectItem): array
+   {
+      $price = (float) $projectItem->getPrice();
+      $contract_qty = (float) $projectItem->getQuantity();
+      $contract_amount = $contract_qty * $price;
+      $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
+      $description = $projectItem->getItem()->getName();
 
+      // Pending = full contract (nada facturado vía data tracking)
+      $pending_qty_btd = $contract_qty;
+      $pending_balance_btd = $contract_amount;
+
+      $objWorksheet
+         ->setCellValue('A' . $fila, $item_number)
+         ->setCellValue('B' . $fila, $description)
+         ->setCellValue('E' . $fila, $unit)
+         ->setCellValue('F' . $fila, $price)
+         ->setCellValue('G' . $fila, $contract_qty)
+         ->setCellValue('H' . $fila, $contract_amount)
+         ->setCellValue('I' . $fila, 0)
+         ->setCellValue('J' . $fila, 0)
+         ->setCellValue('K' . $fila, 0)
+         ->setCellValue('L' . $fila, 0)
+         ->setCellValue('M' . $fila, $pending_qty_btd)
+         ->setCellValue('N' . $fila, $pending_balance_btd)
+         ->setCellValue('O' . $fila, 0)
+         ->setCellValue('P' . $fila, 0);
+
+      $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+
+      return ['contract_amount' => $contract_amount, 'pending_balance_btd' => $pending_balance_btd];
+   }
 
    /**
     * CalcularYGuardarRetainageInvoice: Calcula y persiste el retainage exclusivo del invoice.
@@ -1086,13 +1151,13 @@ class InvoiceService extends Base
          $items = $this->ListarItemsDeInvoice($invoice_id);
          $arreglo_resultado['items'] = $items;
 
-         // Agregar sum_boned_project y bone_price para cálculo de X e Y en JavaScript
+         // Agregar sum_bonded_project y bond_price para cálculo de X e Y en JavaScript
          if (!empty($items)) {
-            $arreglo_resultado['sum_boned_project'] = $items[0]['sum_boned_project'] ?? 0;
-            $arreglo_resultado['bone_price'] = $items[0]['bone_price'] ?? 0;
+            $arreglo_resultado['sum_bonded_project'] = $items[0]['sum_bonded_project'] ?? 0;
+            $arreglo_resultado['bond_price'] = $items[0]['bond_price'] ?? 0;
          } else {
-            $arreglo_resultado['sum_boned_project'] = 0;
-            $arreglo_resultado['bone_price'] = 0;
+            $arreglo_resultado['sum_bonded_project'] = 0;
+            $arreglo_resultado['bond_price'] = 0;
          }
 
          // payments
@@ -1226,8 +1291,8 @@ class InvoiceService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
-            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
-            "bone" => $value->getProjectItem()->getItem()->getBone() ? 1 : 0,
+            "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
+            "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
@@ -1262,13 +1327,13 @@ class InvoiceService extends Base
       // Calcular SUM_BONED_PROJECT y Bone Price para que JavaScript pueda calcular X e Y
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
-      $sum_boned_project = $projectItemRepo->TotalBonedProjectItems($project_id);
-      $bone_price = $projectItemRepo->TotalBonePriceProjectItems($project_id);
+      $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
+      $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
 
       // Agregar estos valores a cada item para que JavaScript los use
       foreach ($items as &$item) {
-         $item['sum_boned_project'] = $sum_boned_project;
-         $item['bone_price'] = $bone_price;
+         $item['sum_bonded_project'] = $sum_bonded_project;
+         $item['bond_price'] = $bond_price;
       }
 
       return $items;

@@ -1647,14 +1647,14 @@ var DataTracking = (function () {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
                
-               var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
-                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
                
-               var badgeBoned = '';
-               if (row.boned == 1 || row.boned === true) {
-                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
                
                var icono = '';
@@ -1668,8 +1668,8 @@ var DataTracking = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
-                           ${badgeBone}
-                           ${badgeBoned}
+                           ${badgeBond}
+                           ${badgeBonded}
                            ${icono}
                </div>`;
             },
@@ -2013,8 +2013,8 @@ var DataTracking = (function () {
                   change_order: item.change_order || false,
                   change_order_date: item.change_order_date || '',
                   apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
-                  boned: item.boned == 1 || item.boned === true,
-                  bone: item.bone == 1 || item.bone === true,
+                  bonded: item.bonded == 1 || item.bonded === true,
+                  bond: item.bond == 1 || item.bond === true,
                   posicion: items_data_tracking.length,
                });
             } else {
@@ -2037,8 +2037,8 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].change_order = item.change_order || false;
                   items_data_tracking[posicion].change_order_date = item.change_order_date || '';
                   items_data_tracking[posicion].apply_retainage = item.apply_retainage == 1 || item.apply_retainage === true;
-                  items_data_tracking[posicion].boned = item.boned == 1 || item.boned === true;
-                  items_data_tracking[posicion].bone = item.bone == 1 || item.bone === true;
+                  items_data_tracking[posicion].bonded = item.bonded == 1 || item.bonded === true;
+                  items_data_tracking[posicion].bond = item.bond == 1 || item.bond === true;
                }
             }
 

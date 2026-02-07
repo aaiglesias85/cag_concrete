@@ -86,7 +86,7 @@ class ProjectController extends AbstractController
                'concrete_classes' => $concrete_classes,
                'employee_roles' => $employee_roles,
                'direccion_url' => $this->projectService->ObtenerURL(),
-               'usuario_bone' => $usuario->getBone() ? true : false,
+               'usuario_bond' => $usuario->getBond() ? true : false,
                'usuario_retainage' => $usuario->getRetainage() ? true : false
             ));
          }
@@ -471,8 +471,8 @@ class ProjectController extends AbstractController
 
          $resultadoJson['success'] = true;
          $resultadoJson['items'] = $result['items'];
-         $resultadoJson['sum_boned_project'] = $result['sum_boned_project'];
-         $resultadoJson['bone_price'] = $result['bone_price'];
+         $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
+         $resultadoJson['bond_price'] = $result['bond_price'];
          $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
 
          return $this->json($resultadoJson);
@@ -774,34 +774,34 @@ class ProjectController extends AbstractController
       if ($apply_retainage !== 0) {
          $apply_retainage = 1;
       }
-      $bone = $request->get('bone') ?? false;
+      $bond = $request->get('bond') ?? false;
       // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
-      if (is_string($bone)) {
-         $bone = strtolower($bone) === 'true' || $bone === '1';
+      if (is_string($bond)) {
+         $bond = strtolower($bond) === 'true' || $bond === '1';
       } else {
-         $bone = (bool)$bone;
+         $bond = (bool)$bond;
       }
 
-      $boned = $request->get('boned') ?? false;
+      $bonded = $request->get('bonded') ?? false;
       // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
-      if (is_string($boned)) {
-         $boned = strtolower($boned) === 'true' || $boned === '1';
+      if (is_string($bonded)) {
+         $bonded = strtolower($bonded) === 'true' || $bonded === '1';
       } else {
-         $boned = (bool)$boned;
+         $bonded = (bool)$bonded;
       }
 
-      // Validar que solo usuarios con permiso bone puedan crear items con bone=true
+      // Validar que solo usuarios con permiso bond puedan crear items con bond=true
       $usuario = $this->getUser();
-      $usuario_bone = $usuario->getBone() ? true : false;
-      if ($bone && !$usuario_bone) {
-         // Si el usuario intenta crear un item con bone=true pero no tiene permiso, forzar a false
-         $bone = false;
+      $usuario_bond = $usuario->getBond() ? true : false;
+      if ($bond && !$usuario_bond) {
+         // Si el usuario intenta crear un item con bond=true pero no tiene permiso, forzar a false
+         $bond = false;
       }
 
-      // Validar que solo usuarios con permiso bone puedan marcar items como boned=true
-      if ($boned && !$usuario_bone) {
-         // Si el usuario intenta marcar un item como boned=true pero no tiene permiso, forzar a false
-         $boned = false;
+      // Validar que solo usuarios con permiso bond puedan marcar items como bonded=true
+      if ($bonded && !$usuario_bond) {
+         // Si el usuario intenta marcar un item como bonded=true pero no tiene permiso, forzar a false
+         $bonded = false;
       }
 
       $usuario_retainage = $usuario->getRetainage() ? true : false;
@@ -811,7 +811,7 @@ class ProjectController extends AbstractController
       }
 
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bone, $boned);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond, $bonded);
 
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
@@ -1217,15 +1217,15 @@ class ProjectController extends AbstractController
    }
 
    /**
-    * Actualizar los Item con Boned
+    * Actualizar los Item con Bonded
     */
-   public function bulkBonedUpdate(Request $request)
+   public function bulkBondedUpdate(Request $request)
    {
-      // Validar que solo usuarios con permiso bone puedan actualizar boned
+      // Validar que solo usuarios con permiso bond puedan actualizar bonded
       $usuario = $this->getUser();
-      $usuario_bone = $usuario->getBone() ? true : false;
-      if (!$usuario_bone) {
-         return $this->json(['success' => false, 'error' => 'You do not have permission to update boned items.']);
+      $usuario_bond = $usuario->getBond() ? true : false;
+      if (!$usuario_bond) {
+         return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);
       }
 
       $ids = $request->get('ids');

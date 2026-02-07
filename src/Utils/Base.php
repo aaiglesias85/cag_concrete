@@ -935,8 +935,8 @@ class Base
       $item_entity->setStatus(1);
       $item_entity->setYieldCalculation($value->yield_calculation);
 
-      if (isset($value->bone)) {
-         $item_entity->setBone($value->bone == 1 || $value->bone === '1' || $value->bone === true);
+      if (isset($value->bond)) {
+         $item_entity->setBond($value->bond == 1 || $value->bond === '1' || $value->bond === true);
       }
 
       if ($value->unit_id != '') {
@@ -1518,7 +1518,7 @@ class Base
             "project_item_id" => $project_item_id,
 
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
-            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
+            "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
             "paid_qty"        => $value->getPaidQty(),
             "paid_amount"     => $value->getPaidAmount(),
             "paid_amount_total" => $value->getPaidAmountTotal(),

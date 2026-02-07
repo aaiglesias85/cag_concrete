@@ -307,7 +307,7 @@ var Usuarios = function () {
 
         KTUtil.get("estadoactivo").checked = true;
         KTUtil.get("estimator").checked = false;
-        KTUtil.get("bone").checked = false;
+        KTUtil.get("bond").checked = false;
         KTUtil.get("retainage").checked = false;
 
         //Permisos
@@ -612,8 +612,8 @@ var Usuarios = function () {
                 var estimator = ($('#estimator').prop('checked')) ? 1 : 0;
                 formData.set("estimator", estimator);
 
-                var bone = ($('#bone').prop('checked')) ? 1 : 0;
-                formData.set("bone", bone);
+                var bond = ($('#bond').prop('checked')) ? 1 : 0;
+                formData.set("bond", bond);
 
                 var retainage = ($('#retainage').prop('checked')) ? 1 : 0;
                 formData.set("retainage", retainage);
@@ -724,7 +724,7 @@ var Usuarios = function () {
 
                 $('#estadoactivo').prop('checked', usuario.habilitado);
                 $('#estimator').prop('checked', usuario.estimator);
-                $('#bone').prop('checked', usuario.bone);
+                $('#bond').prop('checked', usuario.bond);
                 $('#retainage').prop('checked', usuario.retainage);
 
                 permisos = usuario.permisos;

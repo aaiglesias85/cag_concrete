@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-02-2026 a las 00:45:48
+-- Tiempo de generación: 07-02-2026 a las 14:07:14
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -771,7 +771,7 @@ CREATE TABLE `item` (
   `price` float(8,2) DEFAULT NULL,
   `yield_calculation` varchar(50) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL,
-  `bone` tinyint(1) DEFAULT NULL,
+  `bond` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `unit_id` int(11) DEFAULT NULL,
@@ -784,7 +784,7 @@ CREATE TABLE `item` (
 -- Volcado de datos para la tabla `item`
 --
 
-INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculation`, `status`, `bone`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
+INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculation`, `status`, `bond`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
 (1, 'CONC MEDIAN 4IN', 'CONC MEDIAN 4IN', 29.00, NULL, 1, NULL, '2024-04-12 20:18:17', NULL, 1, NULL, NULL, NULL),
 (2, 'CONC MEDIAN 6IN', 'CONC MEDIAN 6IN', 70.00, NULL, 1, NULL, '2024-04-12 20:18:40', NULL, 1, NULL, NULL, NULL),
 (3, 'CONCRETE V GUTTER', 'CONCRETE V GUTTER', 25.00, NULL, 1, NULL, '2024-04-12 20:19:00', NULL, 2, NULL, NULL, NULL),
@@ -1462,14 +1462,14 @@ CREATE TABLE `project_item` (
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL,
   `apply_retainage` tinyint(1) DEFAULT NULL,
-  `boned` tinyint(1) DEFAULT NULL
+  `bonded` tinyint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project_item`
 --
 
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `boned`) VALUES
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`) VALUES
 (1, 1500.000000, 16.50, 'equation', NULL, NULL, 1, NULL, NULL, 3, 6, 2, NULL, NULL),
 (2, 2000.000000, 63.00, 'same', NULL, NULL, 1, NULL, NULL, 3, 15, NULL, NULL, NULL),
 (4, 1600.000000, 150.00, 'none', NULL, NULL, 1, NULL, NULL, 3, 20, NULL, NULL, NULL),
@@ -1884,7 +1884,7 @@ CREATE TABLE `user` (
   `password` varchar(255) NOT NULL,
   `status` tinyint(1) DEFAULT NULL,
   `estimator` tinyint(1) DEFAULT NULL,
-  `bone` tinyint(1) DEFAULT NULL,
+  `bond` tinyint(1) DEFAULT NULL,
   `retainage` tinyint(1) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -1900,7 +1900,7 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bone`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
 (1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
 
 -- --------------------------------------------------------

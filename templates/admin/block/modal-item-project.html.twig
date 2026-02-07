@@ -51,7 +51,7 @@
                               data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}"
                               data-yield="{{ item.yieldCalculation }}"
                               data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
-                              data-bone="{% if item.bone %}1{% else %}0{% endif %}"
+                              data-bond="{% if item.bond %}1{% else %}0{% endif %}"
                            >
                               {{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                            </option>
@@ -152,24 +152,24 @@
                      </div>
                      {% endif %}
 
-                     {% if usuario_bone %}
+                     {% if usuario_bond %}
                      <div class="col-md-4 mt-5">
-                        <label class="form-label">Is Boned?</label>
+                        <label class="form-label">Is Bonded?</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                           <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-boned" />
+                           <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-bonded" />
                         </div>
                      </div>
 
-                     <div class="col-md-4 mt-5 hide" id="div-bone-new-item">
-                        <label class="form-label"> Bone </label>
+                     <div class="col-md-4 mt-5 hide" id="div-bond-new-item">
+                        <label class="form-label">Bond</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                           <input type="checkbox" id="bone" class="form-check-input yesno-toggle" />
+                           <input type="checkbox" id="bond" class="form-check-input yesno-toggle" />
                         </div>
                      </div>
-                     <div class="col-md-4 mt-5 hide" id="div-bone-existing-item">
-                        <label class="form-label"> Bone </label>
+                     <div class="col-md-4 mt-5 hide" id="div-bond-existing-item">
+                        <label class="form-label">Bond</label>
                         <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                           <input type="checkbox" id="bone-existing" class="form-check-input yesno-toggle" disabled />
+                           <input type="checkbox" id="bond-existing" class="form-check-input yesno-toggle" />
                         </div>
                      </div>
                      {% endif %}

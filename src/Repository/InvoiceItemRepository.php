@@ -476,7 +476,7 @@ class InvoiceItemRepository extends ServiceEntityRepository
          ->select('SUM((i_i.quantity + COALESCE(i_i.quantityBroughtForward, 0)) * i_i.price)')
          ->leftJoin('i_i.projectItem', 'p_i')
          ->leftJoin('i_i.invoice', 'i')
-         ->andWhere('p_i.boned = 1') // Solo items con boned = true
+         ->andWhere('p_i.bonded = 1') // Solo items con bonded = true
          ->andWhere('i.invoiceId = :invoice_id') // Solo el invoice actual
          ->setParameter('invoice_id', $invoice_id);
 

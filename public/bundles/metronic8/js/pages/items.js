@@ -86,13 +86,13 @@ var Items = (function () {
          {
             targets: 1, // Name column
             render: function (data, type, row) {
-               var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
-                  badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
-   }
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               }
                return `<div class="d-flex align-items-center" style="white-space: nowrap;">
                            <span>${data || ''}</span>
-                           ${badgeBone}
+                           ${badgeBond}
                        </div>`;
             },
          },
@@ -108,13 +108,13 @@ var Items = (function () {
             {
                targets: 0, // Name column (when no checkbox)
                render: function (data, type, row) {
-                  var badgeBone = '';
-                  if (row.bone == 1 || row.bone === true) {
-                     badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+                  var badgeBond = '';
+                  if (row.bond == 1 || row.bond === true) {
+                     badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                   }
                   return `<div class="d-flex align-items-center" style="white-space: nowrap;">
                               <span>${data || ''}</span>
-                              ${badgeBone}
+                              ${badgeBond}
                           </div>`;
                },
             },
@@ -265,11 +265,11 @@ var Items = (function () {
 
       KTUtil.get('estadoactivo').checked = true;
       
-      // Ocultar campo bone si el usuario no tiene permiso (nuevo item)
-      if (!permiso.usuario_bone) {
-         $('#div-bone-readonly').hide();
+      // Ocultar campo bond si el usuario no tiene permiso (nuevo item)
+      if (!permiso.usuario_bond) {
+         $('#div-bond-readonly').hide();
       } else {
-         KTUtil.get('bone').checked = false;
+         KTUtil.get('bond').checked = false;
       }
 
       $('#unit').val('');
@@ -498,12 +498,12 @@ var Items = (function () {
             var status = $('#estadoactivo').prop('checked') ? 1 : 0;
             formData.set('status', status);
 
-            // Solo enviar bone si el usuario tiene permiso
-            var bone = 0;
-            if (permiso.usuario_bone) {
-               bone = $('#bone').prop('checked') ? 1 : 0;
+            // Solo enviar bond si el usuario tiene permiso
+            var bond = 0;
+            if (permiso.usuario_bond) {
+               bond = $('#bond').prop('checked') ? 1 : 0;
             }
-            formData.set('bone', bone);
+            formData.set('bond', bond);
 
             var yield_calculation = $('#yield-calculation').val();
             formData.set('yield_calculation', yield_calculation);
@@ -645,16 +645,16 @@ var Items = (function () {
 
             $('#estadoactivo').prop('checked', item.status);
             
-            // Si el usuario no tiene permiso pero el item tiene bone, mostrar campo deshabilitado (solo lectura)
-            if (!permiso.usuario_bone) {
-               if (item.bone == 1 || item.bone === true) {
-                  $('#div-bone-readonly').show();
-                  $('#bone').prop('checked', true);
+            // Si el usuario no tiene permiso pero el item tiene bond, mostrar campo deshabilitado (solo lectura)
+            if (!permiso.usuario_bond) {
+               if (item.bond == 1 || item.bond === true) {
+                  $('#div-bond-readonly').show();
+                  $('#bond').prop('checked', true);
                } else {
-                  $('#div-bone-readonly').hide();
+                  $('#div-bond-readonly').hide();
                }
             } else {
-               $('#bone').prop('checked', item.bone);
+               $('#bond').prop('checked', item.bond);
             }
 
             // yield

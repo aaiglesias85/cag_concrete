@@ -1107,19 +1107,19 @@ var Invoices = (function () {
             item.posicion = index;
          });
 
-         // Guardar sum_boned_project y bone_price si vienen en los items
+         // Guardar sum_bonded_project y bond_price si vienen en los items
          if (items.length > 0) {
-            if (items[0].sum_boned_project !== undefined) {
-               sum_boned_project = Number(items[0].sum_boned_project || 0);
+            if (items[0].sum_bonded_project !== undefined) {
+               sum_bonded_project = Number(items[0].sum_bonded_project || 0);
             }
-            if (items[0].bone_price !== undefined) {
-               bone_price = Number(items[0].bone_price || 0);
+            if (items[0].bond_price !== undefined) {
+               bond_price = Number(items[0].bond_price || 0);
             }
                         
          }
 
-         // Calcular y mostrar X e Y (Boned) en JavaScript
-         calcularYMostrarXBonedEnJS();
+         // Calcular y mostrar X e Y (Bonded) en JavaScript
+         calcularYMostrarXBondedEnJS();
 
          actualizarTableListaItems();
 
@@ -1409,8 +1409,8 @@ var Invoices = (function () {
       
       // Si no hay proyecto seleccionado, resetear X e Y
       if (!project_id) {
-         $('#total_boned_x').val('0.000000');
-         $('#total_boned_y').val('0.00');
+         $('#total_bonded_x').val('0.000000');
+         $('#total_bonded_y').val('0.00');
       }
 
       // definir fechas
@@ -1484,8 +1484,8 @@ var Invoices = (function () {
       var invoice_id = $('#invoice_id').val();
       if (invoice_id == '') {
          items = [];
-         $('#total_boned_x').val('0.000000');
-         $('#total_boned_y').val('0.00');
+         $('#total_bonded_x').val('0.000000');
+         $('#total_bonded_y').val('0.00');
          actualizarTableListaItems();
       }
 
@@ -1504,9 +1504,9 @@ var Invoices = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
-                     // Guardar sum_boned_project y bone_price para cálculo de X e Y
-                     sum_boned_project = Number(response.sum_boned_project || 0);
-                     bone_price = Number(response.bone_price || 0);
+                     // Guardar sum_bonded_project y bond_price para cálculo de X e Y
+                     sum_bonded_project = Number(response.sum_bonded_project || 0);
+                     bond_price = Number(response.bond_price || 0);
                      if (response.bon_general != null && response.bon_general !== '') {
                         $('#bon_general_display').val(MyApp.formatMoney(response.bon_general, 2, '.', ','));
                         $('#card-bond').show();
@@ -1556,7 +1556,7 @@ var Invoices = (function () {
                               change_order_date: item.change_order_date,
                               has_quantity_history: item.has_quantity_history || false,
                               has_price_history: item.has_price_history || false,
-                              boned: item.boned || 0, // Agregar campo boned
+                              bonded: item.bonded || 0, // Agregar campo bonded
                               posicion: posicion,
                            });
                         }
@@ -1570,7 +1570,7 @@ var Invoices = (function () {
                      });
 
                      // Calcular y mostrar X e Y (Boned) en JavaScript
-                     calcularYMostrarXBonedEnJS();
+                     calcularYMostrarXBondedEnJS();
 
                      actualizarTableListaItems();
                   } else {
@@ -1593,8 +1593,8 @@ var Invoices = (function () {
 
       // reset
       MyUtil.limpiarSelect('#project');
-      $('#total_boned_x').val('0.000000');
-      $('#total_boned_y').val('0.00');
+$('#total_bonded_x').val('0.000000');
+         $('#total_bonded_y').val('0.00');
 
       if (company_id != '') {
          var formData = new URLSearchParams();
@@ -1697,8 +1697,8 @@ var Invoices = (function () {
    var oTableItems;
    var items = [];
    var items_lista = [];
-   var sum_boned_project = 0; // Suma de (quantity * price) de items boned del proyecto
-   var bone_price = 0; // Suma de precios de Items con bone=true
+   var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
+   var bond_price = 0; // Suma de precios de Items con bond=true
    var nEditingRowItem = null;
    var rowDeleteItem = null;
 
@@ -1803,14 +1803,14 @@ var Invoices = (function () {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
               
-               var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
-                 badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                 badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
    }
                
-               var badgeBoned = '';
-               if (row.boned == 1 || row.boned === true) {
-                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
               
                // Si es change order, agregar icono de historial
@@ -1826,8 +1826,8 @@ var Invoices = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
-                           ${badgeBone}
-                           ${badgeBoned}
+                           ${badgeBond}
+                           ${badgeBonded}
                            ${icono}
                        </div>`;
             },
@@ -2119,39 +2119,39 @@ var Invoices = (function () {
       handlePriceHistory();
    };
 
-   // Función para calcular y mostrar X e Y (Boned) en JavaScript
-   var calcularYMostrarXBonedEnJS = function () { 
+   // Función para calcular y mostrar X e Y (Bonded) en JavaScript
+   var calcularYMostrarXBondedEnJS = function () { 
       
       // 1. OBTENER DATOS 
       // Usamos items_lista si existe, si no, el array general
       var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       
-      var sum_boned_invoices = 0;
+      var sum_bonded_invoices = 0;
       
-      // Sumar solo items con boned activo
+      // Sumar solo items con bonded activo
       items_a_calcular.forEach(function(item) {
-         if (item.boned == 1 || item.boned === true || item.boned === '1') {
+         if (item.bonded == 1 || item.bonded === true || item.bonded === '1') {
             var quantity = parseFloat(item.quantity) || 0;
             var qbf = parseFloat(item.quantity_brought_forward) || 0;
             var price = parseFloat(item.price) || 0;
             
             // Sumar al total
-            sum_boned_invoices += ((quantity + qbf) * price);
+            sum_bonded_invoices += ((quantity + qbf) * price);
          }
       });
 
       // Calcular X (Ratio)
       var x = 0;
-      if (sum_boned_project && parseFloat(sum_boned_project) > 0) {
-         x = sum_boned_invoices / parseFloat(sum_boned_project);
+      if (sum_bonded_project && parseFloat(sum_bonded_project) > 0) {
+         x = sum_bonded_invoices / parseFloat(sum_bonded_project);
       }
       
       // Calcular Y (Monto Monetario)
-      var y = (parseFloat(bone_price) || 0) * x;  
+      var y = (parseFloat(bond_price) || 0) * x;  
 
-      // Valores guardados en hidden (Boned X/Y por items - se mantiene por compatibilidad)
-      $('#total_boned_x').val(MyApp.formatearNumero(x, 2, '.', ','));
-      $('#total_boned_y').val(MyApp.formatMoney(y, 2, '.', ','));
+      // Valores guardados en hidden (Bonded X/Y por items)
+      $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+      $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
 
    var handleChangeOrderHistory = function () {
@@ -2254,7 +2254,7 @@ var Invoices = (function () {
       initTableItems();
       
       // Recalcular X e Y después de actualizar la tabla
-      calcularYMostrarXBonedEnJS();
+      calcularYMostrarXBondedEnJS();
    };
    var validateFormItem = function () {
       var result = false;

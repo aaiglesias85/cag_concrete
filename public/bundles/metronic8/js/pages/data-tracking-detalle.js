@@ -398,14 +398,14 @@ var DataTrackingDetalle = (function () {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
                
-               var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
-                  badgeBone = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bone Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
                
-               var badgeBoned = '';
-               if (row.boned == 1 || row.boned === true) {
-                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Boned Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
                
                var icono = '';
@@ -419,8 +419,8 @@ var DataTrackingDetalle = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
-                           ${badgeBone}
-                           ${badgeBoned}
+                           ${badgeBond}
+                           ${badgeBonded}
                            ${icono}
                </div>`;
             },

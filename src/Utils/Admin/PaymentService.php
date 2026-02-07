@@ -502,16 +502,16 @@ class PaymentService extends Base
          /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-         $sum_boned_project = method_exists($projectItemRepo, 'TotalBonedProjectItems')
-            ? $projectItemRepo->TotalBonedProjectItems($project->getProjectId())
+         $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
+            ? $projectItemRepo->TotalBondedProjectItems($project->getProjectId())
             : 0;
 
-         $bone_price = method_exists($projectItemRepo, 'TotalBonePriceProjectItems')
-            ? $projectItemRepo->TotalBonePriceProjectItems($project->getProjectId())
+         $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
+            ? $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId())
             : 0;
          foreach ($payments as &$p) {
-            $p['sum_boned_project'] = $sum_boned_project;
-            $p['bone_price'] = $bone_price;
+            $p['sum_bonded_project'] = $sum_bonded_project;
+            $p['bond_price'] = $bond_price;
          }
          unset($p);
          $arreglo_resultado['payments'] = $payments;
@@ -620,8 +620,8 @@ class PaymentService extends Base
             "invoice_item_id" => $value->getId(),
             "project_item_id" => $project_item_id,
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
-            "boned" => $value->getProjectItem()->getBoned() ? 1 : 0,
-            "bone" => $value->getProjectItem()->getItem()->getBone() ? 1 : 0,
+            "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
+            "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
             "paid_qty" => $value->getPaidQty(),
             "unpaid_qty" => $value->getUnpaidQty(),
             "paid_amount" => $value->getPaidAmount(),
@@ -653,17 +653,17 @@ class PaymentService extends Base
          /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-         $sum_boned_project = method_exists($projectItemRepo, 'TotalBonedProjectItems')
-            ? $projectItemRepo->TotalBonedProjectItems($project_id)
+         $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
+            ? $projectItemRepo->TotalBondedProjectItems($project_id)
             : 0;
 
-         $bone_price = method_exists($projectItemRepo, 'TotalBonePriceProjectItems')
-            ? $projectItemRepo->TotalBonePriceProjectItems($project_id)
+         $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
+            ? $projectItemRepo->TotalBondPriceProjectItems($project_id)
             : 0;
 
          foreach ($items as &$item) {
-            $item['sum_boned_project'] = $sum_boned_project;
-            $item['bone_price'] = $bone_price;
+            $item['sum_bonded_project'] = $sum_bonded_project;
+            $item['bond_price'] = $bond_price;
          }
       }
 

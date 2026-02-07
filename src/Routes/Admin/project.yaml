@@ -132,9 +132,9 @@ project_bulk_retainage_update:
   path: /project/bulk-retainage-update
   defaults: { _controller: App\Controller\Admin\ProjectController::bulkRetainageUpdate, _format: json }
 
-project_bulk_boned_update:
-  path: /project/bulk-boned-update
-  defaults: { _controller: App\Controller\Admin\ProjectController::bulkBonedUpdate, _format: json }
+project_bulk_bonded_update:
+  path: /project/bulk-bonded-update
+  defaults: { _controller: App\Controller\Admin\ProjectController::bulkBondedUpdate, _format: json }
 
 project_get_reimbursement_history:
     path: /project/get-reimbursement-history

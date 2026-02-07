@@ -58,20 +58,20 @@ var ModalItemProject = (function () {
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
 
-      // mostrar/ocultar campo Bone según el tipo de item
-      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
+      // mostrar/ocultar campo Bond según el tipo de item
+      if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
          if (!state) {
             // item nuevo - mostrar campo editable
-            $('#div-bone-new-item').removeClass('hide');
-            $('#div-bone-existing-item').addClass('hide');
-            $('#bone').prop('checked', false);
-            $('#bone-existing').prop('checked', false);
+            $('#div-bond-new-item').removeClass('hide');
+            $('#div-bond-existing-item').addClass('hide');
+            $('#bond').prop('checked', false);
+            $('#bond-existing').prop('checked', false);
          } else {
             // item existente - ocultar ambos campos (se mostrarán cuando se seleccione un item)
-            $('#div-bone-new-item').addClass('hide');
-            $('#div-bone-existing-item').addClass('hide');
-            $('#bone').prop('checked', false);
-            $('#bone-existing').prop('checked', false);
+            $('#div-bond-new-item').addClass('hide');
+            $('#div-bond-existing-item').addClass('hide');
+            $('#bond').prop('checked', false);
+            $('#bond-existing').prop('checked', false);
          }
       }
 
@@ -107,12 +107,12 @@ var ModalItemProject = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
 
-      // reset campos bone
-      if ($('#div-bone-new-item').length > 0 && $('#div-bone-existing-item').length > 0) {
-         $('#div-bone-new-item').addClass('hide');
-         $('#div-bone-existing-item').addClass('hide');
-         $('#bone').prop('checked', false);
-         $('#bone-existing').prop('checked', false);
+      // reset campos bond
+      if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
+         $('#div-bond-new-item').addClass('hide');
+         $('#div-bond-existing-item').addClass('hide');
+         $('#bond').prop('checked', false);
+         $('#bond-existing').prop('checked', false);
       }
 
       if (item_id != '') {
@@ -124,13 +124,11 @@ var ModalItemProject = (function () {
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
-         // mostrar campo bone si el item tiene bone=true
-         if (item_type && $('#div-bone-existing-item').length > 0) {
-            var bone = $('#item option[value="' + item_id + '"]').data('bone');
-            if (bone == 1 || bone === '1' || bone === true) {
-               $('#div-bone-existing-item').removeClass('hide');
-               $('#bone-existing').prop('checked', true);
-            }
+         // mostrar campo bond editable para items existentes (usuario con permiso bond)
+         if (item_type && $('#div-bond-existing-item').length > 0) {
+            var bond = $('#item option[value="' + item_id + '"]').data('bond');
+            $('#div-bond-existing-item').removeClass('hide');
+            $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
       }
    };
@@ -230,16 +228,19 @@ var ModalItemProject = (function () {
                formData.set('apply_retainage', 0);
             }
 
-            // boned solo se envía si el usuario tiene permiso bone
-            if ($('#item-boned').length > 0) {
-               var boned = $('#item-boned').prop('checked') ? 1 : 0;
-               formData.set('boned', boned);
+            // bonded solo se envía si el usuario tiene permiso bond
+            if ($('#item-bonded').length > 0) {
+               var bonded = $('#item-bonded').prop('checked') ? 1 : 0;
+               formData.set('bonded', bonded);
             }
 
-            // bone solo se envía si es un item nuevo
-            if (!item_type && $('#bone').length > 0) {
-               var bone = $('#bone').prop('checked');
-               formData.set('bone', bone);
+            // bond: item nuevo usa #bond, item existente usa #bond-existing (ambos requieren permiso usuario)
+            if (!item_type && $('#bond').length > 0) {
+               var bond = $('#bond').prop('checked');
+               formData.set('bond', bond);
+            } else if (item_type && $('#bond-existing').length > 0) {
+               var bond = $('#bond-existing').prop('checked') ? 1 : 0;
+               formData.set('bond', bond);
             }
 
             BlockUtil.block('#modal-item .modal-content');
@@ -354,14 +355,14 @@ var ModalItemProject = (function () {
          $('#item-apply-retainage').prop('checked', true);
       }
 
-      // reset bone
-      if ($('#bone').length > 0) {
-         $('#bone').prop('checked', false);
-         $('#div-bone-new-item').addClass('hide');
+      // reset bond
+      if ($('#bond').length > 0) {
+         $('#bond').prop('checked', false);
+         $('#div-bond-new-item').addClass('hide');
       }
-      if ($('#bone-existing').length > 0) {
-         $('#bone-existing').prop('checked', false);
-         $('#div-bone-existing-item').addClass('hide');
+      if ($('#bond-existing').length > 0) {
+         $('#bond-existing').prop('checked', false);
+         $('#div-bond-existing-item').addClass('hide');
       }
 
       // tooltips selects

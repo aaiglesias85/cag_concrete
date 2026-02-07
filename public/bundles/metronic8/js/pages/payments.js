@@ -297,10 +297,10 @@ var Payments = (function () {
    var resetForms = function () {
       MyUtil.resetForm('payment-form');
       payments = [];
-      $('#total_boned_x').val('');
-      $('#total_boned_y').val('');
-      sum_boned_project = 0;
-      bone_price = 0;
+      $('#total_bonded_x').val('');
+      $('#total_bonded_y').val('');
+      sum_bonded_project = 0;
+      bond_price = 0;
       actualizarTableListaPayments();
       archivos = [];
       actualizarTableListaArchivos();
@@ -626,18 +626,18 @@ var Payments = (function () {
 
          payments = invoice.payments;
          if (payments.length > 0) {
-             if (payments[0].sum_boned_project !== undefined) {
-                 sum_boned_project = Number(payments[0].sum_boned_project || 0);
+             if (payments[0].sum_bonded_project !== undefined) {
+                 sum_bonded_project = Number(payments[0].sum_bonded_project || 0);
              }
-             if (payments[0].bone_price !== undefined) {
-                 bone_price = Number(payments[0].bone_price || 0);
+             if (payments[0].bond_price !== undefined) {
+                 bond_price = Number(payments[0].bond_price || 0);
              }
          } else {
-             sum_boned_project = 0;
-             bone_price = 0;
+             sum_bonded_project = 0;
+             bond_price = 0;
          }
          
-         calcularYMostrarXBonedEnJS();
+         calcularYMostrarXBondedEnJS();
 
          actualizarTableListaPayments();
          archivos = invoice.archivos;
@@ -780,8 +780,8 @@ var Payments = (function () {
    var oTablePayments;
    var payments = [];
    var nEditingRowPayment = null;
-   var sum_boned_project = 0;
-   var bone_price = 0;
+   var sum_bonded_project = 0;
+   var bond_price = 0;
 
    var agruparItemsPorChangeOrder = function (items) {
       var items_regulares = [];
@@ -853,13 +853,13 @@ var Payments = (function () {
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               var badgeBone = '';
-               if (row.bone == 1 || row.bone === true) {
-                badgeBone = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
-               var badgeBoned = '';
-               if (row.boned == 1 || row.boned === true) {
-                  badgeBoned = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -868,8 +868,8 @@ var Payments = (function () {
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
-                           ${badgeBone}
-                           ${badgeBoned}
+                           ${badgeBond}
+                           ${badgeBonded}
                            ${icono}
                        </div>`;
             },
@@ -2326,33 +2326,33 @@ var initAccionRecalcularRetainage = function () {
       $('#total_payment_amount').val(MyApp.formatMoney(total, 2, '.', ','));
    };
 
-   // Función para calcular y mostrar X e Y (Boned) en Payment
-   var calcularYMostrarXBonedEnJS = function () {      
+   // Función para calcular y mostrar X e Y (Bonded) en Payment
+   var calcularYMostrarXBondedEnJS = function () {      
      
-      var sum_boned_invoices = 0;
+      var sum_bonded_invoices = 0;
       
       payments.forEach(function(item) {
          // Ignorar cabeceras de grupo si existen
          if (!item.isGroupHeader) {
-             if (item.boned == 1 || item.boned === true) {                
+             if (item.bonded == 1 || item.bonded === true) {                
                 var amount = Number(item.amount || 0);  
-                sum_boned_invoices += amount;
+                sum_bonded_invoices += amount;
              }
          }
       });
       
       var x = 0;
-      if (sum_boned_project > 0) {
-         x = sum_boned_invoices / sum_boned_project;
+      if (sum_bonded_project > 0) {
+         x = sum_bonded_invoices / sum_bonded_project;
       }
       
-      var y = bone_price * x;  
+      var y = bond_price * x;  
  
       var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
       var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
       
-      $('#total_boned_x').val(x_formatted);
-      $('#total_boned_y').val(y_formatted);   
+      $('#total_bonded_x').val(x_formatted);
+      $('#total_bonded_y').val(y_formatted);   
       $('#display_bond_qty').text(x_formatted);   
    };
 
