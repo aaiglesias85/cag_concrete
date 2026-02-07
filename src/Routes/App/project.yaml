@@ -1,9 +1,16 @@
-# Project API Routes - Project listing for mobile app
+# Project API Routes - Project listing and detail for mobile app
 # All routes here are prefixed with /api/{lang}/project
 
 listarProjectsApp:
    path: /{lang}/project/listar
    defaults: { _controller: App\Controller\App\ProjectController::listar, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
+
+cargarDatosProjectApp:
+   path: /{lang}/project/cargarDatos
+   defaults: { _controller: App\Controller\App\ProjectController::cargarDatos, _format: json }
    requirements:
       lang: es|en
    methods: [GET]

@@ -48,5 +48,10 @@ services:
     resource: '../src/Controller'
     tags: [ 'controller.service_arguments' ]
 
+  # Público para que App\Utils\App\ProjectService pueda resolverlo de forma perezosa (container->get)
+  # y así no cargar Doctrine al generar api/doc
+  App\Utils\Admin\ProjectService:
+    public: true
+
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

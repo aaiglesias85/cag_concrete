@@ -2,20 +2,24 @@
 
 namespace App\Utils\App;
 
-use App\Entity\Project;
 use App\Utils\Base;
 use App\Repository\ProjectRepository;
+use App\Utils\Admin\ProjectService as AdminProjectService;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Servicio de proyectos para la API de la app.
- * Lista proyectos con filtros (search, empresa_id, rango de fechas).
+ * Lista proyectos con filtros y carga datos completos (delega en el servicio Admin).
+ * AdminProjectService se obtiene de forma perezosa para no cargar Doctrine al generar api/doc.
  */
 class ProjectService extends Base
 {
    private ProjectRepository $projectRepository;
 
+   private ContainerInterface $container;
+
    public function __construct(
-      \Symfony\Component\DependencyInjection\ContainerInterface $container,
+      ContainerInterface $container,
       \Symfony\Component\Mailer\MailerInterface $mailer,
       \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
       \Symfony\Bundle\SecurityBundle\Security $security,
@@ -24,6 +28,7 @@ class ProjectService extends Base
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->projectRepository = $projectRepository;
+      $this->container = $container;
    }
 
    /**
@@ -74,8 +79,12 @@ class ProjectService extends Base
          );
 
          $projects = [];
+         $adminProjectService = $this->container->get(AdminProjectService::class);
          foreach ($entities as $value) {
-            $projects[] = $this->projectToArray($value);
+            $cargar = $adminProjectService->CargarDatosProject($value->getProjectId());
+            if ($cargar['success'] && isset($cargar['project'])) {
+               $projects[] = $cargar['project'];
+            }
          }
 
          $resultado['success'] = true;
@@ -87,29 +96,6 @@ class ProjectService extends Base
       }
 
       return $resultado;
-   }
-
-   /**
-    * Convierte una entidad Project a array para la respuesta JSON.
-    */
-   private function projectToArray(Project $value): array
-   {
-      $company = $value->getCompany();
-
-      return [
-         'id' => $value->getProjectId(),
-         'project_number' => $value->getProjectNumber(),
-         'subcontract' => $value->getSubcontract(),
-         'name' => $value->getName(),
-         'description' => $value->getDescription(),
-         'company_id' => $company ? $company->getCompanyId() : null,
-         'company' => $company ? $company->getName() : '',
-         'county' => $this->getCountiesDescriptionForProject($value),
-         'status' => $value->getStatus(),
-         'start_date' => $value->getStartDate() ? $value->getStartDate()->format('Y-m-d') : null,
-         'end_date' => $value->getEndDate() ? $value->getEndDate()->format('Y-m-d') : null,
-         'due_date' => $value->getDueDate() ? $value->getDueDate()->format('Y-m-d') : null,
-      ];
    }
 
    /**
@@ -129,5 +115,20 @@ class ProjectService extends Base
          return $date;
       }
       return '';
+   }
+
+   /**
+    * CargarDatosProject: Carga todos los datos del proyecto (misma estructura que el backend admin).
+    * Delega en App\Utils\Admin\ProjectService::CargarDatosProject.
+    * El servicio Admin se obtiene aquí (lazy) para no cargar Doctrine al generar api/doc.
+    *
+    * @param string|int $project_id ID del proyecto
+    * @return array{success: bool, project?: array, error?: string}
+    */
+   public function CargarDatosProject($project_id): array
+   {
+      $adminProjectService = $this->container->get(AdminProjectService::class);
+
+      return $adminProjectService->CargarDatosProject($project_id);
    }
 }
