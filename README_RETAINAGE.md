@@ -141,17 +141,54 @@ Los **ítems con retainage** se marcan en el proyecto por ítem: `ProjectItem.ap
 
 ## 5. Exportar Excel / PDF del Invoice
 
-Tanto la exportación a **Excel** como a **PDF** del invoice usan **solo el retainage del invoice**:
+Tanto la exportación a **Excel** como a **PDF** del invoice usan el **Less Retainers** calculado según las reglas siguientes.
 
-- **Current retainage (celda S):** `invoice_entity->getInvoiceRetainageCalculated()` (L Retainer guardado).
-- **Total retainage accumulated (columna J):** Suma de `getInvoiceRetainageCalculated()` de todos los invoices del proyecto hasta (e incluyendo) el invoice actual, en orden cronológico.
-- **Amount Due:** Total Billed − Current retainage (en PDF se calcula con variables; en Excel con fórmula).
-- **Balance columna J:** Total completed (columna J) − Total retainage accumulated.
+### 5.1 Less Retainers en Excel (descripción)
 
-Si algún invoice no tiene aún `invoice_retainage_calculated` (p. ej. datos antiguos), antes de exportar se llama a `CalcularYGuardarRetainageInvoice` para ese invoice y se hace flush/refresh, de modo que el Excel/PDF siempre usen valores coherentes.
+**Less Retainers** es un valor **acumulado**: la suma del **current_retainage** del invoice actual más todos los **current_retainage** de los invoices anteriores. Los invoices se procesan en **orden cronológico** (por `start_date`, luego `invoice_id`).
+
+### 5.2 Reglas de negocio aplicadas al exportar
+
+#### 1. Regla de límite de mano de obra (sin retainage)
+
+- **total_billed_amount:** total facturado acumulado hasta (e incluyendo) el invoice actual. Para cada invoice, el “billed” es la suma de **Final Amount This Period** de todos los ítems (`InvoiceItemRepository::TotalInvoiceFinalAmountThisPeriod(invoice_id)`). El acumulado es la suma de ese valor para los invoices 1..N en orden cronológico.
+- **Total_contract_amount:** total de mano de obra permitido para el proyecto (`project.contract_amount`).
+
+Si se cumple:
+
+```text
+total_billed_amount (acumulado) > Total_contract_amount
+```
+
+entonces, para **ese** invoice (y los siguientes mientras sigan superando el límite):
+
+- **current_retainage** = 0  
+- **Less Retainers** = 0  
+
+En ese caso no se aplica retainage (el acumulado se pone a 0 desde ese invoice).
+
+#### 2. Cálculo normal (cuando no se supera el límite)
+
+- **Primer invoice:** Less Retainers = current_retainage de ese invoice.
+- **Cada invoice siguiente:** Less Retainers = Less Retainers del paso anterior + current_retainage de este invoice.
+
+Es decir, Less Retainers es siempre el **acumulado** de los `invoice_retainage_calculated` (current_retainage) de los invoices ya procesados, aplicando la regla 1 en cada paso.
+
+#### 3. Regla de recálculo
+
+Si se modifica un invoice anterior (por ejemplo cambia su `current_retainage` o los ítems), al **volver a exportar** el Excel/PDF se recalculan Less Retainers recorriendo de nuevo todos los invoices en orden cronológico. La regla del límite de mano de obra se evalúa de nuevo para cada invoice en ese recorrido. No se guarda “Less Retainers” por invoice en BD; se calcula en cada exportación a partir del estado actual de todos los invoices.
+
+### 5.3 Valores escritos en Excel/PDF
+
+- **Current retainage (celda S):** valor efectivo para este invoice (0 si aplica regla de límite; si no, `invoice_retainage_calculated`).
+- **Less Retainers / Total retainage accumulated (columna J):** acumulado según las reglas anteriores (puede ser 0 si se superó el límite).
+- **Amount Due:** Total Billed − Current retainage (en PDF con variables; en Excel con fórmula).
+- **Balance columna J:** Total completed (columna J) − Less Retainers (columna J retainage).
+
+Si algún invoice no tiene aún `invoice_retainage_calculated`, antes de usar se llama a `CalcularYGuardarRetainageInvoice` y flush/refresh.
 
 - **Controlador:** `InvoiceController::exportarExcel(Request)` — recibe `format` (`excel` o `pdf`) y llama a `InvoiceService::ExportarExcel($invoice_id, $format)`.
-- **Método único:** `InvoiceService::ExportarExcel()` genera tanto el Excel como el PDF; en ambos se escriben las celdas de retainage con los valores del invoice descritos arriba.
+- **Método único:** `InvoiceService::ExportarExcel()` genera tanto el Excel como el PDF; en ambos se aplican las reglas de Less Retainers descritas arriba.
 
 ---
 

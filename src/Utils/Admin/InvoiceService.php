@@ -632,29 +632,39 @@ class InvoiceService extends Base
       $objWorksheet->getStyle('S' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
 
-      // 8. RETAINAGE DEL INVOICE (solo para Excel/PDF; NO es el retainage de Payments)
-      // Se usa invoice_current_retainage e invoice_retainage_calculated del invoice.
+      // 8. LESS RETAINERS (Excel/PDF): valor acumulado con regla de límite de mano de obra
+      // Ver README_RETAINAGE.md y reglas: (1) si total_billed acumulado > Total_contract_amount → current=0, Less=0;
+      // (2) orden cronológico; (3) Less Retainers = acumulado de current_retainage de invoices 1..actual.
       $std_retainage = (float)$project_entity->getRetainagePercentage();
-      $current_retainage_amount = (float)($invoice_entity->getInvoiceRetainageCalculated() ?? 0);
-      $total_retainage_accumulated = 0.0;
-
-      if ($invoice_entity->getInvoiceRetainageCalculated() === null && $invoice_entity->getInvoiceCurrentRetainage() === null) {
-         $this->CalcularYGuardarRetainageInvoice($invoice_entity);
-         $em->flush();
-         $em->refresh($invoice_entity);
-         $current_retainage_amount = (float)($invoice_entity->getInvoiceRetainageCalculated() ?? 0);
-      }
+      $total_contract_amount = (float)($project_entity->getContractAmount() ?? 0);
 
       $allInvoices = $invoiceRepo->findBy(['project' => $project_id], ['startDate' => 'ASC', 'invoiceId' => 'ASC']);
       $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $current_retainage_amount = 0.0;
+      $total_retainage_accumulated = 0.0; // Less Retainers acumulado
+      $cumulative_billed = 0.0;
+
       foreach ($allInvoices as $inv) {
          if ($inv->getInvoiceRetainageCalculated() === null) {
             $this->CalcularYGuardarRetainageInvoice($inv);
             $em->flush();
             $em->refresh($inv);
          }
-         $total_retainage_accumulated += (float)($inv->getInvoiceRetainageCalculated() ?? 0);
+
+         $billed_this_invoice = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string)$inv->getInvoiceId());
+         $cumulative_billed += $billed_this_invoice;
+
+         if ($total_contract_amount > 0 && $cumulative_billed > $total_contract_amount) {
+            $effective_current = 0.0;
+            $total_retainage_accumulated = 0.0;
+         } else {
+            $effective_current = (float)($inv->getInvoiceRetainageCalculated() ?? 0);
+            $total_retainage_accumulated += $effective_current;
+         }
+
          if ($inv->getInvoiceId() == $invoice_id) {
+            $current_retainage_amount = $effective_current;
             break;
          }
       }
