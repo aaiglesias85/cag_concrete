@@ -26,6 +26,32 @@ class CompanyRepository extends ServiceEntityRepository
    }
 
    /**
+    * ListarOrdenadosParaOffline: Lista companies como arrays para trabajo offline.
+    * Usa getArrayResult() para evitar lazy loading (requiere PHP 8.4 en Doctrine ORM 3.4).
+    *
+    * @return array<array<string, mixed>>
+    */
+   public function ListarOrdenadosParaOffline(): array
+   {
+      return $this->createQueryBuilder('c')
+         ->select(
+            'c.companyId AS company_id',
+            'c.name',
+            'c.phone',
+            'c.address',
+            'c.contactName AS contact_name',
+            'c.contactEmail AS contact_email',
+            'c.email',
+            'c.website',
+            'c.createdAt AS created_at',
+            'c.updatedAt AS updated_at'
+         )
+         ->orderBy('c.name', 'ASC')
+         ->getQuery()
+         ->getArrayResult();
+   }
+
+   /**
     * ListarCompanies: Lista los companies
     *
     * @param int $start Inicio

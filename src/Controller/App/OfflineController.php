@@ -27,6 +27,76 @@ class OfflineController extends AbstractController
    }
 
    /**
+    * listarInformacionRequerida Lista la información requerida para trabajo offline de la app.
+    * Los datos se cargan una vez cuando hay conexión y la app trabaja con ellos en memoria/storage.
+    * Requiere autenticación via Bearer token.
+    */
+   #[OA\Get(
+      path: '/api/{lang}/offline/listarInformacionRequerida',
+      summary: 'List offline required data',
+      description: 'Returns all data required for offline mode. The app loads this once when online and then works with the data in memory/storage. Currently returns companies. Requires authentication via Bearer token.',
+      security: [['Bearer' => []]],
+      parameters: [
+         new OA\Parameter(
+            name: 'lang',
+            in: 'path',
+            required: true,
+            description: 'Language code (es or en)',
+            schema: new OA\Schema(type: 'string', enum: ['es', 'en'])
+         ),
+      ],
+      responses: [
+         new OA\Response(
+            response: 200,
+            description: 'Data loaded successfully',
+            content: new OA\JsonContent(
+               properties: [
+                  new OA\Property(property: 'success', type: 'boolean', example: true),
+                  new OA\Property(
+                     property: 'companies',
+                     type: 'array',
+                     description: 'Lista de companies (company_id, name, phone, address, contact_name, contact_email, email, website, created_at, updated_at)',
+                     items: new OA\Items(type: 'object')
+                  ),
+               ]
+            )
+         ),
+         new OA\Response(
+            response: 400,
+            description: 'Error loading data',
+            content: new OA\JsonContent(
+               properties: [
+                  new OA\Property(property: 'success', type: 'boolean', example: false),
+                  new OA\Property(property: 'error', type: 'string'),
+               ]
+            )
+         ),
+         new OA\Response(response: 401, description: 'Unauthorized - Invalid or missing token'),
+         new OA\Response(response: 500, description: 'Internal server error'),
+      ]
+   )]
+   public function listarInformacionRequerida(string $lang = 'es'): JsonResponse
+   {
+      $this->translator->setLocale($lang);
+
+      try {
+         $resultado = $this->offlineService->ListarInformacionRequerida();
+
+         if ($resultado['success']) {
+            return $this->json($resultado);
+         }
+
+         return $this->json($resultado, 400);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
+         $this->loginService->writelogerror($e->getMessage());
+
+         return $this->json($resultadoJson, 500);
+      }
+   }
+
+   /**
     * sincronizar Sincroniza los datos offline guardados localmente
     */
    #[OA\Post(
@@ -112,7 +182,7 @@ class OfflineController extends AbstractController
       try {
          // Leer datos desde JSON body
          $data = $this->getRequestData($request);
-         
+
          $profile_offline = $data['profile_offline'] ?? null;
 
          if (empty($profile_offline)) {

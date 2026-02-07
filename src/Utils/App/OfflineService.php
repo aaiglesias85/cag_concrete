@@ -2,12 +2,14 @@
 
 namespace App\Utils\App;
 
+use App\Repository\CompanyRepository;
 use App\Utils\Base;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OfflineService extends Base
 {
    private UsuarioService $usuarioService;
+   private CompanyRepository $companyRepository;
    private TranslatorInterface $translator;
 
    public function __construct(
@@ -17,11 +19,66 @@ class OfflineService extends Base
       \Symfony\Bundle\SecurityBundle\Security $security,
       \Psr\Log\LoggerInterface $logger,
       UsuarioService $usuarioService,
+      CompanyRepository $companyRepository,
       TranslatorInterface $translator
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->usuarioService = $usuarioService;
+      $this->companyRepository = $companyRepository;
       $this->translator = $translator;
+   }
+
+   /**
+    * ListarInformacionRequerida: Lista la información requerida para trabajo offline de la app.
+    * Los datos se cargan una vez cuando hay conexión y se trabaja con ellos en memoria/storage.
+    *
+    * @return array{success: bool, companies?: array, error?: string}
+    */
+   public function ListarInformacionRequerida(): array
+   {
+      $resultado = ['success' => false];
+
+      try {
+         $resultado['success'] = true;
+         $resultado['companies'] = $this->listarCompaniesParaOffline();
+         // Aquí se agregan más arrays según se necesiten:
+         // $resultado['proyectos'] = $this->listarProyectosParaOffline();
+         // $resultado['empleados'] = $this->listarEmpleadosParaOffline();
+      } catch (\Exception $e) {
+         $resultado['success'] = false;
+         $resultado['error'] = $this->translator->trans('message.exception', [], 'messages');
+         $this->logger->error($e->getMessage());
+      }
+
+      return $resultado;
+   }
+
+   /**
+    * listarCompaniesParaOffline: Retorna las companies como arrays para uso offline.
+    * Usa getArrayResult() para evitar instanciar entidades y el lazy loading (PHP 8.4 en Doctrine 3.4).
+    *
+    * @return array<array<string, mixed>>
+    */
+   private function listarCompaniesParaOffline(): array
+   {
+      $rows = $this->companyRepository->ListarOrdenadosParaOffline();
+
+      return array_map(static function (array $row): array {
+         return [
+            'company_id' => $row['company_id'],
+            'name' => $row['name'],
+            'phone' => $row['phone'],
+            'address' => $row['address'],
+            'contact_name' => $row['contact_name'],
+            'contact_email' => $row['contact_email'],
+            'email' => $row['email'],
+            'website' => $row['website'],
+            'created_at' => isset($row['created_at']) && $row['created_at'] instanceof \DateTimeInterface
+               ? $row['created_at']->format('c') : $row['created_at'] ?? null,
+            'updated_at' => isset($row['updated_at']) && $row['updated_at'] instanceof \DateTimeInterface
+               ? $row['updated_at']->format('c') : $row['updated_at'] ?? null,
+         ];
+      }, $rows);
    }
 
    /**
