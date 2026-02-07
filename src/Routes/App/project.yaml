@@ -1,0 +1,9 @@
+# Project API Routes - Project listing for mobile app
+# All routes here are prefixed with /api/{lang}/project
+
+listarProjectsApp:
+   path: /{lang}/project/listar
+   defaults: { _controller: App\Controller\App\ProjectController::listar, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
