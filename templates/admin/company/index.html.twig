@@ -396,11 +396,18 @@
                      <div class="row" id="lista-projects">
                         <div class="col-md-12">
                            <!--begin::Wrapper-->
-                           <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
-                              <!--search-->
-                              <div class="d-flex align-items-center position-relative my-1">
-                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
-                                 <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                           <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                              <div class="d-flex align-items-center gap-3">
+                                 <div class="d-flex align-items-center position-relative my-1">
+                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
+                                    <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                                 </div>
+                                 {% if permiso.agregar or permiso.editar %}
+                                 <button type="button" id="btn-nuevo-project-company" class="btn btn-success">
+                                    <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    New Project
+                                 </button>
+                                 {% endif %}
                               </div>
                            </div>
                            <!--end::Wrapper-->
@@ -503,6 +510,24 @@
    </div>
 </div>
 
+{% include 'admin/block/modal-new-project-company.html.twig' with {
+    countys: countys|default([]),
+    inspectors: inspectors|default([]),
+    items: items|default([]),
+    units: units|default([]),
+    equations: equations|default([]),
+    concrete_vendors: concrete_vendors|default([]),
+    concrete_classes: concrete_classes|default([]),
+    employee_roles: employee_roles|default([]),
+    yields_calculation: yields_calculation|default([]),
+    usuario_retainage: usuario_retainage|default(false),
+    usuario_bond: usuario_bond|default(false)
+} %}
+
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalConcreteVendor')) }}
+
 {% endblock %} {% block javascriptsspecific %}
 
 <!-- Google maps-->
@@ -542,6 +567,7 @@
    })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
 </script>
 
+<script src="{{ asset('bundles/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/js/pages/companies.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
@@ -553,6 +579,9 @@
    };
 
    jQuery(document).ready(function () {
+       if (typeof ModalUnit !== 'undefined') ModalUnit.init();
+       if (typeof ModalEquation !== 'undefined') ModalEquation.init();
+       if (typeof ModalConcreteVendor !== 'undefined') ModalConcreteVendor.init();
        Companies.init();
    });
 </script>

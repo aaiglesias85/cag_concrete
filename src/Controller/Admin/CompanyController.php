@@ -2,6 +2,14 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ConcreteClass;
+use App\Entity\ConcreteVendor;
+use App\Entity\County;
+use App\Entity\EmployeeRole;
+use App\Entity\Equation;
+use App\Entity\Inspector;
+use App\Entity\Item;
+use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\CompanyService;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,8 +32,33 @@ class CompanyController extends AbstractController
         if (count($permiso) > 0) {
             if ($permiso[0]['ver']) {
 
+                $doctrine = $this->companyService->getDoctrine();
+                $countys = $doctrine->getRepository(County::class)->ListarOrdenados('', '', '');
+                $inspectors = $doctrine->getRepository(Inspector::class)->ListarOrdenados();
+                $items = $doctrine->getRepository(Item::class)->ListarOrdenados();
+                $units = $doctrine->getRepository(Unit::class)->ListarOrdenados();
+                $equations = $doctrine->getRepository(Equation::class)->ListarOrdenados();
+                $concrete_vendors = $doctrine->getRepository(ConcreteVendor::class)->ListarOrdenados();
+                $concrete_classes = $doctrine->getRepository(ConcreteClass::class)->ListarOrdenados();
+                $employee_roles = $doctrine->getRepository(EmployeeRole::class)->ListarOrdenados();
+                $yields_calculation = $this->companyService->ListarYieldsCalculation();
+                $usuario = $this->getUser();
+                $usuario_retainage = $usuario && method_exists($usuario, 'getRetainage') ? $usuario->getRetainage() : false;
+                $usuario_bond = $usuario && method_exists($usuario, 'getBond') ? $usuario->getBond() : false;
+
                 return $this->render('admin/company/index.html.twig', array(
-                    'permiso' => $permiso[0]
+                    'permiso' => $permiso[0],
+                    'countys' => $countys,
+                    'inspectors' => $inspectors,
+                    'items' => $items,
+                    'units' => $units,
+                    'equations' => $equations,
+                    'concrete_vendors' => $concrete_vendors,
+                    'concrete_classes' => $concrete_classes,
+                    'employee_roles' => $employee_roles,
+                    'yields_calculation' => $yields_calculation,
+                    'usuario_retainage' => $usuario_retainage,
+                    'usuario_bond' => $usuario_bond,
                 ));
             }
         } else {

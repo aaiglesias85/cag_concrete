@@ -2278,23 +2278,26 @@ class ProjectService extends Base
 
             $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
          }
-         $entity->setConcreteQuotePrice($concrete_quote_price);
+         $valQuotePrice = ($concrete_quote_price !== '' && $concrete_quote_price !== null) ? (float)$concrete_quote_price : null;
+         $entity->setConcreteQuotePrice($valQuotePrice);
 
-         if ($concrete_quote_price_escalator != $entity->getConcreteQuotePriceEscalator()) {
+         $valEscalator = ($concrete_quote_price_escalator !== '' && $concrete_quote_price_escalator !== null) ? (float)$concrete_quote_price_escalator : null;
+         if ($valEscalator != $entity->getConcreteQuotePriceEscalator()) {
             $notas[] = [
                'notes' => 'Change concrete quote price escalator, old value: ' . $entity->getConcreteQuotePriceEscalator(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
+         $entity->setConcreteQuotePriceEscalator($valEscalator);
 
-         if ($concrete_time_period_every_n != $entity->getConcreteTimePeriodEveryN()) {
+         $valTpEveryN = ($concrete_time_period_every_n !== '' && $concrete_time_period_every_n !== null) ? (int)$concrete_time_period_every_n : null;
+         if ($valTpEveryN != $entity->getConcreteTimePeriodEveryN()) {
             $notas[] = [
                'notes' => 'Change concrete time periodo every n, old value: ' . $entity->getConcreteTimePeriodEveryN(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
+         $entity->setConcreteTimePeriodEveryN($valTpEveryN);
 
          if ($concrete_time_period_unit != $entity->getConcreteTimePeriodUnit()) {
             $notas[] = [
@@ -2312,29 +2315,32 @@ class ProjectService extends Base
          }
          $entity->setRetainage($retainage);
 
-         if ($retainage_percentage != $entity->getRetainagePercentage()) {
+         $valRetPct = ($retainage_percentage !== '' && $retainage_percentage !== null) ? (float)$retainage_percentage : null;
+         if ($valRetPct != $entity->getRetainagePercentage()) {
             $notas[] = [
                'notes' => 'Change retainage percentage, old value: ' . $entity->getRetainagePercentage(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setRetainagePercentage($retainage_percentage);
+         $entity->setRetainagePercentage($valRetPct);
 
-         if ($retainage_adjustment_percentage != $entity->getRetainageAdjustmentPercentage()) {
+         $valRetAdjPct = ($retainage_adjustment_percentage !== '' && $retainage_adjustment_percentage !== null) ? (float)$retainage_adjustment_percentage : null;
+         if ($valRetAdjPct != $entity->getRetainageAdjustmentPercentage()) {
             $notas[] = [
                'notes' => 'Change retainage adjustment percentage, old value: ' . $entity->getRetainageAdjustmentPercentage(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setRetainageAdjustmentPercentage($retainage_adjustment_percentage);
+         $entity->setRetainageAdjustmentPercentage($valRetAdjPct);
 
-         if ($retainage_adjustment_completion != $entity->getRetainageAdjustmentCompletion()) {
+         $valRetAdjComp = ($retainage_adjustment_completion !== '' && $retainage_adjustment_completion !== null) ? (float)$retainage_adjustment_completion : null;
+         if ($valRetAdjComp != $entity->getRetainageAdjustmentCompletion()) {
             $notas[] = [
                'notes' => 'Change retainage adjustment completion, old value: ' . $entity->getRetainageAdjustmentCompletion(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
+         $entity->setRetainageAdjustmentCompletion($valRetAdjComp);
 
          if ($prevailing_wage != $entity->getPrevailingWage()) {
             $notas[] = [
@@ -2382,13 +2388,14 @@ class ProjectService extends Base
             $entity->setPrevailingRole(null);
          }
 
-         if ($prevailing_rate != $entity->getPrevailingRate()) {
+         $valPrevRate = ($prevailing_rate !== '' && $prevailing_rate !== null) ? (float)$prevailing_rate : null;
+         if ($valPrevRate != $entity->getPrevailingRate()) {
             $notas[] = [
                'notes' => 'Change prevailing rate, old value: ' . $entity->getPrevailingRate(),
                'date' => new \DateTime()
             ];
          }
-         $entity->setPrevailingRate($prevailing_rate);
+         $entity->setPrevailingRate($valPrevRate);
          if ($bon_general !== null && $bon_general !== '') {
             $entity->setBonGeneral((float) $bon_general);
          } else {
@@ -2572,8 +2579,10 @@ class ProjectService extends Base
       // $entity->setConcreteQuotePrice($concrete_quote_price);
       $val = ($concrete_quote_price !== '' && $concrete_quote_price !== null) ? (float)$concrete_quote_price : null;
       $entity->setConcreteQuotePrice($val);
-      $entity->setConcreteQuotePriceEscalator($concrete_quote_price_escalator);
-      $entity->setConcreteTimePeriodEveryN($concrete_time_period_every_n);
+      $valEscalator = ($concrete_quote_price_escalator !== '' && $concrete_quote_price_escalator !== null) ? (float)$concrete_quote_price_escalator : null;
+      $entity->setConcreteQuotePriceEscalator($valEscalator);
+      $valTpEveryN = ($concrete_time_period_every_n !== '' && $concrete_time_period_every_n !== null) ? (int)$concrete_time_period_every_n : null;
+      $entity->setConcreteTimePeriodEveryN($valTpEveryN);
       $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
 
       if ($concrete_quote_price !== '') {
@@ -2581,13 +2590,17 @@ class ProjectService extends Base
       }
 
       $entity->setRetainage($retainage);
-      $entity->setRetainagePercentage($retainage_percentage);
-      $entity->setRetainageAdjustmentPercentage($retainage_adjustment_percentage);
-      $entity->setRetainageAdjustmentCompletion($retainage_adjustment_completion);
+      $valRetPct = ($retainage_percentage !== '' && $retainage_percentage !== null) ? (float)$retainage_percentage : null;
+      $entity->setRetainagePercentage($valRetPct);
+      $valRetAdjPct = ($retainage_adjustment_percentage !== '' && $retainage_adjustment_percentage !== null) ? (float)$retainage_adjustment_percentage : null;
+      $entity->setRetainageAdjustmentPercentage($valRetAdjPct);
+      $valRetAdjComp = ($retainage_adjustment_completion !== '' && $retainage_adjustment_completion !== null) ? (float)$retainage_adjustment_completion : null;
+      $entity->setRetainageAdjustmentCompletion($valRetAdjComp);
 
 
       $entity->setPrevailingWage($prevailing_wage);
-      $entity->setPrevailingRate($prevailing_rate);
+      $valPrevRate = ($prevailing_rate !== '' && $prevailing_rate !== null) ? (float)$prevailing_rate : null;
+      $entity->setPrevailingRate($valPrevRate);
       if ($bon_general !== null && $bon_general !== '') {
          $entity->setBonGeneral((float) $bon_general);
       } else {

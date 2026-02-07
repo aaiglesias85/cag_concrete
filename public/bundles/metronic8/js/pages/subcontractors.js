@@ -757,64 +757,74 @@ var Subcontractors = function () {
         inicializarAutocomplete2();
     }
 
-    // google maps
+    // google maps (PlaceAutocompleteElement - API recomendada desde 2025)
     var latitud = '';
     var longitud = '';
     var inicializarAutocomplete = async function () {
-
-        // Cargar librería de Places
         await google.maps.importLibrary("places");
 
         const input = document.getElementById('address');
+        if (!input) return;
 
-        const autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ['address'], // Solo direcciones
-            componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)
+        const container = document.createElement('div');
+        container.className = 'place-autocomplete-wrapper flex-grow-1';
+        input.parentNode.insertBefore(container, input);
+        input.style.display = 'none';
+
+        const placeAutocomplete = new google.maps.places.PlaceAutocompleteElement({
+            includedPrimaryTypes: ['street_address'],
+            includedRegionCodes: ['us'],
+            placeholder: input.placeholder || '',
         });
+        container.appendChild(placeAutocomplete);
 
-        autocomplete.addListener('place_changed', function () {
-            const place = autocomplete.getPlace();
-
-            if (!place.geometry) {
+        placeAutocomplete.addEventListener('gmp-select', async (e) => {
+            const place = e.placePrediction.toPlace();
+            await place.fetchFields({ fields: ['formattedAddress', 'location'] });
+            if (!place.location) {
                 console.log("No se pudo obtener ubicación.");
                 return;
             }
-
-            latitud = place.geometry.location.lat();
-            longitud = place.geometry.location.lng();
-
-            console.log('Dirección seleccionada:', place.formatted_address);
-            console.log('Coordenadas:', place.geometry?.location?.toString());
+            input.value = place.formattedAddress || '';
+            latitud = place.location.lat();
+            longitud = place.location.lng();
+            console.log('Dirección seleccionada:', place.formattedAddress);
+            console.log('Coordenadas:', place.location.toString());
         });
     }
 
     var latitud2 = '';
     var longitud2 = '';
     var inicializarAutocomplete2 = async function () {
-
-        // Cargar librería de Places
         await google.maps.importLibrary("places");
 
         const input = document.getElementById('companyAddress');
+        if (!input) return;
 
-        const autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ['address'], // Solo direcciones
-            componentRestrictions: {country: 'us'} // Opcional: restringir a país (ej: Chile)
+        const container = document.createElement('div');
+        container.className = 'place-autocomplete-wrapper flex-grow-1';
+        input.parentNode.insertBefore(container, input);
+        input.style.display = 'none';
+
+        const placeAutocomplete = new google.maps.places.PlaceAutocompleteElement({
+            includedPrimaryTypes: ['street_address'],
+            includedRegionCodes: ['us'],
+            placeholder: input.placeholder || '',
         });
+        container.appendChild(placeAutocomplete);
 
-        autocomplete.addListener('place_changed', function () {
-            const place = autocomplete.getPlace();
-
-            if (!place.geometry) {
+        placeAutocomplete.addEventListener('gmp-select', async (e) => {
+            const place = e.placePrediction.toPlace();
+            await place.fetchFields({ fields: ['formattedAddress', 'location'] });
+            if (!place.location) {
                 console.log("No se pudo obtener ubicación.");
                 return;
             }
-
-            latitud2 = place.geometry.location.lat();
-            longitud2 = place.geometry.location.lng();
-
-            console.log('Dirección seleccionada:', place.formatted_address);
-            console.log('Coordenadas:', place.geometry?.location?.toString());
+            input.value = place.formattedAddress || '';
+            latitud2 = place.location.lat();
+            longitud2 = place.location.lng();
+            console.log('Dirección seleccionada:', place.formattedAddress);
+            console.log('Coordenadas:', place.location.toString());
         });
     }
 

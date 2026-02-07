@@ -728,33 +728,39 @@ var Companies = (function () {
       inicializarAutocomplete();
    };
 
-   // google maps
+   // google maps (PlaceAutocompleteElement - API recomendada desde 2025)
    var latitud = '';
    var longitud = '';
    var inicializarAutocomplete = async function () {
-      // Cargar librería de Places
       await google.maps.importLibrary('places');
 
       const input = document.getElementById('address');
+      if (!input) return;
 
-      const autocomplete = new google.maps.places.Autocomplete(input, {
-         types: ['address'], // Solo direcciones
-         componentRestrictions: { country: 'us' }, // Opcional: restringir a país (ej: Chile)
+      const container = document.createElement('div');
+      container.className = 'place-autocomplete-wrapper flex-grow-1';
+      input.parentNode.insertBefore(container, input);
+      input.style.display = 'none';
+
+      const placeAutocomplete = new google.maps.places.PlaceAutocompleteElement({
+         includedPrimaryTypes: ['street_address'],
+         includedRegionCodes: ['us'],
+         placeholder: input.placeholder || '',
       });
+      container.appendChild(placeAutocomplete);
 
-      autocomplete.addListener('place_changed', function () {
-         const place = autocomplete.getPlace();
-
-         if (!place.geometry) {
+      placeAutocomplete.addEventListener('gmp-select', async (e) => {
+         const place = e.placePrediction.toPlace();
+         await place.fetchFields({ fields: ['formattedAddress', 'location'] });
+         if (!place.location) {
             console.log('No se pudo obtener ubicación.');
             return;
          }
-
-         latitud = place.geometry.location.lat();
-         longitud = place.geometry.location.lng();
-
-         console.log('Dirección seleccionada:', place.formatted_address);
-         console.log('Coordenadas:', place.geometry?.location?.toString());
+         input.value = place.formattedAddress || '';
+         latitud = place.location.lat();
+         longitud = place.location.lng();
+         console.log('Dirección seleccionada:', place.formattedAddress);
+         console.log('Coordenadas:', place.location.toString());
       });
    };
 
@@ -1101,6 +1107,39 @@ var Companies = (function () {
             window.location.href = url_project;
          }
       });
+
+      // New Project desde tab Proyectos (company_id de la compañía actual)
+      $(document).off('click', '#btn-nuevo-project-company');
+      $(document).on('click', '#btn-nuevo-project-company', function (e) {
+         var company_id = $('#company_id').val();
+         if (!company_id) {
+            toastr.warning('Save the company first or select a company to add a project.', '');
+            return;
+         }
+         if (typeof ModalNewProjectCompany !== 'undefined') {
+            ModalNewProjectCompany.mostrarModal(company_id, function () {
+               recargarProjectsDeCompany(company_id);
+            });
+         }
+      });
+   };
+
+   /**
+    * Recarga los proyectos de la compañía llamando a company/cargarDatos y actualiza solo el DataTable de proyectos.
+    */
+   var recargarProjectsDeCompany = function (company_id) {
+      if (!company_id) return;
+      var formData = new URLSearchParams();
+      formData.set('company_id', company_id);
+      axios
+         .post('company/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.data.success && res.data.company) {
+               projects = res.data.company.projects || [];
+               actualizarTableListaProjects();
+            }
+         })
+         .catch(MyUtil.catchErrorAxios);
    };
 
    return {
@@ -1120,6 +1159,10 @@ var Companies = (function () {
 
          // projects
          initAccionesProjects();
+
+         if (typeof ModalNewProjectCompany !== 'undefined' && ModalNewProjectCompany.init) {
+            ModalNewProjectCompany.init();
+         }
 
          initAccionChange();
       },

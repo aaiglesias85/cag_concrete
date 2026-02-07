@@ -733,3 +733,46 @@ table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-ch
    pointer-events: none;
    line-height: 1;
 }
+
+/* Google PlaceAutocompleteElement: igualar a form-control-solid */
+gmp-place-autocomplete {
+   display: block !important;
+   width: 100% !important;
+   min-height: 38px;
+   background-color: var(--bs-gray-100) !important;
+   border: 1px solid var(--bs-gray-100) !important;
+   border-radius: 0.475rem !important;
+   color: var(--bs-body-color, #181c32) !important;
+   font-family: inherit !important;
+   font-size: 1rem !important;
+   font-weight: 400 !important;
+   line-height: 1.5 !important;
+   color-scheme: light;
+   box-shadow: none !important;
+   outline: none !important;
+}
+
+gmp-place-autocomplete:focus-within {
+   background-color: var(--bs-gray-200) !important;
+   border-color: var(--bs-gray-200) !important;
+}
+
+/* Dentro de input-group: mismo estilo que .form-control en input-group-solid */
+.input-group.input-group-solid .place-autocomplete-wrapper gmp-place-autocomplete {
+   background-color: var(--bs-gray-100) !important;
+   border-color: var(--bs-gray-100) !important;
+   border-left: 1px solid var(--bs-gray-300) !important; /* divisor como .form-control */
+   border-radius: 0 0.475rem 0.475rem 0 !important;
+}
+
+.input-group.input-group-solid .place-autocomplete-wrapper gmp-place-autocomplete:focus-within {
+   background-color: var(--bs-gray-200) !important;
+   border-color: var(--bs-gray-200) !important;
+   border-left-color: var(--bs-gray-300) !important;
+}
+
+/* Fallback: input-group sin -solid (mantener unido al texto) */
+.input-group:not(.input-group-solid) .place-autocomplete-wrapper gmp-place-autocomplete {
+   border-left: none !important;
+   border-radius: 0 0.475rem 0.475rem 0 !important;
+}

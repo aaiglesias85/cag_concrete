@@ -1,0 +1,908 @@
+<div class="modal fade" id="modal-new-project-company" role="dialog" aria-labelledby="modalNewProjectCompanyLabel">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Project</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="project-form-modal-project" action="#" enctype="multipart/form-data" method="post">
+                    <input type="hidden" id="company_id-modal-project" name="company_id" />
+
+                    <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general-modal-project" id="tab-general-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">1</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">General</div>
+                                        <div class="wizard-desc">General information</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="2" data-bs-toggle="tab" href="#tab-content-items-modal-project" id="tab-items-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">2</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Items</div>
+                                        <div class="wizard-desc">List of items</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="3" data-bs-toggle="tab" href="#tab-content-retainage-modal-project" id="tab-retainage-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">3</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Retainage</div>
+                                        <div class="wizard-desc">Retainage information</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="4" data-bs-toggle="tab" href="#tab-content-ajustes-precio-modal-project" id="tab-ajustes-precio-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">4</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Escalator</div>
+                                        <div class="wizard-desc">Price escalator</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="5" data-bs-toggle="tab" href="#tab-content-prevailing-wage-modal-project" id="tab-prevailing-wage-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">5</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Prevailing Wage</div>
+                                        <div class="wizard-desc">Prevailing wage</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="6" data-bs-toggle="tab" href="#tab-content-concrete-vendor-modal-project" id="tab-concrete-vendor-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">6</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Concrete</div>
+                                        <div class="wizard-desc">Concrete vendor & classes</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link wizard-tab" data-item="7" data-bs-toggle="tab" href="#tab-content-contacts-modal-project" id="tab-contacts-modal-project">
+                                <div class="wizard-wrapper">
+                                    <span class="wizard-number"><i class="wizard-check ki-duotone ki-check"></i><span class="number">7</span></span>
+                                    <div class="wizard-label">
+                                        <div class="wizard-title">Contacts</div>
+                                        <div class="wizard-desc">List of contacts</div>
+                                    </div>
+                                    <span class="svg-icon ps-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                            <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                            <rect fill="#000000" opacity="0.3" transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)" x="7.5" y="7.5" width="2" height="9" rx="1"></rect>
+                                            <path d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z" fill="#000000" fill-rule="nonzero" transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"></path></g>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Tab 1: General -->
+                        <div class="tab-pane fade show active" id="tab-content-general-modal-project" role="tabpanel">
+                            <div class="form-group ic-form-group">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label required">Subcontract NO</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="subcontract-modal-project" name="subcontract" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Manager</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="manager-modal-project" name="manager" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Invoice Contact</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="invoice_contact-modal-project" name="invoice_contact" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Invoice Due Date</label>
+                                        <div class="input-group input-group-solid" id="datetimepicker-due-date-modal-project" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                            <input type="text" class="form-control filter-date" placeholder="Select a date" id="due-date-modal-project" data-td-target="#datetimepicker-due-date-modal-project" autocomplete="off" name="due_date" />
+                                            <span class="input-group-text" data-td-target="#datetimepicker-new-project-due-date" data-td-toggle="datetimepicker">
+                                                <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Start Date</label>
+                                        <div class="input-group input-group-solid" id="datetimepicker-start-date-modal-project" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                            <input type="text" class="form-control filter-date" placeholder="Select a date" id="start-date-modal-project" data-td-target="#datetimepicker-start-date-modal-project" autocomplete="off" name="start_date" />
+                                            <span class="input-group-text" data-td-target="#datetimepicker-start-date-modal-project" data-td-toggle="datetimepicker">
+                                                <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">End Date</label>
+                                        <div class="input-group input-group-solid" id="datetimepicker-end-date-modal-project" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                            <input type="text" class="form-control filter-date" placeholder="Select a date" id="end-date-modal-project" data-td-target="#datetimepicker-end-date-modal-project" autocomplete="off" name="end_date" />
+                                            <span class="input-group-text" data-td-target="#datetimepicker-end-date-modal-project" data-td-toggle="datetimepicker">
+                                                <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="form-check form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" value="1" id="federal_funding-modal-project" name="federal_funding" />
+                                            <label class="form-check-label">Federal Funding</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="form-check form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" value="1" id="certified_payrolls-modal-project" name="certified_payrolls" />
+                                            <label class="form-check-label">Certified payrolls</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="form-check form-check-custom form-check-solid">
+                                            <input class="form-check-input" type="checkbox" value="1" id="resurfacing-modal-project" name="resurfacing" />
+                                            <label class="form-check-label">Resurfacing</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label required">Project Name</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="name-modal-project" name="name" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label required">Owner</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="owner-modal-project" name="owner" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label required">Project ID #</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="project_id_number-modal-project" name="projectidnumber" />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Proposal ID #</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="proposal_number-modal-project" name="proposal_number" />
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4" id="select-county-modal-project">
+                                        <label class="form-label required">County</label>
+                                        <select class="form-control form-select form-select2 form-select-solid np-select" id="county-modal-project" name="county[]" multiple>
+                                            {% for item in countys %}
+                                            <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4" id="select-inspector-modal-project">
+                                        <label class="form-label">Inspector</label>
+                                        <select class="form-control form-select form-select2 form-select-solid np-select" id="inspector-modal-project" name="inspector">
+                                            <option value="">Select</option>
+                                            {% for item in inspectors %}
+                                            <option value="{{ item.inspectorId }}">{{ item.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4" id="select-status-modal-project">
+                                        <label class="form-label required">Status</label>
+                                        <select class="form-control form-select form-select2 form-select-solid np-select" id="status-modal-project" name="status">
+                                            <option value="1">In Progress</option>
+                                            <option value="0">Not Started</option>
+                                            <option value="2">Completed</option>
+                                            <option value="3">Canceled</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <label class="form-label required">C&G Project #</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="number-modal-project" name="number" />
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label class="form-label required">Project Description</label>
+                                        <input type="text" class="form-control form-control-solid form-control-validate" id="description-modal-project" name="description" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bon General</label>
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">$</span>
+                                            <input type="text" class="form-control form-control-validate form-control-number" id="bon-general-modal-project" name="bon_general" placeholder="e.g. -1850" />
+                                        </div>
+                                        <span class="form-text">Total Bon for this project (used in invoices).</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Items (misma estructura que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-items-modal-project" role="tabpanel">
+                            <div class="row" id="lista-items-modal-project">
+                                <div class="col-md-12">
+                                    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <button type="button" id="btn-agregar-item-modal-project" class="btn btn-success w-125px">
+                                                <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                New
+                                            </button>
+                                        </div>
+                                        <div class="d-flex flex-wrap align-items-center gap-3">
+                                            <div class="input-group input-group-solid w-150px">
+                                                <span class="input-group-text">Items:</span>
+                                                <input type="text" class="form-control form-control-validate" id="total_count_items-modal-project" disabled />
+                                            </div>
+                                            <div class="input-group input-group-solid w-300px">
+                                                <span class="input-group-text">Total $:</span>
+                                                <input type="text" class="form-control form-control-validate" id="total_total_items-modal-project" disabled />
+                                            </div>
+                                            <div class="position-relative w-250px">
+                                                <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                                <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="items-table-editable-modal-project" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>Item</th>
+                                                <th>Unit</th>
+                                                <th>Yield Calculation</th>
+                                                <th>Quantity</th>
+                                                <th>Price</th>
+                                                <th>Total</th>
+                                                <th class="text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Retainage (igual que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-retainage-modal-project" role="tabpanel">
+                            <div class="form-group ic-form-group">
+                                <label class="form-label">
+                                    <span class="ic-step-number">1</span>
+                                    Retainage
+                                </label>
+                                <div>
+                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                        <input type="checkbox" id="retainage-modal-project" class="form-check-input" checked />
+                                        <label class="form-check-label" for="retainage-modal-project"> Yes / No </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group hide" id="div-retainage-modal-project">
+                                <label class="form-label">
+                                    <span class="ic-step-number">2</span>
+                                    Retainage Percentage
+                                </label>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">%</span>
+                                            <input type="text" class="form-control form-control-validate form-control-number" id="retainage_percentage-modal-project" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group hide div-retainage-modal-project">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">3</span>
+                                            Adjust Retainage to
+                                        </label>
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">%</span>
+                                            <input type="text" class="form-control form-control-validate form-control-number" id="retainage_adjustment_percentage-modal-project" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label"> % of Contract Completion </label>
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">@</span>
+                                            <input type="text" class="form-control form-control-validate form-control-number" id="retainage_adjustment_completion-modal-project" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 4: Escalator / Ajustes precio (igual que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-ajustes-precio-modal-project" role="tabpanel">
+                            <div class="row" id="lista-ajustes-precio-modal-project">
+                                <div class="col-md-12">
+                                    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <button type="button" id="btn-agregar-ajuste-precio-modal-project" class="btn btn-success w-125px">
+                                                <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                New
+                                            </button>
+                                        </div>
+                                        <div class="d-flex flex-wrap align-items-center gap-3">
+                                            <div class="position-relative w-250px">
+                                                <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                                <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="ajustes-precio-table-editable-modal-project" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>Day</th>
+                                                <th>Percent</th>
+                                                <th>Items</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 5: Prevailing Wage (igual que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-prevailing-wage-modal-project" role="tabpanel">
+                            <div class="form-group ic-form-group">
+                                <label class="form-label">
+                                    <span class="ic-step-number">1</span>
+                                    Prevailing Wage
+                                </label>
+                                <div>
+                                    <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                        <input type="checkbox" id="prevailing-wage-modal-project" class="form-check-input" name="prevailing_wage" />
+                                        <label class="form-check-label" for="prevailing-wage-modal-project"> Yes / No </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group">
+                                <div class="row">
+                                    <div class="col-md-4" id="select-prevailing-county-modal-project">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">2</span>
+                                            County
+                                        </label>
+                                        <select class="form-control form-select form-select2 form-select-solid np-select" id="prevailing-county-modal-project" name="prevailing_county_id">
+                                            <option value="">Select</option>
+                                            {% for item in countys %}
+                                            <option value="{{ item.countyId }}">{{ item.description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ic-form-group">
+                                <div class="row">
+                                    <div class="col-md-4" id="select-prevailing-role-modal-project">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">3</span>
+                                            Labor Type
+                                        </label>
+                                        <select class="form-control form-select form-select2 form-select-solid np-select" id="prevailing-role-modal-project" name="prevailing_role_id">
+                                            <option value="">Select</option>
+                                            {% for item in employee_roles %}
+                                            <option value="{{ item.roleId }}">{{ item.description }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label"> Rate </label>
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">$</span>
+                                            <input type="text" class="form-control form-control-validate form-control-number" id="prevailing-rate-modal-project" name="prevailing_rate" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 6: Concrete (igual que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-concrete-vendor-modal-project" role="tabpanel">
+                            <div class="form-group ic-form-group">
+                                <div class="row mb-3">
+                                    <div class="col-md-3" id="select-concrete-vendor-modal-project">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">1</span>
+                                            Concrete Vendor
+                                        </label>
+                                        <div class="input-group input-group-solid flex-nowrap">
+                                            <div class="overflow-hidden flex-grow-1">
+                                                <select id="concrete-vendor-modal-project" class="form-control form-select form-select2 form-select-solid np-select rounded-end-0 border-end" name="vendor_id">
+                                                    <option value="">Select</option>
+                                                    {% for item in concrete_vendors %}
+                                                    <option value="{{ item.vendorId }}">{{ item.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <span class="input-group-text" title="Add Conc Vendor" id="btn-add-conc-vendor-modal-project" style="cursor: pointer">
+                                                <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">2</span>
+                                            Escalator
+                                        </label>
+                                        <div class="input-group input-group-solid">
+                                            <span class="input-group-text">$</span>
+                                            <input type="text" class="form-control form-control-price" id="concrete_quote_price_escalator-modal-project" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label"> Time Period </label>
+                                        <div class="d-flex align-items-center flex-nowrap gap-3">
+                                            <label for="tp-every-n-modal-project" class="form-label w-100px mb-0 me-1">Repeat every</label>
+                                            <input type="number" class="form-control form-control-solid form-control-validate just-number w-100px" id="tp-every-n-modal-project" name="tp_every_n" />
+                                            <div class="w-150px">
+                                                <select id="tp-unit-modal-project" name="tp_unit" class="form-select form-select2 form-select-solid np-select">
+                                                    <option value="">Select</option>
+                                                    <option value="month">months</option>
+                                                    <option value="day">days</option>
+                                                    <option value="year">years</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-text mb-0">e.g. every 6 months</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">
+                                            <span class="ic-step-number">3</span>
+                                            Concrete Quote
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="row" id="lista-concrete-classes-modal-project">
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                            <div class="d-flex flex-wrap gap-3">
+                                                <button type="button" id="btn-agregar-concrete-class-modal-project" class="btn btn-success w-125px">
+                                                    <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                    Add
+                                                </button>
+                                            </div>
+                                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                                <div class="position-relative w-250px">
+                                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                                    <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <table id="concrete-classes-table-editable-modal-project" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                            <thead>
+                                                <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                    <th>Concrete Class</th>
+                                                    <th>Price</th>
+                                                    <th>Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="text-gray-600 fw-semibold"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 7: Contacts (igual que Projects) -->
+                        <div class="tab-pane fade" id="tab-content-contacts-modal-project" role="tabpanel">
+                            <div class="row" id="lista-contacts-modal-project">
+                                <div class="col-md-12">
+                                    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                        <div class="d-flex flex-wrap gap-3">
+                                            <button type="button" id="btn-agregar-contact-modal-project" class="btn btn-success w-125px">
+                                                <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                                New
+                                            </button>
+                                        </div>
+                                        <div class="d-flex flex-wrap align-items-center gap-3">
+                                            <div class="position-relative w-250px">
+                                                <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                                <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <table id="contacts-table-editable-modal-project" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                        <thead>
+                                            <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                                <th>Phone</th>
+                                                <th>Role</th>
+                                                <th>Notes</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-project-modal-project">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal Add/Edit Item (tal cual Projects: Existing/New item, yield, equation, unit, change order) #}
+<div class="modal fade" id="modal-item-modal-project" role="dialog" aria-labelledby="modalItemModalProjectLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New item</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="m-form" id="item-form-modal-project" action="#" enctype="multipart/form-data" method="post">
+                    <input type="hidden" id="item-edit-index-modal-project" name="item_edit_index" />
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-check-custom form-check-solid me-10">
+                                    <input class="form-check-input h-30px w-30px item-type-modal-project" type="radio" checked id="item-type-existing-modal-project" name="itemtype_mp" />
+                                    <label class="form-check-label" for="item-type-existing-modal-project"> Existing item </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check form-check-custom form-check-solid me-10">
+                                    <input class="form-check-input h-30px w-30px item-type-modal-project" type="radio" id="item-type-new-modal-project" name="itemtype_mp" />
+                                    <label class="form-check-label" for="item-type-new-modal-project"> New item </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required"> Item </label>
+                        <input type="text" class="form-control form-control-solid form-control-validate hide" id="item-name-modal-project" name="item_custom_name" placeholder="Enter the custom name" />
+                        <div class="row" id="div-item-modal-project">
+                            <div class="col-md-12" id="select-item-modal-project">
+                                <select class="form-control form-select select-modal-item-mp select-validate form-select-solid event-change" id="item-modal-project" name="item_id">
+                                    <option value="">Select</option>
+                                    {% for item in items %}
+                                    <option value="{{ item.itemId }}" data-unit-id="{% if item.unit != null %}{{ item.unit.unitId }}{% endif %}" data-unit="{% if item.unit != null %}{{ item.unit.description }}{% endif %}" data-yield="{{ item.yieldCalculation|default('') }}" data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}" data-bond="{% if item.bond %}1{% else %}0{% endif %}">{{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"> Yield Calculation </label>
+                        <div class="row">
+                            <div class="col-md-12" id="select-yield-calculation-modal-project">
+                                <select class="form-control form-select select-modal-item-mp select-validate form-select-solid" id="yield-calculation-modal-project" name="yield">
+                                    <option value="">Select</option>
+                                    {% for item in yields_calculation|default([]) %}
+                                    <option value="{{ item.id }}">{{ item.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group hide" id="select-equation-modal-project">
+                        <label class="form-label required"> Equation </label>
+                        <div class="input-group input-group-solid flex-nowrap">
+                            <div class="overflow-hidden flex-grow-1">
+                                <select id="equation-modal-project" class="form-control form-select select-modal-item-mp select-validate form-select-solid rounded-end-0 border-end">
+                                    <option value="">Select</option>
+                                    {% for item in equations %}
+                                    <option value="{{ item.equationId }}" data-equation="{{ item.equation|default('') }}">{{ item.description }} {{ item.equation|default('') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="input-group-text" title="Add equation" id="btn-add-equation-modal-project" style="cursor: pointer">
+                                <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group hide" id="select-unit-modal-project">
+                        <label class="form-label required"> Unit </label>
+                        <div class="input-group input-group-solid flex-nowrap">
+                            <div class="overflow-hidden flex-grow-1">
+                                <select id="unit-modal-project" class="form-control form-select select-modal-item-mp select-validate form-select-solid rounded-end-0 border-end">
+                                    <option value="">Select</option>
+                                    {% for item in units %}
+                                    <option value="{{ item.unitId }}">{{ item.description }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <span class="input-group-text" title="Add unit" id="btn-add-unit-modal-project" style="cursor: pointer">
+                                <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    Quantity
+                                    <i class="ki-duotone ki-information-5 fs-6 ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="When editing, you can use + or - signs to add or subtract from the current quantity. Example: +10 to add 10, -5 to subtract 5.">
+                                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                    </i>
+                                </label>
+                                <input type="text" class="form-control form-control-validate form-control-solid" id="item-quantity-modal-project" name="quantity" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label required">
+                                    Price
+                                    <i class="ki-duotone ki-information-5 fs-6 ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="When editing, you can use + or - signs to add or subtract from the current price. Example: +2.50 to add, -1.00 to subtract.">
+                                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                    </i>
+                                </label>
+                                <div class="input-group input-group-solid">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control form-control-validate form-control-solid event-change" id="item-price-modal-project" name="price" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label"> Change Order </label>
+                                <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="change-order-modal-project" class="form-check-input yesno-toggle" checked />
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label"> Change Order Date </label>
+                                <div class="input-group input-group-solid">
+                                    <input type="text" class="form-control form-control-validate form-control-solid" id="change-order-date-modal-project" name="change_order_date" />
+                                    <span class="input-group-text"><i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i></span>
+                                </div>
+                            </div>
+
+                            {% if usuario_retainage %}
+                            <div class="col-md-4 mt-5">
+                                <label class="form-label">Is Retainage?</label>
+                                <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-apply-retainage-modal-project" checked="checked" />
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if usuario_bond %}
+                            <div class="col-md-4 mt-5">
+                                <label class="form-label">Is Bonded?</label>
+                                <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input class="form-check-input yesno-toggle" type="checkbox" value="1" id="item-bonded-modal-project" />
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-5 hide" id="div-bond-new-item-modal-project">
+                                <label class="form-label">Bond</label>
+                                <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="bond-modal-project" class="form-check-input yesno-toggle" />
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-5 hide" id="div-bond-existing-item-modal-project">
+                                <label class="form-label">Bond</label>
+                                <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="bond-existing-modal-project" class="form-check-input yesno-toggle" />
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-item-modal-project">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal Contact (igual que Projects modal-contact) #}
+<div class="modal fade" id="modal-contact-modal-project" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New contact</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="contact-form-modal-project" class="m-form">
+                    <input type="hidden" id="contact-edit-index-modal-project" value="" />
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required"><span class="ic-step-number">1</span> Name</label>
+                        <input type="text" class="form-control form-control-solid form-control-validate" id="contact-name-modal-project" name="name" />
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <label class="form-label"><span class="ic-step-number">2</span> Email</label>
+                                <div class="input-group input-group-solid">
+                                    <span class="input-group-text">&#64;</span>
+                                    <input type="text" class="form-control form-control-validate" id="contact-email-modal-project" name="email" />
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label"> Phone </label>
+                                <div class="input-group input-group-solid">
+                                    <span class="input-group-text"><i class="la la-phone"></i></span>
+                                    <input type="text" class="form-control form-control-validate input-phone" id="contact-phone-modal-project" name="phone" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label"><span class="ic-step-number">3</span> Role</label>
+                        <input type="text" class="form-control form-control-solid form-control-validate" id="contact-role-modal-project" name="role" />
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label"><span class="ic-step-number">4</span> Notes</label>
+                        <textarea class="form-control form-control-solid form-control-validate" rows="6" id="contact-notes-modal-project" name="notes"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-contact-modal-project">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal Concrete Class (igual que Projects modal-concrete-class) #}
+<div class="modal fade" id="modal-concrete-class-modal-project" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Concrete Class</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="concrete-class-form-modal-project" class="m-form">
+                    <input type="hidden" id="concrete-class-edit-index-modal-project" value="" />
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required"><span class="ic-step-number">1</span> Concrete Class</label>
+                        <select id="concrete-class-select-modal-project" class="form-control form-select form-select2 form-select-solid">
+                            <option value="">Concrete Class</option>
+                            {% for item in concrete_classes %}
+                            <option value="{{ item.concreteClassId }}">{{ item.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required"><span class="ic-step-number">2</span> Price</label>
+                        <div class="input-group input-group-solid">
+                            <span class="input-group-text">$</span>
+                            <input type="text" class="form-control form-control-validate form-control-number" id="concrete-class-price-modal-project" name="price" />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-concrete-class-modal-project">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal Ajuste Precio / Escalator (igual que Projects modal-ajuste-precio) #}
+<div class="modal fade" id="modal-ajuste-precio-modal-project" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Escalator</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form id="ajuste-precio-form-modal-project" class="m-form">
+                    <input type="hidden" id="ajuste-precio-edit-index-modal-project" value="" />
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required"><span class="ic-step-number">1</span> Day</label>
+                        <input type="text" class="form-control form-control-solid form-control-validate" id="ajuste-precio-day-modal-project" name="day" placeholder="e.g. 30" />
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required"><span class="ic-step-number">2</span> Percent</label>
+                        <div class="input-group input-group-solid">
+                            <span class="input-group-text">%</span>
+                            <input type="text" class="form-control form-control-validate" id="ajuste_precio_percent-modal-project" name="percent" />
+                        </div>
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label"><span class="ic-step-number">3</span> Items (Optional)</label>
+                        <input type="text" class="form-control form-control-solid" id="ajuste_precio_items-modal-project" name="items" placeholder="Leave empty for all items" />
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-salvar-ajuste-precio-modal-project">Save</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ asset('bundles/metronic8/js/components/modal-new-project-company.js') }}?{{ 'now' | date('U') }}"></script>
