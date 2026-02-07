@@ -468,12 +468,12 @@ class InvoiceService extends Base
       };
 
       // --- INICIALIZAR VARIABLES DE SUMA PARA PDF ---
-      $sum_H_contract      = 0;
-      $sum_J_completed     = 0;
-      $sum_L_unpaid_prev   = 0;
-      $sum_N_pending       = 0;
-      $sum_P_this_period   = 0;
-      $sum_S_billed        = 0;
+      $sum_H_contract       = 0;
+      $sum_J_completed      = 0;
+      $sum_L_previous_bill  = 0;  // PREVIOUS BILL AMOUNT (Final Amount This Period del invoice anterior)
+      $sum_N_pending        = 0;
+      $sum_P_this_period    = 0;
+      $sum_S_billed         = 0;
 
       // 5. ESCRIBIR ITEMS REGULARES
       foreach ($items_regulares as $value) {
@@ -485,7 +485,7 @@ class InvoiceService extends Base
             $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
          }
 
-         $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+         $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
          // Datos para el Excel
          $qty_this_period = $value->getQuantity();
@@ -495,11 +495,10 @@ class InvoiceService extends Base
          // --- ACUMULAR PARA PDF (Cálculo manual) ---
          $price = $value->getPrice();
          $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
-         $unpaid_prev_qty = $value->getUnpaidFromPrevious() ?: 0;
 
          $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
          $sum_J_completed     += ($qty_completed * $price);
-         $sum_L_unpaid_prev   += ($unpaid_prev_qty * $price);
+         $sum_L_previous_bill += $prevBill[1];  // PREVIOUS BILL AMOUNT
          $sum_N_pending       += ($value->getUnpaidQty() * $price);
          $sum_P_this_period   += ($value->getQuantity() * $price);
          $sum_S_billed        += ($final_invoiced_qty * $price);
@@ -563,7 +562,7 @@ class InvoiceService extends Base
                   $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
                }
 
-               $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+               $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
 
                $price = $value->getPrice();
                $qty_this_period = $value->getQuantity();
@@ -572,11 +571,10 @@ class InvoiceService extends Base
 
                // --- ACUMULAR PARA PDF (Igual que arriba) ---
                $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
-               $unpaid_prev_qty = $value->getUnpaidFromPrevious() ?: 0;
 
                $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
                $sum_J_completed     += ($qty_completed * $price);
-               $sum_L_unpaid_prev   += ($unpaid_prev_qty * $price);
+               $sum_L_previous_bill += $prevBill[1];  // PREVIOUS BILL AMOUNT
                $sum_N_pending       += ($value->getUnpaidQty() * $price);
                $sum_P_this_period   += ($value->getQuantity() * $price);
                $sum_S_billed        += ($final_invoiced_qty * $price);
@@ -603,7 +601,7 @@ class InvoiceService extends Base
          // USAMOS LAS VARIABLES PHP (Sin Fórmulas)
          $objWorksheet->setCellValue('H' . $fila_footer_inicio, $sum_H_contract);
          $objWorksheet->setCellValue('J' . $fila_footer_inicio, $sum_J_completed);
-         $objWorksheet->setCellValue('L' . $fila_footer_inicio, $sum_L_unpaid_prev);
+         $objWorksheet->setCellValue('L' . $fila_footer_inicio, $sum_L_previous_bill);  // PREVIOUS BILL AMOUNT (suma de col L)
          $objWorksheet->setCellValue('N' . $fila_footer_inicio, $sum_N_pending);
          $objWorksheet->setCellValue('P' . $fila_footer_inicio, $sum_P_this_period);
          $objWorksheet->setCellValue('S' . $fila_footer_inicio, $sum_S_billed);
@@ -802,7 +800,13 @@ class InvoiceService extends Base
       return $this->ObtenerURL() . 'uploads/invoice/' . $fichero;
    }
 
-   // Función auxiliar
+   /**
+    * EscribirFilaItem: Escribe una fila de ítem en el Excel/PDF.
+    * Columna K = PREVIOUS BILL QTY (Final Invoiced Quantity del invoice anterior).
+    * Columna L = PREVIOUS BILL AMOUNT (Final Amount This Period del invoice anterior).
+    *
+    * @return array [previous_bill_qty, previous_bill_amount] para totales del footer en PDF
+    */
    private function EscribirFilaItem($objWorksheet, $fila, $item_number, $value, $styleArray, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId)
    {
       $price = $value->getPrice();
@@ -812,14 +816,31 @@ class InvoiceService extends Base
       $qbf = $value->getQuantityBroughtForward();
 
       // Cálculo de totales actuales
-      $final_qty = $qty + $qbf;
       $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
 
-      // usamos getUnpaidFromPrevious()
-      // Si el valor es null, ponemos 0.
-      $unpaid_prev_qty = $value->getUnpaidFromPrevious() ? $value->getUnpaidFromPrevious() : 0;
-      $unpaid_prev_amount = $unpaid_prev_qty * $price;
-      // -----------------------
+      // K y L: PREVIOUS BILL QTY y PREVIOUS BILL AMOUNT = Final Invoiced Qty y Final Amount This Period del invoice anterior
+      $previous_bill_qty = 0.0;
+      $previous_bill_amount = 0.0;
+      $prevInvoice = null;
+      foreach ($allInvoicesHistory as $inv) {
+         if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
+            break;
+         }
+         $prevInvoice = $inv;
+      }
+      if ($prevInvoice !== null) {
+         $prev_items = $invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId());
+         $project_item_id = $value->getProjectItem()->getId();
+         foreach ($prev_items as $prevItem) {
+            if ($prevItem->getProjectItem()->getId() === $project_item_id) {
+               $prev_qty = (float) $prevItem->getQuantity();
+               $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
+               $previous_bill_qty = $prev_qty + $prev_qbf;
+               $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
+               break;
+            }
+         }
+      }
 
       $unpaid_qty = $value->getUnpaidQty();
       $unpaid_amount = $unpaid_qty * $price;
@@ -836,9 +857,8 @@ class InvoiceService extends Base
          ->setCellValue('I' . $fila, $qty_completed)
          ->setCellValue('J' . $fila, $qty_completed * $price)
 
-         // COLUMNAS K y L ACTUALIZADAS
-         ->setCellValue('K' . $fila, $unpaid_prev_qty)    // Unpaid Qty From Previous
-         ->setCellValue('L' . $fila, $unpaid_prev_amount) // Unpaid Amount From Previous
+         ->setCellValue('K' . $fila, $previous_bill_qty)    // PREVIOUS BILL QTY = Final Invoiced Quantity del invoice anterior
+         ->setCellValue('L' . $fila, $previous_bill_amount)  // PREVIOUS BILL AMOUNT = Final Amount This Period del invoice anterior
 
          ->setCellValue('M' . $fila, $unpaid_qty)
          ->setCellValue('N' . $fila, $unpaid_qty * $price)
@@ -851,6 +871,8 @@ class InvoiceService extends Base
          $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleArray);
          $objWorksheet->getStyle("A{$fila}:R{$fila}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE);
       }
+
+      return [$previous_bill_qty, $previous_bill_amount];
    }
 
 
