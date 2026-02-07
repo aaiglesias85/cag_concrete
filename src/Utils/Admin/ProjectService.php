@@ -3201,26 +3201,26 @@ class ProjectService extends Base
          $em->persist($history);
       }
 
-      // Si cambió la cantidad
+      // Si cambió la cantidad - created_at = fecha actual del cambio (no change_order_date)
       if ($quantity_old !== null && $quantity_old != $quantity_new) {
          $history = new ProjectItemHistory();
          $history->setProjectItem($project_item_entity);
          $history->setActionType('update_quantity');
          $history->setOldValue((string)$quantity_old);
          $history->setNewValue((string)$quantity_new);
-         $history->setCreatedAt($change_order_date);
+         $history->setCreatedAt(new \DateTime());
          $history->setUser($this->getUser());
          $em->persist($history);
       }
 
-      // Si cambió el precio
+      // Si cambió el precio - created_at = fecha actual del cambio (no change_order_date)
       if ($price_old !== null && $price_old != $price_new) {
          $history = new ProjectItemHistory();
          $history->setProjectItem($project_item_entity);
          $history->setActionType('update_price');
          $history->setOldValue((string)$price_old);
          $history->setNewValue((string)$price_new);
-         $history->setCreatedAt($change_order_date);
+         $history->setCreatedAt(new \DateTime());
          $history->setUser($this->getUser());
          $em->persist($history);
       }
