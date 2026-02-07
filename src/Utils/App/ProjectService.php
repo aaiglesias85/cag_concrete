@@ -81,8 +81,10 @@ class ProjectService extends Base
          $projects = [];
          $adminProjectService = $this->container->get(AdminProjectService::class);
          foreach ($entities as $value) {
-            $cargar = $adminProjectService->CargarDatosProject($value->getProjectId());
+            $projectId = $value->getProjectId();
+            $cargar = $adminProjectService->CargarDatosProject($projectId);
             if ($cargar['success'] && isset($cargar['project'])) {
+               $cargar['project']['project_id'] = $projectId;
                $projects[] = $cargar['project'];
             }
          }
