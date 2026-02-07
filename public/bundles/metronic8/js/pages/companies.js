@@ -458,10 +458,14 @@ var Companies = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
+      });
+      $(document).off('click', '#btn-wizard-finalizar-exit');
+      $(document).on('click', '#btn-wizard-finalizar-exit', function (e) {
+         btnClickSalvarForm(true);
       });
 
-      function btnClickSalvarForm() {
+      function btnClickSalvarForm(closeForm) {
          KTUtil.scrollTop();
 
          event_change = false;
@@ -499,9 +503,18 @@ var Companies = (function () {
                      if (response.success) {
                         toastr.success(response.message, '');
 
-                        cerrarForms();
+                        // Recuperar company_id del backend (necesario cuando es compañía nueva)
+                        var savedCompanyId = response.company_id;
+                        $('#company_id').val(savedCompanyId);
 
                         oTable.draw();
+
+                        if (closeForm) {
+                           cerrarForms();
+                        } else {
+                           // Cargar datos completos (contacts, projects, etc.) como en projects
+                           editRow(savedCompanyId);
+                        }
                      } else {
                         toastr.error(response.error, '');
                      }
@@ -552,6 +565,58 @@ var Companies = (function () {
       $('#lista-company').removeClass('hide');
    };
 
+   // Cargar datos de una company (compartido entre editar y tras Save en nueva)
+   // Usa #form-company-body para no superponer block con el de salvar (#form-company)
+   var editRow = function (company_id) {
+      var formData = new URLSearchParams();
+      formData.set('company_id', company_id);
+
+      BlockUtil.block('#form-company-body');
+
+      axios
+         .post('company/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  cargarDatosCompany(response.company);
+               } else {
+                  toastr.error(response.error, '');
+               }
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#form-company-body');
+         });
+   };
+
+   var cargarDatosCompany = function (company) {
+      KTUtil.find(KTUtil.get('form-company'), '.card-label').innerHTML = 'Update Comany: ' + company.name;
+
+      $('#name').val(company.name);
+      $('#phone').val(company.phone);
+      $('#address').val(company.address);
+      $('#email').val(company.email || '');
+      $('#website').val(company.website || '');
+
+      // contacts
+      contacts = company.contacts;
+      actualizarTableListaContacts();
+
+      // projects
+      projects = company.projects;
+      actualizarTableListaProjects();
+
+      // habilitar tab
+      totalTabs = 3;
+      $('.nav-item-hide').removeClass('hide');
+
+      event_change = false;
+   };
+
    //Editar
    var initAccionEditar = function () {
       $(document).off('click', '#company-table-editable a.edit');
@@ -566,57 +631,6 @@ var Companies = (function () {
 
          editRow(company_id);
       });
-
-      function editRow(company_id) {
-         var formData = new URLSearchParams();
-         formData.set('company_id', company_id);
-
-         BlockUtil.block('#form-company');
-
-         axios
-            .post('company/cargarDatos', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     //cargar datos
-                     cargarDatos(response.company);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-company');
-            });
-
-         function cargarDatos(company) {
-            KTUtil.find(KTUtil.get('form-company'), '.card-label').innerHTML = 'Update Comany: ' + company.name;
-
-            $('#name').val(company.name);
-            $('#phone').val(company.phone);
-            $('#address').val(company.address);
-            $('#email').val(company.email || '');
-            $('#website').val(company.website || '');
-
-            // contacts
-            contacts = company.contacts;
-            actualizarTableListaContacts();
-
-            // projects
-            projects = company.projects;
-            actualizarTableListaProjects();
-
-            // habilitar tab
-            totalTabs = 3;
-            $('.nav-item-hide').removeClass('hide');
-
-            event_change = false;
-         }
-      }
    };
    //Eliminar
    var initAccionEliminar = function () {

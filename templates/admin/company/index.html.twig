@@ -185,9 +185,13 @@
                </button>
 
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-wizard-finalizar" class="btn btn-success">
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-success me-2">
                   <i class="la la-check"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
+               </button>
+               <button type="button" id="btn-wizard-finalizar-exit" class="btn btn-success">
+                  <i class="la la-check-double"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Save & Exit</span>
                </button>
                {% endif %}
             </div>
@@ -196,7 +200,7 @@
          <form class="form" id="company-form" action="javascript:;" enctype="multipart/form-data" method="post">
             <input type="hidden" id="company_id" name="company_id" />
 
-            <div class="card-body">
+            <div id="form-company-body" class="card-body">
                <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                   <li class="nav-item">
                      <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
