@@ -569,6 +569,9 @@ var Invoices = (function () {
       $('#bon_quantity_display').val('');
       $('#bon_amount_display').val('');
 
+      $('#invoice_current_retainage_display').val('$0.00');
+      $('#invoice_retainage_calculated_display').val('$0.00');
+
       //Mostrar el primer tab
       resetWizard();
 
@@ -1071,6 +1074,17 @@ var Invoices = (function () {
          $('#bon_quantity_requested').val(invoice.bon_quantity_requested != null && invoice.bon_quantity_requested !== '' ? invoice.bon_quantity_requested : '');
          $('#bon_quantity_display').val(invoice.bon_quantity != null && invoice.bon_quantity !== '' ? MyApp.formatearNumero(invoice.bon_quantity, 6, '.', ',') : '');
          $('#bon_amount_display').val(invoice.bon_amount != null && invoice.bon_amount !== '' ? MyApp.formatMoney(invoice.bon_amount, 2, '.', ',') : '');
+
+         if (invoice.invoice_current_retainage != null && invoice.invoice_current_retainage !== '') {
+            $('#invoice_current_retainage_display').val(MyApp.formatMoney(invoice.invoice_current_retainage, 2, '.', ','));
+         } else {
+            $('#invoice_current_retainage_display').val('$0.00');
+         }
+         if (invoice.invoice_retainage_calculated != null && invoice.invoice_retainage_calculated !== '') {
+            $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(invoice.invoice_retainage_calculated, 2, '.', ','));
+         } else {
+            $('#invoice_retainage_calculated_display').val('$0.00');
+         }
 
          $('#company').on('change', changeCompany);
          $('#project').on('change', changeProject);

@@ -274,8 +274,13 @@ class InvoiceService extends Base
 
 
    /**
-    * ExportarExcel: Exporta a excel el invoice
-    * @author Marcel
+    * ExportarExcel: Exporta el invoice a Excel o PDF.
+    * Tanto Excel como PDF usan el retainage del invoice (invoice_retainage_calculated / invoice_current_retainage),
+    * no el retainage del módulo de Payments. Ver README_RETAINAGE.md.
+    *
+    * @param int|string $invoice_id
+    * @param string     $format 'excel' o 'pdf'
+    * @return string|null URL del archivo generado
     */
    public function ExportarExcel($invoice_id, $format = 'excel')
    {
@@ -627,49 +632,36 @@ class InvoiceService extends Base
       $objWorksheet->getStyle('S' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
 
-      // 8. RETAINAGE Y GUARDAR
+      // 8. RETAINAGE DEL INVOICE (solo para Excel/PDF; NO es el retainage de Payments)
+      // Se usa invoice_current_retainage e invoice_retainage_calculated del invoice.
       $std_retainage = (float)$project_entity->getRetainagePercentage();
-      $red_retainage = (float)$project_entity->getRetainageAdjustmentPercentage();
-      $target_completion = (float)$project_entity->getRetainageAdjustmentCompletion();
-      $contract_amount = (float)$project_entity->getContractAmount();
+      $current_retainage_amount = (float)($invoice_entity->getInvoiceRetainageCalculated() ?? 0);
+      $total_retainage_accumulated = 0.0;
 
-      $percentage_used_for_display = $std_retainage;
-      $threshold_amount = 0;
-      if ($contract_amount > 0 && $target_completion > 0) {
-         $threshold_amount = $contract_amount * ($target_completion / 100);
+      if ($invoice_entity->getInvoiceRetainageCalculated() === null && $invoice_entity->getInvoiceCurrentRetainage() === null) {
+         $this->CalcularYGuardarRetainageInvoice($invoice_entity);
+         $em->flush();
+         $em->refresh($invoice_entity);
+         $current_retainage_amount = (float)($invoice_entity->getInvoiceRetainageCalculated() ?? 0);
       }
 
-      $total_retainage_accumulated = 0;
-      $running_paid_accumulated = 0;
-      $current_retainage_amount = 0;
-
       $allInvoices = $invoiceRepo->findBy(['project' => $project_id], ['startDate' => 'ASC', 'invoiceId' => 'ASC']);
-
+      $this->sortInvoicesByStartDateAndId($allInvoices);
       foreach ($allInvoices as $inv) {
-         $paid_this_invoice_retainage_base = 0;
-         $invItems = $invoiceItemRepo->findBy(['invoice' => $inv]);
-         foreach ($invItems as $item) {
-            if ($item->getProjectItem()->getApplyRetainage()) {
-               $paid_this_invoice_retainage_base += $item->getPaidAmount();
-            }
+         if ($inv->getInvoiceRetainageCalculated() === null) {
+            $this->CalcularYGuardarRetainageInvoice($inv);
+            $em->flush();
+            $em->refresh($inv);
          }
-         $pct_to_use = $std_retainage;
-         if ($threshold_amount > 0 && ($running_paid_accumulated + $paid_this_invoice_retainage_base) >= $threshold_amount) {
-            $pct_to_use = $red_retainage;
-         }
-         $retainage_calculated = $paid_this_invoice_retainage_base * ($pct_to_use / 100);
-         foreach ($inv->getReimbursementHistories() as $history) {
-            $retainage_calculated -= (float)$history->getAmount();
-         }
-         $total_retainage_accumulated += $retainage_calculated;
-         $running_paid_accumulated += $paid_this_invoice_retainage_base;
-
+         $total_retainage_accumulated += (float)($inv->getInvoiceRetainageCalculated() ?? 0);
          if ($inv->getInvoiceId() == $invoice_id) {
-            $percentage_used_for_display = $pct_to_use;
-            $current_retainage_amount = $retainage_calculated;
             break;
          }
       }
+
+      $invoice_current_base = (float)($invoice_entity->getInvoiceCurrentRetainage() ?? 0);
+      $percentage_used_for_display = ($invoice_current_base > 0 && $current_retainage_amount !== 0.0)
+         ? ($current_retainage_amount / $invoice_current_base * 100) : $std_retainage;
 
       // Escritura
       $objWorksheet->setCellValue('R' . $fila_retainage, "CURRENT RETAINAGE @ " . number_format($percentage_used_for_display, 2) . "%");
@@ -854,6 +846,63 @@ class InvoiceService extends Base
 
 
    /**
+    * CalcularYGuardarRetainageInvoice: Calcula y persiste el retainage exclusivo del invoice.
+    * No usa ni modifica el retainage de pagos. Base: suma "Final Amount This Period" de items R;
+    * porcentaje según avance del contrato (project Retainage tab).
+    *
+    * @param Invoice $entity Invoice a recalcular
+    */
+   public function CalcularYGuardarRetainageInvoice(Invoice $entity): void
+   {
+      $em = $this->getDoctrine()->getManager();
+      $invoice_id = $entity->getInvoiceId();
+      $project = $entity->getProject();
+      if (!$project) {
+         $entity->setInvoiceCurrentRetainage(0.0);
+         $entity->setInvoiceRetainageCalculated(0.0);
+         $em->persist($entity);
+         return;
+      }
+      $project_id = $project->getProjectId();
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+      $current_retainage = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly((string) $invoice_id);
+      $contract_amount = (float) ($project->getContractAmount() ?? 0);
+
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $accumulated = 0.0;
+      foreach ($allInvoices as $inv) {
+         $accumulated += $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly((string) $inv->getInvoiceId());
+         if ($inv->getInvoiceId() == $invoice_id) {
+            break;
+         }
+      }
+
+      $completion_pct = ($contract_amount > 0) ? ($accumulated / $contract_amount * 100) : 0.0;
+      $pct_to_use = 0.0;
+      if ($project->getRetainage()) {
+         $target = (float) ($project->getRetainageAdjustmentCompletion() ?? 0);
+         if ($target > 0 && $completion_pct >= $target) {
+            $pct_to_use = (float) ($project->getRetainageAdjustmentPercentage() ?? 0);
+         } else {
+            $pct_to_use = (float) ($project->getRetainagePercentage() ?? 0);
+         }
+      }
+
+      $invoice_retainage = $current_retainage * ($pct_to_use / 100);
+
+      $entity->setInvoiceCurrentRetainage($current_retainage);
+      $entity->setInvoiceRetainageCalculated($invoice_retainage);
+      $em->persist($entity);
+   }
+
+   /**
     * Summary of CalcularPorcientoRetainage
     * @param Project $project_entity
     * @param float $total_amount_final
@@ -923,8 +972,14 @@ class InvoiceService extends Base
 
          $item_name = $entity->getProjectItem()->getItem()->getName();
 
+         $invoice = $entity->getInvoice();
          $em->remove($entity);
          $em->flush();
+
+         if ($invoice) {
+            $this->CalcularYGuardarRetainageInvoice($invoice);
+            $em->flush();
+         }
 
          //Salvar log
          $log_operacion = "Delete";
@@ -975,6 +1030,15 @@ class InvoiceService extends Base
          $arreglo_resultado['bon_quantity_requested'] = $entity->getBonQuantityRequested() !== null ? (float) $entity->getBonQuantityRequested() : null;
          $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
          $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
+
+         $em = $this->getDoctrine()->getManager();
+         if ($entity->getInvoiceRetainageCalculated() === null && $entity->getInvoiceCurrentRetainage() === null) {
+            $this->CalcularYGuardarRetainageInvoice($entity);
+            $em->flush();
+            $em->refresh($entity);
+         }
+         $arreglo_resultado['invoice_current_retainage'] = $entity->getInvoiceCurrentRetainage() !== null ? (float) $entity->getInvoiceCurrentRetainage() : null;
+         $arreglo_resultado['invoice_retainage_calculated'] = $entity->getInvoiceRetainageCalculated() !== null ? (float) $entity->getInvoiceRetainageCalculated() : null;
 
          // projects
          $projects = $this->ListarProjectsDeCompany($company_id);
@@ -1370,6 +1434,8 @@ class InvoiceService extends Base
 
          $this->RecalcularBonProyecto($project_id);
 
+         $this->CalcularYGuardarRetainageInvoice($entity);
+
          // salvar en la cola
          $this->SalvarInvoiceQuickbook($entity);
 
@@ -1491,6 +1557,8 @@ class InvoiceService extends Base
       $this->ActualizarUnpaidQtyPorQuantityBroughtForward($entity, $items);
 
       $this->RecalcularBonProyecto($project_id);
+
+      $this->CalcularYGuardarRetainageInvoice($entity);
 
       $em->flush();
 
@@ -1803,6 +1871,11 @@ class InvoiceService extends Base
 
       $em->flush();
       $this->RecalcularUnpaidQtyProyecto($project_id);
+
+      foreach ($invoices as $invoice) {
+         $this->CalcularYGuardarRetainageInvoice($invoice);
+      }
+      $em->flush();
    }
 
    /**

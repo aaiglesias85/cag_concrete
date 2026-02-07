@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 06-02-2026 a las 19:09:32
+-- Tiempo de generación: 07-02-2026 a las 00:45:48
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -661,17 +661,19 @@ CREATE TABLE `invoice` (
   `edit_sequence` varchar(255) DEFAULT NULL,
   `bon_quantity_requested` decimal(10,6) DEFAULT NULL COMMENT 'Bon Quantity solicitado (0 a 1)',
   `bon_quantity` decimal(10,6) DEFAULT NULL COMMENT 'Bon Quantity aplicado (cap por acumulado)',
-  `bon_amount` decimal(18,2) DEFAULT NULL COMMENT 'Bon General * Bon Quantity aplicado'
+  `bon_amount` decimal(18,2) DEFAULT NULL COMMENT 'Bon General * Bon Quantity aplicado',
+  `invoice_current_retainage` decimal(18,2) DEFAULT NULL COMMENT 'Suma Final Amount This Period de items R del invoice',
+  `invoice_retainage_calculated` decimal(18,2) DEFAULT NULL COMMENT 'Retainage $ calculado para este invoice (para imprimir)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `invoice`
 --
 
-INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity_requested`, `bon_quantity`, `bon_amount`) VALUES
-(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL),
-(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL),
-(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity_requested`, `bon_quantity`, `bon_amount`, `invoice_current_retainage`, `invoice_retainage_calculated`) VALUES
+(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 

@@ -68,6 +68,14 @@ class Invoice
    #[ORM\Column(name: 'bon_amount', type: 'decimal', precision: 18, scale: 2, nullable: true)]
    private ?float $bonAmount = null;
 
+   /** Suma "Final Amount This Period" de items tipo R del invoice (solo para invoice, no pagos). */
+   #[ORM\Column(name: 'invoice_current_retainage', type: 'decimal', precision: 18, scale: 2, nullable: true)]
+   private ?float $invoiceCurrentRetainage = null;
+
+   /** Retainage $ calculado para este invoice (se imprime en Excel). Independiente del retainage de pagos. */
+   #[ORM\Column(name: 'invoice_retainage_calculated', type: 'decimal', precision: 18, scale: 2, nullable: true)]
+   private ?float $invoiceRetainageCalculated = null;
+
 
    public function getInvoiceId(): ?int
    {
@@ -235,6 +243,28 @@ class Invoice
    public function setBonAmount(?float $bonAmount): self
    {
       $this->bonAmount = $bonAmount;
+      return $this;
+   }
+
+   public function getInvoiceCurrentRetainage(): ?float
+   {
+      return $this->invoiceCurrentRetainage;
+   }
+
+   public function setInvoiceCurrentRetainage(?float $invoiceCurrentRetainage): self
+   {
+      $this->invoiceCurrentRetainage = $invoiceCurrentRetainage;
+      return $this;
+   }
+
+   public function getInvoiceRetainageCalculated(): ?float
+   {
+      return $this->invoiceRetainageCalculated;
+   }
+
+   public function setInvoiceRetainageCalculated(?float $invoiceRetainageCalculated): self
+   {
+      $this->invoiceRetainageCalculated = $invoiceRetainageCalculated;
       return $this;
    }
 
