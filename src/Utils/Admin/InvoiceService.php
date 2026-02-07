@@ -498,8 +498,8 @@ class InvoiceService extends Base
 
          $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
          $sum_J_completed     += ($qty_completed * $price);
-         $sum_L_previous_bill += $prevBill[1];  // PREVIOUS BILL AMOUNT
-         $sum_N_pending       += ($value->getUnpaidQty() * $price);
+         $sum_L_previous_bill += $prevBill[1];   // PREVIOUS BILL AMOUNT
+         $sum_N_pending       += $prevBill[3];   // PENDING BALANCE (BTD) = como en Payments
          $sum_P_this_period   += ($value->getQuantity() * $price);
          $sum_S_billed        += ($final_invoiced_qty * $price);
          // ------------------------------------------
@@ -574,8 +574,8 @@ class InvoiceService extends Base
 
                $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
                $sum_J_completed     += ($qty_completed * $price);
-               $sum_L_previous_bill += $prevBill[1];  // PREVIOUS BILL AMOUNT
-               $sum_N_pending       += ($value->getUnpaidQty() * $price);
+               $sum_L_previous_bill += $prevBill[1];   // PREVIOUS BILL AMOUNT
+               $sum_N_pending       += $prevBill[3];   // PENDING BALANCE (BTD) = como en Payments
                $sum_P_this_period   += ($value->getQuantity() * $price);
                $sum_S_billed        += ($final_invoiced_qty * $price);
                // --------------------------------------------
@@ -804,8 +804,10 @@ class InvoiceService extends Base
     * EscribirFilaItem: Escribe una fila de ítem en el Excel/PDF.
     * Columna K = PREVIOUS BILL QTY (Final Invoiced Quantity del invoice anterior).
     * Columna L = PREVIOUS BILL AMOUNT (Final Amount This Period del invoice anterior).
+    * Columna M = PENDING QTY (BTD): quantity_final - paid_qty (mismo criterio que en Payments).
+    * Columna N = PENDING BALANCE (BTD): pending_qty_btd * price.
     *
-    * @return array [previous_bill_qty, previous_bill_amount] para totales del footer en PDF
+    * @return array [previous_bill_qty, previous_bill_amount, pending_qty_btd, pending_balance_btd] para totales del footer en PDF
     */
    private function EscribirFilaItem($objWorksheet, $fila, $item_number, $value, $styleArray, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId)
    {
@@ -842,8 +844,12 @@ class InvoiceService extends Base
          }
       }
 
-      $unpaid_qty = $value->getUnpaidQty();
-      $unpaid_amount = $unpaid_qty * $price;
+      // PENDING QTY (BTD) y PENDING BALANCE (BTD): mismo criterio que en Payments
+      // En Payments: unpaid_qty = quantity_final - paid_qty (lo que falta por pagar de este invoice)
+      $quantity_final = $qty + ($qbf ?? 0.0);
+      $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
+      $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
+      $pending_balance_btd = $pending_qty_btd * $price;
 
       $unit = $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
 
@@ -860,8 +866,8 @@ class InvoiceService extends Base
          ->setCellValue('K' . $fila, $previous_bill_qty)    // PREVIOUS BILL QTY = Final Invoiced Quantity del invoice anterior
          ->setCellValue('L' . $fila, $previous_bill_amount)  // PREVIOUS BILL AMOUNT = Final Amount This Period del invoice anterior
 
-         ->setCellValue('M' . $fila, $unpaid_qty)
-         ->setCellValue('N' . $fila, $unpaid_qty * $price)
+         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = quantity_final - paid_qty (como en Payments)
+         ->setCellValue('N' . $fila, $pending_balance_btd)   // PENDING BALANCE (BTD) = pending_qty_btd * price
 
          ->setCellValue('O' . $fila, $qty)           // QTY THIS PERIOD
          ->setCellValue('P' . $fila, $qty * $price); // AMOUNT THIS PERIOD
@@ -872,7 +878,7 @@ class InvoiceService extends Base
          $objWorksheet->getStyle("A{$fila}:R{$fila}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE);
       }
 
-      return [$previous_bill_qty, $previous_bill_amount];
+      return [$previous_bill_qty, $previous_bill_amount, $pending_qty_btd, $pending_balance_btd];
    }
 
 
