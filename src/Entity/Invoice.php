@@ -59,12 +59,11 @@ class Invoice
    #[ORM\OneToMany(mappedBy: 'invoice', targetEntity: ReimbursementHistory::class, cascade: ['persist', 'remove'])]
    private Collection $reimbursementHistories;
 
-   #[ORM\Column(name: 'bon_quantity_requested', type: 'decimal', precision: 10, scale: 6, nullable: true)]
-   private ?float $bonQuantityRequested = null;
-
+   /** Bond Quantity (X) aplicado (0-1). Regla: suma en todos los invoices del proyecto ≤ 1. */
    #[ORM\Column(name: 'bon_quantity', type: 'decimal', precision: 10, scale: 6, nullable: true)]
    private ?float $bonQuantity = null;
 
+   /** Bond Amount (Y) = Bond General × bon_quantity. */
    #[ORM\Column(name: 'bon_amount', type: 'decimal', precision: 18, scale: 2, nullable: true)]
    private ?float $bonAmount = null;
 
@@ -210,17 +209,6 @@ class Invoice
    public function setRetainageReimbursedDate(?\DateTimeInterface $retainageReimbursedDate): self
    {
       $this->retainageReimbursedDate = $retainageReimbursedDate;
-      return $this;
-   }
-
-   public function getBonQuantityRequested(): ?float
-   {
-      return $this->bonQuantityRequested;
-   }
-
-   public function setBonQuantityRequested(?float $bonQuantityRequested): self
-   {
-      $this->bonQuantityRequested = $bonQuantityRequested;
       return $this;
    }
 

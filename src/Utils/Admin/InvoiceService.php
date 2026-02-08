@@ -46,8 +46,13 @@ class InvoiceService extends Base
    }
 
    /**
-    * RecalcularBonProyecto: Aplica la regla de Bon (suma Bon Quantity ≤ 1) a todos los invoices del proyecto.
-    * Orden: por start_date e invoice_id. Por cada invoice: applied = min(requested, 1 - used), bon_amount = bon_general * applied.
+    * RecalcularBonProyecto: aplica la regla de tope Bond Quantity ≤ 1 en el proyecto.
+    * Por cada invoice (orden: start_date, invoice_id):
+    * - X = Bond Quantity calculado = SumBondedInvoiceItems(invoice) / SumBondedProject(project)
+    * - Disponible = 1 - Bond Quantity Used (acumulado de invoices anteriores)
+    * - Bond Quantity Aplicado = min(X, Disponible)
+    * - Bond Amount (Y) = Bond General × Bond Quantity Aplicado
+    * - Actualizar acumulado. Si no queda disponible, aplicar 0.
     *
     * @param int|string $project_id
     */
@@ -55,17 +60,17 @@ class InvoiceService extends Base
    {
       $project_id = (int) $project_id;
       $em = $this->getDoctrine()->getManager();
-      /** @var Project|null $project */
       $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
       if (!$project) {
          return;
       }
-      $bonGeneral = $project->getBonGeneral();
-      if ($bonGeneral === null) {
-         $bonGeneral = 0.0;
-      } else {
-         $bonGeneral = (float) $bonGeneral;
-      }
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $bondGeneral = (float) $projectItemRepo->TotalBondAmountProjectItems($project_id);
+      $sumBondedProject = (float) $projectItemRepo->TotalBondedProjectItems($project_id);
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
@@ -84,25 +89,28 @@ class InvoiceService extends Base
             continue;
          }
 
-         $requested = $invoice->getBonQuantityRequested();
-         if ($requested === null || $requested < 0) {
-            $requested = 0.0;
-         } else {
-            $requested = (float) $requested;
+         // X = Bond Quantity calculado para este invoice
+         $sumBondedInvoice = (float) $invoiceItemRepo->SumBondedInvoiceItems($invoice->getInvoiceId());
+         $x = 0.0;
+         if ($sumBondedProject > 0) {
+            $x = $sumBondedInvoice / $sumBondedProject;
          }
-         if ($requested > 1.0) {
-            $requested = 1.0;
+         if ($x < 0) {
+            $x = 0.0;
+         }
+         if ($x > 1.0) {
+            $x = 1.0;
          }
 
-         $availableBonQty = $MAX_BON_QUANTITY - $bonQuantityUsed;
-         $appliedBonQty = min($requested, $availableBonQty);
-         $bonAmount = $bonGeneral * $appliedBonQty;
+         $available = $MAX_BON_QUANTITY - $bonQuantityUsed;
+         $applied = min($x, $available);
+         $bonAmount = round($bondGeneral * $applied, 2);
 
-         $invoice->setBonQuantity($appliedBonQty);
-         $invoice->setBonAmount(round($bonAmount, 2));
+         $invoice->setBonQuantity($applied);
+         $invoice->setBonAmount($bonAmount);
          $em->persist($invoice);
 
-         $bonQuantityUsed += $appliedBonQty;
+         $bonQuantityUsed += $applied;
       }
 
       $em->flush();
@@ -1117,6 +1125,7 @@ class InvoiceService extends Base
       if ($entity != null) {
          $project_id = $entity->getProject()->getProjectId();
          $this->RecalcularBonProyecto($project_id);
+         $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
 
          $arreglo_resultado['project_id'] = $project_id;
 
@@ -1129,8 +1138,6 @@ class InvoiceService extends Base
          $arreglo_resultado['notes'] = $entity->getNotes();
          $arreglo_resultado['paid'] = $entity->getPaid();
 
-         $arreglo_resultado['bon_general'] = $entity->getProject()->getBonGeneral() !== null ? (float) $entity->getProject()->getBonGeneral() : null;
-         $arreglo_resultado['bon_quantity_requested'] = $entity->getBonQuantityRequested() !== null ? (float) $entity->getBonQuantityRequested() : null;
          $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
          $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
 
@@ -1151,13 +1158,15 @@ class InvoiceService extends Base
          $items = $this->ListarItemsDeInvoice($invoice_id);
          $arreglo_resultado['items'] = $items;
 
-         // Agregar sum_bonded_project y bond_price para cálculo de X e Y en JavaScript
+         // Agregar sum_bonded_project, bond_price y bond_general para cálculo de X e Y en JavaScript
          if (!empty($items)) {
             $arreglo_resultado['sum_bonded_project'] = $items[0]['sum_bonded_project'] ?? 0;
             $arreglo_resultado['bond_price'] = $items[0]['bond_price'] ?? 0;
+            $arreglo_resultado['bond_general'] = $items[0]['bond_general'] ?? 0;
          } else {
             $arreglo_resultado['sum_bonded_project'] = 0;
             $arreglo_resultado['bond_price'] = 0;
+            $arreglo_resultado['bond_general'] = 0;
          }
 
          // payments
@@ -1324,16 +1333,18 @@ class InvoiceService extends Base
          ];
       }
 
-      // Calcular SUM_BONED_PROJECT y Bone Price para que JavaScript pueda calcular X e Y
+      // Calcular SUM_BONDED_PROJECT, Bond Price y Bond General para que JavaScript pueda calcular X e Y
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
       $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
+      $bond_general = $projectItemRepo->TotalBondAmountProjectItems($project_id);
 
       // Agregar estos valores a cada item para que JavaScript los use
       foreach ($items as &$item) {
          $item['sum_bonded_project'] = $sum_bonded_project;
          $item['bond_price'] = $bond_price;
+         $item['bond_general'] = $bond_general;
       }
 
       return $items;
@@ -1458,7 +1469,7 @@ class InvoiceService extends Base
     * @param int $invoice_id Id
     * @author Marcel
     */
-   public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested = null)
+   public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -1466,10 +1477,6 @@ class InvoiceService extends Base
          ->find($invoice_id);
       /** @var Invoice $entity */
       if ($entity != null) {
-         if ($bon_quantity_requested !== null && $bon_quantity_requested !== '') {
-            $entity->setBonQuantityRequested((float) $bon_quantity_requested);
-         }
-
          // verificar fechas
          /** @var InvoiceRepository $invoiceRepo */
          $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
@@ -1571,7 +1578,7 @@ class InvoiceService extends Base
     * @param string $description Nombre
     * @author Marcel
     */
-   public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested = null)
+   public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -1629,9 +1636,6 @@ class InvoiceService extends Base
       $entity = new Invoice();
 
       $entity->setNumber($number);
-      if ($bon_quantity_requested !== null && $bon_quantity_requested !== '') {
-         $entity->setBonQuantityRequested((float) $bon_quantity_requested);
-      }
 
       $entity->setStartDate($start_date);
       $entity->setEndDate($end_date);

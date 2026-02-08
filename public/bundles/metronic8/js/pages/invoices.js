@@ -563,10 +563,8 @@ var Invoices = (function () {
       items_lista = [];
       actualizarTableListaItems();
 
-      $('#bon_general_display').val('');
-      $('#bon_quantity_requested').val('');
-      $('#bon_quantity_display').val('');
-      $('#bon_amount_display').val('');
+      $('#total_bonded_x').val('0.00');
+      $('#total_bonded_y').val('0.00');
 
       $('#invoice_current_retainage_display').val('$0.00');
       $('#invoice_retainage_calculated_display').val('$0.00');
@@ -886,9 +884,6 @@ var Invoices = (function () {
 
             formData.set('exportar', exportar ? 1 : 0);
 
-            var bonQtyRequested = $('#bon_quantity_requested').val();
-            formData.set('bon_quantity_requested', bonQtyRequested !== undefined && bonQtyRequested !== '' ? bonQtyRequested : '');
-
             BlockUtil.block('#form-invoice');
 
             axios
@@ -1063,16 +1058,15 @@ var Invoices = (function () {
 
          $('#paidactivo').prop('checked', invoice.paid);
 
-         if (invoice.bon_general != null && invoice.bon_general !== '') {
-            $('#bon_general_display').val(MyApp.formatMoney(invoice.bon_general, 2, '.', ','));
-            $('#card-bond').show();
+         $('#card-bond').show();
+         // Valores aplicados (con regla cap ≤1) vienen del backend
+         if (invoice.bon_quantity != null && invoice.bon_amount != null) {
+            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
+            $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
          } else {
-            $('#bon_general_display').val('');
-            $('#card-bond').show();
+            $('#total_bonded_x').val('0.00');
+            $('#total_bonded_y').val('0.00');
          }
-         $('#bon_quantity_requested').val(invoice.bon_quantity_requested != null && invoice.bon_quantity_requested !== '' ? invoice.bon_quantity_requested : '');
-         $('#bon_quantity_display').val(invoice.bon_quantity != null && invoice.bon_quantity !== '' ? MyApp.formatearNumero(invoice.bon_quantity, 6, '.', ',') : '');
-         $('#bon_amount_display').val(invoice.bon_amount != null && invoice.bon_amount !== '' ? MyApp.formatMoney(invoice.bon_amount, 2, '.', ',') : '');
 
          if (invoice.invoice_current_retainage != null && invoice.invoice_current_retainage !== '') {
             $('#invoice_current_retainage_display').val(MyApp.formatMoney(invoice.invoice_current_retainage, 2, '.', ','));
@@ -1106,7 +1100,7 @@ var Invoices = (function () {
             item.posicion = index;
          });
 
-         // Guardar sum_bonded_project y bond_price si vienen en los items
+         // Guardar sum_bonded_project, bond_price y bond_general para cálculo de X e Y
          if (items.length > 0) {
             if (items[0].sum_bonded_project !== undefined) {
                sum_bonded_project = Number(items[0].sum_bonded_project || 0);
@@ -1114,12 +1108,15 @@ var Invoices = (function () {
             if (items[0].bond_price !== undefined) {
                bond_price = Number(items[0].bond_price || 0);
             }
-                        
+            if (items[0].bond_general !== undefined) {
+               bond_general = Number(items[0].bond_general || 0);
+            }
          }
 
-         // Calcular y mostrar X e Y (Bonded) en JavaScript
-         calcularYMostrarXBondedEnJS();
-
+         // Si no tenemos valores aplicados del backend, calcular X e Y en JS (preview para invoice nuevo)
+         if (invoice.bon_quantity == null || invoice.bon_amount == null) {
+            calcularYMostrarXBondedEnJS();
+         }
          actualizarTableListaItems();
 
          event_change = false;
@@ -1406,9 +1403,9 @@ var Invoices = (function () {
    var changeProject = function () {
       var project_id = $('#project').val();
       
-      // Si no hay proyecto seleccionado, resetear X e Y
+      // Si no hay proyecto seleccionado, resetear Bon
       if (!project_id) {
-         $('#total_bonded_x').val('0.000000');
+         $('#total_bonded_x').val('0.00');
          $('#total_bonded_y').val('0.00');
       }
 
@@ -1483,7 +1480,7 @@ var Invoices = (function () {
       var invoice_id = $('#invoice_id').val();
       if (invoice_id == '') {
          items = [];
-         $('#total_bonded_x').val('0.000000');
+         $('#total_bonded_x').val('0.00');
          $('#total_bonded_y').val('0.00');
          actualizarTableListaItems();
       }
@@ -1503,19 +1500,12 @@ var Invoices = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
-                     // Guardar sum_bonded_project y bond_price para cálculo de X e Y
+                     // Guardar sum_bonded_project, bond_price y bond_general para cálculo de X e Y
                      sum_bonded_project = Number(response.sum_bonded_project || 0);
                      bond_price = Number(response.bond_price || 0);
-                     if (response.bon_general != null && response.bon_general !== '') {
-                        $('#bon_general_display').val(MyApp.formatMoney(response.bon_general, 2, '.', ','));
-                        $('#card-bond').show();
-                     } else {
-                        $('#bon_general_display').val('');
-                     }
-                     $('#bon_quantity_requested').val('');
-                     $('#bon_quantity_display').val('');
-                     $('#bon_amount_display').val('');
-                     
+                     bond_general = Number(response.bon_general || 0);
+                     $('#card-bond').show();
+
                      //Llenar select
                      for (let item of response.items) {
                         var posicion = items.length;
@@ -1568,9 +1558,8 @@ var Invoices = (function () {
                         item.posicion = index;
                      });
 
-                     // Calcular y mostrar X e Y (Boned) en JavaScript
+                     // Calcular y mostrar X e Y en la card
                      calcularYMostrarXBondedEnJS();
-
                      actualizarTableListaItems();
                   } else {
                      toastr.error(response.error, '');
@@ -1592,8 +1581,8 @@ var Invoices = (function () {
 
       // reset
       MyUtil.limpiarSelect('#project');
-$('#total_bonded_x').val('0.000000');
-         $('#total_bonded_y').val('0.00');
+      $('#total_bonded_x').val('0.00');
+      $('#total_bonded_y').val('0.00');
 
       if (company_id != '') {
          var formData = new URLSearchParams();
@@ -1698,6 +1687,7 @@ $('#total_bonded_x').val('0.000000');
    var items_lista = [];
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
+   var bond_general = 0; // Bond General del proyecto (monto ítem Bond) para Y = bond_general * X
    var nEditingRowItem = null;
    var rowDeleteItem = null;
 
@@ -2145,10 +2135,10 @@ $('#total_bonded_x').val('0.000000');
          x = sum_bonded_invoices / parseFloat(sum_bonded_project);
       }
       
-      // Calcular Y (Monto Monetario)
-      var y = (parseFloat(bond_price) || 0) * x;  
+      // Calcular Y (Monto Monetario): Y = Bond General × X (quantity × price del ítem Bond)
+      var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * x;
 
-      // Valores guardados en hidden (Bonded X/Y por items)
+      // Mostrar X e Y en la card
       $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
       $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
@@ -2251,9 +2241,10 @@ $('#total_bonded_x').val('0.000000');
       }
 
       initTableItems();
-      
-      // Recalcular X e Y después de actualizar la tabla
-      calcularYMostrarXBondedEnJS();
+      // Solo recalcular X e Y en la card cuando es invoice nuevo (sin ID); si es existente, se muestran los valores aplicados del backend
+      if (!$('#invoice_id').val()) {
+         calcularYMostrarXBondedEnJS();
+      }
    };
    var validateFormItem = function () {
       var result = false;

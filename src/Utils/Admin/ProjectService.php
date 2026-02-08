@@ -1158,12 +1158,8 @@ class ProjectService extends Base
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
       $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
-
-      $bon_general = null;
-      $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
-      if ($project && $project->getBonGeneral() !== null) {
-         $bon_general = (float) $project->getBonGeneral();
-      }
+      // Bon General = monto del ítem Bond en el proyecto (quantity * price del item con bond=true)
+      $bon_general = $projectItemRepo->TotalBondAmountProjectItems($project_id);
 
       return [
          'items' => $items,
@@ -1324,7 +1320,9 @@ class ProjectService extends Base
          $arreglo_resultado['prevailing_role_id'] = $entity->getPrevailingRole() != null ? $entity->getPrevailingRole()->getRoleId() : '';
          $arreglo_resultado['prevailing_role'] = $entity->getPrevailingRole() != null ? $entity->getPrevailingRole()->getDescription() : '';
          $arreglo_resultado['prevailing_rate'] = $entity->getPrevailingRate();
-         $arreglo_resultado['bon_general'] = $entity->getBonGeneral();
+         // Bon General = monto del ítem Bond en el proyecto (calculado, no se guarda en project)
+         $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+         $arreglo_resultado['bon_general'] = $projectItemRepo->TotalBondAmountProjectItems($project_id);
 
          // items
          $items = $this->ListarItemsDeProject($project_id);
@@ -2004,8 +2002,7 @@ class ProjectService extends Base
       $prevailing_wage,
       $prevailing_county_id,
       $prevailing_role_id,
-      $prevailing_rate,
-      $bon_general = null
+      $prevailing_rate
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2396,11 +2393,6 @@ class ProjectService extends Base
             ];
          }
          $entity->setPrevailingRate($valPrevRate);
-         if ($bon_general !== null && $bon_general !== '') {
-            $entity->setBonGeneral((float) $bon_general);
-         } else {
-            $entity->setBonGeneral(null);
-         }
 
          $entity->setUpdatedAt(new \DateTime());
 
@@ -2487,8 +2479,7 @@ class ProjectService extends Base
       $prevailing_wage,
       $prevailing_county_id,
       $prevailing_role_id,
-      $prevailing_rate,
-      $bon_general = null
+      $prevailing_rate
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2601,13 +2592,7 @@ class ProjectService extends Base
       $entity->setPrevailingWage($prevailing_wage);
       $valPrevRate = ($prevailing_rate !== '' && $prevailing_rate !== null) ? (float)$prevailing_rate : null;
       $entity->setPrevailingRate($valPrevRate);
-      if ($bon_general !== null && $bon_general !== '') {
-         $entity->setBonGeneral((float) $bon_general);
-      } else {
-         $entity->setBonGeneral(null);
-      }
-
-      if ($prevailing_county_id != '') {
+         if ($prevailing_county_id != '') {
          $prevailing_county = $this->getDoctrine()->getRepository(County::class)
             ->find($prevailing_county_id);
          $entity->setPrevailingCounty($prevailing_county);

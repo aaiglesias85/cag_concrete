@@ -372,4 +372,29 @@ class ProjectItemRepository extends ServiceEntityRepository
 
       return $total;
    }
+
+   /**
+    * TotalBondAmountProjectItems: Obtiene la suma de (quantity * price) de los ProjectItems
+    * donde el Item maestro tiene bond=true.
+    * Este valor es el "Bon General" usado en invoices: monto del ítem Bond en el proyecto.
+    *
+    * @param int|null $project_id El ID del proyecto
+    * @return float
+    */
+   public function TotalBondAmountProjectItems(?int $project_id = null): float
+   {
+      $qb = $this->createQueryBuilder('p_i')
+         ->select('SUM(p_i.quantity * p_i.price)')
+         ->leftJoin('p_i.item', 'i')
+         ->leftJoin('p_i.project', 'p')
+         ->andWhere('i.bond = 1');
+
+      if ($project_id) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id);
+      }
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
 }

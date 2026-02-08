@@ -108,14 +108,13 @@ class InvoiceController extends AbstractController
       $items = json_decode($items);
 
       $exportar = $request->get('exportar');
-      $bon_quantity_requested = $request->get('bon_quantity_requested');
 
       try {
 
          if ($invoice_id == "") {
-            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested);
+            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
          } else {
-            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar, $bon_quantity_requested);
+            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
          }
 
          if ($resultado['success']) {

@@ -544,7 +544,6 @@ var ModalNewProjectCompany = (function () {
       formData.set('prevailing_county_id', ($('#prevailing-county-modal-project').val() || '').toString());
       formData.set('prevailing_role_id', ($('#prevailing-role-modal-project').val() || '').toString());
       formData.set('prevailing_rate', ($('#prevailing-rate-modal-project').val() || '').toString());
-      formData.set('bon_general', ($('#bon-general-modal-project').val() || '').toString());
 
       var itemsArr = npItems.map(function (row) {
          var o = {

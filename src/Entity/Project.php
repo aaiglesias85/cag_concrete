@@ -139,9 +139,6 @@ class Project
    #[ORM\Column(name: 'prevailing_rate', type: 'float', nullable: true)]
    private ?float $prevailingRate;
 
-   #[ORM\Column(name: 'bon_general', type: 'decimal', precision: 18, scale: 2, nullable: true)]
-   private ?float $bonGeneral = null;
-
    public function getProjectId(): ?int
    {
       return $this->projectId;
@@ -558,13 +555,4 @@ class Project
       $this->prevailingRate = $prevailingRate;
    }
 
-   public function getBonGeneral(): ?float
-   {
-      return $this->bonGeneral;
-   }
-
-   public function setBonGeneral(?float $bonGeneral): void
-   {
-      $this->bonGeneral = $bonGeneral;
-   }
 }

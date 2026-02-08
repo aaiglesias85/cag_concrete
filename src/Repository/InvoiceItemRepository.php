@@ -84,6 +84,29 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * SumBondedInvoiceItems: Suma de (quantity + quantity_brought_forward) * price
+    * para los ítems del invoice cuyo project_item tiene bonded = true.
+    * Es el "SUM_BONDED_INVOICES" usado para calcular X (Bond Quantity solicitado) por invoice.
+    *
+    * @param int $invoice_id
+    * @return float
+    */
+   public function SumBondedInvoiceItems(int $invoice_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('SUM((i_i.quantity + COALESCE(i_i.quantityBroughtForward, 0)) * i_i.price)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->leftJoin('i_i.invoice', 'i')
+         ->andWhere('p_i.bonded = :bonded')
+         ->andWhere('i.invoiceId = :invoice_id')
+         ->setParameter('bonded', true)
+         ->setParameter('invoice_id', $invoice_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
+
+   /**
     * TotalPreviousAmount: Obtiene el total de cantidad de items por precio.
     *
     * @param int $project_item_id El ID del item de proyecto

@@ -235,26 +235,16 @@
                            </table>
                            <!--end::Datatable-->
 
-                           <!-- Bon: General, Quantity Requested, Quantity Applied, Amount -->
+                           <!-- Bond: Bond Amount General, Bond Qty (calculados en backend) -->
                            <div class="d-flex gap-3 flex-nowrap flex-grow-1 overflow-auto mt-3" style="padding-bottom: 0.25rem">
-                              <div class="input-group input-group-solid w-200px flex-shrink-0">
-                                 <span class="input-group-text">Bon General</span>
-                                 <input type="text" class="form-control form-control-solid" id="modal_bon_general" readonly />
-                              </div>
                               <div class="input-group input-group-solid w-220px flex-shrink-0">
-                                 <span class="input-group-text">Bon Qty Requested (0-1)</span>
-                                 <input type="number" class="form-control form-control-solid event-change" id="modal_bon_quantity_requested" name="bon_quantity_requested" min="0" max="1" step="0.01" placeholder="0" inputmode="decimal" autocomplete="off" />
+                                 <span class="input-group-text">Bond Amount General</span>
+                                 <input type="text" class="form-control form-control-solid" id="modal_total_bonded_y" readonly value="0.00" />
                               </div>
-                              <div class="input-group input-group-solid w-180px flex-shrink-0">
-                                 <span class="input-group-text">Bon Qty Applied</span>
-                                 <input type="text" class="form-control form-control-solid" id="modal_bon_quantity" readonly />
+                              <div class="input-group input-group-solid w-200px flex-shrink-0">
+                                 <span class="input-group-text">Bond Qty (proporción 0-1)</span>
+                                 <input type="text" class="form-control form-control-solid" id="modal_total_bonded_x" readonly value="0.00" />
                               </div>
-                              <div class="input-group input-group-solid w-180px flex-shrink-0">
-                                 <span class="input-group-text">Bon Amount</span>
-                                 <input type="text" class="form-control form-control-solid" id="modal_bon_amount" readonly />
-                              </div>
-                              <input type="hidden" id="modal_total_bonded_x" />
-                              <input type="hidden" id="modal_total_bonded_y" />
                            </div>
                         </div>
                      </div>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-02-2026 a las 14:52:19
+-- Tiempo de generación: 08-02-2026 a las 05:07:01
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -661,9 +661,8 @@ CREATE TABLE `invoice` (
   `project_id` int(11) DEFAULT NULL,
   `txn_id` varchar(255) DEFAULT NULL,
   `edit_sequence` varchar(255) DEFAULT NULL,
-  `bon_quantity_requested` decimal(10,6) DEFAULT NULL COMMENT 'Bon Quantity solicitado (0 a 1)',
-  `bon_quantity` decimal(10,6) DEFAULT NULL COMMENT 'Bon Quantity aplicado (cap por acumulado)',
-  `bon_amount` decimal(18,2) DEFAULT NULL COMMENT 'Bon General * Bon Quantity aplicado',
+  `bon_quantity` decimal(10,6) DEFAULT NULL COMMENT 'Bond Quantity aplicado (0-1, cap por proyecto)',
+  `bon_amount` decimal(18,2) DEFAULT NULL COMMENT 'Bond General × bon_quantity',
   `invoice_current_retainage` decimal(18,2) DEFAULT NULL COMMENT 'Suma Final Amount This Period de items R del invoice',
   `invoice_retainage_calculated` decimal(18,2) DEFAULT NULL COMMENT 'Retainage $ calculado para este invoice (para imprimir)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -672,10 +671,10 @@ CREATE TABLE `invoice` (
 -- Volcado de datos para la tabla `invoice`
 --
 
-INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity_requested`, `bon_quantity`, `bon_amount`, `invoice_current_retainage`, `invoice_retainage_calculated`) VALUES
-(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity`, `bon_amount`, `invoice_current_retainage`, `invoice_retainage_calculated`) VALUES
+(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1370,18 +1369,17 @@ CREATE TABLE `project` (
   `prevailing_wage` tinyint(1) DEFAULT NULL,
   `prevailing_county_id` int(11) DEFAULT NULL,
   `prevailing_role_id` int(11) DEFAULT NULL,
-  `prevailing_rate` decimal(18,2) DEFAULT NULL,
-  `bon_general` decimal(18,2) DEFAULT NULL COMMENT 'Bon total del proyecto (ej: -1850)'
+  `prevailing_rate` decimal(18,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_county_id`, `prevailing_role_id`, `prevailing_rate`, `bon_general`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_county_id`, `prevailing_role_id`, `prevailing_rate`) VALUES
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
