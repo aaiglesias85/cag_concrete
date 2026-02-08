@@ -527,6 +527,16 @@ class InvoiceService extends Base
          $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
 
          $aplicarFormatoFila($objWorksheet, $fila);
+
+         // Si el ítem es Bond, M y N van con los valores calculados del invoice (bon_quantity, bon_amount)
+         if ($value->getProjectItem()->getItem()->getBond()) {
+            $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
+            $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+            $objWorksheet->setCellValue('M' . $fila, $bon_qty);
+            $objWorksheet->setCellValue('N' . $fila, $bon_amt);
+            $sum_N_pending = $sum_N_pending - $prevBill[3] + $bon_amt;
+         }
+
          $item_number++;
          $fila++;
       }
@@ -603,6 +613,15 @@ class InvoiceService extends Base
                $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
 
                $aplicarFormatoFila($objWorksheet, $fila);
+
+               if ($value->getProjectItem()->getItem()->getBond()) {
+                  $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
+                  $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+                  $objWorksheet->setCellValue('M' . $fila, $bon_qty);
+                  $objWorksheet->setCellValue('N' . $fila, $bon_amt);
+                  $sum_N_pending = $sum_N_pending - $prevBill[3] + $bon_amt;
+               }
+
                $item_number++;
                $fila++;
             }
