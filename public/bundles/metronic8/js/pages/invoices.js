@@ -348,6 +348,7 @@ var Invoices = (function () {
 
       // acciones (mismo método que el resto de tablas: DatatableUtil.getRenderAcciones)
       var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
+      if (permiso.editar) accionesInvoice.push('edit');
       if (permiso.eliminar) accionesInvoice.push('delete');
 
       columnDefs.push({
@@ -1983,7 +1984,7 @@ $('#total_bonded_x').val('0.000000');
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['delete']);
             },
          },
       ];
