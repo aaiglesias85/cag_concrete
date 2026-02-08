@@ -328,7 +328,8 @@ class ProjectItemRepository extends ServiceEntityRepository
       $qb = $this->createQueryBuilder('p_i')
          ->leftJoin('p_i.item', 'i')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('i.bond = 1')
+         ->andWhere('i.bond = :bond')
+         ->setParameter('bond', true)
          ->orderBy('p_i.id', 'ASC');
 
       if ($project_id) {
@@ -354,7 +355,8 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->select('i.itemId, p_i.price')
          ->leftJoin('p_i.item', 'i')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('i.bond = 1') // Solo items con bond = true (del Item maestro)
+         ->andWhere('i.bond = :bond')
+         ->setParameter('bond', true)
          ->groupBy('i.itemId', 'p_i.price'); // Agrupar por item y precio de project_item para evitar duplicados
 
       if ($project_id) {
@@ -387,7 +389,8 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->select('SUM(p_i.quantity * p_i.price)')
          ->leftJoin('p_i.item', 'i')
          ->leftJoin('p_i.project', 'p')
-         ->andWhere('i.bond = 1');
+         ->andWhere('i.bond = :bond')
+         ->setParameter('bond', true);
 
       if ($project_id) {
          $qb->andWhere('p.projectId = :project_id')

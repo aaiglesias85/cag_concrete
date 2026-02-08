@@ -1998,8 +1998,26 @@ var Projects = (function () {
       return result;
    };
 
+   function EsItemBond() {
+      if (nEditingRowItem == null) {
+         var isExisting = $('#item-type-existing').prop('checked');
+         if (isExisting) {
+            return $('#bond-existing').length > 0 && $('#bond-existing').prop('checked');
+         }
+         return $('#bond').length > 0 && $('#bond').prop('checked');
+      }
+      var row = items[nEditingRowItem];
+      return row && (row.bond === 1 || row.bond === true || row.bond === '1');
+   }
+
    function DevolverCantidadItemProject() {
       var quantity = $('#item-quantity').val();
+
+      if (EsItemBond()) {
+         quantity = quantity.trim().replace(/,/g, '');
+         quantity = parseFloat(quantity);
+         return isNaN(quantity) ? 0 : quantity;
+      }
 
       if (nEditingRowItem == null) {
          quantity = quantity.trim().replace(/^[-+]/, '');
@@ -2029,6 +2047,12 @@ var Projects = (function () {
 
    function DevolverPrecioItemProject() {
       var price = $('#item-price').val();
+
+      if (EsItemBond()) {
+         price = price.trim().replace(/,/g, '');
+         price = parseFloat(price);
+         return isNaN(price) ? 0 : price;
+      }
 
       if (nEditingRowItem == null) {
          price = price.trim().replace(/^[-+]/, '').replace(/,/g, '');
