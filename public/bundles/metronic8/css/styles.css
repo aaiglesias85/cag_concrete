@@ -889,6 +889,43 @@ google map
     border-bottom: 3px solid #3699FF !important;
 }
 
+/* Tabs: scroll horizontal en una sola línea (todos los formularios con wizard-tabs) */
+.tabs-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -0.5rem;
+    margin-right: -0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.tabs-scroll .wizzard-tabs {
+    flex-wrap: nowrap;
+    display: flex;
+    border-bottom: 1px solid var(--bs-border-color, #e4e6ef);
+    min-width: min-content;
+}
+.tabs-scroll .wizzard-tabs .nav-item {
+    flex-shrink: 0;
+}
+/* Scrollbar más discreta en el contenedor de tabs */
+.tabs-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+.tabs-scroll::-webkit-scrollbar-track {
+    background: #f1f1f3;
+    border-radius: 3px;
+}
+.tabs-scroll::-webkit-scrollbar-thumb {
+    background: #b5b5c3;
+    border-radius: 3px;
+}
+.tabs-scroll::-webkit-scrollbar-thumb:hover {
+    background: #a1a1b8;
+}
+
 /** buttons*/
 .dx-button-mode-contained.dx-button-success {
     background-color: #1BC5BD !important;

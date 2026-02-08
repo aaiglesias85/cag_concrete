@@ -274,6 +274,7 @@
             <input type="hidden" id="project_id" name="project_id" />
 
             <div class="card-body">
+               <div class="tabs-scroll">
                <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                   <li class="nav-item">
                      <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
@@ -572,11 +573,11 @@
                      </a>
                   </li>
                   <li class="nav-item hide nav-item-hide">
-                     <a class="nav-link wizard-tab" data-item="8" data-bs-toggle="tab" href="#tab-content-items-completion" id="tab-items-completion">
+                     <a class="nav-link wizard-tab" data-item="9" data-bs-toggle="tab" href="#tab-content-items-completion" id="tab-items-completion">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">8</span>
+                              <span class="number">9</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Completion</div>
@@ -586,11 +587,11 @@
                      </a>
                   </li>
                   <li class="nav-item hide nav-item-hide">
-                     <a class="nav-link wizard-tab" data-item="9" data-bs-toggle="tab" href="#tab-content-data-tracking" id="tab-data-tracking">
+                     <a class="nav-link wizard-tab" data-item="10" data-bs-toggle="tab" href="#tab-content-data-tracking" id="tab-data-tracking">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">9</span>
+                              <span class="number">10</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Data Tracking</div>
@@ -660,11 +661,11 @@
                      </a>
                   </li>
                   <li class="nav-item hide nav-item-hide">
-                     <a class="nav-link wizard-tab" data-item="11" data-bs-toggle="tab" href="#tab-content-notes" id="tab-notes">
+                     <a class="nav-link wizard-tab" data-item="12" data-bs-toggle="tab" href="#tab-content-notes" id="tab-notes">
                         <div class="wizard-wrapper">
                            <span class="wizard-number">
                               <i class="wizard-check ki-duotone ki-check"></i>
-                              <span class="number">11</span>
+                              <span class="number">12</span>
                            </span>
                            <div class="wizard-label">
                               <div class="wizard-title">Notes</div>
@@ -674,6 +675,7 @@
                      </a>
                   </li>
                </ul>
+               </div>
 
                <div class="tab-content">
                   <div class="tab-pane fade show active" id="tab-content-general" role="tabpanel">
@@ -1286,6 +1288,13 @@
                            <table id="notes-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    {% if permiso.eliminar %}
+                                    <th class="w-10px pe-2">
+                                       <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                                          <input class="form-check-input check-select-all-notes" type="checkbox" data-kt-check="true" data-kt-check-target="#notes-table-editable .form-check-input" value="1" title="Select all" />
+                                       </div>
+                                    </th>
+                                    {% endif %}
                                     <th>Date</th>
                                     <th>Notes</th>
                                     <th>Actions</th>
@@ -1654,6 +1663,7 @@
             <input type="hidden" id="project_id_detalle" name="project_id_detalle" />
 
             <div class="card-body">
+               <div class="tabs-scroll">
                <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                   <li class="nav-item">
                      <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general-detalle" id="tab-general-detalle">
@@ -2054,6 +2064,7 @@
                      </a>
                   </li>
                </ul>
+               </div>
 
                <div class="tab-content">
                   <div class="tab-pane fade show active" id="tab-content-general-detalle" role="tabpanel">

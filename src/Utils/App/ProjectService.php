@@ -33,6 +33,7 @@ class ProjectService extends Base
 
    /**
     * ListarProjects: Lista proyectos con filtros para la app.
+    * Devuelve los mismos datos ligeros que el listar del backend (Admin), sin CargarDatosProject.
     *
     * @param string $search       Búsqueda libre (opcional)
     * @param string $empresa_id   ID de company (opcional)
@@ -56,37 +57,27 @@ class ProjectService extends Base
          $fecha_inicial = $this->normalizeDate($fecha_inicial);
          $fecha_fin = $this->normalizeDate($fecha_fin);
 
-         $total = $this->projectRepository->TotalProjects(
-            $search,
-            $empresa_id,
-            '', // inspector_id
-            '', // status
-            $fecha_inicial,
-            $fecha_fin
-         );
-
-         $entities = $this->projectRepository->ListarProjects(
+         $adminProjectService = $this->container->get(AdminProjectService::class);
+         $total = $adminProjectService->TotalProjects($search, $empresa_id, '', $fecha_inicial, $fecha_fin);
+         $data = $adminProjectService->ListarProjects(
             $offset,
             $limit > 0 ? $limit : 100,
             $search,
             'name',
             'ASC',
             $empresa_id,
-            '', // inspector_id
             '', // status
             $fecha_inicial,
             $fecha_fin
          );
 
          $projects = [];
-         $adminProjectService = $this->container->get(AdminProjectService::class);
-         foreach ($entities as $value) {
-            $projectId = $value->getProjectId();
-            $cargar = $adminProjectService->CargarDatosProject($projectId);
-            if ($cargar['success'] && isset($cargar['project'])) {
-               $cargar['project']['project_id'] = $projectId;
-               $projects[] = $cargar['project'];
-            }
+         foreach ($data as $row) {
+            $row['project_id'] = $row['id'] ?? null;
+            $row['start_date'] = $row['startDate'] ?? '';
+            $row['end_date'] = $row['endDate'] ?? '';
+            $row['number'] = $row['projectNumber'] ?? '';
+            $projects[] = $row;
          }
 
          $resultado['success'] = true;
@@ -120,9 +111,8 @@ class ProjectService extends Base
    }
 
    /**
-    * CargarDatosProject: Carga todos los datos del proyecto (misma estructura que el backend admin).
-    * Delega en App\Utils\Admin\ProjectService::CargarDatosProject.
-    * El servicio Admin se obtiene aquí (lazy) para no cargar Doctrine al generar api/doc.
+    * CargarDatosProject: Carga todos los datos del proyecto para la app.
+    * Usa el Admin CargarDatosProject y añade para la app: data_tracking (tab Datatracking) e invoices (tab Invoices).
     *
     * @param string|int $project_id ID del proyecto
     * @return array{success: bool, project?: array, error?: string}
@@ -130,7 +120,29 @@ class ProjectService extends Base
    public function CargarDatosProject($project_id): array
    {
       $adminProjectService = $this->container->get(AdminProjectService::class);
+      $result = $adminProjectService->CargarDatosProject($project_id);
 
-      return $adminProjectService->CargarDatosProject($project_id);
+      if ($result['success'] && isset($result['project'])) {
+         $listarDt = $adminProjectService->ListarDataTrackings(0, 5000, '', 0, 'asc', (string) $project_id, '', '', '');
+         $result['project']['data_tracking'] = $listarDt['data'] ?? [];
+
+         $invoices = $adminProjectService->ListarInvoicesDeProject($project_id);
+         $result['project']['invoices'] = $invoices;
+
+         $notes = $adminProjectService->ListarNotesDeProject($project_id);
+         $result['project']['notes'] = $notes;
+
+         // Historial por ítem (change order, cantidad, precio) para la app
+         if (!empty($result['project']['items'])) {
+            foreach ($result['project']['items'] as $k => $item) {
+               $project_item_id = $item['project_item_id'] ?? $item['id'] ?? null;
+               if ($project_item_id) {
+                  $result['project']['items'][$k]['item_history'] = $adminProjectService->ListarHistorialDeItem($project_item_id);
+               }
+            }
+         }
+      }
+
+      return $result;
    }
 }

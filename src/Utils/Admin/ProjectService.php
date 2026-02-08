@@ -1352,6 +1352,16 @@ class ProjectService extends Base
          $items_completion = $this->ListarItemsCompletion($project_id);
          $arreglo_resultado['items_completion'] = $items_completion;
 
+         // Invoices and Retainage History (paso 4 del tab Retainage)
+         if ($entity->getRetainage()) {
+            $invoices_retainage = $this->ListarInvoicesConRetainage($project_id);
+            $arreglo_resultado['invoices_retainage'] = $invoices_retainage;
+            $total_retainage_withheld = 0;
+            if (!empty($invoices_retainage)) {
+               $total_retainage_withheld = (float) ($invoices_retainage[0]['total_retainage_to_date'] ?? 0);
+            }
+            $arreglo_resultado['total_retainage_withheld'] = $total_retainage_withheld;
+         }
 
          $resultado['success'] = true;
          $resultado['project'] = $arreglo_resultado;
@@ -1606,6 +1616,28 @@ class ProjectService extends Base
       }
 
       return $invoices;
+   }
+
+   /**
+    * ListarNotesDeProject: Lista las notas del proyecto para la app (tab Notes).
+    * @param string|int $project_id
+    * @return array[] id, date (m/d/Y), notes
+    */
+   public function ListarNotesDeProject($project_id)
+   {
+      $data = [];
+      /** @var ProjectNotesRepository $projectNotesRepo */
+      $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
+      $lista = $projectNotesRepo->ListarNotesDeProject($project_id, '', '', 'DESC');
+      foreach ($lista as $value) {
+         $date = $value->getDate();
+         $data[] = [
+            'id' => $value->getId(),
+            'date' => $date !== null ? $date->format('m/d/Y') : '',
+            'notes' => $value->getNotes() ?? '',
+         ];
+      }
+      return $data;
    }
 
    /**

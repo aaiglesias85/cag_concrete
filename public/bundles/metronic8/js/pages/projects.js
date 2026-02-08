@@ -565,36 +565,48 @@ var Projects = (function () {
          // marcar los pasos validos
          marcarPasosValidosWizard();
 
-         //bug visual de la tabla que muestra las cols corridas
+         //bug visual de la tabla que muestra las cols corridas / recargar datos al cambiar de tab
          switch (activeTab) {
-            case 3:
+            case 2:
                actualizarTableListaItems();
+               break;
+            case 3:
                break;
             case 4:
                actualizarTableListaAjustesPrecio();
                break;
             case 5:
-               // Prevailing Wage - poblar dropdown de counties
                poblarPrevailingCounties();
                break;
             case 6:
-               actualizarTableListaContacts();
+               actualizarTableListaConcreteClasses();
                break;
             case 7:
-               btnClickFiltrarNotes();
+               actualizarTableListaContacts();
                break;
             case 8:
-               actualizarTableListaInvoices();
-               break;
-            case 9:
-               btnClickFiltrarDataTracking();
-               break;
-            case 10:
                actualizarTableListaArchivos();
                break;
-            case 11:
+            case 9:
                actualizarTableListaItemsCompletion();
                break;
+            case 10:
+               btnClickFiltrarDataTracking();
+               break;
+            case 11:
+               actualizarTableListaInvoices();
+               break;
+            case 12:
+               btnClickFiltrarNotes();
+               break;
+         }
+      });
+
+      // Al mostrar el tab de notas (click directo o por wizard), recargar la tabla
+      $(document).off('shown.bs.tab', '#tab-notes');
+      $(document).on('shown.bs.tab', '#tab-notes', function () {
+         if (typeof oTableNotes !== 'undefined' && oTableNotes) {
+            btnClickFiltrarNotes();
          }
       });
 
@@ -2495,60 +2507,80 @@ var Projects = (function () {
          error: DatatableUtil.errorDataTable,
       };
 
-      // columns
-      const columns = [{ data: 'date' }, { data: 'notes' }, { data: null }];
+      // columns: checkbox (id) si permiso.eliminar, date, notes, actions
+      const columns = [];
+      if (permiso.eliminar) {
+         columns.push({ data: 'id' });
+      }
+      columns.push({ data: 'date' }, { data: 'notes' }, { data: null });
 
       // column defs
-      let columnDefs = [
-         {
-            targets: -1,
-            data: null,
+      let columnDefs = [];
+      if (permiso.eliminar) {
+         columnDefs.push({
+            targets: 0,
             orderable: false,
-            className: 'text-center',
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
-            },
+            searchable: false,
+            render: DatatableUtil.getRenderColumnCheck,
+         });
+      }
+      columnDefs.push({
+         targets: -1,
+         data: null,
+         orderable: false,
+         className: 'text-center',
+         render: function (data, type, row) {
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
          },
-      ];
+      });
 
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = [[0, 'asc']];
+      // order: nunca por columna checkbox (0), por fecha (1) desc por defecto
+      const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
 
-      oTableNotes = $(table).DataTable({
+      var dtOptions = {
          searchDelay: 500,
          processing: true,
          serverSide: true,
          order: order,
-
          stateSave: true,
          displayLength: 25,
          stateSaveParams: DatatableUtil.stateSaveParams,
-
-         /*displayLength: 15,
-            lengthMenu: [
-              [15, 25, 50, -1],
-              [15, 25, 50, 'Todos']
-            ],*/
-         select: {
-            info: false,
-            style: 'multi',
-            selector: 'td:first-child input[type="checkbox"]',
-            className: 'row-selected',
-         },
          ajax: datasource,
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+      };
+      if (permiso.eliminar) {
+         dtOptions.select = {
+            info: false,
+            style: 'multi',
+            selector: 'td:first-child input[type="checkbox"]',
+            className: 'row-selected',
+         };
+      }
+      oTableNotes = $(table).DataTable(dtOptions);
+
+      // Re-init functions on every table re-draw
+      oTableNotes.on('draw', function () {
+         initAccionesNotes();
+         $('.check-select-all-notes').prop('checked', false);
       });
 
-      // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
-      oTableNotes.on('draw', function () {
-         // init acciones
-         initAccionesNotes();
-      });
+      // Select all checkbox in header (solo si hay columna de checkbox)
+      if (permiso.eliminar) {
+         $(document).off('click', '.check-select-all-notes');
+         $(document).on('click', '.check-select-all-notes', function () {
+            var checked = this.checked;
+            if (checked) {
+               oTableNotes.rows({ page: 'current' }).select();
+            } else {
+               oTableNotes.rows({ page: 'current' }).deselect();
+            }
+         });
+      }
 
       // search
       handleSearchDatatableNotes();
@@ -2714,20 +2746,24 @@ var Projects = (function () {
       $(document).on('click', '#btn-eliminar-notes', function (e) {
          e.preventDefault();
 
-         var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde-notes');
-         var fechaFin = FlatpickrUtil.getString('datetimepicker-hasta-notes');
+         var selectedRows = oTableNotes.rows({ selected: true });
+         var selectedIds = [];
+         selectedRows.every(function (rowIdx) {
+            var row = this.data();
+            if (row && row.id) selectedIds.push(row.id);
+         });
 
-         if (fechaInicial === '' && fechaFin === '') {
-            toastr.error('Select the dates to delete', '');
+         if (selectedIds.length === 0) {
+            toastr.warning('Select one or more notes to delete (use the checkboxes).', '');
             return;
          }
 
          Swal.fire({
-            text: 'Are you sure you want to delete the notes?',
+            text: 'Are you sure you want to delete the selected note(s)?',
             icon: 'warning',
             showCancelButton: true,
             buttonsStyling: false,
-            confirmButtonText: 'Yes, delete it!',
+            confirmButtonText: 'Yes, delete!',
             cancelButtonText: 'No, cancel',
             customClass: {
                confirmButton: 'btn fw-bold btn-success',
@@ -2735,22 +2771,58 @@ var Projects = (function () {
             },
          }).then(function (result) {
             if (result.value) {
-               eliminarNotes(fechaInicial, fechaFin);
+               eliminarNotesPorIds(selectedIds);
             }
          });
       });
 
+      function eliminarNotesPorIds(ids) {
+         BlockUtil.block('#lista-notes');
+         var total = ids.length;
+         var done = 0;
+         var hasError = false;
+
+         function doNext() {
+            if (done >= total) {
+               BlockUtil.unblock('#lista-notes');
+               if (!hasError) {
+                  toastr.success('The selected note(s) were deleted.', '');
+                  btnClickFiltrarNotes();
+               }
+               return;
+            }
+            var formData = new URLSearchParams();
+            formData.set('notes_id', ids[done]);
+            axios
+               .post('project/eliminarNotes', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if ((res.status === 200 || res.status === 201) && res.data && res.data.success) {
+                     done++;
+                     doNext();
+                  } else {
+                     hasError = true;
+                     toastr.error(res.data && res.data.error ? res.data.error : 'Error deleting note.', '');
+                     BlockUtil.unblock('#lista-notes');
+                     btnClickFiltrarNotes();
+                  }
+               })
+               .catch(function (err) {
+                  hasError = true;
+                  MyUtil.catchErrorAxios(err);
+                  BlockUtil.unblock('#lista-notes');
+                  btnClickFiltrarNotes();
+               });
+         }
+         doNext();
+      }
+
       function eliminarNotes(fechaInicial, fechaFin) {
          var formData = new URLSearchParams();
-
          var project_id = $('#project_id').val();
          formData.set('project_id', project_id);
-
          formData.set('from', fechaInicial);
          formData.set('to', fechaFin);
-
          BlockUtil.block('#lista-notes');
-
          axios
             .post('project/eliminarNotesDate', formData, { responseType: 'json' })
             .then(function (res) {
@@ -2758,11 +2830,8 @@ var Projects = (function () {
                   var response = res.data;
                   if (response.success) {
                      toastr.success(response.message, '');
-
-                     // reset
-                     FlatpickrUtil.clear('datetimepicker-desde');
-                     FlatpickrUtil.clear('datetimepicker-hasta');
-
+                     FlatpickrUtil.clear('datetimepicker-desde-notes');
+                     FlatpickrUtil.clear('datetimepicker-hasta-notes');
                      btnClickFiltrarNotes();
                   } else {
                      toastr.error(response.error, '');
