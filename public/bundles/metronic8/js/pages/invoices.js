@@ -347,7 +347,8 @@ var Invoices = (function () {
       }
 
       // acciones (mismo método que el resto de tablas: DatatableUtil.getRenderAcciones)
-      var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
+      //var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
+      var accionesInvoice = ['exportar_excel'];
       if (permiso.editar) accionesInvoice.push('edit');
       if (permiso.eliminar) accionesInvoice.push('delete');
 
