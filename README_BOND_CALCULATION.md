@@ -84,6 +84,14 @@ Para un **invoice existente** se muestran los valores aplicados que devuelve el 
 - Al **cargar un invoice existente**: se muestran `invoice.bon_quantity` e `invoice.bon_amount` en la card (valores aplicados del backend).
 - Para **invoice nuevo** (sin ID): `calcularYMostrarXBondedEnJS()` calcula un preview (X e Y) hasta que se guarde; al guardar el backend aplica la regla y en la siguiente carga se ven los aplicados.
 
+### Exportación Excel/PDF
+
+- El ítem Bond del proyecto puede estar como **línea en el invoice** (el usuario lo agrega desde la lista de ítems del proyecto). En ese caso aparece **una sola vez** en el Excel/PDF, en la lista de ítems (regulares o change order), en su posición natural. No se añade una fila Bond duplicada.
+- **Columnas CONTRACT (F, G, H)**: para la fila del Bond se rellenan con los valores del ítem Bond en el proyecto (precio, cantidad y monto contrato), igual que el resto de ítems (`EscribirFilaItem`).
+- **Columnas PENDING QTY (BTD) (M) y PENDING BALANCE (BTD) (N)**: para la fila del ítem Bond se sobrescriben con los valores calculados del invoice: **M = bon_quantity**, **N = bon_amount** (los mismos que muestra la card amarilla). El total PENDING del footer incluye este `bon_amount` en la suma de la columna N.
+- Si el ítem Bond **no** está como línea en el invoice, el bloque **6b** (`EscribirFilaItemBond`) lo incluye en el Excel/PDF con description, unit, price, contract qty/amount y pending = contrato completo; solo se listan los Bond del proyecto que **no** están ya como línea en el invoice (para no duplicar).
+- En la exportación se usan los valores `bon_quantity` y `bon_amount` que ya trae el invoice (no se recalcula al exportar).
+
 ---
 
 ## Fórmulas
@@ -142,5 +150,8 @@ Para que el “usado” sea consistente: se procesan por `start_date` e `invoice
 
 **¿Puede Bond General (y por tanto Y) ser negativo?**  
 Sí. El monto se muestra tal cual (p. ej. -1850.00).
+
+**¿Cómo sale el Bond en el Excel/PDF del invoice?**  
+Si el Bond está como ítem en el invoice, sale una sola vez en la lista (en ítems regulares o change order). Las columnas M (PENDING QTY BTD) y N (PENDING BALANCE BTD) llevan `bon_quantity` y `bon_amount` del invoice. Si el Bond no está en el invoice, se añade una fila en el bloque 6b con el contrato del Bond y pending = contrato completo.
 
 Para más detalle de métodos y archivos, ver la sección [Implementación técnica](#implementación-técnica).
