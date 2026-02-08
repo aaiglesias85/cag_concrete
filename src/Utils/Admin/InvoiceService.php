@@ -683,43 +683,12 @@ class InvoiceService extends Base
       $objWorksheet->getStyle('S' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
 
-      // 8. LESS RETAINERS (Excel/PDF): valor acumulado con regla de límite de mano de obra
-      // Ver README_RETAINAGE.md y reglas: (1) si total_billed acumulado > Total_contract_amount → current=0, Less=0;
-      // (2) orden cronológico; (3) Less Retainers = acumulado de current_retainage de invoices 1..actual.
+      // 8. LESS RETAINERS (Excel/PDF): mismo cálculo que la vista (CalcularRetainageEfectivoParaInvoice)
+      $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
+      $current_retainage_amount = $retainage_efectivo['effective_current'];
+      $total_retainage_accumulated = $retainage_efectivo['total_retainage_accumulated'];
+
       $std_retainage = (float)$project_entity->getRetainagePercentage();
-      $total_contract_amount = (float)($project_entity->getContractAmount() ?? 0);
-
-      $allInvoices = $invoiceRepo->findBy(['project' => $project_id], ['startDate' => 'ASC', 'invoiceId' => 'ASC']);
-      $this->sortInvoicesByStartDateAndId($allInvoices);
-
-      $current_retainage_amount = 0.0;
-      $total_retainage_accumulated = 0.0; // Less Retainers acumulado
-      $cumulative_billed = 0.0;
-
-      foreach ($allInvoices as $inv) {
-         if ($inv->getInvoiceRetainageCalculated() === null) {
-            $this->CalcularYGuardarRetainageInvoice($inv);
-            $em->flush();
-            $em->refresh($inv);
-         }
-
-         $billed_this_invoice = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string)$inv->getInvoiceId());
-         $cumulative_billed += $billed_this_invoice;
-
-         if ($total_contract_amount > 0 && $cumulative_billed > $total_contract_amount) {
-            $effective_current = 0.0;
-            $total_retainage_accumulated = 0.0;
-         } else {
-            $effective_current = (float)($inv->getInvoiceRetainageCalculated() ?? 0);
-            $total_retainage_accumulated += $effective_current;
-         }
-
-         if ($inv->getInvoiceId() == $invoice_id) {
-            $current_retainage_amount = $effective_current;
-            break;
-         }
-      }
-
       $invoice_current_base = (float)($invoice_entity->getInvoiceCurrentRetainage() ?? 0);
       $percentage_used_for_display = ($invoice_current_base > 0 && $current_retainage_amount !== 0.0)
          ? ($current_retainage_amount / $invoice_current_base * 100) : $std_retainage;
@@ -1033,6 +1002,67 @@ class InvoiceService extends Base
    }
 
    /**
+    * Calcula el retainage efectivo para un invoice aplicando la misma regla que el Excel/PDF:
+    * si total_billed acumulado > contract_amount → current=0, Less=0.
+    * Usado en CargarDatosInvoice (vista) y en ExportarExcel.
+    *
+    * @param int|string $invoice_id
+    * @return array{effective_current: float, total_retainage_accumulated: float}
+    */
+   public function CalcularRetainageEfectivoParaInvoice($invoice_id): array
+   {
+      $invoice_id = (int) $invoice_id;
+      $em = $this->getDoctrine()->getManager();
+      $invoiceRepo = $em->getRepository(Invoice::class);
+      $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
+
+      $entity = $invoiceRepo->find($invoice_id);
+      if (!$entity || !$entity->getProject()) {
+         return ['effective_current' => 0.0, 'total_retainage_accumulated' => 0.0];
+      }
+
+      $project_entity = $entity->getProject();
+      $project_id = $project_entity->getProjectId();
+      $total_contract_amount = (float)($project_entity->getContractAmount() ?? 0);
+
+      $allInvoices = $invoiceRepo->findBy(['project' => $project_id], ['startDate' => 'ASC', 'invoiceId' => 'ASC']);
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $current_retainage_amount = 0.0;
+      $total_retainage_accumulated = 0.0;
+      $cumulative_billed = 0.0;
+
+      foreach ($allInvoices as $inv) {
+         if ($inv->getInvoiceRetainageCalculated() === null) {
+            $this->CalcularYGuardarRetainageInvoice($inv);
+            $em->flush();
+            $em->refresh($inv);
+         }
+
+         $billed_this_invoice = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string)$inv->getInvoiceId());
+         $cumulative_billed += $billed_this_invoice;
+
+         if ($total_contract_amount > 0 && $cumulative_billed > $total_contract_amount) {
+            $effective_current = 0.0;
+            $total_retainage_accumulated = 0.0;
+         } else {
+            $effective_current = (float)($inv->getInvoiceRetainageCalculated() ?? 0);
+            $total_retainage_accumulated += $effective_current;
+         }
+
+         if ((int)$inv->getInvoiceId() === $invoice_id) {
+            $current_retainage_amount = $effective_current;
+            break;
+         }
+      }
+
+      return [
+         'effective_current' => $current_retainage_amount,
+         'total_retainage_accumulated' => $total_retainage_accumulated
+      ];
+   }
+
+   /**
     * Summary of CalcularPorcientoRetainage
     * @param Project $project_entity
     * @param float $total_amount_final
@@ -1166,8 +1196,16 @@ class InvoiceService extends Base
             $em->flush();
             $em->refresh($entity);
          }
-         $arreglo_resultado['invoice_current_retainage'] = $entity->getInvoiceCurrentRetainage() !== null ? (float) $entity->getInvoiceCurrentRetainage() : null;
-         $arreglo_resultado['invoice_retainage_calculated'] = $entity->getInvoiceRetainageCalculated() !== null ? (float) $entity->getInvoiceRetainageCalculated() : null;
+         // Valores para la vista: mismo criterio que Excel (Amount Earned Less Retainage = Total Billed - L Retainer)
+         $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
+         $effective_current = $retainage_efectivo['effective_current'];
+         $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
+         $total_billed = (float) $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+         $amount_earned_less_retainage = $total_billed - $effective_current;
+
+         $arreglo_resultado['invoice_retainage_calculated'] = $effective_current;
+         $arreglo_resultado['invoice_current_retainage'] = $amount_earned_less_retainage; // Current Retainer box = AMOUNT EARNED LESS RETAINAGE (Total - L Retainer)
+         $arreglo_resultado['invoice_retainage_accumulated'] = $retainage_efectivo['total_retainage_accumulated'];
 
          // projects
          $projects = $this->ListarProjectsDeCompany($company_id);
