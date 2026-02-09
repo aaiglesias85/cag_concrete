@@ -628,12 +628,17 @@ class InvoiceService extends Base
          }
       }
 
-      // 6b. ESCRIBIR ITEMS BOND (no están en invoice pero sí en Excel/PDF con description, unit, price, contract qty, contract amount, pending qty btd, pending balance; el resto en 0)
+      // 6b. ESCRIBIR ITEMS BOND (no están en invoice pero sí en Excel/PDF). M y N = bon_quantity y bon_amount del invoice (mismo que cargar datos).
       foreach ($bondProjectItems as $projectItem) {
          $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
 
-         $sum_H_contract   += $bondResult['contract_amount'];
-         $sum_N_pending    += $bondResult['pending_balance_btd'];
+         $sum_H_contract += $bondResult['contract_amount'];
+
+         $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
+         $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+         $objWorksheet->setCellValue('M' . $fila, $bon_qty);
+         $objWorksheet->setCellValue('N' . $fila, $bon_amt);
+         $sum_N_pending += $bon_amt;
 
          $objWorksheet->setCellValue("R{$fila}", 0);
          $objWorksheet->setCellValue("S{$fila}", 0);
