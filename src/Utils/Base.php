@@ -1495,14 +1495,12 @@ class Base
          $amount = $quantity_final * $price;
          $total_amount = $quantity_completed * $price;
 
-         // payment (unpaid_qty viene de BD; puede estar sobrescrito desde Notas)
+         // payment: unpaid_qty = mismo concepto que Excel Invoice columna M (PENDING QTY BTD)
+         // quantity_final - paid_qty (no usar getUnpaidQty() de BD, que es la columna roja de Invoices)
          $paid_qty = $value->getPaidQty();
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
-         $unpaid_qty = $value->getUnpaidQty();
-         if ($unpaid_qty === null) {
-            $unpaid_qty = max(0, $quantity_final - $paid_qty);
-         }
+         $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
 
          // notes
          $notes = $this->ListarNotesDeItemInvoice($value->getId());

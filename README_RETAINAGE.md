@@ -127,6 +127,21 @@ Este valor es para **visualización y lógica de pagos**, no para el Excel/PDF d
 
 No se guarda un “retainage total de payments” en la tabla `invoice`; el invoice guarda solo `retainage_reimbursed`, `retainage_reimbursed_amount`, `retainage_reimbursed_date` para reembolsos, y los campos de retainage **del invoice** (`invoice_current_retainage`, `invoice_retainage_calculated`).
 
+### 3.4 De dónde sale el valor de la caja "Retainage" en Payments
+
+En la pestaña **Payments** (al abrir un invoice para pagos) se muestra una caja etiquetada **"Retainage"** con el id `total_retainage_amount`. Ese valor **no** viene del retainage del Invoice (no usa Final Amount This Period ni `invoice_retainage_calculated`). Se calcula así:
+
+1. **Origen del dato:** Al cargar el invoice para pagos se llama `PaymentService::CargarDatosPayment($invoice_id)`. El resultado incluye `total_retainage_amount`, que es el valor que se muestra en la caja.
+2. **Cálculo en backend:** Dentro de `CargarDatosPayment`:
+   - Se obtiene el **historial pagado anterior** (suma de paid amount de ítems R en invoices anteriores al actual): `InvoiceRepository::ObtenerTotalPagadoAnterior(project_id, start_date, invoice_id)`.
+   - Se obtienen los ítems del invoice con datos de pago mediante `ListarPaymentsDeInvoice($invoice_id)` (cada ítem tiene `paid_amount`, `apply_retainage`, etc.).
+   - Se decide el **porcentaje:** si (historial anterior + suma de paid_amount de ítems R de esta factura) ≥ contract_amount_retainage_base × (retainage_adjustment_completion / 100), se usa `retainage_adjustment_percentage`; si no, `retainage_percentage`.
+   - Se recorre la lista de ítems de pago; por cada ítem con `apply_retainage` y `paid_amount > 0` se hace: `monto_ret = paid_amount × (porcentaje / 100)` y se suma.
+   - Esa suma se asigna a `$arreglo_resultado['total_retainage_amount']` (redondeada a 2 decimales).
+3. **En el frontend:** El JS (`payments.js`) rellena la caja con `invoice.total_retainage_amount` al cargar los datos del payment.
+
+En resumen: la caja **Retainage** en Payments muestra el **retainage calculado sobre lo PAGADO** en este invoice (paid amount de ítems R × porcentaje del proyecto), con el porcentaje elegido según el avance de lo pagado respecto al umbral del proyecto. Es independiente del "Current retainage" del Invoice, que se calcula sobre lo facturado (Final Amount This Period).
+
 ---
 
 ## 4. Configuración en el proyecto (tab Retainage)
