@@ -5,10 +5,12 @@
 1. [Referencia: Estructura de la Tabla `invoice_item` (Base de Datos)](#referencia-estructura-de-la-tabla-invoice_item-base-de-datos)
 2. [Columnas de Invoice Items (Tabla Visual)](#columnas-de-invoice-items-tabla-visual)
 3. [Columnas de Payment Items (Tabla Visual)](#columnas-de-payment-items-tabla-visual)
-4. [Lógica de Creación y Edición de Invoices](#lógica-de-creación-y-edición-de-invoices)
-5. [Lógica de Creación y Edición de Payments](#lógica-de-creación-y-edición-de-payments)
-6. [Operaciones al Guardar/Actualizar](#operaciones-al-guardaractualizar)
-7. [Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`](#reglas-de-cálculo-de-unpaid_qty-con-quantity_brought_forward)
+4. [Columnas del Excel de Invoice (Export)](#columnas-del-excel-de-invoice-export)
+5. [Unpaid Qty en Payments, Excel y Override desde Notas](#unpaid-qty-en-payments-excel-y-override-desde-notas)
+6. [Lógica de Creación y Edición de Invoices](#lógica-de-creación-y-edición-de-invoices)
+7. [Lógica de Creación y Edición de Payments](#lógica-de-creación-y-edición-de-payments)
+8. [Operaciones al Guardar/Actualizar](#operaciones-al-guardaractualizar)
+9. [Reglas de Cálculo de `unpaid_qty` con `quantity_brought_forward`](#reglas-de-cálculo-de-unpaid_qty-con-quantity_brought_forward)
 
 ---
 
@@ -570,6 +572,8 @@ paid_amount = paid_qty * price;
 
 **Icono:** Incluye un botón para agregar notas al item.
 
+**Override desde notas:** Si en una nota del ítem se guarda "Override Unpaid Qty", ese valor se usa al cargar datos (y también en el Excel del invoice, columna M). Ver [Unpaid Qty en Payments, Excel y Override desde Notas](#unpaid-qty-en-payments-excel-y-override-desde-notas).
+
 ---
 
 ### 10. **Paid Amount**
@@ -635,6 +639,98 @@ $paid_amount_total = CalculaPaidAmountTotalFromPreviusInvoice($project_item_id) 
 -  Si `unpaid_qty > 0` y `paid_qty == 0`: Botón rojo (item no pagado)
 
 **Al hacer clic:** Marca el item como pagado completamente (paid_qty = quantity_final).
+
+---
+
+## Columnas del Excel de Invoice (Export)
+
+Al exportar un invoice a Excel (o generar el PDF), se genera una hoja con filas por ítem. Las columnas del Excel tienen el siguiente significado. **Importante:** Los ítems marcados como **Bond** tienen lógica especial en las columnas M y N (ver más abajo y la sección [Unpaid Qty en Payments, Excel y Override desde Notas](#unpaid-qty-en-payments-excel-y-override-desde-notas)).
+
+| Columna | Nombre / Concepto | Descripción | Origen / Fórmula |
+|--------|-------------------|-------------|-------------------|
+| **A** | Item # | Número de ítem (1, 2, 3, …). | Secuencia al escribir filas. |
+| **B** | Description | Nombre del ítem del proyecto. | `ProjectItem->Item->name`. |
+| **C–D** | (fusionadas con B) | — | — |
+| **E** | Unit | Unidad de medida (m², m³, etc.). | `ProjectItem->Item->Unit->description`. |
+| **F** | Unit Price | Precio unitario. | `InvoiceItem->price` (del ProjectItem). |
+| **G** | Contract Qty | Cantidad contratada en el proyecto. | `ProjectItem->quantity`. |
+| **H** | Contract Amount | Monto total del contrato. | `contract_qty * price`. |
+| **I** | Completed Qty | Cantidad completada hasta la fecha (BTD). | `quantity + quantity_from_previous`. |
+| **J** | Completed Amount | Monto completado. | `qty_completed * price`. |
+| **K** | Previous Bill Qty | Cantidad facturada en el invoice anterior (Final Invoiced Qty del anterior). | Del invoice inmediatamente anterior: `prev_qty + prev_qbf` del mismo `project_item_id`. |
+| **L** | Previous Bill Amount | Monto del invoice anterior (Final Amount This Period del anterior). | `previous_bill_qty * price` del invoice anterior. |
+| **M** | **PENDING QTY (BTD)** | Cantidad pendiente por pagar de este invoice. Mismo concepto que **Unpaid Qty** en Payments. | Por defecto: `max(0, quantity_final - paid_qty)`. Si existe **Override Unpaid Qty** en una nota (Payments), se usa ese valor. **Bond:** no se usa este cálculo; M se fija con `bon_quantity` (ver nota Bond). |
+| **N** | **PENDING BALANCE (BTD)** | Monto pendiente por pagar. | `M * unit price`. Para Bond: se usa `bon_amount` (ver nota Bond). |
+| **O** | Qty This Period | Cantidad del periodo actual (BTD). | `InvoiceItem->quantity`. |
+| **P** | Amount This Period | Monto del periodo. | `qty_this_period * price`. |
+| **Q** | (reservada) | — | — |
+| **R** | Final Invoiced Qty | Cantidad final facturada en este invoice. | `quantity + quantity_brought_forward`. |
+| **S** | Final Amount This Period | Monto final facturado. | `final_invoiced_qty * price`. |
+
+### Ítem Bond en el Excel (columnas M y N)
+
+El ítem marcado como **Bond** es especial y **no debe usarse la lógica estándar de M y N**:
+
+- Para la fila del ítem Bond, las columnas **M** y **N** se escriben siempre con los valores del **invoice**, no con `quantity_final - paid_qty` ni con override de notas:
+  - **M** = `bon_quantity` (del invoice).
+  - **N** = `bon_amount` (del invoice).
+- El override de Unpaid Qty desde notas **no se aplica** al ítem Bond; solo aplica a ítems no-Bond.
+- Código: después de `EscribirFilaItem`, si el ítem es Bond se sobrescriben M y N con `bon_quantity` y `bon_amount` y se ajusta el total de la columna N en el footer.
+
+### Totales en el footer del Excel
+
+En la fila de totales del reporte se suman, entre otras:
+
+- **H:** Total Contract Amount.
+- **J:** Total Completed Amount.
+- **L:** Total Previous Bill Amount.
+- **N:** Total Pending Balance (BTD) — incluye el `bon_amount` si hay ítem Bond.
+- **P:** Total Amount This Period.
+- **S:** Total Billed Amount.
+
+---
+
+## Unpaid Qty en Payments, Excel y Override desde Notas
+
+### Mismo concepto en Payments y en Excel (columnas M y N)
+
+En **Payments** (tabla al “Cargar datos”) y en el **Excel del Invoice** (columnas M y N) se usa el **mismo concepto** de “cantidad pendiente por pagar” para cada ítem (salvo Bond):
+
+- **Fórmula base:**  
+  `unpaid_qty = quantity_final - paid_qty`  
+  con `quantity_final = quantity + quantity_brought_forward` del invoice.
+
+- **Payments:** al cargar datos, cada ítem muestra `unpaid_qty` calculado así (en `Base::ListarPaymentsDeInvoice`). No se usa el campo `unpaid_qty` de la tabla `invoice_item` (que en Invoices es la “columna roja”, otro concepto).
+- **Excel:** en `EscribirFilaItem`, la columna **M** = PENDING QTY (BTD) y **N** = M × unit price, con el mismo criterio.
+
+Así, el valor que ves en **Unpaid Qty** en Payments y el que sale en la **columna M** del Excel coinciden (para ítems no-Bond).
+
+### Override Unpaid Qty desde Notas (Payments)
+
+En el módulo **Payments** se puede agregar una **nota** a un ítem y opcionalmente definir **Override Unpaid Qty** (valor manual de cantidad pendiente).
+
+- **Dónde se guarda:** en `InvoiceItemNotes.override_unpaid_qty` (tabla `invoice_item_notes`). Una nota por registro; un ítem puede tener varias notas.
+- **Cuál override se usa:** al listar o exportar se usa el **override de la nota más reciente** (orden por fecha de la nota DESC) que tenga `override_unpaid_qty` definido (no null ni vacío).
+
+**Dónde se aplica el override:**
+
+1. **Tabla de Payments (Cargar datos):**  
+   En `Base::ListarPaymentsDeInvoice`, después de calcular `unpaid_qty = quantity_final - paid_qty`, se recorre las notas del ítem y, si alguna tiene `override_unpaid_qty`, se usa ese valor (el de la nota más reciente) como `unpaid_qty` devuelto para la tabla.
+
+2. **Excel del Invoice (columnas M y N):**  
+   En `InvoiceService::EscribirFilaItem`, después de calcular PENDING QTY (BTD) y PENDING BALANCE (BTD), si el ítem **no es Bond** se consultan las notas del ítem y, si existe override en la nota más reciente, se usa para:
+   - **Columna M** = valor override (con `max(0, ...)`).
+   - **Columna N** = M × unit price.
+
+**Ítem Bond:** el override **no se aplica** al ítem Bond. Para Bond, M y N en el Excel se fijan siempre con `bon_quantity` y `bon_amount` del invoice; no se tocan ni por la fórmula estándar ni por las notas.
+
+### Resumen rápido
+
+| Contexto | Unpaid Qty / Columna M | Columna N |
+|----------|------------------------|-----------|
+| Payments (cargar datos) | `quantity_final - paid_qty` o override de la nota más reciente | (no es columna; monto = unpaid_qty × price) |
+| Excel ítem normal | Igual que Payments; override aplica si existe | M × unit price |
+| Excel ítem Bond | Siempre `bon_quantity` (del invoice) | Siempre `bon_amount` (del invoice) |
 
 ---
 
