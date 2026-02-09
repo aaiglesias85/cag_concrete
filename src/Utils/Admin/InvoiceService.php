@@ -338,7 +338,31 @@ class InvoiceService extends Base
       }
       ksort($items_change_order);
 
-      // 2b. OBTENER ITEMS BOND (no están en data tracking ni en invoice, pero deben aparecer en Excel/PDF)
+      // 2b. Separar Bond del resto: Bond va siempre al final de ítems regulares, antes de change orders
+      $items_regulares_sin_bond = [];
+      $bondInvoiceItem = null;
+      foreach ($items_regulares as $value) {
+         if ($value->getProjectItem()->getItem()->getBond()) {
+            $bondInvoiceItem = $value;
+         } else {
+            $items_regulares_sin_bond[] = $value;
+         }
+      }
+      // Extraer Bond también de change orders (si está ahí) para ubicarlo siempre en el mismo lugar
+      $bondInvoiceItemFromCO = null;
+      foreach ($items_change_order as $key => $group_items) {
+         $sin_bond = [];
+         foreach ($group_items as $value) {
+            if ($value->getProjectItem()->getItem()->getBond()) {
+               $bondInvoiceItemFromCO = $value;
+            } else {
+               $sin_bond[] = $value;
+            }
+         }
+         $items_change_order[$key] = $sin_bond;
+      }
+
+      // 2c. Bond no en invoice: ítems Bond del proyecto que no están como línea en el invoice
       $projectItemIdsEnInvoice = array_map(function ($ii) { return $ii->getProjectItem()->getId(); }, $items);
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $em->getRepository(ProjectItem::class);
@@ -404,8 +428,9 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // CÁLCULO EXACTO DE FILAS
-      $filas_necesarias = count($items_regulares);
+      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila fija al final de regulares, antes de change orders)
+      $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
+      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0);
       if (!empty($items_change_order)) {
          $esPrimerGrupoCalculo = true;
          foreach ($items_change_order as $group_key => $group) {
@@ -420,7 +445,6 @@ class InvoiceService extends Base
             }
          }
       }
-      $filas_necesarias += count($bondProjectItems);
 
       $filas_disponibles = $fila_footer_inicio - $start_row_data;
       if ($filas_necesarias > $filas_disponibles) {
@@ -494,8 +518,8 @@ class InvoiceService extends Base
       $sum_P_this_period    = 0;
       $sum_S_billed         = 0;
 
-      // 5. ESCRIBIR ITEMS REGULARES
-      foreach ($items_regulares as $value) {
+      // 5. ESCRIBIR ITEMS REGULARES (sin Bond; el Bond va siempre en 5b)
+      foreach ($items_regulares_sin_bond as $value) {
          $em->refresh($value);
 
          if (isset($mapa_datos_web[$value->getId()])) {
@@ -528,15 +552,49 @@ class InvoiceService extends Base
 
          $aplicarFormatoFila($objWorksheet, $fila);
 
-         // Si el ítem es Bond, M y N van con los valores calculados del invoice (bon_quantity, bon_amount)
-         if ($value->getProjectItem()->getItem()->getBond()) {
-            $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
-            $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+         $item_number++;
+         $fila++;
+      }
+
+      // 5b. ESCRIBIR FILA BOND (siempre en el mismo lugar: al final de ítems regulares, antes de change orders)
+      if ($hay_bond) {
+         $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
+         $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+         $bondItem = $bondInvoiceItem ?? $bondInvoiceItemFromCO;
+         if ($bondItem !== null) {
+            $em->refresh($bondItem);
+            if (isset($mapa_datos_web[$bondItem->getId()])) {
+               $d = $mapa_datos_web[$bondItem->getId()];
+               $bondItem->setUnpaidQty($d['unpaid_qty']);
+               $bondItem->setUnpaidFromPrevious($d['unpaid_from_previous']);
+            }
+            $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $bondItem, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+            $qty_this_period = $bondItem->getQuantity();
+            $qty_brought_forward = $bondItem->getQuantityBroughtForward() ? $bondItem->getQuantityBroughtForward() : 0;
+            $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
+            $price = $bondItem->getPrice();
+            $qty_completed = $bondItem->getQuantity() + $bondItem->getQuantityFromPrevious();
+            $sum_H_contract      += ($bondItem->getProjectItem()->getQuantity() * $price);
+            $sum_J_completed     += ($qty_completed * $price);
+            $sum_L_previous_bill += $prevBill[1];
+            $sum_P_this_period   += ($bondItem->getQuantity() * $price);
+            $sum_S_billed        += ($final_invoiced_qty * $price);
             $objWorksheet->setCellValue('M' . $fila, $bon_qty);
             $objWorksheet->setCellValue('N' . $fila, $bon_amt);
-            $sum_N_pending = $sum_N_pending - $prevBill[3] + $bon_amt;
+            $sum_N_pending += $bon_amt;
+            $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
+            $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $price);
+         } else {
+            $projectItem = $bondProjectItems[0];
+            $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
+            $sum_H_contract += $bondResult['contract_amount'];
+            $objWorksheet->setCellValue('M' . $fila, $bon_qty);
+            $objWorksheet->setCellValue('N' . $fila, $bon_amt);
+            $sum_N_pending += $bon_amt;
+            $objWorksheet->setCellValue("R{$fila}", 0);
+            $objWorksheet->setCellValue("S{$fila}", 0);
          }
-
+         $aplicarFormatoFila($objWorksheet, $fila);
          $item_number++;
          $fila++;
       }
@@ -614,38 +672,10 @@ class InvoiceService extends Base
 
                $aplicarFormatoFila($objWorksheet, $fila);
 
-               if ($value->getProjectItem()->getItem()->getBond()) {
-                  $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
-                  $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
-                  $objWorksheet->setCellValue('M' . $fila, $bon_qty);
-                  $objWorksheet->setCellValue('N' . $fila, $bon_amt);
-                  $sum_N_pending = $sum_N_pending - $prevBill[3] + $bon_amt;
-               }
-
                $item_number++;
                $fila++;
             }
          }
-      }
-
-      // 6b. ESCRIBIR ITEMS BOND (no están en invoice pero sí en Excel/PDF). M y N = bon_quantity y bon_amount del invoice (mismo que cargar datos).
-      foreach ($bondProjectItems as $projectItem) {
-         $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
-
-         $sum_H_contract += $bondResult['contract_amount'];
-
-         $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
-         $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
-         $objWorksheet->setCellValue('M' . $fila, $bon_qty);
-         $objWorksheet->setCellValue('N' . $fila, $bon_amt);
-         $sum_N_pending += $bon_amt;
-
-         $objWorksheet->setCellValue("R{$fila}", 0);
-         $objWorksheet->setCellValue("S{$fila}", 0);
-
-         $aplicarFormatoFila($objWorksheet, $fila);
-         $item_number++;
-         $fila++;
       }
 
       // 7. TOTALES FOOTER
