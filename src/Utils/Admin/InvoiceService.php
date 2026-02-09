@@ -873,6 +873,16 @@ class InvoiceService extends Base
       $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
       $pending_balance_btd = $pending_qty_btd * $price;
 
+      // Si hay una nota con override_unpaid_qty (Payments), usar ese valor en M y N también
+      $notes = $this->ListarNotesDeItemInvoice($value->getId());
+      foreach ($notes as $note) {
+         if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+            $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
+            $pending_balance_btd = $pending_qty_btd * $price;
+            break;
+         }
+      }
+
       $unit = $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
 
       $objWorksheet

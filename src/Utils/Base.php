@@ -1502,8 +1502,15 @@ class Base
          $paid_amount_total = $value->getPaidAmountTotal();
          $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
 
-         // notes
+         // notes (orden DESC por fecha: la más reciente primero)
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
+         // Si alguna nota tiene override_unpaid_qty, usar el de la más reciente al cargar datos
+         foreach ($notes as $note) {
+            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+               $unpaid_qty = (float) $note['override_unpaid_qty'];
+               break;
+            }
+         }
 
          $project_item_id = $value->getProjectItem()->getId();
          /** @var \App\Repository\ProjectItemHistoryRepository $historyRepo */
