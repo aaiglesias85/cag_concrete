@@ -1196,16 +1196,13 @@ class InvoiceService extends Base
             $em->flush();
             $em->refresh($entity);
          }
-         // Valores para la vista: mismo criterio que Excel (Amount Earned Less Retainage = Total Billed - L Retainer)
+         // Valores para la vista: Current retainage ($) = retención de este invoice; Less Retainers = acumulado (mismo criterio que Excel)
          $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
          $effective_current = $retainage_efectivo['effective_current'];
-         $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
-         $total_billed = (float) $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
-         $amount_earned_less_retainage = $total_billed - $effective_current;
 
-         $arreglo_resultado['invoice_retainage_calculated'] = $effective_current;
-         $arreglo_resultado['invoice_current_retainage'] = $amount_earned_less_retainage; // Current Retainer box = AMOUNT EARNED LESS RETAINAGE (Total - L Retainer)
-         $arreglo_resultado['invoice_retainage_accumulated'] = $retainage_efectivo['total_retainage_accumulated'];
+         $arreglo_resultado['invoice_retainage_calculated'] = $effective_current;   // current retainage en $ (este invoice)
+         $arreglo_resultado['invoice_current_retainage'] = $effective_current;     // Current Retainer box = current retainage ($)
+         $arreglo_resultado['invoice_retainage_accumulated'] = $retainage_efectivo['total_retainage_accumulated']; // Less Retainers (acumulado)
 
          // projects
          $projects = $this->ListarProjectsDeCompany($company_id);

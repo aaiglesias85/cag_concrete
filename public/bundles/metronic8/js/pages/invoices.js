@@ -1074,8 +1074,9 @@ var Invoices = (function () {
          } else {
             $('#invoice_current_retainage_display').val('$0.00');
          }
-         if (invoice.invoice_retainage_calculated != null && invoice.invoice_retainage_calculated !== '') {
-            $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(invoice.invoice_retainage_calculated, 2, '.', ','));
+         // L Retainer = Less Retainers (acumulado: current retainage de este invoice + anteriores)
+         if (invoice.invoice_retainage_accumulated != null && invoice.invoice_retainage_accumulated !== '') {
+            $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(invoice.invoice_retainage_accumulated, 2, '.', ','));
          } else {
             $('#invoice_retainage_calculated_display').val('$0.00');
          }

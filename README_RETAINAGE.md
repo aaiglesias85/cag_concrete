@@ -20,9 +20,9 @@ Este documento describe cómo se maneja el **retainage** (retención) en el sist
 | Aspecto | Retainage del **Invoice** | Retainage de **Payments** |
 |--------|----------------------------|----------------------------|
 | **Dónde se usa** | Solo en el invoice: pantalla (tab Items), Excel y PDF. | Módulo de Payments (pestaña del proyecto). |
-| **Base de cálculo** | Suma de **Final Amount This Period** de ítems tipo R del **invoice actual**. | Monto **pagado** (paid amount) de ítems con retainage en los payments. |
-| **Avance del contrato** | Acumulado de **cantidades facturadas** (Final Amount This Period de ítems R) hasta ese invoice. | Acumulado de **lo pagado** en invoices anteriores + actual. |
-| **Dónde se guarda** | Campos en la tabla `invoice`: `invoice_current_retainage`, `invoice_retainage_calculated`. | No se guarda un monto único en BD; se calcula en tiempo real en Payments. |
+| **Base de cálculo** | **Current retainage:** suma Final Amount This Period solo ítems R del invoice actual × % del proyecto. **Less Retainers:** acumulado de ese current retainage ($) de este invoice + anteriores. | Monto **pagado** (paid amount) de ítems con retainage en los payments. |
+| **Avance del contrato** | Acumulado de **cantidades facturadas** (Final Amount This Period de ítems R) hasta ese invoice; define si se usa `retainage_percentage` o `retainage_adjustment_percentage`. | Acumulado de **lo pagado** en invoices anteriores + actual. |
+| **Dónde se guarda** | En `invoice`: `invoice_current_retainage` (suma base ítems R), `invoice_retainage_calculated` (current retainage en $). Less Retainers se calcula al cargar/exportar. | No se guarda un monto único en BD; se calcula en tiempo real en Payments. |
 | **Objetivo** | Valor a **imprimir/exportar** en el invoice (Excel/PDF). | Mostrar retainage en la pestaña de pagos y convivir con reimbursable y otros conceptos. |
 
 **Conclusión:** El retainage de Payments y el retainage del Invoice son dos cálculos separados. Mantenerlos separados evita doble impacto y errores.
@@ -33,37 +33,40 @@ Este documento describe cómo se maneja el **retainage** (retención) en el sist
 
 ### 2.1 Objetivo
 
-Calcular un **Current Retainer** y un **L Retainer** (retainage en $) exclusivos del invoice, para mostrarlos en la pantalla (tab Items) y en el **Excel/PDF** del invoice. No afecta al módulo de Payments ni al proyecto fuera del invoice.
+Calcular el **Current retainage** (retención en $ de este invoice) y **Less Retainers** (valor acumulado) para mostrarlos en la pantalla (tab Items) y en el **Excel/PDF** del invoice. No afecta al módulo de Payments ni al proyecto fuera del invoice.
 
 ### 2.2 Definiciones
 
-- **Current Retainer (invoice):** Suma del campo **Final Amount This Period** de todos los ítems del invoice que son tipo **Retainage (R)** — es decir, ítems cuyo `ProjectItem.apply_retainage = 1`.
+- **Base del current retainage:** Suma del campo **Final Amount This Period** en el invoice **solo de los ítems tipo Retainage (R)** del invoice actual — es decir, ítems del proyecto con `ProjectItem.apply_retainage = true`.
   - Fórmula por ítem: `(quantity + quantity_brought_forward) * price`.
-  - Se guarda en `invoice.invoice_current_retainage`.
+  - A esta suma se le aplica un **porcentaje** que sale del proyecto (ver 2.3).
 
-- **L Retainer (Less Retainage):** Monto en $ que se retiene en este invoice. Es el valor que se **imprime** en el Excel/PDF.
-  - Se calcula aplicando un **porcentaje** al Current Retainer.
-  - El porcentaje se decide según el **avance del contrato** y la configuración del proyecto (tab Retainage).
-  - Se guarda en `invoice.invoice_retainage_calculated`.
+- **Current retainage (en $):** Es la retención de **este** invoice. Se obtiene aplicando el porcentaje del proyecto a la suma anterior:
+  - **Current retainage ($)** = (suma Final Amount This Period solo ítems R del invoice actual) × (porcentaje elegido / 100).
+  - Se guarda en `invoice.invoice_retainage_calculated`. En BD también se guarda la suma base en `invoice.invoice_current_retainage` para referencia.
+
+- **Less Retainers:** Valor **acumulado**. Representa la suma del **current_retainage** (en $) del invoice actual más todos los **current_retainage** (en $) de los invoices anteriores.
+  - Se calcula recorriendo los invoices del proyecto en **orden cronológico** y sumando el current retainage ($) de cada uno (con la regla de límite de mano de obra aplicada; ver 5.2).
+  - No se guarda en BD; se calcula al cargar el invoice y al exportar Excel/PDF.
 
 ### 2.3 Regla del porcentaje (proyecto)
 
 La configuración está en el **proyecto**, pestaña **Retainage**:
 
-- **Contract amount (contra amount):** `project.contract_amount`.
+- **Contract amount:** `project.contract_amount`.
 - **Percentage of contra completion:** `project.retainage_adjustment_completion` (ej. 50).
 - **Porcentaje por defecto:** `project.retainage_percentage` (ej. 10%).
 - **Porcentaje ajustado:** `project.retainage_adjustment_percentage` (ej. 5%).
 
 Lógica:
 
-1. Se calcula el **avance del contrato** hasta (e incluyendo) este invoice:
+1. Se calcula el **avance** hasta (e incluyendo) este invoice:
    - Acumulado = suma de **Final Amount This Period** (solo ítems R) de todos los invoices del proyecto en orden cronológico hasta el invoice actual.
 2. **Porcentaje de avance** = (Acumulado / contract_amount) × 100.
-3. Si el porcentaje de avance es **mayor o igual** a “percentage of contra completion”, se usa el **porcentaje ajustado** (ej. 5%). Si no, se usa el **porcentaje por defecto** (ej. 10%).
-4. **L Retainer** = Current Retainer × (porcentaje elegido / 100).
+3. Si este porcentaje de avance es **mayor o igual** a `retainage_adjustment_completion`, se usa **retainage_adjustment_percentage**. Si no, se usa **retainage_percentage**.
+4. **Current retainage ($)** = (suma Final Amount This Period solo ítems R del invoice actual) × (porcentaje elegido / 100).
 
-Todos los porcentajes y el contract amount provienen **solo del proyecto**.
+Todos los valores provienen **solo del proyecto**.
 
 ### 2.4 Cuándo se recalcula
 
@@ -83,19 +86,21 @@ En la tabla `invoice`:
 
 | Campo | Tipo | Descripción |
 |-------|------|-------------|
-| `invoice_current_retainage` | DECIMAL(18,2) NULL | Suma Final Amount This Period de ítems R del invoice. |
-| `invoice_retainage_calculated` | DECIMAL(18,2) NULL | Retainage en $ para este invoice (el que se imprime). |
+| `invoice_current_retainage` | DECIMAL(18,2) NULL | Suma base: Final Amount This Period solo ítems R del invoice (referencia para el cálculo). |
+| `invoice_retainage_calculated` | DECIMAL(18,2) NULL | **Current retainage en $** para este invoice (suma base × porcentaje; es el valor que se imprime). |
+
+Less Retainers (acumulado) no se guarda en BD; se calcula al cargar y al exportar.
 
 Script: `database/cambios_constructora_invoice_retainage_07_02.sql`.
 
 ### 2.6 UI (tab Items del invoice)
 
-En el tab **Items** del invoice (pantalla completa y modal) se muestran dos cajas de solo lectura:
+En el tab **Items** del invoice (pantalla completa y modal) se muestran cajas de solo lectura rellenadas con los valores efectivos (incluyendo la regla de límite de mano de obra):
 
-- **Current Retainer:** valor de `invoice_current_retainage`.
-- **L Retainer:** valor de `invoice_retainage_calculated`.
+- **Current Retainer:** **Current retainage** en $ para este invoice (valor efectivo, 0 si aplica límite).
+- **Less Retainers (L Retainer):** valor **acumulado** (current retainage de este invoice + todos los anteriores en orden cronológico).
 
-Se rellenan al cargar el invoice y se resetean al crear uno nuevo.
+Se rellenan al cargar el invoice con los resultados de `CalcularRetainageEfectivoParaInvoice` y se resetean al crear uno nuevo.
 
 ---
 
@@ -145,7 +150,7 @@ Tanto la exportación a **Excel** como a **PDF** del invoice usan el **Less Reta
 
 ### 5.1 Less Retainers en Excel (descripción)
 
-**Less Retainers** es un valor **acumulado**: la suma del **current_retainage** del invoice actual más todos los **current_retainage** de los invoices anteriores. Los invoices se procesan en **orden cronológico** (por `start_date`, luego `invoice_id`).
+**Less Retainers** es un valor **acumulado**: la suma del **current retainage** (en $) del invoice actual más todos los **current retainage** (en $) de los invoices anteriores. Los invoices se procesan en **orden cronológico** (por `start_date`, luego `invoice_id`).
 
 ### 5.2 Reglas de negocio aplicadas al exportar
 
@@ -162,21 +167,21 @@ total_billed_amount (acumulado) > Total_contract_amount
 
 entonces, para **ese** invoice (y los siguientes mientras sigan superando el límite):
 
-- **current_retainage** = 0  
+- **Current retainage** ($) = 0  
 - **Less Retainers** = 0  
 
 En ese caso no se aplica retainage (el acumulado se pone a 0 desde ese invoice).
 
 #### 2. Cálculo normal (cuando no se supera el límite)
 
-- **Primer invoice:** Less Retainers = current_retainage de ese invoice.
-- **Cada invoice siguiente:** Less Retainers = Less Retainers del paso anterior + current_retainage de este invoice.
+- **Primer invoice:** Less Retainers = current retainage ($) de ese invoice.
+- **Cada invoice siguiente:** Less Retainers = Less Retainers del paso anterior + current retainage ($) de este invoice.
 
-Es decir, Less Retainers es siempre el **acumulado** de los `invoice_retainage_calculated` (current_retainage) de los invoices ya procesados, aplicando la regla 1 en cada paso.
+Es decir, Less Retainers es siempre el **acumulado** de los `invoice_retainage_calculated` (current retainage en $) de los invoices ya procesados, aplicando la regla 1 en cada paso.
 
 #### 3. Regla de recálculo
 
-Si se modifica un invoice anterior (por ejemplo cambia su `current_retainage` o los ítems), al **volver a exportar** el Excel/PDF se recalculan Less Retainers recorriendo de nuevo todos los invoices en orden cronológico. La regla del límite de mano de obra se evalúa de nuevo para cada invoice en ese recorrido. No se guarda “Less Retainers” por invoice en BD; se calcula en cada exportación a partir del estado actual de todos los invoices.
+Si se modifica un invoice anterior (por ejemplo cambia su current retainage o los ítems), al **volver a exportar** el Excel/PDF se recalculan Less Retainers recorriendo de nuevo todos los invoices en orden cronológico. La regla del límite de mano de obra se evalúa de nuevo para cada invoice en ese recorrido. No se guarda “Less Retainers” por invoice en BD; se calcula en cada exportación a partir del estado actual de todos los invoices.
 
 ### 5.3 Valores escritos en Excel/PDF
 
