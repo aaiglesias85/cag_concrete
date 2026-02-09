@@ -94,39 +94,64 @@
     animation: pulse-yellow 0.6s ease-out;
 }
 
-/* Agrega esto en tu <style> */
-
-/* 1. Definimos el movimiento del brillo */
-@keyframes border-travel {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+/* Definición de la animación de brillo */
+@keyframes shine-sweep {
+    0% {
+        left: -100%;
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    50% {
+        left: 200%; /* Se mueve hacia la derecha fuera de la tarjeta */
+        opacity: 0;
+    }
+    100% {
+        left: 200%;
+        opacity: 0;
+    }
 }
 
-/* EFECTO DE BRILLO DORADO (SHINE) */
-@keyframes shine-pass {
-    0% { background-position: 200% center; }
-    100% { background-position: -200% center; }
-}
-
-.card-shine-effect {
+/* Clase para aplicar el efecto */
+.card-elegant-shine {
     position: relative;
-    overflow: hidden;
-    /* Crea un degradado inclinado con una franja de luz en el medio */
-    background: linear-gradient(120deg, 
-        rgba(255, 199, 0, 0.05) 30%, 
-        rgba(255, 199, 0, 0.4) 50%, 
-        rgba(255, 199, 0, 0.05) 70%) !important;
-    background-size: 200% auto !important;
-    
-    /* Velocidad: 3 segundos (suave y elegante) */
-    animation: shine-pass 3s linear infinite !important;
-    
-    border-color: #ffc700 !important;
-    box-shadow: 0 0 15px rgba(255, 199, 0, 0.25);
-    transition: all 0.3s ease;
-
+    overflow: hidden !important; /* Mantiene el brillo dentro de los bordes redondeados */
+    /* Opcional: una transición suave si pasas el mouse */
+    transition: transform 0.3s ease; 
 }
+
+.card-elegant-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%; /* Ancho del haz de luz */
+    height: 100%;
+    /* Degradado blanco sutil e inclinado */
+    background: linear-gradient(
+        120deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.3) 50%, /* Ajusta 0.3 para más o menos intensidad */
+        transparent 100%
+    );
+    transform: skewX(-25deg); /* Inclina el haz de luz */
+    pointer-events: none; /* Permite hacer clic en los inputs debajo del brillo */
+    
+    /* Configuración de la animación: 
+       Duración 3s, espera 0.5s al inicio, corre 1 vez (o pon 'infinite' si quieres bucle) */
+    animation: shine-sweep 3s ease-in-out 0.5s 1 forwards; 
+}
+
+/* Escalonar la animación para que sea más elegante (efecto ola) */
+.card-elegant-shine:nth-child(1)::after { animation-delay: 0.2s; }
+.card-elegant-shine:nth-child(2)::after { animation-delay: 0.4s; }
+.card-elegant-shine:nth-child(3)::after { animation-delay: 0.6s; }
+.card-elegant-shine:nth-child(4)::after { animation-delay: 0.8s; }
+.card-elegant-shine:nth-child(5)::after { animation-delay: 1.0s; }
+.card-elegant-shine:nth-child(6)::after { animation-delay: 1.2s; }
+.card-elegant-shine:nth-child(7)::after { animation-delay: 1.4s; }
+.card-elegant-shine:nth-child(8)::after { animation-delay: 1.6s; }
 
 </style>
 {% endblock %} {% block content %}
@@ -583,50 +608,48 @@
                                  </div>
 
                                  <!-- totales -->
-<div class="d-flex flex-nowrap align-items-center gap-3 mb-6 mt-1 overflow-auto pb-2">
-    <div class="card card-dashed flex-center min-w-130px p-2">
-        <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Contract</span>
-        <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_contract_amount" readonly value="$0.00" />
-    </div>
+<div class="card card-dashed card-elegant-shine flex-center min-w-130px p-2">
+    <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Contract</span>
+    <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_contract_amount" readonly value="$0.00" />
+</div>
 
-    <div class="card bg-info bg-opacity-10 flex-center min-w-130px p-2 border border-info border-opacity-10">
-        <span class="fs-9 fw-bolder text-info text-uppercase d-block mb-n1">Total To Date</span>
-        <input type="text" class="text-info fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_completed" readonly value="$0.00" />
-    </div>
+<div class="card bg-info bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-info border-opacity-10">
+    <span class="fs-9 fw-bolder text-info text-uppercase d-block mb-n1">Total To Date</span>
+    <input type="text" class="text-info fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_completed" readonly value="$0.00" />
+</div>
 
-    <div class="card bg-danger bg-opacity-10 flex-center min-w-130px p-2 border border-danger border-opacity-10">
-        <span class="fs-9 fw-bolder text-danger text-uppercase d-block mb-n1">Unpaid</span>
-        <input type="text" class="text-danger fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_unpaid" readonly value="$0.00" />
-    </div>
+<div class="card bg-danger bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-danger border-opacity-10">
+    <span class="fs-9 fw-bolder text-danger text-uppercase d-block mb-n1">Unpaid</span>
+    <input type="text" class="text-danger fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_unpaid" readonly value="$0.00" />
+</div>
 
-    <div class="card bg-primary bg-opacity-10 flex-center min-w-130px p-2 border border-primary border-opacity-10">
-        <span class="fs-9 fw-bolder text-primary text-uppercase d-block mb-n1">This Period</span>
-        <input type="text" class="text-primary fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_period" readonly value="$0.00" />
-    </div>
+<div class="card bg-primary bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-primary border-opacity-10">
+    <span class="fs-9 fw-bolder text-primary text-uppercase d-block mb-n1">This Period</span>
+    <input type="text" class="text-primary fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_period" readonly value="$0.00" />
+</div>
 
-    <div class="card bg-dark bg-opacity-10 flex-center min-w-130px p-2 border border-gray-600 border-opacity-10">
-        <span class="fs-9 fw-bolder text-gray-700 text-uppercase d-block mb-n1">Final Period</span>
-        <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
-    </div>
+<div class="card bg-dark bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-gray-600 border-opacity-10">
+    <span class="fs-9 fw-bolder text-gray-700 text-uppercase d-block mb-n1">Final Period</span>
+    <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
+</div>
 
-    <div class="card card-dashed flex-center min-w-130px p-2">
-        <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Current retainage</span>
-        <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_current_retainage_display" readonly value="$0.00" />
-    </div>
-    <div class="card card-dashed flex-center min-w-130px p-2">
-        <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Less retainage </span>
-        <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_retainage_calculated_display" readonly value="$0.00" />
-    </div>
+<div class="card card-dashed card-elegant-shine flex-center min-w-130px p-2">
+    <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Current retainage</span>
+    <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_current_retainage_display" readonly value="$0.00" />
+</div>
 
-    <div id="card-bond" class="d-flex gap-3 flex-nowrap align-items-end">
-        <div class="text-center">
-            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount</span>
-            <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="total_bonded_y" readonly value="0.00" />
-        </div>
-        <div class="text-center">
-            <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Qty (0-1)</span>
-            <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="total_bonded_x" readonly value="0.00" />
-        </div>
+<div class="card card-dashed card-elegant-shine flex-center min-w-130px p-2">
+    <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Less retainage </span>
+    <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_retainage_calculated_display" readonly value="$0.00" />
+</div>
+
+<div id="card-bond" class="d-flex gap-3 flex-nowrap align-items-end card-elegant-shine position-relative overflow-hidden" style="border-radius: 0.475rem;">
+    <div class="text-center position-relative z-index-1"> <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount</span>
+        <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="total_bonded_y" readonly value="0.00" />
+    </div>
+    <div class="text-center position-relative z-index-1">
+        <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Qty (0-1)</span>
+        <input type="text" class="form-control form-control-solid form-control-sm text-center w-100px" id="total_bonded_x" readonly value="0.00" />
     </div>
 </div>
                               </div>
