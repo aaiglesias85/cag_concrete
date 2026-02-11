@@ -2503,12 +2503,20 @@ var Invoices = (function () {
          var posicion = $this.attr('data-position');
          
          if (items_lista[posicion]) {
+            var base = Number(items_lista[posicion].base_debt || 0);
             var new_qbf = Number($this.val() || 0);
+            // Regla: QBF no puede ser mayor que lo debido (unpaid previo)
+            if (new_qbf > base) {
+               new_qbf = base;
+               $this.val(base);
+               if (typeof toastr !== 'undefined') {
+                  toastr.error('QBF no puede ser mayor que lo debido (' + MyApp.formatearNumero(base, 2, '.', ',') + ').');
+               }
+            }
             items_lista[posicion].quantity_brought_forward = new_qbf;
 
             // --- CÁLCULO EN VIVO
             // Unpaid = DeudaBase - QBF Actual
-            var base = Number(items_lista[posicion].base_debt || 0);
             var new_unpaid = Math.max(0, base - new_qbf);
 
             items_lista[posicion].unpaid_qty = new_unpaid;

@@ -490,6 +490,8 @@ var ModalInvoice = (function () {
                      for (let item of response.items) {
                         var posicion = items.length;
 
+                        var uq = Number(item.unpaid_qty) || 0;
+                        var qbf = Number(item.quantity_brought_forward) || 0;
                         items.push({
                            invoice_item_id: '',
                            project_item_id: item.project_item_id,
@@ -501,17 +503,18 @@ var ModalInvoice = (function () {
                            price: item.price,
                            contract_amount: item.contract_amount,
                            quantity_from_previous: item.quantity_from_previous ?? 0,
-                           unpaid_qty: item.unpaid_qty ?? 0,
+                           unpaid_qty: uq,
                            quantity_completed: item.quantity_completed,
                            amount: item.amount,
                            total_amount: item.total_amount,
                            paid_amount_total: item.paid_amount_total,
                            amount_from_previous: item.amount_from_previous,
                            amount_completed: item.amount_completed,
-                           quantity_brought_forward: item.quantity_brought_forward,
+                           quantity_brought_forward: qbf,
                            quantity_final: item.quantity_final,
                            amount_final: item.amount_final,
                            unpaid_amount: item.unpaid_amount,
+                           base_debt: uq + qbf,
                            principal: item.principal,
                            change_order: item.change_order,
                            change_order_date: item.change_order_date,
@@ -1364,15 +1367,22 @@ var ModalInvoice = (function () {
          var $this = $(this);
          var posicion = $this.attr('data-position');
          if (items_lista[posicion]) {
+            var base = Number(items_lista[posicion].base_debt || 0);
             var quantity = Number($this.val() || 0);
+            // Regla: QBF no puede ser mayor que lo debido (unpaid previo)
+            if (quantity > base) {
+               quantity = base;
+               $this.val(base);
+               if (typeof toastr !== 'undefined') {
+                  toastr.error('QBF no puede ser mayor que lo debido (' + MyApp.formatearNumero(base, 2, '.', ',') + ').');
+               }
+            }
             items_lista[posicion].quantity_brought_forward = quantity;
-            items_lista[posicion].quantity_final = items_lista[posicion].quantity + items_lista[posicion].quantity_brought_forward;
+            items_lista[posicion].quantity_final = items_lista[posicion].quantity + quantity;
             items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
-
-            // unpaid_qty ya viene correcto del backend (suma de unpaid_qty de invoices anteriores)
-            // NO recalcular porque ese valor ya está correcto
-            // Solo recalcular unpaid_amount
-            items_lista[posicion].unpaid_amount = items_lista[posicion].unpaid_qty * items_lista[posicion].price;
+            var new_unpaid = Math.max(0, base - quantity);
+            items_lista[posicion].unpaid_qty = new_unpaid;
+            items_lista[posicion].unpaid_amount = new_unpaid * items_lista[posicion].price;
 
             actualizarTableListaItems();
          }
