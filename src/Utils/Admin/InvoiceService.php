@@ -901,16 +901,33 @@ class InvoiceService extends Base
          }
       }
 
-      // PENDING QTY (BTD) y PENDING BALANCE (BTD): mismo criterio que en Payments
-      // En Payments: unpaid_qty = quantity_final - paid_qty (lo que falta por pagar de este invoice)
-      $quantity_final = $qty + ($qbf ?? 0.0);
-      $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
-      $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
-      $pending_balance_btd = $pending_qty_btd * $price;
-
-      // Si hay una nota con override_unpaid_qty (Payments), usar ese valor en M y N también.
-      // No aplicar para ítem Bond: M y N del Bond se fijan después con bon_quantity/bon_amount.
+      // PENDING QTY (BTD) y PENDING BALANCE (BTD) — solo para ítems NO Bond (el Bond no se toca).
+      // Pending QTY (BTD) = Suma (Qty This Period de invoices anteriores) − Suma (Paid Qty en pagos de invoices anteriores).
+      // Paid Qty: mismo campo que usa Payments (invoice_item.paid_qty, persistido en PaymentService al guardar pagos).
+      $pending_qty_btd = 0.0;
+      $pending_balance_btd = 0.0;
       if (!$value->getProjectItem()->getItem()->getBond()) {
+         $sum_qty_this_period_previous = 0.0;
+         $sum_paid_qty_previous = 0.0;
+         $project_item_id = $value->getProjectItem()->getId();
+         foreach ($allInvoicesHistory as $inv) {
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
+               break;
+            }
+            $prev_items = $invoiceItemRepo->ListarItems($inv->getInvoiceId());
+            foreach ($prev_items as $prevItem) {
+               if ($prevItem->getProjectItem()->getId() === $project_item_id) {
+                  $sum_qty_this_period_previous += (float) $prevItem->getQuantity();
+                  // getPaidQty() = invoice_item.paid_qty, mismo valor que usa el módulo Payments
+                  $sum_paid_qty_previous += (float) ($prevItem->getPaidQty() ?? 0);
+                  break;
+               }
+            }
+         }
+         $pending_qty_btd = max(0.0, $sum_qty_this_period_previous - $sum_paid_qty_previous);
+         $pending_balance_btd = $pending_qty_btd * $price;
+
+         // Si hay una nota con override_unpaid_qty (Payments), usar ese valor en M y N también.
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
          foreach ($notes as $note) {
             if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
@@ -919,6 +936,12 @@ class InvoiceService extends Base
                break;
             }
          }
+      } else {
+         // Ítem Bond: M y N se fijan después con bon_quantity/bon_amount en el flujo de exportación (no se toca aquí).
+         $quantity_final = $qty + ($qbf ?? 0.0);
+         $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
+         $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
+         $pending_balance_btd = $pending_qty_btd * $price;
       }
 
       $unit = $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
@@ -936,7 +959,7 @@ class InvoiceService extends Base
          ->setCellValue('K' . $fila, $previous_bill_qty)    // PREVIOUS BILL QTY = Final Invoiced Quantity del invoice anterior
          ->setCellValue('L' . $fila, $previous_bill_amount)  // PREVIOUS BILL AMOUNT = Final Amount This Period del invoice anterior
 
-         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = quantity_final - paid_qty (como en Payments)
+         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = suma(Qty This Period anteriores) − suma(Paid Qty anteriores). Bond se sobrescribe después.
          ->setCellValue('N' . $fila, $pending_balance_btd)   // PENDING BALANCE (BTD) = pending_qty_btd * price
 
          ->setCellValue('O' . $fila, $qty)           // QTY THIS PERIOD
