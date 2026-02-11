@@ -11,6 +11,7 @@ use App\Entity\Inspector;
 use App\Entity\Invoice;
 use App\Entity\ReimbursementHistory;
 use App\Entity\Item;
+use App\Entity\Project;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Entity\EmployeeRole;
@@ -471,8 +472,12 @@ class ProjectController extends AbstractController
          $retainageContext = $this->invoiceService->getRetainageContextForProject($project_id);
          $retainageValues = $this->invoiceService->getRetainageForDraftItems($project_id, $result['items']);
 
+         $project = $this->projectService->getDoctrine()->getRepository(Project::class)->find($project_id);
+         $contract_amount = $project && $project->getContractAmount() !== null ? (float) $project->getContractAmount() : 0.0;
+
          $resultadoJson['success'] = true;
          $resultadoJson['items'] = $result['items'];
+         $resultadoJson['contract_amount'] = $contract_amount;
          $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
          $resultadoJson['bond_price'] = $result['bond_price'];
          $resultadoJson['bon_general'] = $result['bon_general'] ?? null;

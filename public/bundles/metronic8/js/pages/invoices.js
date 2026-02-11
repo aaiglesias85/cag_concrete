@@ -563,8 +563,10 @@ var Invoices = (function () {
       items = [];
       items_lista = [];
       retainageContext = null;
+      projectContractAmount = 0;
       actualizarTableListaItems();
 
+      $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
       $('#total_bonded_x').val('0.00');
       $('#total_bonded_y').val('0.00');
 
@@ -1045,7 +1047,11 @@ var Invoices = (function () {
 
          $('#project').val(invoice.project_id);
          $('#project').trigger('change');
-     
+
+         // Contract amount del proyecto (caja Contract)
+         projectContractAmount = Number(invoice.contract_amount) || 0;
+         $('#total_contract_amount').val(MyApp.formatMoney(projectContractAmount, 2, '.', ','));
+
          if (invoice.start_date && invoice.start_date !== '') {   
             let cleanStartDate = invoice.start_date.split(' ')[0]; 
             FlatpickrUtil.setDate('datetimepicker-start-date', cleanStartDate);
@@ -1483,6 +1489,8 @@ var Invoices = (function () {
       var invoice_id = $('#invoice_id').val();
       if (invoice_id == '') {
          items = [];
+         projectContractAmount = 0;
+         $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
          $('#total_bonded_x').val('0.00');
          $('#total_bonded_y').val('0.00');
          actualizarTableListaItems();
@@ -1503,6 +1511,8 @@ var Invoices = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
+                     // Contract amount del proyecto (para la caja Contract)
+                     projectContractAmount = Number(response.contract_amount) || 0;
                      // Guardar sum_bonded_project, bond_price y bond_general para cálculo de X e Y
                      sum_bonded_project = Number(response.sum_bonded_project || 0);
                      bond_price = Number(response.bond_price || 0);
@@ -1512,8 +1522,8 @@ var Invoices = (function () {
                      retainageContext = response.retainage_context || null;
                      // Valores listos para pintar (calculados en backend)
                      if (response.retainage_current != null && response.retainage_accumulated != null) {
-                        $('#invoice_current_retainage_display').val('$' + MyApp.formatMoney(response.retainage_current, 2, '.', ','));
-                        $('#invoice_retainage_calculated_display').val('$' + MyApp.formatMoney(response.retainage_accumulated, 2, '.', ','));
+                        $('#invoice_current_retainage_display').val(MyApp.formatMoney(response.retainage_current, 2, '.', ','));
+                        $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(response.retainage_accumulated, 2, '.', ','));
                      }
 
                      //Llenar select
@@ -1638,8 +1648,8 @@ var Invoices = (function () {
       var current_retainage = base_current_retainage * (pct_to_use / 100);
       var total_accumulated = accumulated_retainage_previous + current_retainage;
 
-      $('#invoice_current_retainage_display').val('$' + MyApp.formatMoney(current_retainage, 2, '.', ','));
-      $('#invoice_retainage_calculated_display').val('$' + MyApp.formatMoney(total_accumulated, 2, '.', ','));
+      $('#invoice_current_retainage_display').val(MyApp.formatMoney(current_retainage, 2, '.', ','));
+      $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(total_accumulated, 2, '.', ','));
    };
 
    var projects = [];
@@ -1753,6 +1763,7 @@ var Invoices = (function () {
    var items = [];
    var items_lista = [];
    var retainageContext = null; // De listarItemsParaInvoice para cálculo de retainage en frontend
+   var projectContractAmount = 0; // Contract amount del proyecto del invoice (para la caja Contract)
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto (monto ítem Bond) para Y = bond_general * X
@@ -2152,13 +2163,13 @@ var Invoices = (function () {
                }
                // Columnas de totales numéricos
                else if (colsToSum.includes(idx)) {
-                  const { total } = sumCol(idx);
-
+                  // Columna 4 = Contract: mostrar contract amount del proyecto, no la suma de ítems
+                  const total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
                   const selector = totalsSelectors[idx];
                   if (selector) {
                      const $input = $(selector);
                      if ($input.length) {
-                        $input.val('$' + MyApp.formatMoney(total, 2, '.', ','));
+                        $input.val(MyApp.formatMoney(total, 2, '.', ','));
                      }
                   }
 
@@ -2208,7 +2219,7 @@ var Invoices = (function () {
 
       // Mostrar X e Y en la card (Y en $)
       $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
-      $('#total_bonded_y').val('$' + MyApp.formatMoney(y, 2, '.', ','));
+      $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
 
    var handleChangeOrderHistory = function () {

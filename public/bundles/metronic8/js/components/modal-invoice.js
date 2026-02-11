@@ -30,8 +30,10 @@ var ModalInvoice = (function () {
       // items
       items = [];
       retainageContext = null;
-      $('#modal_invoice_current_retainage').val('$0.00');
-      $('#modal_invoice_retainage_calculated').val('$0.00');
+      projectContractAmount = 0;
+      $('#modal_total_contract_amount').val('0.00');
+      $('#modal_invoice_current_retainage').val('0.00');
+      $('#modal_invoice_retainage_calculated').val('0.00');
       actualizarTableListaItems();
 
       //Mostrar el primer tab
@@ -452,6 +454,8 @@ var ModalInvoice = (function () {
 
       // reset
       items = [];
+      projectContractAmount = 0;
+      $('#modal_total_contract_amount').val('0.00');
       $('#modal_total_bonded_x').val('0.00');
       $('#modal_total_bonded_y').val('0.00');
       actualizarTableListaItems();
@@ -471,14 +475,16 @@ var ModalInvoice = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
+                     // Contract amount del proyecto (para la caja Contract)
+                     projectContractAmount = Number(response.contract_amount) || 0;
                      // Guardar sum_bonded_project y bond_price para cálculo de X e Y
                      sum_bonded_project = Number(response.sum_bonded_project || 0);
                      bond_price = Number(response.bond_price || 0);
                      bond_general = Number(response.bon_general || 0);
                      retainageContext = response.retainage_context || null;
                      if (response.retainage_current != null && response.retainage_accumulated != null) {
-                        $('#modal_invoice_current_retainage').val('$' + MyApp.formatMoney(response.retainage_current, 2, '.', ','));
-                        $('#modal_invoice_retainage_calculated').val('$' + MyApp.formatMoney(response.retainage_accumulated, 2, '.', ','));
+                        $('#modal_invoice_current_retainage').val(MyApp.formatearNumero(response.retainage_current, 2, '.', ','));
+                        $('#modal_invoice_retainage_calculated').val(MyApp.formatearNumero(response.retainage_accumulated, 2, '.', ','));
                      }
 
                      console.log('--- Datos cargados desde backend (MODAL - project/listarItemsParaInvoice) ---');
@@ -559,8 +565,8 @@ var ModalInvoice = (function () {
    var actualizarRetainagePreviewModal = function () {
       var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       if (!retainageContext || items_a_calcular.length === 0) {
-         $('#modal_invoice_current_retainage').val('$0.00');
-         $('#modal_invoice_retainage_calculated').val('$0.00');
+         $('#modal_invoice_current_retainage').val('0.00');
+         $('#modal_invoice_retainage_calculated').val('0.00');
          return;
       }
       var ctx = retainageContext;
@@ -587,8 +593,8 @@ var ModalInvoice = (function () {
       });
 
          if (contract_amount > 0 && total_billed_previous + total_billed_current > contract_amount) {
-         $('#modal_invoice_current_retainage').val('$0.00');
-         $('#modal_invoice_retainage_calculated').val('$0.00');
+         $('#modal_invoice_current_retainage').val('0.00');
+         $('#modal_invoice_retainage_calculated').val('0.00');
          return;
       }
 
@@ -601,8 +607,8 @@ var ModalInvoice = (function () {
       var current_retainage = base_current_retainage * (pct_to_use / 100);
       var total_accumulated = accumulated_retainage_previous + current_retainage;
 
-      $('#modal_invoice_current_retainage').val('$' + MyApp.formatMoney(current_retainage, 2, '.', ','));
-      $('#modal_invoice_retainage_calculated').val('$' + MyApp.formatMoney(total_accumulated, 2, '.', ','));
+      $('#modal_invoice_current_retainage').val(MyApp.formatearNumero(current_retainage, 2, '.', ','));
+      $('#modal_invoice_retainage_calculated').val(MyApp.formatearNumero(total_accumulated, 2, '.', ','));
    };
 
    var projects = [];
@@ -683,6 +689,7 @@ var ModalInvoice = (function () {
    var items = [];
    var items_lista = [];
    var retainageContext = null; // De listarItemsParaInvoice para cálculo de retainage en frontend
+   var projectContractAmount = 0; // Contract amount del proyecto (para la caja Contract)
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto para Y = bond_general * X
@@ -964,13 +971,13 @@ var ModalInvoice = (function () {
                }
                // Columnas de totales numéricos
                else if (colsToSum.includes(idx)) {
-                  const { total } = sumCol(idx);
-
+                  // Columna 4 = Contract: mostrar contract amount del proyecto, no la suma de ítems
+                  const total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
                   const selector = totalsSelectors[idx];
                   if (selector) {
                      const $input = $(selector);
                      if ($input.length) {
-                        $input.val(MyApp.formatMoney(total, 2, '.', ','));
+                        $input.val(MyApp.formatearNumero(total, 2, '.', ','));
                      }
                   }
 

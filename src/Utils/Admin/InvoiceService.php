@@ -1387,7 +1387,10 @@ class InvoiceService extends Base
 
          $arreglo_resultado['project_id'] = $project_id;
 
-         $company_id = $entity->getProject()->getCompany()->getCompanyId();
+         $project = $entity->getProject();
+         $arreglo_resultado['contract_amount'] = $project && $project->getContractAmount() !== null ? (float) $project->getContractAmount() : 0.0;
+
+         $company_id = $project->getCompany()->getCompanyId();
          $arreglo_resultado['company_id'] = $company_id;
 
          $arreglo_resultado['number'] = $entity->getNumber();
