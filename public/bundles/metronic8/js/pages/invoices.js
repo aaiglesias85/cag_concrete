@@ -1358,6 +1358,17 @@ var Invoices = (function () {
 
    var offChangeStart;
    var offChangeEnd;
+   /** Impide pegar y teclear en el input de fecha; la fecha solo se elige por calendario */
+   var preventDateInputPasteAndKey = function (selector) {
+      var el = document.querySelector(selector);
+      if (!el) return;
+      el.addEventListener('paste', function (e) { e.preventDefault(); });
+      el.addEventListener('keydown', function (e) {
+         // Permitir Tab, flechas, Enter (para navegación y abrir calendario)
+         if (e.key === 'Tab' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Enter') return;
+         e.preventDefault();
+      });
+   };
    var initFlatpickr = function () {
       // filtros fechas
       const desdeInput = document.getElementById('datetimepicker-desde');
@@ -1380,15 +1391,19 @@ var Invoices = (function () {
          position: 'above',
       });
 
-      // start date
+      // start date (solo selección por calendario: no escribir ni pegar)
       FlatpickrUtil.initDate('datetimepicker-start-date', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+         allowInput: false,
       });
+      preventDateInputPasteAndKey('#start-date');
 
-      // end date
+      // end date (solo selección por calendario: no escribir ni pegar)
       FlatpickrUtil.initDate('datetimepicker-end-date', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+         allowInput: false,
       });
+      preventDateInputPasteAndKey('#end-date');
 
       initChangeFlatpickr();
    };

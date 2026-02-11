@@ -70,7 +70,7 @@ var FlatpickrUtil = (function () {
         var dateFormat = _mapFormat(loc.format, hasTime);
 
         var cfg = {
-            allowInput: true,
+            allowInput: (options && options.allowInput !== false),
             // Fecha vs Fecha+Hora
             enableTime: !!hasTime,
             noCalendar: false,
