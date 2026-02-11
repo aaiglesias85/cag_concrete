@@ -1528,12 +1528,28 @@ class InvoiceService extends Base
          $quantity_brought_forward = $value->getQuantityBroughtForward();
 
          $quantity_completed = $quantity + $quantity_from_previous;
-         $quantity_final = $quantity + $quantity_brought_forward;
+         $quantity_final = $quantity + ($quantity_brought_forward ?? 0);
 
          $total_amount = $quantity_completed * $price;
          $amount_from_previous = $quantity_from_previous * $price;
          $amount_completed = $quantity_completed * $price;
          $amount_final = $quantity_final * $price;
+         $amount = $quantity * $price;
+
+         // Ítem Bond: usar bon_quantity y bon_amount del invoice para que la tabla coincida con la caja amarilla (evitar redondeo quantity*price). Qty a 2 decimales.
+         if ($value->getProjectItem()->getItem()->getBond()) {
+            $bon_qty = $currentInvoice->getBonQuantity() !== null ? (float) $currentInvoice->getBonQuantity() : 0.0;
+            $bon_qty_rounded = round($bon_qty, 2);
+            $bon_amt = $currentInvoice->getBonAmount() !== null ? (float) $currentInvoice->getBonAmount() : 0.0;
+            $quantity = $bon_qty_rounded;
+            $quantity_final = $bon_qty_rounded;
+            $quantity_completed = $bon_qty_rounded;
+            $amount = $bon_amt;
+            $amount_final = $bon_amt;
+            $total_amount = $bon_amt;
+            $amount_completed = $bon_amt;
+            $amount_from_previous = 0.0;
+         }
 
          $paid_qty = $value->getPaidQty();
          $unpaid_amount = $unpaid_qty * $price;
@@ -1563,7 +1579,7 @@ class InvoiceService extends Base
             "unpaid_from_previous" => $unpaid_from_previous,
             "quantity" => $quantity,
             "quantity_completed" => $quantity_completed,
-            "amount" => $value->getQuantity() * $price,
+            "amount" => $amount,
             "total_amount" => $total_amount,
             "amount_from_previous" => $amount_from_previous,
             "amount_completed" => $amount_completed,
