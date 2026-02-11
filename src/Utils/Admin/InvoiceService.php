@@ -1111,6 +1111,130 @@ class InvoiceService extends Base
    }
 
    /**
+    * Contexto de retainage del proyecto para cálculo en frontend (invoice en borrador).
+    * Devuelve config del proyecto y acumulados de invoices anteriores; el frontend calcula current y total con los ítems.
+    *
+    * @param string|int $project_id
+    * @return array{contract_amount: float, retainage: bool, retainage_percentage: float, retainage_adjustment_percentage: float, retainage_adjustment_completion: float, accumulated_retainage_amount_previous: float, accumulated_base_retainage_previous: float, total_billed_previous: float}
+    */
+   public function getRetainageContextForProject($project_id): array
+   {
+      $project_id = (string) $project_id;
+      $em = $this->getDoctrine()->getManager();
+      $project = $em->getRepository(Project::class)->find($project_id);
+      if (!$project) {
+         return [
+            'contract_amount' => 0.0,
+            'retainage' => false,
+            'retainage_percentage' => 0.0,
+            'retainage_adjustment_percentage' => 0.0,
+            'retainage_adjustment_completion' => 0.0,
+            'accumulated_retainage_amount_previous' => 0.0,
+            'accumulated_base_retainage_previous' => 0.0,
+            'total_billed_previous' => 0.0,
+         ];
+      }
+
+      $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
+      $invoiceRepo = $em->getRepository(Invoice::class);
+      $total_contract_amount = (float) ($project->getContractAmount() ?? 0);
+
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+
+      $accumulated_previous_retainage = 0.0;
+      $accumulated_previous_base_retainage = 0.0;
+      $cumulative_billed = 0.0;
+
+      foreach ($allInvoices as $inv) {
+         if ($inv->getInvoiceRetainageCalculated() === null) {
+            $this->CalcularYGuardarRetainageInvoice($inv);
+            $em->flush();
+            $em->refresh($inv);
+         }
+
+         $billed_this = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $inv->getInvoiceId());
+         $cumulative_billed += $billed_this;
+
+         if ($total_contract_amount > 0 && $cumulative_billed > $total_contract_amount) {
+            $accumulated_previous_retainage = 0.0;
+            $accumulated_previous_base_retainage = 0.0;
+         } else {
+            $accumulated_previous_retainage += (float) ($inv->getInvoiceRetainageCalculated() ?? 0);
+            $accumulated_previous_base_retainage += $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly((string) $inv->getInvoiceId());
+         }
+      }
+
+      return [
+         'contract_amount' => $total_contract_amount,
+         'retainage' => (bool) $project->getRetainage(),
+         'retainage_percentage' => (float) ($project->getRetainagePercentage() ?? 0),
+         'retainage_adjustment_percentage' => (float) ($project->getRetainageAdjustmentPercentage() ?? 0),
+         'retainage_adjustment_completion' => (float) ($project->getRetainageAdjustmentCompletion() ?? 0),
+         'accumulated_retainage_amount_previous' => round($accumulated_previous_retainage, 2),
+         'accumulated_base_retainage_previous' => round($accumulated_previous_base_retainage, 2),
+         'total_billed_previous' => round($cumulative_billed, 2),
+      ];
+   }
+
+   /**
+    * Calcula retainage (current y acumulado) para un conjunto de ítems de borrador.
+    * Usado desde listarItemsParaInvoice para devolver valores listos para pintar en frontend.
+    *
+    * @param string|int $project_id
+    * @param array $items_draft Cada ítem: quantity, quantity_brought_forward, price, apply_retainage
+    * @return array{effective_current_retainage: float, total_retainage_accumulated: float}
+    */
+   public function getRetainageForDraftItems($project_id, array $items_draft): array
+   {
+      $ctx = $this->getRetainageContextForProject($project_id);
+
+      $base_current_retainage = 0.0;
+      $total_billed_current = 0.0;
+      foreach ($items_draft as $item) {
+         $qty = (float) ($item['quantity'] ?? 0);
+         $qbf = (float) ($item['quantity_brought_forward'] ?? 0);
+         $price = (float) ($item['price'] ?? 0);
+         $apply_retainage = !empty($item['apply_retainage']);
+         $final_amount = ($qty + $qbf) * $price;
+         $total_billed_current += $final_amount;
+         if ($apply_retainage) {
+            $base_current_retainage += $final_amount;
+         }
+      }
+
+      $contract_amount = (float) ($ctx['contract_amount'] ?? 0);
+      $total_billed_previous = (float) ($ctx['total_billed_previous'] ?? 0);
+      if ($contract_amount > 0 && $total_billed_previous + $total_billed_current > $contract_amount) {
+         return ['effective_current_retainage' => 0.0, 'total_retainage_accumulated' => 0.0];
+      }
+
+      $accumulated_retainage_previous = (float) ($ctx['accumulated_retainage_amount_previous'] ?? 0);
+      $accumulated_base_previous = (float) ($ctx['accumulated_base_retainage_previous'] ?? 0);
+      $retainage_enabled = (bool) ($ctx['retainage'] ?? false);
+      $pct_default = (float) ($ctx['retainage_percentage'] ?? 0);
+      $pct_adjustment = (float) ($ctx['retainage_adjustment_percentage'] ?? 0);
+      $completion_threshold = (float) ($ctx['retainage_adjustment_completion'] ?? 0);
+
+      $total_base_retainage = $accumulated_base_previous + $base_current_retainage;
+      $completion_pct = $contract_amount > 0 ? ($total_base_retainage / $contract_amount * 100) : 0.0;
+      $pct_to_use = 0.0;
+      if ($retainage_enabled && $completion_threshold > 0 && $completion_pct >= $completion_threshold) {
+         $pct_to_use = $pct_adjustment;
+      } elseif ($retainage_enabled) {
+         $pct_to_use = $pct_default;
+      }
+
+      $current_retainage = $base_current_retainage * ($pct_to_use / 100);
+      $total_accumulated = $accumulated_retainage_previous + $current_retainage;
+
+      return [
+         'effective_current_retainage' => round($current_retainage, 2),
+         'total_retainage_accumulated' => round($total_accumulated, 2),
+      ];
+   }
+
+   /**
     * Summary of CalcularPorcientoRetainage
     * @param Project $project_entity
     * @param float $total_amount_final

@@ -562,6 +562,7 @@ var Invoices = (function () {
       // items
       items = [];
       items_lista = [];
+      retainageContext = null;
       actualizarTableListaItems();
 
       $('#total_bonded_x').val('0.00');
@@ -1507,6 +1508,13 @@ var Invoices = (function () {
                      bond_price = Number(response.bond_price || 0);
                      bond_general = Number(response.bon_general || 0);
                      $('#card-bond').show();
+                     // Contexto para cálculo de retainage en frontend
+                     retainageContext = response.retainage_context || null;
+                     // Valores listos para pintar (calculados en backend)
+                     if (response.retainage_current != null && response.retainage_accumulated != null) {
+                        $('#invoice_current_retainage_display').val('$' + MyApp.formatMoney(response.retainage_current, 2, '.', ','));
+                        $('#invoice_retainage_calculated_display').val('$' + MyApp.formatMoney(response.retainage_accumulated, 2, '.', ','));
+                     }
 
                      //Llenar select
                      for (let item of response.items) {
@@ -1547,7 +1555,9 @@ var Invoices = (function () {
                               change_order_date: item.change_order_date,
                               has_quantity_history: item.has_quantity_history || false,
                               has_price_history: item.has_price_history || false,
-                              bonded: item.bonded || 0, // Agregar campo bonded
+                              bonded: item.bonded === true || item.bonded === 1,
+                              bond: item.bond === true || item.bond === 1,
+                              apply_retainage: item.apply_retainage === true || item.apply_retainage === 1,
                               posicion: posicion,
                            });
                         }
@@ -1563,6 +1573,8 @@ var Invoices = (function () {
                      // Calcular y mostrar X e Y en la card
                      calcularYMostrarXBondedEnJS();
                      actualizarTableListaItems();
+                     // Retainage en borrador (sin depender de guardar)
+                     actualizarRetainagePreview();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -1575,6 +1587,59 @@ var Invoices = (function () {
                // BlockUtil.unblock('#lista-items');
             });
       }
+   };
+
+   /**
+    * Calcula retainage en frontend con retainage_context (de listarItemsParaInvoice) e items actuales.
+    * Actualiza las cajas Current retainage y Less retainage.
+    */
+   var actualizarRetainagePreview = function () {
+      var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
+      if (!retainageContext || items_a_calcular.length === 0) {
+         $('#invoice_current_retainage_display').val('$0.00');
+         $('#invoice_retainage_calculated_display').val('$0.00');
+         return;
+      }
+      var ctx = retainageContext;
+      var contract_amount = Number(ctx.contract_amount) || 0;
+      var total_billed_previous = Number(ctx.total_billed_previous) || 0;
+      var accumulated_retainage_previous = Number(ctx.accumulated_retainage_amount_previous) || 0;
+      var accumulated_base_previous = Number(ctx.accumulated_base_retainage_previous) || 0;
+      var retainage_enabled = ctx.retainage === true || ctx.retainage === 1;
+      var pct_default = Number(ctx.retainage_percentage) || 0;
+      var pct_adjustment = Number(ctx.retainage_adjustment_percentage) || 0;
+      var completion_threshold = Number(ctx.retainage_adjustment_completion) || 0;
+
+      var base_current_retainage = 0;
+      var total_billed_current = 0;
+      items_a_calcular.forEach(function (item) {
+         var qty = Number(item.quantity) || 0;
+         var qbf = Number(item.quantity_brought_forward) || 0;
+         var price = Number(item.price) || 0;
+         var final_amount = (qty + qbf) * price;
+         total_billed_current += final_amount;
+         if (item.apply_retainage === true || item.apply_retainage === 1) {
+            base_current_retainage += final_amount;
+         }
+      });
+
+      if (contract_amount > 0 && total_billed_previous + total_billed_current > contract_amount) {
+         $('#invoice_current_retainage_display').val('$0.00');
+         $('#invoice_retainage_calculated_display').val('$0.00');
+         return;
+      }
+
+      var total_base_retainage = accumulated_base_previous + base_current_retainage;
+      var completion_pct = contract_amount > 0 ? (total_base_retainage / contract_amount * 100) : 0;
+      var pct_to_use = 0;
+      if (retainage_enabled) {
+         pct_to_use = (completion_threshold > 0 && completion_pct >= completion_threshold) ? pct_adjustment : pct_default;
+      }
+      var current_retainage = base_current_retainage * (pct_to_use / 100);
+      var total_accumulated = accumulated_retainage_previous + current_retainage;
+
+      $('#invoice_current_retainage_display').val('$' + MyApp.formatMoney(current_retainage, 2, '.', ','));
+      $('#invoice_retainage_calculated_display').val('$' + MyApp.formatMoney(total_accumulated, 2, '.', ','));
    };
 
    var projects = [];
@@ -1687,6 +1752,7 @@ var Invoices = (function () {
    var oTableItems;
    var items = [];
    var items_lista = [];
+   var retainageContext = null; // De listarItemsParaInvoice para cálculo de retainage en frontend
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto (monto ítem Bond) para Y = bond_general * X
@@ -2092,7 +2158,7 @@ var Invoices = (function () {
                   if (selector) {
                      const $input = $(selector);
                      if ($input.length) {
-                        $input.val(MyApp.formatMoney(total, 2, '.', ','));
+                        $input.val('$' + MyApp.formatMoney(total, 2, '.', ','));
                      }
                   }
 
@@ -2140,9 +2206,9 @@ var Invoices = (function () {
       // Calcular Y (Monto Monetario): Y = Bond General × X (quantity × price del ítem Bond)
       var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * x;
 
-      // Mostrar X e Y en la card
+      // Mostrar X e Y en la card (Y en $)
       $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
-      $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
+      $('#total_bonded_y').val('$' + MyApp.formatMoney(y, 2, '.', ','));
    };
 
    var handleChangeOrderHistory = function () {
@@ -2246,6 +2312,10 @@ var Invoices = (function () {
       // Solo recalcular X e Y en la card cuando es invoice nuevo (sin ID); si es existente, se muestran los valores aplicados del backend
       if (!$('#invoice_id').val()) {
          calcularYMostrarXBondedEnJS();
+      }
+      // Retainage en borrador: solo cuando tenemos contexto (ítems cargados por listarItemsParaInvoice)
+      if (retainageContext) {
+         actualizarRetainagePreview();
       }
    };
    var validateFormItem = function () {

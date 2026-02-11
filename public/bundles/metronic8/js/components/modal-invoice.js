@@ -29,6 +29,9 @@ var ModalInvoice = (function () {
 
       // items
       items = [];
+      retainageContext = null;
+      $('#modal_invoice_current_retainage').val('$0.00');
+      $('#modal_invoice_retainage_calculated').val('$0.00');
       actualizarTableListaItems();
 
       //Mostrar el primer tab
@@ -472,6 +475,11 @@ var ModalInvoice = (function () {
                      sum_bonded_project = Number(response.sum_bonded_project || 0);
                      bond_price = Number(response.bond_price || 0);
                      bond_general = Number(response.bon_general || 0);
+                     retainageContext = response.retainage_context || null;
+                     if (response.retainage_current != null && response.retainage_accumulated != null) {
+                        $('#modal_invoice_current_retainage').val('$' + MyApp.formatMoney(response.retainage_current, 2, '.', ','));
+                        $('#modal_invoice_retainage_calculated').val('$' + MyApp.formatMoney(response.retainage_accumulated, 2, '.', ','));
+                     }
 
                      console.log('--- Datos cargados desde backend (MODAL - project/listarItemsParaInvoice) ---');
                      console.log('sum_bonded_project:', sum_bonded_project);
@@ -509,7 +517,9 @@ var ModalInvoice = (function () {
                            change_order_date: item.change_order_date,
                            has_quantity_history: item.has_quantity_history || false,
                            has_price_history: item.has_price_history || false,
-                           bonded: item.bonded || 0, // Agregar campo bonded
+                           bonded: item.bonded || 0,
+                           bond: item.bond === true || item.bond === 1,
+                           apply_retainage: item.apply_retainage === true || item.apply_retainage === 1,
                            posicion: posicion,
                         });
                      }
@@ -524,6 +534,8 @@ var ModalInvoice = (function () {
                      // Calcular y mostrar X e Y en la card
                      calcularYMostrarXBondedEnJSModal();
                      actualizarTableListaItems();
+                     // Retainage en borrador (sin depender de guardar)
+                     actualizarRetainagePreviewModal();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -536,6 +548,58 @@ var ModalInvoice = (function () {
                // BlockUtil.unblock('#lista-items-invoice-modal');
             });
       }
+   };
+
+   /**
+    * Calcula retainage en frontend con retainage_context (de listarItemsParaInvoice) e items actuales del modal.
+    */
+   var actualizarRetainagePreviewModal = function () {
+      var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
+      if (!retainageContext || items_a_calcular.length === 0) {
+         $('#modal_invoice_current_retainage').val('$0.00');
+         $('#modal_invoice_retainage_calculated').val('$0.00');
+         return;
+      }
+      var ctx = retainageContext;
+      var contract_amount = Number(ctx.contract_amount) || 0;
+      var total_billed_previous = Number(ctx.total_billed_previous) || 0;
+      var accumulated_retainage_previous = Number(ctx.accumulated_retainage_amount_previous) || 0;
+      var accumulated_base_previous = Number(ctx.accumulated_base_retainage_previous) || 0;
+      var retainage_enabled = ctx.retainage === true || ctx.retainage === 1;
+      var pct_default = Number(ctx.retainage_percentage) || 0;
+      var pct_adjustment = Number(ctx.retainage_adjustment_percentage) || 0;
+      var completion_threshold = Number(ctx.retainage_adjustment_completion) || 0;
+
+      var base_current_retainage = 0;
+      var total_billed_current = 0;
+      items_a_calcular.forEach(function (item) {
+         var qty = Number(item.quantity) || 0;
+         var qbf = Number(item.quantity_brought_forward) || 0;
+         var price = Number(item.price) || 0;
+         var final_amount = (qty + qbf) * price;
+         total_billed_current += final_amount;
+         if (item.apply_retainage === true || item.apply_retainage === 1) {
+            base_current_retainage += final_amount;
+         }
+      });
+
+         if (contract_amount > 0 && total_billed_previous + total_billed_current > contract_amount) {
+         $('#modal_invoice_current_retainage').val('$0.00');
+         $('#modal_invoice_retainage_calculated').val('$0.00');
+         return;
+      }
+
+      var total_base_retainage = accumulated_base_previous + base_current_retainage;
+      var completion_pct = contract_amount > 0 ? (total_base_retainage / contract_amount * 100) : 0;
+      var pct_to_use = 0;
+      if (retainage_enabled) {
+         pct_to_use = (completion_threshold > 0 && completion_pct >= completion_threshold) ? pct_adjustment : pct_default;
+      }
+      var current_retainage = base_current_retainage * (pct_to_use / 100);
+      var total_accumulated = accumulated_retainage_previous + current_retainage;
+
+      $('#modal_invoice_current_retainage').val('$' + MyApp.formatMoney(current_retainage, 2, '.', ','));
+      $('#modal_invoice_retainage_calculated').val('$' + MyApp.formatMoney(total_accumulated, 2, '.', ','));
    };
 
    var projects = [];
@@ -615,6 +679,7 @@ var ModalInvoice = (function () {
    var oTableItems;
    var items = [];
    var items_lista = [];
+   var retainageContext = null; // De listarItemsParaInvoice para cálculo de retainage en frontend
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto para Y = bond_general * X
@@ -644,11 +709,22 @@ var ModalInvoice = (function () {
 
       // column defs
       let columnDefs = [
-         // item
+         // item (con badges R / B igual que invoice full page)
          {
             targets: 0,
             render: function (data, type, row) {
-               // Si es change order, agregar icono de historial
+               var badgeRetainage = '';
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
+               }
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               }
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+               }
                var icono = '';
                if (row.change_order) {
                   icono =
@@ -656,9 +732,7 @@ var ModalInvoice = (function () {
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${
-                  data || ''
-               }</span>${icono}</div>`;
+               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>${badgeRetainage}${badgeBond}${badgeBonded}${icono}</div>`;
             },
          },
          // unit
@@ -1089,6 +1163,9 @@ var ModalInvoice = (function () {
       
       // Recalcular X e Y después de actualizar la tabla
       calcularYMostrarXBondedEnJSModal();
+      if (retainageContext) {
+         actualizarRetainagePreviewModal();
+      }
    };
    var validateFormItem = function () {
       var result = false;

@@ -14,6 +14,7 @@ use App\Entity\Item;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Entity\EmployeeRole;
+use App\Utils\Admin\InvoiceService;
 use App\Utils\Admin\ProjectService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,10 +25,12 @@ class ProjectController extends AbstractController
 {
 
    private $projectService;
+   private $invoiceService;
 
-   public function __construct(ProjectService $projectService)
+   public function __construct(ProjectService $projectService, InvoiceService $invoiceService)
    {
       $this->projectService = $projectService;
+      $this->invoiceService = $invoiceService;
    }
 
    public function index(Request $request)
@@ -465,12 +468,17 @@ class ProjectController extends AbstractController
 
       try {
          $result = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
+         $retainageContext = $this->invoiceService->getRetainageContextForProject($project_id);
+         $retainageValues = $this->invoiceService->getRetainageForDraftItems($project_id, $result['items']);
 
          $resultadoJson['success'] = true;
          $resultadoJson['items'] = $result['items'];
          $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
          $resultadoJson['bond_price'] = $result['bond_price'];
          $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
+         $resultadoJson['retainage_context'] = $retainageContext;
+         $resultadoJson['retainage_current'] = $retainageValues['effective_current_retainage'];
+         $resultadoJson['retainage_accumulated'] = $retainageValues['total_retainage_accumulated'];
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
