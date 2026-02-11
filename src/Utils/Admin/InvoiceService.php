@@ -338,14 +338,17 @@ class InvoiceService extends Base
       }
       ksort($items_change_order);
 
-      // 2b. Separar Bond del resto: Bond va siempre al final de ítems regulares, antes de change orders
+      // 2b. Separar Bond del resto. Excel: solo ítems con quantity > 0 en el periodo (los que tienen cantidad en datatracking) + Bond siempre
       $items_regulares_sin_bond = [];
       $bondInvoiceItem = null;
       foreach ($items_regulares as $value) {
          if ($value->getProjectItem()->getItem()->getBond()) {
             $bondInvoiceItem = $value;
          } else {
-            $items_regulares_sin_bond[] = $value;
+            $qty = (float) ($value->getQuantity() ?? 0);
+            if ($qty > 0) {
+               $items_regulares_sin_bond[] = $value;
+            }
          }
       }
       // Extraer Bond también de change orders (si está ahí) para ubicarlo siempre en el mismo lugar
@@ -434,8 +437,12 @@ class InvoiceService extends Base
       if (!empty($items_change_order)) {
          $esPrimerGrupoCalculo = true;
          foreach ($items_change_order as $group_key => $group) {
-            $filas_necesarias += count($group);
-            if ($group_key !== 'no-date') {
+            $items_visibles = array_filter($group, function ($v) {
+               $q = (float) ($v->getQuantity() ?? 0);
+               return $q > 0;
+            });
+            $filas_necesarias += count($items_visibles);
+            if ($group_key !== 'no-date' && !empty($items_visibles)) {
                if ($esPrimerGrupoCalculo) {
                   $filas_necesarias += 2;
                   $esPrimerGrupoCalculo = false;
@@ -615,10 +622,17 @@ class InvoiceService extends Base
          $esPrimerGrupo = true;
 
          foreach ($items_change_order as $group_key => $group_items) {
+            $group_items_visibles = array_values(array_filter($group_items, function ($v) {
+               $q = (float) ($v->getQuantity() ?? 0);
+               return $q > 0;
+            }));
+            if (empty($group_items_visibles)) {
+               continue;
+            }
             $month = '';
             $year = '';
-            if ($group_key !== 'no-date' && !empty($group_items)) {
-               $d = $group_items[0]->getProjectItem()->getChangeOrderDate();
+            if ($group_key !== 'no-date') {
+               $d = $group_items_visibles[0]->getProjectItem()->getChangeOrderDate();
                if ($d) {
                   $month = $d->format('F');
                   $year = $d->format('Y');
@@ -641,7 +655,7 @@ class InvoiceService extends Base
                $fila++;
             }
 
-            foreach ($group_items as $value) {
+            foreach ($group_items_visibles as $value) {
                $em->refresh($value);
                if (isset($mapa_datos_web[$value->getId()])) {
                   $d = $mapa_datos_web[$value->getId()];
