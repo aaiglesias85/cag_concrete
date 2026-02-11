@@ -599,10 +599,13 @@ class ProjectService extends Base
             $em->refresh($project_item_entity);
          }
 
-         // Registrar historial si es change order
+         // Registrar historial: para change order (add + cambios), para el resto solo cambios de cantidad/precio
          if ($change_order === true) {
             $is_first_time_change_order = !$change_order_old && $change_order;
             $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $quantity, $price_old, $price);
+         } elseif (!$is_new_project_item && ($quantity_old != $quantity || $price_old != $price)) {
+            // Item no es change order: registrar solo historial de cantidad/precio si cambiaron
+            $this->RegistrarHistorialChangeOrder($project_item_entity, false, false, $quantity_old, $quantity, $price_old, $price);
          }
 
          $em->flush();
@@ -3000,10 +3003,12 @@ class ProjectService extends Base
             $price_old = $project_item_entity->getPrice();
          }
 
-         // Registrar historial si es change order
+         // Registrar historial: para change order (add + cambios), para el resto solo cambios de cantidad/precio
          if ($value->change_order && $project_item_entity->getId()) {
             $is_first_time_change_order = !$change_order_old && $value->change_order;
             $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $value->quantity, $price_old, $value->price);
+         } elseif (!$is_new_project_item && isset($quantity_old, $price_old) && ($quantity_old != $value->quantity || $price_old != $value->price)) {
+            $this->RegistrarHistorialChangeOrder($project_item_entity, false, false, $quantity_old, $value->quantity, $price_old, $value->price);
          }
       }
 
