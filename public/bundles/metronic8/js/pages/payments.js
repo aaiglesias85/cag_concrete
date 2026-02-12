@@ -1253,6 +1253,13 @@ var Payments = (function () {
          }
       });
 
+      // Al hacer foco: si el valor es 0, borrar para poder escribir sin el 0 delante
+      $(document).off('focus', '#payments-table-editable input.paid_qty, #payments-table-editable input.unpaid_qty');
+      $(document).on('focus', '#payments-table-editable input.paid_qty, #payments-table-editable input.unpaid_qty', function () {
+         var v = $(this).val();
+         if (parseFloat(v) === 0 && String(v).trim() !== '') $(this).val('');
+      });
+
       // Regla: Solo en evento change (al salir del campo). Paid Quantity modificado -> Unpaid Quantity = Paid Quantity.
       $(document).off('change', '#payments-table-editable input.paid_qty');
       $(document).on('change', '#payments-table-editable input.paid_qty', function (e) {
