@@ -477,19 +477,21 @@ var ModalInvoice = (function () {
                   if (response.success) {
                      // Contract amount del proyecto (para la caja Contract)
                      projectContractAmount = Number(response.contract_amount) || 0;
-                     // Guardar sum_bonded_project y bond_price para cálculo de X e Y
-                     sum_bonded_project = Number(response.sum_bonded_project || 0);
-                     bond_price = Number(response.bond_price || 0);
-                     bond_general = Number(response.bon_general || 0);
                      retainageContext = response.retainage_context || null;
                      if (response.retainage_current != null && response.retainage_accumulated != null) {
                         $('#modal_invoice_current_retainage').val(MyApp.formatearNumero(response.retainage_current, 2, '.', ','));
                         $('#modal_invoice_retainage_calculated').val(MyApp.formatearNumero(response.retainage_accumulated, 2, '.', ','));
                      }
+                     // Bond solo desde backend; no cálculo en frontend
+                     if (response.bon_quantity != null && response.bon_amount != null) {
+                        $('#modal_total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 2, '.', ','));
+                        $('#modal_total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
+                     } else {
+                        $('#modal_total_bonded_x').val('0.00');
+                        $('#modal_total_bonded_y').val('0.00');
+                     }
 
                      console.log('--- Datos cargados desde backend (MODAL - project/listarItemsParaInvoice) ---');
-                     console.log('sum_bonded_project:', sum_bonded_project);
-                     console.log('bond_price:', bond_price);
                      console.log('Total items recibidos:', response.items ? response.items.length : 0);
 
                      //Llenar select
@@ -540,8 +542,6 @@ var ModalInvoice = (function () {
                         item.posicion = index;
                      });
 
-                     // Calcular y mostrar X e Y en la card
-                     calcularYMostrarXBondedEnJSModal();
                      actualizarTableListaItems();
                      // Retainage en borrador (sin depender de guardar)
                      actualizarRetainagePreviewModal();
@@ -693,6 +693,7 @@ var ModalInvoice = (function () {
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto para Y = bond_general * X
+   var bon_quantity_available = 1.0; // Bond Quantity disponible para aplicar el mismo tope que el backend
    var nEditingRowItem = null;
    var rowDeleteItem = null;
    var initTableItems = function () {
@@ -1048,21 +1049,29 @@ var ModalInvoice = (function () {
       } else {
          console.log('X = 0 (sum_bonded_project es 0 o no definido)');
       }
+      if (x > 1) x = 1;
+      if (x < 0) x = 0;
 
-      // Calcular Y = Bond General × X (quantity × price del ítem Bond)
+      // Aplicar el mismo tope que el backend: aplicado = min(X, disponible)
+      var available = Number(bon_quantity_available);
+      if (isNaN(available) || available < 0) available = 0;
+      if (available > 1) available = 1;
+      var applied = Math.min(x, available);
+
+      // Y = Bond General × aplicado
       console.log('--- Cálculo de Y (MODAL) ---');
       console.log('bond_general:', bond_general, 'bond_price:', bond_price);
-      console.log('X:', x);
+      console.log('X:', x, 'applied:', applied);
       
-      var y = (Number(bond_general) || Number(bond_price) || 0) * x;
-      console.log('Y =', bond_price, '*', x, '=', y);
+      var y = (Number(bond_general) || Number(bond_price) || 0) * applied;
+      console.log('Y =', bond_general || bond_price, '*', applied, '=', y);
 
-      // Mostrar valores
-      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
+      // Mostrar valores aplicados (mismo criterio que backend)
+      var x_formatted = MyApp.formatearNumero(applied, 2, '.', ',');
       var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
       
       console.log('--- Valores finales mostrados (MODAL) ---');
-      console.log('X formateado:', x_formatted);
+      console.log('X formateado (applied):', x_formatted);
       console.log('Y formateado:', y_formatted);
       
       $('#modal_total_bonded_x').val(x_formatted);
@@ -1207,8 +1216,6 @@ var ModalInvoice = (function () {
          if ($body.length) $body.scrollLeft(scrollLeft);
       }
 
-      // Recalcular X e Y después de actualizar la tabla
-      calcularYMostrarXBondedEnJSModal();
       if (retainageContext) {
          actualizarRetainagePreviewModal();
       }
@@ -1442,7 +1449,6 @@ var ModalInvoice = (function () {
          $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
          $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
          actualizarFooterTotalesModal();
-         calcularYMostrarXBondedEnJSModal();
          if (retainageContext) actualizarRetainagePreviewModal();
          // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
          if (isEmpty) $this.val('');

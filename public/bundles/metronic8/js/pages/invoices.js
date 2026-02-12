@@ -1122,10 +1122,7 @@ var Invoices = (function () {
             }
          }
 
-         // Si no tenemos valores aplicados del backend, calcular X e Y en JS (preview para invoice nuevo)
-         if (invoice.bon_quantity == null || invoice.bon_amount == null) {
-            calcularYMostrarXBondedEnJS();
-         }
+         // Bond solo se muestra desde backend; no cálculo en frontend
          actualizarTableListaItems();
 
          event_change = false;
@@ -1528,11 +1525,15 @@ var Invoices = (function () {
                   if (response.success) {
                      // Contract amount del proyecto (para la caja Contract)
                      projectContractAmount = Number(response.contract_amount) || 0;
-                     // Guardar sum_bonded_project, bond_price y bond_general para cálculo de X e Y
-                     sum_bonded_project = Number(response.sum_bonded_project || 0);
-                     bond_price = Number(response.bond_price || 0);
-                     bond_general = Number(response.bon_general || 0);
+                     // Bond viene 100% del backend; no calcular en frontend
                      $('#card-bond').show();
+                     if (response.bon_quantity != null && response.bon_amount != null) {
+                        $('#total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 2, '.', ','));
+                        $('#total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
+                     } else {
+                        $('#total_bonded_x').val('0.00');
+                        $('#total_bonded_y').val('0.00');
+                     }
                      // Contexto para cálculo de retainage en frontend
                      retainageContext = response.retainage_context || null;
                      // Valores listos para pintar (calculados en backend)
@@ -1595,8 +1596,6 @@ var Invoices = (function () {
                         item.posicion = index;
                      });
 
-                     // Calcular y mostrar X e Y en la card
-                     calcularYMostrarXBondedEnJS();
                      actualizarTableListaItems();
                      // Retainage en borrador (sin depender de guardar)
                      actualizarRetainagePreview();
@@ -1782,6 +1781,7 @@ var Invoices = (function () {
    var sum_bonded_project = 0; // Suma de (quantity * price) de items bonded del proyecto
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto (monto ítem Bond) para Y = bond_general * X
+   var bon_quantity_available = 1.0; // Bond Quantity disponible (1 - usado) para aplicar el mismo tope que el backend en el preview
    var nEditingRowItem = null;
    var rowDeleteItem = null;
 
@@ -2223,17 +2223,25 @@ var Invoices = (function () {
          }
       });
 
-      // Calcular X (Ratio)
+      // Calcular X (Ratio solicitado)
       var x = 0;
       if (sum_bonded_project && parseFloat(sum_bonded_project) > 0) {
          x = sum_bonded_invoices / parseFloat(sum_bonded_project);
       }
-      
-      // Calcular Y (Monto Monetario): Y = Bond General × X (quantity × price del ítem Bond)
-      var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * x;
+      if (x > 1) x = 1;
+      if (x < 0) x = 0;
 
-      // Mostrar X e Y en la card (Y en $)
-      $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+      // Aplicar el mismo tope que el backend: aplicado = min(X, disponible)
+      var available = parseFloat(bon_quantity_available);
+      if (isNaN(available) || available < 0) available = 0;
+      if (available > 1) available = 1;
+      var applied = Math.min(x, available);
+
+      // Y = Bond General × aplicado (no × X crudo)
+      var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * applied;
+
+      // Mostrar valores aplicados en la card (mismo criterio que al cargar invoice guardado)
+      $('#total_bonded_x').val(MyApp.formatearNumero(applied, 2, '.', ','));
       $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
 
@@ -2368,10 +2376,7 @@ var Invoices = (function () {
          if ($body.length) $body.scrollLeft(scrollLeft);
       }
 
-      // Solo recalcular X e Y en la card cuando es invoice nuevo (sin ID); si es existente, se muestran los valores aplicados del backend
-      if (!$('#invoice_id').val()) {
-         calcularYMostrarXBondedEnJS();
-      }
+      // Bond no se calcula en frontend; la card solo se actualiza con valores del backend
       // Retainage en borrador: solo cuando tenemos contexto (ítems cargados por listarItemsParaInvoice)
       if (retainageContext) {
          actualizarRetainagePreview();
@@ -2593,7 +2598,7 @@ var Invoices = (function () {
          $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
          $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
          actualizarFooterTotalesPage();
-         if (!$('#invoice_id').val()) calcularYMostrarXBondedEnJS();
+         // Bond no se recalcula en frontend; las cajas amarillas solo muestran bon_quantity/bon_amount del backend
          if (retainageContext) actualizarRetainagePreview();
          // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
          if (isEmpty) $this.val('');

@@ -315,6 +315,36 @@ class InvoiceRepository extends ServiceEntityRepository
    }
 
    /**
+    * SumBonQuantityUsedBeforeOrOnDate: Suma de bon_quantity de invoices del proyecto
+    * con start_date <= la fecha dada. Sirve para calcular cuánto Bond queda disponible
+    * para un invoice nuevo (preview): available = 1 - este valor.
+    * La fecha puede venir en formato m/d/Y.
+    *
+    * @param int|string $project_id
+    * @param string $start_date_str fecha en m/d/Y
+    * @return float
+    */
+   public function SumBonQuantityUsedBeforeOrOnDate($project_id, string $start_date_str): float
+   {
+      $date = \DateTime::createFromFormat('m/d/Y', trim($start_date_str));
+      if (!$date) {
+         return 0.0;
+      }
+      $dateStr = $date->format('Y-m-d');
+
+      $qb = $this->createQueryBuilder('i')
+         ->select('COALESCE(SUM(i.bonQuantity), 0)')
+         ->leftJoin('i.project', 'p')
+         ->andWhere('p.projectId = :project_id')
+         ->andWhere('i.startDate <= :date')
+         ->setParameter('project_id', $project_id)
+         ->setParameter('date', $dateStr);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
+
+   /**
     * ListarInvoicesParaPaymentsConTotal: Lista y cuenta aplicando los mismos filtros.
     *
     */

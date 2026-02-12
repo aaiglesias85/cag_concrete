@@ -1071,6 +1071,10 @@ class ProjectService extends Base
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $project_items = $projectItemRepo->ListarItemsDeProject($project_id);
       foreach ($project_items as $value) {
+         // El ítem marcado como Bond no va en la tabla del invoice; solo se incluye en el Excel
+         if ($value->getItem()->getBond()) {
+            continue;
+         }
          $project_item_id = $value->getId();
 
          /** @var DataTrackingItemRepository $dataTrackingItemRepo */
@@ -1157,19 +1161,45 @@ class ProjectService extends Base
          $items[] = $item_data;
       }
 
-      // Calcular SUM_BONDED_PROJECT y Bond Price para que JavaScript pueda calcular X e Y
+      // Calcular SUM_BONDED_PROJECT, Bond Price y Bond General para que JavaScript pueda calcular X e Y
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
       $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
-      // Bon General = monto del ítem Bond en el proyecto (quantity * price del item con bond=true)
       $bon_general = $projectItemRepo->TotalBondAmountProjectItems($project_id);
+
+      // Bond disponible para este invoice nuevo: 1 - usado (invoices con start_date <= fecha_inicial)
+      /** @var \App\Repository\InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(\App\Entity\Invoice::class);
+      $bon_quantity_used_before = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $fecha_inicial);
+      $bon_quantity_available = max(0.0, 1.0 - $bon_quantity_used_before);
+
+      // Calcular bon_quantity y bon_amount con la misma lógica que RecalcularBonProyecto (frontend no calcula nada)
+      $sum_bonded_invoices = 0.0;
+      foreach ($items as $it) {
+         if (!empty($it['bonded'])) {
+            $qty = (float) ($it['quantity'] ?? 0);
+            $qbf = (float) ($it['quantity_brought_forward'] ?? 0);
+            $pr = (float) ($it['price'] ?? 0);
+            $sum_bonded_invoices += ($qty + $qbf) * $pr;
+         }
+      }
+      $x = 0.0;
+      if ($sum_bonded_project > 0) {
+         $x = $sum_bonded_invoices / (float) $sum_bonded_project;
+      }
+      $x = max(0.0, min(1.0, $x));
+      $applied = min($x, $bon_quantity_available);
+      $bon_amount = round($bon_general * $applied, 2);
 
       return [
          'items' => $items,
          'sum_bonded_project' => $sum_bonded_project,
          'bond_price' => $bond_price,
-         'bon_general' => $bon_general
+         'bon_general' => $bon_general,
+         'bon_quantity_available' => $bon_quantity_available,
+         'bon_quantity' => $applied,
+         'bon_amount' => $bon_amount
       ];
    }
 

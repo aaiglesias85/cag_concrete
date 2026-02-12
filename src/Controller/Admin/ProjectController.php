@@ -481,6 +481,8 @@ class ProjectController extends AbstractController
          $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
          $resultadoJson['bond_price'] = $result['bond_price'];
          $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
+         $resultadoJson['bon_quantity'] = $result['bon_quantity'] ?? 0;
+         $resultadoJson['bon_amount'] = $result['bon_amount'] ?? 0;
          $resultadoJson['retainage_context'] = $retainageContext;
          $resultadoJson['retainage_current'] = $retainageValues['effective_current_retainage'];
          $resultadoJson['retainage_accumulated'] = $retainageValues['total_retainage_accumulated'];

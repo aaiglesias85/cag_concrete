@@ -1472,6 +1472,10 @@ class InvoiceService extends Base
       $this->sortInvoicesByStartDateAndId($allInvoices);
 
       foreach ($lista as $key => $value) {
+         // El ítem marcado como Bond no se muestra en la tabla del invoice; solo se incluye en el Excel
+         if ($value->getProjectItem()->getItem()->getBond()) {
+            continue;
+         }
 
          $contract_qty = $value->getProjectItem()->getQuantity();
          $price = $value->getPrice();
