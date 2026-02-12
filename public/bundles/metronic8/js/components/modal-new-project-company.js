@@ -522,12 +522,24 @@ var ModalNewProjectCompany = (function () {
       }
    };
 
-   var mostrarModal = function (companyId, onSuccess) {
+   var mostrarModal = function (companyId, companyName, onSuccess) {
       company_id = companyId || '';
-      onSuccessCallback = typeof onSuccess === 'function' ? onSuccess : null;
+      // Compatibilidad: si companyName es función, es el callback (llamada antigua)
+      if (typeof companyName === 'function') {
+         onSuccessCallback = companyName;
+         companyName = '';
+      } else {
+         onSuccessCallback = typeof onSuccess === 'function' ? onSuccess : null;
+      }
 
       resetForm();
       $('#company_id-modal-project').val(company_id);
+
+      // Actualizar título del modal con el nombre de la compañía
+      var titleEl = document.querySelector('#modal-new-project-company .modal-title');
+      if (titleEl) {
+         titleEl.textContent = companyName ? 'New Project - ' + companyName : 'New Project';
+      }
 
       initDatePickers();
       resetWizard();

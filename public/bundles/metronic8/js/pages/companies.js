@@ -1130,8 +1130,9 @@ var Companies = (function () {
             toastr.warning('Save the company first or select a company to add a project.', '');
             return;
          }
+         var company_name = $('#name').val() || '';
          if (typeof ModalNewProjectCompany !== 'undefined') {
-            ModalNewProjectCompany.mostrarModal(company_id, function () {
+            ModalNewProjectCompany.mostrarModal(company_id, company_name, function () {
                recargarProjectsDeCompany(company_id);
             });
          }
