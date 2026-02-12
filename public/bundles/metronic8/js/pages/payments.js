@@ -42,7 +42,14 @@ var Payments = (function () {
          order: order,
 
          stateSave: true,
-         displayLength: 25,
+         // displayLength: 25,
+
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
+
          stateSaveParams: DatatableUtil.stateSaveParams,
 
          fixedColumns: {
@@ -95,14 +102,14 @@ var Payments = (function () {
       return columns;
    };
 
-  var getColumnsDefTable = function () {
+   var getColumnsDefTable = function () {
       let columnDefs = [
          {
             targets: 0,
             render: function (data, type, row) {
                return DatatableUtil.getRenderColumnDiv(data, 50);
             },
-         },         
+         },
          {
             targets: 1,
             render: function (data, type, row) {
@@ -158,12 +165,12 @@ var Payments = (function () {
             targets: 9, // Columna Status
             className: 'text-center', // Centra el contenido en la celda
             render: function (data, type, row) {
-               var isChecked = data == 1 ? 'checked' : '';              
-               
+               var isChecked = data == 1 ? 'checked' : '';
+
                return `<div class="form-check form-switch form-check-custom form-check-solid justify-content-center">
                         <input class="form-check-input status-toggle cursor-pointer" type="checkbox" value="${row.id}" ${isChecked} data-id="${row.id}" />
                      </div>`;
-            }
+            },
          },
          {
             targets: -1,
@@ -171,13 +178,13 @@ var Payments = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               // Lista de acciones por defecto              
+               // Lista de acciones por defecto
                var actions = ['edit', 'paid'];
-               
+
                // Si está pagado/cerrado (1), se va la acción 'edit'
                if (row.paid == 1) {
                   //actions = actions.filter(action => action !== 'edit');
-              return `<a href="javascript:;" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 view-payment" data-id="${row.id}" title="View Details">
+                  return `<a href="javascript:;" class="btn btn-icon btn-bg-light btn-active-color-primary btn-sm me-1 view-payment" data-id="${row.id}" title="View Details">
                               <i class="fas fa-eye fs-3"></i>
                           </a>`;
                }
@@ -215,7 +222,9 @@ var Payments = (function () {
             { extend: 'csvHtml5', title: documentTitle, exportOptions: { columns: exclude_columns } },
             { extend: 'pdfHtml5', title: documentTitle, exportOptions: { columns: exclude_columns } },
          ],
-      }).container().appendTo($('#payment-table-editable-buttons'));
+      })
+         .container()
+         .appendTo($('#payment-table-editable-buttons'));
 
       const exportButtons = document.querySelectorAll('#payment_export_menu [data-kt-export]');
       exportButtons.forEach((exportButton) => {
@@ -468,7 +477,8 @@ var Payments = (function () {
             formData.set('archivos', JSON.stringify(archivos));
 
             BlockUtil.block('#form-payment');
-            axios.post('payment/salvarPayment', formData, { responseType: 'json' })
+            axios
+               .post('payment/salvarPayment', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -530,7 +540,7 @@ var Payments = (function () {
    };
 
    var invoice = null;
-  var initAccionEditar = function () {
+   var initAccionEditar = function () {
       // Acción EDITAR (Lápiz) - Comportamiento normal
       $(document).off('click', '#payment-table-editable a.edit');
       $(document).on('click', '#payment-table-editable a.edit', function (e) {
@@ -539,7 +549,7 @@ var Payments = (function () {
          var invoice_id = $(this).data('id');
          $('#invoice_id').val(invoice_id);
          mostrarForm();
-         editRow(invoice_id, false); 
+         editRow(invoice_id, false);
       });
 
       // Acción VER (Ojito) - Nuevo comportamiento
@@ -554,14 +564,15 @@ var Payments = (function () {
       });
    };
 
- // Agregamos el parámetro isReadOnly con valor por defecto false
+   // Agregamos el parámetro isReadOnly con valor por defecto false
    var editRow = function (invoice_id, isReadOnly = false) {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
 
       BlockUtil.block('#form-payment');
 
-      axios.post('payment/cargarDatos', formData, { responseType: 'json' })
+      axios
+         .post('payment/cargarDatos', formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
@@ -578,17 +589,17 @@ var Payments = (function () {
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
             BlockUtil.unblock('#form-payment');
-            
+
             if (isReadOnly) {
                // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario
                $('#form-payment').find('input, select, textarea, button').prop('disabled', true);
-               
+
                // 2. Ocultar botones de guardar específicamente
                $('#btn-salvar-invoice, #btn-save-changes, #btn-wizard-siguiente, .btn-wizard-finalizar').addClass('hide');
-               
+
                // 3. Asegurar que los botones de cerrar/cancelar sigan funcionando y visibles
                $('.cerrar-form-payment, #btn-wizard-anterior').prop('disabled', false).removeClass('hide');
-               
+
                // 4. Deshabilitar clicks en la tabla de items (para que no abran modales internos)
                $('#payments-table-editable').find('a, input').addClass('disabled').prop('disabled', true).css('pointer-events', 'none');
 
@@ -604,10 +615,10 @@ var Payments = (function () {
 
       function cargarDatos(invoice) {
          KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: #' + invoice.number;
-        
+
          var $retAmt = $('#total_retainage_amount');
          $retAmt.val(MyApp.formatMoney(invoice.total_retainage_amount, 2, '.', ','));
-         
+
          $retAmt.data('std-percentage', invoice.retainage_percentage);
          $retAmt.data('red-percentage', invoice.retainage_adjustment_percentage || 5);
          $retAmt.data('contract-amount', invoice.contract_amount || 0);
@@ -615,28 +626,28 @@ var Payments = (function () {
          $retAmt.data('total-work-completed', invoice.total_work_completed || 0);
          // --------------------------------------------
 
-         var isReimbursed = (invoice.retainage_reimbursed == 1 || invoice.retainage_reimbursed === true);                 
-         $('#retainage-reimbursed-toggle').prop('checked', isReimbursed);    
+         var isReimbursed = invoice.retainage_reimbursed == 1 || invoice.retainage_reimbursed === true;
+         $('#retainage-reimbursed-toggle').prop('checked', isReimbursed);
 
          var amount = invoice.retainage_reimbursed_amount || 0;
-         $('#retainage-reimbursed-amount').val(MyApp.formatMoney(amount));        
+         $('#retainage-reimbursed-amount').val(MyApp.formatMoney(amount));
          $('#retainage-reimbursed-toggle').trigger('change');
 
          calcularTotalPaymentGlobal();
 
          payments = invoice.payments;
          if (payments.length > 0) {
-             if (payments[0].sum_bonded_project !== undefined) {
-                 sum_bonded_project = Number(payments[0].sum_bonded_project || 0);
-             }
-             if (payments[0].bond_price !== undefined) {
-                 bond_price = Number(payments[0].bond_price || 0);
-             }
+            if (payments[0].sum_bonded_project !== undefined) {
+               sum_bonded_project = Number(payments[0].sum_bonded_project || 0);
+            }
+            if (payments[0].bond_price !== undefined) {
+               bond_price = Number(payments[0].bond_price || 0);
+            }
          } else {
-             sum_bonded_project = 0;
-             bond_price = 0;
+            sum_bonded_project = 0;
+            bond_price = 0;
          }
-         
+
          calcularYMostrarXBondedEnJS();
 
          actualizarTableListaPayments();
@@ -646,7 +657,6 @@ var Payments = (function () {
       }
    };
 
-
    var initAccionExportar = function () {
       $(document).off('click', '#payment-table-editable a.excel');
       $(document).on('click', '#payment-table-editable a.excel', function (e) {
@@ -655,7 +665,8 @@ var Payments = (function () {
          var formData = new URLSearchParams();
          formData.set('invoice_id', invoice_id);
          BlockUtil.block('#lista-payment');
-         axios.post('invoice/exportarExcel', formData, { responseType: 'json' })
+         axios
+            .post('invoice/exportarExcel', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -730,7 +741,8 @@ var Payments = (function () {
          var formData = new URLSearchParams();
          formData.set('company_id', company_id);
          BlockUtil.block('#select-filtro-project');
-         axios.post('project/listarOrdenados', formData, { responseType: 'json' })
+         axios
+            .post('project/listarOrdenados', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -839,7 +851,7 @@ var Payments = (function () {
          { data: 'paid_qty' },
          { data: 'unpaid_qty' },
          { data: 'paid_amount' },
-         { data: null }, 
+         { data: null },
          { data: '_groupOrder', visible: false },
          { data: null },
       ];
@@ -855,7 +867,7 @@ var Payments = (function () {
                }
                var badgeBond = '';
                if (row.bond == 1 || row.bond === true) {
-                badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
                var badgeBonded = '';
                if (row.bonded == 1 || row.bonded === true) {
@@ -863,7 +875,10 @@ var Payments = (function () {
                }
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' + row.project_item_id + '" title="View change order history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
                }
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
@@ -887,7 +902,10 @@ var Payments = (function () {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' + row.project_item_id + '" title="View quantity history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View quantity history"></i>';
                }
                return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
@@ -898,7 +916,10 @@ var Payments = (function () {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
-                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' + row.project_item_id + '" title="View price history"></i>';
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View price history"></i>';
                }
                return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
@@ -924,19 +945,17 @@ var Payments = (function () {
                return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
-       // Target 7: Paid Qty (Agregar lógica disabled)
+         // Target 7: Paid Qty (Agregar lógica disabled)
          {
             targets: 7,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               var safeValue = (data !== null && data !== undefined) ? data : 0;
-               
+               var safeValue = data !== null && data !== undefined ? data : 0;
+
                // Verificamos si tiene bloqueo manual O si está cerrado por saldo 0
-               var isClosed = (typeof row.is_closed_manual !== 'undefined') 
-                              ? row.is_closed_manual 
-                              : (row.unpaid_qty <= 0);
-               
-               var disabled = isClosed ? 'disabled' : ''; 
+               var isClosed = typeof row.is_closed_manual !== 'undefined' ? row.is_closed_manual : row.unpaid_qty <= 0;
+
+               var disabled = isClosed ? 'disabled' : '';
 
                return `<div class="w-100px">
                         <input type="number" class="form-control paid_qty" value="${safeValue}" 
@@ -945,23 +964,21 @@ var Payments = (function () {
             },
          },
          // Target 8: Unpaid Qty (Agregar lógica disabled)
-       {
+         {
             targets: 8,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               var safeValue = (data !== null && data !== undefined) ? data : 0;
+               var safeValue = data !== null && data !== undefined ? data : 0;
 
-               var isClosed = (typeof row.is_closed_manual !== 'undefined') 
-                              ? row.is_closed_manual 
-                              : (row.unpaid_qty <= 0);
-               
-               var disabled = isClosed ? 'disabled' : ''; 
+               var isClosed = typeof row.is_closed_manual !== 'undefined' ? row.is_closed_manual : row.unpaid_qty <= 0;
+
+               var disabled = isClosed ? 'disabled' : '';
 
                let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" ${disabled} />`;
                return `<div class="d-flex align-items-center gap-2 w-100px">${valueHtml}<a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
             },
          },
-          
+
          {
             targets: 9,
             render: function (data, type, row) {
@@ -977,7 +994,7 @@ var Payments = (function () {
                if (row.isGroupHeader) return '';
 
                // Lógica: Si unpaid_qty es 0, nace cerrado (checked)
-               var isClosed = (row.unpaid_qty == null || parseFloat(row.unpaid_qty) <= 0);
+               var isClosed = row.unpaid_qty == null || parseFloat(row.unpaid_qty) <= 0;
                var isChecked = isClosed ? 'checked' : '';
 
                return `<div class="form-check form-switch form-check-custom form-check-solid justify-content-center" style="min-height: auto;">
@@ -1032,10 +1049,13 @@ var Payments = (function () {
             const api = this.api();
             const num = (v) => (typeof v === 'number' ? v : (typeof v === 'string' ? Number(v.replace(/[^\d.-]/g, '')) : 0) || 0);
             const sumCol = (idx) => ({
-               total: api.column(idx).data().reduce((a, b) => {
-                  if (typeof b === 'object' && b !== null && b.isGroupHeader) return a;
-                  return num(a) + num(b);
-               }, 0),
+               total: api
+                  .column(idx)
+                  .data()
+                  .reduce((a, b) => {
+                     if (typeof b === 'object' && b !== null && b.isGroupHeader) return a;
+                     return num(a) + num(b);
+                  }, 0),
             });
             const { total: totalInvoice } = sumCol(6);
             $('#total_invoice_amount').val(MyApp.formatMoney(totalInvoice, 2, '.', ','));
@@ -1093,14 +1113,17 @@ var Payments = (function () {
 
    var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
-      axios.get('project/listarHistorialItem', { params: { project_item_id: project_item_id }, responseType: 'json' })
+      axios
+         .get('project/listarHistorialItem', { params: { project_item_id: project_item_id }, responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
                if (response.success) {
                   var historial = response.historial || [];
                   if (filterType) {
-                     historial = historial.filter(function (item) { return item.action_type === filterType; });
+                     historial = historial.filter(function (item) {
+                        return item.action_type === filterType;
+                     });
                   }
                   var html = '';
                   if (historial.length === 0) {
@@ -1120,8 +1143,12 @@ var Payments = (function () {
                }
             }
          })
-         .catch(function (error) { toastr.error('Error loading history', ''); })
-         .finally(function () { BlockUtil.unblock('#modal-change-order-history .modal-content'); });
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
    };
 
    var actualizarTableListaPayments = function () {
@@ -1148,8 +1175,7 @@ var Payments = (function () {
    };
 
    var initAccionesPayments = function () {
-
-      // --- Toggle Manual con Alerta ---  
+      // --- Toggle Manual con Alerta ---
       $(document).off('click', '.item-status-toggle');
       $(document).on('click', '.item-status-toggle', function (e) {
          var $input = $(this);
@@ -1157,13 +1183,13 @@ var Payments = (function () {
          var posicion = $input.data('posicion');
 
          // 1. Detectar el estado DESEADO (lo que el usuario clicó)
-         var desiredState = $input.prop('checked'); 
+         var desiredState = $input.prop('checked');
 
          // 2. Bloquear el cambio visual inmediatamente para preguntar primero
-         e.preventDefault(); 
-         
+         e.preventDefault();
+
          // Determinamos texto según a dónde quiere ir
-         var statusLabel = desiredState ? "Closed" : "Open";
+         var statusLabel = desiredState ? 'Closed' : 'Open';
 
          Swal.fire({
             title: 'Change Status',
@@ -1173,28 +1199,27 @@ var Payments = (function () {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, change it!',
-            cancelButtonText: 'No, cancel'
+            cancelButtonText: 'No, cancel',
          }).then((result) => {
             if (result.isConfirmed) {
                // 3. Aplicar el estado deseado visualmente
                $input.prop('checked', desiredState);
-               
+
                // 4. Guardar en memoria para que no se pierda al ordenar/filtrar
                if (payments[posicion]) {
-                   payments[posicion].is_closed_manual = desiredState;
+                  payments[posicion].is_closed_manual = desiredState;
                }
 
                // 5. Bloquear/Desbloquear inputs (Paid Qty y Unpaid Qty)
                // Si desiredState es true (Closed) -> disabled = true
                var $inputs = $row.find('input.paid_qty, input.unpaid_qty');
                $inputs.prop('disabled', desiredState);
-
             }
             // Si cancela, no hacemos nada (el preventDefault ya lo dejó como estaba)
          });
       });
 
-       // --- Toggle Manual con Alerta end ---
+      // --- Toggle Manual con Alerta end ---
 
       $(document).off('click', '#btn-salvar-payment');
       $(document).on('click', '#btn-salvar-payment', function (e) {
@@ -1228,7 +1253,7 @@ var Payments = (function () {
          }
       });
 
-    // Regla: Solo en evento change (al salir del campo). Paid Quantity modificado -> Unpaid Quantity = Paid Quantity.
+      // Regla: Solo en evento change (al salir del campo). Paid Quantity modificado -> Unpaid Quantity = Paid Quantity.
       $(document).off('change', '#payments-table-editable input.paid_qty');
       $(document).on('change', '#payments-table-editable input.paid_qty', function (e) {
          var $this = $(this);
@@ -1345,7 +1370,7 @@ var Payments = (function () {
          {
             targets: 2,
             render: function (data, type, row) {
-               var val = (data !== null && data !== undefined && data !== '') ? data : '—';
+               var val = data !== null && data !== undefined && data !== '' ? data : '—';
                return typeof val === 'number' ? MyApp.formatearNumero(val, 2, '.', ',') : val;
             },
          },
@@ -1384,154 +1409,161 @@ var Payments = (function () {
       initTableNotesItem();
    };
 
-  var initAccionesNotesItem = function () {
-   $(document).off('click', '#btn-salvar-note-item');
-   $(document).on('click', '#btn-salvar-note-item', function (e) {
-      e.preventDefault();
-      var notes = QuillUtil.getHtml('#notes-item');
-      var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
-      
-      if (!notesIsEmpty) {
-         var formData = new URLSearchParams();
-         var notes_id = $('#notes_item_id').val();
-         formData.set('notes_id', notes_id);
-         var invoice_item_id = $('#invoice_item_id').val();
-         formData.set('invoice_item_id', invoice_item_id);
-         formData.set('notes', notes);
-         var overrideUnpaidQty = $('#manual-unpaid-qty').val();
-         if (overrideUnpaidQty !== '' && overrideUnpaidQty !== undefined) {
-            formData.set('override_unpaid_qty', overrideUnpaidQty);
-         }
-         
-         BlockUtil.block('#modal-notes-item .modal-content');
-         
-         axios.post('payment/salvarNotesItem', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     toastr.success(response.message, '');
+   var initAccionesNotesItem = function () {
+      $(document).off('click', '#btn-salvar-note-item');
+      $(document).on('click', '#btn-salvar-note-item', function (e) {
+         e.preventDefault();
+         var notes = QuillUtil.getHtml('#notes-item');
+         var notesIsEmpty = !notes || notes.trim() === '' || notes === '<p><br></p>';
 
-                     // 1. Limpieza y lógica de Notas (Original)
-                     QuillUtil.setHtml('#notes-item', '');
-                     if (nEditingRowNotesItem == null) {
-                        notes_item.push({
-                           id: response.note.id,
-                           notes: notes,
-                           date: response.note.date,
-                           override_unpaid_qty: response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null,
-                           posicion: notes_item.length
-                        });
+         if (!notesIsEmpty) {
+            var formData = new URLSearchParams();
+            var notes_id = $('#notes_item_id').val();
+            formData.set('notes_id', notes_id);
+            var invoice_item_id = $('#invoice_item_id').val();
+            formData.set('invoice_item_id', invoice_item_id);
+            formData.set('notes', notes);
+            var overrideUnpaidQty = $('#manual-unpaid-qty').val();
+            if (overrideUnpaidQty !== '' && overrideUnpaidQty !== undefined) {
+               formData.set('override_unpaid_qty', overrideUnpaidQty);
+            }
+
+            BlockUtil.block('#modal-notes-item .modal-content');
+
+            axios
+               .post('payment/salvarNotesItem', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
+
+                        // 1. Limpieza y lógica de Notas (Original)
+                        QuillUtil.setHtml('#notes-item', '');
+                        if (nEditingRowNotesItem == null) {
+                           notes_item.push({
+                              id: response.note.id,
+                              notes: notes,
+                              date: response.note.date,
+                              override_unpaid_qty: response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null,
+                              posicion: notes_item.length,
+                           });
+                        } else {
+                           var posicion = nEditingRowNotesItem;
+                           if (notes_item[posicion]) {
+                              notes_item[posicion].notes = notes;
+                              notes_item[posicion].override_unpaid_qty = response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null;
+                           }
+                        }
+                        actualizarTableListaNotesItem();
+
+                        // Actualizar notas en memoria global
+                        if (payments[nEditingRowPayment]) {
+                           payments[nEditingRowPayment].notes = notes_item;
+                        }
+
+                        // Regla: Si se ingresó Override Unpaid Qty en Notas, solo sobrescribir Unpaid Qty; Paid Qty no se modifica.
+                        var valorManual = parseFloat($('#manual-unpaid-qty').val());
+                        if (!isNaN(valorManual) && nEditingRowPayment !== null && payments[nEditingRowPayment]) {
+                           payments[nEditingRowPayment].unpaid_qty = valorManual;
+                           var $inputUnpaid = $('#payments-table-editable input.unpaid_qty').filter(function () {
+                              return $(this).attr('data-position') == nEditingRowPayment;
+                           });
+                           if ($inputUnpaid.length > 0) {
+                              $inputUnpaid.val(valorManual);
+                              $inputUnpaid.addClass('bg-light-success');
+                              setTimeout(function () {
+                                 $inputUnpaid.removeClass('bg-light-success');
+                              }, 1000);
+                           }
+                        }
+                        $('#manual-unpaid-qty').val('');
+                        // Si no se ingresó valor en Notas, Paid Qty y Unpaid Qty permanecen sin cambios (no hacemos nada).
+                        // =======================================================
                      } else {
-                        var posicion = nEditingRowNotesItem;
-                        if (notes_item[posicion]) {
-                           notes_item[posicion].notes = notes;
-                           notes_item[posicion].override_unpaid_qty = response.note.override_unpaid_qty != null ? response.note.override_unpaid_qty : null;
-                        }
+                        toastr.error(response.error, '');
                      }
-                     actualizarTableListaNotesItem();
-                     
-                     // Actualizar notas en memoria global
-                     if (payments[nEditingRowPayment]) {
-                        payments[nEditingRowPayment].notes = notes_item;
-                     }
-
-                     // Regla: Si se ingresó Override Unpaid Qty en Notas, solo sobrescribir Unpaid Qty; Paid Qty no se modifica.
-                     var valorManual = parseFloat($('#manual-unpaid-qty').val());
-                     if (!isNaN(valorManual) && nEditingRowPayment !== null && payments[nEditingRowPayment]) {
-                        payments[nEditingRowPayment].unpaid_qty = valorManual;
-                        var $inputUnpaid = $('#payments-table-editable input.unpaid_qty').filter(function() {
-                            return $(this).attr('data-position') == nEditingRowPayment;
-                        });
-                        if ($inputUnpaid.length > 0) {
-                            $inputUnpaid.val(valorManual);
-                            $inputUnpaid.addClass('bg-light-success');
-                            setTimeout(function() { $inputUnpaid.removeClass('bg-light-success'); }, 1000);
-                        }
-                     }
-                     $('#manual-unpaid-qty').val('');
-                     // Si no se ingresó valor en Notas, Paid Qty y Unpaid Qty permanecen sin cambios (no hacemos nada).
-                     // =======================================================
-
                   } else {
-                     toastr.error(response.error, '');
+                     toastr.error('An internal error has occurred, please try again.', '');
                   }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#modal-notes-item .modal-content'); });
-      } else {
-         if (notesIsEmpty) toastr.error('The note cannot be empty.', '');
-      }
-   });
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#modal-notes-item .modal-content');
+               });
+         } else {
+            if (notesIsEmpty) toastr.error('The note cannot be empty.', '');
+         }
+      });
 
-   // Eventos Edit y Delete de la tabla de notas (Sin cambios)
-   $(document).off('click', '#notes-item-table-editable a.edit');
-   $(document).on('click', '#notes-item-table-editable a.edit', function () {
-      var posicion = $(this).data('posicion');
-      if (notes_item[posicion]) {
-         nEditingRowNotesItem = posicion;
-         $('#notes_item_id').val(notes_item[posicion].id);
-         $('#invoice_item_id').val(payments[nEditingRowPayment].invoice_item_id);
-         QuillUtil.setHtml('#notes-item', notes_item[posicion].notes);
-         var overrideVal = notes_item[posicion].override_unpaid_qty;
-         $('#manual-unpaid-qty').val(overrideVal !== null && overrideVal !== undefined && overrideVal !== '' ? overrideVal : '');
-      }
-   });
+      // Eventos Edit y Delete de la tabla de notas (Sin cambios)
+      $(document).off('click', '#notes-item-table-editable a.edit');
+      $(document).on('click', '#notes-item-table-editable a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (notes_item[posicion]) {
+            nEditingRowNotesItem = posicion;
+            $('#notes_item_id').val(notes_item[posicion].id);
+            $('#invoice_item_id').val(payments[nEditingRowPayment].invoice_item_id);
+            QuillUtil.setHtml('#notes-item', notes_item[posicion].notes);
+            var overrideVal = notes_item[posicion].override_unpaid_qty;
+            $('#manual-unpaid-qty').val(overrideVal !== null && overrideVal !== undefined && overrideVal !== '' ? overrideVal : '');
+         }
+      });
 
-   $(document).off('click', '#notes-item-table-editable a.delete');
-   $(document).on('click', '#notes-item-table-editable a.delete', function (e) {
-      e.preventDefault();
-      var posicion = $(this).data('posicion');
-      if (notes_item[posicion]) {
-         Swal.fire({
-            text: 'Are you sure you want to delete the notes?',
-            icon: 'warning',
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel',
-            customClass: { confirmButton: 'btn fw-bold btn-success', cancelButton: 'btn fw-bold btn-danger' },
-         }).then(function (result) {
-            if (result.value) eliminarNote(posicion);
-         });
-      }
-   });
+      $(document).off('click', '#notes-item-table-editable a.delete');
+      $(document).on('click', '#notes-item-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (notes_item[posicion]) {
+            Swal.fire({
+               text: 'Are you sure you want to delete the notes?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               cancelButtonText: 'No, cancel',
+               customClass: { confirmButton: 'btn fw-bold btn-success', cancelButton: 'btn fw-bold btn-danger' },
+            }).then(function (result) {
+               if (result.value) eliminarNote(posicion);
+            });
+         }
+      });
 
-   function eliminarNote(posicion) {
-      if (notes_item[posicion].id != '') {
-         var formData = new URLSearchParams();
-         formData.set('notes_id', notes_item[posicion].id);
-         BlockUtil.block('#lista-notes-item');
-         axios.post('payment/eliminarNotesItem', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     toastr.success(response.message, '');
-                     deleteNote(posicion);
+      function eliminarNote(posicion) {
+         if (notes_item[posicion].id != '') {
+            var formData = new URLSearchParams();
+            formData.set('notes_id', notes_item[posicion].id);
+            BlockUtil.block('#lista-notes-item');
+            axios
+               .post('payment/eliminarNotesItem', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
+                        deleteNote(posicion);
+                     } else {
+                        toastr.error(response.error, '');
+                     }
                   } else {
-                     toastr.error(response.error, '');
+                     toastr.error('An internal error has occurred, please try again.', '');
                   }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#lista-notes-item'); });
-      } else {
-         deleteNote(posicion);
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#lista-notes-item');
+               });
+         } else {
+            deleteNote(posicion);
+         }
       }
-   }
 
-   function deleteNote(posicion) {
-      notes_item.splice(posicion, 1);
-      for (var i = 0; i < notes_item.length; i++) notes_item[i].posicion = i;
-      actualizarTableListaNotesItem();
-   }
-};
+      function deleteNote(posicion) {
+         notes_item.splice(posicion, 1);
+         for (var i = 0; i < notes_item.length; i++) notes_item[i].posicion = i;
+         actualizarTableListaNotesItem();
+      }
+   };
 
    var resetFormNoteItem = function () {
       MyUtil.resetForm('notes-item-form');
@@ -1590,7 +1622,9 @@ var Payments = (function () {
          columnDefs: columnDefs,
          language: language,
       });
-      oTableNotes.on('draw', function () { initAccionesNotes(); });
+      oTableNotes.on('draw', function () {
+         initAccionesNotes();
+      });
       handleSearchDatatableNotes();
    };
 
@@ -1637,7 +1671,8 @@ var Payments = (function () {
             formData.set('notes', notes);
             formData.set('date', date);
             BlockUtil.block('#modal-notes .modal-content');
-            axios.post('payment/salvarNotes', formData, { responseType: 'json' })
+            axios
+               .post('payment/salvarNotes', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -1654,7 +1689,9 @@ var Payments = (function () {
                   }
                })
                .catch(MyUtil.catchErrorAxios)
-               .then(function () { BlockUtil.unblock('#modal-notes .modal-content'); });
+               .then(function () {
+                  BlockUtil.unblock('#modal-notes .modal-content');
+               });
          } else {
             if (date === '') MyApp.showErrorMessageValidateInput(KTUtil.get('notes-date'), 'This field is required');
             if (notesIsEmpty) toastr.error('The note cannot be empty.', '');
@@ -1686,7 +1723,8 @@ var Payments = (function () {
          var formData = new URLSearchParams();
          formData.set('notes_id', notes_id);
          BlockUtil.block('#lista-notes');
-         axios.post('payment/eliminarNotes', formData, { responseType: 'json' })
+         axios
+            .post('payment/eliminarNotes', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -1701,7 +1739,9 @@ var Payments = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#lista-notes'); });
+            .then(function () {
+               BlockUtil.unblock('#lista-notes');
+            });
       }
       $(document).off('click', '#btn-eliminar-notes');
       $(document).on('click', '#btn-eliminar-notes', function (e) {
@@ -1731,7 +1771,8 @@ var Payments = (function () {
          formData.set('from', fechaInicial);
          formData.set('to', fechaFin);
          BlockUtil.block('#lista-notes');
-         axios.post('payment/eliminarNotesDate', formData, { responseType: 'json' })
+         axios
+            .post('payment/eliminarNotesDate', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -1748,7 +1789,9 @@ var Payments = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#lista-notes'); });
+            .then(function () {
+               BlockUtil.unblock('#lista-notes');
+            });
       }
    };
 
@@ -1757,7 +1800,8 @@ var Payments = (function () {
       var formData = new URLSearchParams();
       formData.set('notes_id', notes_id);
       BlockUtil.block('#modal-notes .modal-content');
-      axios.post('payment/cargarDatosNotes', formData, { responseType: 'json' })
+      axios
+         .post('payment/cargarDatosNotes', formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
@@ -1771,7 +1815,9 @@ var Payments = (function () {
             }
          })
          .catch(MyUtil.catchErrorAxios)
-         .then(function () { BlockUtil.unblock('#modal-notes .modal-content'); });
+         .then(function () {
+            BlockUtil.unblock('#modal-notes .modal-content');
+         });
       function cargarDatos(notes) {
          $('#notes_id').val(notes.notes_id);
          const date = MyApp.convertirStringAFecha(notes.date);
@@ -1874,7 +1920,8 @@ var Payments = (function () {
                var formData = new FormData();
                formData.set('file', file);
                BlockUtil.block('#modal-archivo .modal-content');
-               axios.post('payment/salvarArchivo', formData, { responseType: 'json' })
+               axios
+                  .post('payment/salvarArchivo', formData, { responseType: 'json' })
                   .then(function (res) {
                      if (res.status == 200) {
                         var response = res.data;
@@ -1892,7 +1939,9 @@ var Payments = (function () {
                      console.log(err);
                      toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', 'Error !!!');
                   })
-                  .then(function () { BlockUtil.unblock('#modal-archivo .modal-content'); });
+                  .then(function () {
+                     BlockUtil.unblock('#modal-archivo .modal-content');
+                  });
             } else {
                archivos[nEditingRowArchivo].name = nombre;
                actualizarTableListaArchivos();
@@ -1955,7 +2004,8 @@ var Payments = (function () {
             var formData = new URLSearchParams();
             formData.set('archivo', archivos[posicion].file);
             BlockUtil.block('#lista-archivos');
-            axios.post('payment/eliminarArchivo', formData, { responseType: 'json' })
+            axios
+               .post('payment/eliminarArchivo', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -1970,7 +2020,9 @@ var Payments = (function () {
                   }
                })
                .catch(MyUtil.catchErrorAxios)
-               .then(function () { BlockUtil.unblock('#lista-archivos'); });
+               .then(function () {
+                  BlockUtil.unblock('#lista-archivos');
+               });
          }
       }
       $(document).off('click', '#archivo-table-editable a.download');
@@ -2017,7 +2069,8 @@ var Payments = (function () {
             var formData = new URLSearchParams();
             formData.set('archivos', archivos_name);
             BlockUtil.block('#lista-archivos');
-            axios.post('payment/eliminarArchivos', formData, { responseType: 'json' })
+            axios
+               .post('payment/eliminarArchivos', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -2032,7 +2085,9 @@ var Payments = (function () {
                   }
                })
                .catch(MyUtil.catchErrorAxios)
-               .then(function () { BlockUtil.unblock('#lista-archivos'); });
+               .then(function () {
+                  BlockUtil.unblock('#lista-archivos');
+               });
          }
       });
       function deleteArchivo(posicion) {
@@ -2080,7 +2135,8 @@ var Payments = (function () {
                var formData = new URLSearchParams();
                formData.set('invoice_id', invoice_id);
                BlockUtil.block('#lista-payment');
-               axios.post('payment/paid', formData, { responseType: 'json' })
+               axios
+                  .post('payment/paid', formData, { responseType: 'json' })
                   .then(function (res) {
                      if (res.status === 200 || res.status === 201) {
                         var response = res.data;
@@ -2095,7 +2151,9 @@ var Payments = (function () {
                      }
                   })
                   .catch(MyUtil.catchErrorAxios)
-                  .then(function () { BlockUtil.unblock('#lista-payment'); });
+                  .then(function () {
+                     BlockUtil.unblock('#lista-payment');
+                  });
             }
          });
       }
@@ -2113,7 +2171,7 @@ var Payments = (function () {
       });
    };
 
-var initRetainageModal = function () {
+   var initRetainageModal = function () {
       // 1. Lógica visual (Mostrar/Ocultar input) - YA LA TENÍAS
       $(document).off('change', '#retainage-reimbursed-toggle');
       $(document).on('change', '#retainage-reimbursed-toggle', function () {
@@ -2122,11 +2180,13 @@ var initRetainageModal = function () {
          var $input = $('#retainage-reimbursed-amount');
 
          if (isChecked) {
-            $container.slideDown(); 
-            setTimeout(function() { $input.focus(); }, 300);
+            $container.slideDown();
+            setTimeout(function () {
+               $input.focus();
+            }, 300);
          } else {
             $container.slideUp();
-            $input.val(''); 
+            $input.val('');
          }
       });
 
@@ -2137,7 +2197,7 @@ var initRetainageModal = function () {
 
          // Obtener ID del invoice actual
          var invoice_id = $('#invoice_id').val();
-         
+
          // Obtener valores del modal
          var isReimbursed = $('#retainage-reimbursed-toggle').is(':checked') ? 1 : 0;
          var amountRaw = $('#retainage-reimbursed-amount').val();
@@ -2145,13 +2205,13 @@ var initRetainageModal = function () {
 
          // Limpiar el valor numérico (quitar comas)
          if (amountRaw) {
-             amount = parseFloat(amountRaw.toString().replace(/,/g, '')) || 0;
+            amount = parseFloat(amountRaw.toString().replace(/,/g, '')) || 0;
          }
 
          // Validar si activó el switch pero no puso monto
          if (isReimbursed == 1 && amount <= 0) {
-             toastr.warning('Please enter a valid amount greater than 0.', 'Warning');
-             return;
+            toastr.warning('Please enter a valid amount greater than 0.', 'Warning');
+            return;
          }
 
          // Preparar datos para enviar
@@ -2164,15 +2224,15 @@ var initRetainageModal = function () {
          BlockUtil.block('#modal-retainage-reimbursement .modal-content');
 
          // Enviar al servidor
-         axios.post('payment/salvarRetainageReimbursement', formData, { responseType: 'json' })
+         axios
+            .post('payment/salvarRetainageReimbursement', formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200) {
                   var response = res.data;
                   if (response.success) {
-                     toastr.success(response.message || 'Saved successfully', '');                 
-                   
-                    $('#modal-retainage-reimbursement').modal('hide');
-                     
+                     toastr.success(response.message || 'Saved successfully', '');
+
+                     $('#modal-retainage-reimbursement').modal('hide');
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -2188,36 +2248,35 @@ var initRetainageModal = function () {
    };
 
    // FUNCIÓN CÁLCULO DE RETAINAGE
-var initAccionRecalcularRetainage = function () {
+   var initAccionRecalcularRetainage = function () {
       var tablaSelector = '#payments-table-editable';
       $(document).off('keyup change input', tablaSelector + ' input');
       $(document).on('keyup change input', tablaSelector + ' input', function () {
-         
          var $retInput = $('#total_retainage_amount');
-         
+
          // 1. Recuperar constantes
          var stdPercent = parseFloat($retInput.data('std-percentage') || 0);
          var redPercent = parseFloat($retInput.data('red-percentage') || 0);
          var contractAmt = parseFloat($retInput.data('contract-amount') || 0);
          var targetComp = parseFloat($retInput.data('target-completion') || 0);
-         
+
          // 'total-work-completed' ahora trae el TOTAL PAGADO ANTERIOR desde PHP
          var previousPaid = parseFloat($retInput.data('total-work-completed') || 0);
 
-         var currentInvoicePaidBase = 0; 
+         var currentInvoicePaidBase = 0;
          var table = $(tablaSelector).DataTable();
 
          table.rows().every(function () {
             var data = this.data();
             var rowNode = this.node();
-            
+
             if (data.apply_retainage == 1 || data.apply_retainage === true) {
                // Calculamos lo que estás pagando AHORA MISMO
                var price = parseFloat(data.price || 0);
                var $input = $(rowNode).find('input.paid_qty');
                var paidQty = $input.length > 0 ? parseFloat($input.val().replace(/,/g, '')) || 0 : parseFloat(data.paid_qty || 0);
-               
-               currentInvoicePaidBase += (paidQty * price);
+
+               currentInvoicePaidBase += paidQty * price;
             }
          });
 
@@ -2225,31 +2284,31 @@ var initAccionRecalcularRetainage = function () {
          // Si esta suma supera el 50%, baja al 5%.
          var totalPaid = previousPaid + currentInvoicePaidBase;
          var threshold = contractAmt * (targetComp / 100);
-         
-         var finalPercent = (totalPaid >= threshold && threshold > 0) ? redPercent : stdPercent;
+
+         var finalPercent = totalPaid >= threshold && threshold > 0 ? redPercent : stdPercent;
 
          // 3. Calcular y mostrar
          var totalRetainage = currentInvoicePaidBase * (finalPercent / 100);
          $retInput.val(MyApp.formatMoney(totalRetainage, 2, '.', ','));
-         
+
          // Opcional: Para que veas visualmente qué % está aplicando
          $('#retainage-percentage-display').text(finalPercent.toFixed(2) + '%');
       });
    };
-  
 
-  // 1. Definimos la función que envía los datos al servidor
-   var cambiarEstadoServidor = function(invoice_id, status, $input) {
+   // 1. Definimos la función que envía los datos al servidor
+   var cambiarEstadoServidor = function (invoice_id, status, $input) {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
       formData.set('status', status);
 
       // Ajusta esta URL si es necesario
-      var url = 'payment/cambiarEstado'; 
+      var url = 'payment/cambiarEstado';
 
       BlockUtil.block('#lista-payment');
-      
-      axios.post(url, formData, { responseType: 'json' })
+
+      axios
+         .post(url, formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
@@ -2269,8 +2328,8 @@ var initAccionRecalcularRetainage = function () {
             }
          })
          .catch(function (error) {
-             MyUtil.catchErrorAxios(error);
-             $input.prop('checked', !status);
+            MyUtil.catchErrorAxios(error);
+            $input.prop('checked', !status);
          })
          .then(function () {
             BlockUtil.unblock('#lista-payment');
@@ -2282,12 +2341,12 @@ var initAccionRecalcularRetainage = function () {
       $(document).off('change', '.status-toggle');
       $(document).on('change', '.status-toggle', function (e) {
          e.preventDefault();
-         
+
          var $input = $(this);
          var invoice_id = $input.data('id');
          var isChecked = $input.is(':checked');
          var newStatus = isChecked ? 1 : 0;
-         var statusLabel = isChecked ? "Closed" : "Open";
+         var statusLabel = isChecked ? 'Closed' : 'Open';
 
          Swal.fire({
             title: 'Change Status',
@@ -2297,7 +2356,7 @@ var initAccionRecalcularRetainage = function () {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, change it!',
-            cancelButtonText: 'No, cancel'
+            cancelButtonText: 'No, cancel',
          }).then((result) => {
             if (result.isConfirmed) {
                // Llamamos a la función definida arriba
@@ -2311,11 +2370,11 @@ var initAccionRecalcularRetainage = function () {
    };
 
    // Función nueva para sumar el total real desde la memoria
-   var calcularTotalPaymentGlobal = function() {
+   var calcularTotalPaymentGlobal = function () {
       var total = 0;
       // 'payments' es la variable global que tiene todos los datos cargados
       if (payments && payments.length > 0) {
-         payments.forEach(function(item) {
+         payments.forEach(function (item) {
             // Ignoramos las cabeceras de grupo si existen
             if (!item.isGroupHeader) {
                total += parseFloat(item.paid_amount || 0);
@@ -2327,35 +2386,33 @@ var initAccionRecalcularRetainage = function () {
    };
 
    // Función para calcular y mostrar X e Y (Bonded) en Payment
-   var calcularYMostrarXBondedEnJS = function () {      
-     
+   var calcularYMostrarXBondedEnJS = function () {
       var sum_bonded_invoices = 0;
-      
-      payments.forEach(function(item) {
+
+      payments.forEach(function (item) {
          // Ignorar cabeceras de grupo si existen
          if (!item.isGroupHeader) {
-             if (item.bonded == 1 || item.bonded === true) {                
-                var amount = Number(item.amount || 0);  
-                sum_bonded_invoices += amount;
-             }
+            if (item.bonded == 1 || item.bonded === true) {
+               var amount = Number(item.amount || 0);
+               sum_bonded_invoices += amount;
+            }
          }
       });
-      
+
       var x = 0;
       if (sum_bonded_project > 0) {
          x = sum_bonded_invoices / sum_bonded_project;
       }
-      
-      var y = bond_price * x;  
- 
-      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
-      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');     
-      
-      $('#total_bonded_x').val(x_formatted);
-      $('#total_bonded_y').val(y_formatted);   
-      $('#display_bond_qty').text(x_formatted);   
-   };
 
+      var y = bond_price * x;
+
+      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
+      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
+
+      $('#total_bonded_x').val(x_formatted);
+      $('#total_bonded_y').val(y_formatted);
+      $('#display_bond_qty').text(x_formatted);
+   };
 
    return {
       init: function () {
