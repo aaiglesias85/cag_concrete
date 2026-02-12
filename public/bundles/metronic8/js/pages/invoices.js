@@ -1066,7 +1066,7 @@ var Invoices = (function () {
 
          $('#paidactivo').prop('checked', invoice.paid);
 
-         $('#card-bond').show();
+      
          // Valores aplicados (con regla cap ≤1) vienen del backend
          if (invoice.bon_quantity != null && invoice.bon_amount != null) {
             $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
@@ -1081,7 +1081,7 @@ var Invoices = (function () {
          } else {
             $('#invoice_current_retainage_display').val('$0.00');
          }
-         // L Retainer = Less Retainers (acumulado: current retainage de este invoice + anteriores)
+         // L Retainer
          if (invoice.invoice_retainage_accumulated != null && invoice.invoice_retainage_accumulated !== '') {
             $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(invoice.invoice_retainage_accumulated, 2, '.', ','));
          } else {
@@ -1098,32 +1098,32 @@ var Invoices = (function () {
          items.forEach(function(item) {
             var qbf = Number(item.quantity_brought_forward || 0);
             var unpaid = Number(item.unpaid_qty || 0);
-            // Base = Lo que se debe + Lo que se protegió
             item.base_debt = unpaid + qbf;
          });
 
-         // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+         // items_lista
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
-         // setear la posicion
          items_lista.forEach((item, index) => {
             item.posicion = index;
          });
 
-         // Guardar sum_bonded_project, bond_price y bond_general para cálculo de X e Y
+         // Guardar variables globales para cálculo de bonos
          if (items.length > 0) {
-            if (items[0].sum_bonded_project !== undefined) {
-               sum_bonded_project = Number(items[0].sum_bonded_project || 0);
-            }
-            if (items[0].bond_price !== undefined) {
-               bond_price = Number(items[0].bond_price || 0);
-            }
-            if (items[0].bond_general !== undefined) {
-               bond_general = Number(items[0].bond_general || 0);
-            }
+            if (items[0].sum_bonded_project !== undefined) sum_bonded_project = Number(items[0].sum_bonded_project || 0);
+            if (items[0].bond_price !== undefined) bond_price = Number(items[0].bond_price || 0);
+            if (items[0].bond_general !== undefined) bond_general = Number(items[0].bond_general || 0);
          }
 
-         // Bond solo se muestra desde backend; no cálculo en frontend
          actualizarTableListaItems();
+
+         // --- CORRECCIÓN FINAL: EJECUTAR LAS VALIDACIONES DE VISIBILIDAD ---
+         
+         // 1. Esto revisará si los bonos son 0 y OCULTARÁ las tarjetas amarillas
+         calcularYMostrarXBonedEnJS(); 
+
+         // 2. Esto revisará si el retainage es 0 y OCULTARÁ la tarjeta verde
+         var valRet = parseFloat($('#invoice_current_retainage_display').val().replace(/[^0-9.-]+/g,"")) || 0;
+         checkAndToggleCard('#invoice_current_retainage_display', valRet);
 
          event_change = false;
       }
@@ -1664,6 +1664,8 @@ var Invoices = (function () {
 
       $('#invoice_current_retainage_display').val(MyApp.formatMoney(current_retainage, 2, '.', ','));
       $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(total_accumulated, 2, '.', ','));
+      checkAndToggleCard('#invoice_current_retainage_display', current_retainage);
+      // checkAndToggleCard('#invoice_retainage_calculated_display',
    };
 
    var projects = [];
@@ -2143,23 +2145,18 @@ var Invoices = (function () {
          footerCallback: function (row, data, start, end, display) {
             const api = this.api();
 
-            // Función para limpiar valores numéricos
+            // Función helper para limpiar números
             const num = (v) => (typeof v === 'number' ? v : (typeof v === 'string' ? Number(v.replace(/[^\d.-]/g, '')) : 0) || 0);
 
             // Helper para sumar columna
             const sumCol = (idx) => ({
-               page: api
-                  .column(idx, { page: 'current' })
-                  .data()
-                  .reduce((a, b) => num(a) + num(b), 0),
                total: api
                   .column(idx)
                   .data()
                   .reduce((a, b) => num(a) + num(b), 0),
             });
 
-            // Columnas a sumar (índices)
-            const colsToSum = [4, 6, 8, 10, 13];
+            // Columnas y sus selectores
             const totalsSelectors = {
                4: '#total_contract_amount',
                6: '#total_amount_completed',
@@ -2168,30 +2165,26 @@ var Invoices = (function () {
                13: '#total_amount_final',
             };
 
-            // Recorre todas las columnas visibles
-            api.columns().every(function (idx) {
-               const footer = $(api.column(idx).footer());
-
-               // Columna "Unit Price" (index 2)
-               if (idx === 2) {
-                  footer.html('');
+            // Recorrer las columnas configuradas
+            Object.keys(totalsSelectors).forEach(function(key) {
+               var idx = parseInt(key);
+               var selector = totalsSelectors[idx];
+               
+               // Calcular total
+               // Si es col 4 (Contract), usar variable global, sino sumar columna
+               var total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
+               
+               var $input = $(selector);
+               if ($input.length) {
+                  // 1. Poner valor
+                  $input.val(MyApp.formatMoney(total, 2, '.', ','));
+                  
+                  // 2. NUEVO: Ocultar si es 0, Mostrar si tiene datos
+                  checkAndToggleCard(selector, total);
                }
-               // Columnas de totales numéricos
-               else if (colsToSum.includes(idx)) {
-                  // Columna 4 = Contract: mostrar contract amount del proyecto, no la suma de ítems
-                  const total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
-                  const selector = totalsSelectors[idx];
-                  if (selector) {
-                     const $input = $(selector);
-                     if ($input.length) {
-                        $input.val(MyApp.formatMoney(total, 2, '.', ','));
-                     }
-                  }
-
-                  footer.html('');
-               } else {
-                  footer.html(''); // Limpia las demás
-               }
+               
+               // Limpiar el footer HTML nativo de datatable
+               $(api.column(idx).footer()).html('');
             });
          },
       });
@@ -2673,7 +2666,87 @@ var Invoices = (function () {
       });
    };
 
+   var calcularYMostrarXBonedEnJS = function () { 
+      
+      // 1. OBTENER DATOS
+      var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
+      
+      var sum_bonded_invoices = 0; 
 
+      items_a_calcular.forEach(function(item) {         
+         if (item.bonded == 1 || item.bonded === true || item.bonded === '1') {
+            var quantity = parseFloat(item.quantity) || 0;
+            var qbf = parseFloat(item.quantity_brought_forward) || 0;
+            var price = parseFloat(item.price) || 0;
+            
+            sum_bonded_invoices += ((quantity + qbf) * price);
+         }
+      });
+
+      // Calcular X (Ratio)
+      var x = 0;
+          if (typeof sum_bonded_project !== 'undefined' && parseFloat(sum_bonded_project) > 0) {
+         x = sum_bonded_invoices / parseFloat(sum_bonded_project);
+      }
+         
+      if (x > 1) x = 1;
+      if (x < 0) x = 0;
+
+      // Calcular Y (Monto)
+      // Usamos bond_general si existe, si no bond_price
+      var base_bond = parseFloat(typeof bond_general !== 'undefined' ? bond_general : bond_price) || 0;
+      var y = base_bond * x;  
+
+      // 2. ELEMENTOS
+      var $inputY = $('#total_bonded_y'); 
+      var $inputX = $('#total_bonded_x'); 
+      var $cardY = $inputY.closest('.card'); 
+      var $cardX = $inputX.closest('.card');
+      var $wrapper = $('#card-bond'); // El contenedor padre
+
+      // Clase del efecto visual
+      var claseEfecto = 'card-shine-effect shine-warning'; 
+      var duracion = 2000; 
+
+      // Si el cálculo da 0, ocultamos todo
+      if (x <= 0.0001 && y <= 0.0001) {
+          $wrapper.hide(); 
+          $cardY.hide();
+          $cardX.hide();
+          
+          $('#total_bonded_x').val('0.00');
+          $inputY.val('$0.00');
+          return; 
+      }
+
+      // 4. SI HAY DATOS: MOSTRAR
+      $wrapper.removeClass('d-none').show();
+      
+      $cardY.removeClass('d-none').show().addClass(claseEfecto);
+      $cardX.removeClass('d-none').show().addClass(claseEfecto); 
+
+      // Animar valores
+      if (typeof animateValue === 'function') {
+          animateValue('#total_bonded_x', x, duracion, false);
+          animateValue('#total_bonded_y', y, duracion, true);
+      } else {
+          $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+          $inputY.val(MyApp.formatMoney(y, 2, '.', ','));
+      }
+   };
+
+   // Función para mostrar/ocultar tarjeta según si tiene valor
+   var checkAndToggleCard = function(selector, value) {
+      var $input = $(selector);
+      if ($input.length === 0) return;
+      
+      var $card = $input.closest('.card');
+      if (Math.abs(value) > 0.001) {
+         $card.removeClass('d-none').show();
+      } else {
+         $card.hide();
+      }
+   };
 
    return {
       //main function to initiate the module
@@ -2696,7 +2769,12 @@ var Invoices = (function () {
 
          initAccionEditar();
          initAccionChange();
+         calcularYMostrarXBonedEnJS();
+         checkAndToggleCard();
 
+         var valRetainage = parseFloat($('#invoice_current_retainage_display').val().replace(/[^0-9.-]+/g,"")) || 0;
+         checkAndToggleCard('#invoice_current_retainage_display', valRetainage);
+         
          // editar
          var invoice_id_edit = localStorage.getItem('invoice_id_edit');
          if (invoice_id_edit) {

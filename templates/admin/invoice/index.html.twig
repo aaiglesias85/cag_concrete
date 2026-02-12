@@ -1,5 +1,8 @@
-{% extends 'admin/layout.html.twig' %} {% block subtitle %} - Invoices{% endblock %} {% block stylesheetspecific %}
+{% extends 'admin/layout.html.twig' %} 
 
+{% block subtitle %} - Invoices{% endblock %} 
+
+{% block stylesheetspecific %}
 <link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 
 <style>
@@ -20,7 +23,7 @@
    }
 
    #items-table-editable thead th {
-      white-space: normal; /* Permite salto de línea */
+      white-space: normal;
       font-size: 1rem;
       line-height: 1.2;
       text-align: center;
@@ -34,124 +37,141 @@
       font-weight: bold;
    }
 
-/* Ajuste de Diseño Slim para Invoices */
-#form-invoice .card {
-    min-height: 55px !important; /* Altura más baja */
-    justify-content: center;
-    border-radius: 8px !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
-}
+   /* Ajuste de Diseño Slim para Invoices */
+   #form-invoice .card {
+      min-height: 55px !important;
+      justify-content: center;
+      border-radius: 8px !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+   }
 
-/* Forzar que los inputs no tomen espacio extra */
-#form-invoice .card input {
-    height: auto !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    pointer-events: none;
-    line-height: 1.1;
-}
+   /* Forzar que los inputs no tomen espacio extra */
+   #form-invoice .card input {
+      height: auto !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      pointer-events: none;
+      line-height: 1.1;
+   }
 
-/* Card Bond: inputs solo lectura (Bond Qty X y Bond Amount General Y) */
-#card-bond input {
-    pointer-events: auto;
-}
+   /* Card Bond: inputs solo lectura */
+   #card-bond input {
+      pointer-events: auto;
+   }
 
-/* Card Bon: mismo aspecto que bg-warning/border-warning*/
+   /* Ajuste de etiquetas micro */
+   .fs-9 {
+      font-size: 0.65rem !important;
+   }
 
-#card-bond {
-    background-color: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-  
-}
+   /* Fondo claro exacto (opacity 10) */
+   .bg-opacity-10 {
+      --bs-bg-opacity: 0.1 !important;
+   }
 
-/* Ajuste de etiquetas micro */
-.fs-9 {
-    font-size: 0.65rem !important;
-}
+   /* Animación de pulso básica (la antigua) */
+   @keyframes pulse-yellow {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.7); }
+      50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255, 199, 0, 0); background-color: rgba(255, 199, 0, 0.2) !important; }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0); }
+   }
 
-/* Fondo claro exacto (opacity 10) */
-.bg-opacity-10 {
-    --bs-bg-opacity: 0.1 !important; /* Esto hace el fondo claro y elegante */
-}
+   .anim-update {
+      animation: pulse-yellow 0.6s ease-out;
+   }
+/* ================================================================== */
+   /* EFECTO PREMIUM PARA TODAS LAS TARJETAS (Sólido + Reflejo) */
+   /* ================================================================== */
 
-#form-invoice .card {
-    min-height: 55px !important;
-    border-radius: 8px !important;
+   /* 1. Animación del reflejo */
+   @keyframes shine-pass-universal {
+      0% { left: -100%; opacity: 0; }
+      20% { opacity: 0.5; }
+      50% { left: 200%; opacity: 0; }
+      100% { left: 200%; opacity: 0; }
+   }
 
-}
+   /* 2. Clase Base (Estructura común) */
+   .card-shine-effect {
+      position: relative;
+      overflow: hidden;
+      --bs-bg-opacity: 1 !important; 
+      border-radius: 12px !important;
+      z-index: 1;
+      transition: all 0.3s ease;
+      /* Texto oscuro por defecto para leerse bien sobre fondo claro */
+      color: #3F4254 !important; 
+   }
 
-@keyframes pulse-yellow {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0.7); }
-    50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255, 199, 0, 0); background-color: rgba(255, 199, 0, 0.2) !important; }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 199, 0, 0); }
-}
+   /* El Reflejo (Haz de luz) */
+   .card-shine-effect::after {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      transform: skewX(-25deg);
+      animation: shine-pass-universal 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      pointer-events: none;
+   }
 
-.anim-update {
-    animation: pulse-yellow 0.6s ease-out;
-}
+   /* Ajuste de textos internos para que sean legibles y elegantes */
+   .card-shine-effect .fs-9 { opacity: 0.8; color: #000 !important; font-weight: 800 !important; }
+   .card-shine-effect input { color: #000 !important; font-weight: 900 !important; text-shadow: none !important; }
 
-/* Definición de la animación de brillo */
-@keyframes shine-sweep {
-    0% {
-        left: -100%;
-        opacity: 0;
-    }
-    20% {
-        opacity: 1;
-    }
-    50% {
-        left: 200%; /* Se mueve hacia la derecha fuera de la tarjeta */
-        opacity: 0;
-    }
-    100% {
-        left: 200%;
-        opacity: 0;
-    }
-}
+   /* --- VARIANTES DE COLOR (Sólido y Cremoso) --- */
 
-/* Clase para aplicar el efecto */
-.card-elegant-shine {
-    position: relative;
-    overflow: hidden !important; /* Mantiene el brillo dentro de los bordes redondeados */
-    /* Opcional: una transición suave si pasas el mouse */
-    transition: transform 0.3s ease; 
-}
+   /* A. GOLD (Bond - Advertencia) */
+   .shine-warning {
+      background: linear-gradient(180deg, #FFFBEB 0%, #FFD54F 100%) !important;
+      border: 1px solid #FFC107 !important;
+      box-shadow: 0 4px 15px rgba(255, 193, 7, 0.3) !important;
+   }
 
-.card-elegant-shine::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%; /* Ancho del haz de luz */
-    height: 100%;
-    /* Degradado blanco sutil e inclinado */
-    background: linear-gradient(
-        120deg,
-        transparent 0%,
-        rgba(255, 255, 255, 0.3) 50%, /* Ajusta 0.3 para más o menos intensidad */
-        transparent 100%
-    );
-    transform: skewX(-25deg); /* Inclina el haz de luz */
-    pointer-events: none; /* Permite hacer clic en los inputs debajo del brillo */
-    
-    /* Configuración de la animación: 
-       Duración 3s, espera 0.5s al inicio, corre 1 vez (o pon 'infinite' si quieres bucle) */
-    animation: shine-sweep 3s ease-in-out 0.5s 1 forwards; 
-}
+   /* B. BLUE (Total To Date - Info) */
+   .shine-info {
+      background: linear-gradient(180deg, #F0F9FF 0%, #81D4FA 100%) !important;
+      border: 1px solid #03A9F4 !important;
+      box-shadow: 0 4px 15px rgba(3, 169, 244, 0.3) !important;
+   }
 
-/* Escalonar la animación para que sea más elegante (efecto ola) */
-.card-elegant-shine:nth-child(1)::after { animation-delay: 0.2s; }
-.card-elegant-shine:nth-child(2)::after { animation-delay: 0.4s; }
-.card-elegant-shine:nth-child(3)::after { animation-delay: 0.6s; }
-.card-elegant-shine:nth-child(4)::after { animation-delay: 0.8s; }
-.card-elegant-shine:nth-child(5)::after { animation-delay: 1.0s; }
-.card-elegant-shine:nth-child(6)::after { animation-delay: 1.2s; }
-.card-elegant-shine:nth-child(7)::after { animation-delay: 1.4s; }
-.card-elegant-shine:nth-child(8)::after { animation-delay: 1.6s; }
+   /* C. RED (Unpaid - Danger) */
+   .shine-danger {
+      background: linear-gradient(180deg, #FFF5F5 0%, #EF9A9A 100%) !important;
+      border: 1px solid #F44336 !important;
+      box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3) !important;
+   }
 
+   /* D. PRIMARY (This Period - Azul Oscuro) */
+   .shine-primary {
+      background: linear-gradient(180deg, #E3F2FD 0%, #90CAF9 100%) !important;
+      border: 1px solid #2196F3 !important;
+      box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3) !important;
+   }
+
+   /* E. GREEN (Retainage - Success) */
+   .shine-success {
+      background: linear-gradient(180deg, #F1F8E9 0%, #A5D6A7 100%) !important;
+      border: 1px solid #4CAF50 !important;
+      box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
+   }
+
+   /* F. DARK/GRAY (Final Period o Contract) */
+   .shine-dark {
+      background: linear-gradient(180deg, #F5F5F5 0%, #BDBDBD 100%) !important;
+      border: 1px solid #9E9E9E !important;
+      box-shadow: 0 4px 15px rgba(158, 158, 158, 0.3) !important;
+   }
+   
+   /* G. WHITE/DASHED (Contract - Opción suave) */
+   .shine-light {
+      background: linear-gradient(180deg, #FFFFFF 0%, #E0E0E0 100%) !important;
+      border: 1px solid #D6D6D6 !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+   }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 
 <!--begin::Toolbar-->
 <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
@@ -599,63 +619,54 @@
                               <div class="d-flex flex-wrap gap-3"></div>
 
                               <!-- Filtros -->
-                              <div class="d-flex align-items-center gap-3 flex-nowrap w-100">
-                                 <!--search-->
-                                 <div class="position-relative w-250px flex-shrink-0">
-                                    <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
-                                    <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
-                                 </div>
-
-                                 <!-- totales -->
-<div class="card card-dashed card-elegant-shine flex-center min-w-130px p-2">
-    <span class="fs-9 fw-bolder text-gray-500 text-uppercase d-block mb-n1">Contract</span>
-    <input type="text" class="text-gray-800 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_contract_amount" readonly value="$0.00" />
-</div>
-
-<div class="card bg-info bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-info border-opacity-10">
-    <span class="fs-9 fw-bolder text-info text-uppercase d-block mb-n1">Total To Date</span>
-    <input type="text" class="text-info fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_completed" readonly value="$0.00" />
-</div>
-
-<div class="card bg-danger bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-danger border-opacity-10">
-    <span class="fs-9 fw-bolder text-danger text-uppercase d-block mb-n1">Unpaid</span>
-    <input type="text" class="text-danger fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_unpaid" readonly value="$0.00" />
-</div>
-
-<div class="card bg-primary bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-primary border-opacity-10">
-    <span class="fs-9 fw-bolder text-primary text-uppercase d-block mb-n1">This Period</span>
-    <input type="text" class="text-primary fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_period" readonly value="$0.00" />
-</div>
-
-<div class="card bg-dark bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-gray-600 border-opacity-10">
-    <span class="fs-9 fw-bolder text-gray-700 text-uppercase d-block mb-n1">Final Period</span>
-    <input type="text" class="text-gray-900 fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
-</div>
-
-<div class="card bg-success bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-success border-opacity-10">
-        <span class="fs-9 fw-bolder text-success text-uppercase d-block mb-n1">Current retainage</span>
-        <input type="text" class="text-success fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_current_retainage_display" readonly value="$0.00" />
+                             <div class="d-flex align-items-center gap-3 flex-nowrap w-100">
+    <div class="position-relative w-250px flex-shrink-0">
+        <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+        <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
     </div>
 
-      <!--end:<div class="card bg-success bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-success border-opacity-10">
-        <span class="fs-9 fw-bolder text-success text-uppercase d-block mb-n1">Less retainage </span>
-        <input type="text" class="text-success fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_retainage_calculated_display" readonly value="$0.00" />
-    </div>
-    -->
-<div id="card-bond" class="d-flex gap-3 align-items-center">
-    
-    <div class="card bg-warning bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-warning border-opacity-10">
-        <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Total Amount</span>
-        <input type="text" class="text-warning fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_bonded_y" readonly value="$0.00" />
+    <div class="card card-shine-effect shine-light flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Contract</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_contract_amount" readonly value="$0.00" />
     </div>
 
-    <div class="card bg-warning bg-opacity-10 card-elegant-shine flex-center min-w-130px p-2 border border-warning border-opacity-10">
-        <span class="fs-9 fw-bolder text-warning text-uppercase d-block mb-n1">Bond Qty (0-1)</span>
-        <input type="text" class="text-warning fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_bonded_x" readonly value="0.00" />
+    <div class="card card-shine-effect shine-info flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Total To Date</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_completed" readonly value="$0.00" />
     </div>
 
+    <div class="card card-shine-effect shine-danger flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Unpaid</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_unpaid" readonly value="$0.00" />
+    </div>
+
+    <div class="card card-shine-effect shine-primary flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">This Period</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_period" readonly value="$0.00" />
+    </div>
+
+    <div class="card card-shine-effect shine-dark flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Final Period</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_amount_final" readonly value="$0.00" />
+    </div>
+
+    <div class="card card-shine-effect shine-success flex-center min-w-130px p-2">
+        <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Current retainage</span>
+        <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="invoice_current_retainage_display" readonly value="$0.00" />
+    </div>
+
+    <div id="card-bond" class="d-flex gap-3 align-items-center">
+        <div class="card card-shine-effect shine-warning flex-center min-w-130px p-2">
+            <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Bond Total Amount</span>
+            <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_bonded_y" readonly value="$0.00" />
+        </div>
+
+        <div class="card card-shine-effect shine-warning flex-center min-w-130px p-2">
+            <span class="fs-9 fw-bolder text-uppercase d-block mb-n1">Bond Qty</span>
+            <input type="text" class="fw-bold fs-6 border-0 bg-transparent text-center w-100" id="total_bonded_x" readonly value="0.00" />
+        </div>
+    </div>
 </div>
-                              </div>
                            </div>
                            <!--end::Wrapper-->
 
