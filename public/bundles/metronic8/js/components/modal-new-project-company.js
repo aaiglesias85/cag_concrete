@@ -6,6 +6,7 @@ var ModalNewProjectCompany = (function () {
    var npItems = [];
    var oTableItems = null;
    var npContacts = [];
+   var npContacts_company = [];
    var oTableContacts = null;
    var npConcreteClasses = [];
    var oTableConcreteClasses = null;
@@ -372,7 +373,49 @@ var ModalNewProjectCompany = (function () {
       return true;
    };
 
-   // --- Contacts (igual que Projects) ---
+   // --- Contacts: select company contact + role + notes (igual que Projects) ---
+   var loadCompanyContactsForModalProject = function (callback) {
+      if (!company_id) {
+         if (callback) callback();
+         return;
+      }
+      var formData = new URLSearchParams();
+      formData.set('company_id', company_id);
+      if (typeof BlockUtil !== 'undefined') BlockUtil.block('#lista-contacts-modal-project');
+      axios
+         .post('company/listarContacts', formData, { responseType: 'json' })
+         .then(function (res) {
+            if ((res.status === 200 || res.status === 201) && res.data.success) {
+               npContacts_company = res.data.contacts || [];
+               if (callback) callback();
+            }
+         })
+         .catch(function (err) {
+            if (typeof MyUtil !== 'undefined' && MyUtil.catchErrorAxios) MyUtil.catchErrorAxios(err);
+            else toastr.error(err.message || 'Error', '');
+         })
+         .then(function () {
+            if (typeof BlockUtil !== 'undefined') BlockUtil.unblock('#lista-contacts-modal-project');
+         });
+   };
+   var actualizarSelectContactCompanyModalProject = function () {
+      var select = '#contact-company-select-modal-project';
+      jQuery(select).empty();
+      jQuery(select).append(new Option('Select', '', false, false));
+      for (var i = 0; i < npContacts_company.length; i++) {
+         var c = npContacts_company[i];
+         var opt = new Option(c.name, c.contact_id, false, false);
+         jQuery(opt).attr('data-email', c.email || '');
+         jQuery(opt).attr('data-phone', c.phone || '');
+         jQuery(select).append(opt);
+      }
+      if (typeof jQuery().select2 !== 'undefined') {
+         jQuery('.select-modal-contact-mp').select2({ dropdownParent: jQuery('#modal-contact-modal-project'), width: '100%' });
+      }
+   };
+   var resetSelectContactCompanyModalProjectValue = function () {
+      jQuery('#contact-company-select-modal-project').val('').trigger('change');
+   };
    var initTableContacts = function () {
       if (!jQuery('#contacts-table-editable-modal-project').length || typeof DatatableUtil === 'undefined') return;
       var columns = [{ data: 'name' }, { data: 'email' }, { data: 'phone' }, { data: 'role' }, { data: 'notes' }, { data: null }];
@@ -465,6 +508,7 @@ var ModalNewProjectCompany = (function () {
       $('#tp-unit-modal-project').val('').trigger('change');
       npItems = [];
       npContacts = [];
+      npContacts_company = [];
       npConcreteClasses = [];
       npAjustesPrecio = [];
       actualizarTableListaItems();
@@ -566,7 +610,14 @@ var ModalNewProjectCompany = (function () {
          return o;
       });
       var contactsArr = npContacts.map(function (r) {
-         return { name: r.name || '', email: r.email || '', phone: r.phone || '', role: r.role || '', notes: r.notes || '' };
+         return {
+            company_contact_id: r.company_contact_id || '',
+            name: r.name || '',
+            email: r.email || '',
+            phone: r.phone || '',
+            role: r.role || '',
+            notes: r.notes || ''
+         };
       });
       var concreteClassesArr = npConcreteClasses.map(function (r) {
          return { concrete_class_id: r.concrete_class_id || '', price: r.price || '0' };
@@ -653,6 +704,11 @@ var ModalNewProjectCompany = (function () {
 
       jQuery('#modal-new-project-company').on('shown.bs.modal', function () {
          initSelectsModalParent();
+         if (company_id && npContacts_company.length === 0) {
+            loadCompanyContactsForModalProject(function () {
+               actualizarSelectContactCompanyModalProject();
+            });
+         }
       });
 
       $(document).off('click', '#btn-salvar-project-modal-project');
@@ -849,19 +905,76 @@ var ModalNewProjectCompany = (function () {
          jQuery('#modal-new-project-company .div-retainage-modal-project').toggleClass('hide', !jQuery(this).prop('checked'));
       });
 
-      // --- Contacts (igual que Projects) ---
+      // --- Contacts: select company contact + role + notes (load once per modal open) ---
       jQuery(document).off('click', '#btn-agregar-contact-modal-project');
       jQuery(document).on('click', '#btn-agregar-contact-modal-project', function () {
+         if (!company_id) {
+            toastr.error('Company is required.', '');
+            return;
+         }
          jQuery('#contact-edit-index-modal-project').val('');
-         jQuery('#contact-name-modal-project, #contact-email-modal-project, #contact-phone-modal-project, #contact-role-modal-project, #contact-notes-modal-project').val('');
-         ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+         jQuery('#contact-role-modal-project, #contact-notes-modal-project').val('');
+         if (npContacts_company.length === 0) {
+            loadCompanyContactsForModalProject(function () {
+               actualizarSelectContactCompanyModalProject();
+               ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+            });
+         } else {
+            resetSelectContactCompanyModalProjectValue();
+            ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+         }
+      });
+      jQuery(document).off('click', '.btn-add-contact-company-mp');
+      jQuery(document).on('click', '.btn-add-contact-company-mp', function () {
+         if (!company_id) {
+            if (typeof MyApp !== 'undefined' && MyApp.showErrorMessageValidateSelect && typeof KTUtil !== 'undefined') {
+               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-contact-company-modal-project'), 'Company is required.');
+            } else {
+               toastr.error('Company is required.', '');
+            }
+            return;
+         }
+         if (typeof ModalContactCompany !== 'undefined') {
+            ModalContactCompany.mostrarModal(company_id);
+         }
+      });
+      jQuery('#modal-contact-company').off('hidden.bs.modal.contact-modal-project');
+      jQuery('#modal-contact-company').on('hidden.bs.modal.contact-modal-project', function () {
+         var contact = typeof ModalContactCompany !== 'undefined' ? ModalContactCompany.getContact() : null;
+         if (contact && jQuery('#contact-company-select-modal-project').length) {
+            npContacts_company.push(contact);
+            jQuery('#contact-company-select-modal-project').append(new Option(contact.name, contact.contact_id, false, false));
+            jQuery('#contact-company-select-modal-project').val(contact.contact_id);
+            jQuery('#contact-company-select-modal-project').trigger('change');
+            jQuery('.select-modal-contact-mp').select2({ dropdownParent: jQuery('#modal-contact-modal-project'), width: '100%' });
+         }
       });
       jQuery(document).off('click', '#btn-salvar-contact-modal-project');
       jQuery(document).on('click', '#btn-salvar-contact-modal-project', function () {
-         var name = jQuery('#contact-name-modal-project').val() || '';
-         if (!name.trim()) { toastr.error('Name is required.', ''); return; }
+         var company_contact_id = jQuery('#contact-company-select-modal-project').val();
+         if (!company_contact_id) {
+            if (typeof MyApp !== 'undefined' && MyApp.showErrorMessageValidateSelect && typeof KTUtil !== 'undefined') {
+               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-contact-company-modal-project'), 'This field is required');
+            } else {
+               toastr.error('Contact is required.', '');
+            }
+            return;
+         }
          var editIdx = jQuery('#contact-edit-index-modal-project').val();
-         var row = { name: name, email: jQuery('#contact-email-modal-project').val() || '', phone: jQuery('#contact-phone-modal-project').val() || '', role: jQuery('#contact-role-modal-project').val() || '', notes: jQuery('#contact-notes-modal-project').val() || '' };
+         var isDuplicate = npContacts.some(function (c, idx) {
+            return String(c.company_contact_id) === String(company_contact_id) && idx !== parseInt(editIdx, 10);
+         });
+         if (isDuplicate) {
+            toastr.error('This contact is already added to the project.', '');
+            return;
+         }
+         var selectedOpt = jQuery('#contact-company-select-modal-project option:selected');
+         var name = selectedOpt.text();
+         var email = selectedOpt.attr('data-email') || '';
+         var phone = selectedOpt.attr('data-phone') || '';
+         var role = jQuery('#contact-role-modal-project').val() || '';
+         var notes = jQuery('#contact-notes-modal-project').val() || '';
+         var row = { company_contact_id: company_contact_id, name: name, email: email, phone: phone, role: role, notes: notes };
          if (editIdx !== '' && editIdx !== undefined) {
             row.posicion = npContacts[parseInt(editIdx, 10)].posicion;
             npContacts[parseInt(editIdx, 10)] = row;
@@ -879,12 +992,20 @@ var ModalNewProjectCompany = (function () {
          if (pos === undefined || !npContacts[pos]) return;
          var r = npContacts[pos];
          jQuery('#contact-edit-index-modal-project').val(pos);
-         jQuery('#contact-name-modal-project').val(r.name);
-         jQuery('#contact-email-modal-project').val(r.email);
-         jQuery('#contact-phone-modal-project').val(r.phone);
-         jQuery('#contact-role-modal-project').val(r.role);
-         jQuery('#contact-notes-modal-project').val(r.notes);
-         ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+         jQuery('#contact-role-modal-project').val(r.role || '');
+         jQuery('#contact-notes-modal-project').val(r.notes || '');
+         if (npContacts_company.length === 0) {
+            loadCompanyContactsForModalProject(function () {
+               actualizarSelectContactCompanyModalProject();
+               jQuery('#contact-company-select-modal-project').val(r.company_contact_id || '');
+               jQuery('#contact-company-select-modal-project').trigger('change');
+               ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+            });
+         } else {
+            jQuery('#contact-company-select-modal-project').val(r.company_contact_id || '');
+            jQuery('#contact-company-select-modal-project').trigger('change');
+            ModalUtil.show('modal-contact-modal-project', { backdrop: 'static', keyboard: true });
+         }
       });
       jQuery(document).off('click', '#contacts-table-editable-modal-project a.delete');
       jQuery(document).on('click', '#contacts-table-editable-modal-project a.delete', function (e) {

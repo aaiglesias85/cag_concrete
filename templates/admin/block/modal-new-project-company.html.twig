@@ -1,5 +1,5 @@
 <div class="modal fade" id="modal-new-project-company" role="dialog" aria-labelledby="modalNewProjectCompanyLabel">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">New Project</h5>
@@ -767,9 +767,9 @@
     </div>
 </div>
 
-{# Modal Contact (igual que Projects modal-contact) #}
+{# Modal Contact: select company contact + role + notes (igual que Projects) #}
 <div class="modal fade" id="modal-contact-modal-project" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">New contact</h5>
@@ -780,34 +780,25 @@
             <div class="modal-body">
                 <form id="contact-form-modal-project" class="m-form">
                     <input type="hidden" id="contact-edit-index-modal-project" value="" />
-                    <div class="form-group ic-form-group">
-                        <label class="form-label required"><span class="ic-step-number">1</span> Name</label>
-                        <input type="text" class="form-control form-control-solid form-control-validate" id="contact-name-modal-project" name="name" />
-                    </div>
-                    <div class="form-group ic-form-group">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <label class="form-label"><span class="ic-step-number">2</span> Email</label>
-                                <div class="input-group input-group-solid">
-                                    <span class="input-group-text">&#64;</span>
-                                    <input type="text" class="form-control form-control-validate" id="contact-email-modal-project" name="email" />
-                                </div>
+                    <div class="form-group ic-form-group" id="select-contact-company-modal-project">
+                        <label class="form-label required"><span class="ic-step-number">1</span> Contact</label>
+                        <div class="input-group input-group-solid flex-nowrap">
+                            <div class="overflow-hidden flex-grow-1">
+                                <select id="contact-company-select-modal-project" class="form-control form-select select-modal-contact-mp select-validate form-select-solid rounded-end-0 border-end" name="company_contact_id">
+                                    <option value="">Select</option>
+                                </select>
                             </div>
-                            <div class="col-md-5">
-                                <label class="form-label"> Phone </label>
-                                <div class="input-group input-group-solid">
-                                    <span class="input-group-text"><i class="la la-phone"></i></span>
-                                    <input type="text" class="form-control form-control-validate input-phone" id="contact-phone-modal-project" name="phone" />
-                                </div>
-                            </div>
+                            <span class="input-group-text btn-add-contact-company-mp" title="Add contact" style="cursor: pointer">
+                                <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                            </span>
                         </div>
                     </div>
                     <div class="form-group ic-form-group">
-                        <label class="form-label"><span class="ic-step-number">3</span> Role</label>
+                        <label class="form-label"><span class="ic-step-number">2</span> Role</label>
                         <input type="text" class="form-control form-control-solid form-control-validate" id="contact-role-modal-project" name="role" />
                     </div>
                     <div class="form-group ic-form-group">
-                        <label class="form-label"><span class="ic-step-number">4</span> Notes</label>
+                        <label class="form-label"><span class="ic-step-number">3</span> Notes</label>
                         <textarea class="form-control form-control-solid form-control-validate" rows="6" id="contact-notes-modal-project" name="notes"></textarea>
                     </div>
                 </form>

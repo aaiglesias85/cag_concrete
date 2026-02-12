@@ -1080,6 +1080,8 @@ class Base
 
    /**
     * ListarContactsDeProject
+    * Compatible with project_contact.company_contact_id NULL (legacy records).
+    *
     * @param $project_id
     * @return array
     */
@@ -1091,13 +1093,16 @@ class Base
       $projectContactRepo = $this->getDoctrine()->getRepository(ProjectContact::class);
       $project_contacts = $projectContactRepo->ListarContacts($project_id);
       foreach ($project_contacts as $key => $contact) {
+         $companyContact = $contact->getCompanyContact();
+         // Compatible with company_contact_id NULL (legacy)
          $contacts[] = [
             'contact_id' => $contact->getContactId(),
-            'name' => $contact->getName(),
-            'email' => $contact->getEmail(),
-            'phone' => $contact->getPhone(),
-            'role' => $contact->getRole(),
-            'notes' => $contact->getNotes(),
+            'company_contact_id' => $companyContact ? $companyContact->getContactId() : null,
+            'name' => $contact->getName() ?? '',
+            'email' => $contact->getEmail() ?? '',
+            'phone' => $contact->getPhone() ?? '',
+            'role' => $contact->getRole() ?? '',
+            'notes' => $contact->getNotes() ?? '',
             'posicion' => $key
          ];
       }

@@ -3,6 +3,7 @@
 namespace App\Utils\Admin;
 
 use App\Entity\Company;
+use App\Entity\CompanyContact;
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
@@ -1540,13 +1541,16 @@ class ProjectService extends Base
       $project_contacts = $projectContactRepo->ListarContacts($project_id);
 
       foreach ($project_contacts as $key => $project_contact) {
+         $companyContact = $project_contact->getCompanyContact();
+         // Compatible with company_contact_id NULL (legacy): name/email/phone from stored fields
          $contacts[] = [
             'contact_id' => $project_contact->getContactId(),
-            'name' => $project_contact->getName(),
-            'email' => $project_contact->getEmail(),
-            'phone' => $project_contact->getPhone(),
-            'role' => $project_contact->getRole(),
-            'notes' => $project_contact->getNotes(),
+            'company_contact_id' => $companyContact ? $companyContact->getContactId() : null,
+            'name' => $project_contact->getName() ?? '',
+            'email' => $project_contact->getEmail() ?? '',
+            'phone' => $project_contact->getPhone() ?? '',
+            'role' => $project_contact->getRole() ?? '',
+            'notes' => $project_contact->getNotes() ?? '',
             'posicion' => $key
          ];
       }
@@ -2824,6 +2828,9 @@ class ProjectService extends Base
 
    /**
     * SalvarContacts
+    * Contacts reference CompanyContact (company_contact_id). When set, name/email/phone come from there.
+    * Skips contacts without company_contact_id. Legacy records (company_contact_id NULL) persist unchanged.
+    *
     * @param $contacts
     * @param Project $entity
     * @return void
@@ -2832,12 +2839,14 @@ class ProjectService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
-      //Senderos
       foreach ($contacts as $value) {
+         if (empty($value->company_contact_id)) {
+            continue;
+         }
 
          $contact_entity = null;
 
-         if (is_numeric($value->contact_id)) {
+         if (!empty($value->contact_id) && is_numeric($value->contact_id)) {
             $contact_entity = $this->getDoctrine()->getRepository(ProjectContact::class)
                ->find($value->contact_id);
          }
@@ -2848,15 +2857,20 @@ class ProjectService extends Base
             $is_new_contact = true;
          }
 
-         $contact_entity->setName($value->name);
-         $contact_entity->setEmail($value->email);
-         $contact_entity->setPhone($value->phone);
-         $contact_entity->setRole($value->role);
-         $contact_entity->setNotes($value->notes);
+         /** @var CompanyContact|null $companyContact */
+         $companyContact = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->find($value->company_contact_id);
+
+         if ($companyContact) {
+            $contact_entity->setCompanyContact($companyContact);
+            // name/email/phone stay empty in DB; entity getters use CompanyContact
+         }
+
+         $contact_entity->setRole($value->role ?? null);
+         $contact_entity->setNotes($value->notes ?? null);
 
          if ($is_new_contact) {
             $contact_entity->setProject($entity);
-
             $em->persist($contact_entity);
          }
       }

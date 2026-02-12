@@ -1,81 +1,67 @@
 <div class="modal fade" id="modal-contact-company" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Contact</h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
-                     aria-label="Close">
-                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-                </div>
+   <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New Contact</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
-            <div class="modal-body">
-                <form class="m-form" id="contact-company-modal-form" action="#"
-                      enctype="multipart/form-data" method="post">
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="contact-company-modal-form" action="#" enctype="multipart/form-data" method="post">
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Name
+                  </label>
+                  <input type="text" class="form-control form-control-solid form-control-validate" id="contact-name-company-modal" name="name" />
+               </div>
 
-                    <div class="form-group ic-form-group">
-                        <label class="form-label required">
-                            <span class="ic-step-number">1</span>
-                            Name
+               <div class="form-group ic-form-group">
+                  <div class="row">
+                     <div class="col-md-5">
+                        <label class="form-label">
+                           <span class="ic-step-number">2</span>
+                           Email
                         </label>
-                        <input type="text" class="form-control form-control-solid form-control-validate"
-                               id="contact-name-company-modal" name="name"/>
-                    </div>
-
-                    <div class="form-group ic-form-group">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <label class="form-label">
-                                    <span class="ic-step-number">2</span>
-                                    Email
-                                </label>
-                                <div class="input-group input-group-solid">
-                                    <span class="input-group-text">&#64;</span>
-                                    <input type="text"
-                                           class="form-control form-control-validate"
-                                           id="contact-email-company-modal"
-                                           name="email" autocomplete="off">
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label">
-                                    Phone
-                                </label>
-                                <div class="input-group input-group-solid">
-                                    <span class="input-group-text"><i class="la la-phone"></i></span>
-                                    <input type="text"
-                                           class="form-control form-control-validate input-phone event-change"
-                                           id="contact-phone-company-modal" name="phone" autocomplete="off">
-                                </div>
-                            </div>
+                        <div class="input-group input-group-solid">
+                           <span class="input-group-text">&#64;</span>
+                           <input type="text" class="form-control form-control-validate" id="contact-email-company-modal" name="email" autocomplete="off" />
                         </div>
-                    </div>
+                     </div>
+                     <div class="col-md-5">
+                        <label class="form-label"> Phone </label>
+                        <div class="input-group input-group-solid">
+                           <span class="input-group-text"><i class="la la-phone"></i></span>
+                           <input type="text" class="form-control form-control-validate input-phone event-change" id="contact-phone-company-modal" name="phone" autocomplete="off" />
+                        </div>
+                     </div>
+                  </div>
+               </div>
 
-                    <div class="form-group ic-form-group">
-                        <label class="form-label">
-                            <span class="ic-step-number">3</span>
-                            Role
-                        </label>
-                        <input type="text" class="form-control form-control-solid form-control-validate"
-                               id="contact-role-company-modal" name="role"/>
-                    </div>
+               <div class="form-group ic-form-group">
+                  <label class="form-label">
+                     <span class="ic-step-number">3</span>
+                     Role
+                  </label>
+                  <input type="text" class="form-control form-control-solid form-control-validate" id="contact-role-company-modal" name="role" />
+               </div>
 
-                    <div class="form-group ic-form-group">
-                        <label class="form-label">
-                            <span class="ic-step-number">4</span>
-                            Notes
-                        </label>
-                        <textarea class="form-control form-control-solid form-control-validate" rows="6"
-                                  id="contact-notes-company-modal" name="notes"></textarea>
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="btn-salvar-contact-company-modal">Save</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
+               <div class="form-group ic-form-group">
+                  <label class="form-label">
+                     <span class="ic-step-number">4</span>
+                     Notes
+                  </label>
+                  <textarea class="form-control form-control-solid form-control-validate" rows="6" id="contact-notes-company-modal" name="notes"></textarea>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-contact-company-modal">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
 </div>
 
 <script src="{{ asset('bundles/metronic8/js/components/modal-contact-company.js') }}?{{ 'now' | date('U') }}"></script>

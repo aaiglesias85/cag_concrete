@@ -582,6 +582,11 @@ var Projects = (function () {
                actualizarTableListaConcreteClasses();
                break;
             case 7:
+               if (contacts_company.length === 0) {
+                  loadCompanyContactsForProject(function () {
+                     actualizarSelectContactCompany();
+                  });
+               }
                actualizarTableListaContacts();
                break;
             case 8:
@@ -1158,8 +1163,11 @@ var Projects = (function () {
          items = project.items;
          actualizarTableListaItems();
 
-         // contacts
+         // contacts (load company contacts once when project data loads)
          contacts = project.contacts;
+         loadCompanyContactsForProject(function () {
+            actualizarSelectContactCompany();
+         });
          actualizarTableListaContacts();
 
          // concrete_classes
@@ -2958,26 +2966,70 @@ var Projects = (function () {
       });
    };
 
-   // Contacts
+   // Contacts (project contacts = company contacts with role/notes)
    var contacts = [];
+   var contacts_company = [];
    var oTableContacts;
    var nEditingRowContact = null;
+
+   var loadCompanyContactsForProject = function (callback) {
+      var company_id = $('#company').val();
+      if (!company_id) {
+         if (callback) callback();
+         return;
+      }
+      var formData = new URLSearchParams();
+      formData.set('company_id', company_id);
+      BlockUtil.block('#lista-contacts');
+      axios
+         .post('company/listarContacts', formData, { responseType: 'json' })
+         .then(function (res) {
+            if ((res.status === 200 || res.status === 201) && res.data.success) {
+               contacts_company = res.data.contacts || [];
+               if (callback) callback();
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#lista-contacts');
+         });
+   };
+
+   var actualizarSelectContactCompany = function () {
+      var select = '#contact-company-select';
+      $(select).empty();
+      $(select).append(new Option('Select', '', false, false));
+      for (var i = 0; i < contacts_company.length; i++) {
+         var c = contacts_company[i];
+         var opt = new Option(c.name, c.contact_id, false, false);
+         $(opt).attr('data-email', c.email || '');
+         $(opt).attr('data-phone', c.phone || '');
+         $(select).append(opt);
+      }
+      if (typeof $().select2 !== 'undefined') {
+         $('.select-modal-contact-project').select2({ dropdownParent: $('#modal-contact'), width: '100%' });
+      }
+   };
+   var resetSelectContactCompanyValue = function () {
+      $('#contact-company-select').val('').trigger('change');
+   };
+
+   var findCompanyContactByEmail = function (email) {
+      if (!email) return null;
+      for (var i = 0; i < contacts_company.length; i++) {
+         if (contacts_company[i].email && String(contacts_company[i].email).toLowerCase() === String(email).toLowerCase()) {
+            return contacts_company[i];
+         }
+      }
+      return null;
+   };
+
    var initTableContacts = function () {
       const table = '#contacts-table-editable';
-
-      // columns
       const columns = [{ data: 'name' }, { data: 'email' }, { data: 'phone' }, { data: 'role' }, { data: 'notes' }, { data: null }];
-
-      // column defs
       let columnDefs = [
-         {
-            targets: 1,
-            render: DatatableUtil.getRenderColumnEmail,
-         },
-         {
-            targets: 2,
-            render: DatatableUtil.getRenderColumnPhone,
-         },
+         { targets: 1, render: DatatableUtil.getRenderColumnEmail },
+         { targets: 2, render: DatatableUtil.getRenderColumnPhone },
          {
             targets: -1,
             data: null,
@@ -2988,14 +3040,8 @@ var Projects = (function () {
             },
          },
       ];
-
-      // language
       const language = DatatableUtil.getDataTableLenguaje();
-
-      // order
       const order = [[0, 'asc']];
-
-      // escapar contenido de la tabla
       oTableContacts = DatatableUtil.initSafeDataTable(table, {
          data: contacts,
          displayLength: 10,
@@ -3004,120 +3050,162 @@ var Projects = (function () {
          columnDefs: columnDefs,
          language: language,
       });
-
       handleSearchDatatableContacts();
    };
+
    var handleSearchDatatableContacts = function () {
       $(document).off('keyup', '#lista-contacts [data-table-filter="search"]');
       $(document).on('keyup', '#lista-contacts [data-table-filter="search"]', function (e) {
-         oTableContacts.search(e.target.value).draw();
+         if (oTableContacts) oTableContacts.search(e.target.value).draw();
       });
    };
+
    var actualizarTableListaContacts = function () {
       if (oTableContacts) {
          oTableContacts.destroy();
       }
-
       initTableContacts();
    };
 
    var validateFormContact = function () {
-      var result = false;
-
-      //Validacion
-      var form = KTUtil.get('contact-form');
-
-      var constraints = {
-         name: {
-            presence: { message: 'This field is required' },
-         },
-         email: {
-            email: { message: 'The email must be valid' },
-         },
-      };
-
-      var errors = validate(form, constraints);
-
-      if (!errors) {
-         result = true;
-      } else {
-         MyApp.showErrorsValidateForm(form, errors);
+      var company_contact_id = $('#contact-company-select').val();
+      if (!company_contact_id || company_contact_id === '') {
+         MyApp.showErrorMessageValidateSelect(KTUtil.get('select-contact-project-modal'), 'This field is required');
+         return false;
       }
-
-      //attach change
-      MyUtil.attachChangeValidacion(form, constraints);
-
-      return result;
+      MyApp.resetErrorMessageValidateSelect(KTUtil.get('select-contact-project-modal'));
+      return true;
    };
+
    var initAccionesContacts = function () {
       $(document).off('click', '#btn-agregar-contact');
       $(document).on('click', '#btn-agregar-contact', function (e) {
-         // reset
+         var company_id = $('#company').val();
+         if (!company_id) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
+            return;
+         }
          resetFormContact();
+         if (contacts_company.length === 0) {
+            loadCompanyContactsForProject(function () {
+               actualizarSelectContactCompany();
+               ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+            });
+         } else {
+            resetSelectContactCompanyValue();
+            ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+         }
+      });
 
-         // mostar modal
-         ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+      $(document).off('click', '.btn-add-contact-company');
+      $(document).on('click', '.btn-add-contact-company', function (e) {
+         var company_id = $('#company').val();
+         if (!company_id) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-contact-project-modal'), 'Please select a company first.');
+            return;
+         }
+         if (typeof ModalContactCompany !== 'undefined') {
+            ModalContactCompany.mostrarModal(company_id);
+         }
+      });
+
+      $('#modal-contact-company').off('hidden.bs.modal.contact-project');
+      $('#modal-contact-company').on('hidden.bs.modal.contact-project', function () {
+         var contact = typeof ModalContactCompany !== 'undefined' ? ModalContactCompany.getContact() : null;
+         if (contact) {
+            contacts_company.push(contact);
+            var opt = new Option(contact.name, contact.contact_id, false, false);
+            $('#contact-company-select').append(opt);
+            $('#contact-company-select').val(contact.contact_id);
+            $('#contact-company-select').trigger('change');
+            $('.select-modal-contact-project').select2({ dropdownParent: $('#modal-contact'), width: '100%' });
+         }
       });
 
       $(document).off('click', '#btn-salvar-contact');
       $(document).on('click', '#btn-salvar-contact', function (e) {
          e.preventDefault();
+         if (!validateFormContact()) return;
 
-         if (validateFormContact()) {
-            var name = $('#contact-name').val();
-            var email = $('#contact-email').val();
-            var phone = $('#contact-phone').val();
-            var role = $('#contact-role').val();
-            var notes = $('#contact-notes').val();
+         var company_contact_id = $('#contact-company-select').val();
+         var selectedOpt = $('#contact-company-select option:selected');
+         var name = selectedOpt.text();
+         var email = selectedOpt.attr('data-email') || '';
+         var phone = selectedOpt.attr('data-phone') || '';
+         var role = $('#contact-role').val() || '';
+         var notes = $('#contact-notes').val() || '';
 
-            if (nEditingRowContact == null) {
-               contacts.push({
-                  contact_id: '',
-                  name: name,
-                  email: email,
-                  phone: phone,
-                  role: role,
-                  notes: notes,
-                  posicion: contacts.length,
-               });
-            } else {
-               var posicion = nEditingRowContact;
-               if (contacts[posicion]) {
-                  contacts[posicion].name = name;
-                  contacts[posicion].email = email;
-                  contacts[posicion].phone = phone;
-                  contacts[posicion].role = role;
-                  contacts[posicion].notes = notes;
-               }
-            }
-
-            //actualizar lista
-            actualizarTableListaContacts();
-
-            // reset
-            resetFormContact();
-            // hide modal
-            ModalUtil.hide('modal-contact');
+         var isDuplicate = contacts.some(function (c, idx) {
+            return String(c.company_contact_id) === String(company_contact_id) && idx !== nEditingRowContact;
+         });
+         if (isDuplicate) {
+            toastr.error('This contact is already added to the project.', '');
+            return;
          }
+
+         if (nEditingRowContact == null) {
+            contacts.push({
+               contact_id: '',
+               company_contact_id: company_contact_id,
+               name: name,
+               email: email,
+               phone: phone,
+               role: role,
+               notes: notes,
+               posicion: contacts.length,
+            });
+         } else {
+            var posicion = nEditingRowContact;
+            if (contacts[posicion]) {
+               contacts[posicion].company_contact_id = company_contact_id;
+               contacts[posicion].name = name;
+               contacts[posicion].email = email;
+               contacts[posicion].phone = phone;
+               contacts[posicion].role = role;
+               contacts[posicion].notes = notes;
+            }
+         }
+
+         actualizarTableListaContacts();
+         resetFormContact();
+         ModalUtil.hide('modal-contact');
       });
 
       $(document).off('click', '#contacts-table-editable a.edit');
       $(document).on('click', '#contacts-table-editable a.edit', function () {
          var posicion = $(this).data('posicion');
-         if (contacts[posicion]) {
-            // reset
-            resetFormContact();
+         if (!contacts[posicion]) return;
+         var company_id = $('#company').val();
+         if (!company_id) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
+            return;
+         }
+         resetFormContact();
+         nEditingRowContact = posicion;
+         $('#contact_id').val(contacts[posicion].contact_id || '');
+         $('#contact-role').val(contacts[posicion].role || '');
+         $('#contact-notes').val(contacts[posicion].notes || '');
 
-            nEditingRowContact = posicion;
-
-            $('#contact_id').val(contacts[posicion].contact_id);
-            $('#contact-name').val(contacts[posicion].name);
-            $('#contact-email').val(contacts[posicion].email);
-            $('#contact-phone').val(contacts[posicion].phone);
-            $('#contact-role').val(contacts[posicion].role);
-            $('#contact-notes').val(contacts[posicion].notes);
-
-            // mostar modal
+         if (contacts_company.length === 0) {
+            loadCompanyContactsForProject(function () {
+               actualizarSelectContactCompany();
+               var c = contacts[posicion];
+               var matched = findCompanyContactByEmail(c.email);
+               if (matched) {
+                  $('#contact-company-select').val(matched.contact_id);
+                  $('#contact-company-select').trigger('change');
+               }
+               ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
+            });
+         } else {
+            var c = contacts[posicion];
+            var matched = findCompanyContactByEmail(c.email);
+            if (matched) {
+               $('#contact-company-select').val(matched.contact_id);
+               $('#contact-company-select').trigger('change');
+            } else {
+               resetSelectContactCompanyValue();
+            }
             ModalUtil.show('modal-contact', { backdrop: 'static', keyboard: true });
          }
       });
@@ -3126,44 +3214,38 @@ var Projects = (function () {
       $(document).on('click', '#contacts-table-editable a.delete', function (e) {
          e.preventDefault();
          var posicion = $(this).data('posicion');
-         if (contacts[posicion]) {
-            Swal.fire({
-               text: 'Are you sure you want to delete the contact?',
-               icon: 'warning',
-               showCancelButton: true,
-               buttonsStyling: false,
-               confirmButtonText: 'Yes, delete it!',
-               cancelButtonText: 'No, cancel',
-               customClass: {
-                  confirmButton: 'btn fw-bold btn-success',
-                  cancelButton: 'btn fw-bold btn-danger',
-               },
-            }).then(function (result) {
-               if (result.value) {
-                  eliminarContact(posicion);
-               }
-            });
-         }
+         if (!contacts[posicion]) return;
+         Swal.fire({
+            text: 'Are you sure you want to delete the contact?',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: {
+               confirmButton: 'btn fw-bold btn-success',
+               cancelButton: 'btn fw-bold btn-danger',
+            },
+         }).then(function (result) {
+            if (result.value) eliminarContact(posicion);
+         });
       });
 
       function eliminarContact(posicion) {
-         if (contacts[posicion].contact_id != '') {
+         if (contacts[posicion].contact_id) {
             var formData = new URLSearchParams();
             formData.set('contact_id', contacts[posicion].contact_id);
-
             BlockUtil.block('#lista-contacts');
-
             axios
-               .post('company/eliminarContact', formData, { responseType: 'json' })
+               .post('project/eliminarContact', formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
                      if (response.success) {
                         toastr.success(response.message, '');
-
                         deleteContact(posicion);
                      } else {
-                        toastr.error(response.error, '');
+                        toastr.error(response.error || '');
                      }
                   } else {
                      toastr.error('An internal error has occurred, please try again.', '');
@@ -3179,20 +3261,17 @@ var Projects = (function () {
       }
 
       function deleteContact(posicion) {
-         //Eliminar
          contacts.splice(posicion, 1);
-         //actualizar posiciones
          for (var i = 0; i < contacts.length; i++) {
             contacts[i].posicion = i;
          }
-         //actualizar lista
          actualizarTableListaContacts();
       }
    };
-   var resetFormContact = function () {
-      // reset form
-      MyUtil.resetForm('contact-form');
 
+   var resetFormContact = function () {
+      MyUtil.resetForm('contact-form');
+      resetSelectContactCompanyValue();
       nEditingRowContact = null;
    };
 

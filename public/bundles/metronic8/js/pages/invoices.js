@@ -2329,12 +2329,45 @@ var Invoices = (function () {
          oTableItems.search(e.target.value).draw();
       });
    };
+   // Recalcular solo los totales del footer desde items_lista (sin redibujar tabla)
+   var actualizarFooterTotalesPage = function () {
+      var num = function (v) {
+         return (typeof v === 'number' ? v : (typeof v === 'string' ? Number(String(v).replace(/[^\d.-]/g, '')) : 0)) || 0;
+      };
+      var sum = function (key) {
+         return items_lista.reduce(function (a, row) {
+            return a + num(row[key]);
+         }, 0);
+      };
+      var totalContract = typeof projectContractAmount !== 'undefined' ? projectContractAmount : sum('contract_amount');
+      $('#total_contract_amount').val(MyApp.formatMoney(totalContract, 2, '.', ','));
+      $('#total_amount_completed').val(MyApp.formatMoney(sum('amount_completed'), 2, '.', ','));
+      $('#total_amount_unpaid').val(MyApp.formatMoney(sum('unpaid_amount'), 2, '.', ','));
+      $('#total_amount_period').val(MyApp.formatMoney(sum('amount'), 2, '.', ','));
+      $('#total_amount_final').val(MyApp.formatMoney(sum('amount_final'), 2, '.', ','));
+   };
+
    var actualizarTableListaItems = function () {
+      const table = '#items-table-editable';
+      var scrollLeft = 0;
+      var $wrapper = $(table).closest('.dataTables_wrapper');
+      if ($wrapper.length) {
+         var $body = $wrapper.find('.dataTables_scrollBody');
+         if ($body.length) scrollLeft = $body.scrollLeft();
+      }
       if (oTableItems) {
          oTableItems.destroy();
       }
 
       initTableItems();
+
+      // Restaurar scroll horizontal para no reiniciar la posición
+      $wrapper = $(table).closest('.dataTables_wrapper');
+      if ($wrapper.length) {
+         $body = $wrapper.find('.dataTables_scrollBody');
+         if ($body.length) $body.scrollLeft(scrollLeft);
+      }
+
       // Solo recalcular X e Y en la card cuando es invoice nuevo (sin ID); si es existente, se muestran los valores aplicados del backend
       if (!$('#invoice_id').val()) {
          calcularYMostrarXBondedEnJS();
@@ -2523,40 +2556,47 @@ var Invoices = (function () {
          actualizarTableListaItems();
       }
 
-      $(document).off('change', '#items-table-editable input.quantity_brought_forward');
-      $(document).on('change', '#items-table-editable input.quantity_brought_forward', function (e) {
+      // Guardar último valor válido al enfocar (para restaurar si excede el máximo)
+      $(document).off('focus', '#items-table-editable input.quantity_brought_forward');
+      $(document).on('focus', '#items-table-editable input.quantity_brought_forward', function () {
+         $(this).data('lastValid', $(this).val() || '');
+      });
+      // Validación en input: si es mayor que base, borrar el último número escrito (restaurar valor anterior)
+      $(document).off('input', '#items-table-editable input.quantity_brought_forward');
+      $(document).on('input', '#items-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
-         
-         if (items_lista[posicion]) {
-            var base = Number(items_lista[posicion].base_debt || 0);
-            var new_qbf = Number($this.val() || 0);
-            // Regla: QBF no puede ser mayor que lo debido (unpaid previo)
-            if (new_qbf > base) {
-               new_qbf = base;
-               $this.val(base);
-               if (typeof toastr !== 'undefined') {
-                  toastr.error('QBF no puede ser mayor que lo debido (' + MyApp.formatearNumero(base, 2, '.', ',') + ').');
-               }
-            }
-            items_lista[posicion].quantity_brought_forward = new_qbf;
-
-            // --- CÁLCULO EN VIVO
-            // Unpaid = DeudaBase - QBF Actual
-            var new_unpaid = Math.max(0, base - new_qbf);
-
-            items_lista[posicion].unpaid_qty = new_unpaid;
-            // ------------------------------------------------
-
-            // Actualizar totales dependientes
-            items_lista[posicion].quantity_final = Number(items_lista[posicion].quantity) + new_qbf;
-            items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
-            
-            // Actualizar dinero pendiente ($)
-            items_lista[posicion].unpaid_amount = new_unpaid * items_lista[posicion].price;
-
-            actualizarTableListaItems();
+         if (!items_lista[posicion] || !oTableItems) return;
+         var base = Number(items_lista[posicion].base_debt || 0);
+         var rawVal = $this.val();
+         var isEmpty = rawVal === '' || rawVal === null || rawVal === undefined;
+         var new_qbf = isEmpty ? 0 : Number(rawVal || 0);
+         if (!isEmpty && new_qbf > base) {
+            $this.val($this.data('lastValid') ?? '');
+            new_qbf = Number($this.val() || 0);
+         } else {
+            $this.data('lastValid', rawVal);
          }
+         var item = items_lista[posicion];
+         item.quantity_brought_forward = new_qbf;
+         var new_unpaid = Math.max(0, base - new_qbf);
+         item.unpaid_qty = new_unpaid;
+         item.quantity_final = Number(item.quantity) + new_qbf;
+         item.amount_final = item.quantity_final * item.price;
+         item.unpaid_amount = new_unpaid * item.price;
+
+         // Actualizar solo las celdas de esta fila en el DOM (sin tocar datos del DataTable = no se reemplaza el input ni se pierde foco)
+         var $row = $this.closest('tr');
+         var $cells = $row.find('td');
+         $cells.eq(7).find('div').first().text(item.unpaid_qty ?? '');
+         $cells.eq(8).find('div').first().text(MyApp.formatMoney(item.unpaid_amount, 2, '.', ','));
+         $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
+         $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
+         actualizarFooterTotalesPage();
+         if (!$('#invoice_id').val()) calcularYMostrarXBondedEnJS();
+         if (retainageContext) actualizarRetainagePreview();
+         // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
+         if (isEmpty) $this.val('');
       });
    };
 

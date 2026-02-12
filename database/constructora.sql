@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-02-2026 a las 05:07:01
+-- Tiempo de generación: 11-02-2026 a las 23:38:22
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1420,15 +1420,16 @@ CREATE TABLE `project_contact` (
   `phone` varchar(50) DEFAULT NULL,
   `role` varchar(255) DEFAULT NULL,
   `notes` text,
-  `project_id` int(11) DEFAULT NULL
+  `project_id` int(11) DEFAULT NULL,
+  `company_contact_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project_contact`
 --
 
-INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `project_id`) VALUES
-(1, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', '', '', 3);
+INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `notes`, `project_id`, `company_contact_id`) VALUES
+(1, 'Marcel Curbelo Carmona', 'cyborgmnk@gmail.com', '(955)383-3543', '', '', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -2312,7 +2313,8 @@ ALTER TABLE `project_concrete_class`
 --
 ALTER TABLE `project_contact`
   ADD PRIMARY KEY (`contact_id`),
-  ADD KEY `Ref6475` (`project_id`);
+  ADD KEY `Ref6475` (`project_id`),
+  ADD KEY `IDX_project_contact_company_contact` (`company_contact_id`);
 
 --
 -- Indices de la tabla `project_county`
@@ -3122,6 +3124,7 @@ ALTER TABLE `project_concrete_class`
 -- Filtros para la tabla `project_contact`
 --
 ALTER TABLE `project_contact`
+  ADD CONSTRAINT `FK_project_contact_company_contact` FOREIGN KEY (`company_contact_id`) REFERENCES `company_contact` (`contact_id`),
   ADD CONSTRAINT `Refcontractor75` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 --

@@ -1164,13 +1164,49 @@ var ModalInvoice = (function () {
          oTableItems.search(e.target.value).draw();
       });
    };
+   // Recalcular solo los totales del footer desde items_lista (sin redibujar tabla)
+   var actualizarFooterTotalesModal = function () {
+      var num = function (v) {
+         return (typeof v === 'number' ? v : (typeof v === 'string' ? Number(String(v).replace(/[^\d.-]/g, '')) : 0)) || 0;
+      };
+      var sum = function (key) {
+         return items_lista.reduce(function (a, row) {
+            return a + num(row[key]);
+         }, 0);
+      };
+      var totalContract = typeof projectContractAmount !== 'undefined' ? projectContractAmount : sum('contract_amount');
+      var totalCompleted = sum('amount_completed');
+      var totalUnpaid = sum('unpaid_amount');
+      var totalPeriod = sum('amount');
+      var totalFinal = sum('amount_final');
+      $('#modal_total_contract_amount').val(MyApp.formatearNumero(totalContract, 2, '.', ','));
+      $('#modal_total_amount_completed').val(MyApp.formatearNumero(totalCompleted, 2, '.', ','));
+      $('#modal_total_amount_unpaid').val(MyApp.formatearNumero(totalUnpaid, 2, '.', ','));
+      $('#modal_total_amount_period').val(MyApp.formatearNumero(totalPeriod, 2, '.', ','));
+      $('#modal_total_amount_final').val(MyApp.formatearNumero(totalFinal, 2, '.', ','));
+   };
+
    var actualizarTableListaItems = function () {
+      const table = '#items-invoice-modal-table-editable';
+      var scrollLeft = 0;
+      var $wrapper = $(table).closest('.dataTables_wrapper');
+      if ($wrapper.length) {
+         var $body = $wrapper.find('.dataTables_scrollBody');
+         if ($body.length) scrollLeft = $body.scrollLeft();
+      }
       if (oTableItems) {
          oTableItems.destroy();
       }
 
       initTableItems();
-      
+
+      // Restaurar scroll horizontal para no reiniciar la posición
+      $wrapper = $(table).closest('.dataTables_wrapper');
+      if ($wrapper.length) {
+         $body = $wrapper.find('.dataTables_scrollBody');
+         if ($body.length) $body.scrollLeft(scrollLeft);
+      }
+
       // Recalcular X e Y después de actualizar la tabla
       calcularYMostrarXBondedEnJSModal();
       if (retainageContext) {
@@ -1369,30 +1405,47 @@ var ModalInvoice = (function () {
          actualizarTableListaItems();
       }
 
-      $(document).off('change', '#items-invoice-modal-table-editable input.quantity_brought_forward');
-      $(document).on('change', '#items-invoice-modal-table-editable input.quantity_brought_forward', function (e) {
+      // Guardar último valor válido al enfocar (para restaurar si excede el máximo)
+      $(document).off('focus', '#items-invoice-modal-table-editable input.quantity_brought_forward');
+      $(document).on('focus', '#items-invoice-modal-table-editable input.quantity_brought_forward', function () {
+         $(this).data('lastValid', $(this).val() || '');
+      });
+      // Validación en input: si es mayor que base, borrar el último número escrito (restaurar valor anterior)
+      $(document).off('input', '#items-invoice-modal-table-editable input.quantity_brought_forward');
+      $(document).on('input', '#items-invoice-modal-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
-         if (items_lista[posicion]) {
-            var base = Number(items_lista[posicion].base_debt || 0);
-            var quantity = Number($this.val() || 0);
-            // Regla: QBF no puede ser mayor que lo debido (unpaid previo)
-            if (quantity > base) {
-               quantity = base;
-               $this.val(base);
-               if (typeof toastr !== 'undefined') {
-                  toastr.error('QBF no puede ser mayor que lo debido (' + MyApp.formatearNumero(base, 2, '.', ',') + ').');
-               }
-            }
-            items_lista[posicion].quantity_brought_forward = quantity;
-            items_lista[posicion].quantity_final = items_lista[posicion].quantity + quantity;
-            items_lista[posicion].amount_final = items_lista[posicion].quantity_final * items_lista[posicion].price;
-            var new_unpaid = Math.max(0, base - quantity);
-            items_lista[posicion].unpaid_qty = new_unpaid;
-            items_lista[posicion].unpaid_amount = new_unpaid * items_lista[posicion].price;
-
-            actualizarTableListaItems();
+         if (!items_lista[posicion] || !oTableItems) return;
+         var base = Number(items_lista[posicion].base_debt || 0);
+         var rawVal = $this.val();
+         var isEmpty = rawVal === '' || rawVal === null || rawVal === undefined;
+         var quantity = isEmpty ? 0 : Number(rawVal || 0);
+         if (!isEmpty && quantity > base) {
+            $this.val($this.data('lastValid') ?? '');
+            quantity = Number($this.val() || 0);
+         } else {
+            $this.data('lastValid', rawVal);
          }
+         var item = items_lista[posicion];
+         item.quantity_brought_forward = quantity;
+         item.quantity_final = item.quantity + quantity;
+         item.amount_final = item.quantity_final * item.price;
+         var new_unpaid = Math.max(0, base - quantity);
+         item.unpaid_qty = new_unpaid;
+         item.unpaid_amount = new_unpaid * item.price;
+
+         // Actualizar solo las celdas de esta fila en el DOM (sin tocar datos del DataTable = no se reemplaza el input ni se pierde foco)
+         var $row = $this.closest('tr');
+         var $cells = $row.find('td');
+         $cells.eq(7).find('div').first().text(item.unpaid_qty ?? '');
+         $cells.eq(8).find('div').first().text(MyApp.formatMoney(item.unpaid_amount, 2, '.', ','));
+         $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
+         $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
+         actualizarFooterTotalesModal();
+         calcularYMostrarXBondedEnJSModal();
+         if (retainageContext) actualizarRetainagePreviewModal();
+         // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
+         if (isEmpty) $this.val('');
       });
    };
    var resetFormItem = function () {

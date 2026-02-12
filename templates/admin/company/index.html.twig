@@ -530,6 +530,7 @@
 
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalContactCompany')) }}
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalConcreteVendor')) }}
 
 {% endblock %} {% block javascriptsspecific %}
@@ -585,6 +586,7 @@
    jQuery(document).ready(function () {
        if (typeof ModalUnit !== 'undefined') ModalUnit.init();
        if (typeof ModalEquation !== 'undefined') ModalEquation.init();
+       if (typeof ModalContactCompany !== 'undefined') ModalContactCompany.init();
        if (typeof ModalConcreteVendor !== 'undefined') ModalConcreteVendor.init();
        Companies.init();
    });

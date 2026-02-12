@@ -32,13 +32,24 @@ class ProjectContact
     #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
     private ?Project $project;
 
+    #[ORM\ManyToOne(targetEntity: "App\Entity\CompanyContact")]
+    #[ORM\JoinColumn(name: "company_contact_id", referencedColumnName: "contact_id", nullable: true)]
+    private ?CompanyContact $companyContact;
+
     public function getContactId(): ?int
     {
         return $this->contactId;
     }
 
+    /**
+     * Name from CompanyContact when company_contact_id is set, else from legacy stored field.
+     * Compatible with project_contact records that have company_contact_id NULL (legacy).
+     */
     public function getName(): ?string
     {
+        if ($this->companyContact !== null) {
+            return $this->companyContact->getName();
+        }
         return $this->name;
     }
 
@@ -47,8 +58,15 @@ class ProjectContact
         $this->name = $name;
     }
 
+    /**
+     * Phone from CompanyContact when company_contact_id is set, else from legacy stored field.
+     * Compatible with company_contact_id NULL (legacy).
+     */
     public function getPhone(): ?string
     {
+        if ($this->companyContact !== null) {
+            return $this->companyContact->getPhone();
+        }
         return $this->phone;
     }
 
@@ -57,8 +75,16 @@ class ProjectContact
         $this->phone = $phone;
     }
 
+    /**
+     * Email from CompanyContact when company_contact_id is set, else from legacy stored field.
+     * When company_contact_id is set, project_contact.email is typically empty.
+     * Compatible with company_contact_id NULL (legacy).
+     */
     public function getEmail(): ?string
     {
+        if ($this->companyContact !== null) {
+            return $this->companyContact->getEmail();
+        }
         return $this->email;
     }
 
@@ -95,5 +121,15 @@ class ProjectContact
     public function setNotes(?string $notes): void
     {
         $this->notes = $notes;
+    }
+
+    public function getCompanyContact(): ?CompanyContact
+    {
+        return $this->companyContact;
+    }
+
+    public function setCompanyContact(?CompanyContact $companyContact): void
+    {
+        $this->companyContact = $companyContact;
     }
 }

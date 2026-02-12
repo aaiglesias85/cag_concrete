@@ -461,7 +461,7 @@ class ScheduleService extends Base
                'className' => $class,
                "location" => $value->getLocation(),
                "description" => $value->getDescription(),
-               "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
+               "contactProject" => ($value->getContactProject()?->getName()) ?? '',
                "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
                "day" => $dayOriginal->format('m/d/Y'),
                "hour" => $value->getHour() != null ? $value->getHour() : "",
@@ -1190,7 +1190,7 @@ class ScheduleService extends Base
          $data[] = array(
             "id" => $schedule_id,
             "project" => $value->getProject()->getProjectNumber() . " - " . $value->getProject()->getDescription(),
-            "contactProject" => $value->getContactProject() ? $value->getContactProject()->getName() : '',
+            "contactProject" => ($value->getContactProject()?->getName()) ?? '',
             "concreteVendor" => $value->getConcreteVendor() ? $value->getConcreteVendor()->getName() : '',
             "description" => $value->getDescription(),
             "location" => $value->getLocation(),
