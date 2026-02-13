@@ -28,14 +28,13 @@ var Equations = function () {
             order: order,
 
             stateSave: true,
-            displayLength: 25,
+            displayLength: 30,
+            lengthMenu: [
+               [10, 25, 30, 50, -1],
+               [10, 25, 30, 50, 'Todos'],
+            ],
             stateSaveParams: DatatableUtil.stateSaveParams,
 
-            /*displayLength: 15,
-            lengthMenu: [
-              [15, 25, 50, -1],
-              [15, 25, 50, 'Todos']
-            ],*/
             select: {
                 info: false,
                 style: 'multi',
@@ -776,7 +775,11 @@ var Equations = function () {
         // escapar contenido de la tabla
         oTablePayItems = DatatableUtil.initSafeDataTable(table, {
             data: pay_items,
-            displayLength: 10,
+            displayLength: 30,
+            lengthMenu: [
+               [10, 25, 30, 50, -1],
+               [10, 25, 30, 50, 'Todos'],
+            ],
             order: order,
             columns: columns,
             columnDefs: columnDefs,
@@ -936,7 +939,11 @@ var Equations = function () {
         // escapar contenido de la tabla
         oTableItems = DatatableUtil.initSafeDataTable(table, {
             data: items,
-            displayLength: 10,
+            displayLength: 30,
+            lengthMenu: [
+               [10, 25, 30, 50, -1],
+               [10, 25, 30, 50, 'Todos'],
+            ],
             order: order,
             columns: columns,
             columnDefs: columnDefs,

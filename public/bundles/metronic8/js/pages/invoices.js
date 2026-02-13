@@ -99,7 +99,11 @@ var Invoices = (function () {
          order: order,
 
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
          fixedColumns: {
@@ -111,11 +115,6 @@ var Invoices = (function () {
          scrollX: true,
          // scrollY: 500,
 
-         /*displayLength: 15,
-            lengthMenu: [
-              [15, 25, 50, -1],
-              [15, 25, 50, 'Todos']
-            ],*/
          select: {
             info: false,
             style: 'multi',
@@ -2094,7 +2093,11 @@ var Invoices = (function () {
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
 
          fixedColumns: {

@@ -899,7 +899,11 @@ var ModalInvoice = (function () {
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: items_lista,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,

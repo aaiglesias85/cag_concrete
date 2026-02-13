@@ -188,7 +188,11 @@ var ModalNewProjectCompany = (function () {
       ];
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: npItems,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          columns: columns,
          columnDefs: columnDefs,
          language: typeof DatatableUtil.getDataTableLenguaje === 'function' ? DatatableUtil.getDataTableLenguaje() : {},
@@ -427,7 +431,11 @@ var ModalNewProjectCompany = (function () {
       ];
       oTableContacts = DatatableUtil.initSafeDataTable('#contacts-table-editable-modal-project', {
          data: npContacts,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          columns: columns,
          columnDefs: columnDefs,
          language: typeof DatatableUtil.getDataTableLenguaje === 'function' ? DatatableUtil.getDataTableLenguaje() : {},
@@ -450,7 +458,11 @@ var ModalNewProjectCompany = (function () {
       ];
       oTableConcreteClasses = DatatableUtil.initSafeDataTable('#concrete-classes-table-editable-modal-project', {
          data: npConcreteClasses,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          columns: columns,
          columnDefs: columnDefs,
          language: typeof DatatableUtil.getDataTableLenguaje === 'function' ? DatatableUtil.getDataTableLenguaje() : {},
@@ -473,7 +485,11 @@ var ModalNewProjectCompany = (function () {
       ];
       oTableAjustesPrecio = DatatableUtil.initSafeDataTable('#ajustes-precio-table-editable-modal-project', {
          data: npAjustesPrecio,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          columns: columns,
          columnDefs: columnDefs,
          language: typeof DatatableUtil.getDataTableLenguaje === 'function' ? DatatableUtil.getDataTableLenguaje() : {},

@@ -501,7 +501,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -677,7 +681,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableLabor = DatatableUtil.initSafeDataTable(table, {
          data: labor,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -754,7 +762,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableMaterial = DatatableUtil.initSafeDataTable(table, {
          data: materials,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -845,7 +857,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableConcVendor = DatatableUtil.initSafeDataTable(table, {
          data: conc_vendors,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -949,7 +965,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableSubcontracts = DatatableUtil.initSafeDataTable(table, {
          data: subcontracts,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -1020,7 +1040,11 @@ var DataTrackingDetalle = (function () {
       // escapar contenido de la tabla
       oTableArchivos = DatatableUtil.initSafeDataTable(table, {
          data: archivos,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,

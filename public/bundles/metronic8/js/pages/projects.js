@@ -41,7 +41,11 @@ var Projects = (function () {
          order: order,
 
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
          fixedColumns: {
@@ -53,11 +57,6 @@ var Projects = (function () {
          scrollX: true,
          // scrollY: 500,
 
-         /*displayLength: 15,
-            lengthMenu: [
-              [15, 25, 50, -1],
-              [15, 25, 50, 'Todos']
-            ],*/
          select: {
             info: false,
             style: 'multi',
@@ -1844,7 +1843,11 @@ var Projects = (function () {
 
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -2578,7 +2581,11 @@ var Projects = (function () {
          serverSide: true,
          order: order,
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
          ajax: datasource,
          columns: columns,
@@ -3045,7 +3052,11 @@ var Projects = (function () {
       const order = [[0, 'asc']];
       oTableContacts = DatatableUtil.initSafeDataTable(table, {
          data: contacts,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -3325,7 +3336,11 @@ var Projects = (function () {
       // escapar contenido de la tabla
       oTableConcreteClasses = DatatableUtil.initSafeDataTable(table, {
          data: concrete_classes,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -3596,7 +3611,11 @@ var Projects = (function () {
       // escapar contenido de la tabla
       oTableInvoices = DatatableUtil.initSafeDataTable(table, {
          data: invoices,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -3798,14 +3817,13 @@ var Projects = (function () {
          order: order,
 
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
-         /*displayLength: 15,
-            lengthMenu: [
-              [15, 25, 50, -1],
-              [15, 25, 50, 'Todos']
-            ],*/
          select: {
             info: false,
             style: 'multi',
@@ -3918,7 +3936,11 @@ var Projects = (function () {
       // escapar contenido de la tabla
       oTableAjustesPrecio = DatatableUtil.initSafeDataTable(table, {
          data: ajustes_precio,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -4249,7 +4271,11 @@ var Projects = (function () {
       // escapar contenido de la tabla
       oTableArchivos = DatatableUtil.initSafeDataTable(table, {
          data: archivos,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -4766,7 +4792,11 @@ var Projects = (function () {
       // escapar contenido de la tabla
       oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -5028,7 +5058,11 @@ var Projects = (function () {
 
       oTableInvoicesRetainage = DatatableUtil.initSafeDataTable(table, {
          data: data || [],
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,

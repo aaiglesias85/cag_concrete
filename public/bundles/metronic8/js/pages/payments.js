@@ -42,8 +42,6 @@ var Payments = (function () {
          order: order,
 
          stateSave: true,
-         // displayLength: 25,
-
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
@@ -1021,7 +1019,11 @@ var Payments = (function () {
 
       oTablePayments = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -1395,7 +1397,11 @@ var Payments = (function () {
       const order = [[1, 'desc']];
       oTableNotesItem = DatatableUtil.initSafeDataTable(table, {
          data: notes_item,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -1616,7 +1622,11 @@ var Payments = (function () {
          serverSide: true,
          order: order,
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
          select: {
             info: false,
@@ -1869,7 +1879,11 @@ var Payments = (function () {
       const order = [[1, 'asc']];
       oTableArchivos = DatatableUtil.initSafeDataTable(table, {
          data: archivos,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,

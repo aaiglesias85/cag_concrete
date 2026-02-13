@@ -27,7 +27,11 @@ var ConcreteClass = (function () {
          order: order,
 
          stateSave: true,
-         displayLength: 25,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
          select: {
@@ -684,7 +688,11 @@ var ConcreteClass = (function () {
       // escapar contenido de la tabla
       oTableProjects = DatatableUtil.initSafeDataTable(table, {
          data: projects,
-         displayLength: 10,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
