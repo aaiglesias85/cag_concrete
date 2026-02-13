@@ -375,6 +375,31 @@ class InvoiceService extends Base
       );
       $bondProjectItems = array_values($bondProjectItems);
 
+      // 2d. Resto de ítems del proyecto (contratados pero sin cantidad en este invoice): se listan después del Bond
+      $allProjectItems = $projectItemRepo->ListarItemsDeProject($project_id);
+      $projectItemIdsWithRow = [];
+      foreach ($items_regulares_sin_bond as $v) {
+         $projectItemIdsWithRow[$v->getProjectItem()->getId()] = true;
+      }
+      if ($bondInvoiceItem !== null) {
+         $projectItemIdsWithRow[$bondInvoiceItem->getProjectItem()->getId()] = true;
+      } elseif ($bondInvoiceItemFromCO !== null) {
+         $projectItemIdsWithRow[$bondInvoiceItemFromCO->getProjectItem()->getId()] = true;
+      } elseif (!empty($bondProjectItems)) {
+         $projectItemIdsWithRow[$bondProjectItems[0]->getId()] = true;
+      }
+      foreach ($items_change_order as $group_items) {
+         foreach ($group_items as $v) {
+            $q = (float) ($v->getQuantity() ?? 0);
+            if ($q > 0) {
+               $projectItemIdsWithRow[$v->getProjectItem()->getId()] = true;
+            }
+         }
+      }
+      $otherProjectItems = array_values(array_filter($allProjectItems, function ($pi) use ($projectItemIdsWithRow) {
+         return !isset($projectItemIdsWithRow[$pi->getId()]);
+      }));
+
       // 3. CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
 
@@ -431,9 +456,9 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila fija al final de regulares, antes de change orders)
+      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila; luego resto de ítems del proyecto sin cantidad; luego change orders)
       $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
-      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0);
+      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0) + count($otherProjectItems);
       if (!empty($items_change_order)) {
          $esPrimerGrupoCalculo = true;
          foreach ($items_change_order as $group_key => $group) {
@@ -605,6 +630,15 @@ class InvoiceService extends Base
             $objWorksheet->setCellValue("R{$fila}", $bon_qty);
             $objWorksheet->setCellValue("S{$fila}", $bon_amt);
          }
+         $aplicarFormatoFila($objWorksheet, $fila);
+         $item_number++;
+         $fila++;
+      }
+
+      // 5c. ESCRIBIR RESTO DE ÍTEMS DEL PROYECTO (contratados, sin cantidad en este invoice)
+      foreach ($otherProjectItems as $projectItem) {
+         $resultOtro = $this->EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, $projectItem);
+         $sum_H_contract += $resultOtro['contract_amount'];
          $aplicarFormatoFila($objWorksheet, $fila);
          $item_number++;
          $fila++;
@@ -1028,6 +1062,43 @@ class InvoiceService extends Base
       $objWorksheet->mergeCells("B{$fila}:D{$fila}");
 
       return ['contract_amount' => $contract_amount, 'pending_balance_btd' => 0];
+   }
+
+   /**
+    * EscribirFilaItemSinCantidad: Escribe una fila de ítem del proyecto sin cantidad en este invoice.
+    * Ítems contratados que se listan con contract qty/amount y ceros en el resto (I–S).
+    *
+    * @return array ['contract_amount']
+    */
+   private function EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, ProjectItem $projectItem): array
+   {
+      $price = (float) $projectItem->getPrice();
+      $contract_qty = (float) $projectItem->getQuantity();
+      $contract_amount = $contract_qty * $price;
+      $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
+      $description = $projectItem->getItem()->getName();
+
+      $objWorksheet
+         ->setCellValue('A' . $fila, $item_number)
+         ->setCellValue('B' . $fila, $description)
+         ->setCellValue('E' . $fila, $unit)
+         ->setCellValue('F' . $fila, $price)
+         ->setCellValue('G' . $fila, $contract_qty)
+         ->setCellValue('H' . $fila, $contract_amount)
+         ->setCellValue('I' . $fila, 0)
+         ->setCellValue('J' . $fila, 0)
+         ->setCellValue('K' . $fila, 0)
+         ->setCellValue('L' . $fila, 0)
+         ->setCellValue('M' . $fila, 0)
+         ->setCellValue('N' . $fila, 0)
+         ->setCellValue('O' . $fila, 0)
+         ->setCellValue('P' . $fila, 0)
+         ->setCellValue('R' . $fila, 0)
+         ->setCellValue('S' . $fila, 0);
+
+      $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+
+      return ['contract_amount' => $contract_amount];
    }
 
    /**
