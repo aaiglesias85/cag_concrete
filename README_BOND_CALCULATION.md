@@ -88,7 +88,7 @@ Para un **invoice existente** se muestran los valores aplicados que devuelve el 
 
 - El ítem Bond del proyecto puede estar como **línea en el invoice** (el usuario lo agrega desde la lista de ítems del proyecto). En ese caso aparece **una sola vez** en el Excel/PDF, en la lista de ítems (regulares o change order), en su posición natural. No se añade una fila Bond duplicada.
 - **Columnas CONTRACT (F, G, H)**: para la fila del Bond se rellenan con los valores del ítem Bond en el proyecto (precio, cantidad y monto contrato), igual que el resto de ítems (`EscribirFilaItem`).
-- **Columnas PENDING QTY (BTD) (M) y PENDING BALANCE (BTD) (N)**: para la fila del ítem Bond se sobrescriben con los valores calculados del invoice: **M = bon_quantity**, **N = bon_amount** (los mismos que muestra la card amarilla). El total PENDING del footer incluye este `bon_amount` en la suma de la columna N.
+- **Columnas QTY THIS PERIOD (O) y AMOUNT THIS PERIOD (P)**: para la fila del ítem Bond se escriben los valores calculados del invoice: **O = bon_quantity**, **P = bon_amount** (los mismos que muestra la card amarilla). El total Amount This Period del footer (columna P) incluye este `bon_amount`.
 - Si el ítem Bond **no** está como línea en el invoice, el bloque **6b** (`EscribirFilaItemBond`) lo incluye en el Excel/PDF con description, unit, price, contract qty/amount y pending = contrato completo; solo se listan los Bond del proyecto que **no** están ya como línea en el invoice (para no duplicar).
 - En la exportación se usan los valores `bon_quantity` y `bon_amount` que ya trae el invoice (no se recalcula al exportar).
 
@@ -152,6 +152,6 @@ Para que el “usado” sea consistente: se procesan por `start_date` e `invoice
 Sí. El monto se muestra tal cual (p. ej. -1850.00).
 
 **¿Cómo sale el Bond en el Excel/PDF del invoice?**  
-Si el Bond está como ítem en el invoice, sale una sola vez en la lista (en ítems regulares o change order). Las columnas M (PENDING QTY BTD) y N (PENDING BALANCE BTD) llevan `bon_quantity` y `bon_amount` del invoice. Si el Bond no está en el invoice, se añade una fila en el bloque 6b con el contrato del Bond y pending = contrato completo.
+Si el Bond está como ítem en el invoice, sale una sola vez en la lista (en ítems regulares o change order). Las columnas O (Qty This Period) y P (Amount This Period) llevan `bon_quantity` y `bon_amount` del invoice. Si el Bond no está en el invoice, se añade una fila en el bloque 6b con el contrato del Bond y O/P con bon_quantity y bon_amount.
 
 Para más detalle de métodos y archivos, ver la sección [Implementación técnica](#implementación-técnica).

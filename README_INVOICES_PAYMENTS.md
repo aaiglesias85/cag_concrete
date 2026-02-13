@@ -659,23 +659,23 @@ Al exportar un invoice a Excel (o generar el PDF), se genera una hoja con filas 
 | **J** | Completed Amount | Monto completado. | `qty_completed * price`. |
 | **K** | Previous Bill Qty | Cantidad facturada en el invoice anterior (Final Invoiced Qty del anterior). | Del invoice inmediatamente anterior: `prev_qty + prev_qbf` del mismo `project_item_id`. |
 | **L** | Previous Bill Amount | Monto del invoice anterior (Final Amount This Period del anterior). | `previous_bill_qty * price` del invoice anterior. |
-| **M** | **PENDING QTY (BTD)** | Cantidad pendiente por pagar de este invoice. Mismo concepto que **Unpaid Qty** en Payments. | Por defecto: `max(0, quantity_final - paid_qty)`. Si existe **Override Unpaid Qty** en una nota (Payments), se usa ese valor. **Bond:** no se usa este cálculo; M se fija con `bon_quantity` (ver nota Bond). |
-| **N** | **PENDING BALANCE (BTD)** | Monto pendiente por pagar. | `M * unit price`. Para Bond: se usa `bon_amount` (ver nota Bond). |
-| **O** | Qty This Period | Cantidad del periodo actual (BTD). | `InvoiceItem->quantity`. |
-| **P** | Amount This Period | Monto del periodo. | `qty_this_period * price`. |
+| **M** | **PENDING QTY (BTD)** | Cantidad pendiente por pagar de este invoice. Mismo concepto que **Unpaid Qty** en Payments. | Por defecto: `max(0, quantity_final - paid_qty)`. Si existe **Override Unpaid Qty** en una nota (Payments), se usa ese valor. No aplica al ítem Bond (ver nota Bond). |
+| **N** | **PENDING BALANCE (BTD)** | Monto pendiente por pagar. | `M * unit price`. No aplica al ítem Bond (ver nota Bond). |
+| **O** | Qty This Period | Cantidad del periodo actual (BTD). | `InvoiceItem->quantity`. Para Bond: `bon_quantity` (ver nota Bond). |
+| **P** | Amount This Period | Monto del periodo. | `qty_this_period * price`. Para Bond: `bon_amount` (ver nota Bond). |
 | **Q** | (reservada) | — | — |
 | **R** | Final Invoiced Qty | Cantidad final facturada en este invoice. | `quantity + quantity_brought_forward`. |
 | **S** | Final Amount This Period | Monto final facturado. | `final_invoiced_qty * price`. |
 
-### Ítem Bond en el Excel (columnas M y N)
+### Ítem Bond en el Excel (columnas O y P)
 
-El ítem marcado como **Bond** es especial y **no debe usarse la lógica estándar de M y N**:
+El ítem marcado como **Bond** es especial: sus valores van en **O** y **P** (Qty This Period / Amount This Period):
 
-- Para la fila del ítem Bond, las columnas **M** y **N** se escriben siempre con los valores del **invoice**, no con `quantity_final - paid_qty` ni con override de notas:
-  - **M** = `bon_quantity` (del invoice).
-  - **N** = `bon_amount` (del invoice).
+- Para la fila del ítem Bond, las columnas **O** y **P** se escriben con los valores del **invoice**:
+  - **O** = `bon_quantity` (del invoice).
+  - **P** = `bon_amount` (del invoice).
 - El override de Unpaid Qty desde notas **no se aplica** al ítem Bond; solo aplica a ítems no-Bond.
-- Código: después de `EscribirFilaItem`, si el ítem es Bond se sobrescriben M y N con `bon_quantity` y `bon_amount` y se ajusta el total de la columna N en el footer.
+- Código: después de `EscribirFilaItem` (o en `EscribirFilaItemBond`), si el ítem es Bond se escriben O y P con `bon_quantity` y `bon_amount`; el total de la columna P en el footer incluye este monto.
 
 ### Totales en el footer del Excel
 
@@ -684,8 +684,8 @@ En la fila de totales del reporte se suman, entre otras:
 - **H:** Total Contract Amount.
 - **J:** Total Completed Amount.
 - **L:** Total Previous Bill Amount.
-- **N:** Total Pending Balance (BTD) — incluye el `bon_amount` si hay ítem Bond.
-- **P:** Total Amount This Period.
+- **N:** Total Pending Balance (BTD).
+- **P:** Total Amount This Period — incluye el `bon_amount` si hay ítem Bond.
 - **S:** Total Billed Amount.
 
 ---
@@ -722,7 +722,7 @@ En el módulo **Payments** se puede agregar una **nota** a un ítem y opcionalme
    - **Columna M** = valor override (con `max(0, ...)`).
    - **Columna N** = M × unit price.
 
-**Ítem Bond:** el override **no se aplica** al ítem Bond. Para Bond, M y N en el Excel se fijan siempre con `bon_quantity` y `bon_amount` del invoice; no se tocan ni por la fórmula estándar ni por las notas.
+**Ítem Bond:** el override **no se aplica** al ítem Bond. Para Bond, O y P en el Excel se fijan siempre con `bon_quantity` y `bon_amount` del invoice; no se tocan ni por la fórmula estándar ni por las notas.
 
 ### Resumen rápido
 
@@ -730,7 +730,7 @@ En el módulo **Payments** se puede agregar una **nota** a un ítem y opcionalme
 |----------|------------------------|-----------|
 | Payments (cargar datos) | `quantity_final - paid_qty` o override de la nota más reciente | (no es columna; monto = unpaid_qty × price) |
 | Excel ítem normal | Igual que Payments; override aplica si existe | M × unit price |
-| Excel ítem Bond | Siempre `bon_quantity` (del invoice) | Siempre `bon_amount` (del invoice) |
+| Excel ítem Bond | Columna O: `bon_quantity` (del invoice) | Columna P: `bon_amount` (del invoice) |
 
 ---
 

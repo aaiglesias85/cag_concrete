@@ -584,22 +584,26 @@ class InvoiceService extends Base
             $sum_H_contract      += ($bondItem->getProjectItem()->getQuantity() * $price);
             $sum_J_completed     += ($qty_completed * $price);
             $sum_L_previous_bill += $prevBill[1];
-            $sum_P_this_period   += ($bondItem->getQuantity() * $price);
-            $sum_S_billed        += ($final_invoiced_qty * $price);
-            $objWorksheet->setCellValue('M' . $fila, $bon_qty);
-            $objWorksheet->setCellValue('N' . $fila, $bon_amt);
-            $sum_N_pending += $bon_amt;
-            $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
-            $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $price);
+            $sum_P_this_period   += $bon_amt;
+            $sum_S_billed        += $bon_amt;
+            $objWorksheet->setCellValue('M' . $fila, 0);
+            $objWorksheet->setCellValue('N' . $fila, 0);
+            $objWorksheet->setCellValue('O' . $fila, $bon_qty);
+            $objWorksheet->setCellValue('P' . $fila, $bon_amt);
+            $objWorksheet->setCellValue("R{$fila}", $bon_qty);
+            $objWorksheet->setCellValue("S{$fila}", $bon_amt);
          } else {
             $projectItem = $bondProjectItems[0];
             $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
             $sum_H_contract += $bondResult['contract_amount'];
-            $objWorksheet->setCellValue('M' . $fila, $bon_qty);
-            $objWorksheet->setCellValue('N' . $fila, $bon_amt);
-            $sum_N_pending += $bon_amt;
-            $objWorksheet->setCellValue("R{$fila}", 0);
-            $objWorksheet->setCellValue("S{$fila}", 0);
+            $sum_P_this_period += $bon_amt;
+            $sum_S_billed += $bon_amt;
+            $objWorksheet->setCellValue('M' . $fila, 0);
+            $objWorksheet->setCellValue('N' . $fila, 0);
+            $objWorksheet->setCellValue('O' . $fila, $bon_qty);
+            $objWorksheet->setCellValue('P' . $fila, $bon_amt);
+            $objWorksheet->setCellValue("R{$fila}", $bon_qty);
+            $objWorksheet->setCellValue("S{$fila}", $bon_amt);
          }
          $aplicarFormatoFila($objWorksheet, $fila);
          $item_number++;
@@ -951,7 +955,7 @@ class InvoiceService extends Base
             }
          }
       } else {
-         // Ítem Bond: M y N se fijan después con bon_quantity/bon_amount en el flujo de exportación (no se toca aquí).
+         // Ítem Bond: O y P se fijan después con bon_quantity/bon_amount en el flujo de exportación (no se toca aquí).
          $quantity_final = $qty + ($qbf ?? 0.0);
          $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
          $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
@@ -973,11 +977,11 @@ class InvoiceService extends Base
          ->setCellValue('K' . $fila, $previous_bill_qty)    // PREVIOUS BILL QTY = Final Invoiced Quantity del invoice anterior
          ->setCellValue('L' . $fila, $previous_bill_amount)  // PREVIOUS BILL AMOUNT = Final Amount This Period del invoice anterior
 
-         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = suma(Qty This Period anteriores) − suma(Paid Qty anteriores). Bond se sobrescribe después.
-         ->setCellValue('N' . $fila, $pending_balance_btd)   // PENDING BALANCE (BTD) = pending_qty_btd * price
+         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = suma(Qty This Period anteriores) − suma(Paid Qty anteriores).
+         ->setCellValue('N' . $fila, $pending_balance_btd)   // PENDING BALANCE (BTD) = pending_qty_btd * price. Bond: O y P se sobrescriben después.
 
-         ->setCellValue('O' . $fila, $qty)           // QTY THIS PERIOD
-         ->setCellValue('P' . $fila, $qty * $price); // AMOUNT THIS PERIOD
+         ->setCellValue('O' . $fila, $qty)           // QTY THIS PERIOD (Bond: se sobrescribe con bon_quantity)
+         ->setCellValue('P' . $fila, $qty * $price); // AMOUNT THIS PERIOD (Bond: se sobrescribe con bon_amount)
 
       $objWorksheet->mergeCells("B{$fila}:D{$fila}");
       if (!empty($styleArray)) {
@@ -991,10 +995,10 @@ class InvoiceService extends Base
    /**
     * EscribirFilaItemBond: Escribe una fila de ítem BOND en el Excel/PDF.
     * Los items Bond no tienen data tracking ni InvoiceItem; solo aparecen en la exportación.
-    * Columnas con valor: description, unit, price, contract qty, contract amount, pending qty btd, pending balance.
-    * El resto (I, J, K, L, O, P, R, S) en 0.
+    * Columnas con valor: description, unit, price, contract qty, contract amount (A–H). M, N, O, P en 0.
+    * El llamador sobrescribe O y P con bon_quantity y bon_amount del invoice.
     *
-    * @return array ['contract_amount', 'pending_balance_btd'] para totales del footer
+    * @return array ['contract_amount', 'pending_balance_btd' => 0]
     */
    private function EscribirFilaItemBond($objWorksheet, $fila, $item_number, ProjectItem $projectItem): array
    {
@@ -1004,10 +1008,7 @@ class InvoiceService extends Base
       $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
       $description = $projectItem->getItem()->getName();
 
-      // Pending = full contract (nada facturado vía data tracking)
-      $pending_qty_btd = $contract_qty;
-      $pending_balance_btd = $contract_amount;
-
+      // Bond: M y N en 0 (los valores van en O y P; el llamador escribe bon_quantity y bon_amount ahí)
       $objWorksheet
          ->setCellValue('A' . $fila, $item_number)
          ->setCellValue('B' . $fila, $description)
@@ -1019,14 +1020,14 @@ class InvoiceService extends Base
          ->setCellValue('J' . $fila, 0)
          ->setCellValue('K' . $fila, 0)
          ->setCellValue('L' . $fila, 0)
-         ->setCellValue('M' . $fila, $pending_qty_btd)
-         ->setCellValue('N' . $fila, $pending_balance_btd)
+         ->setCellValue('M' . $fila, 0)
+         ->setCellValue('N' . $fila, 0)
          ->setCellValue('O' . $fila, 0)
          ->setCellValue('P' . $fila, 0);
 
       $objWorksheet->mergeCells("B{$fila}:D{$fila}");
 
-      return ['contract_amount' => $contract_amount, 'pending_balance_btd' => $pending_balance_btd];
+      return ['contract_amount' => $contract_amount, 'pending_balance_btd' => 0];
    }
 
    /**
