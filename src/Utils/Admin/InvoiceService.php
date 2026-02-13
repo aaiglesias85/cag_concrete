@@ -631,6 +631,19 @@ class InvoiceService extends Base
             $objWorksheet->setCellValue("S{$fila}", $bon_amt);
          }
          $aplicarFormatoFila($objWorksheet, $fila);
+         // Fondos para fila Bond: I–L verde oscuro, M–N amarillo oscuro, O/P/R/S naranja oscuro
+         $objWorksheet->getStyle('I' . $fila . ':L' . $fila)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FF66BB6A');
+         $objWorksheet->getStyle('M' . $fila . ':N' . $fila)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFEB3B');
+         $objWorksheet->getStyle('O' . $fila . ':P' . $fila)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFB74D');
+         $objWorksheet->getStyle('R' . $fila . ':S' . $fila)->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFFB74D');
          $item_number++;
          $fila++;
       }
