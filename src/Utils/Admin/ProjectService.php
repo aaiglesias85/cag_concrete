@@ -57,10 +57,30 @@ use App\Repository\ScheduleRepository;
 use App\Repository\EmployeeRoleRepository;
 use App\Entity\EmployeeRole;
 
+use App\Utils\Admin\InvoiceService;
 use App\Utils\Base;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class ProjectService extends Base
 {
+   /** @var InvoiceService */
+   private $invoiceService;
+
+   public function __construct(
+      ContainerInterface $container,
+      MailerInterface $mailer,
+      ContainerBagInterface $containerBag,
+      Security $security,
+      LoggerInterface $logger,
+      InvoiceService $invoiceService
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+      $this->invoiceService = $invoiceService;
+   }
 
    /**
     * EliminarArchivos: Elimina varios archivos en la BD
@@ -3365,10 +3385,6 @@ class ProjectService extends Base
       $resultado = [];
       $running_balance = 0;
 
-      // ACUMULADOR: Sumaremos aquí solo lo pagado de items con "R"
-      $total_paid_accumulated_retainage_items = 0;
-
-      $contract_amount = (float)$project->getContractAmount();
       $retainage_percentage = (float)$project->getRetainagePercentage();
       $retainage_adjustment_percentage = (float)$project->getRetainageAdjustmentPercentage();
       $retainage_adjustment_completion = (float)$project->getRetainageAdjustmentCompletion();
@@ -3380,38 +3396,17 @@ class ProjectService extends Base
          $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id_str);
          $paid_amount_total_invoice = $invoiceItemRepo->TotalInvoicePaidAmount($invoice_id_str);
 
-         // --- LÓGICA DE FILTRADO ÍTEM POR ÍTEM ---
-         $items = $invoiceItemRepo->findBy(['invoice' => $invoice]);
-         $paid_base_this_invoice = 0; // Dinero pagado en esta factura SOLO de items con R
+         // Inv. Ret Amt = mismo valor que la caja "Current Retainage" del invoice
+         $retainage_efectivo = $this->invoiceService->CalcularRetainageEfectivoParaInvoice($invoice_id_str);
+         $retainage_entry = (float) $retainage_efectivo['effective_current'];
 
-         foreach ($items as $item) {
-            $pi = $item->getProjectItem();
-            // Solo sumamos si el ítem tiene el switch de Retainage activado
-            if ($pi && $pi->getApplyRetainage()) {
-               $paid_base_this_invoice += $item->getPaidAmount();
-            }
-         }
+         // Porcentaje para visualización: derivado del cálculo del invoice (base = Invoice Amt)
+         $porciento_retainage = ($invoice_amount > 0 && $retainage_entry > 0)
+            ? ($retainage_entry / $invoice_amount * 100)
+            : $retainage_percentage;
 
-         // 2. Sumamos al histórico del proyecto (Previous + Current)
-         $total_paid_accumulated_retainage_items += $paid_base_this_invoice;
-
-         // 3. Evaluar la Regla del 50%
-         $porciento_retainage = $retainage_percentage; // Empieza en 10%
-         $ajuste_aplicado = false;
-
-         if ($retainage_adjustment_completion > 0 && $contract_amount > 0) {
-            $threshold = $contract_amount * ($retainage_adjustment_completion / 100);
-
-            // Comparamos el ACUMULADO FILTRADO contra el umbral
-            if ($total_paid_accumulated_retainage_items >= $threshold) {
-               $porciento_retainage = $retainage_adjustment_percentage; // Baja al 5%
-               $ajuste_aplicado = true;
-            }
-         }
-
-         // 4. Calcular Retainage ($) de esta factura
-         // Base Filtrada * Porcentaje Decidido
-         $retainage_entry = $paid_base_this_invoice * ($porciento_retainage / 100);
+         // Ajuste aplicado: inferido si se usó el porcentaje de ajuste (umbral basado en billed, no paid)
+         $ajuste_aplicado = ($retainage_adjustment_completion > 0 && abs($porciento_retainage - $retainage_adjustment_percentage) < 0.01);
 
          // Manejo de Reembolsos
          $reimbursed_real = 0;
