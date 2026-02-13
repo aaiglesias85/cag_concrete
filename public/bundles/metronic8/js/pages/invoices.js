@@ -1023,7 +1023,7 @@ var Invoices = (function () {
             BlockUtil.unblock('#form-invoice');
          });
 
-      function cargarDatos(invoice) {
+         function cargarDatos(invoice) {
          KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = 'Update Invoice: #' + invoice.number;
 
          $('#number').val(invoice.number);
@@ -1037,7 +1037,7 @@ var Invoices = (function () {
          $('#company').val(invoice.company_id);
          $('#company').trigger('change');
 
-         //Llenar select
+         // Llenar select projects
          projects = invoice.projects;
          for (var i = 0; i < projects.length; i++) {
             var descripcion = `${projects[i].number} - ${projects[i].description}`;
@@ -1048,26 +1048,25 @@ var Invoices = (function () {
          $('#project').val(invoice.project_id);
          $('#project').trigger('change');
 
-         // Contract amount del proyecto (caja Contract)
+         // Contract amount
          projectContractAmount = Number(invoice.contract_amount) || 0;
          $('#total_contract_amount').val(MyApp.formatMoney(projectContractAmount, 2, '.', ','));
 
-         if (invoice.start_date && invoice.start_date !== '') {   
-            let cleanStartDate = invoice.start_date.split(' ')[0]; 
+         // Fechas
+         if (invoice.start_date && invoice.start_date !== '') {
+            let cleanStartDate = invoice.start_date.split(' ')[0];
             FlatpickrUtil.setDate('datetimepicker-start-date', cleanStartDate);
          }
 
-         if (invoice.end_date && invoice.end_date !== '') {         
+         if (invoice.end_date && invoice.end_date !== '') {
             let cleanEndDate = invoice.end_date.split(' ')[0];
             FlatpickrUtil.setDate('datetimepicker-end-date', cleanEndDate);
          }
 
          $('#notes').val(invoice.notes);
-
          $('#paidactivo').prop('checked', invoice.paid);
 
-      
-         // Valores aplicados (con regla cap ≤1) vienen del backend
+         // --- VALORES DEL BOND ---
          if (invoice.bon_quantity != null && invoice.bon_amount != null) {
             $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
             $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
@@ -1076,12 +1075,13 @@ var Invoices = (function () {
             $('#total_bonded_y').val('0.00');
          }
 
+         // --- VALORES DEL RETAINAGE ---
          if (invoice.invoice_current_retainage != null && invoice.invoice_current_retainage !== '') {
             $('#invoice_current_retainage_display').val(MyApp.formatMoney(invoice.invoice_current_retainage, 2, '.', ','));
          } else {
             $('#invoice_current_retainage_display').val('$0.00');
          }
-         // L Retainer
+         
          if (invoice.invoice_retainage_accumulated != null && invoice.invoice_retainage_accumulated !== '') {
             $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(invoice.invoice_retainage_accumulated, 2, '.', ','));
          } else {
@@ -1094,20 +1094,18 @@ var Invoices = (function () {
 
          // items
          items = invoice.items;
-         // --- CÁLCULO DE BASE AL EDITAR ---
+         
          items.forEach(function(item) {
             var qbf = Number(item.quantity_brought_forward || 0);
             var unpaid = Number(item.unpaid_qty || 0);
             item.base_debt = unpaid + qbf;
          });
 
-         // items_lista
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
          items_lista.forEach((item, index) => {
             item.posicion = index;
          });
 
-         // Guardar variables globales para cálculo de bonos
          if (items.length > 0) {
             if (items[0].sum_bonded_project !== undefined) sum_bonded_project = Number(items[0].sum_bonded_project || 0);
             if (items[0].bond_price !== undefined) bond_price = Number(items[0].bond_price || 0);
@@ -1116,17 +1114,29 @@ var Invoices = (function () {
 
          actualizarTableListaItems();
 
-         // --- CORRECCIÓN FINAL: EJECUTAR LAS VALIDACIONES DE VISIBILIDAD ---
-         
-         // 1. Esto revisará si los bonos son 0 y OCULTARÁ las tarjetas amarillas
-         calcularYMostrarXBonedEnJS(); 
+         // REGLA: Si la cantidad es 0 -> OCULTAR
+         var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g,"")) || 0;
 
-         // 2. Esto revisará si el retainage es 0 y OCULTARÁ la tarjeta verde
+         if (bondQty > 0.0001) {
+             $('#card-bond').removeClass('d-none').show();
+             $('#card-bond .card').removeClass('d-none').show();
+         } else {
+             $('#card-bond').addClass('d-none').hide();
+         }
+        // REGLA: Si el monto es 0 -> OCULTAR
          var valRet = parseFloat($('#invoice_current_retainage_display').val().replace(/[^0-9.-]+/g,"")) || 0;
-         checkAndToggleCard('#invoice_current_retainage_display', valRet);
+         var $cardRet = $('#invoice_current_retainage_display').closest('.card');
+
+         if (Math.abs(valRet) > 0.001) {
+             $cardRet.removeClass('d-none').show();
+         } else {
+             $cardRet.addClass('d-none').hide();
+         }
 
          event_change = false;
       }
+
+
    };
 
    // change number
