@@ -3004,6 +3004,7 @@ var Projects = (function () {
          var opt = new Option(c.name, c.contact_id, false, false);
          $(opt).attr('data-email', c.email || '');
          $(opt).attr('data-phone', c.phone || '');
+         $(opt).attr('data-role', c.role || '');
          $(select).append(opt);
       }
       if (typeof $().select2 !== 'undefined') {
@@ -3115,11 +3116,21 @@ var Projects = (function () {
          if (contact) {
             contacts_company.push(contact);
             var opt = new Option(contact.name, contact.contact_id, false, false);
+            $(opt).attr('data-email', contact.email || '');
+            $(opt).attr('data-phone', contact.phone || '');
+            $(opt).attr('data-role', contact.role || '');
             $('#contact-company-select').append(opt);
             $('#contact-company-select').val(contact.contact_id);
             $('#contact-company-select').trigger('change');
             $('.select-modal-contact-project').select2({ dropdownParent: $('#modal-contact'), width: '100%' });
          }
+      });
+
+      $(document).off('change', '#contact-company-select');
+      $(document).on('change', '#contact-company-select', function () {
+         var selectedOpt = $('#contact-company-select option:selected');
+         var role = selectedOpt.attr('data-role') || '';
+         $('#contact-role').val(role);
       });
 
       $(document).off('click', '#btn-salvar-contact');

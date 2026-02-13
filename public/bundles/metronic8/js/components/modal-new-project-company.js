@@ -407,6 +407,7 @@ var ModalNewProjectCompany = (function () {
          var opt = new Option(c.name, c.contact_id, false, false);
          jQuery(opt).attr('data-email', c.email || '');
          jQuery(opt).attr('data-phone', c.phone || '');
+         jQuery(opt).attr('data-role', c.role || '');
          jQuery(select).append(opt);
       }
       if (typeof jQuery().select2 !== 'undefined') {
@@ -955,11 +956,21 @@ var ModalNewProjectCompany = (function () {
          var contact = typeof ModalContactCompany !== 'undefined' ? ModalContactCompany.getContact() : null;
          if (contact && jQuery('#contact-company-select-modal-project').length) {
             npContacts_company.push(contact);
-            jQuery('#contact-company-select-modal-project').append(new Option(contact.name, contact.contact_id, false, false));
+            var opt = new Option(contact.name, contact.contact_id, false, false);
+            jQuery(opt).attr('data-email', contact.email || '');
+            jQuery(opt).attr('data-phone', contact.phone || '');
+            jQuery(opt).attr('data-role', contact.role || '');
+            jQuery('#contact-company-select-modal-project').append(opt);
             jQuery('#contact-company-select-modal-project').val(contact.contact_id);
             jQuery('#contact-company-select-modal-project').trigger('change');
             jQuery('.select-modal-contact-mp').select2({ dropdownParent: jQuery('#modal-contact-modal-project'), width: '100%' });
          }
+      });
+      jQuery(document).off('change', '#contact-company-select-modal-project');
+      jQuery(document).on('change', '#contact-company-select-modal-project', function () {
+         var selectedOpt = jQuery('#contact-company-select-modal-project option:selected');
+         var role = selectedOpt.attr('data-role') || '';
+         jQuery('#contact-role-modal-project').val(role);
       });
       jQuery(document).off('click', '#btn-salvar-contact-modal-project');
       jQuery(document).on('click', '#btn-salvar-contact-modal-project', function () {
