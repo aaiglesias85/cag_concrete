@@ -1465,6 +1465,14 @@ class ProjectService extends Base
          $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
          $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
 
+         // Diff Qty = Paid qty - Inv qty; Diff Amt = Paid Amt - Inv Amt (igual que en el frontend admin)
+         $invQty = (float) $invoiced_qty;
+         $invAmt = (float) $total_invoiced_amount;
+         $paidQty = (float) $paid_qty;
+         $paidAmt = (float) $total_paid_amount;
+         $diff_qty = $paidQty - $invQty;
+         $diff_amt = $paidAmt - $invAmt;
+
          $items[] = [
             'project_item_id' => $project_item_id,
             "apply_retainage" => $value->getApplyRetainage(),
@@ -1485,6 +1493,8 @@ class ProjectService extends Base
             "total_invoiced_amount" => $total_invoiced_amount,
             "paid_qty" => $paid_qty,
             "total_paid_amount" => $total_paid_amount,
+            "diff_qty" => $diff_qty,
+            "diff_amt" => $diff_amt,
             "principal" => $value->getPrincipal(),
             "change_order" => $value->getChangeOrder(),
             "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
