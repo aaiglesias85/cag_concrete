@@ -592,6 +592,20 @@ class InvoiceService extends Base
       if ($hay_bond) {
          $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
          $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+         // K y L = valores de O y P del invoice anterior (bon_quantity y bon_amount)
+         $prevInvoiceBond = null;
+         foreach ($allInvoicesHistory as $inv) {
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
+               break;
+            }
+            $prevInvoiceBond = $inv;
+         }
+         $prev_bon_qty = 0.0;
+         $prev_bon_amt = 0.0;
+         if ($prevInvoiceBond !== null) {
+            $prev_bon_qty = (float) ($prevInvoiceBond->getBonQuantity() ?? 0);
+            $prev_bon_amt = (float) ($prevInvoiceBond->getBonAmount() ?? 0);
+         }
          $bondItem = $bondInvoiceItem ?? $bondInvoiceItemFromCO;
          if ($bondItem !== null) {
             $em->refresh($bondItem);
@@ -600,17 +614,19 @@ class InvoiceService extends Base
                $bondItem->setUnpaidQty($d['unpaid_qty']);
                $bondItem->setUnpaidFromPrevious($d['unpaid_from_previous']);
             }
-            $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $bondItem, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
-            $qty_this_period = $bondItem->getQuantity();
-            $qty_brought_forward = $bondItem->getQuantityBroughtForward() ? $bondItem->getQuantityBroughtForward() : 0;
-            $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
+            $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $bondItem, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
             $price = $bondItem->getPrice();
-            $qty_completed = $bondItem->getQuantity() + $bondItem->getQuantityFromPrevious();
-            $sum_H_contract      += ($bondItem->getProjectItem()->getQuantity() * $price);
-            $sum_J_completed     += ($qty_completed * $price);
-            $sum_L_previous_bill += $prevBill[1];
+            $contract_qty_bond = (float) $bondItem->getProjectItem()->getQuantity();
+            $contract_amt_bond = $contract_qty_bond * $price;
+            $sum_H_contract      += $contract_amt_bond;
+            $sum_J_completed     += $contract_amt_bond;
+            $sum_L_previous_bill += $prev_bon_amt;
             $sum_P_this_period   += $bon_amt;
             $sum_S_billed        += $bon_amt;
+            $objWorksheet->setCellValue('I' . $fila, $contract_qty_bond);
+            $objWorksheet->setCellValue('J' . $fila, $contract_amt_bond);
+            $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
+            $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
             $objWorksheet->setCellValue('M' . $fila, 0);
             $objWorksheet->setCellValue('N' . $fila, 0);
             $objWorksheet->setCellValue('O' . $fila, $bon_qty);
@@ -621,8 +637,12 @@ class InvoiceService extends Base
             $projectItem = $bondProjectItems[0];
             $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
             $sum_H_contract += $bondResult['contract_amount'];
+            $sum_J_completed += $bondResult['contract_amount'];
+            $sum_L_previous_bill += $prev_bon_amt;
             $sum_P_this_period += $bon_amt;
             $sum_S_billed += $bon_amt;
+            $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
+            $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
             $objWorksheet->setCellValue('M' . $fila, 0);
             $objWorksheet->setCellValue('N' . $fila, 0);
             $objWorksheet->setCellValue('O' . $fila, $bon_qty);
@@ -631,19 +651,6 @@ class InvoiceService extends Base
             $objWorksheet->setCellValue("S{$fila}", $bon_amt);
          }
          $aplicarFormatoFila($objWorksheet, $fila);
-         // Fondos para fila Bond: I–L verde oscuro, M–N amarillo oscuro, O/P/R/S naranja oscuro
-         $objWorksheet->getStyle('I' . $fila . ':L' . $fila)->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FF66BB6A');
-         $objWorksheet->getStyle('M' . $fila . ':N' . $fila)->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFFEB3B');
-         $objWorksheet->getStyle('O' . $fila . ':P' . $fila)->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFFB74D');
-         $objWorksheet->getStyle('R' . $fila . ':S' . $fila)->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFFB74D');
          $item_number++;
          $fila++;
       }
@@ -1055,7 +1062,7 @@ class InvoiceService extends Base
       $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
       $description = $projectItem->getItem()->getName();
 
-      // Bond: M y N en 0 (los valores van en O y P; el llamador escribe bon_quantity y bon_amount ahí)
+      // Bond: I y J = mismos que G y H (contract qty/amount del project_item); M y N en 0; O y P los escribe el llamador
       $objWorksheet
          ->setCellValue('A' . $fila, $item_number)
          ->setCellValue('B' . $fila, $description)
@@ -1063,8 +1070,8 @@ class InvoiceService extends Base
          ->setCellValue('F' . $fila, $price)
          ->setCellValue('G' . $fila, $contract_qty)
          ->setCellValue('H' . $fila, $contract_amount)
-         ->setCellValue('I' . $fila, 0)
-         ->setCellValue('J' . $fila, 0)
+         ->setCellValue('I' . $fila, $contract_qty)
+         ->setCellValue('J' . $fila, $contract_amount)
          ->setCellValue('K' . $fila, 0)
          ->setCellValue('L' . $fila, 0)
          ->setCellValue('M' . $fila, 0)
