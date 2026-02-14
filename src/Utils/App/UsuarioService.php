@@ -42,8 +42,9 @@ class UsuarioService extends Base
          $resultadoAdmin = $this->adminUsuarioService->CargarDatosUsuario($usuario_id);
 
          if ($resultadoAdmin['success']) {
-            // Agregar imagen al resultado
+            // Agregar imagen y preferred_lang al resultado
             $resultadoAdmin['usuario']['imagen'] = $usuario->getImagen() ?? '';
+            $resultadoAdmin['usuario']['preferred_lang'] = $usuario->getPreferredLang();
 
             $resultado['success'] = true;
             $resultado['usuario'] = $resultadoAdmin['usuario'];
@@ -70,7 +71,7 @@ class UsuarioService extends Base
     * @param string $password Nueva contraseña (opcional)
     * @return array
     */
-   public function ActualizarMisDatos($nombre, $apellidos, $email, $telefono, $password_actual = '', $password = ''): array
+   public function ActualizarMisDatos($nombre, $apellidos, $email, $telefono, $password_actual = '', $password = '', $preferred_lang = null): array
    {
       $usuario = $this->getUser();
 
@@ -91,7 +92,8 @@ class UsuarioService extends Base
          $nombre,
          $apellidos,
          $email,
-         $telefono
+         $telefono,
+         $preferred_lang
       );
    }
 

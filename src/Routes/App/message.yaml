@@ -1,0 +1,44 @@
+# Message API Routes - Internal messaging for mobile app
+# All routes here are prefixed with /api/{lang}/message
+
+listarUsuariosParaChatApp:
+   path: /{lang}/message/usuarios
+   defaults: { _controller: App\Controller\App\MessageController::listarUsuarios, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
+
+listarConversacionesApp:
+   path: /{lang}/message/conversaciones
+   defaults: { _controller: App\Controller\App\MessageController::listarConversaciones, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
+
+obtenerOcrearConversacionApp:
+   path: /{lang}/message/conversacion
+   defaults: { _controller: App\Controller\App\MessageController::obtenerOcrearConversacion, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
+
+listarMensajesApp:
+   path: /{lang}/message/mensajes
+   defaults: { _controller: App\Controller\App\MessageController::listarMensajes, _format: json }
+   requirements:
+      lang: es|en
+   methods: [GET]
+
+enviarMensajeApp:
+   path: /{lang}/message/enviar
+   defaults: { _controller: App\Controller\App\MessageController::enviarMensaje, _format: json }
+   requirements:
+      lang: es|en
+   methods: [POST]
+
+marcarComoLeidosApp:
+   path: /{lang}/message/marcar-leidos
+   defaults: { _controller: App\Controller\App\MessageController::marcarComoLeidos, _format: json }
+   requirements:
+      lang: es|en
+   methods: [POST]

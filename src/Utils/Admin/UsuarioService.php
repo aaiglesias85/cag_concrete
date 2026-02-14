@@ -78,7 +78,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function ActualizarMisDatos($usuario_id, $contrasenna, $contrasenna_actual, $nombre, $apellidos, $email, $telefono)
+   public function ActualizarMisDatos($usuario_id, $contrasenna, $contrasenna_actual, $nombre, $apellidos, $email, $telefono, $preferred_lang = null)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -109,6 +109,10 @@ class UsuarioService extends Base
          $entity->setApellidos($apellidos);
          $entity->setEmail($email);
          $entity->setTelefono($telefono);
+
+         if ($preferred_lang !== null && $preferred_lang !== '') {
+            $entity->setPreferredLang($preferred_lang === 'en' ? 'en' : 'es');
+         }
 
          if ($contrasenna != "") {
             $entity->setContrasenna($this->CodificarPassword($contrasenna));
@@ -158,6 +162,7 @@ class UsuarioService extends Base
          $arreglo_resultado['estimator'] = $usuario->getEstimator();
          $arreglo_resultado['bond'] = $usuario->getBond();
          $arreglo_resultado['retainage'] = $usuario->getRetainage();
+         $arreglo_resultado['preferred_lang'] = $usuario->getPreferredLang();
 
          $permisos = $this->ListarPermisos($usuario_id);
          $arreglo_resultado['permisos'] = $permisos;

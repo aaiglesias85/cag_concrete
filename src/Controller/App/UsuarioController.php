@@ -119,6 +119,7 @@ class UsuarioController extends AbstractController
                new OA\Property(property: 'telefono', type: 'string', nullable: true, example: '+1234567890', description: 'User phone number'),
                new OA\Property(property: 'password_actual', type: 'string', format: 'password', nullable: true, example: 'oldpassword123', description: 'Current password (required only if changing password)'),
                new OA\Property(property: 'password', type: 'string', format: 'password', nullable: true, example: 'newpassword123', description: 'New password (required only if changing password)'),
+               new OA\Property(property: 'preferred_lang', type: 'string', enum: ['es', 'en'], nullable: true, description: 'Preferred app language'),
             ]
          )
       ),
@@ -155,24 +156,27 @@ class UsuarioController extends AbstractController
       try {
          // Leer parámetros desde JSON body solamente
          $data = $this->getRequestData($request);
-         
-         $nombre = $data['nombre'] ?? null;
-         $apellidos = $data['apellidos'] ?? null;
-         $email = $data['email'] ?? null;
-         $telefono = $data['telefono'] ?? null;
+         $user = $this->getUser();
+         // Si solo se envía preferred_lang, mantener el resto de datos del usuario
+         $nombre = $data['nombre'] ?? $user?->getNombre();
+         $apellidos = $data['apellidos'] ?? $user?->getApellidos();
+         $email = $data['email'] ?? $user?->getEmail();
+         $telefono = $data['telefono'] ?? $user?->getTelefono();
 
          // Contraseñas opcionales (solo si se quiere cambiar)
          $password_actual = $data['password_actual'] ?? '';
          $password = $data['password'] ?? '';
+         $preferred_lang = isset($data['preferred_lang']) && $data['preferred_lang'] === 'en' ? 'en' : (isset($data['preferred_lang']) && $data['preferred_lang'] === 'es' ? 'es' : null);
 
-         // Actualizar datos (con o sin cambiar contraseña)
+         // Actualizar datos (con o sin cambiar contraseña o idioma)
          $resultado = $this->usuarioService->ActualizarMisDatos(
             $nombre,
             $apellidos,
             $email,
             $telefono,
             $password_actual,
-            $password
+            $password,
+            $preferred_lang
          );
 
          if ($resultado['success']) {

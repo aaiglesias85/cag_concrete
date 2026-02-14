@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-02-2026 a las 23:38:22
+-- Tiempo de generación: 14-02-2026 a las 16:46:49
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1243,6 +1243,38 @@ INSERT INTO `material` (`material_id`, `name`, `price`, `unit_id`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `message`
+--
+
+CREATE TABLE `message` (
+  `message_id` int(11) NOT NULL,
+  `conversation_id` int(11) NOT NULL,
+  `sender_id` int(11) NOT NULL,
+  `body_original` text NOT NULL COMMENT 'Texto tal como lo escribió el remitente',
+  `source_lang` char(2) NOT NULL DEFAULT 'es' COMMENT 'es|en - idioma del body_original',
+  `body_es` text COMMENT 'Versión en español (original o traducida)',
+  `body_en` text COMMENT 'Versión en inglés (original o traducida)',
+  `created_at` datetime DEFAULT NULL,
+  `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `message_conversation`
+--
+
+CREATE TABLE `message_conversation` (
+  `conversation_id` int(11) NOT NULL,
+  `user1_id` int(11) NOT NULL COMMENT 'user_id menor del par',
+  `user2_id` int(11) NOT NULL COMMENT 'user_id mayor del par',
+  `created_at` datetime DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL COMMENT 'Última actividad (envío de mensaje)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `notification`
 --
 
@@ -1894,6 +1926,7 @@ CREATE TABLE `user` (
   `push_token` varchar(255) DEFAULT NULL,
   `plataforma` varchar(255) DEFAULT NULL,
   `imagen` varchar(255) DEFAULT NULL,
+  `preferred_lang` char(2) DEFAULT 'es' COMMENT 'es|en - idioma preferido en la app',
   `rol_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1901,8 +1934,8 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `rol_id`) VALUES
-(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
+(1, 'Administrator', 'Concrete', 'admin@concrete.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2024-04-12 18:37:27', NULL, NULL, NULL, NULL, 'es', 1);
 
 -- --------------------------------------------------------
 
@@ -2254,6 +2287,25 @@ ALTER TABLE `log`
 ALTER TABLE `material`
   ADD PRIMARY KEY (`material_id`),
   ADD KEY `fk_material_unit` (`unit_id`);
+
+--
+-- Indices de la tabla `message`
+--
+ALTER TABLE `message`
+  ADD PRIMARY KEY (`message_id`),
+  ADD KEY `IDX_message_conversation` (`conversation_id`),
+  ADD KEY `IDX_message_sender` (`sender_id`),
+  ADD KEY `IDX_message_created_at` (`created_at`);
+
+--
+-- Indices de la tabla `message_conversation`
+--
+ALTER TABLE `message_conversation`
+  ADD PRIMARY KEY (`conversation_id`),
+  ADD UNIQUE KEY `UQ_conversation_users` (`user1_id`,`user2_id`),
+  ADD KEY `IDX_conversation_user1` (`user1_id`),
+  ADD KEY `IDX_conversation_user2` (`user2_id`),
+  ADD KEY `IDX_conversation_updated_at` (`updated_at`);
 
 --
 -- Indices de la tabla `notification`
@@ -2711,6 +2763,18 @@ ALTER TABLE `material`
   MODIFY `material_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT de la tabla `message`
+--
+ALTER TABLE `message`
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `message_conversation`
+--
+ALTER TABLE `message_conversation`
+  MODIFY `conversation_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `notification`
 --
 ALTER TABLE `notification`
@@ -3088,6 +3152,20 @@ ALTER TABLE `log`
 --
 ALTER TABLE `material`
   ADD CONSTRAINT `fk_material_unit` FOREIGN KEY (`unit_id`) REFERENCES `unit` (`unit_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `message`
+--
+ALTER TABLE `message`
+  ADD CONSTRAINT `FK_message_conversation` FOREIGN KEY (`conversation_id`) REFERENCES `message_conversation` (`conversation_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_message_sender` FOREIGN KEY (`sender_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `message_conversation`
+--
+ALTER TABLE `message_conversation`
+  ADD CONSTRAINT `FK_conversation_user1` FOREIGN KEY (`user1_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_conversation_user2` FOREIGN KEY (`user2_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `notification`

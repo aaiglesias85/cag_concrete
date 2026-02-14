@@ -11,6 +11,7 @@ parameters:
   recaptcha_publick_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
   recaptcha_private_key: '%env(GOOGLE_RECAPTCHA_SECRET)%'
   google_maps_api_key: '%env(GOOGLE_MAPS_API_KEY)%'
+  google_translate_api_key: '%env(GOOGLE_TRANSLATE_API_KEY)%'
   direccion_url: '%env(direccion_url)%'
   quickbook_account_name: '%env(QUICKBOOK_ACCOUNT_NAME)%'
 
@@ -52,6 +53,10 @@ services:
   # y así no cargar Doctrine al generar api/doc
   App\Utils\Admin\ProjectService:
     public: true
+
+  App\Utils\App\MessageService:
+    arguments:
+      $googleTranslateApiKey: '%google_translate_api_key%'
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

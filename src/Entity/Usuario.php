@@ -60,6 +60,9 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "imagen", type: "string", length: 255, nullable: true)]
     private ?string $imagen;
 
+    #[ORM\Column(name: "preferred_lang", type: "string", length: 2, nullable: true, options: ["default" => "es"])]
+    private ?string $preferredLang = 'es';
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Rol")]
     #[ORM\JoinColumn(name: "rol_id", referencedColumnName: "rol_id", nullable: true)]
     private ?Rol $rol;
@@ -328,6 +331,17 @@ class Usuario implements UserInterface, EquatableInterface
     public function setImagen(?string $imagen): self
     {
         $this->imagen = $imagen;
+        return $this;
+    }
+
+    public function getPreferredLang(): ?string
+    {
+        return $this->preferredLang ?? 'es';
+    }
+
+    public function setPreferredLang(?string $preferredLang): self
+    {
+        $this->preferredLang = ($preferredLang === 'en' ? 'en' : 'es');
         return $this;
     }
 }
