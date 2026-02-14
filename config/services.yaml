@@ -12,6 +12,8 @@ parameters:
   recaptcha_private_key: '%env(GOOGLE_RECAPTCHA_SECRET)%'
   google_maps_api_key: '%env(GOOGLE_MAPS_API_KEY)%'
   google_translate_api_key: '%env(GOOGLE_TRANSLATE_API_KEY)%'
+  # Mismo que en SQMC: Firebase Cloud Messaging server key para push (mensajería)
+  firebase_server_key: '%env(string:firebase_server_key:default::)%'
   direccion_url: '%env(direccion_url)%'
   quickbook_account_name: '%env(QUICKBOOK_ACCOUNT_NAME)%'
 
@@ -54,9 +56,14 @@ services:
   App\Utils\Admin\ProjectService:
     public: true
 
+  App\Service\PushNotificationService:
+    arguments:
+      $fcmServerKey: '%firebase_server_key%'
+
   App\Utils\App\MessageService:
     arguments:
       $googleTranslateApiKey: '%google_translate_api_key%'
+      $pushNotificationService: '@App\Service\PushNotificationService'
 
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones

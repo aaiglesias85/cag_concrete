@@ -8,6 +8,7 @@ use App\Entity\Usuario;
 use App\Repository\MessageConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UsuarioRepository;
+use App\Service\PushNotificationService;
 use App\Utils\Base;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -31,6 +32,7 @@ class MessageService extends Base
     private UsuarioRepository $usuarioRepository;
     private EntityManagerInterface $em;
     private string $googleTranslateApiKey;
+    private PushNotificationService $pushNotificationService;
 
     public function __construct(
         \Symfony\Component\DependencyInjection\ContainerInterface $container,
@@ -42,7 +44,8 @@ class MessageService extends Base
         MessageRepository $messageRepository,
         UsuarioRepository $usuarioRepository,
         EntityManagerInterface $em,
-        string $googleTranslateApiKey = ''
+        string $googleTranslateApiKey = '',
+        PushNotificationService $pushNotificationService
     ) {
         parent::__construct($container, $mailer, $containerBag, $security, $logger);
         $this->conversationRepository = $conversationRepository;
@@ -50,6 +53,7 @@ class MessageService extends Base
         $this->usuarioRepository = $usuarioRepository;
         $this->em = $em;
         $this->googleTranslateApiKey = $googleTranslateApiKey;
+        $this->pushNotificationService = $pushNotificationService;
     }
 
     /**
@@ -254,6 +258,22 @@ class MessageService extends Base
             $conv->setUpdatedAt($now);
             $this->em->persist($message);
             $this->em->flush();
+
+            // Notificación push al destinatario (otro usuario de la conversación)
+            $recipient = $conv->getOtherUser($usuario);
+            if ($recipient instanceof Usuario && $recipient->getPushToken() !== null && $recipient->getPushToken() !== '') {
+                $senderName = $usuario->getNombreCompleto();
+                $preview = mb_strlen($body) > 80 ? mb_substr($body, 0, 77) . '...' : $body;
+                $this->pushNotificationService->sendToDevice(
+                    $recipient->getPushToken(),
+                    $senderName,
+                    $preview,
+                    [
+                        'conversation_id' => (string) $conv->getConversationId(),
+                        'message_id' => (string) $message->getMessageId(),
+                    ]
+                );
+            }
 
             return [
                 'success' => true,
