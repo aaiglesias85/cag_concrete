@@ -1442,6 +1442,8 @@ var ProjectsDetalle = (function () {
             total_invoiced_amount: null,
             paid_qty: null,
             total_paid_amount: null,
+            diff_qty: null,
+            diff_amt: null,
          });
       }
 
@@ -1474,6 +1476,8 @@ var ProjectsDetalle = (function () {
          { data: 'total_invoiced_amount' },
          { data: 'paid_qty' },
          { data: 'total_paid_amount' },
+         { data: 'diff_qty' },
+         { data: 'diff_amt' },
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
       ];
 
@@ -1541,6 +1545,24 @@ var ProjectsDetalle = (function () {
             render: function (data, type, row) {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '', '%').display(data) : '0.00%';
             }
+         },
+         {
+            targets: 12, // Diff Qty = Paid Qty - Inv Qty
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var val = (parseFloat(row.paid_qty) || 0) - (parseFloat(row.invoiced_qty) || 0);
+               return type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
+            }
+         },
+         {
+            targets: 13, // Diff Amt = Paid Amt - Inv Amt
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var val = (parseFloat(row.total_paid_amount) || 0) - (parseFloat(row.total_invoiced_amount) || 0);
+               return type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
+            }
          }
       ];
 
@@ -1548,7 +1570,7 @@ var ProjectsDetalle = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[12, 'asc']];
+      const order = [[14, 'asc']];
 
       // escapar contenido de la tabla
       oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {
@@ -1573,7 +1595,7 @@ var ProjectsDetalle = (function () {
                // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
                var $firstCell = $(row).find('td:first');
                $firstCell.attr('colspan', columns.length - 1);
-               $firstCell.css('text-align', 'left');
+               $firstCell.css('text-align', 'center');
                // Ocultar las demás celdas
                $(row).find('td:not(:first)').hide();
             } else {

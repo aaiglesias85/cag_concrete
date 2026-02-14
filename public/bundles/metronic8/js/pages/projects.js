@@ -4709,6 +4709,8 @@ var Projects = (function () {
             total_invoiced_amount: null,
             paid_qty: null,
             total_paid_amount: null,
+            diff_qty: null,
+            diff_amt: null,
          });
       }
 
@@ -4741,6 +4743,8 @@ var Projects = (function () {
          { data: 'total_invoiced_amount' },
          { data: 'paid_qty' },
          { data: 'total_paid_amount' },
+         { data: 'diff_qty' },
+         { data: 'diff_amt' },
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
       ];
 
@@ -4750,6 +4754,34 @@ var Projects = (function () {
          {
             targets: 0, // Item
             className: 'min-w-150px',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';
+
+               var badgeRetainage = '';
+               if (row.apply_retainage == 1 || row.apply_retainage === true) {
+                  badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
+               }
+
+               var badgeBond = '';
+               if (row.bond == 1 || row.bond === true) {
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               }
+
+               var badgeBonded = '';
+               if (row.bonded == 1 || row.bonded === true) {
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+               }
+
+               var icono = '';
+               if (row.change_order && !row.isGroupHeader) {
+                  icono =
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="View change order history"></i>';
+               }
+
+               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBond}${badgeBonded}${icono}</div>`;
+            },
          },
          {
             targets: 1, // Unit
@@ -4781,13 +4813,31 @@ var Projects = (function () {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '', '%').display(data) : '0.00%';
             },
          },
+         {
+            targets: 12, // Diff Qty = Paid Qty - Inv Qty
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var val = (parseFloat(row.paid_qty) || 0) - (parseFloat(row.invoiced_qty) || 0);
+               return type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
+            },
+         },
+         {
+            targets: 13, // Diff Amt = Paid Amt - Inv Amt
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var val = (parseFloat(row.total_paid_amount) || 0) - (parseFloat(row.total_invoiced_amount) || 0);
+               return type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
+            },
+         },
       ];
 
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[12, 'asc']];
+      const order = [[14, 'asc']];
 
       // escapar contenido de la tabla
       oTableItemsCompletion = DatatableUtil.initSafeDataTable(table, {
@@ -4812,7 +4862,7 @@ var Projects = (function () {
                // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
                var $firstCell = $(row).find('td:first');
                $firstCell.attr('colspan', columns.length - 1);
-               $firstCell.css('text-align', 'left');
+               $firstCell.css('text-align', 'center');
                // Ocultar las demás celdas
                $(row).find('td:not(:first)').hide();
             } else {
