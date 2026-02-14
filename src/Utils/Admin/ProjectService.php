@@ -1375,6 +1375,7 @@ class ProjectService extends Base
          $arreglo_resultado['prevailing_role'] = $entity->getPrevailingRole() != null ? $entity->getPrevailingRole()->getDescription() : '';
          $arreglo_resultado['prevailing_rate'] = $entity->getPrevailingRate();
          // Bon General = monto del ítem Bond en el proyecto (calculado, no se guarda en project)
+         /** @var ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
          $arreglo_resultado['bon_general'] = $projectItemRepo->TotalBondAmountProjectItems($project_id);
 
