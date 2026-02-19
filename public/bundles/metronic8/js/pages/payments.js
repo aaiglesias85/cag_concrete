@@ -1210,18 +1210,13 @@ var Payments = (function () {
             cancelButtonText: 'No, cancel',
          }).then((result) => {
             if (result.isConfirmed) {
-               // 3. Aplicar el estado deseado visualmente
-               $input.prop('checked', desiredState);
-
-               // 4. Guardar en memoria para que no se pierda al ordenar/filtrar
+               // 3. Guardar en memoria para que no se pierda al ordenar/filtrar o cambiar de tab
                if (payments[posicion]) {
                   payments[posicion].is_closed_manual = desiredState;
                }
 
-               // 5. Bloquear/Desbloquear inputs (Paid Qty y Unpaid Qty)
-               // Si desiredState es true (Closed) -> disabled = true
-               var $inputs = $row.find('input.paid_qty, input.unpaid_qty');
-               $inputs.prop('disabled', desiredState);
+               // 4. Redibujar la tabla para que las celdas se re-rendericen: cerrado = solo texto, abierto = inputs editables
+               actualizarTableListaPayments();
             }
             // Si cancela, no hacemos nada (el preventDefault ya lo dejó como estaba)
          });
