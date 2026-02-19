@@ -2357,13 +2357,17 @@ class InvoiceService extends Base
       $em->flush();
       $this->RecalcularUnpaidQtyProyecto($project_id);
 
-      // Recalcular Bond (bon_quantity, bon_amount) porque las cantidades de ítems bonded pueden haber cambiado
-      $this->RecalcularBonProyecto($project_id);
-
       foreach ($invoices as $invoice) {
          $this->CalcularYGuardarRetainageInvoice($invoice);
       }
       $em->flush();
+
+      // Recalcular Bond al final (cantidades de ítems bonded pueden haber cambiado). En try-catch para no revertir las actualizaciones de items si falla.
+      try {
+         $this->RecalcularBonProyecto($project_id);
+      } catch (\Throwable $e) {
+         $this->SalvarLog('Error', 'Invoice', 'RecalcularBonProyecto tras DataTracking: ' . $e->getMessage());
+      }
    }
 
    /**
