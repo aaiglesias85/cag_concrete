@@ -44,6 +44,7 @@ Después de un cambio en Data T, para el invoice afectado y los posteriores se r
 - **Quantity Completed** – quantity + quantity_from_previous (derivado).
 - **Unpaid Qty / Unpaid From Previous** – según las reglas de deuda y QBF (ver `README_INVOICES_PAYMENTS.md`).
 - **Amounts** – derivados de quantity y price.
+- **Bond (bon_quantity, bon_amount)** – recalculado para todo el proyecto con `RecalcularBonProyecto` (si cambian cantidades de ítems bonded).
 
 Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** del invoice de ese periodo. No importa si la línea estaba pagada: se elimina igual.  
 **Importante:** Esa eliminación aplica **solo al invoice de ese periodo** (p. ej. invoice #5). No se elimina la línea en los invoices posteriores (#6, #7, #8…): cada uno tiene su propio periodo y su propia cantidad; si en #6 ese ítem tiene cantidad en su periodo, la línea sigue en #6.
@@ -68,6 +69,8 @@ Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** de
      - Recorre todos los invoices del proyecto ordenados por `start_date` e `invoice_id`.
      - Para cada ítem de proyecto: actualiza **quantity_from_previous** (suma de cantidades de invoices anteriores), **unpaid_qty** y **unpaid_from_previous** en cada invoice.  
    Así, si cambió la cantidad en el invoice #5, los #6, #7, … quedan con total acumulado y unpaid correctos.
+   - `InvoiceService::RecalcularBonProyecto(project_id)`:
+     - Recalcula **Bond** (bon_quantity, bon_amount) para todos los invoices del proyecto, ya que las cantidades de ítems bonded pueden haber cambiado (ver `README_BOND_CALCULATION.md`).
 
 ---
 
@@ -102,8 +105,9 @@ Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** de
 | Archivo | Responsabilidad |
 |---------|-----------------|
 | `InvoiceRepository::FindInvoicesContainingDate` | Invoices del proyecto cuyo periodo contiene una fecha. |
-| `InvoiceService::ActualizarInvoicesPorCambioDataTracking` | Actualiza cantidades del periodo y elimina líneas en 0; luego dispara recálculo en cascada. |
+| `InvoiceService::ActualizarInvoicesPorCambioDataTracking` | Actualiza cantidades del periodo y elimina líneas en 0; luego dispara recálculo en cascada (unpaid, Bond, retainage). |
 | `InvoiceService::RecalcularUnpaidQtyProyecto` | Recalcula quantity_from_previous, unpaid_qty y unpaid_from_previous para todos los ítems del proyecto. |
+| `InvoiceService::RecalcularBonProyecto` | Recalcula bon_quantity y bon_amount de todos los invoices del proyecto (p. ej. tras cambio en Data T de ítems bonded). |
 | `DataTrackingService::SalvarDataTracking` | Tras guardar, llama a la sincronización con invoices. |
 | `DataTrackingService::EliminarItemDataTracking` / `EliminarDataTracking` / `EliminarDataTrackings` | Tras eliminar, llaman a la sincronización con invoices. |
 | `DataTrackingItemRepository::TotalQuantity` | Suma de cantidades en Data T por project_item y rango de fechas. |

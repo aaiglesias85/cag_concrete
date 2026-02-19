@@ -2357,6 +2357,9 @@ class InvoiceService extends Base
       $em->flush();
       $this->RecalcularUnpaidQtyProyecto($project_id);
 
+      // Recalcular Bond (bon_quantity, bon_amount) porque las cantidades de ítems bonded pueden haber cambiado
+      $this->RecalcularBonProyecto($project_id);
+
       foreach ($invoices as $invoice) {
          $this->CalcularYGuardarRetainageInvoice($invoice);
       }
