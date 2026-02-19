@@ -2441,6 +2441,47 @@ var Payments = (function () {
       $('#display_bond_qty').text(x_formatted);
    };
 
+   // Función para calcular y animar Bonded 
+   var calcularYMostrarXBondedEnJS = function () {
+      var sum_bonded_invoices = 0;
+
+      payments.forEach(function (item) {
+         if (!item.isGroupHeader) {
+            if (item.bonded == 1 || item.bonded === true) {
+               var amount = Number(item.amount || 0);
+               sum_bonded_invoices += amount;
+            }
+         }
+      });
+
+      var x = 0;
+      if (typeof sum_bonded_project !== 'undefined' && sum_bonded_project > 0) {
+         x = sum_bonded_invoices / sum_bonded_project;
+      }
+      var y = (typeof bond_price !== 'undefined' ? bond_price : 0) * x;
+
+      // Aseguramos que el contenedor sea visible
+      $('#card-bond').show();
+
+      // Animar 
+      if (typeof animateValue === 'function') {
+          animateValue('#total_bonded_x', x, 1500, false);
+          animateValue('#total_bonded_y', y, 1500, true);
+      } else {
+          $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+          $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
+      }
+   };
+
+   // Función modificada para NO ocultar tarjetas
+   var checkAndToggleCard = function(selector, value) {
+      var $input = $(selector);
+      if ($input.length === 0) return;
+      var $card = $input.closest('.card');
+      // Siempre mostramos, nunca ocultamos
+      $card.removeClass('d-none hide').show(); 
+   };
+
    return {
       init: function () {
          initWidgets();
