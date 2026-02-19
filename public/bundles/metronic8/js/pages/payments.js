@@ -949,30 +949,33 @@ var Payments = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var safeValue = data !== null && data !== undefined ? data : 0;
+               var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
+               var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
+               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (parseFloat(item.unpaid_qty) <= 0));
 
-               // Verificamos si tiene bloqueo manual O si está cerrado por saldo 0
-               var isClosed = typeof row.is_closed_manual !== 'undefined' ? row.is_closed_manual : row.unpaid_qty <= 0;
-
-               var disabled = isClosed ? 'disabled' : '';
-
+               if (isClosed) {
+                  return `<div class="w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span></div>`;
+               }
                return `<div class="w-100px">
                         <input type="number" class="form-control paid_qty" value="${safeValue}" 
-                        data-position="${row.posicion}" style="min-width: 80px;" ${disabled} />
+                        data-position="${row.posicion}" style="min-width: 80px;" />
                        </div>`;
             },
          },
-         // Target 8: Unpaid Qty (Agregar lógica disabled)
+         // Target 8: Unpaid Qty (cuando closed o invoice pagado: solo texto, sin inputs)
          {
             targets: 8,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var safeValue = data !== null && data !== undefined ? data : 0;
+               var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
+               var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
+               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (parseFloat(item.unpaid_qty) <= 0));
 
-               var isClosed = typeof row.is_closed_manual !== 'undefined' ? row.is_closed_manual : row.unpaid_qty <= 0;
-
-               var disabled = isClosed ? 'disabled' : '';
-
-               let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" ${disabled} />`;
+               if (isClosed) {
+                  return `<div class="d-flex align-items-center gap-2 w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span><a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
+               }
+               let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" />`;
                return `<div class="d-flex align-items-center gap-2 w-100px">${valueHtml}<a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
             },
          },
@@ -990,11 +993,14 @@ var Payments = (function () {
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
+               var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
+               var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
+               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (item.unpaid_qty == null || parseFloat(item.unpaid_qty) <= 0));
 
-               // Lógica: Si unpaid_qty es 0, nace cerrado (checked)
-               var isClosed = row.unpaid_qty == null || parseFloat(row.unpaid_qty) <= 0;
+               if (isInvoicePaid) {
+                  return '<span class="badge badge-light-success">C</span>';
+               }
                var isChecked = isClosed ? 'checked' : '';
-
                return `<div class="form-check form-switch form-check-custom form-check-solid justify-content-center" style="min-height: auto;">
                         <input class="form-check-input item-status-toggle cursor-pointer" type="checkbox" 
                            value="1" ${isChecked} 
