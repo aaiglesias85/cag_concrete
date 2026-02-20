@@ -631,6 +631,10 @@ class ProjectService extends Base
 
          $em->flush();
 
+         // Recalcular retainage y bond en todos los invoices del proyecto
+         // cuando cambian las marcas R (apply_retainage) o bonded en ítems
+         $this->invoiceService->RecalcularRetainageYBonPorProyecto($project_id);
+
          $resultado['success'] = true;
 
          // devolver item
@@ -3097,7 +3101,9 @@ class ProjectService extends Base
       /** @var \App\Repository\ProjectItemRepository $repo */
       $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-      return $repo->ActualizarRetainageMasivo($ids, (bool)$status);
+      $result = $repo->ActualizarRetainageMasivo($ids, (bool)$status);
+      $this->recalcularInvoicesPorProjectItems($repo, $ids);
+      return $result;
    }
 
    public function ActualizarBonedItems(array $ids, $status)
@@ -3105,7 +3111,28 @@ class ProjectService extends Base
       /** @var \App\Repository\ProjectItemRepository $repo */
       $repo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-      return $repo->ActualizarBondedMasivo($ids, (bool)$status);
+      $result = $repo->ActualizarBondedMasivo($ids, (bool)$status);
+      $this->recalcularInvoicesPorProjectItems($repo, $ids);
+      return $result;
+   }
+
+   /**
+    * Recalcula retainage y bond en los invoices de los proyectos afectados
+    * tras cambios en apply_retainage o bonded de ítems del proyecto.
+    *
+    * @param ProjectItemRepository $repo
+    * @param array $projectItemIds ids de project_item
+    */
+   private function recalcularInvoicesPorProjectItems(ProjectItemRepository $repo, array $projectItemIds): void
+   {
+      $projectItemIds = array_map('intval', array_filter($projectItemIds));
+      if (empty($projectItemIds)) {
+         return;
+      }
+      $projectIds = $repo->getProjectIdsByProjectItemIds($projectItemIds);
+      foreach (array_unique($projectIds) as $projectId) {
+         $this->invoiceService->RecalcularRetainageYBonPorProyecto($projectId);
+      }
    }
 
 

@@ -258,6 +258,27 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Obtiene los project_id distintos correspondientes a una lista de project_item id.
+    * Útil para recalcular invoices tras cambios masivos en R o bonded.
+    *
+    * @param array $projectItemIds Lista de id de project_item
+    * @return int[]
+    */
+   public function getProjectIdsByProjectItemIds(array $projectItemIds): array
+   {
+      if (empty($projectItemIds)) {
+         return [];
+      }
+      $qb = $this->createQueryBuilder('p_i')
+         ->select('DISTINCT p.projectId')
+         ->leftJoin('p_i.project', 'p')
+         ->where('p_i.id IN (:ids)')
+         ->setParameter('ids', $projectItemIds);
+      $result = $qb->getQuery()->getSingleColumnResult();
+      return array_map('intval', array_filter($result));
+   }
+
+   /**
     * Actualiza el estado de retainage para múltiples items a la vez
     */
    public function ActualizarRetainageMasivo(array $ids, bool $status)

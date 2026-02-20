@@ -117,6 +117,32 @@ class InvoiceService extends Base
    }
 
    /**
+    * RecalcularRetainageYBonPorProyecto: Recalcula los valores de retainage y bond
+    * de todos los invoices del proyecto. Se debe llamar cuando cambian las marcas
+    * R (apply_retainage) o bonded en ítems del proyecto.
+    *
+    * @param int|string $project_id
+    */
+   public function RecalcularRetainageYBonPorProyecto($project_id): void
+   {
+      $project_id = (string) $project_id;
+      $project = $this->getDoctrine()->getRepository(Project::class)->find((int) $project_id);
+      if (!$project) {
+         return;
+      }
+      $this->RecalcularBonProyecto($project_id);
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+      $em = $this->getDoctrine()->getManager();
+      foreach ($allInvoices as $inv) {
+         $this->CalcularYGuardarRetainageInvoice($inv);
+      }
+      $em->flush();
+   }
+
+   /**
     * Construye series (quantity/paid/qbf) y prefijos para un project_item
     * a lo largo de la lista ordenada de invoices del proyecto.
     *
