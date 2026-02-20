@@ -992,19 +992,17 @@ class DataTrackingService extends Base
 
       $em->flush();
 
-      // Sincronizar invoices del periodo: si se cambió cantidad o precio en Data T, actualizar el invoice de ese periodo y los posteriores
+      // Sincronizar invoices: si se cambió cantidad o precio en Data T, actualizar el invoice de ese periodo y los posteriores (#5 y #6,#7…); #1-#4 no se tocan
       $project_id = $entity->getProject()->getProjectId();
       $dateObj = $entity->getDate();
       $project_item_ids = [];
       foreach ($items as $value) {
-         if (!empty($value->item_id)) {
+         if (isset($value->item_id) && $value->item_id !== '' && $value->item_id !== null) {
             $project_item_ids[] = $value->item_id;
          }
       }
-      $project_item_ids = array_unique($project_item_ids);
-      if (!empty($project_item_ids)) {
-         $this->invoiceService->ActualizarInvoicesPorCambioDataTracking($project_id, $dateObj, $project_item_ids);
-      }
+      $project_item_ids = !empty($project_item_ids) ? array_values(array_unique($project_item_ids)) : null;
+      $this->invoiceService->ActualizarInvoicesPorCambioDataTracking($project_id, $dateObj, $project_item_ids);
 
       //Salvar log
       $log_categoria = "Data Tracking";

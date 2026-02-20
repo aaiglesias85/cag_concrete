@@ -2299,9 +2299,13 @@ class InvoiceService extends Base
 
    /**
     * ActualizarInvoicesPorCambioDataTracking
-    * Cuando se elimina(n) o modifica(n) item(s) del datatracking, recalcula las cantidades
-    * solo en el/los invoice(s) cuyo periodo contiene esa fecha. Si la cantidad queda en 0
-    * se elimina la línea solo en ese invoice (no en los posteriores #6, #7, etc.).
+    * Cuando en Data T se cambia cantidad o precio de un ítem (o se elimina), se actualiza
+    * el/los invoice(s) cuyo periodo contiene esa fecha; los invoices posteriores (#6, #7…)
+    * se recalculan en cascada (quantity_from_previous, unpaid, etc.). Los anteriores (#1-#4) no se tocan.
+    *
+    * - Cantidad (Qty This Period): suma de quantity en Data T para ese project_item en [start_date, end_date].
+    * - Precio: promedio ponderado por cantidad en ese periodo; si no hay datos, se mantiene el actual.
+    * - Si la cantidad queda en 0 se elimina la línea solo en ese invoice.
     *
     * @param int $project_id
     * @param \DateTimeInterface $date Fecha del datatracking afectado
@@ -2325,7 +2329,7 @@ class InvoiceService extends Base
 
       foreach ($invoices as $invoice) {
          /** @var Invoice $invoice */
-         $invoiceId = $invoice->getInvoiceId();
+         $invoiceId = (int) $invoice->getInvoiceId();
          $startDate = $invoice->getStartDate()->format('m/d/Y');
          $endDate = $invoice->getEndDate()->format('m/d/Y');
 
@@ -2339,17 +2343,22 @@ class InvoiceService extends Base
          }
 
          foreach ($itemsToUpdate as $project_item_id) {
+            $project_item_id = (int) $project_item_id;
             $invoiceItem = $invoiceItemRepo->BuscarItem($invoiceId, $project_item_id);
             if ($invoiceItem === null) {
                continue;
             }
 
-            $newQuantity = $dataTrackingItemRepo->TotalQuantity('', $project_item_id, $startDate, $endDate);
+            $newQuantity = (float) $dataTrackingItemRepo->TotalQuantity('', (string) $project_item_id, $startDate, $endDate);
 
-            if ($newQuantity == 0.0) {
+            if ($newQuantity <= 0.0) {
                $em->remove($invoiceItem);
             } else {
                $invoiceItem->setQuantity($newQuantity);
+               $effectivePrice = $dataTrackingItemRepo->EffectivePriceForPeriod((string) $project_item_id, $startDate, $endDate);
+               if ($effectivePrice !== null) {
+                  $invoiceItem->setPrice($effectivePrice);
+               }
             }
          }
       }

@@ -39,7 +39,8 @@ En todos los casos, **solo se tocan el invoice del periodo afectado y los invoic
 
 Después de un cambio en Data T, para el invoice afectado y los posteriores se recalculan entre otras:
 
-- **Quantity (Qty This Period)** – desde Data T para el periodo de cada invoice.
+- **Quantity (Qty This Period)** – suma de cantidades en Data T para ese ítem en el periodo del invoice.
+- **Price** – promedio ponderado por cantidad en Data T en ese periodo; si no hay datos en el periodo se mantiene el precio actual del invoice.
 - **Quantity From Previous** – suma de las cantidades de los invoices anteriores (por eso al cambiar #5 se actualizan #6, #7, …).
 - **Quantity Completed** – quantity + quantity_from_previous (derivado).
 - **Unpaid Qty / Unpaid From Previous** – según las reglas de deuda y QBF (ver `README_INVOICES_PAYMENTS.md`).
@@ -57,11 +58,11 @@ Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** de
    - Al **eliminar** un ítem o un Data T: `EliminarItemDataTracking` / `EliminarDataTracking` / `EliminarDataTrackings` → después del `flush` llaman a `ActualizarInvoicesPorCambioDataTracking`.
 
 2. **Actualizar solo el invoice de ese periodo**  
-   - `InvoiceRepository::FindInvoicesContainingDate(project_id, date)` obtiene **solo** los invoices cuyo `[start_date, end_date]` contiene esa fecha (normalmente uno, p. ej. el #5). No se tocan los invoices posteriores (#6, #7, …) para quitar líneas.
+   - `InvoiceRepository::FindInvoicesContainingDate(project_id, date)` obtiene los invoices cuyo `[start_date, end_date]` contiene esa fecha (normalmente uno, p. ej. el #5).
    - Para cada invoice devuelto y cada `project_item_id` afectado:
      - Nueva cantidad = `DataTrackingItemRepository::TotalQuantity(project_item_id, invoice.start_date, invoice.end_date)`.
-     - Si cantidad = 0 → se **elimina** el `InvoiceItem` (sin importar si tenía pago).
-     - Si no → se actualiza `InvoiceItem::quantity`.
+     - Si cantidad ≤ 0 → se **elimina** el `InvoiceItem` (ya no puede estar en el invoice).
+     - Si no → se actualiza `InvoiceItem::quantity` y, si hay datos en el periodo, `InvoiceItem::price` (precio efectivo = promedio ponderado por cantidad en Data T en ese periodo).
 
 3. **Recalcular cascada (invoice afectado y posteriores)**  
    - `InvoiceService::RecalcularUnpaidQtyProyecto(project_id)`:
@@ -91,9 +92,8 @@ Si la nueva cantidad del periodo es **0**, la **línea del ítem se elimina** de
 
 ## 5. Precio en el invoice
 
-- El **precio** del ítem en el invoice (`invoice_item.price`) se toma del **contrato** (`project_item.price`) al crear/cargar el invoice (p. ej. en `ListarItemsParaInvoice`).
-- El precio que se guarda en cada línea de **Data T** (`data_tracking_item.price`) puede usarse en otros cálculos o reportes, pero **no sustituye automáticamente** al precio del invoice.  
-  Si en el futuro se desea que un cambio de precio en Data T actualice el invoice del periodo, habría que definir la regla (p. ej. precio del periodo = promedio o último precio en Data T) e implementarla sobre este mismo flujo.
+- Al **crear/cargar** un invoice, el precio del ítem se toma del contrato (`project_item.price`).
+- Cuando en **Data T** se cambia cantidad o precio y se guarda, el invoice del periodo se sincroniza: el **precio** del ítem en ese invoice se actualiza al **promedio ponderado por cantidad** en Data T en ese periodo (`DataTrackingItemRepository::EffectivePriceForPeriod`). Si en el periodo no hay datos, se mantiene el precio actual del invoice.
 
 ---
 

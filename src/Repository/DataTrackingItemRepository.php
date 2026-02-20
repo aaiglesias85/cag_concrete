@@ -104,6 +104,59 @@ class DataTrackingItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Precio efectivo (promedio ponderado por cantidad) de un ítem en un rango de fechas.
+    * Útil para actualizar invoice_item.price cuando cambia el precio en Data T.
+    *
+    * @param string|int $project_item_id
+    * @param string $fecha_inicial m/d/Y
+    * @param string $fecha_fin m/d/Y
+    * @return float|null Precio ponderado, o null si no hay cantidad en el periodo
+    */
+   public function EffectivePriceForPeriod($project_item_id, string $fecha_inicial, string $fecha_fin): ?float
+   {
+      $project_item_id = (string) $project_item_id;
+      if ($project_item_id === '') {
+         return null;
+      }
+      $qbSumQty = $this->createQueryBuilder('d_t_i')
+         ->select('SUM(d_t_i.quantity)')
+         ->leftJoin('d_t_i.projectItem', 'p_i')
+         ->leftJoin('d_t_i.dataTracking', 'd_t')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+      $this->applyDateRange($qbSumQty, $fecha_inicial, $fecha_fin);
+      $totalQty = (float) $qbSumQty->getQuery()->getSingleScalarResult();
+      if ($totalQty <= 0) {
+         return null;
+      }
+      $qbSumAmount = $this->createQueryBuilder('d_t_i')
+         ->select('SUM(d_t_i.quantity * d_t_i.price)')
+         ->leftJoin('d_t_i.projectItem', 'p_i')
+         ->leftJoin('d_t_i.dataTracking', 'd_t')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id);
+      $this->applyDateRange($qbSumAmount, $fecha_inicial, $fecha_fin);
+      $totalAmount = (float) $qbSumAmount->getQuery()->getSingleScalarResult();
+      return $totalAmount / $totalQty;
+   }
+
+   private function applyDateRange($qb, string $fecha_inicial, string $fecha_fin): void
+   {
+      if ($fecha_inicial !== '') {
+         $dt = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+         if ($dt) {
+            $qb->andWhere('d_t.date >= :start')->setParameter('start', $dt->format('Y-m-d'));
+         }
+      }
+      if ($fecha_fin !== '') {
+         $dt = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+         if ($dt) {
+            $qb->andWhere('d_t.date <= :end')->setParameter('end', $dt->format('Y-m-d'));
+         }
+      }
+   }
+
+   /**
     * TotalDaily: Total de quantity * price items de la BD
     *
     * @param string $data_tracking_id
