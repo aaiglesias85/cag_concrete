@@ -330,6 +330,12 @@ class InvoiceService extends Base
       $invoice_entity = $invoiceRepo->find($invoice_id);
       if (!$invoice_entity) return null;
 
+      $project_entity = $invoice_entity->getProject();
+      $project_id = $project_entity->getProjectId();
+      // Recalcular bond y retainage de todo el proyecto y guardar en BD (por si se quitó R o bonded en ítems)
+      $this->RecalcularRetainageYBonPorProyecto($project_id);
+      $invoice_entity = $invoiceRepo->find($invoice_id);
+
       // ---  LOS DATOS CALCULADOS DE LA WEB ---
       $datos_web = $this->ListarItemsDeInvoice($invoice_id);
       $mapa_datos_web = [];
@@ -340,8 +346,6 @@ class InvoiceService extends Base
          ];
       }
 
-      $project_entity = $invoice_entity->getProject();
-      $project_id = $project_entity->getProjectId();
       $currentInvoiceId = $invoice_id;
 
       $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
@@ -1500,7 +1504,8 @@ class InvoiceService extends Base
       /** @var Invoice $entity */
       if ($entity != null) {
          $project_id = $entity->getProject()->getProjectId();
-         $this->RecalcularBonProyecto($project_id);
+         // Recalcular bond y retainage de todo el proyecto y guardar en BD (por si se quitó R o bonded en ítems)
+         $this->RecalcularRetainageYBonPorProyecto($project_id);
          $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
 
          $arreglo_resultado['project_id'] = $project_id;
@@ -1520,12 +1525,6 @@ class InvoiceService extends Base
          $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
          $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
 
-         $em = $this->getDoctrine()->getManager();
-         if ($entity->getInvoiceRetainageCalculated() === null && $entity->getInvoiceCurrentRetainage() === null) {
-            $this->CalcularYGuardarRetainageInvoice($entity);
-            $em->flush();
-            $em->refresh($entity);
-         }
          // Valores para la vista: Current retainage ($) = retención de este invoice; Less Retainers = acumulado (mismo criterio que Excel)
          $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
          $effective_current = $retainage_efectivo['effective_current'];
