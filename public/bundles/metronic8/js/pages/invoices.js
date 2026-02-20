@@ -1535,13 +1535,19 @@ var Invoices = (function () {
                      // Contract amount del proyecto (para la caja Contract)
                      projectContractAmount = Number(response.contract_amount) || 0;
                      // Bond viene 100% del backend; no calcular en frontend
-                     $('#card-bond').show();
                      if (response.bon_quantity != null && response.bon_amount != null) {
                         $('#total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 2, '.', ','));
                         $('#total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
                      } else {
                         $('#total_bonded_x').val('0.00');
                         $('#total_bonded_y').val('0.00');
+                     }
+                     var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g, '')) || 0;
+                     if (bondQty > 0.0001) {
+                        $('#card-bond').removeClass('d-none').show();
+                        $('#card-bond .card').removeClass('d-none').show();
+                     } else {
+                        $('#card-bond').addClass('d-none').hide();
                      }
                      // Contexto para cálculo de retainage en frontend
                      retainageContext = response.retainage_context || null;

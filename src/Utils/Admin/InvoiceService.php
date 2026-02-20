@@ -1939,6 +1939,9 @@ class InvoiceService extends Base
          // items
          $this->SalvarItems($entity, $items);
 
+         // Asegurar que el ítem Bond del proyecto exista en invoice_item (para Payments)
+         $this->AsegurarInvoiceItemBond($entity);
+
          // Flush para que los items estén disponibles en la BD antes de recalcular
          $em->flush();
 
@@ -2059,6 +2062,9 @@ class InvoiceService extends Base
 
       // items
       $this->SalvarItems($entity, $items);
+
+      // Asegurar que el ítem Bond del proyecto exista en invoice_item (para Payments)
+      $this->AsegurarInvoiceItemBond($entity);
 
       // Flush para que los items estén disponibles en la BD antes de recalcular
       $em->flush();
@@ -2195,6 +2201,51 @@ class InvoiceService extends Base
       }
    }
 
+   /**
+    * AsegurarInvoiceItemBond: Si el proyecto tiene ítem(es) Bond, asegura que exista
+    * un InvoiceItem por cada uno en este invoice (aunque no se muestre en la tabla del invoice).
+    * Necesario para que en Payments se pueda pagar el Bond como un ítem más.
+    *
+    * @param Invoice $entity
+    * @return void
+    */
+   private function AsegurarInvoiceItemBond(Invoice $entity): void
+   {
+      $project = $entity->getProject();
+      if ($project === null) {
+         return;
+      }
+      $project_id = $project->getProjectId();
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $bondProjectItems = $projectItemRepo->ListarBondProjectItems($project_id);
+      if (empty($bondProjectItems)) {
+         return;
+      }
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $em = $this->getDoctrine()->getManager();
+
+      foreach ($bondProjectItems as $bondProjectItem) {
+         $existing = $invoiceItemRepo->BuscarItem($entity->getInvoiceId(), $bondProjectItem->getId());
+         if ($existing !== null) {
+            continue;
+         }
+         $invoiceItem = new InvoiceItem();
+         $invoiceItem->setInvoice($entity);
+         $invoiceItem->setProjectItem($bondProjectItem);
+         $invoiceItem->setQuantity(0.0);
+         $invoiceItem->setQuantityBroughtForward(0.0);
+         $invoiceItem->setQuantityFromPrevious(0.0);
+         $invoiceItem->setUnpaidFromPrevious(0.0);
+         $invoiceItem->setPrice((float) $bondProjectItem->getPrice());
+         $invoiceItem->setPaidQty(0.0);
+         $invoiceItem->setUnpaidQty(0.0);
+         $invoiceItem->setPaidAmount(0.0);
+         $invoiceItem->setPaidAmountTotal(0.0);
+         $em->persist($invoiceItem);
+      }
+   }
 
    /**
     * ListarInvoices: Listar los invoices

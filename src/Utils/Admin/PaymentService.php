@@ -18,9 +18,28 @@ use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use App\Entity\ReimbursementHistory;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class PaymentService extends Base
 {
+   /** @var InvoiceService */
+   private $invoiceService;
+
+   public function __construct(
+      ContainerInterface $container,
+      MailerInterface $mailer,
+      ContainerBagInterface $containerBag,
+      Security $security,
+      LoggerInterface $logger,
+      InvoiceService $invoiceService
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+      $this->invoiceService = $invoiceService;
+   }
 
    /**
     * EliminarNotesItem: Elimina un notes en la BD
@@ -419,6 +438,11 @@ class PaymentService extends Base
       /** @var Invoice $entity */
       if ($entity != null) {
          $project = $entity->getProject();
+         $project_id = $project->getProjectId();
+         // Recalcular bond y retainage antes de cargar datos (para tomar cambios en R o bonded)
+         $this->invoiceService->RecalcularRetainageYBonPorProyecto($project_id);
+         $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
          $company_id = $project->getCompany()->getCompanyId();
 
          // ... (asignación de datos básicos igual que antes) ...
@@ -518,6 +542,10 @@ class PaymentService extends Base
 
          $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
          $arreglo_resultado['retainage_reimbursed_amount'] = $entity->getRetainageReimbursedAmount();
+
+         // Bond: mismos valores que el invoice (bon_quantity, bon_amount guardados en BD)
+         $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
+         $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
 
          // Recalcular el monto visual inicial
          $total_retainage_calc = 0;

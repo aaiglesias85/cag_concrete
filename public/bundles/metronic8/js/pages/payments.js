@@ -306,8 +306,6 @@ var Payments = (function () {
       payments = [];
       $('#total_bonded_x').val('');
       $('#total_bonded_y').val('');
-      sum_bonded_project = 0;
-      bond_price = 0;
       actualizarTableListaPayments();
       archivos = [];
       actualizarTableListaArchivos();
@@ -634,19 +632,22 @@ var Payments = (function () {
          calcularTotalPaymentGlobal();
 
          payments = invoice.payments;
-         if (payments.length > 0) {
-            if (payments[0].sum_bonded_project !== undefined) {
-               sum_bonded_project = Number(payments[0].sum_bonded_project || 0);
-            }
-            if (payments[0].bond_price !== undefined) {
-               bond_price = Number(payments[0].bond_price || 0);
-            }
-         } else {
-            sum_bonded_project = 0;
-            bond_price = 0;
-         }
 
-         calcularYMostrarXBondedEnJS();
+         // Bond: mismo criterio que Invoice (valores del backend; mostrar/ocultar card según si hay cantidad)
+         if (invoice.bon_quantity != null && invoice.bon_amount != null) {
+            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
+            $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
+         } else {
+            $('#total_bonded_x').val('0.00');
+            $('#total_bonded_y').val(MyApp.formatMoney(0, 2, '.', ','));
+         }
+         var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g, '')) || 0;
+         if (bondQty > 0.0001) {
+            $('#card-bond').removeClass('d-none').show();
+            $('#card-bond .card').removeClass('d-none').show();
+         } else {
+            $('#card-bond').addClass('d-none').hide();
+         }
 
          actualizarTableListaPayments();
          archivos = invoice.archivos;
@@ -790,8 +791,6 @@ var Payments = (function () {
    var oTablePayments;
    var payments = [];
    var nEditingRowPayment = null;
-   var sum_bonded_project = 0;
-   var bond_price = 0;
 
    var agruparItemsPorChangeOrder = function (items) {
       var items_regulares = [];
@@ -2405,67 +2404,6 @@ var Payments = (function () {
       }
       // Actualizamos el input visual del total
       $('#total_payment_amount').val(MyApp.formatMoney(total, 2, '.', ','));
-   };
-
-   // Función para calcular y mostrar X e Y (Bonded) en Payment
-   var calcularYMostrarXBondedEnJS = function () {
-      var sum_bonded_invoices = 0;
-
-      payments.forEach(function (item) {
-         // Ignorar cabeceras de grupo si existen
-         if (!item.isGroupHeader) {
-            if (item.bonded == 1 || item.bonded === true) {
-               var amount = Number(item.amount || 0);
-               sum_bonded_invoices += amount;
-            }
-         }
-      });
-
-      var x = 0;
-      if (sum_bonded_project > 0) {
-         x = sum_bonded_invoices / sum_bonded_project;
-      }
-
-      var y = bond_price * x;
-
-      var x_formatted = MyApp.formatearNumero(x, 2, '.', ',');
-      var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
-
-      $('#total_bonded_x').val(x_formatted);
-      $('#total_bonded_y').val(y_formatted);
-      $('#display_bond_qty').text(x_formatted);
-   };
-
-   // Función para calcular y animar Bonded 
-   var calcularYMostrarXBondedEnJS = function () {
-      var sum_bonded_invoices = 0;
-
-      payments.forEach(function (item) {
-         if (!item.isGroupHeader) {
-            if (item.bonded == 1 || item.bonded === true) {
-               var amount = Number(item.amount || 0);
-               sum_bonded_invoices += amount;
-            }
-         }
-      });
-
-      var x = 0;
-      if (typeof sum_bonded_project !== 'undefined' && sum_bonded_project > 0) {
-         x = sum_bonded_invoices / sum_bonded_project;
-      }
-      var y = (typeof bond_price !== 'undefined' ? bond_price : 0) * x;
-
-      // Aseguramos que el contenedor sea visible
-      $('#card-bond').show();
-
-      // Animar 
-      if (typeof animateValue === 'function') {
-          animateValue('#total_bonded_x', x, 1500, false);
-          animateValue('#total_bonded_y', y, 1500, true);
-      } else {
-          $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
-          $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
-      }
    };
 
    // Función modificada para NO ocultar tarjetas

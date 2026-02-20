@@ -1476,11 +1476,19 @@ class Base
    {
       $payments = [];
 
+      /** @var \App\Entity\Invoice|null $invoice */
+      $invoice = $this->getDoctrine()->getRepository(\App\Entity\Invoice::class)->find($invoice_id);
+      $bon_quantity = $invoice && $invoice->getBonQuantity() !== null ? (float) $invoice->getBonQuantity() : null;
+      $bon_amount = $invoice && $invoice->getBonAmount() !== null ? (float) $invoice->getBonAmount() : null;
+
       /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $lista = $invoiceItemRepo->ListarItems($invoice_id);
       foreach ($lista as $key => $value) {
 
+         $is_bond_item = $value->getProjectItem()->getItem()->getBond();
+
+         // Contract: siempre del project_item (cantidad y monto definidos en el proyecto)
          $contract_qty = $value->getProjectItem()->getQuantity();
          $price = $value->getPrice();
          $contract_amount = $contract_qty * $price;
@@ -1492,28 +1500,33 @@ class Base
          $quantity_brought_forward = $value->getQuantityBroughtForward();
 
          // quantity_final debe coincidir con Final Invoice Quantity en invoices
-         // quantity + quantity_brought_forward
          $quantity_final = $quantity + ($quantity_brought_forward ?? 0);
-
          $quantity_completed = ($quantity + $unpaid_from_previous) + $quantity_from_previous;
 
          $amount = $quantity_final * $price;
          $total_amount = $quantity_completed * $price;
 
-         // payment: unpaid_qty = mismo concepto que Excel Invoice columna M (PENDING QTY BTD)
-         // quantity_final - paid_qty (no usar getUnpaidQty() de BD, que es la columna roja de Invoices)
          $paid_qty = $value->getPaidQty();
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
          $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
 
+         // Ítem Bond: Invoiced Qty e Invoiced Amount son bon_quantity y bon_amount del invoice
+         if ($is_bond_item) {
+            $quantity_final = $bon_quantity !== null ? $bon_quantity : 0.0;
+            $amount = $bon_amount !== null ? $bon_amount : 0.0;
+            $total_amount = $amount;
+            $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
+         }
+
          // notes (orden DESC por fecha: la más reciente primero)
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
-         // Si alguna nota tiene override_unpaid_qty, usar el de la más reciente al cargar datos
-         foreach ($notes as $note) {
-            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
-               $unpaid_qty = (float) $note['override_unpaid_qty'];
-               break;
+         if (!$is_bond_item) {
+            foreach ($notes as $note) {
+               if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+                  $unpaid_qty = (float) $note['override_unpaid_qty'];
+                  break;
+               }
             }
          }
 
@@ -1529,9 +1542,10 @@ class Base
 
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
             "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
-            "paid_qty"        => $value->getPaidQty(),
-            "paid_amount"     => $value->getPaidAmount(),
-            "paid_amount_total" => $value->getPaidAmountTotal(),
+            "bond" => $is_bond_item ? 1 : 0,
+            "paid_qty"        => $paid_qty,
+            "paid_amount"     => $paid_amount,
+            "paid_amount_total" => $paid_amount_total,
 
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
             "item" => $value->getProjectItem()->getItem()->getName(),
@@ -1545,7 +1559,6 @@ class Base
             "quantity_completed" => $quantity_completed,
             "amount" => $amount,
             "total_amount" => $total_amount,
-            "paid_qty" => $paid_qty,
             "unpaid_qty" => $unpaid_qty,
             "principal" => $value->getProjectItem()->getPrincipal(),
             "change_order" => $value->getProjectItem()->getChangeOrder(),
