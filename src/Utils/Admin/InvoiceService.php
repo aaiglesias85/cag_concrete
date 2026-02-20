@@ -104,6 +104,7 @@ class InvoiceService extends Base
 
          $available = $MAX_BON_QUANTITY - $bonQuantityUsed;
          $applied = min($x, $available);
+         $applied = round($applied, 5); // Bond qty con 5 decimales, sin redondear a 2
          $bonAmount = round($bondGeneral * $applied, 2);
 
          $invoice->setBonQuantity($applied);

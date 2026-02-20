@@ -381,7 +381,7 @@ var ModalInvoice = (function () {
       
       // Si no hay proyecto seleccionado, resetear Bon
       if (!project_id) {
-         $('#modal_total_bonded_x').val('0.00');
+         $('#modal_total_bonded_x').val('0.00000');
          $('#modal_total_bonded_y').val('0.00');
       }
 
@@ -456,7 +456,7 @@ var ModalInvoice = (function () {
       items = [];
       projectContractAmount = 0;
       $('#modal_total_contract_amount').val('0.00');
-      $('#modal_total_bonded_x').val('0.00');
+      $('#modal_total_bonded_x').val('0.00000');
       $('#modal_total_bonded_y').val('0.00');
       actualizarTableListaItems();
 
@@ -484,10 +484,10 @@ var ModalInvoice = (function () {
                      }
                      // Bond solo desde backend; no cálculo en frontend
                      if (response.bon_quantity != null && response.bon_amount != null) {
-                        $('#modal_total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 2, '.', ','));
+                        $('#modal_total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 5, '.', ','));
                         $('#modal_total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
                      } else {
-                        $('#modal_total_bonded_x').val('0.00');
+                        $('#modal_total_bonded_x').val('0.00000');
                         $('#modal_total_bonded_y').val('0.00');
                      }
 
@@ -617,7 +617,7 @@ var ModalInvoice = (function () {
 
       // reset
       MyUtil.limpiarSelect('#project-invoice-modal');
-      $('#modal_total_bonded_x').val('0.00');
+      $('#modal_total_bonded_x').val('0.00000');
       $('#modal_total_bonded_y').val('0.00');
 
       if (company_id != '') {
@@ -1071,7 +1071,7 @@ var ModalInvoice = (function () {
       console.log('Y =', bond_general || bond_price, '*', applied, '=', y);
 
       // Mostrar valores aplicados (mismo criterio que backend)
-      var x_formatted = MyApp.formatearNumero(applied, 2, '.', ',');
+      var x_formatted = MyApp.formatearNumero(applied, 5, '.', ',');
       var y_formatted = MyApp.formatMoney(y, 2, '.', ',');
       
       console.log('--- Valores finales mostrados (MODAL) ---');

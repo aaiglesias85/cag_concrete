@@ -635,10 +635,10 @@ var Payments = (function () {
 
          // Bond: mismo criterio que Invoice (valores del backend; mostrar/ocultar card según si hay cantidad)
          if (invoice.bon_quantity != null && invoice.bon_amount != null) {
-            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
+            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 5, '.', ','));
             $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
          } else {
-            $('#total_bonded_x').val('0.00');
+            $('#total_bonded_x').val('0.00000');
             $('#total_bonded_y').val(MyApp.formatMoney(0, 2, '.', ','));
          }
          var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g, '')) || 0;
@@ -932,7 +932,8 @@ var Payments = (function () {
             targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+               var decimals = (row.bond == 1 || row.bond === true) ? 5 : 2;
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatearNumero(data, decimals, '.', ',')}</div>`;
             },
          },
          {

@@ -1210,6 +1210,7 @@ class ProjectService extends Base
       }
       $x = max(0.0, min(1.0, $x));
       $applied = min($x, $bon_quantity_available);
+      $applied = round($applied, 5); // Bond qty con 5 decimales
       $bon_amount = round($bon_general * $applied, 2);
 
       return [

@@ -134,7 +134,7 @@ var Invoices = (function () {
 
          // init acciones
          initAccionChangeNumber();
-         initAccionEliminar();
+         // initAccionEliminar(); // Comentado: ocultar botón eliminar invoice
          initAccionExportar();
          initAccionProject();
       });
@@ -149,9 +149,10 @@ var Invoices = (function () {
    var getColumnsTable = function () {
       const columns = [];
 
-      if (permiso.eliminar) {
-         columns.push({ data: 'id' });
-      }
+      // Comentado: columna check solo se usaba para eliminar varios
+      // if (permiso.eliminar) {
+      //    columns.push({ data: 'id' });
+      // }
 
       columns.push(
          { data: 'number' },
@@ -259,7 +260,8 @@ var Invoices = (function () {
          },
       ];
 
-      if (!permiso.eliminar) {
+      // Siempre sin columna check (comentado eliminar; la check solo servía para eliminar varios)
+      if (true) {
          columnDefs = [
             // number
             {
@@ -349,7 +351,7 @@ var Invoices = (function () {
       //var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
       var accionesInvoice = ['exportar_excel'];
       if (permiso.editar) accionesInvoice.push('edit');
-      if (permiso.eliminar) accionesInvoice.push('delete');
+      // if (permiso.eliminar) accionesInvoice.push('delete'); // Comentado: ocultar botón eliminar en tabla
 
       columnDefs.push({
          targets: -1,
@@ -381,8 +383,8 @@ var Invoices = (function () {
    var exportButtons = () => {
       const documentTitle = 'Invoices';
       var table = document.querySelector('#invoice-table-editable');
-      // Excluir la columna de check y acciones
-      var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
+      // Excluir la columna de acciones (ya no hay columna check)
+      var exclude_columns = ':not(:last-child)';
 
       var buttons = new $.fn.dataTable.Buttons(table, {
          buttons: [
@@ -475,11 +477,12 @@ var Invoices = (function () {
    var actualizarRecordsSeleccionados = function () {
       var selectedData = oTable.rows({ selected: true }).data().toArray();
 
-      if (selectedData.length > 0) {
-         $('#btn-eliminar-invoice').removeClass('hide');
-      } else {
-         $('#btn-eliminar-invoice').addClass('hide');
-      }
+      // Comentado: ocultar botón eliminar varios invoices
+      // if (selectedData.length > 0) {
+      //    $('#btn-eliminar-invoice').removeClass('hide');
+      // } else {
+      //    $('#btn-eliminar-invoice').addClass('hide');
+      // }
    };
 
    //Filtrar
@@ -566,7 +569,7 @@ var Invoices = (function () {
       actualizarTableListaItems();
 
       $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
-      $('#total_bonded_x').val('0.00');
+      $('#total_bonded_x').val('0.00000');
       $('#total_bonded_y').val('0.00');
 
       $('#invoice_current_retainage_display').val('$0.00');
@@ -1067,10 +1070,10 @@ var Invoices = (function () {
 
          // --- VALORES DEL BOND ---
          if (invoice.bon_quantity != null && invoice.bon_amount != null) {
-            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 2, '.', ','));
+            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 5, '.', ','));
             $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
          } else {
-            $('#total_bonded_x').val('0.00');
+            $('#total_bonded_x').val('0.00000');
             $('#total_bonded_y').val('0.00');
          }
 
@@ -1175,7 +1178,8 @@ var Invoices = (function () {
       });
    };
 
-   //Eliminar
+   //Eliminar - Comentado: ocultar botones eliminar invoice (tabla y eliminar varios)
+   /*
    var initAccionEliminar = function () {
       $(document).off('click', '#invoice-table-editable a.delete');
       $(document).on('click', '#invoice-table-editable a.delete', function (e) {
@@ -1272,6 +1276,7 @@ var Invoices = (function () {
             });
       }
    };
+   */
 
    // exportar excel
   var initAccionExportarPdf = function () {
@@ -1435,7 +1440,7 @@ var Invoices = (function () {
       
       // Si no hay proyecto seleccionado, resetear Bon
       if (!project_id) {
-         $('#total_bonded_x').val('0.00');
+         $('#total_bonded_x').val('0.00000');
          $('#total_bonded_y').val('0.00');
       }
 
@@ -1512,7 +1517,7 @@ var Invoices = (function () {
          items = [];
          projectContractAmount = 0;
          $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
-         $('#total_bonded_x').val('0.00');
+         $('#total_bonded_x').val('0.00000');
          $('#total_bonded_y').val('0.00');
          actualizarTableListaItems();
       }
@@ -1536,10 +1541,10 @@ var Invoices = (function () {
                      projectContractAmount = Number(response.contract_amount) || 0;
                      // Bond viene 100% del backend; no calcular en frontend
                      if (response.bon_quantity != null && response.bon_amount != null) {
-                        $('#total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 2, '.', ','));
+                        $('#total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 5, '.', ','));
                         $('#total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
                      } else {
-                        $('#total_bonded_x').val('0.00');
+                        $('#total_bonded_x').val('0.00000');
                         $('#total_bonded_y').val('0.00');
                      }
                      var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g, '')) || 0;
@@ -1689,7 +1694,7 @@ var Invoices = (function () {
 
       // reset
       MyUtil.limpiarSelect('#project');
-      $('#total_bonded_x').val('0.00');
+      $('#total_bonded_x').val('0.00000');
       $('#total_bonded_y').val('0.00');
 
       if (company_id != '') {
@@ -2253,7 +2258,7 @@ var Invoices = (function () {
       var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * applied;
 
       // Mostrar valores aplicados en la card (mismo criterio que al cargar invoice guardado)
-      $('#total_bonded_x').val(MyApp.formatearNumero(applied, 2, '.', ','));
+      $('#total_bonded_x').val(MyApp.formatearNumero(applied, 5, '.', ','));
       $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
    };
 
@@ -2733,7 +2738,7 @@ var Invoices = (function () {
           $cardY.hide();
           $cardX.hide();
           
-          $('#total_bonded_x').val('0.00');
+          $('#total_bonded_x').val('0.00000');
           $inputY.val('$0.00');
           return; 
       }
@@ -2749,7 +2754,7 @@ var Invoices = (function () {
           animateValue('#total_bonded_x', x, duracion, false);
           animateValue('#total_bonded_y', y, duracion, true);
       } else {
-          $('#total_bonded_x').val(MyApp.formatearNumero(x, 2, '.', ','));
+          $('#total_bonded_x').val(MyApp.formatearNumero(x, 5, '.', ','));
           $inputY.val(MyApp.formatMoney(y, 2, '.', ','));
       }
    };
