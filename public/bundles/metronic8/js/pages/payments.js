@@ -1210,9 +1210,34 @@ var Payments = (function () {
             cancelButtonText: 'No, cancel',
          }).then((result) => {
             if (result.isConfirmed) {
-               // 3. Guardar en memoria para que no se pierda al ordenar/filtrar o cambiar de tab
-               if (payments[posicion]) {
-                  payments[posicion].is_closed_manual = desiredState;
+               var item = payments[posicion];
+               if (item) {
+                  item.is_closed_manual = desiredState;
+                  var quantity = parseFloat(item.quantity) || 0;
+                  var price = parseFloat(item.price) || 0;
+
+                  if (desiredState) {
+                     // Cerrando: guardar estado previo y marcar como pagado completo
+                     item._closed_previous_paid = parseFloat(item.paid_qty) || 0;
+                     item._closed_previous_unpaid = parseFloat(item.unpaid_qty) || 0;
+                     item.paid_qty = quantity;
+                     item.unpaid_qty = 0;
+                     item.paid_amount = quantity * price;
+                  } else {
+                     // Abriendo: restaurar paid_qty y unpaid_qty al estado anterior al cierre
+                     if (typeof item._closed_previous_paid === 'number' && typeof item._closed_previous_unpaid === 'number') {
+                        item.paid_qty = item._closed_previous_paid;
+                        item.unpaid_qty = item._closed_previous_unpaid;
+                        item.paid_amount = item.paid_qty * price;
+                     } else {
+                        // Sin estado guardado (ej. ya venía cerrado): proceso inverso = todo como no pagado
+                        item.paid_qty = 0;
+                        item.unpaid_qty = quantity;
+                        item.paid_amount = 0;
+                     }
+                     delete item._closed_previous_paid;
+                     delete item._closed_previous_unpaid;
+                  }
                }
 
                // 4. Redibujar la tabla para que las celdas se re-rendericen: cerrado = solo texto, abierto = inputs editables
