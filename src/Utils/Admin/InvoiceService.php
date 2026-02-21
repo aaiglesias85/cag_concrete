@@ -770,39 +770,51 @@ class InvoiceService extends Base
                continue;
             }
 
-            $month = '';
-            $year = '';
+            $titulo = '';
             if ($group_key !== 'no-date') {
+               $month = '';
+               $year = '';
                if (!empty($group_items_visibles)) {
                   $d = $group_items_visibles[0]->getProjectItem()->getChangeOrderDate();
                   if ($d) {
                      $month = $d->format('F');
                      $year = $d->format('Y');
                   }
-               } elseif (!empty($project_items_sin_cantidad)) {
+               }
+               if (!$month && !empty($project_items_sin_cantidad)) {
                   $d = $project_items_sin_cantidad[0]->getChangeOrderDate();
                   if ($d) {
                      $month = $d->format('F');
                      $year = $d->format('Y');
                   }
                }
+               if (!$month && preg_match('/^(\d{4})-(\d{2})$/', $group_key, $m)) {
+                  $dt = \DateTime::createFromFormat('Y-m', $group_key);
+                  if ($dt) {
+                     $month = $dt->format('F');
+                     $year = $dt->format('Y');
+                  }
+               }
+               if ($month) {
+                  $titulo = strtoupper("CHANGE ORDER IN {$month} {$year}");
+               }
+            }
+            if ($titulo === '') {
+               $titulo = 'CHANGE ORDER (NO DATE)';
             }
 
-            if ($month) {
-               if ($esPrimerGrupo) {
-                  $objWorksheet->getStyle("A{$fila}:S{$fila}")->applyFromArray($styleSeparator);
-                  $objWorksheet->getRowDimension($fila)->setRowHeight(10);
-                  $fila++;
-                  $esPrimerGrupo = false;
-               }
-               $titulo = strtoupper("CHANGE ORDER IN {$month} {$year}");
-               $objWorksheet->setCellValue('B' . $fila, $titulo);
-               $objWorksheet->mergeCells("B{$fila}:D{$fila}");
-               $objWorksheet->getStyle("B{$fila}:S{$fila}")->applyFromArray($styleHeaderCO);
-               $objWorksheet->getStyle("A{$fila}")->applyFromArray(['borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]]);
-               $objWorksheet->getRowDimension($fila)->setRowHeight(22);
+            if ($esPrimerGrupo) {
+               $objWorksheet->getStyle("A{$fila}:S{$fila}")->applyFromArray($styleSeparator);
+               $objWorksheet->getRowDimension($fila)->setRowHeight(10);
                $fila++;
+               $esPrimerGrupo = false;
             }
+            $objWorksheet->setCellValue('B' . $fila, $titulo);
+            $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+            $objWorksheet->getStyle("B{$fila}:S{$fila}")->applyFromArray($styleHeaderCO);
+            $objWorksheet->getStyle("A{$fila}")->applyFromArray(['borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]]);
+            $objWorksheet->getRowDimension($fila)->setRowHeight(22);
+            $fila++;
 
             foreach ($group_items_visibles as $value) {
                $em->refresh($value);
