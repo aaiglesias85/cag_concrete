@@ -128,4 +128,22 @@ class MessageRepository extends ServiceEntityRepository
         }
         return (int) $result->fetchOne();
     }
+
+    /**
+     * Suma de caracteres (body_original) de mensajes traducidos a petición en el periodo (para límite 500k/mes).
+     *
+     * @param \DateTimeInterface $start
+     * @param \DateTimeInterface $end
+     * @return int
+     */
+    public function sumTranslatedCharactersForPeriod(\DateTimeInterface $start, \DateTimeInterface $end): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE translated_at >= :start AND translated_at <= :end';
+        $result = $conn->executeQuery($sql, [
+            'start' => $start->format('Y-m-d H:i:s'),
+            'end'   => $end->format('Y-m-d H:i:s'),
+        ]);
+        return (int) $result->fetchOne();
+    }
 }

@@ -39,6 +39,10 @@ class Message
     #[ORM\Column(name: "read_at", type: "datetime", nullable: true)]
     private ?\DateTimeInterface $readAt = null;
 
+    /** Fecha en que se tradujo a petición (para límite 500k/mes). */
+    #[ORM\Column(name: "translated_at", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $translatedAt = null;
+
     public function getMessageId(): ?int
     {
         return $this->messageId;
@@ -135,6 +139,17 @@ class Message
     public function setReadAt(?\DateTimeInterface $readAt): self
     {
         $this->readAt = $readAt;
+        return $this;
+    }
+
+    public function getTranslatedAt(): ?\DateTimeInterface
+    {
+        return $this->translatedAt;
+    }
+
+    public function setTranslatedAt(?\DateTimeInterface $translatedAt): self
+    {
+        $this->translatedAt = $translatedAt;
         return $this;
     }
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-02-2026 a las 14:56:18
+-- Tiempo de generación: 21-02-2026 a las 16:44:56
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -27965,7 +27965,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (148, '5', '2025-10-01', '2025-10-31', '', 0, '2025-11-12 15:23:35', NULL, 258, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
 (154, '3', '2025-02-01', '2025-02-28', '', 1, '2025-11-13 15:13:21', '2026-02-02 02:25:13', 251, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
 (155, '6', '2025-05-01', '2025-05-31', '', 0, '2025-11-13 15:22:27', '2026-02-03 02:34:44', 251, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
-(163, '4', '2025-10-01', '2025-10-31', '', 0, '2025-11-17 20:59:45', '2026-02-12 00:31:37', 8, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
+(163, '4', '2025-10-01', '2025-10-31', '', 1, '2025-11-17 20:59:45', '2026-02-12 00:31:37', 8, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
 (164, '1', '2022-03-01', '2022-03-31', '', 0, '2025-11-17 21:11:23', NULL, 259, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
 (165, '2', '2022-04-01', '2022-04-30', '', 0, '2025-11-17 21:14:04', NULL, 259, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
 (172, '3', '2022-08-01', '2022-08-31', '', 0, '2025-11-18 14:57:24', NULL, 259, NULL, NULL, NULL, NULL, NULL, 0, 0.00, NULL, NULL, NULL),
@@ -27985,7 +27985,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (360, '3', '2025-11-01', '2025-11-30', '', 0, '2026-01-25 21:14:10', '2026-02-06 02:37:48', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (361, '4', '2025-12-01', '2025-12-31', '', 1, '2026-01-25 21:14:32', '2026-02-02 02:24:33', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (362, '5', '2026-01-01', '2026-01-31', '', 0, '2026-02-06 02:10:27', NULL, 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3636.00, 363.60),
-(371, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-20 20:43:11', NULL, 28, NULL, NULL, NULL, 1.000000, -1823.75, 0, 0.00, NULL, 254514.54, 12725.73);
+(371, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-20 20:43:11', '2026-02-21 16:02:08', 28, NULL, NULL, NULL, 1.000000, -1823.75, 0, 0.00, NULL, 254514.54, 12725.73);
 
 -- --------------------------------------------------------
 
@@ -28379,7 +28379,7 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (1304, 0.000000, 0.000000, 718.300000, 87.00, 200.000000, 500.000000, 0.000000, 17400.000000, NULL, 155, 1508, NULL),
 (1305, 22.500000, 22.500000, 14.000000, 222.00, 0.000000, 14.000000, 0.000000, NULL, NULL, 155, 3000, NULL),
 (1378, 0.000000, 0.000000, 13286.000000, 11.25, 13286.000000, 0.000000, 0.000000, 149467.500000, 149467.500000, 163, 3001, NULL),
-(1379, 0.000000, 0.000000, 17.000000, 675.00, 0.000000, 17.000000, 0.000000, 0.000000, 34425.000000, 163, 3002, NULL),
+(1379, 0.000000, 0.000000, 17.000000, 675.00, 17.000000, 0.000000, 0.000000, 11475.000000, 11475.000000, 163, 3002, NULL),
 (1380, 0.000000, 0.000000, 306.990000, 53.00, NULL, NULL, 0.000000, NULL, NULL, 164, 1595, NULL),
 (1381, 0.000000, 0.000000, 0.000000, 11005.98, NULL, NULL, 0.000000, NULL, NULL, 164, 1596, NULL),
 (1382, 0.000000, 0.000000, 0.000000, 31.50, NULL, NULL, 0.000000, NULL, NULL, 164, 1597, NULL),
@@ -28672,7 +28672,6 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (3428, 0.000000, 0.000000, 35.500000, 2200.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 152, NULL),
 (3429, 0.000000, 0.000000, 22.000000, 800.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 153, NULL),
 (3430, 0.000000, 0.000000, 2506.000000, 36.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 2941, NULL),
-(3431, 0.000000, 0.000000, 34.000000, 124.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3081, NULL),
 (3432, 0.000000, 0.000000, 50.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3089, NULL),
 (3433, 0.000000, 0.000000, 12.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3090, NULL),
 (3434, 0.000000, 0.000000, 32.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3092, NULL),
@@ -29988,7 +29987,11 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (366, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-02-20 20:19:48', 27),
 (367, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2026-02-20 20:38:52', 27),
 (368, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2026-02-20 20:38:52', 27),
-(369, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2026-02-20 20:43:11', 27);
+(369, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2026-02-20 20:43:11', 27),
+(370, 'Update', 'User', 'The user is modified: Employee_27 last name', '::1', '2026-02-21 15:03:22', 27),
+(371, 'Update', 'User', 'The user is modified: Empleado_Prueba_1 Iglesias', '::1', '2026-02-21 15:19:33', 27),
+(372, 'Delete', 'Item Invoice', 'The item details invoice is deleted: SIDEWALK ON BRIDGE 10 IN W/REINF', '::1', '2026-02-21 16:02:05', 27),
+(373, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-02-21 16:02:08', 27);
 
 -- --------------------------------------------------------
 
@@ -30059,6 +30062,7 @@ CREATE TABLE `message` (
   `body_es` text COMMENT 'Versión en español (original o traducida)',
   `body_en` text COMMENT 'Versión en inglés (original o traducida)',
   `created_at` datetime DEFAULT NULL,
+  `translated_at` datetime DEFAULT NULL,
   `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -30066,21 +30070,23 @@ CREATE TABLE `message` (
 -- Volcado de datos para la tabla `message`
 --
 
-INSERT INTO `message` (`message_id`, `conversation_id`, `sender_id`, `body_original`, `source_lang`, `body_es`, `body_en`, `created_at`, `read_at`) VALUES
-(1, 1, 27, 'Hello', 'en', 'Hello', 'Hello', '2026-02-14 16:54:50', '2026-02-14 17:02:04'),
-(2, 1, 1, 'hello', 'es', 'hello', 'hello', '2026-02-14 17:02:22', '2026-02-14 17:03:59'),
-(3, 1, 1, 'cual es tu nombre', 'es', 'cual es tu nombre', 'cual es tu nombre', '2026-02-14 17:13:53', '2026-02-14 17:15:13'),
-(4, 1, 27, 'Mi nombre es marcel', 'en', 'Mi nombre es marcel', 'Mi nombre es marcel', '2026-02-14 17:14:07', '2026-02-14 17:15:05'),
-(5, 1, 1, 'mucho gusto marcel', 'es', 'mucho gusto marcel', 'mucho gusto marcel', '2026-02-14 17:14:17', '2026-02-14 17:15:13'),
-(6, 1, 1, 'el mio es andres', 'es', 'el mio es andres', 'el mio es andres', '2026-02-14 17:14:23', '2026-02-14 17:15:13'),
-(7, 1, 27, 'mucho gusto andres', 'en', 'mucho gusto andres', 'mucho gusto andres', '2026-02-14 17:17:55', '2026-02-14 17:22:10'),
-(8, 1, 27, 'como te sientes', 'en', 'como te sientes', 'como te sientes', '2026-02-14 17:18:01', '2026-02-14 17:22:10'),
-(9, 1, 1, 'bien y tu', 'es', 'bien y tu', 'bien y tu', '2026-02-14 17:19:20', '2026-02-14 17:21:58'),
-(10, 1, 27, 'bien tambien gracias', 'en', 'bien tambien gracias', 'bien tambien gracias', '2026-02-14 17:22:48', '2026-02-14 17:25:25'),
-(11, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 17:22:59', '2026-02-14 17:25:24'),
-(12, 1, 1, 'donde trabajas', 'es', 'donde trabajas', 'donde trabajas', '2026-02-14 17:25:40', '2026-02-14 17:25:41'),
-(13, 1, 27, 'yo trabajo en las condes', 'en', 'yo trabajo en las condes', 'yo trabajo en las condes', '2026-02-14 17:26:05', '2026-02-14 17:26:05'),
-(14, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 18:30:18', '2026-02-14 18:30:26');
+INSERT INTO `message` (`message_id`, `conversation_id`, `sender_id`, `body_original`, `source_lang`, `body_es`, `body_en`, `created_at`, `translated_at`, `read_at`) VALUES
+(1, 1, 27, 'Hello', 'en', 'Hello', 'Hello', '2026-02-14 16:54:50', NULL, '2026-02-14 17:02:04'),
+(2, 1, 1, 'hello', 'es', 'hello', 'hello', '2026-02-14 17:02:22', NULL, '2026-02-14 17:03:59'),
+(3, 1, 1, 'cual es tu nombre', 'es', 'cual es tu nombre', 'cual es tu nombre', '2026-02-14 17:13:53', NULL, '2026-02-14 17:15:13'),
+(4, 1, 27, 'Mi nombre es marcel', 'en', 'Mi nombre es marcel', 'Mi nombre es marcel', '2026-02-14 17:14:07', NULL, '2026-02-14 17:15:05'),
+(5, 1, 1, 'mucho gusto marcel', 'es', 'mucho gusto marcel', 'mucho gusto marcel', '2026-02-14 17:14:17', NULL, '2026-02-14 17:15:13'),
+(6, 1, 1, 'el mio es andres', 'es', 'el mio es andres', 'el mio es andres', '2026-02-14 17:14:23', NULL, '2026-02-14 17:15:13'),
+(7, 1, 27, 'mucho gusto andres', 'en', 'mucho gusto andres', 'mucho gusto andres', '2026-02-14 17:17:55', NULL, '2026-02-14 17:22:10'),
+(8, 1, 27, 'como te sientes', 'en', 'como te sientes', 'como te sientes', '2026-02-14 17:18:01', NULL, '2026-02-14 17:22:10'),
+(9, 1, 1, 'bien y tu', 'es', 'bien y tu', 'bien y tu', '2026-02-14 17:19:20', NULL, '2026-02-14 17:21:58'),
+(10, 1, 27, 'bien tambien gracias', 'en', 'bien tambien gracias', 'bien tambien gracias', '2026-02-14 17:22:48', NULL, '2026-02-14 17:25:25'),
+(11, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 17:22:59', NULL, '2026-02-14 17:25:24'),
+(12, 1, 1, 'donde trabajas', 'es', 'donde trabajas', 'donde trabajas', '2026-02-14 17:25:40', NULL, '2026-02-14 17:25:41'),
+(13, 1, 27, 'yo trabajo en las condes', 'en', 'yo trabajo en las condes', 'yo trabajo en las condes', '2026-02-14 17:26:05', NULL, '2026-02-14 17:26:05'),
+(14, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 18:30:18', NULL, '2026-02-14 18:30:26'),
+(15, 1, 27, 'Hola buenos dias', 'en', 'Hola buenos dias', 'Hola buenos dias', '2026-02-21 15:46:22', NULL, '2026-02-21 15:46:27'),
+(16, 1, 1, 'buenos dias', 'es', 'buenos dias', 'buenos dias', '2026-02-21 15:46:32', NULL, '2026-02-21 15:46:34');
 
 -- --------------------------------------------------------
 
@@ -30101,7 +30107,7 @@ CREATE TABLE `message_conversation` (
 --
 
 INSERT INTO `message_conversation` (`conversation_id`, `user1_id`, `user2_id`, `created_at`, `updated_at`) VALUES
-(1, 1, 27, '2026-02-14 16:49:10', '2026-02-14 18:30:18');
+(1, 1, 27, '2026-02-14 16:49:10', '2026-02-21 15:46:32');
 
 -- --------------------------------------------------------
 
@@ -41192,7 +41198,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `chat`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
-(1, 'Empleado_Prueba_1', 'Iglesias', 'aiglesias@gmail.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2025-11-21 21:05:10', '', '', 'Browser', NULL, 'es', 3),
+(1, 'Andres', 'Iglesias', 'aiglesias@gmail.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 0, 0, 1, '', '2024-04-12 09:24:44', '2026-02-21 15:19:33', '', '', 'Browser', NULL, 'es', 3),
 (3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:17:59', '2025-10-19 22:43:36', NULL, NULL, NULL, NULL, 'es', 3),
 (4, 'Empleado_Prueba_4', 'Royster', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:21:43', '2025-10-19 18:46:42', NULL, NULL, NULL, NULL, 'es', 1),
 (6, 'Empleado_Prueba_6', 'Valdez', '', '', 1, 1, NULL, NULL, NULL, '', '2024-06-25 18:33:59', '2025-12-10 20:55:50', NULL, NULL, NULL, NULL, 'es', 10),
@@ -41210,7 +41216,7 @@ INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`
 (21, 'Empleado_Prueba_21', 'Suarez', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-07-01 15:25:38', '2025-07-03 18:19:53', NULL, NULL, NULL, NULL, 'es', 8),
 (22, 'Empleado_Prueba_22', 'Brooken', '', '', 1, 0, NULL, NULL, NULL, '', '2025-07-01 16:17:22', '2025-11-06 20:47:28', NULL, NULL, NULL, NULL, 'es', 4),
 (23, 'Empleado_Prueba_23', 'Royster', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-08-25 17:37:41', NULL, NULL, NULL, NULL, NULL, 'es', 3),
-(27, 'Employee_27', 'last name', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, NULL, '(786) 720-5678', '2025-10-26 21:13:13', '2026-02-14 16:54:09', '', '', 'Browser', NULL, 'en', 1),
+(27, 'Administrator', 'Concrete', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, 1, '(786) 720-5678', '2025-10-26 21:13:13', '2026-02-21 15:03:22', '', '', 'Browser', NULL, 'en', 1),
 (28, 'Empleado_Prueba_28', 'Garcia', '', '', 1, 0, NULL, NULL, NULL, '', '2025-11-19 14:53:25', NULL, NULL, NULL, NULL, NULL, 'es', 3),
 (29, 'Empleado_Prueba_29', 'Iglesias ', '', '', 1, 0, 0, NULL, NULL, '', '2026-01-21 00:27:51', NULL, NULL, NULL, NULL, NULL, 'es', 1);
 
@@ -41238,9 +41244,10 @@ INSERT INTO `user_access_token` (`id`, `token`, `expires_at`, `user_id`) VALUES
 (6, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzY5OTc1NTQyLCJleHAiOjE3NzA1ODAzNDJ9.9CA-hVITJu3bbz0j9MsblG2PDLo5GYyNFbRQHyGrlIc', 1770580342, 27),
 (7, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzcwMzA4NzQyLCJleHAiOjE3NzA5MTM1NDJ9.ezKrlLRSlmujtLZzY4jww8YjK6bRmovx6ZG84SS6lvk', 1770913542, 27),
 (8, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzcwNTg0OTM0LCJleHAiOjE3NzExODk3MzR9._kOjfAZfHCiXkk2fVefHX-djn91KLolKmGok_-u_H88', 1771189734, 27),
-(10, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc3MTA4Nzc3NSwiZXhwIjoxNzcxNjkyNTc1fQ.LDF3vLy6x_daGoSFM8-k9PcfYJlYZ49je1-ByI_e4DY', 1771692575, 27),
 (11, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzEwODgyNjYsImV4cCI6MTc3MTY5MzA2Nn0.-BCNxmG50a19_uzeTy2Wxyl8cuGsIk26jsi8fIwvKIA', 1771693066, 1),
-(12, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzEwOTM2MzEsImV4cCI6MTc3MTY5ODQzMX0.YoX5h2DhIRorUi8a4dLIi8jKdIrUVtokNgXx_Xk0UaY', 1771698431, 1);
+(12, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzEwOTM2MzEsImV4cCI6MTc3MTY5ODQzMX0.YoX5h2DhIRorUi8a4dLIi8jKdIrUVtokNgXx_Xk0UaY', 1771698431, 1),
+(13, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc3MTY4NzExMCwiZXhwIjoxNzcyMjkxOTEwfQ.iUPxcN1WQe6y7NT_PcIOFb6kpgMgAX6J9b6KF1zG284', 1772291910, 27),
+(14, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzE2ODcxNTcsImV4cCI6MTc3MjI5MTk1N30.h58g8nGCLMx5YCkorK9PvMAbdfyg02HsfbXrK5Z-C4s', 1772291957, 1);
 
 -- --------------------------------------------------------
 
@@ -41579,42 +41586,6 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3543, 1, 0, 0, 0, 28, 19),
 (3544, 1, 0, 0, 0, 28, 21),
 (3545, 1, 1, 1, 0, 28, 33),
-(3550, 1, 1, 1, 1, 1, 1),
-(3551, 1, 1, 1, 1, 1, 2),
-(3552, 1, 1, 1, 1, 1, 3),
-(3553, 1, 1, 1, 1, 1, 4),
-(3554, 1, 1, 1, 1, 1, 5),
-(3555, 1, 1, 1, 1, 1, 6),
-(3556, 1, 1, 1, 1, 1, 7),
-(3557, 1, 1, 1, 1, 1, 8),
-(3558, 1, 1, 1, 1, 1, 9),
-(3559, 1, 1, 1, 1, 1, 10),
-(3560, 1, 1, 1, 1, 1, 11),
-(3561, 1, 1, 1, 1, 1, 12),
-(3562, 1, 1, 1, 1, 1, 13),
-(3563, 1, 1, 1, 1, 1, 14),
-(3564, 1, 1, 1, 1, 1, 15),
-(3565, 1, 1, 1, 1, 1, 16),
-(3566, 1, 1, 1, 1, 1, 17),
-(3567, 1, 1, 1, 1, 1, 18),
-(3568, 1, 1, 1, 1, 1, 19),
-(3569, 1, 1, 1, 1, 1, 20),
-(3570, 1, 1, 1, 1, 1, 21),
-(3571, 1, 1, 1, 1, 1, 22),
-(3572, 1, 1, 1, 1, 1, 23),
-(3573, 1, 1, 1, 1, 1, 24),
-(3574, 1, 1, 1, 1, 1, 25),
-(3575, 1, 1, 1, 1, 1, 26),
-(3576, 1, 1, 1, 1, 1, 27),
-(3577, 1, 1, 1, 1, 1, 28),
-(3578, 1, 1, 1, 1, 1, 29),
-(3579, 1, 1, 1, 1, 1, 30),
-(3580, 1, 1, 1, 1, 1, 31),
-(3581, 1, 1, 1, 1, 1, 32),
-(3582, 1, 1, 1, 1, 1, 33),
-(3583, 1, 1, 1, 1, 1, 34),
-(3584, 1, 1, 1, 1, 1, 35),
-(3589, 1, 1, 1, 1, 1, 36),
 (3590, 1, 1, 1, 1, 6, 1),
 (3591, 1, 1, 1, 1, 6, 2),
 (3592, 1, 1, 1, 1, 6, 3),
@@ -41651,7 +41622,6 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3623, 1, 1, 1, 1, 6, 34),
 (3624, 1, 1, 1, 1, 6, 35),
 (3625, 1, 1, 1, 1, 6, 36),
-(3630, 1, 1, 1, 1, 1, 37),
 (3646, 1, 1, 1, 1, 9, 1),
 (3647, 1, 0, 0, 0, 9, 2),
 (3648, 1, 0, 0, 0, 9, 3),
@@ -41704,39 +41674,78 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3905, 1, 1, 1, 1, 29, 35),
 (3906, 1, 1, 1, 1, 29, 36),
 (3907, 1, 1, 1, 1, 29, 37),
-(3908, 1, 1, 1, 1, 27, 5),
-(3909, 1, 1, 1, 1, 27, 6),
-(3910, 1, 1, 1, 1, 27, 7),
-(3911, 1, 1, 1, 1, 27, 8),
-(3912, 1, 1, 1, 1, 27, 9),
-(3913, 1, 1, 1, 1, 27, 10),
-(3914, 1, 1, 1, 1, 27, 11),
-(3915, 1, 1, 1, 1, 27, 12),
-(3916, 1, 1, 1, 1, 27, 13),
-(3917, 1, 1, 1, 1, 27, 14),
-(3918, 1, 1, 1, 1, 27, 15),
-(3919, 1, 1, 1, 1, 27, 16),
-(3920, 1, 1, 1, 1, 27, 17),
-(3921, 1, 1, 1, 1, 27, 18),
-(3922, 1, 1, 1, 1, 27, 19),
-(3923, 1, 1, 1, 1, 27, 20),
-(3924, 1, 1, 1, 1, 27, 21),
-(3925, 1, 1, 1, 1, 27, 22),
-(3926, 1, 1, 1, 1, 27, 23),
-(3927, 1, 1, 1, 1, 27, 24),
-(3928, 1, 1, 1, 1, 27, 25),
-(3929, 1, 1, 1, 1, 27, 26),
-(3930, 1, 1, 1, 1, 27, 27),
-(3931, 1, 1, 1, 1, 27, 28),
-(3932, 1, 1, 1, 1, 27, 29),
-(3933, 1, 1, 1, 1, 27, 30),
-(3934, 1, 1, 1, 1, 27, 31),
-(3935, 1, 1, 1, 1, 27, 32),
-(3936, 1, 1, 1, 1, 27, 33),
-(3937, 1, 1, 1, 1, 27, 34),
-(3938, 1, 1, 1, 1, 27, 35),
-(3939, 1, 1, 1, 1, 27, 36),
-(3940, 1, 1, 1, 1, 27, 37);
+(3943, 1, 1, 1, 1, 27, 2),
+(3944, 1, 1, 1, 1, 27, 3),
+(3945, 1, 1, 1, 1, 27, 5),
+(3946, 1, 1, 1, 1, 27, 6),
+(3947, 1, 1, 1, 1, 27, 7),
+(3948, 1, 1, 1, 1, 27, 8),
+(3949, 1, 1, 1, 1, 27, 9),
+(3950, 1, 1, 1, 1, 27, 10),
+(3951, 1, 1, 1, 1, 27, 11),
+(3952, 1, 1, 1, 1, 27, 12),
+(3953, 1, 1, 1, 1, 27, 13),
+(3954, 1, 1, 1, 1, 27, 14),
+(3955, 1, 1, 1, 1, 27, 15),
+(3956, 1, 1, 1, 1, 27, 16),
+(3957, 1, 1, 1, 1, 27, 17),
+(3958, 1, 1, 1, 1, 27, 18),
+(3959, 1, 1, 1, 1, 27, 19),
+(3960, 1, 1, 1, 1, 27, 20),
+(3961, 1, 1, 1, 1, 27, 21),
+(3962, 1, 1, 1, 1, 27, 22),
+(3963, 1, 1, 1, 1, 27, 23),
+(3964, 1, 1, 1, 1, 27, 24),
+(3965, 1, 1, 1, 1, 27, 25),
+(3966, 1, 1, 1, 1, 27, 26),
+(3967, 1, 1, 1, 1, 27, 27),
+(3968, 1, 1, 1, 1, 27, 28),
+(3969, 1, 1, 1, 1, 27, 29),
+(3970, 1, 1, 1, 1, 27, 30),
+(3971, 1, 1, 1, 1, 27, 31),
+(3972, 1, 1, 1, 1, 27, 32),
+(3973, 1, 1, 1, 1, 27, 33),
+(3974, 1, 1, 1, 1, 27, 34),
+(3975, 1, 1, 1, 1, 27, 35),
+(3976, 1, 1, 1, 1, 27, 36),
+(3977, 1, 1, 1, 1, 27, 37),
+(3978, 1, 1, 1, 1, 1, 1),
+(3979, 1, 1, 1, 1, 1, 2),
+(3980, 1, 1, 1, 1, 1, 3),
+(3981, 1, 1, 1, 1, 1, 4),
+(3982, 1, 1, 1, 1, 1, 5),
+(3983, 1, 1, 1, 1, 1, 6),
+(3984, 1, 1, 1, 1, 1, 7),
+(3985, 1, 1, 1, 1, 1, 8),
+(3986, 1, 1, 1, 1, 1, 9),
+(3987, 1, 1, 1, 1, 1, 10),
+(3988, 1, 1, 1, 1, 1, 11),
+(3989, 1, 1, 1, 1, 1, 12),
+(3990, 1, 1, 1, 1, 1, 13),
+(3991, 1, 1, 1, 1, 1, 14),
+(3992, 1, 1, 1, 1, 1, 15),
+(3993, 1, 1, 1, 1, 1, 16),
+(3994, 1, 1, 1, 1, 1, 17),
+(3995, 1, 1, 1, 1, 1, 18),
+(3996, 1, 1, 1, 1, 1, 19),
+(3997, 1, 1, 1, 1, 1, 20),
+(3998, 1, 1, 1, 1, 1, 21),
+(3999, 1, 1, 1, 1, 1, 22),
+(4000, 1, 1, 1, 1, 1, 23),
+(4001, 1, 1, 1, 1, 1, 24),
+(4002, 1, 1, 1, 1, 1, 25),
+(4003, 1, 1, 1, 1, 1, 26),
+(4004, 1, 1, 1, 1, 1, 27),
+(4005, 1, 1, 1, 1, 1, 28),
+(4006, 1, 1, 1, 1, 1, 29),
+(4007, 1, 1, 1, 1, 1, 30),
+(4008, 1, 1, 1, 1, 1, 31),
+(4009, 1, 1, 1, 1, 1, 32),
+(4010, 1, 1, 1, 1, 1, 33),
+(4011, 1, 1, 1, 1, 1, 34),
+(4012, 1, 1, 1, 1, 1, 35),
+(4013, 1, 1, 1, 1, 1, 36),
+(4014, 1, 1, 1, 1, 1, 37);
 
 -- --------------------------------------------------------
 
@@ -42487,7 +42496,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=370;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=374;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -42499,7 +42508,7 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT de la tabla `message`
 --
 ALTER TABLE `message`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `message_conversation`
@@ -42697,13 +42706,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_access_token`
 --
 ALTER TABLE `user_access_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3941;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4015;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`

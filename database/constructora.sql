@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-02-2026 a las 14:56:30
+-- Tiempo de generación: 21-02-2026 a las 16:44:43
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1255,6 +1255,7 @@ CREATE TABLE `message` (
   `body_es` text COMMENT 'Versión en español (original o traducida)',
   `body_en` text COMMENT 'Versión en inglés (original o traducida)',
   `created_at` datetime DEFAULT NULL,
+  `translated_at` datetime DEFAULT NULL,
   `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

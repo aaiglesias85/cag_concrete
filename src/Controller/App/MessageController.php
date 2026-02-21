@@ -266,4 +266,53 @@ class MessageController extends AbstractController
       }
       return $this->json($result);
    }
+
+   /**
+    * Traducir texto a petición del usuario (no se traduce al enviar el mensaje).
+    */
+   #[OA\Post(
+      path: '/api/{lang}/message/traducir',
+      summary: 'Translate text on demand',
+      description: 'Translates the given text to the target language. Used when the user taps "Translate" on a message. Monthly character limit applies. Requires Bearer token and chat permission.',
+      security: [['Bearer' => []]],
+      parameters: [
+         new OA\Parameter(name: 'lang', in: 'path', required: true, description: 'Language code (es or en)', schema: new OA\Schema(type: 'string')),
+      ],
+      requestBody: new OA\RequestBody(
+         required: true,
+         content: new OA\JsonContent(required: ['text'], properties: [
+            new OA\Property(property: 'text', type: 'string', description: 'Text to translate'),
+            new OA\Property(property: 'target_lang', type: 'string', description: 'Target language: es or en (default es)'),
+            new OA\Property(property: 'message_id', type: 'integer', description: 'Optional. Message ID to store translation in body_es/body_en'),
+            new OA\Property(property: 'conversation_id', type: 'integer', description: 'Required if message_id is sent'),
+         ])
+      ),
+      responses: [
+         new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'success', type: 'boolean'),
+            new OA\Property(property: 'translated_text', type: 'string'),
+         ])),
+         new OA\Response(response: 400, description: 'Bad request'),
+         new OA\Response(response: 403, description: 'Chat not allowed'),
+      ]
+   )]
+   public function traducir(Request $request, string $lang = 'es'): JsonResponse
+   {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+      $data = json_decode($request->getContent(), true) ?? [];
+      $text = trim((string) ($data['text'] ?? ''));
+      $targetLang = isset($data['target_lang']) && $data['target_lang'] === 'en' ? 'en' : 'es';
+      $messageId = isset($data['message_id']) ? (int) $data['message_id'] : null;
+      $conversationId = isset($data['conversation_id']) ? (int) $data['conversation_id'] : null;
+      if ($text === '') {
+         return $this->json(['success' => false, 'error' => 'text is required'], 400);
+      }
+      $result = $this->messageService->TraducirOnDemand($text, $targetLang, $messageId, $conversationId);
+      if (!$result['success']) {
+         $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
+         return $this->json($result, $status);
+      }
+      return $this->json($result);
+   }
 }

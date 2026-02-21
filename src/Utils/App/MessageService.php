@@ -16,15 +16,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 /**
  * Servicio de mensajería interna para la app.
  *
- * Proceso de traducción:
- * - Al enviar (EnviarMensaje): el cliente envía body + source_lang (es|en, idioma del remitente).
- *   Se guarda body_original y source_lang; se rellenan body_es y body_en. Si source_lang es 'es',
- *   body_es = original y body_en = traducir(original, es→en). Si es 'en', al revés.
- *   Si GOOGLE_TRANSLATE_API_KEY está configurada se usa Google Translate; si no, se devuelve el mismo texto.
- * - Al listar (ListarMensajes, ListarConversaciones): el parámetro $lang es el idioma del usuario
- *   que hace la petición (viene en la URL). Se devuelve body_es o body_en según ese $lang.
- *   El idioma del destinatario no se usa: cada usuario ve los mensajes en su idioma al abrir el chat
- *   porque su app envía su lang en la URL.
+ * Traducción: ya no se traduce al enviar. Se guarda el texto original en body_es y body_en.
+ * Si el usuario no entiende un mensaje, puede pulsar "Traducir" en la app; la app llama al
+ * endpoint POST /message/traducir y se traduce solo entonces (límite 500k caracteres/mes por uso).
  */
 class MessageService extends Base
 {
@@ -282,13 +276,9 @@ class MessageService extends Base
          $message->setSender($usuario);
          $message->setBodyOriginal($body);
          $message->setSourceLang($sourceLang);
-         if ($sourceLang === 'es') {
-            $message->setBodyEs($body);
-            $message->setBodyEn($this->traducirTexto($body, 'es', 'en'));
-         } else {
-            $message->setBodyEn($body);
-            $message->setBodyEs($this->traducirTexto($body, 'en', 'es'));
-         }
+         // Sin traducción automática: se guarda el mismo texto en ambos idiomas (traducción a petición del usuario).
+         $message->setBodyEs($body);
+         $message->setBodyEn($body);
          $now = new \DateTime();
          $message->setCreatedAt($now);
          $conv->setUpdatedAt($now);
@@ -415,39 +405,93 @@ class MessageService extends Base
    }
 
    /**
-    * Traduce texto entre es y en. Si no hay API configurada o se superó el límite free (500k caracteres/mes), devuelve el mismo texto.
-    * El uso mensual se calcula con la suma de caracteres de body_original en message del mes en curso (consulta SQL).
+    * Traducción a petición del usuario. Comprueba permiso chat y límite mensual (500k) cuando se persiste en un mensaje.
+    * Si se pasan message_id y conversation_id, guarda la traducción en body_es/body_en del mensaje y actualiza translated_at.
+    *
+    * @param int|null $messageId      Id del mensaje para persistir la traducción (opcional; ej. mensajes pendientes no tienen id)
+    * @param int|null $conversationId Id de la conversación (requerido si se pasa message_id)
+    * @return array{success: bool, translated_text?: string, error?: string}
     */
-   private function traducirTexto(string $text, string $sourceLang, string $targetLang): string
+   public function TraducirOnDemand(string $text, string $targetLang, ?int $messageId = null, ?int $conversationId = null): array
    {
+      $usuario = $this->getUser();
+      if (!$usuario instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario no autenticado'];
+      }
+      $forbidden = $this->checkPermisoChat($usuario);
+      if ($forbidden !== null) {
+         return $forbidden;
+      }
+      $text = trim($text);
+      if ($text === '') {
+         return ['success' => false, 'error' => 'El texto está vacío'];
+      }
+      $targetLang = $targetLang === 'en' ? 'en' : 'es';
+
+      $message = null;
+      if ($messageId !== null && $conversationId !== null) {
+         $conv = $this->conversationRepository->find($conversationId);
+         if (!$conv instanceof MessageConversation || !$conv->getOtherUser($usuario)) {
+            return ['success' => false, 'error' => 'Conversación no encontrada o no pertenece'];
+         }
+         $message = $this->messageRepository->find($messageId);
+         if (!$message instanceof Message || $message->getConversation()?->getConversationId() !== $conversationId) {
+            return ['success' => false, 'error' => 'Mensaje no encontrado'];
+         }
+      }
+
       if ($this->googleTranslateApiKey === '') {
-         return $text;
+         $translated = $text;
+         if ($message !== null) {
+            $this->persistTranslatedBody($message, $targetLang, $translated);
+         }
+         return ['success' => true, 'translated_text' => $translated];
       }
+
       $charCount = mb_strlen($text);
-      $now = new \DateTimeImmutable();
-      $startOfMonth = $now->modify('first day of this month')->setTime(0, 0, 0);
-      // Mes en curso: desde el primer día del mes hasta la fecha actual
-      $usedThisMonth = $this->messageRepository->sumBodyOriginalLengthForMonth($startOfMonth, $now);
-      if (($usedThisMonth + $charCount) > self::TRANSLATE_LIMIT_CHARS_PER_MONTH) {
-         $this->logger->info('Translation skipped: monthly character limit reached.');
-         return $text;
+      if ($message !== null) {
+         $now = new \DateTimeImmutable();
+         $startOfMonth = $now->modify('first day of this month')->setTime(0, 0, 0);
+         $usedThisMonth = $this->messageRepository->sumTranslatedCharactersForPeriod($startOfMonth, $now);
+         if (($usedThisMonth + $charCount) > self::TRANSLATE_LIMIT_CHARS_PER_MONTH) {
+            return ['success' => false, 'error' => 'Límite mensual de traducción alcanzado'];
+         }
       }
+
       try {
+         $payload = [
+            'q'      => $text,
+            'target' => $targetLang,
+            'format' => 'text',
+         ];
          $response = $this->httpClient->request('POST', self::GOOGLE_TRANSLATE_API_URL, [
             'query' => ['key' => $this->googleTranslateApiKey],
-            'json'  => [
-               'q'      => $text,
-               'source' => $sourceLang,
-               'target' => $targetLang,
-               'format' => 'text',
-            ],
+            'json'  => $payload,
          ]);
          $data = $response->toArray();
          $translated = $data['data']['translations'][0]['translatedText'] ?? null;
-         return $translated !== null ? $translated : $text;
+         if ($translated === null) {
+            $translated = $text;
+         }
+         if ($message !== null) {
+            $this->persistTranslatedBody($message, $targetLang, $translated);
+         }
+         return ['success' => true, 'translated_text' => $translated];
       } catch (\Throwable $e) {
-         $this->logger->warning('Translation skipped: ' . $e->getMessage());
-         return $text;
+         $this->logger->warning('Translation on-demand failed: ' . $e->getMessage());
+         return ['success' => false, 'error' => $e->getMessage()];
       }
+   }
+
+   private function persistTranslatedBody(Message $message, string $targetLang, string $translated): void
+   {
+      if ($targetLang === 'en') {
+         $message->setBodyEn($translated);
+      } else {
+         $message->setBodyEs($translated);
+      }
+      $message->setTranslatedAt(new \DateTimeImmutable());
+      $this->em->persist($message);
+      $this->em->flush();
    }
 }
