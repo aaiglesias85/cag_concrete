@@ -308,6 +308,7 @@ var Usuarios = function () {
         KTUtil.get("estimator").checked = false;
         KTUtil.get("bond").checked = false;
         KTUtil.get("retainage").checked = false;
+        KTUtil.get("chat").checked = false;
 
         //Permisos
         permisos = [];
@@ -617,6 +618,9 @@ var Usuarios = function () {
                 var retainage = ($('#retainage').prop('checked')) ? 1 : 0;
                 formData.set("retainage", retainage);
 
+                var chat = ($('#chat').prop('checked')) ? 1 : 0;
+                formData.set("chat", chat);
+
                 var telefono = $('#telefono').val();
                 formData.set("telefono", telefono);
 
@@ -725,6 +729,7 @@ var Usuarios = function () {
                 $('#estimator').prop('checked', usuario.estimator);
                 $('#bond').prop('checked', usuario.bond);
                 $('#retainage').prop('checked', usuario.retainage);
+                $('#chat').prop('checked', usuario.chat);
 
                 permisos = usuario.permisos;
                 marcarPermisos();

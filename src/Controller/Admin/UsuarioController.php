@@ -235,6 +235,7 @@ class UsuarioController extends AbstractController
       $estimator = $request->get('estimator');
       $bond = $request->get('bond');
       $retainage = $request->get('retainage');
+      $chat = $request->get('chat');
 
       $resultadoJson = array();
 
@@ -251,7 +252,8 @@ class UsuarioController extends AbstractController
                $telefono,
                $estimator,
                $bond,
-               $retainage
+               $retainage,
+               $chat
             );
          } else {
             $resultado = $this->usuarioService->ActualizarUsuario(
@@ -266,7 +268,8 @@ class UsuarioController extends AbstractController
                $telefono,
                $estimator,
                $bond,
-               $retainage
+               $retainage,
+               $chat
             );
          }
 

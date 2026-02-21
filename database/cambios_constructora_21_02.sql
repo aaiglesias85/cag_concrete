@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `chat` BOOLEAN NULL AFTER `retainage`;

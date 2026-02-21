@@ -44,16 +44,16 @@ class MessageService extends Base
         MessageRepository $messageRepository,
         UsuarioRepository $usuarioRepository,
         EntityManagerInterface $em,
-        string $googleTranslateApiKey = '',
-        PushNotificationService $pushNotificationService
+        PushNotificationService $pushNotificationService,
+        string $googleTranslateApiKey = ''
     ) {
         parent::__construct($container, $mailer, $containerBag, $security, $logger);
         $this->conversationRepository = $conversationRepository;
         $this->messageRepository = $messageRepository;
         $this->usuarioRepository = $usuarioRepository;
         $this->em = $em;
-        $this->googleTranslateApiKey = $googleTranslateApiKey;
         $this->pushNotificationService = $pushNotificationService;
+        $this->googleTranslateApiKey = $googleTranslateApiKey;
     }
 
     /**

@@ -162,6 +162,7 @@ class UsuarioService extends Base
          $arreglo_resultado['estimator'] = $usuario->getEstimator();
          $arreglo_resultado['bond'] = $usuario->getBond();
          $arreglo_resultado['retainage'] = $usuario->getRetainage();
+         $arreglo_resultado['chat'] = $usuario->getChat();
          $arreglo_resultado['preferred_lang'] = $usuario->getPreferredLang();
 
          $permisos = $this->ListarPermisos($usuario_id);
@@ -399,7 +400,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage)
+   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -428,6 +429,7 @@ class UsuarioService extends Base
          $entity->setEstimator($estimator);
          $entity->setBond($bond);
          $entity->setRetainage($retainage);
+         $entity->setChat($chat);
 
          if ($contrasenna != "") {
             $entity->setContrasenna($this->CodificarPassword($contrasenna));
@@ -501,7 +503,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage)
+   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat)
    {
       $resultado = array();
       $em = $this->getDoctrine()->getManager();
@@ -526,6 +528,7 @@ class UsuarioService extends Base
       $entity->setEstimator($estimator);
       $entity->setBond($bond);
       $entity->setRetainage($retainage);
+      $entity->setChat($chat);
 
       if ($rol_id != '') {
          $rol = $this->getDoctrine()->getRepository(Rol::class)

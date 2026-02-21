@@ -42,6 +42,9 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: "retainage", type: "boolean", nullable: true)]
     private ?bool $retainage;
 
+    #[ORM\Column(name: "chat", type: "boolean", nullable: true)]
+    private ?bool $chat;
+
     #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
     private ?\DateTime $createdAt;
 
@@ -288,6 +291,16 @@ class Usuario implements UserInterface, EquatableInterface
     public function setRetainage(?bool $retainage): void
     {
         $this->retainage = $retainage;
+    }
+
+    public function getChat(): ?bool
+    {
+        return $this->chat;
+    }
+
+    public function setChat(?bool $chat): void
+    {
+        $this->chat = $chat;
     }
 
     public function getPlayerId(): ?string

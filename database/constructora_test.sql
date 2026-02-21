@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 14-02-2026 a las 16:47:02
+-- Tiempo de generación: 21-02-2026 a las 14:56:18
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -3091,7 +3091,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (2397, '2025-09-22', '', 'Empleado_Prueba_2397', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:52:16', '2026-02-04 23:02:21', 28, NULL, 1),
 (2398, '2025-09-23', '', 'Empleado_Prueba_2398', NULL, 'Empleado_Prueba_2398', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:53:17', '2026-01-06 14:55:20', 28, NULL, 1),
 (2399, '2025-09-24', '', 'Empleado_Prueba_2399', NULL, 'Empleado_Prueba_2399', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:54:14', '2026-01-06 14:57:39', 28, NULL, 1),
-(2400, '2025-09-25', '', 'Empleado_Prueba_2400', NULL, 'Empleado_Prueba_2400', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:55:21', '2025-10-03 14:12:31', 28, NULL, 1),
+(2400, '2025-09-25', '', 'Empleado_Prueba_2400', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:55:21', '2026-02-20 00:46:20', 28, NULL, 1),
 (2401, '2025-09-26', '', 'Empleado_Prueba_2401', NULL, 'Empleado_Prueba_2401', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:56:18', '2025-10-03 19:50:59', 28, NULL, 1),
 (2402, '2025-09-29', '', 'Empleado_Prueba_2402', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:58:17', '2026-02-06 16:15:06', 28, NULL, 1),
 (2403, '2025-09-30', '', 'Empleado_Prueba_2403', NULL, 'Empleado_Prueba_2403', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-01 19:59:10', '2025-10-03 19:58:49', 28, NULL, 1),
@@ -9869,7 +9869,7 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (3526, 74.440000, 58.00, '', 2397, 148),
 (3527, 151.110000, 58.00, '', 2398, 148),
 (3528, 150.000000, 58.00, '\n', 2399, 148),
-(3530, 153.880000, 58.00, '', 2400, 148),
+(3530, 50.000000, 58.00, '', 2400, 148),
 (3531, 207.380000, 58.00, '\n', 2401, 148),
 (3532, 114.830000, 58.00, '', 2402, 148),
 (3533, 131.870000, 58.00, '\n', 2403, 148),
@@ -22169,10 +22169,10 @@ INSERT INTO `data_tracking_labor` (`id`, `hours`, `hourly_rate`, `role`, `color`
 (11445, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2399, NULL, 3),
 (11446, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2399, NULL, 4),
 (11447, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2399, NULL, 2),
-(11448, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, NULL, 5),
-(11449, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, NULL, 3),
-(11450, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, NULL, 4),
-(11451, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, NULL, 2),
+(11448, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, 5, 5),
+(11449, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, 3, 3),
+(11450, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, 4, 4),
+(11451, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2400, 2, 2),
 (11452, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2401, NULL, 5),
 (11453, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2401, NULL, 4),
 (11454, 10.00, 0.00, 'Subcontractor', '#34BFA3', 2401, NULL, 3),
@@ -27984,9 +27984,8 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (359, '2', '2025-10-01', '2025-10-31', 'test test ', 0, '2026-01-25 20:20:11', '2026-02-06 02:24:00', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (360, '3', '2025-11-01', '2025-11-30', '', 0, '2026-01-25 21:14:10', '2026-02-06 02:37:48', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (361, '4', '2025-12-01', '2025-12-31', '', 1, '2026-01-25 21:14:32', '2026-02-02 02:24:33', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
-(362, '5', '2026-01-01', '2026-01-31', '', 0, '2026-02-06 02:10:27', NULL, 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, NULL, NULL),
-(364, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-11 01:33:38', '2026-02-11 02:06:05', 28, NULL, NULL, NULL, 0.973298, -1775.05, 0, 0.00, NULL, 262714.58, 13135.73),
-(368, '2', '2025-10-01', '2025-10-31', '', 0, '2026-02-12 03:11:59', NULL, 28, NULL, NULL, NULL, 0.026702, -48.70, 0, 0.00, NULL, 25200.04, 1260.00);
+(362, '5', '2026-01-01', '2026-01-31', '', 0, '2026-02-06 02:10:27', NULL, 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3636.00, 363.60),
+(371, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-20 20:43:11', NULL, 28, NULL, NULL, NULL, 1.000000, -1823.75, 0, 0.00, NULL, 254514.54, 12725.73);
 
 -- --------------------------------------------------------
 
@@ -28667,35 +28666,21 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (3306, 0.000000, 0.000000, 0.000000, 1.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 362, 3077, NULL),
 (3307, 0.000000, 0.000000, 0.000000, 12.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 362, 3078, NULL),
 (3308, 0.000000, 0.000000, 0.000000, -1800.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 362, 3082, NULL),
-(3325, 0.000000, 0.000000, 25.000000, 87.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 147, NULL),
-(3326, 0.000000, 0.000000, 993.510000, 58.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 148, NULL),
-(3327, 0.000000, 0.000000, 40.000000, 386.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 151, NULL),
-(3328, 0.000000, 0.000000, 35.500000, 2200.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 152, NULL),
-(3329, 0.000000, 0.000000, 22.000000, 800.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 153, NULL),
-(3330, 0.000000, 0.000000, 0.970000, -1823.75, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 154, NULL),
-(3331, 0.000000, 0.000000, 2506.000000, 36.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 2941, NULL),
-(3332, 0.000000, 0.000000, 34.000000, 124.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3081, NULL),
-(3333, 0.000000, 0.000000, 50.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3089, NULL),
-(3334, 0.000000, 0.000000, 12.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3090, NULL),
-(3335, 0.000000, 0.000000, 32.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3092, NULL),
-(3336, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3086, NULL),
-(3337, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3087, NULL),
-(3338, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3088, NULL),
-(3339, 0.000000, 0.000000, 0.000000, 12.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 364, 3091, NULL),
-(3383, 25.000000, 0.000000, 61.930000, 87.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 147, NULL),
-(3384, 993.510000, 0.000000, 376.880000, 58.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 148, NULL),
-(3385, 40.000000, 0.000000, 2.500000, 386.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 151, NULL),
-(3386, 35.500000, 0.000000, 0.000000, 2200.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 152, NULL),
-(3387, 22.000000, 0.000000, 0.000000, 800.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 153, NULL),
-(3388, 2506.000000, 0.000000, 66.000000, 36.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 2941, NULL),
-(3389, 34.000000, 0.000000, 90.220000, 124.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3081, NULL),
-(3390, 50.000000, 0.000000, 0.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3089, NULL),
-(3391, 12.000000, 0.000000, 0.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3090, NULL),
-(3392, 32.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3092, NULL),
-(3393, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3086, NULL),
-(3394, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3087, NULL),
-(3395, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3088, NULL),
-(3396, 0.000000, 0.000000, 0.000000, 12.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 368, 3091, NULL);
+(3425, 0.000000, 0.000000, 25.000000, 87.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 147, NULL),
+(3426, 0.000000, 0.000000, 889.630000, 58.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 148, NULL),
+(3427, 0.000000, 0.000000, 40.000000, 386.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 151, NULL),
+(3428, 0.000000, 0.000000, 35.500000, 2200.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 152, NULL),
+(3429, 0.000000, 0.000000, 22.000000, 800.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 153, NULL),
+(3430, 0.000000, 0.000000, 2506.000000, 36.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 2941, NULL),
+(3431, 0.000000, 0.000000, 34.000000, 124.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3081, NULL),
+(3432, 0.000000, 0.000000, 50.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3089, NULL),
+(3433, 0.000000, 0.000000, 12.000000, 20.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3090, NULL),
+(3434, 0.000000, 0.000000, 32.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3092, NULL),
+(3435, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3086, NULL),
+(3436, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3087, NULL),
+(3437, 0.000000, 0.000000, 0.000000, 10.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3088, NULL),
+(3438, 0.000000, 0.000000, 0.000000, 12.00, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 3091, NULL),
+(3439, 0.000000, 0.000000, 0.000000, -1823.75, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 371, 154, NULL);
 
 -- --------------------------------------------------------
 
@@ -28801,7 +28786,7 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (28, 'C&G 6x30 IN, TP 2', 'C&G 6x30 IN, TP 2', NULL, 'equation', 1, NULL, '2024-07-08 15:01:23', NULL, 12, 9, NULL, NULL),
 (29, 'C&G 6x30 IN, TP 7', 'C&G 6x30 IN, TP 7', NULL, 'equation', 1, NULL, '2024-07-08 15:01:48', NULL, 12, 9, NULL, NULL),
 (30, 'C&G 8x24 IN, TP 2', 'C&G 8x24 IN, TP 2', NULL, 'equation', 1, NULL, '2024-07-08 15:05:26', NULL, 12, 10, NULL, NULL),
-(31, 'CONC SIDEWALK, 4 IN', 'CONC SIDEWALK, 4 IN', NULL, 'equation', 1, NULL, '2024-07-08 15:08:59', NULL, 13, 11, NULL, NULL),
+(31, 'CONC SIDEWALK, 4 IN', 'CONC SIDEWALK, 4 IN', NULL, 'equation', 1, 0, '2024-07-08 15:08:59', NULL, 13, 11, NULL, NULL),
 (32, 'CONC SIDEWALK, 8 IN', 'CONC SIDEWALK, 8 IN', NULL, 'equation', 1, NULL, '2024-07-08 15:09:42', NULL, 13, 12, NULL, NULL),
 (33, 'CONC DRAINAGE DITCH', 'CONC DRAINAGE DITCH', NULL, 'equation', 1, NULL, '2024-07-08 15:22:41', NULL, 12, 13, NULL, NULL),
 (34, 'CWM04099 CONC DRIVEWAY, 6 IN', 'CWM04099 CONC DRIVEWAY, 6 IN', 4900.00, 'none', 1, NULL, '2024-07-08 16:10:43', NULL, 14, NULL, NULL, NULL),
@@ -29984,7 +29969,26 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (348, 'Delete', 'Contact', 'The project contact is deleted: Contacto_17', '::1', '2026-02-13 18:12:15', 27),
 (349, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-13 18:12:23', 27),
 (350, 'Update', 'User', 'The user profile image is deleted: Employee_27 last name', '::1', '2026-02-14 15:56:11', 27),
-(351, 'Update', 'User', 'The user is modified: Employee_27 last name', '::1', '2026-02-14 15:56:29', 27);
+(351, 'Update', 'User', 'The user is modified: Employee_27 last name', '::1', '2026-02-14 15:56:29', 27),
+(352, 'Update', 'User', 'The user is modified: Employee_27 last name', '::1', '2026-02-14 16:53:56', 27),
+(353, 'Update', 'User', 'The user is modified: Employee_27 last name', '::1', '2026-02-14 16:54:09', 27),
+(354, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05071 - Lakeview Road Bridge, Date: 09/25/2025', '::1', '2026-02-20 00:45:37', 27),
+(355, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05071 - Lakeview Road Bridge, Date: 09/25/2025', '::1', '2026-02-20 00:46:20', 27),
+(356, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 02:36:24', 27),
+(357, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 02:38:16', 27),
+(358, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 02:40:06', 27),
+(359, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 02:44:42', 27),
+(360, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 02:45:38', 27);
+INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `created_at`, `user_id`) VALUES
+(361, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-02-20 03:03:35', 27),
+(362, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2026-02-20 03:06:49', 27),
+(363, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2026-02-20 03:06:49', 27),
+(364, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2026-02-20 03:07:27', 27),
+(365, 'Add', 'Invoice', 'The invoice #2 is added', '::1', '2026-02-20 03:08:27', 27),
+(366, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-02-20 20:19:48', 27),
+(367, 'Delete', 'Invoice', 'The invoice #1 is deleted', '::1', '2026-02-20 20:38:52', 27),
+(368, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2026-02-20 20:38:52', 27),
+(369, 'Add', 'Invoice', 'The invoice #1 is added', '::1', '2026-02-20 20:43:11', 27);
 
 -- --------------------------------------------------------
 
@@ -30058,6 +30062,26 @@ CREATE TABLE `message` (
   `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `message`
+--
+
+INSERT INTO `message` (`message_id`, `conversation_id`, `sender_id`, `body_original`, `source_lang`, `body_es`, `body_en`, `created_at`, `read_at`) VALUES
+(1, 1, 27, 'Hello', 'en', 'Hello', 'Hello', '2026-02-14 16:54:50', '2026-02-14 17:02:04'),
+(2, 1, 1, 'hello', 'es', 'hello', 'hello', '2026-02-14 17:02:22', '2026-02-14 17:03:59'),
+(3, 1, 1, 'cual es tu nombre', 'es', 'cual es tu nombre', 'cual es tu nombre', '2026-02-14 17:13:53', '2026-02-14 17:15:13'),
+(4, 1, 27, 'Mi nombre es marcel', 'en', 'Mi nombre es marcel', 'Mi nombre es marcel', '2026-02-14 17:14:07', '2026-02-14 17:15:05'),
+(5, 1, 1, 'mucho gusto marcel', 'es', 'mucho gusto marcel', 'mucho gusto marcel', '2026-02-14 17:14:17', '2026-02-14 17:15:13'),
+(6, 1, 1, 'el mio es andres', 'es', 'el mio es andres', 'el mio es andres', '2026-02-14 17:14:23', '2026-02-14 17:15:13'),
+(7, 1, 27, 'mucho gusto andres', 'en', 'mucho gusto andres', 'mucho gusto andres', '2026-02-14 17:17:55', '2026-02-14 17:22:10'),
+(8, 1, 27, 'como te sientes', 'en', 'como te sientes', 'como te sientes', '2026-02-14 17:18:01', '2026-02-14 17:22:10'),
+(9, 1, 1, 'bien y tu', 'es', 'bien y tu', 'bien y tu', '2026-02-14 17:19:20', '2026-02-14 17:21:58'),
+(10, 1, 27, 'bien tambien gracias', 'en', 'bien tambien gracias', 'bien tambien gracias', '2026-02-14 17:22:48', '2026-02-14 17:25:25'),
+(11, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 17:22:59', '2026-02-14 17:25:24'),
+(12, 1, 1, 'donde trabajas', 'es', 'donde trabajas', 'donde trabajas', '2026-02-14 17:25:40', '2026-02-14 17:25:41'),
+(13, 1, 27, 'yo trabajo en las condes', 'en', 'yo trabajo en las condes', 'yo trabajo en las condes', '2026-02-14 17:26:05', '2026-02-14 17:26:05'),
+(14, 1, 1, 'que bueno', 'es', 'que bueno', 'que bueno', '2026-02-14 18:30:18', '2026-02-14 18:30:26');
+
 -- --------------------------------------------------------
 
 --
@@ -30071,6 +30095,13 @@ CREATE TABLE `message_conversation` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL COMMENT 'Última actividad (envío de mensaje)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `message_conversation`
+--
+
+INSERT INTO `message_conversation` (`conversation_id`, `user1_id`, `user2_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 27, '2026-02-14 16:49:10', '2026-02-14 18:30:18');
 
 -- --------------------------------------------------------
 
@@ -30332,7 +30363,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (22, '1148.02', 'BP02020', '', 'WINDY HILL BOULEVARD', 'WINDY HILL BOULEVARD', NULL, 'CITY OF SMYRNA', '159944-01', 529111.75, 0, 'COBB', 0, '', 0, '2024-08-10', '2025-03-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 15:04:04', '2025-04-22 19:12:53', NULL, 17, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (23, '019-45', 'ERS05070', '', 'White Sulphur Road  Realignment Project', 'White Sulphur Road', NULL, 'Hall County Board of Comm', '50446-9754', 731972.72, 0, 'Hall', 0, '', 0, '2024-08-01', '2025-07-02', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 18:11:30', '2025-08-08 13:49:07', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (25, '0013809', 'CMES60005', 'B1CBA2402186-0', 'BRIDGE CONSTRUCTION ON SR 14 COVER CSX RAILROAD', 'BRIDGE CONSTRUCTION ON SR 14 COVER CSX RAILROAD', NULL, 'GDOT', '24030', 445588.50, 1, 'Fulton', 0, '', 0, '2024-08-03', '2027-09-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 19:59:12', '2025-04-22 19:49:26', NULL, 26, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', 'Lakeview Road Bridge', 'Lakeview Road Bridge', 'undefined', 'Gwinnett County Tax Commission', '50445', 268718.25, 0, 'Gwinnett', 0, 'Carlos', 0, '2024-08-13', '2025-03-01', NULL, '', 1, 'undefined', 'undefined', NULL, 8.00, 6, 'month', 1, 10.00, 5.00, 50.00, '2024-10-09 13:21:47', '2026-02-13 18:12:23', '2026-01-23 21:36:11', 5, 13, NULL, 32, NULL, 0, 14, 1, 0.00),
+(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', 'Lakeview Road Bridge', 'Lakeview Road Bridge', 'undefined', 'Gwinnett County Tax Commission', '50445', 181776.25, 0, 'Gwinnett', 0, 'Carlos', 0, '2024-08-13', '2025-03-01', NULL, '', 1, 'undefined', 'undefined', NULL, 8.00, 6, 'month', 1, 10.00, 5.00, 50.00, '2024-10-09 13:21:47', '2026-02-20 03:03:35', '2026-01-23 21:36:11', 5, 13, NULL, 32, NULL, 0, 14, 1, 0.00),
 (29, 'M006298', 'ERS05072', '', 'I-285 RESURFACING', 'I-285 RESURFACING', NULL, 'GDOT', '60385', 80243.62, 1, 'Cobb Fulton', 1, '', 1, '2024-08-19', '2025-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-09 18:14:26', '2025-09-17 12:26:39', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (30, '0015656', 'ERS05073', '', 'Clotfelter Road Bridge', 'Clotfelter Road Bridge', NULL, 'GDOT', '60386', 15462.16, 1, 'Oconee', 0, '', 1, '2023-01-30', '2025-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-10 14:51:15', '2025-09-18 13:33:26', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (31, '0011434', 'SCR16010', 'B3TIA2202312-0', 'Cusseta Road GDOT Project 0011434', 'Cusseta Road Roundabout', NULL, 'GDOT', '2117004', 1814416.50, 1, 'Muscogee', 0, '', 0, '2024-08-12', '2026-03-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-10 15:29:42', '2025-09-25 16:56:08', NULL, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -31062,7 +31093,7 @@ INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
 (115, 22, 12),
 (128, 23, 13),
 (55, 25, 8),
-(624, 28, 14),
+(630, 28, 14),
 (148, 29, 15),
 (149, 30, 16),
 (152, 31, 17),
@@ -31661,8 +31692,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (130, 49.000000, 385.00, 'same', NULL, NULL, 1, NULL, NULL, 25, 52, NULL, 0, NULL),
 (131, 20.000000, 2150.00, 'equation', NULL, NULL, 1, NULL, NULL, 25, 37, 15, 0, NULL),
 (132, 18.000000, 600.00, 'equation', NULL, NULL, 1, NULL, NULL, 25, 38, 16, 0, NULL),
-(147, 48.000000, 87.00, 'equation', 53.000000, NULL, 1, 0, NULL, 28, 77, 22, 0, 1),
-(148, 1500.000000, 58.00, 'equation', NULL, NULL, 1, NULL, NULL, 28, 31, 11, 1, 1),
+(147, 48.000000, 87.00, 'equation', 53.000000, NULL, 1, 0, NULL, 28, 77, 22, 0, 0),
+(148, 1.000000, 58.00, 'equation', 1500.000000, NULL, 1, 0, NULL, 28, 31, 11, 1, 1),
 (151, 16.000000, 386.00, 'same', NULL, NULL, 1, NULL, NULL, 28, 52, NULL, 1, 1),
 (152, 17.000000, 2200.00, 'equation', NULL, NULL, 1, NULL, NULL, 28, 37, 15, 1, 1),
 (153, 2.000000, 800.00, 'equation', NULL, NULL, 1, NULL, NULL, 28, 38, 16, 1, 1),
@@ -34446,7 +34477,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (3078, 12.000000, 12.00, 'equation', NULL, NULL, 1, 0, NULL, 513, 311, 41, 0, NULL),
 (3079, 1.000000, 1.00, 'equation', NULL, NULL, 1, 0, NULL, 2, 420, 23, 0, NULL),
 (3080, 1.000000, 1.00, 'none', NULL, NULL, 0, 0, NULL, 2, 847, NULL, 0, NULL),
-(3081, 5.000000, 124.00, 'equation', 0.000000, NULL, 0, 1, '2025-10-09 18:12:23', 28, 848, 38, 0, 0),
+(3081, 5.000000, 124.00, 'equation', 0.000000, NULL, 0, 1, '2025-10-09 03:03:35', 28, 848, 38, 0, 0),
 (3082, 1.000000, -1800.00, 'none', NULL, NULL, 1, 0, NULL, 513, 602, NULL, 0, NULL),
 (3083, 15.000000, 1.00, 'none', NULL, NULL, 1, 0, NULL, 2, 849, NULL, 0, NULL),
 (3086, 150.000000, 10.00, 'equation', NULL, NULL, 1, 0, NULL, 28, 417, 11, 1, 1),
@@ -34535,7 +34566,8 @@ INSERT INTO `project_item_history` (`id`, `project_item_id`, `action_type`, `old
 (51, 3027, 'update_quantity', '70', '90', '2026-02-08 20:34:49', 27),
 (52, 3027, 'update_quantity', '90', '100', '2026-02-08 20:37:39', 27),
 (53, 3081, 'update_quantity', '0', '5', '2026-02-11 02:32:22', 27),
-(54, 147, 'update_quantity', '53', '48', '2026-02-11 02:41:17', 27);
+(54, 147, 'update_quantity', '53', '48', '2026-02-11 02:41:17', 27),
+(55, 148, 'update_quantity', '1500', '1', '2026-02-20 02:38:12', 27);
 
 -- --------------------------------------------------------
 
@@ -36438,7 +36470,9 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2041, 'Change Quantity Item: 18\" C&G $5 LOT, Previous Quantity: 90, New Quantity: 100', '2026-02-08', 513),
 (2042, 'Change Quantity Item: SIDEWALK ON BRIDGE 10 IN W/REINF, Previous Quantity: 0, New Quantity: 5', '2026-02-11', 28),
 (2043, 'Change Quantity Item: CONC DRIVEWAY, 6 IN, Previous Quantity: 53, New Quantity: 48', '2026-02-11', 28),
-(2044, 'Change contract amount, old value: 268533.25', '2026-02-12', 28);
+(2044, 'Change contract amount, old value: 268533.25', '2026-02-12', 28),
+(2045, 'Change Quantity Item: CONC SIDEWALK, 4 IN, Previous Quantity: 1500, New Quantity: 1', '2026-02-20', 28),
+(2046, 'Change contract amount, old value: 268718.25', '2026-02-20', 28);
 
 -- --------------------------------------------------------
 
@@ -41089,8 +41123,7 @@ INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`,
 (400, 'invoice', 360, 'pendiente', 0, '2026-01-25 21:14:10'),
 (401, 'invoice', 361, 'pendiente', 0, '2026-01-25 21:14:32'),
 (402, 'invoice', 362, 'pendiente', 0, '2026-02-06 02:10:27'),
-(404, 'invoice', 364, 'pendiente', 0, '2026-02-11 01:33:38'),
-(408, 'invoice', 368, 'pendiente', 0, '2026-02-12 03:11:59');
+(411, 'invoice', 371, 'pendiente', 0, '2026-02-20 20:43:11');
 
 -- --------------------------------------------------------
 
@@ -41142,6 +41175,7 @@ CREATE TABLE `user` (
   `estimator` tinyint(1) DEFAULT NULL,
   `bond` tinyint(1) DEFAULT NULL,
   `retainage` tinyint(1) DEFAULT NULL,
+  `chat` tinyint(1) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -41157,28 +41191,28 @@ CREATE TABLE `user` (
 -- Volcado de datos para la tabla `user`
 --
 
-INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
-(1, 'Empleado_Prueba_1', 'Iglesias', '', '', 1, 0, NULL, NULL, '', '2024-04-12 09:24:44', '2025-11-21 21:05:10', NULL, NULL, NULL, NULL, 'es', 3),
-(3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, NULL, NULL, '', '2024-06-25 18:17:59', '2025-10-19 22:43:36', NULL, NULL, NULL, NULL, 'es', 3),
-(4, 'Empleado_Prueba_4', 'Royster', '', '', 1, 0, NULL, NULL, '', '2024-06-25 18:21:43', '2025-10-19 18:46:42', NULL, NULL, NULL, NULL, 'es', 1),
-(6, 'Empleado_Prueba_6', 'Valdez', '', '', 1, 1, NULL, NULL, '', '2024-06-25 18:33:59', '2025-12-10 20:55:50', NULL, NULL, NULL, NULL, 'es', 10),
-(7, 'Empleado_Prueba_7', 'Royster', '', '', 1, 1, NULL, NULL, '', '2024-06-25 18:37:07', '2025-10-19 18:46:54', NULL, NULL, NULL, NULL, 'es', 6),
-(8, 'Empleado_Prueba_8', 'Forges', '', '', 1, NULL, NULL, NULL, '', '2024-06-25 19:02:11', '2025-08-13 13:40:18', NULL, NULL, NULL, NULL, 'es', 3),
-(9, 'Empleado_Prueba_9', 'Lorme', '', '', 0, 0, NULL, NULL, '', '2024-07-10 14:42:14', '2025-12-14 05:06:45', NULL, NULL, NULL, NULL, 'es', 4),
-(10, 'Empleado_Prueba_10', 'Dille', '', '', 1, 0, NULL, NULL, '', '2024-10-03 16:24:41', '2025-10-19 18:47:20', NULL, NULL, NULL, NULL, 'es', 5),
-(11, 'Empleado_Prueba_11', 'Aguirre', '', '', 1, 1, NULL, NULL, '', '2024-11-07 18:23:08', '2025-10-29 13:40:17', NULL, NULL, NULL, NULL, 'es', 10),
-(12, 'Empleado_Prueba_12', 'Avellaneda', '', '', 1, 1, NULL, NULL, '', '2024-11-07 18:26:19', '2025-10-26 22:13:12', NULL, NULL, NULL, NULL, 'es', 10),
-(15, 'Empleado_Prueba_15', 'Luna', '', '', 1, NULL, NULL, NULL, '', '2025-05-12 14:34:41', '2025-07-07 20:20:12', NULL, NULL, NULL, NULL, 'es', 9),
-(17, 'Empleado_Prueba_17', 'Bolton', '', '', 1, NULL, NULL, NULL, '', '2025-06-26 14:45:10', '2025-12-10 14:32:03', NULL, NULL, NULL, NULL, 'es', 4),
-(18, 'Empleado_Prueba_18', 'Hoard', '', '', 1, NULL, NULL, NULL, '', '2025-07-01 15:20:09', '2025-07-07 19:49:51', NULL, NULL, NULL, NULL, 'es', 7),
-(19, 'Empleado_Prueba_19', 'Ortiz', '', '', 1, 0, NULL, NULL, '', '2025-07-01 15:21:42', '2025-11-10 00:27:37', NULL, NULL, NULL, NULL, 'es', 7),
-(20, 'Empleado_Prueba_20', 'Rodriguez', '', '', 1, NULL, NULL, NULL, '', '2025-07-01 15:23:20', '2025-07-07 19:49:33', NULL, NULL, NULL, NULL, 'es', 7),
-(21, 'Empleado_Prueba_21', 'Suarez', '', '', 1, NULL, NULL, NULL, '', '2025-07-01 15:25:38', '2025-07-03 18:19:53', NULL, NULL, NULL, NULL, 'es', 8),
-(22, 'Empleado_Prueba_22', 'Brooken', '', '', 1, 0, NULL, NULL, '', '2025-07-01 16:17:22', '2025-11-06 20:47:28', NULL, NULL, NULL, NULL, 'es', 4),
-(23, 'Empleado_Prueba_23', 'Royster', '', '', 1, NULL, NULL, NULL, '', '2025-08-25 17:37:41', NULL, NULL, NULL, NULL, NULL, 'es', 3),
-(27, 'Employee_27', 'last name', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, NULL, '(786) 720-5678', '2025-10-26 21:13:13', '2026-02-14 15:56:29', '', '', 'Browser', NULL, 'es', 1),
-(28, 'Empleado_Prueba_28', 'Garcia', '', '', 1, 0, NULL, NULL, '', '2025-11-19 14:53:25', NULL, NULL, NULL, NULL, NULL, 'es', 3),
-(29, 'Empleado_Prueba_29', 'Iglesias ', '', '', 1, 0, 0, NULL, '', '2026-01-21 00:27:51', NULL, NULL, NULL, NULL, NULL, 'es', 1);
+INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `chat`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
+(1, 'Empleado_Prueba_1', 'Iglesias', 'aiglesias@gmail.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, NULL, NULL, NULL, '', '2024-04-12 09:24:44', '2025-11-21 21:05:10', '', '', 'Browser', NULL, 'es', 3),
+(3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:17:59', '2025-10-19 22:43:36', NULL, NULL, NULL, NULL, 'es', 3),
+(4, 'Empleado_Prueba_4', 'Royster', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:21:43', '2025-10-19 18:46:42', NULL, NULL, NULL, NULL, 'es', 1),
+(6, 'Empleado_Prueba_6', 'Valdez', '', '', 1, 1, NULL, NULL, NULL, '', '2024-06-25 18:33:59', '2025-12-10 20:55:50', NULL, NULL, NULL, NULL, 'es', 10),
+(7, 'Empleado_Prueba_7', 'Royster', '', '', 1, 1, NULL, NULL, NULL, '', '2024-06-25 18:37:07', '2025-10-19 18:46:54', NULL, NULL, NULL, NULL, 'es', 6),
+(8, 'Empleado_Prueba_8', 'Forges', '', '', 1, NULL, NULL, NULL, NULL, '', '2024-06-25 19:02:11', '2025-08-13 13:40:18', NULL, NULL, NULL, NULL, 'es', 3),
+(9, 'Empleado_Prueba_9', 'Lorme', '', '', 0, 0, NULL, NULL, NULL, '', '2024-07-10 14:42:14', '2025-12-14 05:06:45', NULL, NULL, NULL, NULL, 'es', 4),
+(10, 'Empleado_Prueba_10', 'Dille', '', '', 1, 0, NULL, NULL, NULL, '', '2024-10-03 16:24:41', '2025-10-19 18:47:20', NULL, NULL, NULL, NULL, 'es', 5),
+(11, 'Empleado_Prueba_11', 'Aguirre', '', '', 1, 1, NULL, NULL, NULL, '', '2024-11-07 18:23:08', '2025-10-29 13:40:17', NULL, NULL, NULL, NULL, 'es', 10),
+(12, 'Empleado_Prueba_12', 'Avellaneda', '', '', 1, 1, NULL, NULL, NULL, '', '2024-11-07 18:26:19', '2025-10-26 22:13:12', NULL, NULL, NULL, NULL, 'es', 10),
+(15, 'Empleado_Prueba_15', 'Luna', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-05-12 14:34:41', '2025-07-07 20:20:12', NULL, NULL, NULL, NULL, 'es', 9),
+(17, 'Empleado_Prueba_17', 'Bolton', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-06-26 14:45:10', '2025-12-10 14:32:03', NULL, NULL, NULL, NULL, 'es', 4),
+(18, 'Empleado_Prueba_18', 'Hoard', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-07-01 15:20:09', '2025-07-07 19:49:51', NULL, NULL, NULL, NULL, 'es', 7),
+(19, 'Empleado_Prueba_19', 'Ortiz', '', '', 1, 0, NULL, NULL, NULL, '', '2025-07-01 15:21:42', '2025-11-10 00:27:37', NULL, NULL, NULL, NULL, 'es', 7),
+(20, 'Empleado_Prueba_20', 'Rodriguez', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-07-01 15:23:20', '2025-07-07 19:49:33', NULL, NULL, NULL, NULL, 'es', 7),
+(21, 'Empleado_Prueba_21', 'Suarez', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-07-01 15:25:38', '2025-07-03 18:19:53', NULL, NULL, NULL, NULL, 'es', 8),
+(22, 'Empleado_Prueba_22', 'Brooken', '', '', 1, 0, NULL, NULL, NULL, '', '2025-07-01 16:17:22', '2025-11-06 20:47:28', NULL, NULL, NULL, NULL, 'es', 4),
+(23, 'Empleado_Prueba_23', 'Royster', '', '', 1, NULL, NULL, NULL, NULL, '', '2025-08-25 17:37:41', NULL, NULL, NULL, NULL, NULL, 'es', 3),
+(27, 'Employee_27', 'last name', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, NULL, '(786) 720-5678', '2025-10-26 21:13:13', '2026-02-14 16:54:09', '', '', 'Browser', NULL, 'en', 1),
+(28, 'Empleado_Prueba_28', 'Garcia', '', '', 1, 0, NULL, NULL, NULL, '', '2025-11-19 14:53:25', NULL, NULL, NULL, NULL, NULL, 'es', 3),
+(29, 'Empleado_Prueba_29', 'Iglesias ', '', '', 1, 0, 0, NULL, NULL, '', '2026-01-21 00:27:51', NULL, NULL, NULL, NULL, NULL, 'es', 1);
 
 -- --------------------------------------------------------
 
@@ -41204,7 +41238,9 @@ INSERT INTO `user_access_token` (`id`, `token`, `expires_at`, `user_id`) VALUES
 (6, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzY5OTc1NTQyLCJleHAiOjE3NzA1ODAzNDJ9.9CA-hVITJu3bbz0j9MsblG2PDLo5GYyNFbRQHyGrlIc', 1770580342, 27),
 (7, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzcwMzA4NzQyLCJleHAiOjE3NzA5MTM1NDJ9.ezKrlLRSlmujtLZzY4jww8YjK6bRmovx6ZG84SS6lvk', 1770913542, 27),
 (8, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzcwNTg0OTM0LCJleHAiOjE3NzExODk3MzR9._kOjfAZfHCiXkk2fVefHX-djn91KLolKmGok_-u_H88', 1771189734, 27),
-(9, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc3MTA4NDQ5MiwiZXhwIjoxNzcxNjg5MjkyfQ.AnMWKYweVYMCASYF_tvDohtCrRCb9vWeF0EvksAM_WE', 1771689292, 27);
+(10, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoyNywiZW1haWwiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc3MTA4Nzc3NSwiZXhwIjoxNzcxNjkyNTc1fQ.LDF3vLy6x_daGoSFM8-k9PcfYJlYZ49je1-ByI_e4DY', 1771692575, 27),
+(11, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzEwODgyNjYsImV4cCI6MTc3MTY5MzA2Nn0.-BCNxmG50a19_uzeTy2Wxyl8cuGsIk26jsi8fIwvKIA', 1771693066, 1),
+(12, 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6ImFpZ2xlc2lhc0BnbWFpbC5jb20iLCJpYXQiOjE3NzEwOTM2MzEsImV4cCI6MTc3MTY5ODQzMX0.YoX5h2DhIRorUi8a4dLIi8jKdIrUVtokNgXx_Xk0UaY', 1771698431, 1);
 
 -- --------------------------------------------------------
 
@@ -42415,7 +42451,7 @@ ALTER TABLE `inspector`
 -- AUTO_INCREMENT de la tabla `invoice`
 --
 ALTER TABLE `invoice`
-  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=369;
+  MODIFY `invoice_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=372;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_attachment`
@@ -42427,7 +42463,7 @@ ALTER TABLE `invoice_attachment`
 -- AUTO_INCREMENT de la tabla `invoice_item`
 --
 ALTER TABLE `invoice_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3397;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3440;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_notes`
@@ -42451,7 +42487,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=352;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=370;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -42463,13 +42499,13 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT de la tabla `message`
 --
 ALTER TABLE `message`
-  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `message_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT de la tabla `message_conversation`
 --
 ALTER TABLE `message_conversation`
-  MODIFY `conversation_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `conversation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `notification`
@@ -42523,7 +42559,7 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_county`
 --
 ALTER TABLE `project_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=625;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=631;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -42535,13 +42571,13 @@ ALTER TABLE `project_item`
 -- AUTO_INCREMENT de la tabla `project_item_history`
 --
 ALTER TABLE `project_item_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2045;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2047;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
@@ -42643,7 +42679,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=409;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=412;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -42661,7 +42697,7 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT de la tabla `user_access_token`
 --
 ALTER TABLE `user_access_token`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `user_permission`
