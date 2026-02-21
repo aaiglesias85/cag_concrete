@@ -397,12 +397,16 @@ class InvoiceService extends Base
       }
 
       // 2c. Bond no en invoice: ítems Bond del proyecto que no están como línea en el invoice
-      $projectItemIdsEnInvoice = array_map(function ($ii) { return $ii->getProjectItem()->getId(); }, $items);
+      $projectItemIdsEnInvoice = array_map(function ($ii) {
+         return $ii->getProjectItem()->getId();
+      }, $items);
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $em->getRepository(ProjectItem::class);
       $bondProjectItems = array_filter(
          $projectItemRepo->ListarBondProjectItems($project_id),
-         function ($pi) use ($projectItemIdsEnInvoice) { return !in_array($pi->getId(), $projectItemIdsEnInvoice); }
+         function ($pi) use ($projectItemIdsEnInvoice) {
+            return !in_array($pi->getId(), $projectItemIdsEnInvoice);
+         }
       );
       $bondProjectItems = array_values($bondProjectItems);
 
@@ -453,12 +457,12 @@ class InvoiceService extends Base
 
       $styleLeft = [
          'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-         'font' => ['name' => 'Calibri', 'size' => 11, 'bold' => false],
+         'font' => ['name' => 'Calibri', 'size' => 13, 'bold' => false],
          'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER, 'wrapText' => true]
       ];
       $styleRight = [
          'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => 'FF000000']]],
-         'font' => ['name' => 'Calibri', 'size' => 11, 'bold' => false],
+         'font' => ['name' => 'Calibri', 'size' => 13, 'bold' => false],
          'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT, 'vertical' => Alignment::VERTICAL_CENTER]
       ];
 
