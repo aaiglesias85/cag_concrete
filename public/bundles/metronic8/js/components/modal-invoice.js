@@ -482,7 +482,11 @@ var ModalInvoice = (function () {
                         $('#modal_invoice_current_retainage').val(MyApp.formatearNumero(response.retainage_current, 2, '.', ','));
                         $('#modal_invoice_retainage_calculated').val(MyApp.formatearNumero(response.retainage_accumulated, 2, '.', ','));
                      }
-                     // Bond solo desde backend; no cálculo en frontend
+                     // Bond solo desde backend; disponible considera pagos (consumo real)
+                     if (response.sum_bonded_project != null) sum_bonded_project = Number(response.sum_bonded_project) || 0;
+                     if (response.bond_price != null) bond_price = Number(response.bond_price) || 0;
+                     if (response.bon_general != null) bond_general = Number(response.bon_general) || 0;
+                     bon_quantity_available = (response.bon_quantity_available != null && response.bon_quantity_available !== '') ? Number(response.bon_quantity_available) : 1.0;
                      if (response.bon_quantity != null && response.bon_amount != null) {
                         $('#modal_total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 5, '.', ','));
                         $('#modal_total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));

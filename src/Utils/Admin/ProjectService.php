@@ -1188,11 +1188,15 @@ class ProjectService extends Base
       $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
       $bon_general = $projectItemRepo->TotalBondAmountProjectItems($project_id);
 
-      // Bond disponible para este invoice nuevo: 1 - usado (invoices con start_date <= fecha_inicial)
+      // Bond disponible: consumo acumulado real = Σ bon_quantity (anteriores) − Σ paid_qty Bond (anteriores)
       /** @var \App\Repository\InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(\App\Entity\Invoice::class);
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItem::class);
       $bon_quantity_used_before = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $fecha_inicial);
-      $bon_quantity_available = max(0.0, 1.0 - $bon_quantity_used_before);
+      $bond_paid_qty_before = (float) $invoiceItemRepo->SumBondPaidQtyForInvoicesBeforeOrOnDate($project_id, $fecha_inicial);
+      $consumed_real = $bon_quantity_used_before - $bond_paid_qty_before;
+      $bon_quantity_available = max(0.0, 1.0 - $consumed_real);
 
       // Calcular bon_quantity y bon_amount con la misma lógica que RecalcularBonProyecto (frontend no calcula nada)
       $sum_bonded_invoices = 0.0;

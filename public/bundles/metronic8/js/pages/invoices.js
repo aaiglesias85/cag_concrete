@@ -1554,6 +1554,11 @@ var Invoices = (function () {
                      } else {
                         $('#card-bond').addClass('d-none').hide();
                      }
+                     // Bond: disponible considera pagos (consumo real = Σ bon_quantity − Σ paid_qty Bond)
+                     if (response.sum_bonded_project != null) sum_bonded_project = Number(response.sum_bonded_project) || 0;
+                     if (response.bond_price != null) bond_price = Number(response.bond_price) || 0;
+                     if (response.bon_general != null) bond_general = Number(response.bon_general) || 0;
+                     bon_quantity_available = (response.bon_quantity_available != null && response.bon_quantity_available !== '') ? Number(response.bon_quantity_available) : 1.0;
                      // Contexto para cálculo de retainage en frontend
                      retainageContext = response.retainage_context || null;
                      // Valores listos para pintar (calculados en backend)

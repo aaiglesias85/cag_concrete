@@ -37,16 +37,22 @@ Calcular y **aplicar** Bond Quantity (X) y Bond Amount (Y) por invoice con la **
 - **Bond General** = monto total del ítem Bond en el proyecto (quantity × price de ese ítem).
 - El valor aplicado se guarda en `bon_amount`.
 
-### Regla de tope (Bond Quantity total ≤ 1)
+### Regla de tope (Bond Quantity total ≤ 1) y consideración de pagos
 
-Para cada invoice del proyecto (orden: `start_date`, `invoice_id`):
+El límite máximo es **1.00**. Se usa el **consumo acumulado real**, que considera lo ya pagado:
 
-1. **Revisar** cuánto Bond Quantity ya fue usado (acumulado de invoices anteriores).
-2. **Calcular** disponible = 1 − usado.
+- **Consumo acumulado real** = Σ (bon_quantity de invoices anteriores) − Σ (paid_qty del ítem Bond en invoices anteriores).
+- **Disponible** = 1 − consumo acumulado real.
+- **Bond Quantity aplicado** = min(X, disponible). Si disponible ≤ 0, no se asigna más Bond.
+
+Así, lo ya pagado “libera” espacio bajo el tope para nuevos invoices. Para cada invoice del proyecto (orden: `start_date`, `invoice_id`):
+
+1. **Revisar** consumo real de invoices anteriores (Σ bon_quantity − Σ Bond paid_qty).
+2. **Calcular** disponible = 1 − consumo real.
 3. **Comparar** el Bond Quantity calculado (X) con el disponible.
 4. **Aplicar** solo lo disponible: aplicado = min(X, disponible).
-5. **Actualizar** el acumulado: usado += aplicado.
-6. Si no queda disponible, no aplicar nada (bon_quantity = 0, bon_amount = 0).
+5. **Actualizar** acumulados (bon_quantity aplicado y Bond paid_qty de este invoice).
+6. Si disponible ≤ 0, no aplicar nada (bon_quantity = 0, bon_amount = 0).
 
 ---
 
@@ -75,9 +81,10 @@ Para un **invoice existente** se muestran los valores aplicados que devuelve el 
 
 ### Backend
 
-- **InvoiceService::RecalcularBonProyecto($project_id)**: ordena invoices por `start_date` e `invoice_id`; por cada uno calcula X = SumBondedInvoiceItems(invoice_id) / TotalBondedProjectItems(project_id), disponible = 1 − usado, aplicado = min(X, disponible), bon_amount = Bond General × aplicado; actualiza `bon_quantity` y `bon_amount` y acumula el usado. Se llama desde **CargarDatosInvoice**, **ActualizarInvoice** y **SalvarInvoice**.
+- **InvoiceService::RecalcularBonProyecto($project_id)**: ordena invoices por `start_date` e `invoice_id`; por cada uno calcula X, luego **consumo real** = Σ bon_quantity (anteriores) − Σ Bond paid_qty (anteriores), **disponible** = 1 − consumo real, aplicado = min(X, disponible), bon_amount = Bond General × aplicado; actualiza `bon_quantity` y `bon_amount`. Usa **InvoiceItemRepository::SumBondPaidQtyForInvoice** para considerar pagos.
 - **ListarItemsDeInvoice** / **CargarDatosInvoice**: envían también `sum_bonded_project`, `bond_price`, `bond_general` para el preview en JS y devuelven `bon_quantity` y `bon_amount` (valores aplicados).
-- **ProjectService** (`listarItemsParaInvoice`): devuelve `sum_bonded_project`, `bond_price`, `bon_general` para invoice nuevo.
+- **ProjectService** (`listarItemsParaInvoice`): devuelve `sum_bonded_project`, `bond_price`, `bon_general` y **bon_quantity_available** = 1 − (Σ bon_quantity − Σ Bond paid_qty) para invoices con start_date ≤ fecha del nuevo invoice, usando **InvoiceItemRepository::SumBondPaidQtyForInvoicesBeforeOrOnDate**.
+- **InvoiceItemRepository::SumBondPaidQtyForInvoice(invoice_id)** y **SumBondPaidQtyForInvoicesBeforeOrOnDate(project_id, fecha)**: suman `paid_qty` de ítems Bond para el cálculo del consumo real.
 
 ### Frontend
 

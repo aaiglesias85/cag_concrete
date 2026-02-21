@@ -46,13 +46,14 @@ class InvoiceService extends Base
    }
 
    /**
-    * RecalcularBonProyecto: aplica la regla de tope Bond Quantity ≤ 1 en el proyecto.
+    * RecalcularBonProyecto: aplica la regla de tope Bond Quantity ≤ 1 en el proyecto,
+    * considerando pagos: el consumo acumulado real = Σ bon_quantity (anteriores) − Σ paid_qty Bond (anteriores).
     * Por cada invoice (orden: start_date, invoice_id):
     * - X = Bond Quantity calculado = SumBondedInvoiceItems(invoice) / SumBondedProject(project)
-    * - Disponible = 1 - Bond Quantity Used (acumulado de invoices anteriores)
-    * - Bond Quantity Aplicado = min(X, Disponible)
+    * - Consumo acumulado real = Σ bon_quantity (invoices anteriores) − Σ paid_qty Bond (invoices anteriores)
+    * - Disponible = 1 − consumo acumulado real
+    * - Bond Quantity Aplicado = min(X, Disponible). Si disponible ≤ 0, no se asigna más Bond.
     * - Bond Amount (Y) = Bond General × Bond Quantity Aplicado
-    * - Actualizar acumulado. Si no queda disponible, aplicar 0.
     *
     * @param int|string $project_id
     */
@@ -78,14 +79,21 @@ class InvoiceService extends Base
       $this->sortInvoicesByStartDateAndId($allInvoices);
 
       $MAX_BON_QUANTITY = 1.0;
-      $bonQuantityUsed = 0.0;
+      // Acumulados de invoices ya procesados (para consumo real: bon - paid)
+      $totalBonQuantityPrevious = 0.0;
+      $totalBondPaidQtyPrevious = 0.0;
 
       foreach ($allInvoices as $invoice) {
          /** @var Invoice $invoice */
-         if ($bonQuantityUsed >= $MAX_BON_QUANTITY) {
+         // Consumo acumulado real = Σ bon_quantity anteriores − Σ paid_qty Bond anteriores
+         $consumedReal = $totalBonQuantityPrevious - $totalBondPaidQtyPrevious;
+         $available = $MAX_BON_QUANTITY - $consumedReal;
+         if ($available <= 0.0) {
             $invoice->setBonQuantity(0.0);
             $invoice->setBonAmount(0.0);
             $em->persist($invoice);
+            // Sigue sumando paid_qty de este invoice para el siguiente
+            $totalBondPaidQtyPrevious += (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice->getInvoiceId());
             continue;
          }
 
@@ -102,16 +110,17 @@ class InvoiceService extends Base
             $x = 1.0;
          }
 
-         $available = $MAX_BON_QUANTITY - $bonQuantityUsed;
+         // Nuevo Bond = min(X, disponible). Si supera 1, se limita: aplicado = 1 − consumo acumulado real
          $applied = min($x, $available);
-         $applied = round($applied, 5); // Bond qty con 5 decimales, sin redondear a 2
+         $applied = round($applied, 5); // Bond qty con 5 decimales
          $bonAmount = round($bondGeneral * $applied, 2);
 
          $invoice->setBonQuantity($applied);
          $invoice->setBonAmount($bonAmount);
          $em->persist($invoice);
 
-         $bonQuantityUsed += $applied;
+         $totalBonQuantityPrevious += $applied;
+         $totalBondPaidQtyPrevious += (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice->getInvoiceId());
       }
 
       $em->flush();

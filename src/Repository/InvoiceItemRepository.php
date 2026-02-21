@@ -107,6 +107,63 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * SumBondPaidQtyForInvoice: Suma de paid_qty de los ítems Bond del invoice.
+    * Usado para el consumo acumulado real: Σ bon_quantity − Σ paid_qty (Bond) en invoices anteriores.
+    *
+    * @param int $invoice_id
+    * @return float
+    */
+   public function SumBondPaidQtyForInvoice(int $invoice_id): float
+   {
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.paidQty), 0)')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->leftJoin('p_i.item', 'item')
+         ->leftJoin('i_i.invoice', 'i')
+         ->andWhere('item.bond = :bond')
+         ->andWhere('i.invoiceId = :invoice_id')
+         ->setParameter('bond', true)
+         ->setParameter('invoice_id', $invoice_id);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
+
+   /**
+    * SumBondPaidQtyForInvoicesBeforeOrOnDate: Suma de paid_qty (Bond) de invoices del proyecto
+    * con start_date <= la fecha dada. Para cálculo de disponible: available = 1 - (Σ bon_quantity − Σ bond paid_qty).
+    * La fecha puede venir en formato m/d/Y.
+    *
+    * @param int|string $project_id
+    * @param string $start_date_str fecha en m/d/Y
+    * @return float
+    */
+   public function SumBondPaidQtyForInvoicesBeforeOrOnDate($project_id, string $start_date_str): float
+   {
+      $date = \DateTime::createFromFormat('m/d/Y', trim($start_date_str));
+      if (!$date) {
+         return 0.0;
+      }
+      $dateStr = $date->format('Y-m-d');
+
+      $qb = $this->createQueryBuilder('i_i')
+         ->select('COALESCE(SUM(i_i.paidQty), 0)')
+         ->leftJoin('i_i.invoice', 'i')
+         ->leftJoin('i.project', 'p')
+         ->leftJoin('i_i.projectItem', 'p_i')
+         ->leftJoin('p_i.item', 'item')
+         ->andWhere('item.bond = :bond')
+         ->andWhere('p.projectId = :project_id')
+         ->andWhere('i.startDate <= :date')
+         ->setParameter('bond', true)
+         ->setParameter('project_id', $project_id)
+         ->setParameter('date', $dateStr);
+
+      $result = $qb->getQuery()->getSingleScalarResult();
+      return (float) ($result ?? 0);
+   }
+
+   /**
     * TotalPreviousAmount: Obtiene el total de cantidad de items por precio.
     *
     * @param int $project_item_id El ID del item de proyecto
