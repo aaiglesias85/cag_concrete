@@ -431,6 +431,23 @@ class InvoiceService extends Base
          return !isset($projectItemIdsWithRow[$pi->getId()]);
       }));
 
+      // 2e. Separar otherProjectItems en regulares vs change order (para agrupar los CO en la sección 6)
+      $otherProjectItems_regulares = [];
+      $otherProjectItems_por_co = [];
+      foreach ($otherProjectItems as $pi) {
+         if ($pi->getChangeOrder()) {
+            $date = $pi->getChangeOrderDate();
+            $key = ($date) ? $date->format('Y-m') : 'no-date';
+            if (!isset($otherProjectItems_por_co[$key])) {
+               $otherProjectItems_por_co[$key] = [];
+            }
+            $otherProjectItems_por_co[$key][] = $pi;
+         } else {
+            $otherProjectItems_regulares[] = $pi;
+         }
+      }
+      ksort($otherProjectItems_por_co);
+
       // 3. CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
 
@@ -487,18 +504,29 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila; luego resto de ítems del proyecto sin cantidad; luego change orders)
+      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila; luego resto de ítems del proyecto sin cantidad regulares; luego change orders con invoice_items + project_items)
       $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
-      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0) + count($otherProjectItems);
-      if (!empty($items_change_order)) {
+      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0) + count($otherProjectItems_regulares);
+      // Todas las keys de change order (invoice_items y/o project_items sin cantidad)
+      $all_co_keys = array_keys($items_change_order);
+      foreach (array_keys($otherProjectItems_por_co) as $k) {
+         if (!in_array($k, $all_co_keys, true)) {
+            $all_co_keys[] = $k;
+         }
+      }
+      sort($all_co_keys);
+      if (!empty($all_co_keys)) {
          $esPrimerGrupoCalculo = true;
-         foreach ($items_change_order as $group_key => $group) {
+         foreach ($all_co_keys as $group_key) {
+            $group = $items_change_order[$group_key] ?? [];
             $items_visibles = array_filter($group, function ($v) {
                $q = (float) ($v->getQuantity() ?? 0);
                return $q > 0;
             });
-            $filas_necesarias += count($items_visibles);
-            if ($group_key !== 'no-date' && !empty($items_visibles)) {
+            $project_items_sin_cantidad = $otherProjectItems_por_co[$group_key] ?? [];
+            $filas_necesarias += count($items_visibles) + count($project_items_sin_cantidad);
+            $tiene_filas = !empty($items_visibles) || !empty($project_items_sin_cantidad);
+            if ($group_key !== 'no-date' && $tiene_filas) {
                if ($esPrimerGrupoCalculo) {
                   $filas_necesarias += 2;
                   $esPrimerGrupoCalculo = false;
@@ -686,8 +714,8 @@ class InvoiceService extends Base
          $fila++;
       }
 
-      // 5c. ESCRIBIR RESTO DE ÍTEMS DEL PROYECTO (contratados, sin cantidad en este invoice)
-      foreach ($otherProjectItems as $projectItem) {
+      // 5c. ESCRIBIR RESTO DE ÍTEMS DEL PROYECTO REGULARES (contratados, sin cantidad en este invoice; sin change order)
+      foreach ($otherProjectItems_regulares as $projectItem) {
          $resultOtro = $this->EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, $projectItem);
          $sum_H_contract += $resultOtro['contract_amount'];
          $aplicarFormatoFila($objWorksheet, $fila);
@@ -695,8 +723,16 @@ class InvoiceService extends Base
          $fila++;
       }
 
-      // 6. ESCRIBIR CHANGE ORDERS
-      if (!empty($items_change_order)) {
+      // 6. ESCRIBIR CHANGE ORDERS (invoice_items con qty + project_items sin cantidad, agrupados por change order)
+      $all_co_keys_section6 = array_keys($items_change_order);
+      foreach (array_keys($otherProjectItems_por_co) as $k) {
+         if (!in_array($k, $all_co_keys_section6, true)) {
+            $all_co_keys_section6[] = $k;
+         }
+      }
+      sort($all_co_keys_section6);
+
+      if (!empty($all_co_keys_section6)) {
          $styleHeaderCO = [
             'font' => ['bold' => true, 'size' => 10, 'color' => ['argb' => '000000']],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'E7E7E7']],
@@ -710,21 +746,32 @@ class InvoiceService extends Base
 
          $esPrimerGrupo = true;
 
-         foreach ($items_change_order as $group_key => $group_items) {
+         foreach ($all_co_keys_section6 as $group_key) {
+            $group_items = $items_change_order[$group_key] ?? [];
             $group_items_visibles = array_values(array_filter($group_items, function ($v) {
                $q = (float) ($v->getQuantity() ?? 0);
                return $q > 0;
             }));
-            if (empty($group_items_visibles)) {
+            $project_items_sin_cantidad = $otherProjectItems_por_co[$group_key] ?? [];
+            if (empty($group_items_visibles) && empty($project_items_sin_cantidad)) {
                continue;
             }
+
             $month = '';
             $year = '';
             if ($group_key !== 'no-date') {
-               $d = $group_items_visibles[0]->getProjectItem()->getChangeOrderDate();
-               if ($d) {
-                  $month = $d->format('F');
-                  $year = $d->format('Y');
+               if (!empty($group_items_visibles)) {
+                  $d = $group_items_visibles[0]->getProjectItem()->getChangeOrderDate();
+                  if ($d) {
+                     $month = $d->format('F');
+                     $year = $d->format('Y');
+                  }
+               } elseif (!empty($project_items_sin_cantidad)) {
+                  $d = $project_items_sin_cantidad[0]->getChangeOrderDate();
+                  if ($d) {
+                     $month = $d->format('F');
+                     $year = $d->format('Y');
+                  }
                }
             }
 
@@ -775,6 +822,15 @@ class InvoiceService extends Base
 
                $aplicarFormatoFila($objWorksheet, $fila);
 
+               $item_number++;
+               $fila++;
+            }
+
+            // Project items de este change order sin cantidad en este invoice (solo listados con contract qty/amount)
+            foreach ($project_items_sin_cantidad as $projectItem) {
+               $resultOtro = $this->EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, $projectItem);
+               $sum_H_contract += $resultOtro['contract_amount'];
+               $aplicarFormatoFila($objWorksheet, $fila);
                $item_number++;
                $fila++;
             }
