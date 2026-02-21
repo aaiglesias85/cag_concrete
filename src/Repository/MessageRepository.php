@@ -104,4 +104,28 @@ class MessageRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * Suma de caracteres de body_original de mensajes creados entre fecha inicio y fecha fin (mes en curso: primer día del mes hasta la fecha actual).
+     * Sirve para comprobar el límite free de Google Translate (500k caracteres/mes).
+     *
+     * @param \DateTimeInterface $start Fecha inicial (ej. primer día del mes en curso 00:00:00)
+     * @param \DateTimeInterface $end Fecha final (ej. fecha actual) o null para no acotar por el final
+     * @return int
+     */
+    public function sumBodyOriginalLengthForMonth(\DateTimeInterface $start, ?\DateTimeInterface $end = null): int
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        if ($end !== null) {
+            $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE created_at >= :start AND created_at <= :end';
+            $result = $conn->executeQuery($sql, [
+                'start' => $start->format('Y-m-d H:i:s'),
+                'end'   => $end->format('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE created_at >= :start';
+            $result = $conn->executeQuery($sql, ['start' => $start->format('Y-m-d H:i:s')]);
+        }
+        return (int) $result->fetchOne();
+    }
 }

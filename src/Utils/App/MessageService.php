@@ -11,6 +11,7 @@ use App\Repository\UsuarioRepository;
 use App\Service\PushNotificationService;
 use App\Utils\Base;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Servicio de mensajería interna para la app.
@@ -33,6 +34,10 @@ class MessageService extends Base
    private EntityManagerInterface $em;
    private string $googleTranslateApiKey;
    private PushNotificationService $pushNotificationService;
+   private HttpClientInterface $httpClient;
+
+   private const TRANSLATE_LIMIT_CHARS_PER_MONTH = 500_000;
+   private const GOOGLE_TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
 
    public function __construct(
       \Symfony\Component\DependencyInjection\ContainerInterface $container,
@@ -45,6 +50,7 @@ class MessageService extends Base
       UsuarioRepository $usuarioRepository,
       EntityManagerInterface $em,
       PushNotificationService $pushNotificationService,
+      HttpClientInterface $httpClient,
       string $googleTranslateApiKey = ''
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
@@ -53,6 +59,7 @@ class MessageService extends Base
       $this->usuarioRepository = $usuarioRepository;
       $this->em = $em;
       $this->pushNotificationService = $pushNotificationService;
+      $this->httpClient = $httpClient;
       $this->googleTranslateApiKey = $googleTranslateApiKey;
    }
 
@@ -408,20 +415,36 @@ class MessageService extends Base
    }
 
    /**
-    * Traduce texto entre es y en. Si no hay API configurada, devuelve el mismo texto.
+    * Traduce texto entre es y en. Si no hay API configurada o se superó el límite free (500k caracteres/mes), devuelve el mismo texto.
+    * El uso mensual se calcula con la suma de caracteres de body_original en message del mes en curso (consulta SQL).
     */
    private function traducirTexto(string $text, string $sourceLang, string $targetLang): string
    {
       if ($this->googleTranslateApiKey === '') {
          return $text;
       }
+      $charCount = mb_strlen($text);
+      $now = new \DateTimeImmutable();
+      $startOfMonth = $now->modify('first day of this month')->setTime(0, 0, 0);
+      // Mes en curso: desde el primer día del mes hasta la fecha actual
+      $usedThisMonth = $this->messageRepository->sumBodyOriginalLengthForMonth($startOfMonth, $now);
+      if (($usedThisMonth + $charCount) > self::TRANSLATE_LIMIT_CHARS_PER_MONTH) {
+         $this->logger->info('Translation skipped: monthly character limit reached.');
+         return $text;
+      }
       try {
-         if (!class_exists(\Google\Cloud\Translate\V2\TranslateClient::class)) {
-            return $text;
-         }
-         $translate = new \Google\Cloud\Translate\V2\TranslateClient(['key' => $this->googleTranslateApiKey]);
-         $result = $translate->translate($text, ['source' => $sourceLang, 'target' => $targetLang]);
-         return $result['text'] ?? $text;
+         $response = $this->httpClient->request('POST', self::GOOGLE_TRANSLATE_API_URL, [
+            'query' => ['key' => $this->googleTranslateApiKey],
+            'json'  => [
+               'q'      => $text,
+               'source' => $sourceLang,
+               'target' => $targetLang,
+               'format' => 'text',
+            ],
+         ]);
+         $data = $response->toArray();
+         $translated = $data['data']['translations'][0]['translatedText'] ?? null;
+         return $translated !== null ? $translated : $text;
       } catch (\Throwable $e) {
          $this->logger->warning('Translation skipped: ' . $e->getMessage());
          return $text;
