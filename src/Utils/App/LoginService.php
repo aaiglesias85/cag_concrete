@@ -93,6 +93,7 @@ class LoginService extends Base
                'permisos' => $permisos,
                'token' => $access_token, // Agregar token al usuario para compatibilidad
                'preferred_lang' => $usuario->getPreferredLang(),
+               'chat' => $usuario->getChat(),
             ];
 
             // Codificar usuario en base64 para la app móvil

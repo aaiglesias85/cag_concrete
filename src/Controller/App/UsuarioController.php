@@ -55,6 +55,7 @@ class UsuarioController extends AbstractController
                         new OA\Property(property: 'imagen', type: 'string', nullable: true, example: 'photo123.jpeg', description: 'Profile image filename'),
                         new OA\Property(property: 'rol_id', type: 'integer', nullable: true, example: 2),
                         new OA\Property(property: 'rol', type: 'string', nullable: true, example: 'User'),
+                        new OA\Property(property: 'chat', type: 'boolean', nullable: true, example: true, description: 'Whether the user can use the chat feature'),
                      ]
                   ),
                ]
