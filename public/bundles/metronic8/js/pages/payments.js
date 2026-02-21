@@ -358,13 +358,16 @@ var Payments = (function () {
          marcarPasosValidosWizard();
          switch (activeTab) {
             case 1:
+               $('#tab-payment').tab('show');
                actualizarTableListaPayments();
                break;
-            case 3:
-               btnClickFiltrarNotes();
-               break;
             case 2:
+               $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
+               break;
+            case 3:
+               $('#tab-notes').tab('show');
+               btnClickFiltrarNotes();
                break;
          }
       });

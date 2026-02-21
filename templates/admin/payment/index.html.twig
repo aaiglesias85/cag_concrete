@@ -633,66 +633,57 @@
                <div class="tab-content">
                   <div class="tab-pane fade show active" id="tab-content-payment" role="tabpanel">
                      <div class="row" id="lista-payments">
-                      
-<div class="row" id="lista-payments">
-    
-    <div class="d-flex flex-nowrap align-items-center gap-2 mb-5 overflow-auto pb-2">
-        
-        <div class="card card-shine-effect shine-light min-w-110px flex-grow-1">
-            <span class="text-uppercase d-block">Invoice Total</span>
-            <input type="text" class="fw-bold border-0 w-100" id="total_invoice_amount" readonly value="$0.00" />
-        </div>
-
-        <div class="card card-shine-effect shine-primary min-w-110px flex-grow-1">
-            <span class="text-uppercase d-block">Payment Total</span>
-            <input type="text" class="fw-bold border-0 w-100" id="total_payment_amount" readonly value="$0.00" />
-        </div>
-
-        <div class="card card-shine-effect shine-success min-w-120px flex-grow-1 position-relative">
-            <span class="text-uppercase d-block">Retainage</span>
-            <input type="text" class="fw-bold border-0 w-100" id="total_retainage_amount" readonly value="$0.00" />
-            
-            <button type="button" class="btn btn-icon position-absolute top-50 translate-middle-y" style="right: 4px;" data-bs-toggle="modal" data-bs-target="#modal-retainage-reimbursement" title="Reimburse">
-                <i class="la la-dollar fs-5 text-dark"></i>
-            </button>
-        </div>
-
-        <div id="card-bond" class="d-flex gap-2 align-items-center">
-            <div class="card card-shine-effect shine-warning min-w-110px">
-                <span class="text-uppercase d-block">Bond Amount</span>
-                <input type="text" class="fw-bold border-0 w-100" id="total_bonded_y" readonly value="$0.00" />
-            </div>
-            <div class="card card-shine-effect shine-warning min-w-90px">
-                <span class="text-uppercase d-block">Bond Qty</span>
-                <input type="text" class="fw-bold border-0 w-100" id="total_bonded_x" readonly value="0.00" />
-            </div>
-        </div>
-
-    </div>
-                     
-                         <!--begin::Datatable-->
-                           <table id="payments-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
-                              <thead>
-                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                    <th>Item</th>
-                                    <th>Unit</th>
-                                    <th>Contract QTY</th>
-                                    <th>Unit Price</th>
-                                    <th>Contract Amount</th>
-                                    <th>Invoiced Qty</th>
-                                    <th>Invoiced Amount $</th>
-                                    <th>Paid Qty</th>
-                                    <th>Unpaid Qty</th>
-                                    <th>Paid Amount</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                 </tr>
-                              </thead>
-                              <tbody class="text-gray-600 fw-semibold"></tbody>
-                           </table>
-                           <!--end::Datatable-->
+                        <div class="d-flex flex-nowrap align-items-center gap-2 mb-5 overflow-auto pb-2">
+                           <div class="card card-shine-effect shine-light min-w-110px flex-grow-1">
+                              <span class="text-uppercase d-block">Invoice Total</span>
+                              <input type="text" class="fw-bold border-0 w-100" id="total_invoice_amount" readonly value="$0.00" />
+                           </div>
+                           <div class="card card-shine-effect shine-primary min-w-110px flex-grow-1">
+                              <span class="text-uppercase d-block">Payment Total</span>
+                              <input type="text" class="fw-bold border-0 w-100" id="total_payment_amount" readonly value="$0.00" />
+                           </div>
+                           <div class="card card-shine-effect shine-success min-w-120px flex-grow-1 position-relative">
+                              <span class="text-uppercase d-block">Retainage</span>
+                              <input type="text" class="fw-bold border-0 w-100" id="total_retainage_amount" readonly value="$0.00" />
+                              <button type="button" class="btn btn-icon position-absolute top-50 translate-middle-y" style="right: 4px;" data-bs-toggle="modal" data-bs-target="#modal-retainage-reimbursement" title="Reimburse">
+                                 <i class="la la-dollar fs-5 text-dark"></i>
+                              </button>
+                           </div>
+                           <div id="card-bond" class="d-flex gap-2 align-items-center">
+                              <div class="card card-shine-effect shine-warning min-w-110px">
+                                 <span class="text-uppercase d-block">Bond Amount</span>
+                                 <input type="text" class="fw-bold border-0 w-100" id="total_bonded_y" readonly value="$0.00" />
+                              </div>
+                              <div class="card card-shine-effect shine-warning min-w-90px">
+                                 <span class="text-uppercase d-block">Bond Qty</span>
+                                 <input type="text" class="fw-bold border-0 w-100" id="total_bonded_x" readonly value="0.00" />
+                              </div>
+                           </div>
                         </div>
+
+                        <!--begin::Datatable-->
+                        <table id="payments-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                           <thead>
+                              <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                 <th>Item</th>
+                                 <th>Unit</th>
+                                 <th>Contract QTY</th>
+                                 <th>Unit Price</th>
+                                 <th>Contract Amount</th>
+                                 <th>Invoiced Qty</th>
+                                 <th>Invoiced Amount $</th>
+                                 <th>Paid Qty</th>
+                                 <th>Unpaid Qty</th>
+                                 <th>Paid Amount</th>
+                                 <th>Status</th>
+                                 <th>Actions</th>
+                              </tr>
+                           </thead>
+                           <tbody class="text-gray-600 fw-semibold"></tbody>
+                        </table>
+                        <!--end::Datatable-->
                      </div>
+                  </div>
 
                   <div class="tab-pane fade" id="tab-content-archivo" role="tabpanel">
                      <div class="row" id="lista-archivos">

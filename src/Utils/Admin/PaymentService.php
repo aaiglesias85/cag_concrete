@@ -1051,36 +1051,45 @@ class PaymentService extends Base
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
          $items = $invoiceItemRepo->ListarItems($invoice_id);
 
+         $bon_quantity = $invoice->getBonQuantity() !== null ? (float) $invoice->getBonQuantity() : null;
+         $bon_amount = $invoice->getBonAmount() !== null ? (float) $invoice->getBonAmount() : null;
+
          foreach ($items as $item) {
             /** @var InvoiceItem $item */
-            $quantity = $item->getQuantity();
-            $quantity_brought_forward = $item->getQuantityBroughtForward() ?? 0;
-            $unpaidFromPrevious = $item->getUnpaidFromPrevious();
-            $quantityFromPrevious = $item->getQuantityFromPrevious();
+            $is_bond_item = $item->getProjectItem()->getItem()->getBond();
             $price = $item->getPrice();
             $project_item_id = $item->getProjectItem()->getId();
 
             // Guardar project_item_id para actualizar invoices siguientes
             $updated_project_item_ids[] = $project_item_id;
 
-            // quantity_final = quantity + quantity_brought_forward
-            $quantity_final = $quantity + $quantity_brought_forward;
+            if ($is_bond_item) {
+               // Ítem Bond: cantidad y monto vienen del invoice (bon_quantity, bon_amount)
+               $quantity_final = $bon_quantity !== null ? $bon_quantity : 0.0;
+               $paidQty = $quantity_final;
+               $paidAmount = $bon_amount !== null ? $bon_amount : 0.0;
+               $paidAmountTotal = $paidAmount;
+               $unpaidQty = 0.0;
+            } else {
+               $quantity = $item->getQuantity();
+               $quantity_brought_forward = $item->getQuantityBroughtForward() ?? 0;
+               $unpaidFromPrevious = $item->getUnpaidFromPrevious();
+               $quantityFromPrevious = $item->getQuantityFromPrevious();
 
-            // Calcular cantidad total completada (incluyendo anteriores)
-            $quantityCompleted = ($quantity + $quantityFromPrevious) + $unpaidFromPrevious;
+               // quantity_final = quantity + quantity_brought_forward (mismo criterio que toggle en tabla items)
+               $quantity_final = $quantity + $quantity_brought_forward;
 
-            // Al marcar como pagado completamente, se paga todo quantity_final
-            // Según Regla 2: unpaid_qty = unpaid_from_previous + (quantity_final - paid_qty)
-            // Si paid_qty = quantity_final, entonces unpaid_qty = unpaid_from_previous + (quantity_final - quantity_final) = unpaid_from_previous
-            // Pero como se paga todo, el unpaid_from_previous también se paga, entonces unpaid_qty = 0
+               // Calcular cantidad total completada (incluyendo anteriores)
+               $quantityCompleted = ($quantity + $quantityFromPrevious) + $unpaidFromPrevious;
 
-            // Calcular montos pagados
-            $paidQty = $quantity_final; // Se paga todo quantity_final
-            $paidAmount = $quantity_final * $price;
-            $paidAmountTotal = $quantityCompleted * $price;
-            $unpaidQty = 0; // Como se paga todo, unpaid_qty = 0
+               // Al marcar como pagado: paid_qty = quantity_final, unpaid_qty = 0 (igual que el toggle Status)
+               $paidQty = $quantity_final;
+               $paidAmount = $quantity_final * $price;
+               $paidAmountTotal = $quantityCompleted * $price;
+               $unpaidQty = 0.0;
+            }
 
-            // Actualizar item como pagado
+            // Actualizar item como pagado (mismo proceso que SalvarPayments al usar el toggle)
             $item->setPaidQty($paidQty);
             $item->setPaidAmount($paidAmount);
             $item->setPaidAmountTotal($paidAmountTotal);
