@@ -24,6 +24,7 @@
 
 .idea
 .idea/
+firebase-service-account.json
 
 ###> symfony/asset-mapper ###
 #/public/assets/
