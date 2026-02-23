@@ -440,8 +440,16 @@ class InvoiceService extends Base
             }
          }
       }
+      // Excluir también todos los Bond: Bond solo sale una vez en la sección 5b, no en "otros ítems"
       $otherProjectItems = array_values(array_filter($allProjectItems, function ($pi) use ($projectItemIdsWithRow) {
-         return !isset($projectItemIdsWithRow[$pi->getId()]);
+         if (isset($projectItemIdsWithRow[$pi->getId()])) {
+            return false;
+         }
+         $item = $pi->getItem();
+         if ($item !== null && $item->getBond()) {
+            return false;
+         }
+         return true;
       }));
 
       // 2e. Separar otherProjectItems en regulares vs change order (para agrupar los CO en la sección 6)
