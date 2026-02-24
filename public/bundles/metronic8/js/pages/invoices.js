@@ -59,8 +59,16 @@ var Invoices = (function () {
 
    var rowDelete = null;
 
-   //Inicializar table
+   // Tabla de invoices: se inicializa al cargar pero no se muestra hasta que el usuario aplique un filtro o búsqueda
    var oTable;
+
+   /** Muestra la tabla (oculta el mensaje "Apply a filter") cuando el usuario filtra o busca. */
+   var showTableContent = function () {
+      $('#invoice-list-placeholder').addClass('hide');
+      $('#invoice-table-wrapper').removeClass('hide');
+   };
+
+   //Inicializar table
    var initTable = function () {
       const table = '#invoice-table-editable';
 
@@ -375,6 +383,7 @@ var Invoices = (function () {
 
          debounceTimeout = setTimeout(function () {
             if (searchTerm === '' || searchTerm.length >= 3) {
+               showTableContent();
                oTable.search(searchTerm).draw();
             }
          }, 300); // 300ms de debounce
@@ -489,6 +498,7 @@ var Invoices = (function () {
    var initAccionFiltrar = function () {
       $(document).off('click', '#btn-filtrar');
       $(document).on('click', '#btn-filtrar', function (e) {
+         showTableContent();
          btnClickFiltrar();
       });
 
@@ -505,6 +515,7 @@ var Invoices = (function () {
          var fechaFin = MyApp.getFinMesActual();
          FlatpickrUtil.setDate('datetimepicker-hasta', fechaFin);
 
+         showTableContent();
          btnClickFiltrar();
       });
 
@@ -516,10 +527,12 @@ var Invoices = (function () {
          var fechaFin = MyApp.getFinMesAnterior();
          FlatpickrUtil.setDate('datetimepicker-hasta', fechaFin);
 
+         showTableContent();
          btnClickFiltrar();
       });
    };
    var btnClickFiltrar = function () {
+      if (!oTable) return;
       const search = $('#lista-invoice [data-table-filter="search"]').val();
       oTable.search(search).draw();
    };
@@ -536,7 +549,11 @@ var Invoices = (function () {
       FlatpickrUtil.clear('datetimepicker-desde');
       FlatpickrUtil.clear('datetimepicker-hasta');
 
-      oTable.search('').draw();
+      if (oTable) {
+         oTable.search('').draw();
+      }
+      $('#invoice-table-wrapper').addClass('hide');
+      $('#invoice-list-placeholder').removeClass('hide');
    };
 
    //Reset forms
@@ -2791,7 +2808,7 @@ var Invoices = (function () {
          initAccionCerrar();
 
          initAccionFiltrar();
-         
+
          initAccionExportarPdf();
          initTableItems();
          initAccionesItems();

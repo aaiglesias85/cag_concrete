@@ -377,6 +377,19 @@
             </div>
          </div>
          <div class="card-body">
+            <!-- Mensaje inicial: aplicar filtro para ver invoices -->
+            <div id="invoice-list-placeholder" class="text-center py-15 px-5">
+               <i class="ki-duotone ki-filter-search text-primary fs-3x mb-5">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                  <span class="path3"></span>
+                  <span class="path4"></span>
+               </i>
+               <p class="text-gray-700 fw-semibold fs-4 mb-2">Apply a filter to view invoices</p>
+               <p class="text-gray-500 fs-6 mb-0">Use the <strong>Filter</strong> button to select Company, Project, or date range (From / To), or use <strong>This Month</strong> or <strong>Previous Month</strong> to load the list.</p>
+            </div>
+            <!-- Contenedor de la tabla (oculto hasta que se aplique un filtro) -->
+            <div id="invoice-table-wrapper" class="hide">
             <!--begin::Datatable-->
             <table id="invoice-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                <thead>
@@ -406,6 +419,7 @@
                <tbody class="text-gray-600 fw-semibold"></tbody>
             </table>
             <!--end::Datatable-->
+            </div>
          </div>
       </div>
 
