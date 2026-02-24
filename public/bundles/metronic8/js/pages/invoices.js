@@ -382,9 +382,14 @@ var Invoices = (function () {
          const searchTerm = e.target.value.trim();
 
          debounceTimeout = setTimeout(function () {
-            if (searchTerm === '' || searchTerm.length >= 3) {
+            if (searchTerm.length >= 3) {
                showTableContent();
                oTable.search(searchTerm).draw();
+            } else if (searchTerm === '') {
+               // Al limpiar el search, volver al estado inicial (ocultar tabla, mostrar mensaje)
+               if (oTable) oTable.search('').draw();
+               $('#invoice-table-wrapper').addClass('hide');
+               $('#invoice-list-placeholder').removeClass('hide');
             }
          }, 300); // 300ms de debounce
       });
