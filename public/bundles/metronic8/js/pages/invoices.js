@@ -142,7 +142,7 @@ var Invoices = (function () {
 
          // init acciones
          initAccionChangeNumber();
-         // initAccionEliminar(); // Comentado: ocultar botón eliminar invoice
+         initAccionEliminar();
          initAccionExportar();
          initAccionProject();
       });
@@ -157,10 +157,9 @@ var Invoices = (function () {
    var getColumnsTable = function () {
       const columns = [];
 
-      // Comentado: columna check solo se usaba para eliminar varios
-      // if (permiso.eliminar) {
-      //    columns.push({ data: 'id' });
-      // }
+      if (permiso.eliminar) {
+         columns.push({ data: 'id' });
+      }
 
       columns.push(
          { data: 'number' },
@@ -268,8 +267,8 @@ var Invoices = (function () {
          },
       ];
 
-      // Siempre sin columna check (comentado eliminar; la check solo servía para eliminar varios)
-      if (true) {
+      // Sin columna check cuando no hay permiso eliminar
+      if (!permiso.eliminar) {
          columnDefs = [
             // number
             {
@@ -359,7 +358,7 @@ var Invoices = (function () {
       //var accionesInvoice = ['exportar_excel', 'exportar_pdf'];
       var accionesInvoice = ['exportar_excel'];
       if (permiso.editar) accionesInvoice.push('edit');
-      // if (permiso.eliminar) accionesInvoice.push('delete'); // Comentado: ocultar botón eliminar en tabla
+      if (permiso.eliminar) accionesInvoice.push('delete');
 
       columnDefs.push({
          targets: -1,
@@ -491,12 +490,11 @@ var Invoices = (function () {
    var actualizarRecordsSeleccionados = function () {
       var selectedData = oTable.rows({ selected: true }).data().toArray();
 
-      // Comentado: ocultar botón eliminar varios invoices
-      // if (selectedData.length > 0) {
-      //    $('#btn-eliminar-invoice').removeClass('hide');
-      // } else {
-      //    $('#btn-eliminar-invoice').addClass('hide');
-      // }
+      if (selectedData.length > 0) {
+         $('#btn-eliminar-invoice').removeClass('hide');
+      } else {
+         $('#btn-eliminar-invoice').addClass('hide');
+      }
    };
 
    //Filtrar
@@ -1125,6 +1123,7 @@ var Invoices = (function () {
             item.base_debt = unpaid + qbf;
          });
 
+         // En la tabla solo se muestran ítems con cantidad; al guardar se envían todos
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
          items_lista.forEach((item, index) => {
             item.posicion = index;
@@ -1200,8 +1199,7 @@ var Invoices = (function () {
       });
    };
 
-   //Eliminar - Comentado: ocultar botones eliminar invoice (tabla y eliminar varios)
-   /*
+   // Eliminar invoice (uno o varios)
    var initAccionEliminar = function () {
       $(document).off('click', '#invoice-table-editable a.delete');
       $(document).on('click', '#invoice-table-editable a.delete', function (e) {
@@ -1298,7 +1296,6 @@ var Invoices = (function () {
             });
       }
    };
-   */
 
    // exportar excel
   var initAccionExportarPdf = function () {
@@ -1636,9 +1633,8 @@ var Invoices = (function () {
                         }
                      }
 
-                     // en items_lista solo deben estar los que quantity o unpaid_qty sean mayor a 0
+                     // En la tabla solo se muestran ítems con cantidad; al guardar se envían todos
                      items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
-                     // setear la posicion
                      items_lista.forEach((item, index) => {
                         item.posicion = index;
                      });
@@ -2117,7 +2113,7 @@ var Invoices = (function () {
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, []);
             },
          },
       ];
@@ -2657,15 +2653,14 @@ var Invoices = (function () {
       nEditingRowItem = null;
    };
 
-   // devolver todos los items
+   // Preparar items para enviar al guardar: se envía la lista completa (visibles + sin cantidad)
    var actualizarItems = function () {
-      // en items_sin_cant solo deben estar los que quantity y unpaid_qty 0
-      const items_sin_cant = items.filter((item) => item.quantity == 0 && item.unpaid_qty == 0);
-      // unir items_lista y items_sin_cant en items
-      items = items_lista.concat(items_sin_cant);
-
-      // actualiar posicion en items
-      items.forEach((item, index) => {
+      var merged = items.map(function (item) {
+         var enLista = items_lista.find(function (l) { return Number(l.project_item_id) === Number(item.project_item_id); });
+         return enLista !== undefined ? enLista : item;
+      });
+      items = merged;
+      items.forEach(function (item, index) {
          item.posicion = index;
       });
    };

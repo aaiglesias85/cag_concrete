@@ -378,17 +378,14 @@ class InvoiceService extends Base
       }
       ksort($items_change_order);
 
-      // 2b. Separar Bond del resto. Excel: solo ítems con quantity > 0 en el periodo (los que tienen cantidad en datatracking) + Bond siempre
+      // 2b. Separar Bond del resto. Excel: todos los invoice_item (con qty > 0 o 0) para que columnas de invoices anteriores tengan valor; Bond siempre en 5b
       $items_regulares_sin_bond = [];
       $bondInvoiceItem = null;
       foreach ($items_regulares as $value) {
          if ($value->getProjectItem()->getItem()->getBond()) {
             $bondInvoiceItem = $value;
          } else {
-            $qty = (float) ($value->getQuantity() ?? 0);
-            if ($qty > 0) {
-               $items_regulares_sin_bond[] = $value;
-            }
+            $items_regulares_sin_bond[] = $value;
          }
       }
       // Extraer Bond también de change orders (si está ahí) para ubicarlo siempre en el mismo lugar
@@ -419,55 +416,7 @@ class InvoiceService extends Base
       );
       $bondProjectItems = array_values($bondProjectItems);
 
-      // 2d. Resto de ítems del proyecto (contratados pero sin cantidad en este invoice): se listan después del Bond
-      $allProjectItems = $projectItemRepo->ListarItemsDeProject($project_id);
-      $projectItemIdsWithRow = [];
-      foreach ($items_regulares_sin_bond as $v) {
-         $projectItemIdsWithRow[$v->getProjectItem()->getId()] = true;
-      }
-      if ($bondInvoiceItem !== null) {
-         $projectItemIdsWithRow[$bondInvoiceItem->getProjectItem()->getId()] = true;
-      } elseif ($bondInvoiceItemFromCO !== null) {
-         $projectItemIdsWithRow[$bondInvoiceItemFromCO->getProjectItem()->getId()] = true;
-      } elseif (!empty($bondProjectItems)) {
-         $projectItemIdsWithRow[$bondProjectItems[0]->getId()] = true;
-      }
-      foreach ($items_change_order as $group_items) {
-         foreach ($group_items as $v) {
-            $q = (float) ($v->getQuantity() ?? 0);
-            if ($q > 0) {
-               $projectItemIdsWithRow[$v->getProjectItem()->getId()] = true;
-            }
-         }
-      }
-      // Excluir también todos los Bond: Bond solo sale una vez en la sección 5b, no en "otros ítems"
-      $otherProjectItems = array_values(array_filter($allProjectItems, function ($pi) use ($projectItemIdsWithRow) {
-         if (isset($projectItemIdsWithRow[$pi->getId()])) {
-            return false;
-         }
-         $item = $pi->getItem();
-         if ($item !== null && $item->getBond()) {
-            return false;
-         }
-         return true;
-      }));
-
-      // 2e. Separar otherProjectItems en regulares vs change order (para agrupar los CO en la sección 6)
-      $otherProjectItems_regulares = [];
-      $otherProjectItems_por_co = [];
-      foreach ($otherProjectItems as $pi) {
-         if ($pi->getChangeOrder()) {
-            $date = $pi->getChangeOrderDate();
-            $key = ($date) ? $date->format('Y-m') : 'no-date';
-            if (!isset($otherProjectItems_por_co[$key])) {
-               $otherProjectItems_por_co[$key] = [];
-            }
-            $otherProjectItems_por_co[$key][] = $pi;
-         } else {
-            $otherProjectItems_regulares[] = $pi;
-         }
-      }
-      ksort($otherProjectItems_por_co);
+      // Todos los ítems salen de invoice_item; ya no se usa project_item para ítems adicionales
 
       // 3. CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
@@ -525,28 +474,17 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // CÁLCULO EXACTO DE FILAS (Bond = 1 fila; luego resto de ítems del proyecto sin cantidad regulares; luego change orders con invoice_items + project_items)
+      // CÁLCULO EXACTO DE FILAS (todos los ítems de invoice_item: regulares + Bond + change orders)
       $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
-      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0) + count($otherProjectItems_regulares);
-      // Todas las keys de change order (invoice_items y/o project_items sin cantidad)
+      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0);
       $all_co_keys = array_keys($items_change_order);
-      foreach (array_keys($otherProjectItems_por_co) as $k) {
-         if (!in_array($k, $all_co_keys, true)) {
-            $all_co_keys[] = $k;
-         }
-      }
       sort($all_co_keys);
       if (!empty($all_co_keys)) {
          $esPrimerGrupoCalculo = true;
          foreach ($all_co_keys as $group_key) {
             $group = $items_change_order[$group_key] ?? [];
-            $items_visibles = array_filter($group, function ($v) {
-               $q = (float) ($v->getQuantity() ?? 0);
-               return $q > 0;
-            });
-            $project_items_sin_cantidad = $otherProjectItems_por_co[$group_key] ?? [];
-            $filas_necesarias += count($items_visibles) + count($project_items_sin_cantidad);
-            $tiene_filas = !empty($items_visibles) || !empty($project_items_sin_cantidad);
+            $filas_necesarias += count($group);
+            $tiene_filas = !empty($group);
             if ($group_key !== 'no-date' && $tiene_filas) {
                if ($esPrimerGrupoCalculo) {
                   $filas_necesarias += 2;
@@ -735,22 +673,8 @@ class InvoiceService extends Base
          $fila++;
       }
 
-      // 5c. ESCRIBIR RESTO DE ÍTEMS DEL PROYECTO REGULARES (contratados, sin cantidad en este invoice; sin change order)
-      foreach ($otherProjectItems_regulares as $projectItem) {
-         $resultOtro = $this->EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, $projectItem);
-         $sum_H_contract += $resultOtro['contract_amount'];
-         $aplicarFormatoFila($objWorksheet, $fila);
-         $item_number++;
-         $fila++;
-      }
-
-      // 6. ESCRIBIR CHANGE ORDERS (invoice_items con qty + project_items sin cantidad, agrupados por change order)
+      // 6. ESCRIBIR CHANGE ORDERS (solo invoice_items, agrupados por change order)
       $all_co_keys_section6 = array_keys($items_change_order);
-      foreach (array_keys($otherProjectItems_por_co) as $k) {
-         if (!in_array($k, $all_co_keys_section6, true)) {
-            $all_co_keys_section6[] = $k;
-         }
-      }
       sort($all_co_keys_section6);
 
       if (!empty($all_co_keys_section6)) {
@@ -769,12 +693,7 @@ class InvoiceService extends Base
 
          foreach ($all_co_keys_section6 as $group_key) {
             $group_items = $items_change_order[$group_key] ?? [];
-            $group_items_visibles = array_values(array_filter($group_items, function ($v) {
-               $q = (float) ($v->getQuantity() ?? 0);
-               return $q > 0;
-            }));
-            $project_items_sin_cantidad = $otherProjectItems_por_co[$group_key] ?? [];
-            if (empty($group_items_visibles) && empty($project_items_sin_cantidad)) {
+            if (empty($group_items)) {
                continue;
             }
 
@@ -782,19 +701,10 @@ class InvoiceService extends Base
             if ($group_key !== 'no-date') {
                $month = '';
                $year = '';
-               if (!empty($group_items_visibles)) {
-                  $d = $group_items_visibles[0]->getProjectItem()->getChangeOrderDate();
-                  if ($d) {
-                     $month = $d->format('F');
-                     $year = $d->format('Y');
-                  }
-               }
-               if (!$month && !empty($project_items_sin_cantidad)) {
-                  $d = $project_items_sin_cantidad[0]->getChangeOrderDate();
-                  if ($d) {
-                     $month = $d->format('F');
-                     $year = $d->format('Y');
-                  }
+               $d = $group_items[0]->getProjectItem()->getChangeOrderDate();
+               if ($d) {
+                  $month = $d->format('F');
+                  $year = $d->format('Y');
                }
                if (!$month && preg_match('/^(\d{4})-(\d{2})$/', $group_key, $m)) {
                   $dt = \DateTime::createFromFormat('Y-m', $group_key);
@@ -824,7 +734,7 @@ class InvoiceService extends Base
             $objWorksheet->getRowDimension($fila)->setRowHeight(22);
             $fila++;
 
-            foreach ($group_items_visibles as $value) {
+            foreach ($group_items as $value) {
                $em->refresh($value);
                if (isset($mapa_datos_web[$value->getId()])) {
                   $d = $mapa_datos_web[$value->getId()];
@@ -855,15 +765,6 @@ class InvoiceService extends Base
 
                $aplicarFormatoFila($objWorksheet, $fila);
 
-               $item_number++;
-               $fila++;
-            }
-
-            // Project items de este change order sin cantidad en este invoice (solo listados con contract qty/amount)
-            foreach ($project_items_sin_cantidad as $projectItem) {
-               $resultOtro = $this->EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, $projectItem);
-               $sum_H_contract += $resultOtro['contract_amount'];
-               $aplicarFormatoFila($objWorksheet, $fila);
                $item_number++;
                $fila++;
             }
@@ -2420,13 +2321,21 @@ class InvoiceService extends Base
          $invoiceIndexById[(int) $invoice->getInvoiceId()] = (int) $idx;
       }
 
-      // Para cada item modificado, recalcular desde el invoice afectado hacia adelante
+      // Para cada item modificado, recalcular unpaid_qty desde el primer invoice
       foreach ($items as $itemData) {
-         // --- CAMBIO 3: CÁLCULO SIMPLIFICADO PARA GUARDAR ---
+         $project_item_id = $itemData->project_item_id ?? null;
+         if ($project_item_id === null || $project_item_id === '') {
+            continue;
+         }
+         $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+         $invoiceItemMap = [];
+         foreach ($allInvoiceItems as $ii) {
+            $invoiceItemMap[(int) $ii->getInvoice()->getInvoiceId()] = $ii;
+         }
+
          $historialQty = 0.0;
          $historialPaid = 0.0;
 
-         // Recorremos SIEMPRE desde el principio (0)
          for ($i = 0; $i < count($allInvoices); $i++) {
             $invId = (int)$allInvoices[$i]->getInvoiceId();
             $invItem = $invoiceItemMap[$invId] ?? null;
@@ -2471,7 +2380,7 @@ class InvoiceService extends Base
     *
     * - Cantidad (Qty This Period): suma de quantity en Data T para ese project_item en [start_date, end_date].
     * - Precio: promedio ponderado por cantidad en ese periodo; si no hay datos, se mantiene el actual.
-    * - Si la cantidad queda en 0 se elimina la línea solo en ese invoice.
+    * - Si la cantidad queda en 0 se deja la línea con quantity=0 (no se elimina, para conservar datos de invoices anteriores).
     *
     * @param int $project_id
     * @param \DateTimeInterface $date Fecha del datatracking afectado
@@ -2517,10 +2426,8 @@ class InvoiceService extends Base
 
             $newQuantity = (float) $dataTrackingItemRepo->TotalQuantity('', (string) $project_item_id, $startDate, $endDate);
 
-            if ($newQuantity <= 0.0) {
-               $em->remove($invoiceItem);
-            } else {
-               $invoiceItem->setQuantity($newQuantity);
+            $invoiceItem->setQuantity(max(0.0, $newQuantity));
+            if ($newQuantity > 0.0) {
                $effectivePrice = $dataTrackingItemRepo->EffectivePriceForPeriod((string) $project_item_id, $startDate, $endDate);
                if ($effectivePrice !== null) {
                   $invoiceItem->setPrice($effectivePrice);

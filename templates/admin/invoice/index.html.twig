@@ -319,13 +319,13 @@
                   </button>
                   {% endif %}
 
-                  <!-- delete - Comentado: ocultar botón eliminar varios invoices -->
-                  {# {% if permiso.eliminar %}
+                  <!-- delete -->
+                  {% if permiso.eliminar %}
                   <button type="button" id="btn-eliminar-invoice" class="btn btn-danger me-2 hide">
                      <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                      <span class="kt-hidden-mobile font-weight-bold">Delete</span>
                   </button>
-                  {% endif %} #}
+                  {% endif %}
 
                   <!-- export -->
                   <div>
@@ -394,7 +394,6 @@
             <table id="invoice-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                <thead>
                   <tr class="fw-bold fs-6 text-gray-800 px-7">
-                     {# Comentado: columna check solo se usaba para eliminar varios
                      {% if permiso.eliminar %}
                      <th class="w-10px pe-2">
                         <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
@@ -402,7 +401,6 @@
                         </div>
                      </th>
                      {% endif %}
-                     #}
                      <th>Number</th>
                      <th>Company</th>
                      <th>C&G Proyect Number</th>
