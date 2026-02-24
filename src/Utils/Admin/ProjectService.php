@@ -1936,20 +1936,12 @@ class ProjectService extends Base
          $em->remove($concrete_class);
       }
 
-      // items
+      // items (eliminar antes historial y datos relacionados por FK project_item_history, etc.)
       /** @var ProjectItemRepository $projectItemRepo */
       $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $items = $projectItemRepo->ListarItemsDeProject($project_id);
       foreach ($items as $item) {
-
-         // subcontractors
-         /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
-         $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
-         $data_tracking_subcontractors = $dataTrackingSubcontractRepo->ListarSubcontractsDeItemProject($item->getId());
-         foreach ($data_tracking_subcontractors as $subcontractor) {
-            $em->remove($subcontractor);
-         }
-
+         $this->EliminarInformacionDeProjectItem($item->getId());
          $em->remove($item);
       }
 
