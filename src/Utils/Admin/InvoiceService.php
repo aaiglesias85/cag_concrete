@@ -624,6 +624,16 @@ class InvoiceService extends Base
             $prev_bon_qty = (float) ($prevInvoiceBond->getBonQuantity() ?? 0);
             $prev_bon_amt = (float) ($prevInvoiceBond->getBonAmount() ?? 0);
          }
+         // I y J Bond = total to date (suma de bon_quantity y bon_amount de invoices anteriores + actual)
+         $total_bond_qty_to_date = 0.0;
+         $total_bond_amt_to_date = 0.0;
+         foreach ($allInvoicesHistory as $inv) {
+            $total_bond_qty_to_date += (float) ($inv->getBonQuantity() ?? 0);
+            $total_bond_amt_to_date += (float) ($inv->getBonAmount() ?? 0);
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
+               break;
+            }
+         }
          $bondItem = $bondInvoiceItem ?? $bondInvoiceItemFromCO;
          if ($bondItem !== null) {
             $em->refresh($bondItem);
@@ -637,12 +647,12 @@ class InvoiceService extends Base
             $contract_qty_bond = (float) $bondItem->getProjectItem()->getQuantity();
             $contract_amt_bond = $contract_qty_bond * $price;
             $sum_H_contract      += $contract_amt_bond;
-            $sum_J_completed     += $contract_amt_bond;
+            $sum_J_completed     += $total_bond_amt_to_date;
             $sum_L_previous_bill += $prev_bon_amt;
             $sum_P_this_period   += $bon_amt;
             $sum_S_billed        += $bon_amt;
-            $objWorksheet->setCellValue('I' . $fila, $contract_qty_bond);
-            $objWorksheet->setCellValue('J' . $fila, $contract_amt_bond);
+            $objWorksheet->setCellValue('I' . $fila, $total_bond_qty_to_date);
+            $objWorksheet->setCellValue('J' . $fila, $total_bond_amt_to_date);
             $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
             $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
             $objWorksheet->setCellValue('M' . $fila, 0);
@@ -655,10 +665,12 @@ class InvoiceService extends Base
             $projectItem = $bondProjectItems[0];
             $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
             $sum_H_contract += $bondResult['contract_amount'];
-            $sum_J_completed += $bondResult['contract_amount'];
+            $sum_J_completed += $total_bond_amt_to_date;
             $sum_L_previous_bill += $prev_bon_amt;
             $sum_P_this_period += $bon_amt;
             $sum_S_billed += $bon_amt;
+            $objWorksheet->setCellValue('I' . $fila, $total_bond_qty_to_date);
+            $objWorksheet->setCellValue('J' . $fila, $total_bond_amt_to_date);
             $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
             $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
             $objWorksheet->setCellValue('M' . $fila, 0);
