@@ -1,6 +1,12 @@
 var Payments = (function () {
    var rowDelete = null;
 
+   /** Muestra la tabla (oculta el mensaje "Apply a filter") cuando el usuario filtra o busca. */
+   var showTableContent = function () {
+      $('#payment-list-placeholder').addClass('hide');
+      $('#payment-table-wrapper').removeClass('hide');
+   };
+
    //Inicializar table
    var oTable;
    var initTable = function () {
@@ -201,8 +207,13 @@ var Payments = (function () {
          clearTimeout(debounceTimeout);
          const searchTerm = e.target.value.trim();
          debounceTimeout = setTimeout(function () {
-            if (searchTerm === '' || searchTerm.length >= 3) {
+            if (searchTerm.length >= 3) {
+               showTableContent();
                oTable.search(searchTerm).draw();
+            } else if (searchTerm === '') {
+               if (oTable) oTable.search('').draw();
+               $('#payment-table-wrapper').addClass('hide');
+               $('#payment-list-placeholder').removeClass('hide');
             }
          }, 300);
       });
@@ -266,6 +277,7 @@ var Payments = (function () {
    var initAccionFiltrar = function () {
       $(document).off('click', '#btn-filtrar');
       $(document).on('click', '#btn-filtrar', function (e) {
+         showTableContent();
          btnClickFiltrar();
       });
       $(document).off('click', '#btn-reset-filtrar');
@@ -276,17 +288,20 @@ var Payments = (function () {
       $(document).on('click', '#btn-filter-paid', function (e) {
          $('#filtro-paid').val(1);
          $('#filtro-paid').trigger('change');
+         showTableContent();
          btnClickFiltrar();
       });
       $(document).off('click', '#btn-filter-unpaid');
       $(document).on('click', '#btn-filter-unpaid', function (e) {
          $('#filtro-paid').val(0);
          $('#filtro-paid').trigger('change');
+         showTableContent();
          btnClickFiltrar();
       });
    };
 
    var btnClickFiltrar = function () {
+      if (!oTable) return;
       const search = $('#lista-payment [data-table-filter="search"]').val();
       oTable.search(search).draw();
    };
@@ -298,7 +313,9 @@ var Payments = (function () {
       MyUtil.limpiarSelect('#filtro-project');
       FlatpickrUtil.clear('datetimepicker-desde');
       FlatpickrUtil.clear('datetimepicker-hasta');
-      oTable.search('').draw();
+      if (oTable) oTable.search('').draw();
+      $('#payment-table-wrapper').addClass('hide');
+      $('#payment-list-placeholder').removeClass('hide');
    };
 
    var resetForms = function () {

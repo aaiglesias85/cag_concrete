@@ -471,6 +471,19 @@
             </div>
          </div>
          <div class="card-body">
+            <!-- Mensaje inicial: aplicar filtro para ver payments -->
+            <div id="payment-list-placeholder" class="text-center py-15 px-5">
+               <i class="ki-duotone ki-filter-search text-primary fs-3x mb-5">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                  <span class="path3"></span>
+                  <span class="path4"></span>
+               </i>
+               <p class="text-gray-700 fw-semibold fs-4 mb-2">Apply a filter to view payments</p>
+               <p class="text-gray-500 fs-6 mb-0">Use the <strong>Filter</strong> button to select Company, Project, Status or date range (From / To), use <strong>Closed</strong> or <strong>Open</strong>, or type in the <strong>Search</strong> field to load the list.</p>
+            </div>
+            <!-- Contenedor de la tabla (oculto hasta que se aplique un filtro) -->
+            <div id="payment-table-wrapper" class="hide">
             <!--begin::Datatable-->
             <table id="payment-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                <thead>
@@ -491,6 +504,7 @@
                <tbody class="text-gray-600 fw-semibold"></tbody>
             </table>
             <!--end::Datatable-->
+            </div>
          </div>
       </div>
 
