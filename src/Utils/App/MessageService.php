@@ -108,11 +108,19 @@ class MessageService extends Base
             }
             $lastMessage = $this->messageRepository->ObtenerUltimoMensaje($conv);
             $unreadCount = $this->messageRepository->ContarNoLeidosEnConversacion($conv, $userId);
+            $lastText = null;
+            if ($lastMessage) {
+               $lastSenderId = $lastMessage->getSender() ? $lastMessage->getSender()->getUsuarioId() : null;
+               $lastIsOwn = $lastSenderId === $userId;
+               $lastText = $lastIsOwn
+                  ? ($lastMessage->getBodyOriginal() ?? $lastMessage->getBodyForLang($lang))
+                  : ($lastMessage->getBodyForLang($lang) ?? $lastMessage->getBodyOriginal());
+            }
             $list[] = [
                'conversation_id' => $conv->getConversationId(),
                'other_user' => $this->formatearUsuarioCorto($other),
                'last_message' => $lastMessage ? [
-                  'text' => $lastMessage->getBodyForLang($lang) ?? $lastMessage->getBodyOriginal(),
+                  'text' => $lastText,
                   'created_at' => $lastMessage->getCreatedAt() ? $lastMessage->getCreatedAt()->format('c') : null,
                ] : null,
                'unread_count' => $unreadCount,
@@ -224,10 +232,17 @@ class MessageService extends Base
          $messages = $this->messageRepository->ListarPorConversacion($conv, $limit, $offset);
          $list = [];
          foreach ($messages as $m) {
+            $senderId = $m->getSender() ? $m->getSender()->getUsuarioId() : null;
+            // Mensajes propios: siempre mostrar body_original (lo que escribió el usuario).
+            // Mensajes del otro: mostrar body en su idioma (traducción si la pidió).
+            $isOwn = $senderId === $userId;
+            $text = $isOwn
+               ? ($m->getBodyOriginal() ?? $m->getBodyForLang($lang))
+               : ($m->getBodyForLang($lang) ?? $m->getBodyOriginal());
             $list[] = [
                'message_id' => $m->getMessageId(),
-               'sender_id' => $m->getSender() ? $m->getSender()->getUsuarioId() : null,
-               'text' => $m->getBodyForLang($lang) ?? $m->getBodyOriginal(),
+               'sender_id' => $senderId,
+               'text' => $text,
                'created_at' => $m->getCreatedAt() ? $m->getCreatedAt()->format('c') : null,
                'read_at' => $m->getReadAt() ? $m->getReadAt()->format('c') : null,
             ];
