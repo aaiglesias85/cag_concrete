@@ -444,10 +444,13 @@ class MessageService extends Base
          if (!$message instanceof Message || $message->getConversation()?->getConversationId() !== $conversationId) {
             return ['success' => false, 'error' => 'Mensaje no encontrado'];
          }
-         // Caché: si el mensaje ya tiene traducción en body_es/body_en, devolverla sin llamar a Google
-         $existing = $message->getBodyForLang($targetLang);
-         if ($existing !== null && $existing !== '') {
-            return ['success' => true, 'translated_text' => $existing];
+         // Caché: solo usar body_es/body_en si el mensaje fue traducido antes (translated_at).
+         // Al enviar se copia el mismo texto a body_es y body_en; eso NO es una traducción real.
+         if ($message->getTranslatedAt() !== null) {
+            $existing = $message->getBodyForLang($targetLang);
+            if ($existing !== null && $existing !== '') {
+               return ['success' => true, 'translated_text' => $existing];
+            }
          }
       }
 
