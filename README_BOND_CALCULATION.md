@@ -144,6 +144,24 @@ Para un **invoice existente** se muestran los valores aplicados que devuelve el 
 
 ---
 
+## Bond en Payments (fórmula distinta a Invoices)
+
+En la pantalla de **Payments** el Bond se calcula de forma diferente, reflejando el progreso real de pagos:
+
+| Concepto | Fórmula |
+|----------|---------|
+| **Paid Amt (Bonded)** | Σ `paid_amount` de ítems con `bonded = 1` en el invoice actual |
+| **Contract Amt (Bonded)** | Σ `contract_amount` de ítems bonded del proyecto (TotalBondedProjectItems) |
+| **Bond Qty** | Paid Amt (Bonded) / Contract Amt (Bonded) |
+| **Bond Amount** | Bond General × Bond Qty |
+
+- Se recalcula **en tiempo real** cuando cambian los pagos (paid_qty, unpaid_qty, toggle status).
+- La fila Bond en Payments: `paid_qty` = Bond Qty, `unpaid_qty` = 1 − Bond Qty, `paid_amount` = Bond Amount.
+- **Backend**: `PaymentService::CargarDatosPayment` calcula y devuelve `contract_amount_bonded`, `bond_general`, `bon_quantity`, `bon_amount`.
+- **Frontend**: `calcularBondPaymentsEnTiempoReal()` en `payments.js` recalcula al cambiar pagos.
+
+---
+
 ## Preguntas frecuentes
 
 **¿Bond General se guarda en la tabla `project`?**  

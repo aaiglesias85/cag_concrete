@@ -653,21 +653,12 @@ var Payments = (function () {
 
          payments = invoice.payments;
 
-         // Bond: mismo criterio que Invoice (valores del backend; mostrar/ocultar card según si hay cantidad)
-         if (invoice.bon_quantity != null && invoice.bon_amount != null) {
-            $('#total_bonded_x').val(MyApp.formatearNumero(invoice.bon_quantity, 5, '.', ','));
-            $('#total_bonded_y').val(MyApp.formatMoney(invoice.bon_amount, 2, '.', ','));
-         } else {
-            $('#total_bonded_x').val('0.00000');
-            $('#total_bonded_y').val(MyApp.formatMoney(0, 2, '.', ','));
-         }
-         var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g, '')) || 0;
-         if (bondQty > 0.0001) {
-            $('#card-bond').removeClass('d-none').show();
-            $('#card-bond .card').removeClass('d-none').show();
-         } else {
-            $('#card-bond').addClass('d-none').hide();
-         }
+         // Bond en Payments: fórmula distinta a Invoice. Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
+         var contractAmtBonded = parseFloat(invoice.contract_amount_bonded || 0);
+         var bondGeneral = parseFloat(invoice.bond_general || 0);
+         $('#card-bond').data('contract_amount_bonded', contractAmtBonded).data('bond_general', bondGeneral);
+
+         calcularBondPaymentsEnTiempoReal();
 
          actualizarTableListaPayments();
          archivos = invoice.archivos;
@@ -1260,6 +1251,7 @@ var Payments = (function () {
                   }
                }
 
+               calcularBondPaymentsEnTiempoReal();
                // 4. Redibujar la tabla para que las celdas se re-rendericen: cerrado = solo texto, abierto = inputs editables
                actualizarTableListaPayments();
             }
@@ -1281,7 +1273,10 @@ var Payments = (function () {
                payments[posicion].paid_qty = paid_qty;
                payments[posicion].paid_amount = paid_amount;
                payments[posicion].paid_amount_total = paid_amount_total;
+               var quantity = parseFloat(payments[posicion].quantity || 0);
+               payments[posicion].unpaid_qty = Math.max(0, quantity - paid_qty);
             }
+            calcularBondPaymentsEnTiempoReal();
             actualizarTableListaPayments();
             resetFormPayment();
             ModalUtil.hide('modal-payment');
@@ -1343,6 +1338,7 @@ var Payments = (function () {
          $row.find('span.paid_amount_text').text(MyApp.formatMoney(paid_amount));
 
          calcularTotalPaymentGlobal();
+         calcularBondPaymentsEnTiempoReal();
       });
 
       $(document).off('change', '#payments-table-editable input.unpaid_qty');
@@ -1378,6 +1374,7 @@ var Payments = (function () {
             payments[posicion].paid_qty = quantity;
             payments[posicion].unpaid_qty = 0;
             payments[posicion].paid_amount = quantity * price;
+            calcularBondPaymentsEnTiempoReal();
             actualizarTableListaPayments();
          }
       });
@@ -2450,6 +2447,60 @@ var Payments = (function () {
       }
       // Actualizamos el input visual del total
       $('#total_payment_amount').val(MyApp.formatMoney(total, 2, '.', ','));
+   };
+
+   /**
+    * Bond en Payments: Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
+    * Bond Amount = Bond General × Bond Qty
+    * Recalcula en tiempo real y actualiza la card amarilla + fila Bond
+    */
+   var calcularBondPaymentsEnTiempoReal = function () {
+      var contractAmtBonded = parseFloat($('#card-bond').data('contract_amount_bonded') || 0);
+      var bondGeneral = parseFloat($('#card-bond').data('bond_general') || 0);
+
+      var paidAmtBonded = 0;
+      if (payments && payments.length > 0) {
+         payments.forEach(function (item) {
+            if (!item.isGroupHeader && (item.bonded == 1 || item.bonded === true)) {
+               paidAmtBonded += parseFloat(item.paid_amount || 0);
+            }
+         });
+      }
+
+      var bondQty = 0;
+      var bondAmount = 0;
+      if (contractAmtBonded > 0) {
+         bondQty = paidAmtBonded / contractAmtBonded;
+         bondQty = Math.round(bondQty * 100000) / 100000;
+         bondAmount = Math.round(bondGeneral * bondQty * 100) / 100;
+      }
+
+      $('#total_bonded_x').val(MyApp.formatearNumero(bondQty, 5, '.', ','));
+      $('#total_bonded_y').val(MyApp.formatMoney(bondAmount, 2, '.', ','));
+
+      if (bondQty > 0.0001 || contractAmtBonded > 0) {
+         $('#card-bond').removeClass('d-none').show();
+         $('#card-bond .card').removeClass('d-none').show();
+      } else {
+         $('#card-bond').addClass('d-none').hide();
+      }
+
+      // Actualizar fila Bond en payments: paid_qty = bondQty, unpaid_qty = 1 - bondQty
+      if (payments && payments.length > 0) {
+         var bondRowUpdated = false;
+         payments.forEach(function (item) {
+            if (!item.isGroupHeader && (item.bond == 1 || item.bond === true)) {
+               item.paid_qty = bondQty;
+               item.unpaid_qty = Math.max(0, 1 - bondQty);
+               item.paid_amount = bondAmount;
+               item.paid_amount_total = bondAmount;
+               bondRowUpdated = true;
+            }
+         });
+         if (bondRowUpdated && oTablePayments) {
+            actualizarTableListaPayments();
+         }
+      }
    };
 
    // Función modificada para NO ocultar tarjetas

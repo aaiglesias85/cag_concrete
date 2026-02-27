@@ -533,19 +533,51 @@ class PaymentService extends Base
          $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
             ? $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId())
             : 0;
+         $bond_general = method_exists($projectItemRepo, 'TotalBondAmountProjectItems')
+            ? $projectItemRepo->TotalBondAmountProjectItems($project->getProjectId())
+            : 0;
          foreach ($payments as &$p) {
             $p['sum_bonded_project'] = $sum_bonded_project;
             $p['bond_price'] = $bond_price;
          }
          unset($p);
+
+         // Bond en Payments: fórmula distinta a Invoice. Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
+         $contract_amount_bonded = $sum_bonded_project;
+         $paid_amount_bonded = 0.0;
+         foreach ($payments as $p) {
+            if (!empty($p['bonded'])) {
+               $paid_amount_bonded += (float) ($p['paid_amount'] ?? 0);
+            }
+         }
+         $bond_qty_payments = 0.0;
+         $bond_amount_payments = 0.0;
+         if ($contract_amount_bonded > 0) {
+            $bond_qty_payments = round($paid_amount_bonded / $contract_amount_bonded, 5);
+            $bond_amount_payments = round($bond_general * $bond_qty_payments, 2);
+         }
+         // Actualizar fila Bond en payments con los valores calculados
+         foreach ($payments as &$p) {
+            if (!empty($p['bond'])) {
+               $p['paid_qty'] = $bond_qty_payments;
+               $p['unpaid_qty'] = max(0.0, 1.0 - $bond_qty_payments);
+               $p['paid_amount'] = $bond_amount_payments;
+               $p['paid_amount_total'] = $bond_amount_payments;
+               break;
+            }
+         }
+         unset($p);
+
          $arreglo_resultado['payments'] = $payments;
 
          $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
          $arreglo_resultado['retainage_reimbursed_amount'] = $entity->getRetainageReimbursedAmount();
 
-         // Bond: mismos valores que el invoice (bon_quantity, bon_amount guardados en BD)
-         $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
-         $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
+         // Bond en Payments: datos para cálculo en tiempo real (contract_amount_bonded, bond_general)
+         $arreglo_resultado['contract_amount_bonded'] = $contract_amount_bonded;
+         $arreglo_resultado['bond_general'] = $bond_general;
+         $arreglo_resultado['bon_quantity'] = $bond_qty_payments;
+         $arreglo_resultado['bon_amount'] = $bond_amount_payments;
 
          // Recalcular el monto visual inicial
          $total_retainage_calc = 0;
