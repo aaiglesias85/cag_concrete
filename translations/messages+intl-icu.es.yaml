@@ -27,6 +27,13 @@ usuario:
     imagen_guardada: La operación se realizó correctamente
     imagen_eliminada: La operación se realizó correctamente
 
+# Glosario de términos técnicos en→es para chat
+glossary:
+  catch_basin: "alcantarilla"
+  manhole: "alcantarilla"
+  drywall: "tablaroca"
+  sidewalk: "banqueta"
+
 offline:
   error:
     no_datos: No hay datos para sincronizar

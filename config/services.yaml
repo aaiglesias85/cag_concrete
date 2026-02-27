@@ -68,6 +68,7 @@ services:
          $googleTranslateApiKey: '%google_translate_api_key%'
          $pushNotificationService: '@App\Service\PushNotificationService'
          $httpClient: '@http_client'
+         $projectDir: '%kernel.project_dir%'
 
    # add more service definitions when explicit configuration is needed
    # please note that last definitions always *replace* previous ones

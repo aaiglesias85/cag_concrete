@@ -11,6 +11,7 @@ use App\Repository\UsuarioRepository;
 use App\Service\PushNotificationService;
 use App\Utils\Base;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -29,8 +30,11 @@ class MessageService extends Base
    private string $googleTranslateApiKey;
    private PushNotificationService $pushNotificationService;
    private HttpClientInterface $httpClient;
+   private string $projectDir;
 
    private const TRANSLATE_LIMIT_CHARS_PER_MONTH = 500_000;
+   private const TRANSLATIONS_EN = 'translations/messages+intl-icu.en.yaml';
+   private const TRANSLATIONS_ES = 'translations/messages+intl-icu.es.yaml';
    private const GOOGLE_TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
 
    public function __construct(
@@ -45,7 +49,8 @@ class MessageService extends Base
       EntityManagerInterface $em,
       PushNotificationService $pushNotificationService,
       HttpClientInterface $httpClient,
-      string $googleTranslateApiKey = ''
+      string $googleTranslateApiKey = '',
+      string $projectDir = ''
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->conversationRepository = $conversationRepository;
@@ -55,6 +60,7 @@ class MessageService extends Base
       $this->pushNotificationService = $pushNotificationService;
       $this->httpClient = $httpClient;
       $this->googleTranslateApiKey = $googleTranslateApiKey;
+      $this->projectDir = $projectDir;
    }
 
    /**
@@ -438,6 +444,20 @@ class MessageService extends Base
          if (!$message instanceof Message || $message->getConversation()?->getConversationId() !== $conversationId) {
             return ['success' => false, 'error' => 'Mensaje no encontrado'];
          }
+         // Caché: si el mensaje ya tiene traducción en body_es/body_en, devolverla sin llamar a Google
+         $existing = $message->getBodyForLang($targetLang);
+         if ($existing !== null && $existing !== '') {
+            return ['success' => true, 'translated_text' => $existing];
+         }
+      }
+
+      // Glosario: términos técnicos inglés→español (evita traducciones incorrectas de Google)
+      $glossaryResult = $this->translateWithGlossary($text, $targetLang);
+      if ($glossaryResult !== null) {
+         if ($message !== null) {
+            $this->persistTranslatedBody($message, $targetLang, $glossaryResult);
+         }
+         return ['success' => true, 'translated_text' => $glossaryResult];
       }
 
       if ($this->googleTranslateApiKey === '') {
@@ -459,8 +479,15 @@ class MessageService extends Base
       }
 
       try {
+         $textToTranslate = $text;
+         $placeholders = [];
+         $glossary = $this->getGlossaryEnEs();
+         if ($targetLang === 'es' && $glossary !== []) {
+            $textToTranslate = $this->replaceGlossaryTermsWithPlaceholders($text, $glossary, $placeholders);
+         }
+
          $payload = [
-            'q'      => $text,
+            'q'      => $textToTranslate,
             'target' => $targetLang,
             'format' => 'text',
          ];
@@ -472,6 +499,9 @@ class MessageService extends Base
          $translated = $data['data']['translations'][0]['translatedText'] ?? null;
          if ($translated === null) {
             $translated = $text;
+         }
+         if ($placeholders !== []) {
+            $translated = $this->replacePlaceholdersWithGlossary($translated, $placeholders);
          }
          if ($message !== null) {
             $this->persistTranslatedBody($message, $targetLang, $translated);
@@ -493,5 +523,91 @@ class MessageService extends Base
       $message->setTranslatedAt(new \DateTimeImmutable());
       $this->em->persist($message);
       $this->em->flush();
+   }
+
+   /**
+    * Traduce usando el glosario de términos técnicos. Si el texto coincide exactamente con una clave,
+    * devuelve la traducción. Si contiene términos del glosario, los reemplaza. Si no hay coincidencias,
+    * devuelve null para que se use Google.
+    *
+    * @return string|null La traducción o null si debe usarse Google
+    */
+   private function translateWithGlossary(string $text, string $targetLang): ?string
+   {
+      if ($targetLang !== 'es') {
+         return null;
+      }
+      $glossary = $this->getGlossaryEnEs();
+      if ($glossary === []) {
+         return null;
+      }
+      $lower = mb_strtolower(trim($text));
+      foreach ($glossary as $en => $es) {
+         if (mb_strtolower(trim($en)) === $lower) {
+            return $es;
+         }
+      }
+      return null;
+   }
+
+   /** @return array<string, string> Términos inglés => español (desde translations/messages+intl-icu.*.yaml) */
+   private function getGlossaryEnEs(): array
+   {
+      $pathEn = $this->projectDir . '/' . self::TRANSLATIONS_EN;
+      $pathEs = $this->projectDir . '/' . self::TRANSLATIONS_ES;
+      if ($this->projectDir === '' || !is_file($pathEn) || !is_file($pathEs)) {
+         return [];
+      }
+      try {
+         $dataEn = Yaml::parseFile($pathEn);
+         $dataEs = Yaml::parseFile($pathEs);
+      } catch (\Throwable) {
+         return [];
+      }
+      $glossaryEn = $dataEn['glossary'] ?? [];
+      $glossaryEs = $dataEs['glossary'] ?? [];
+      if (!is_array($glossaryEn) || !is_array($glossaryEs)) {
+         return [];
+      }
+      $result = [];
+      foreach ($glossaryEn as $key => $enTerm) {
+         if (is_string($enTerm) && isset($glossaryEs[$key]) && is_string($glossaryEs[$key])) {
+            $result[$enTerm] = $glossaryEs[$key];
+         }
+      }
+      return $result;
+   }
+
+   /**
+    * Reemplaza términos del glosario con placeholders para que Google no los traduzca.
+    * Orden: claves más largas primero para evitar "catch" antes de "catch basin".
+    *
+    * @param array<string, string> $glossary
+    * @param array<string, string> $placeholders Se rellena con placeholder => traducción
+    */
+   private function replaceGlossaryTermsWithPlaceholders(string $text, array $glossary, array &$placeholders): string
+   {
+      $placeholders = [];
+      $keys = array_keys($glossary);
+      usort($keys, static fn ($a, $b) => mb_strlen($b) <=> mb_strlen($a));
+
+      $result = $text;
+      $i = 0;
+      foreach ($keys as $en) {
+         $placeholder = '§G' . $i . '§';
+         $placeholders[$placeholder] = $glossary[$en];
+         $result = preg_replace('/\b' . preg_quote($en, '/') . '\b/iu', $placeholder, $result);
+         $i++;
+      }
+      return $result;
+   }
+
+   /** @param array<string, string> $placeholders placeholder => traducción */
+   private function replacePlaceholdersWithGlossary(string $text, array $placeholders): string
+   {
+      foreach ($placeholders as $ph => $translation) {
+         $text = str_replace($ph, $translation, $text);
+      }
+      return $text;
    }
 }

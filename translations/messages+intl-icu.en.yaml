@@ -27,6 +27,13 @@ usuario:
     imagen_guardada: The operation was successful
     imagen_eliminada: The operation was successful
 
+# Glosario de términos técnicos en→es para chat (evita traducciones incorrectas de Google)
+glossary:
+  catch_basin: "catch basin"
+  manhole: "manhole"
+  drywall: "drywall"
+  sidewalk: "sidewalk"
+
 offline:
   error:
     no_datos: No data to synchronize
