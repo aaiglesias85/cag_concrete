@@ -929,6 +929,14 @@ class InvoiceService extends Base
             $objWorksheet->setShowGridlines(false);
             $objWorksheet->getPageSetup()->setHorizontalCentered(true);
 
+            // [FIX] Eliminar filas vacías más allá del contenido para evitar páginas en blanco en el PDF.
+            // El writer Html/PDF usa getHighestDataRow() y NO el print area, por lo que incluye
+            // todas las filas con datos del template; al eliminar las sobrantes el PDF queda en 1 página.
+            $highestRow = $objWorksheet->getHighestDataRow();
+            if ($highestRow > $fila_amount_due) {
+               $objWorksheet->removeRow($fila_amount_due + 1, $highestRow - $fila_amount_due);
+            }
+
             while (ob_get_level()) {
                ob_end_clean();
             }
