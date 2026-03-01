@@ -49,3 +49,17 @@ traducirOnDemandApp:
    requirements:
       lang: es|en
    methods: [POST]
+
+eliminarMensajeApp:
+   path: /{lang}/message/eliminar-mensaje
+   defaults: { _controller: App\Controller\App\MessageController::eliminarMensaje, _format: json }
+   requirements:
+      lang: es|en
+   methods: [POST]
+
+ocultarConversacionApp:
+   path: /{lang}/message/ocultar-conversacion
+   defaults: { _controller: App\Controller\App\MessageController::ocultarConversacion, _format: json }
+   requirements:
+      lang: es|en
+   methods: [POST]

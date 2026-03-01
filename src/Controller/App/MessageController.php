@@ -315,4 +315,89 @@ class MessageController extends AbstractController
       }
       return $this->json($result);
    }
+
+   /**
+    * Eliminar mensaje "para mí" o "para todos". Body JSON: message_id, conversation_id, scope ('for_me'|'for_everyone').
+    */
+   #[OA\Post(
+      path: '/api/{lang}/message/eliminar-mensaje',
+      summary: 'Delete message',
+      description: 'Delete message for me (scope: for_me) or for everyone (scope: for_everyone). For everyone: only sender, within 1 hour. JSON body: message_id, conversation_id, scope.',
+      security: [['Bearer' => []]],
+      parameters: [new OA\Parameter(name: 'lang', in: 'path', required: true, schema: new OA\Schema(type: 'string', enum: ['es', 'en']))],
+      requestBody: new OA\RequestBody(
+         required: true,
+         content: new OA\JsonContent(required: ['message_id', 'conversation_id', 'scope'], properties: [
+            new OA\Property(property: 'message_id', type: 'integer'),
+            new OA\Property(property: 'conversation_id', type: 'integer'),
+            new OA\Property(property: 'scope', type: 'string', enum: ['for_me', 'for_everyone']),
+         ])
+      ),
+      responses: [
+         new OA\Response(response: 200, description: 'OK'),
+         new OA\Response(response: 400, description: 'Bad request'),
+         new OA\Response(response: 401, description: 'Unauthorized'),
+      ]
+   )]
+   public function eliminarMensaje(Request $request, string $lang = 'es'): JsonResponse
+   {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+      $data = json_decode($request->getContent(), true) ?? [];
+      $messageId = (int) ($data['message_id'] ?? 0);
+      $conversationId = (int) ($data['conversation_id'] ?? 0);
+      $scope = (string) ($data['scope'] ?? '');
+      if ($messageId <= 0 || $conversationId <= 0) {
+         return $this->json(['success' => false, 'error' => 'message_id y conversation_id son obligatorios'], 400);
+      }
+      if ($scope !== 'for_me' && $scope !== 'for_everyone') {
+         return $this->json(['success' => false, 'error' => 'scope debe ser for_me o for_everyone'], 400);
+      }
+      $result = $scope === 'for_me'
+         ? $this->messageService->EliminarMensajeParaMi($messageId, $conversationId)
+         : $this->messageService->EliminarMensajeParaTodos($messageId, $conversationId);
+      if (!$result['success']) {
+         $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
+         return $this->json($result, $status);
+      }
+      return $this->json($result);
+   }
+
+   /**
+    * Ocultar conversación (eliminar chat de la lista).
+    */
+   #[OA\Post(
+      path: '/api/{lang}/message/ocultar-conversacion',
+      summary: 'Hide conversation',
+      description: 'Hides the conversation from the user chat list. JSON body: conversation_id.',
+      security: [['Bearer' => []]],
+      parameters: [new OA\Parameter(name: 'lang', in: 'path', required: true, schema: new OA\Schema(type: 'string', enum: ['es', 'en']))],
+      requestBody: new OA\RequestBody(
+         required: true,
+         content: new OA\JsonContent(required: ['conversation_id'], properties: [
+            new OA\Property(property: 'conversation_id', type: 'integer'),
+         ])
+      ),
+      responses: [
+         new OA\Response(response: 200, description: 'OK'),
+         new OA\Response(response: 400, description: 'Bad request'),
+         new OA\Response(response: 401, description: 'Unauthorized'),
+      ]
+   )]
+   public function ocultarConversacion(Request $request, string $lang = 'es'): JsonResponse
+   {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+      $data = json_decode($request->getContent(), true) ?? [];
+      $conversationId = (int) ($data['conversation_id'] ?? 0);
+      if ($conversationId <= 0) {
+         return $this->json(['success' => false, 'error' => 'conversation_id es obligatorio'], 400);
+      }
+      $result = $this->messageService->OcultarConversacion($conversationId);
+      if (!$result['success']) {
+         $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
+         return $this->json($result, $status);
+      }
+      return $this->json($result);
+   }
 }

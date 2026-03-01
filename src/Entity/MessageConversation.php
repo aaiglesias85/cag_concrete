@@ -27,6 +27,10 @@ class MessageConversation
     #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
+    /** Array de user_id que ocultaron el chat de su lista. */
+    #[ORM\Column(name: "hidden_for_user_ids", type: "json", nullable: true)]
+    private ?array $hiddenForUserIds = null;
+
     public function getConversationId(): ?int
     {
         return $this->conversationId;
@@ -79,6 +83,45 @@ class MessageConversation
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    /** @return int[] */
+    public function getHiddenForUserIds(): array
+    {
+        return $this->hiddenForUserIds ?? [];
+    }
+
+    /** @param int[] $ids */
+    public function setHiddenForUserIds(array $ids): self
+    {
+        $this->hiddenForUserIds = $ids ?: null;
+        return $this;
+    }
+
+    public function isHiddenForUser(int $userId): bool
+    {
+        return in_array($userId, $this->getHiddenForUserIds(), true);
+    }
+
+    public function addHiddenForUser(int $userId): self
+    {
+        $ids = $this->getHiddenForUserIds();
+        if (!in_array($userId, $ids, true)) {
+            $ids[] = $userId;
+            $this->setHiddenForUserIds($ids);
+        }
+        return $this;
+    }
+
+    /** Quita al usuario de la lista de ocultos (para que el chat reaparezca en su lista). */
+    public function removeHiddenForUser(int $userId): self
+    {
+        $ids = array_values(array_filter(
+            $this->getHiddenForUserIds(),
+            static fn (int $id): bool => $id !== $userId
+        ));
+        $this->setHiddenForUserIds($ids);
         return $this;
     }
 

@@ -106,6 +106,55 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
+     * Obtener el último mensaje visible para un usuario (excluye los eliminados "para mí").
+     *
+     * @param MessageConversation $conversation
+     * @param int $userId
+     * @return Message|null
+     */
+    public function ObtenerUltimoMensajeVisibleParaUsuario(MessageConversation $conversation, int $userId): ?Message
+    {
+        $messages = $this->createQueryBuilder('m')
+            ->where('m.conversation = :conversation')
+            ->setParameter('conversation', $conversation)
+            ->orderBy('m.createdAt', 'DESC')
+            ->setMaxResults(50)
+            ->getQuery()
+            ->getResult();
+        foreach ($messages as $m) {
+            if (!$m->isDeletedForUser($userId)) {
+                return $m;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Marcar todos los mensajes de una conversación como "eliminados para mí" por un usuario.
+     * Se usa al eliminar el chat: borra el historial para ese usuario.
+     *
+     * @param MessageConversation $conversation
+     * @param int $userId
+     */
+    public function MarcarTodosComoEliminadosParaUsuario(MessageConversation $conversation, int $userId): void
+    {
+        $messages = $this->createQueryBuilder('m')
+            ->where('m.conversation = :conversation')
+            ->setParameter('conversation', $conversation)
+            ->getQuery()
+            ->getResult();
+
+        $em = $this->getEntityManager();
+        foreach ($messages as $message) {
+            if (!$message->isDeletedForUser($userId)) {
+                $message->addDeletedForUser($userId);
+                $em->persist($message);
+            }
+        }
+        $em->flush();
+    }
+
+    /**
      * Suma de caracteres de body_original de mensajes creados entre fecha inicio y fecha fin (mes en curso: primer día del mes hasta la fecha actual).
      * Sirve para comprobar el límite free de Google Translate (500k caracteres/mes).
      *

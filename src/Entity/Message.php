@@ -43,6 +43,14 @@ class Message
     #[ORM\Column(name: "translated_at", type: "datetime", nullable: true)]
     private ?\DateTimeInterface $translatedAt = null;
 
+    /** Mensaje eliminado "para todos": se muestra placeholder. */
+    #[ORM\Column(name: "deleted_for_everyone_at", type: "datetime", nullable: true)]
+    private ?\DateTimeInterface $deletedForEveryoneAt = null;
+
+    /** Array de user_id que eliminaron el mensaje "para mí". */
+    #[ORM\Column(name: "deleted_for_user_ids", type: "json", nullable: true)]
+    private ?array $deletedForUserIds = null;
+
     public function getMessageId(): ?int
     {
         return $this->messageId;
@@ -159,5 +167,44 @@ class Message
     public function getBodyForLang(string $lang): ?string
     {
         return $lang === 'en' ? $this->bodyEn : $this->bodyEs;
+    }
+
+    public function getDeletedForEveryoneAt(): ?\DateTimeInterface
+    {
+        return $this->deletedForEveryoneAt;
+    }
+
+    public function setDeletedForEveryoneAt(?\DateTimeInterface $deletedForEveryoneAt): self
+    {
+        $this->deletedForEveryoneAt = $deletedForEveryoneAt;
+        return $this;
+    }
+
+    /** @return int[] */
+    public function getDeletedForUserIds(): array
+    {
+        return $this->deletedForUserIds ?? [];
+    }
+
+    /** @param int[] $ids */
+    public function setDeletedForUserIds(array $ids): self
+    {
+        $this->deletedForUserIds = $ids ?: null;
+        return $this;
+    }
+
+    public function isDeletedForUser(int $userId): bool
+    {
+        return in_array($userId, $this->getDeletedForUserIds(), true);
+    }
+
+    public function addDeletedForUser(int $userId): self
+    {
+        $ids = $this->getDeletedForUserIds();
+        if (!in_array($userId, $ids, true)) {
+            $ids[] = $userId;
+            $this->setDeletedForUserIds($ids);
+        }
+        return $this;
     }
 }

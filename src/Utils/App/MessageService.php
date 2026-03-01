@@ -33,6 +33,8 @@ class MessageService extends Base
    private string $projectDir;
 
    private const TRANSLATE_LIMIT_CHARS_PER_MONTH = 500_000;
+   /** Segundos para permitir "eliminar para todos" (1 hora, como WhatsApp). */
+   private const DELETE_FOR_EVERYONE_WINDOW_SECONDS = 3600;
    private const TRANSLATIONS_EN = 'translations/messages+intl-icu.en.yaml';
    private const TRANSLATIONS_ES = 'translations/messages+intl-icu.es.yaml';
    private const GOOGLE_TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
@@ -102,19 +104,26 @@ class MessageService extends Base
          $conversations = $this->conversationRepository->ListarConversacionesDeUsuario($usuario);
          $list = [];
          foreach ($conversations as $conv) {
+            if ($conv->isHiddenForUser($userId)) {
+               continue;
+            }
             $other = $conv->getOtherUser($usuario);
             if (!$other) {
                continue;
             }
-            $lastMessage = $this->messageRepository->ObtenerUltimoMensaje($conv);
+            $lastMessage = $this->messageRepository->ObtenerUltimoMensajeVisibleParaUsuario($conv, $userId);
             $unreadCount = $this->messageRepository->ContarNoLeidosEnConversacion($conv, $userId);
             $lastText = null;
             if ($lastMessage) {
                $lastSenderId = $lastMessage->getSender() ? $lastMessage->getSender()->getUsuarioId() : null;
                $lastIsOwn = $lastSenderId === $userId;
-               $lastText = $lastIsOwn
-                  ? ($lastMessage->getBodyOriginal() ?? $lastMessage->getBodyForLang($lang))
-                  : ($lastMessage->getBodyForLang($lang) ?? $lastMessage->getBodyOriginal());
+               if ($lastMessage->getDeletedForEveryoneAt() !== null) {
+                  $lastText = 'message_deleted_placeholder';
+               } else {
+                  $lastText = $lastIsOwn
+                     ? ($lastMessage->getBodyOriginal() ?? $lastMessage->getBodyForLang($lang))
+                     : ($lastMessage->getBodyForLang($lang) ?? $lastMessage->getBodyOriginal());
+               }
             }
             $list[] = [
                'conversation_id' => $conv->getConversationId(),
@@ -179,6 +188,10 @@ class MessageService extends Base
             $conv->setUpdatedAt($now);
             $this->em->persist($conv);
             $this->em->flush();
+         } else {
+            $conv->removeHiddenForUser($userId);
+            $this->em->persist($conv);
+            $this->em->flush();
          }
          return [
             'success' => true,
@@ -232,19 +245,23 @@ class MessageService extends Base
          $messages = $this->messageRepository->ListarPorConversacion($conv, $limit, $offset);
          $list = [];
          foreach ($messages as $m) {
+            if ($m->isDeletedForUser($userId)) {
+               continue;
+            }
             $senderId = $m->getSender() ? $m->getSender()->getUsuarioId() : null;
-            // Mensajes propios: siempre mostrar body_original (lo que escribió el usuario).
-            // Mensajes del otro: mostrar body en su idioma (traducción si la pidió).
             $isOwn = $senderId === $userId;
-            $text = $isOwn
-               ? ($m->getBodyOriginal() ?? $m->getBodyForLang($lang))
-               : ($m->getBodyForLang($lang) ?? $m->getBodyOriginal());
+            $text = $m->getDeletedForEveryoneAt() !== null
+               ? 'message_deleted_placeholder'
+               : ($isOwn
+                  ? ($m->getBodyOriginal() ?? $m->getBodyForLang($lang))
+                  : ($m->getBodyForLang($lang) ?? $m->getBodyOriginal()));
             $list[] = [
                'message_id' => $m->getMessageId(),
                'sender_id' => $senderId,
                'text' => $text,
                'created_at' => $m->getCreatedAt() ? $m->getCreatedAt()->format('c') : null,
                'read_at' => $m->getReadAt() ? $m->getReadAt()->format('c') : null,
+               'deleted_for_everyone' => $m->getDeletedForEveryoneAt() !== null,
             ];
          }
          return [
@@ -409,6 +426,154 @@ class MessageService extends Base
 
       try {
          $this->messageRepository->MarcarComoLeidos($conv, $userId);
+         return ['success' => true];
+      } catch (\Exception $e) {
+         $this->logger->error($e->getMessage());
+         return ['success' => false, 'error' => $e->getMessage()];
+      }
+   }
+
+   /**
+    * Eliminar mensaje "para mí": solo deja de mostrarse al usuario que elimina.
+    *
+    * @param int $messageId
+    * @param int $conversationId
+    * @return array{success: bool, error?: string}
+    */
+   public function EliminarMensajeParaMi(int $messageId, int $conversationId): array
+   {
+      $usuario = $this->getUser();
+      if (!$usuario instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario no autenticado'];
+      }
+      $forbidden = $this->checkPermisoChat($usuario);
+      if ($forbidden !== null) {
+         return $forbidden;
+      }
+      $userId = $usuario->getUsuarioId();
+      if ($userId === null) {
+         return ['success' => false, 'error' => 'Usuario no válido'];
+      }
+
+      $message = $this->messageRepository->find($messageId);
+      if (!$message instanceof Message) {
+         return ['success' => false, 'error' => 'Mensaje no encontrado'];
+      }
+      $conv = $message->getConversation();
+      if (!$conv instanceof MessageConversation || $conv->getConversationId() !== $conversationId) {
+         return ['success' => false, 'error' => 'Mensaje no pertenece a esta conversación'];
+      }
+      if (!$conv->getOtherUser($usuario)) {
+         return ['success' => false, 'error' => 'No pertenece a esta conversación'];
+      }
+
+      try {
+         $message->addDeletedForUser($userId);
+         $this->em->persist($message);
+         $this->em->flush();
+         return ['success' => true];
+      } catch (\Exception $e) {
+         $this->logger->error($e->getMessage());
+         return ['success' => false, 'error' => $e->getMessage()];
+      }
+   }
+
+   /**
+    * Eliminar mensaje "para todos": se muestra placeholder "Este mensaje fue eliminado".
+    * Solo permitido si el usuario es el remitente y el mensaje fue enviado hace menos de 1 hora.
+    *
+    * @param int $messageId
+    * @param int $conversationId
+    * @return array{success: bool, error?: string}
+    */
+   public function EliminarMensajeParaTodos(int $messageId, int $conversationId): array
+   {
+      $usuario = $this->getUser();
+      if (!$usuario instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario no autenticado'];
+      }
+      $forbidden = $this->checkPermisoChat($usuario);
+      if ($forbidden !== null) {
+         return $forbidden;
+      }
+      $userId = $usuario->getUsuarioId();
+      if ($userId === null) {
+         return ['success' => false, 'error' => 'Usuario no válido'];
+      }
+
+      $message = $this->messageRepository->find($messageId);
+      if (!$message instanceof Message) {
+         return ['success' => false, 'error' => 'Mensaje no encontrado'];
+      }
+      $conv = $message->getConversation();
+      if (!$conv instanceof MessageConversation || $conv->getConversationId() !== $conversationId) {
+         return ['success' => false, 'error' => 'Mensaje no pertenece a esta conversación'];
+      }
+      $sender = $message->getSender();
+      if (!$sender || $sender->getUsuarioId() !== $userId) {
+         return ['success' => false, 'error' => 'Solo el remitente puede eliminar el mensaje para todos'];
+      }
+      if ($message->getDeletedForEveryoneAt() !== null) {
+         return ['success' => false, 'error' => 'El mensaje ya fue eliminado'];
+      }
+
+      $createdAt = $message->getCreatedAt();
+      if ($createdAt === null) {
+         return ['success' => false, 'error' => 'Fecha del mensaje no válida'];
+      }
+      $elapsed = (new \DateTime())->getTimestamp() - $createdAt->getTimestamp();
+      if ($elapsed > self::DELETE_FOR_EVERYONE_WINDOW_SECONDS) {
+         return ['success' => false, 'error' => 'delete_for_everyone_expired'];
+      }
+
+      try {
+         $message->setDeletedForEveryoneAt(new \DateTime());
+         $this->em->persist($message);
+         $this->em->flush();
+         return ['success' => true];
+      } catch (\Exception $e) {
+         $this->logger->error($e->getMessage());
+         return ['success' => false, 'error' => $e->getMessage()];
+      }
+   }
+
+   /**
+    * Ocultar conversación y borrar historial para el usuario (eliminar chat, estilo WhatsApp).
+    * La conversación se oculta de la lista y todos los mensajes se marcan como "eliminados para mí".
+    *
+    * @param int $conversationId
+    * @return array{success: bool, error?: string}
+    */
+   public function OcultarConversacion(int $conversationId): array
+   {
+      $usuario = $this->getUser();
+      if (!$usuario instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario no autenticado'];
+      }
+      $forbidden = $this->checkPermisoChat($usuario);
+      if ($forbidden !== null) {
+         return $forbidden;
+      }
+      $userId = $usuario->getUsuarioId();
+      if ($userId === null) {
+         return ['success' => false, 'error' => 'Usuario no válido'];
+      }
+
+      $conv = $this->conversationRepository->find($conversationId);
+      if (!$conv instanceof MessageConversation) {
+         return ['success' => false, 'error' => 'Conversación no encontrada'];
+      }
+      if (!$conv->getOtherUser($usuario)) {
+         return ['success' => false, 'error' => 'No pertenece a esta conversación'];
+      }
+
+      try {
+         $conv->addHiddenForUser($userId);
+         $this->em->persist($conv);
+         $this->em->flush();
+
+         $this->messageRepository->MarcarTodosComoEliminadosParaUsuario($conv, $userId);
+
          return ['success' => true];
       } catch (\Exception $e) {
          $this->logger->error($e->getMessage());

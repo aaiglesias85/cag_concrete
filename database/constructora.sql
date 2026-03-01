@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-02-2026 a las 16:44:43
+-- Tiempo de generación: 01-03-2026 a las 19:53:54
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1256,7 +1256,9 @@ CREATE TABLE `message` (
   `body_en` text COMMENT 'Versión en inglés (original o traducida)',
   `created_at` datetime DEFAULT NULL,
   `translated_at` datetime DEFAULT NULL,
-  `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje'
+  `read_at` datetime DEFAULT NULL COMMENT 'Cuando el destinatario leyó el mensaje',
+  `deleted_for_everyone_at` datetime DEFAULT NULL COMMENT 'Si set: mensaje eliminado para todos (mostrar placeholder)',
+  `deleted_for_user_ids` json DEFAULT NULL COMMENT 'Array de user_id que eliminaron el mensaje para sí mismos'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -1270,7 +1272,8 @@ CREATE TABLE `message_conversation` (
   `user1_id` int(11) NOT NULL COMMENT 'user_id menor del par',
   `user2_id` int(11) NOT NULL COMMENT 'user_id mayor del par',
   `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL COMMENT 'Última actividad (envío de mensaje)'
+  `updated_at` datetime DEFAULT NULL COMMENT 'Última actividad (envío de mensaje)',
+  `hidden_for_user_ids` json DEFAULT NULL COMMENT 'Array de user_id que ocultaron el chat de su lista'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
