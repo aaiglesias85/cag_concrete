@@ -18,6 +18,12 @@ use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Mailer\MailerInterface;
+use Psr\Log\LoggerInterface;
+use Twig\Environment as TwigEnvironment;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -27,6 +33,20 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 
 class InvoiceService extends Base
 {
+   private TwigEnvironment $twig;
+
+   public function __construct(
+      ContainerInterface    $container,
+      MailerInterface       $mailer,
+      ContainerBagInterface $containerBag,
+      Security              $security,
+      LoggerInterface       $logger,
+      TwigEnvironment       $twig
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+      $this->twig = $twig;
+   }
+
    /**
     * Orden determinístico de invoices (fecha inicio, luego ID).
     *
@@ -328,9 +348,12 @@ class InvoiceService extends Base
     */
    public function ExportarExcel($invoice_id, $format = 'excel')
    {
-      // 0. OPTIMIZACIÓN: Aumentar recursos para evitar timeout en local
       set_time_limit(300);
       ini_set('memory_limit', '512M');
+
+      if ($format === 'pdf') {
+         return $this->ExportarPdfDesdeTemplate($invoice_id);
+      }
 
       $em = $this->getDoctrine()->getManager();
       $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
@@ -894,9 +917,9 @@ class InvoiceService extends Base
       $nombre_base = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber();
 
       // ==========================================
-      // GENERACIÓN DEL ARCHIVO
+      // GENERACIÓN DEL ARCHIVO (solo Excel; PDF se genera en ExportarPdfDesdeTemplate)
       // ==========================================
-      if ($format === 'pdf') {
+      if (false) { // PDF ahora usa plantilla Twig (ver early return al inicio)
          $fichero = $nombre_base . ".pdf";
 
          try {
@@ -968,6 +991,459 @@ class InvoiceService extends Base
       unset($objPHPExcel);
 
       return $this->ObtenerURL() . 'uploads/invoice/' . $fichero;
+   }
+
+   /**
+    * ExportarPdfDesdeTemplate: Genera el PDF del invoice usando la plantilla Twig (admin/invoice/pdf.html.twig).
+    * Usa los mismos datos y cálculos que ExportarExcel para mantener consistencia.
+    *
+    * @param int|string $invoice_id
+    * @return string|null URL del archivo generado
+    */
+   public function ExportarPdfDesdeTemplate($invoice_id)
+   {
+      set_time_limit(300);
+      ini_set('memory_limit', '512M');
+
+      $data = $this->PrepararDatosParaPdfTemplate($invoice_id);
+      if ($data === null) {
+         return null;
+      }
+
+      $projectDir = $this->getParameter('kernel.project_dir');
+      $publicDir = $projectDir . DIRECTORY_SEPARATOR . 'public';
+      $logoFullPath = str_replace('\\', '/', $publicDir . '/bundles/metronic8/img/logo.jpg');
+      $data['logo_path'] = file_exists($logoFullPath) ? $logoFullPath : '';
+
+      $fichero = $data['nombre_archivo'] . '.pdf';
+      $path_archivo = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'invoice' . DIRECTORY_SEPARATOR . $fichero;
+      $directorio = dirname($path_archivo);
+      if (!is_dir($directorio)) {
+         mkdir($directorio, 0777, true);
+      }
+
+      $html = $this->twig->render('admin/invoice/pdf.html.twig', $data);
+
+      try {
+         $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'Legal-L',
+            'margin_left' => 4,
+            'margin_right' => 4,
+            'margin_top' => 4,
+            'margin_bottom' => 4,
+            'fontsize' => 8,
+            'shrink_tables_to_fit' => 6,
+         ]);
+         $mpdf->WriteHTML($html);
+         $mpdf->Output($path_archivo, \Mpdf\Output\Destination::FILE);
+         return $this->ObtenerURL() . 'uploads/invoice/' . $fichero;
+      } catch (\Exception $e) {
+         $this->logger->error('PDF Mpdf falló: ' . $e->getMessage());
+         return null;
+      }
+   }
+
+   /**
+    * PrepararDatosParaPdfTemplate: Prepara el array de datos para la plantilla Twig del invoice PDF.
+    * Replica la lógica de ExportarExcel para mantener los mismos valores.
+    *
+    * @param int|string $invoice_id
+    * @return array|null Datos para el template, o null si el invoice no existe
+    */
+   public function PrepararDatosParaPdfTemplate($invoice_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
+      $invoiceRepo = $em->getRepository(Invoice::class);
+
+      $invoice_entity = $invoiceRepo->find($invoice_id);
+      if (!$invoice_entity) {
+         return null;
+      }
+
+      $project_entity = $invoice_entity->getProject();
+      $project_id = $project_entity->getProjectId();
+      $this->RecalcularRetainageYBonPorProyecto($project_id);
+      $invoice_entity = $invoiceRepo->find($invoice_id);
+
+      $datos_web = $this->ListarItemsDeInvoice($invoice_id);
+      $mapa_datos_web = [];
+      foreach ($datos_web as $dato) {
+         $mapa_datos_web[$dato['invoice_item_id']] = [
+            'unpaid_qty' => $dato['unpaid_qty'],
+            'unpaid_from_previous' => $dato['unpaid_from_previous']
+         ];
+      }
+
+      $currentInvoiceId = $invoice_id;
+      $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoicesHistory);
+
+      $items = $invoiceItemRepo->ListarItems($invoice_id);
+      $items_regulares = [];
+      $items_change_order = [];
+      foreach ($items as $value) {
+         $change_order = $value->getProjectItem()->getChangeOrder();
+         if ($change_order) {
+            $date = $value->getProjectItem()->getChangeOrderDate();
+            $key = ($date) ? $date->format('Y-m') : 'no-date';
+            $items_change_order[$key][] = $value;
+         } else {
+            $items_regulares[] = $value;
+         }
+      }
+      ksort($items_change_order);
+
+      $items_regulares_sin_bond = [];
+      $bondInvoiceItem = null;
+      foreach ($items_regulares as $value) {
+         if ($value->getProjectItem()->getItem()->getBond()) {
+            $bondInvoiceItem = $value;
+         } else {
+            $items_regulares_sin_bond[] = $value;
+         }
+      }
+      $bondInvoiceItemFromCO = null;
+      foreach ($items_change_order as $key => $group_items) {
+         $sin_bond = [];
+         foreach ($group_items as $value) {
+            if ($value->getProjectItem()->getItem()->getBond()) {
+               $bondInvoiceItemFromCO = $value;
+            } else {
+               $sin_bond[] = $value;
+            }
+         }
+         $items_change_order[$key] = $sin_bond;
+      }
+
+      $projectItemIdsEnInvoice = array_map(fn($ii) => $ii->getProjectItem()->getId(), $items);
+      $projectItemRepo = $em->getRepository(ProjectItem::class);
+      $bondProjectItems = array_values(array_filter(
+         $projectItemRepo->ListarBondProjectItems($project_id),
+         fn($pi) => !in_array($pi->getId(), $projectItemIdsEnInvoice)
+      ));
+      $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
+
+      $company = $project_entity->getCompany();
+      $insp = $project_entity->getInspector();
+      $projectDir = $this->getParameter('kernel.project_dir');
+      $logoPath = str_replace('\\', '/', $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'bundles' . DIRECTORY_SEPARATOR . 'metronic8' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'logo.jpg');
+
+      $rows = [];
+      $item_number = 1;
+      $sum_H_contract = 0;
+      $sum_J_completed = 0;
+      $sum_L_previous_bill = 0;
+      $sum_N_pending = 0;
+      $sum_P_this_period = 0;
+      $sum_S_billed = 0;
+
+      foreach ($items_regulares_sin_bond as $value) {
+         $em->refresh($value);
+         if (isset($mapa_datos_web[$value->getId()])) {
+            $d = $mapa_datos_web[$value->getId()];
+            $value->setUnpaidQty($d['unpaid_qty']);
+            $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
+         }
+         $rowData = $this->ObtenerFilaItemData($value, $item_number, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+         $prevBill = $rowData['prev_bill'];
+         $qty_this_period = $value->getQuantity();
+         $qty_brought_forward = $value->getQuantityBroughtForward() ?: 0;
+         $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
+         $rowData['billed_qty'] = $final_invoiced_qty;
+         $rowData['billed_amount'] = $final_invoiced_qty * $value->getPrice();
+
+         $sum_H_contract += $rowData['contract_amount'];
+         $sum_J_completed += $rowData['total_amount_btd'];
+         $sum_L_previous_bill += $prevBill[1];
+         $sum_N_pending += $prevBill[3];
+         $sum_P_this_period += $value->getQuantity() * $value->getPrice();
+         $sum_S_billed += $rowData['billed_amount'];
+
+         $rows[] = $rowData;
+         $item_number++;
+      }
+
+      if ($hay_bond) {
+         $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
+         $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
+         $prev_bon_qty = 0.0;
+         $prev_bon_amt = 0.0;
+         $prevInvoiceBond = null;
+         foreach ($allInvoicesHistory as $inv) {
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
+            $prevInvoiceBond = $inv;
+         }
+         if ($prevInvoiceBond !== null) {
+            $prev_bon_qty = (float) ($prevInvoiceBond->getBonQuantity() ?? 0);
+            $prev_bon_amt = (float) ($prevInvoiceBond->getBonAmount() ?? 0);
+         }
+         $total_bond_qty_to_date = 0.0;
+         $total_bond_amt_to_date = 0.0;
+         foreach ($allInvoicesHistory as $inv) {
+            $total_bond_qty_to_date += (float) ($inv->getBonQuantity() ?? 0);
+            $total_bond_amt_to_date += (float) ($inv->getBonAmount() ?? 0);
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
+         }
+
+         $bondItem = $bondInvoiceItem ?? $bondInvoiceItemFromCO;
+         if ($bondItem !== null) {
+            $em->refresh($bondItem);
+            if (isset($mapa_datos_web[$bondItem->getId()])) {
+               $d = $mapa_datos_web[$bondItem->getId()];
+               $bondItem->setUnpaidQty($d['unpaid_qty']);
+               $bondItem->setUnpaidFromPrevious($d['unpaid_from_previous']);
+            }
+            $rowData = $this->ObtenerFilaItemData($bondItem, $item_number, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+         } else {
+            $projectItem = $bondProjectItems[0];
+            $rowData = $this->ObtenerFilaItemBondData($projectItem, $item_number);
+         }
+         $rowData['total_qty_btd'] = $total_bond_qty_to_date;
+         $rowData['total_amount_btd'] = $total_bond_amt_to_date;
+         $rowData['previous_bill_qty'] = $prev_bon_qty;
+         $rowData['previous_bill_amount'] = $prev_bon_amt;
+         $rowData['pending_qty'] = 0;
+         $rowData['pending_balance'] = 0;
+         $rowData['qty_this_period'] = $bon_qty;
+         $rowData['amount_this_period'] = $bon_amt;
+         $rowData['billed_qty'] = $bon_qty;
+         $rowData['billed_amount'] = $bon_amt;
+
+         $sum_H_contract += $rowData['contract_amount'];
+         $sum_J_completed += $total_bond_amt_to_date;
+         $sum_L_previous_bill += $prev_bon_amt;
+         $sum_P_this_period += $bon_amt;
+         $sum_S_billed += $bon_amt;
+
+         $rows[] = $rowData;
+         $item_number++;
+      }
+
+      $all_co_keys = array_keys($items_change_order);
+      sort($all_co_keys);
+      $esPrimerGrupo = true;
+      foreach ($all_co_keys as $group_key) {
+         $group_items = $items_change_order[$group_key] ?? [];
+         if (empty($group_items)) continue;
+
+         $titulo = '';
+         if ($group_key !== 'no-date') {
+            $d = $group_items[0]->getProjectItem()->getChangeOrderDate();
+            if ($d) {
+               $titulo = strtoupper('CHANGE ORDER IN ' . $d->format('F') . ' ' . $d->format('Y'));
+            } else {
+               $dt = \DateTime::createFromFormat('Y-m', $group_key);
+               if ($dt) {
+                  $titulo = strtoupper('CHANGE ORDER IN ' . $dt->format('F') . ' ' . $dt->format('Y'));
+               }
+            }
+         }
+         if ($titulo === '') $titulo = 'CHANGE ORDER (NO DATE)';
+
+         if ($esPrimerGrupo) {
+            $esPrimerGrupo = false;
+            $rows[] = ['header' => '']; // Separador como en Excel
+         }
+         $rows[] = ['header' => $titulo];
+
+         foreach ($group_items as $value) {
+            $em->refresh($value);
+            if (isset($mapa_datos_web[$value->getId()])) {
+               $d = $mapa_datos_web[$value->getId()];
+               $value->setUnpaidQty($d['unpaid_qty']);
+               $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
+            }
+            $rowData = $this->ObtenerFilaItemData($value, $item_number, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
+            $prevBill = $rowData['prev_bill'];
+            $final_invoiced_qty = $value->getQuantity() + ($value->getQuantityBroughtForward() ?: 0);
+            $rowData['billed_qty'] = $final_invoiced_qty;
+            $rowData['billed_amount'] = $final_invoiced_qty * $value->getPrice();
+
+            $sum_H_contract += $rowData['contract_amount'];
+            $sum_J_completed += $rowData['total_amount_btd'];
+            $sum_L_previous_bill += $prevBill[1];
+            $sum_N_pending += $prevBill[3];
+            $sum_P_this_period += $value->getQuantity() * $value->getPrice();
+            $sum_S_billed += $rowData['billed_amount'];
+
+            $rows[] = $rowData;
+            $item_number++;
+         }
+      }
+
+      $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
+      $current_retainage_amount = $retainage_efectivo['effective_current'];
+      $total_retainage_accumulated = $retainage_efectivo['total_retainage_accumulated'];
+      $std_retainage = (float) $project_entity->getRetainagePercentage();
+      $invoice_current_base = (float) ($invoice_entity->getInvoiceCurrentRetainage() ?? 0);
+      $percentage_used = ($invoice_current_base > 0 && $current_retainage_amount !== 0.0)
+         ? ($current_retainage_amount / $invoice_current_base * 100) : $std_retainage;
+      $amount_due = $sum_S_billed - $current_retainage_amount;
+      $balance_after_retainage = $sum_J_completed - $total_retainage_accumulated;
+
+      $company_name = $company ? $company->getName() : '';
+      $company_address = $company ? ($company->getAddress() ?? '') : '';
+      $company_phone = $company ? ($company->getPhone() ?? '') : '';
+      $company_contact = $company ? ($company->getContactName() ?? '') : '';
+      $company_email = $company ? ($company->getEmail() ?? $company->getContactEmail() ?? '') : '';
+      $company_contact_email = $company ? ($company->getContactEmail() ?? '') : '';
+
+      return [
+         'logo_path' => $logoPath,
+         'company_name' => $company_name,
+         'company_address' => $company_address,
+         'company_phone' => $company_phone,
+         'company_fax' => '',
+         'company_email' => $company_email,
+         'company_contact_email' => $company_contact_email,
+         'contractor_name' => $company_name,
+         'contractor_phone' => $company_phone,
+         'inspector_name' => $insp ? $insp->getName() : '',
+         'inspector_phone' => $insp ? $insp->getPhone() : '',
+         'contact_name' => $company_contact,
+         'contact_email' => $company_contact_email,
+         'project_location' => $this->getCountiesDescriptionForProject($project_entity),
+         'project_name' => $project_entity->getName(),
+         'project_id_number' => $project_entity->getProjectIdNumber(),
+         'subcontract' => $project_entity->getSubcontract(),
+         'project_number' => $project_entity->getProjectNumber(),
+         'invoice_date' => date('m/d/Y'),
+         'invoice_number' => $invoice_entity->getNumber(),
+         'start_date' => $invoice_entity->getStartDate()->format('m/d/Y'),
+         'end_date' => $invoice_entity->getEndDate()->format('m/d/Y'),
+         'notes' => $invoice_entity->getNotes() ?? '',
+         'rows' => $rows,
+         'total_contract_amount' => $sum_H_contract,
+         'total_amount_btd' => $sum_J_completed,
+         'total_previous_bill' => $sum_L_previous_bill,
+         'total_pending_balance' => $sum_N_pending,
+         'total_amt_this_period' => $sum_P_this_period,
+         'total_billed_amount' => $sum_S_billed,
+         'retainage_label' => 'CURRENT RETAINAGE @ ' . number_format($percentage_used, 2) . '%',
+         'current_retainage_amount' => $current_retainage_amount,
+         'total_retainage_accumulated' => $total_retainage_accumulated,
+         'balance_after_retainage' => $balance_after_retainage,
+         'current_amount_due' => $amount_due,
+         'nombre_archivo' => $project_entity->getProjectNumber() . '-Invoice' . $invoice_entity->getNumber(),
+      ];
+   }
+
+   /**
+    * ObtenerFilaItemData: Devuelve los datos de una fila de ítem (sin escribir en Excel).
+    * @return array Con keys: item_number, description, unit, unit_price, contract_qty, contract_amount, total_qty_btd, total_amount_btd,
+    *   previous_bill_qty, previous_bill_amount, pending_qty, pending_balance, qty_this_period, amount_this_period, prev_bill (para totales)
+    */
+   private function ObtenerFilaItemData($value, $item_number, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId): array
+   {
+      $price = $value->getPrice();
+      $contract_qty = $value->getProjectItem()->getQuantity();
+      $qty = $value->getQuantity();
+      $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
+
+      $previous_bill_qty = 0.0;
+      $previous_bill_amount = 0.0;
+      $prevInvoice = null;
+      foreach ($allInvoicesHistory as $inv) {
+         if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
+         $prevInvoice = $inv;
+      }
+      if ($prevInvoice !== null) {
+         foreach ($invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId()) as $prevItem) {
+            if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
+               $prev_qty = (float) $prevItem->getQuantity();
+               $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
+               $previous_bill_qty = $prev_qty + $prev_qbf;
+               $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
+               break;
+            }
+         }
+      }
+
+      $pending_qty_btd = 0.0;
+      $pending_balance_btd = 0.0;
+      if (!$value->getProjectItem()->getItem()->getBond()) {
+         $sum_qty_prev = 0.0;
+         $sum_paid_prev = 0.0;
+         foreach ($allInvoicesHistory as $inv) {
+            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
+            foreach ($invoiceItemRepo->ListarItems($inv->getInvoiceId()) as $prevItem) {
+               if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
+                  $sum_qty_prev += (float) $prevItem->getQuantity();
+                  $sum_paid_prev += (float) ($prevItem->getPaidQty() ?? 0);
+                  break;
+               }
+            }
+         }
+         $pending_qty_btd = max(0.0, $sum_qty_prev - $sum_paid_prev);
+         $pending_balance_btd = $pending_qty_btd * $price;
+         $notes = $this->ListarNotesDeItemInvoice($value->getId());
+         foreach ($notes as $note) {
+            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+               $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
+               $pending_balance_btd = $pending_qty_btd * $price;
+               break;
+            }
+         }
+      } else {
+         $quantity_final = $qty + ($value->getQuantityBroughtForward() ?? 0.0);
+         $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
+         $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
+         $pending_balance_btd = $pending_qty_btd * $price;
+      }
+
+      $unit = $value->getProjectItem()->getItem()->getUnit()
+         ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
+
+      return [
+         'item_number' => $item_number,
+         'description' => $value->getProjectItem()->getItem()->getName(),
+         'unit' => $unit,
+         'unit_price' => $price,
+         'contract_qty' => $contract_qty,
+         'contract_amount' => $contract_qty * $price,
+         'total_qty_btd' => $qty_completed,
+         'total_amount_btd' => $qty_completed * $price,
+         'previous_bill_qty' => $previous_bill_qty,
+         'previous_bill_amount' => $previous_bill_amount,
+         'pending_qty' => $pending_qty_btd,
+         'pending_balance' => $pending_balance_btd,
+         'qty_this_period' => $qty,
+         'amount_this_period' => $qty * $price,
+         'billed_qty' => 0,
+         'billed_amount' => 0,
+         'prev_bill' => [$previous_bill_qty, $previous_bill_amount, $pending_qty_btd, $pending_balance_btd],
+      ];
+   }
+
+   /**
+    * ObtenerFilaItemBondData: Datos para fila Bond cuando no existe invoice_item Bond.
+    */
+   private function ObtenerFilaItemBondData(ProjectItem $projectItem, $item_number): array
+   {
+      $price = (float) $projectItem->getPrice();
+      $contract_qty = (float) $projectItem->getQuantity();
+      $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
+      return [
+         'item_number' => $item_number,
+         'description' => $projectItem->getItem()->getName(),
+         'unit' => $unit,
+         'unit_price' => $price,
+         'contract_qty' => $contract_qty,
+         'contract_amount' => $contract_qty * $price,
+         'total_qty_btd' => 0,
+         'total_amount_btd' => 0,
+         'previous_bill_qty' => 0,
+         'previous_bill_amount' => 0,
+         'pending_qty' => 0,
+         'pending_balance' => 0,
+         'qty_this_period' => 0,
+         'amount_this_period' => 0,
+         'billed_qty' => 0,
+         'billed_amount' => 0,
+         'prev_bill' => [0, 0, 0, 0],
+      ];
    }
 
    /**

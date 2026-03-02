@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Invoice</title>
+    <style type="text/css">
+      html {
+        font-family: "Calibri", Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      table {
+        border-collapse: collapse;
+        border-spacing: 0;
+      }
+      .header-wrapper {
+        display: flex;
+        align-items: flex-start;
+        gap: 2em;
+        margin-bottom: 1.5em;
+        font-family: "Calibri", Arial, Helvetica, sans-serif;
+        font-size: 10pt;
+      }
+      .header-logo {
+        flex-shrink: 0;
+      }
+      .header-logo img {
+        display: block;
+        width: 120px;
+        height: auto;
+        max-height: 120px;
+        object-fit: contain;
+      }
+      .header-company {
+        flex: 0 0 auto;
+        min-width: 280px;
+      }
+      .header-company .company-name {
+        font-weight: bold;
+        font-size: 11pt;
+        color: #000;
+        margin-bottom: 0.4em;
+      }
+      .header-company .company-columns {
+        display: flex;
+        gap: 1.5em;
+      }
+      .header-company .company-col {
+        color: #000;
+        line-height: 1.5;
+      }
+      .header-company .company-email {
+        color: #4bacc6;
+        text-decoration: underline;
+      }
+      .sheet-header {
+        page-break-after: avoid;
+      }
+      .header-right {
+        display: flex;
+        gap: 1.5em;
+        flex: 1;
+        min-width: 0;
+      }
+      .header-block {
+        flex: 1;
+        min-width: 0;
+      }
+      .bill-to-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+      }
+      .bill-to-table td {
+        padding: 0.3em 0.5em;
+        border: 1px solid #000;
+        vertical-align: middle;
+      }
+      .bill-to-title {
+        font-weight: bold;
+        background-color: #f2f2f2;
+        color: #000;
+      }
+      .bill-to-label {
+        font-weight: bold;
+        background-color: #f2f2f2;
+        color: #000;
+      }
+      .bill-to-value {
+        background-color: #fff;
+        color: #000;
+      }
+      .header-block-title {
+        font-weight: bold;
+        padding: 0.35em 0.5em;
+        font-size: 9.5pt;
+        border-bottom: 1px solid #000;
+        background-color: #f2f2f2;
+        color: #000;
+      }
+      .header-block-title.project-title {
+        background-color: #f2f2f2;
+      }
+      .header-block table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+      }
+      .header-block table td {
+        padding: 0.3em 0.5em;
+        border: 1px solid #000;
+        vertical-align: middle;
+      }
+      .header-block table tr:nth-child(odd) .header-cell-label {
+        background-color: #fff;
+      }
+      .header-block table tr:nth-child(even) .header-cell-label {
+        background-color: #f2f2f2;
+      }
+      .header-block table tr:nth-child(odd) .header-cell-value {
+        background-color: #f2f2f2;
+      }
+      .header-block table tr:nth-child(even) .header-cell-value {
+        background-color: #fff;
+      }
+      .header-cell-label {
+        font-weight: bold;
+        color: #000;
+        width: 45%;
+      }
+      .header-cell-value {
+        color: #000;
+      }
+      .project-table .header-cell-label {
+        background-color: #f2f2f2 !important;
+      }
+      .project-table .header-cell-value {
+        background-color: #fff !important;
+      }
+      .project-table + .project-table {
+        margin-top: 0.6em;
+      }
+<｜tool▁sep｜>path
+/usr/local/var/www/exce-to-html/invoice.html
+      .header-invoice-section {
+        flex: 0 0 auto;
+        min-width: 200px;
+      }
+      .header-invoice-section .invoice-main-title {
+        font-weight: bold;
+        font-size: 16pt;
+        text-align: right;
+        padding: 0.25em 0.5em 0.35em 0;
+        color: #000;
+      }
+      .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5pt;
+      }
+      .invoice-table td {
+        padding: 0.3em 0.5em;
+        border: 1px solid #000;
+        vertical-align: middle;
+        text-align: center;
+      }
+      .invoice-cell-label {
+        font-weight: bold;
+        background-color: #f2f2f2;
+        color: #000;
+      }
+      .invoice-cell-value {
+        background-color: #fff;
+        color: #000;
+      }
+      .notes-section {
+        margin-bottom: 1em;
+        border: 2px solid #000;
+      }
+      .notes-label {
+        display: block;
+        padding: 0.25em 0.5em;
+        background-color: #ffc000;
+        font-family: "Calibri", Arial, Helvetica, sans-serif;
+        font-size: 9.5pt;
+      }
+      .notes-content {
+        min-height: 2.5em;
+        padding: 0.5em;
+        background-color: #fff;
+      }
+      .sheet-items {
+        page-break-after: always;
+        font-size: 10pt;
+      }
+      .sheet-items .row-header td,
+      .sheet-items .row-totals td,
+      .sheet-items .row-summary td {
+        font-size: 9.5pt;
+      }
+      .cell-img-wrap {
+        display: block;
+        min-width: 100px;
+        min-height: 100px;
+        line-height: 0;
+        padding-right: 12px;
+        padding-bottom: 4px;
+      }
+      /* Celdas: clases semánticas cell-*, th-*, td-* */
+      .cell-img {
+        display: block;
+        width: 100px;
+        height: auto;
+        max-height: 100px;
+        object-fit: contain;
+        vertical-align: top;
+      }
+      .cell-desc {
+        vertical-align: bottom;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .cell-text {
+        vertical-align: bottom;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .cell-center {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .cell-right {
+        vertical-align: bottom;
+        text-align: right;
+        padding-right: 0;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .cell-center-sm {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .cell-center-sm-error {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        color: #f00;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .cell-center-bold {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style9 {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 20pt;
+        background-color: #fff;
+      }
+      .style10 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style11 {
+        vertical-align: bottom;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style12 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 2px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 12pt;
+        background-color: #f2f2f2;
+      }
+      .style13 {
+        vertical-align: bottom;
+        border-bottom: 2px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .th-desc-border {
+        vertical-align: bottom;
+        border-bottom: 2px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: none;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style15 {
+        vertical-align: bottom;
+        border: none;
+        color: #f00;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      /* Base común: encabezado gris 12pt bold */
+      .style16, .style20, .style21, .style24, .style25, .style39, .style40, .style41, .style42, .style50 {
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 12pt;
+        background-color: #f2f2f2;
+      }
+      .style16 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-top-width: 2px !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style17 {
+        vertical-align: bottom;
+        border-bottom: 1px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style18 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style19 {
+        vertical-align: bottom;
+        border-bottom: 1px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: none;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style20 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-top-width: 2px !important;
+        border-left-width: 2px !important;
+      }
+      .style21 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-top-width: 2px !important;
+        border-right-width: 2px !important;
+      }
+      .style22 {
+        vertical-align: middle;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style24 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0;
+        border: 1px solid #000 !important;
+        border-top-width: 2px !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style25 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-bottom-width: 2px !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style26 {
+        vertical-align: bottom;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style27 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style28 {
+        vertical-align: bottom;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style29 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style30 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style31 {
+        vertical-align: top;
+        text-align: left;
+        padding-left: 0px;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style34 {
+        vertical-align: bottom;
+        text-align: left;
+        padding-left: 0px;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style35 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style36 {
+        vertical-align: bottom;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style38 {
+        vertical-align: bottom;
+        text-align: right;
+        padding-right: 0px;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style39 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-left-width: 2px !important;
+      }
+      .style40 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-right-width: 2px !important;
+      }
+      .style41 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0;
+        border: 1px solid #000 !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style42 {
+        vertical-align: bottom;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-top-width: 2px !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style44 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style45 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style46 {
+        vertical-align: bottom;
+        text-align: left;
+        padding-left: 0px;
+        border: none;
+        color: #4bacc6;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style47 {
+        vertical-align: bottom;
+        border: none;
+        color: #4bacc6;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style49 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style50 {
+        vertical-align: middle;
+        text-align: center;
+        border: 1px solid #000 !important;
+        border-right: none !important;
+        border-left-width: 2px !important;
+      }
+      .style51 {
+        vertical-align: bottom;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style52 {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style53 {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style54 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: none;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #f2f2f2;
+      }
+      .style55 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 2px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style56 {
+        vertical-align: bottom;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style58 {
+        vertical-align: middle;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 12pt;
+        background-color: #f2f2f2;
+      }
+      .style59 {
+        vertical-align: bottom;
+        border-bottom: 2px solid #000 !important;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style60, .style61 {
+        vertical-align: bottom;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style60 {
+        border: none;
+        border-bottom: 2px solid #000 !important;
+      }
+      .style61 {
+        border: none;
+        border-bottom: 2px solid #000 !important;
+        border-right: 2px solid #000 !important;
+      }
+      .style65 {
+        vertical-align: bottom;
+        text-align: center;
+        border: none;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style66 {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        border-top: 2px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #ffc000;
+      }
+      .style67 {
+        vertical-align: middle;
+        border: none;
+        border-top: 2px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        font-weight: bold;
+        color: #f00;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .style68, .style69 {
+        vertical-align: bottom;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style68 {
+        border: none;
+        border-top: 2px solid #000 !important;
+      }
+      .style69 {
+        border: none;
+        border-top: 2px solid #000 !important;
+        border-right: 2px solid #000 !important;
+      }
+      .style70 {
+        vertical-align: bottom;
+        border: none;
+        border-bottom: 2px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .style72, .style73 {
+        vertical-align: bottom;
+        border: none;
+        color: #f00;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style73 {
+        text-align: center;
+      }
+      .th-item, .th-desc, .th-unit, .th-contract-qty {
+        vertical-align: middle;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        border: 2px solid #000 !important;
+      }
+      .th-item {
+        text-align: left;
+        padding-left: 0;
+        background-color: #fff;
+      }
+      .th-desc {
+        text-align: center;
+        border-right: none !important;
+        background-color: #fff;
+      }
+      .th-unit {
+        text-align: center;
+        background-color: #f2f2f2;
+      }
+      .th-contract-qty {
+        text-align: center;
+        border-right: none !important;
+        background-color: #f2f2f2;
+      }
+      .th-contract-amount, .th-total-btd, .th-prev-bill-qty, .th-prev-bill-amount,
+      .th-pending, .th-period-qty, .th-period-amount, .th-billed-qty, .th-billed-amount {
+        vertical-align: middle;
+        text-align: center;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        border: 2px solid #000 !important;
+      }
+      .th-contract-amount, .th-total-btd, .th-billed-qty {
+        border-right: 1px solid #000 !important;
+      }
+      .th-contract-amount { background-color: #f2f2f2; }
+      .th-total-btd { background-color: #e5dfec; }
+      .th-prev-bill-qty { border-right: none !important; background-color: #c2d3e8; }
+      .th-prev-bill-amount { background-color: #c2d3e8; }
+      .th-pending { background-color: #fabf8f; }
+      .th-period-qty { border-right: none !important; background-color: #faf3ed; }
+      .th-period-amount { background-color: #faf3ed; }
+      .th-billed-qty { background-color: #ebf5d5; }
+      .th-billed-amount {
+        border-left: 1px solid #000 !important;
+        background-color: #ebf5d5;
+      }
+      .td-empty {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: none;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .td-empty-desc {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0;
+        border-bottom: none;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .td-empty-desc-sm {
+        vertical-align: bottom;
+        border-bottom: none;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 10pt;
+        background-color: #fff;
+      }
+      .td-total-spacer {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: none;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .td-total-label {
+        vertical-align: middle;
+        text-align: center;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #f2f2f2;
+      }
+      .td-total-amount-gray {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #f2f2f2;
+      }
+      .td-total-btd {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #e4dfec;
+      }
+      .td-total-prev {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #c2d3e8;
+      }
+      .td-total-pending-label {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fabf8f;
+      }
+      .td-total-pending-amount {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: none;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fabf8f;
+      }
+      .td-total-period {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #faf3ed;
+      }
+      .td-total-billed-label {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #ebf5d5;
+      }
+      .td-total-billed-amount {
+        vertical-align: top;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #ebf5d5;
+      }
+      .cell-center-mid {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .cell-label {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .cell-italic {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        font-style: italic;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style107 {
+        vertical-align: middle;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #e4dfec;
+      }
+      .style108 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #e4dfec;
+      }
+      .style111 {
+        vertical-align: middle;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #ebf5d5;
+      }
+      .style112 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 1px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #ebf5d5;
+      }
+      .style113 {
+        vertical-align: top;
+        text-align: left;
+        padding-left: 0px;
+        border: none;
+        color: #f00;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #fff;
+      }
+      .style116 {
+        vertical-align: middle;
+        text-align: right;
+        padding-right: 0px;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 2px solid #000 !important;
+        border-right: 1px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #ebf5d5;
+      }
+      .style117 {
+        vertical-align: middle;
+        text-align: left;
+        padding-left: 0px;
+        border-bottom: 2px solid #000 !important;
+        border-top: 1px solid #000 !important;
+        border-left: 1px solid #000 !important;
+        border-right: 2px solid #000 !important;
+        font-weight: bold;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 13pt;
+        background-color: #ebf5d5;
+      }
+      .style118 {
+        vertical-align: middle;
+        text-align: center;
+        border: none;
+        color: #000;
+        font-family: "Calibri";
+        font-size: 11pt;
+        background-color: #fff;
+      }
+      .sheet-items col:nth-child(1) { width: 270pt; vertical-align: middle; }
+      .sheet-items col:nth-child(2) { width: 550pt; }
+      .sheet-items col:nth-child(3) { width: 880pt; }
+      .sheet-items col:nth-child(4) { width: 550pt; }
+      .sheet-items col:nth-child(5) { width: 185pt; }
+      .sheet-items col:nth-child(6), .sheet-items col:nth-child(7), .sheet-items col:nth-child(9), .sheet-items col:nth-child(11), .sheet-items col:nth-child(13), .sheet-items col:nth-child(15), .sheet-items col:nth-child(18) { width: 285pt; }
+      .sheet-items col:nth-child(8), .sheet-items col:nth-child(10), .sheet-items col:nth-child(12), .sheet-items col:nth-child(14), .sheet-items col:nth-child(16), .sheet-items col:nth-child(19) { width: 360pt; }
+      .sheet-items col:nth-child(17) { width: 42pt; }
+      /* Alturas semánticas: padding vertical, el contenido define la altura real */
+      .sheet-items td {
+        padding-top: 0.35em;
+        padding-bottom: 0.35em;
+      }
+      .sheet-items .row-header td {
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+      }
+      .sheet-items .row-totals td,
+      .sheet-items .row-summary td {
+        padding-top: 0.45em;
+        padding-bottom: 0.45em;
+      }
+    </style>
+    <style>
+      @page {
+        margin-left: 0.25in;
+        margin-right: 0.25in;
+        margin-top: 0.387917in;
+        margin-bottom: 0.45125in;
+      }
+      body {
+        margin-left: 0.25in;
+        margin-right: 0.25in;
+        margin-top: 0.387917in;
+        margin-bottom: 0.45125in;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header-wrapper sheet-header">
+      <div class="header-logo">
+        <img src="logo.jpg" alt="Logo C&amp;G" />
+      </div>
+      <div class="header-company">
+        <div class="company-name">C&amp;G CONCRETE CONSTRUCTION CO., INC.</div>
+        <div class="company-columns">
+          <div class="company-col">
+            1258 Willingham Dr<br />
+            East Point, Ga. 5025<br />
+            <a href="mailto:data_t@concrete.com" class="company-email">data_t@concrete.com</a>
+          </div>
+          <div class="company-col">
+            Office: 404-254-2017<br />
+            Fax: 404-589-5896<br />
+            <a href="mailto:data_t@concrete.com" class="company-email">data_t@concrete.com</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-block">
+        <table class="bill-to-table">
+          <tr>
+            <td colspan="2" class="bill-to-title">BILL TO:</td>
+          </tr>
+          <tr>
+            <td class="bill-to-label">Contractor's Name:</td>
+            <td class="bill-to-label">Inspector's Name:</td>
+          </tr>
+          <tr>
+            <td class="bill-to-value"></td>
+            <td class="bill-to-value"></td>
+          </tr>
+          <tr>
+            <td class="bill-to-label">Contractor's Phone Number:</td>
+            <td class="bill-to-label">Inspector Cell Number:</td>
+          </tr>
+          <tr>
+            <td class="bill-to-value"></td>
+            <td class="bill-to-value"></td>
+          </tr>
+          <tr>
+            <td class="bill-to-label">Contact Name</td>
+            <td class="bill-to-value"></td>
+          </tr>
+          <tr>
+            <td class="bill-to-label">Email/No.:</td>
+            <td class="bill-to-value"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="header-right">
+        <div class="header-block">
+          <table class="project-table">
+            <tr>
+              <td class="header-cell-label">PROJECT LOCATION:</td>
+              <td class="header-cell-value"></td>
+            </tr>
+            <tr>
+              <td class="header-cell-label">PROJECT NAME:</td>
+              <td class="header-cell-value"></td>
+            </tr>
+          </table>
+          <table class="project-table">
+            <tr>
+              <td class="header-cell-label">PROJECT #</td>
+              <td class="header-cell-value"></td>
+            </tr>
+            <tr>
+              <td class="header-cell-label">PO NUMBER #</td>
+              <td class="header-cell-value"></td>
+            </tr>
+            <tr>
+              <td class="header-cell-label">C&amp;G PO#</td>
+              <td class="header-cell-value"></td>
+            </tr>
+          </table>
+        </div>
+        <div class="header-invoice-section">
+          <div class="invoice-main-title">INVOICE</div>
+          <div class="header-block">
+            <table class="invoice-table">
+              <tr>
+                <td class="invoice-cell-label">Date</td>
+                <td class="invoice-cell-label">Invoice #</td>
+              </tr>
+              <tr>
+                <td class="invoice-cell-value"></td>
+                <td class="invoice-cell-value"></td>
+              </tr>
+              <tr>
+                <td class="invoice-cell-label">Start Date</td>
+                <td class="invoice-cell-label">End Date</td>
+              </tr>
+              <tr>
+                <td class="invoice-cell-value"></td>
+                <td class="invoice-cell-value"></td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="notes-section">
+      <strong class="notes-label">Notes:</strong>
+      <div class="notes-content"></div>
+    </div>
+
+    <table border="0" id="items-table" class="sheet-items">
+      <colgroup>
+        <col /><col /><col /><col /><col /><col /><col /><col /><col /><col />
+        <col /><col /><col /><col /><col /><col /><col /><col /><col />
+      </colgroup>
+      <tbody>
+        <tr class="row-header">
+          <td class="th-item">Item #:</td>
+          <td class="th-desc th-desc-border" colspan="3">DESCRIPTION</td>
+          <td class="th-unit">UNIT</td>
+          <td class="th-unit">UNIT PRICE</td>
+          <td class="th-contract-qty">CONTRACT QTY</td>
+          <td class="th-contract-amount">CONTRACT AMOUNT</td>
+          <td class="th-total-btd">TOTAL QTY BTD</td>
+          <td class="th-total-btd">TOTAL AMOUNT BTD</td>
+          <td class="th-prev-bill-qty">PREVIOUS BILL QTY</td>
+          <td class="th-prev-bill-amount">PREVIOUS BILL AMOUNT</td>
+          <td class="th-pending">PENDING QTY (BTD)</td>
+          <td class="th-pending">PENDING BALANCE (BTD)</td>
+          <td class="th-period-qty">QTY THIS PERIOD</td>
+          <td class="th-period-amount">AMOUNT THIS PERIOD</td>
+          <td class="cell-right"> </td>
+          <td class="th-billed-qty">BILLED QTY THIS PERIOD</td>
+          <td class="th-billed-amount">BILLED AMOUNT THIS PERIOD</td>
+        </tr>
+
+        <tr class="row-totals">
+          <td class="td-empty"> </td>
+          <td class="td-empty-desc td-empty-desc-sm" colspan="3"> </td>
+          <td class="td-empty"> </td>
+          <td class="td-total-spacer"> </td>
+          <td class="td-total-label">TOTAL CONTRACT AMOUNT:</td>
+          <td class="td-total-amount-gray">$0.00</td>
+          <td class="td-total-btd">TOTAL AMOUNT BTD:</td>
+          <td class="td-total-btd">$0.00</td>
+          <td class="td-total-prev">TOTAL PREVIOUS BILL AMT:</td>
+          <td class="td-total-prev">$0.00</td>
+          <td class="td-total-pending-label">TOTAL PENDING BALANCE:</td>
+          <td class="td-total-pending-amount">$0.00</td>
+          <td class="td-total-period">TOTAL AMT THIS PERIOD:</td>
+          <td class="td-total-period">$0.00</td>
+          <td class="cell-right"> </td>
+          <td class="td-total-billed-label">TOTAL BILLED AMOUNT:</td>
+          <td class="td-total-billed-amount">$0.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
