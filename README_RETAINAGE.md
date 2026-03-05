@@ -207,8 +207,8 @@ Si se modifica un invoice anterior (por ejemplo cambia su current retainage o lo
 
 Si algún invoice no tiene aún `invoice_retainage_calculated`, antes de usar se llama a `CalcularYGuardarRetainageInvoice` y flush/refresh.
 
-- **Controlador:** `InvoiceController::exportarExcel(Request)` — recibe `format` (`excel` o `pdf`) y llama a `InvoiceService::ExportarExcel($invoice_id, $format)`.
-- **Método único:** `InvoiceService::ExportarExcel()` genera tanto el Excel como el PDF; en ambos se aplican las reglas de Less Retainers descritas arriba.
+- **Controlador:** `InvoiceController::exportarExcel(Request)` — recibe `format` (`excel` o `pdf`) y llama a `InvoiceService::ExportarExcel($invoice_id)` o `InvoiceService::ExportarPdf($invoice_id)` según el formato.
+- **Datos compartidos:** Excel y PDF usan la misma fuente de datos y cálculos (`ObtenerDatosExportacionInvoice`); en ambos se aplican las reglas de Less Retainers descritas arriba.
 
 ---
 

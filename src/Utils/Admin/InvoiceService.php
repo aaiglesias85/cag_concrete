@@ -338,110 +338,29 @@ class InvoiceService extends Base
 
 
    /**
-    * ExportarExcel: Exporta el invoice a Excel o PDF.
-    * Tanto Excel como PDF usan el retainage del invoice (invoice_retainage_calculated / invoice_current_retainage),
-    * no el retainage del módulo de Payments. Ver README_RETAINAGE.md.
+    * ExportarExcel: Exporta el invoice a Excel.
+    * Usa ObtenerDatosExportacionInvoice (misma fuente que el PDF). Ver README_RETAINAGE.md.
     *
     * @param int|string $invoice_id
-    * @param string     $format 'excel' o 'pdf'
     * @return string|null URL del archivo generado
     */
-   public function ExportarExcel($invoice_id, $format = 'excel')
+   public function ExportarExcel($invoice_id)
    {
       set_time_limit(300);
       ini_set('memory_limit', '512M');
 
-      if ($format === 'pdf') {
-         return $this->ExportarPdfDesdeTemplate($invoice_id);
+      // Fuente única de datos y cálculos (compartida con PDF)
+      $data = $this->ObtenerDatosExportacionInvoice($invoice_id);
+      if ($data === null) {
+         return null;
       }
 
-      $em = $this->getDoctrine()->getManager();
-      $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
-      $invoiceRepo = $em->getRepository(Invoice::class);
+      $invoice_entity = $data['invoice_entity'];
+      $project_entity = $data['project_entity'];
+      $company = $data['company'];
+      $insp = $data['inspector'];
 
-      // 1. OBTENER DATOS
-      $invoice_entity = $invoiceRepo->find($invoice_id);
-      if (!$invoice_entity) return null;
-
-      $project_entity = $invoice_entity->getProject();
-      $project_id = $project_entity->getProjectId();
-      // Recalcular bond y retainage de todo el proyecto y guardar en BD (por si se quitó R o bonded en ítems)
-      $this->RecalcularRetainageYBonPorProyecto($project_id);
-      $invoice_entity = $invoiceRepo->find($invoice_id);
-
-      // ---  LOS DATOS CALCULADOS DE LA WEB ---
-      $datos_web = $this->ListarItemsDeInvoice($invoice_id);
-      $mapa_datos_web = [];
-      foreach ($datos_web as $dato) {
-         $mapa_datos_web[$dato['invoice_item_id']] = [
-            'unpaid_qty' => $dato['unpaid_qty'],
-            'unpaid_from_previous' => $dato['unpaid_from_previous']
-         ];
-      }
-
-      $currentInvoiceId = $invoice_id;
-
-      $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
-      $this->sortInvoicesByStartDateAndId($allInvoicesHistory);
-
-      // 2. SEPARAR ITEMS
-      $items = $invoiceItemRepo->ListarItems($invoice_id);
-      $items_regulares = [];
-      $items_change_order = [];
-
-      foreach ($items as $value) {
-         $change_order = $value->getProjectItem()->getChangeOrder();
-         if ($change_order) {
-            $date = $value->getProjectItem()->getChangeOrderDate();
-            $key = ($date) ? $date->format('Y-m') : 'no-date';
-            $items_change_order[$key][] = $value;
-         } else {
-            $items_regulares[] = $value;
-         }
-      }
-      ksort($items_change_order);
-
-      // 2b. Separar Bond del resto. Excel: todos los invoice_item (con qty > 0 o 0) para que columnas de invoices anteriores tengan valor; Bond siempre en 5b
-      $items_regulares_sin_bond = [];
-      $bondInvoiceItem = null;
-      foreach ($items_regulares as $value) {
-         if ($value->getProjectItem()->getItem()->getBond()) {
-            $bondInvoiceItem = $value;
-         } else {
-            $items_regulares_sin_bond[] = $value;
-         }
-      }
-      // Extraer Bond también de change orders (si está ahí) para ubicarlo siempre en el mismo lugar
-      $bondInvoiceItemFromCO = null;
-      foreach ($items_change_order as $key => $group_items) {
-         $sin_bond = [];
-         foreach ($group_items as $value) {
-            if ($value->getProjectItem()->getItem()->getBond()) {
-               $bondInvoiceItemFromCO = $value;
-            } else {
-               $sin_bond[] = $value;
-            }
-         }
-         $items_change_order[$key] = $sin_bond;
-      }
-
-      // 2c. Bond no en invoice: ítems Bond del proyecto que no están como línea en el invoice
-      $projectItemIdsEnInvoice = array_map(function ($ii) {
-         return $ii->getProjectItem()->getId();
-      }, $items);
-      /** @var ProjectItemRepository $projectItemRepo */
-      $projectItemRepo = $em->getRepository(ProjectItem::class);
-      $bondProjectItems = array_filter(
-         $projectItemRepo->ListarBondProjectItems($project_id),
-         function ($pi) use ($projectItemIdsEnInvoice) {
-            return !in_array($pi->getId(), $projectItemIdsEnInvoice);
-         }
-      );
-      $bondProjectItems = array_values($bondProjectItems);
-
-      // Todos los ítems salen de invoice_item; ya no se usa project_item para ítems adicionales
-
-      // 3. CARGAR EXCEL Y DEFINIR ESTILOS
+      // CARGAR EXCEL Y DEFINIR ESTILOS
       Cell::setValueBinder(new AdvancedValueBinder());
 
       $styleLeft = [
@@ -497,28 +416,8 @@ class InvoiceService extends Base
       }
       if ($fila_footer_inicio == 0) $fila_footer_inicio = 41;
 
-      // CÁLCULO EXACTO DE FILAS (todos los ítems de invoice_item: regulares + Bond + change orders)
-      $hay_bond = ($bondInvoiceItem !== null || $bondInvoiceItemFromCO !== null || !empty($bondProjectItems));
-      $filas_necesarias = count($items_regulares_sin_bond) + ($hay_bond ? 1 : 0);
-      $all_co_keys = array_keys($items_change_order);
-      sort($all_co_keys);
-      if (!empty($all_co_keys)) {
-         $esPrimerGrupoCalculo = true;
-         foreach ($all_co_keys as $group_key) {
-            $group = $items_change_order[$group_key] ?? [];
-            $filas_necesarias += count($group);
-            $tiene_filas = !empty($group);
-            if ($group_key !== 'no-date' && $tiene_filas) {
-               if ($esPrimerGrupoCalculo) {
-                  $filas_necesarias += 2;
-                  $esPrimerGrupoCalculo = false;
-               } else {
-                  $filas_necesarias += 1;
-               }
-            }
-         }
-      }
-
+      // Número de filas = mismo que en ObtenerDatosExportacionInvoice (rows incluye headers y datos)
+      $filas_necesarias = count($data['rows']);
       $filas_disponibles = $fila_footer_inicio - $start_row_data;
       if ($filas_necesarias > $filas_disponibles) {
          $a_insertar = $filas_necesarias - $filas_disponibles;
@@ -583,253 +482,49 @@ class InvoiceService extends Base
          foreach ($colsQty as $col) $sheet->getStyle($col . $f)->getNumberFormat()->setFormatCode($qtyFormat);
       };
 
-      // --- INICIALIZAR VARIABLES DE SUMA PARA PDF ---
-      $sum_H_contract       = 0;
-      $sum_J_completed      = 0;
-      $sum_L_previous_bill  = 0;  // PREVIOUS BILL AMOUNT (Final Amount This Period del invoice anterior)
-      $sum_N_pending        = 0;
-      $sum_P_this_period    = 0;
-      $sum_S_billed         = 0;
+      $styleHeaderCO = [
+         'font' => ['bold' => true, 'size' => 10, 'color' => ['argb' => '000000']],
+         'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'E7E7E7']],
+         'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER],
+         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => '000000']]]
+      ];
+      $styleSeparator = [
+         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_NONE]],
+         'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE]
+      ];
 
-      // 5. ESCRIBIR ITEMS REGULARES (sin Bond; el Bond va siempre en 5b)
-      foreach ($items_regulares_sin_bond as $value) {
-         $em->refresh($value);
-
-         if (isset($mapa_datos_web[$value->getId()])) {
-            $d = $mapa_datos_web[$value->getId()];
-            $value->setUnpaidQty($d['unpaid_qty']);
-            $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
-         }
-
-         $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
-
-         // Datos para el Excel
-         $qty_this_period = $value->getQuantity();
-         $qty_brought_forward = $value->getQuantityBroughtForward() ? $value->getQuantityBroughtForward() : 0;
-         $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
-
-         // --- ACUMULAR PARA PDF (Cálculo manual) ---
-         $price = $value->getPrice();
-         $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
-
-         $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
-         $sum_J_completed     += ($qty_completed * $price);
-         $sum_L_previous_bill += $prevBill[1];   // PREVIOUS BILL AMOUNT
-         $sum_N_pending       += $prevBill[3];   // PENDING BALANCE (BTD) = como en Payments
-         $sum_P_this_period   += ($value->getQuantity() * $price);
-         $sum_S_billed        += ($final_invoiced_qty * $price);
-         // ------------------------------------------
-
-         $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
-         $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
-
-         $aplicarFormatoFila($objWorksheet, $fila);
-
-         $item_number++;
-         $fila++;
-      }
-
-      // 5b. ESCRIBIR FILA BOND (siempre en el mismo lugar: al final de ítems regulares, antes de change orders)
-      if ($hay_bond) {
-         $bon_qty = $invoice_entity->getBonQuantity() !== null ? (float) $invoice_entity->getBonQuantity() : 0.0;
-         $bon_amt = $invoice_entity->getBonAmount() !== null ? (float) $invoice_entity->getBonAmount() : 0.0;
-         // K y L = valores de O y P del invoice anterior (bon_quantity y bon_amount)
-         $prevInvoiceBond = null;
-         foreach ($allInvoicesHistory as $inv) {
-            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
-               break;
-            }
-            $prevInvoiceBond = $inv;
-         }
-         $prev_bon_qty = 0.0;
-         $prev_bon_amt = 0.0;
-         if ($prevInvoiceBond !== null) {
-            $prev_bon_qty = (float) ($prevInvoiceBond->getBonQuantity() ?? 0);
-            $prev_bon_amt = (float) ($prevInvoiceBond->getBonAmount() ?? 0);
-         }
-         // I y J Bond = total to date (suma de bon_quantity y bon_amount de invoices anteriores + actual)
-         $total_bond_qty_to_date = 0.0;
-         $total_bond_amt_to_date = 0.0;
-         foreach ($allInvoicesHistory as $inv) {
-            $total_bond_qty_to_date += (float) ($inv->getBonQuantity() ?? 0);
-            $total_bond_amt_to_date += (float) ($inv->getBonAmount() ?? 0);
-            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
-               break;
-            }
-         }
-         $bondItem = $bondInvoiceItem ?? $bondInvoiceItemFromCO;
-         if ($bondItem !== null) {
-            $em->refresh($bondItem);
-            if (isset($mapa_datos_web[$bondItem->getId()])) {
-               $d = $mapa_datos_web[$bondItem->getId()];
-               $bondItem->setUnpaidQty($d['unpaid_qty']);
-               $bondItem->setUnpaidFromPrevious($d['unpaid_from_previous']);
-            }
-            $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $bondItem, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
-            $price = $bondItem->getPrice();
-            $contract_qty_bond = (float) $bondItem->getProjectItem()->getQuantity();
-            $contract_amt_bond = $contract_qty_bond * $price;
-            $sum_H_contract      += $contract_amt_bond;
-            $sum_J_completed     += $total_bond_amt_to_date;
-            $sum_L_previous_bill += $prev_bon_amt;
-            $sum_P_this_period   += $bon_amt;
-            $sum_S_billed        += $bon_amt;
-            $objWorksheet->setCellValue('I' . $fila, $total_bond_qty_to_date);
-            $objWorksheet->setCellValue('J' . $fila, $total_bond_amt_to_date);
-            $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
-            $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
-            $objWorksheet->setCellValue('M' . $fila, 0);
-            $objWorksheet->setCellValue('N' . $fila, 0);
-            $objWorksheet->setCellValue('O' . $fila, $bon_qty);
-            $objWorksheet->setCellValue('P' . $fila, $bon_amt);
-            $objWorksheet->setCellValue("R{$fila}", $bon_qty);
-            $objWorksheet->setCellValue("S{$fila}", $bon_amt);
-         } else {
-            $projectItem = $bondProjectItems[0];
-            $bondResult = $this->EscribirFilaItemBond($objWorksheet, $fila, $item_number, $projectItem);
-            $sum_H_contract += $bondResult['contract_amount'];
-            $sum_J_completed += $total_bond_amt_to_date;
-            $sum_L_previous_bill += $prev_bon_amt;
-            $sum_P_this_period += $bon_amt;
-            $sum_S_billed += $bon_amt;
-            $objWorksheet->setCellValue('I' . $fila, $total_bond_qty_to_date);
-            $objWorksheet->setCellValue('J' . $fila, $total_bond_amt_to_date);
-            $objWorksheet->setCellValue('K' . $fila, $prev_bon_qty);
-            $objWorksheet->setCellValue('L' . $fila, $prev_bon_amt);
-            $objWorksheet->setCellValue('M' . $fila, 0);
-            $objWorksheet->setCellValue('N' . $fila, 0);
-            $objWorksheet->setCellValue('O' . $fila, $bon_qty);
-            $objWorksheet->setCellValue('P' . $fila, $bon_amt);
-            $objWorksheet->setCellValue("R{$fila}", $bon_qty);
-            $objWorksheet->setCellValue("S{$fila}", $bon_amt);
-         }
-         $aplicarFormatoFila($objWorksheet, $fila);
-         $item_number++;
-         $fila++;
-      }
-
-      // 6. ESCRIBIR CHANGE ORDERS (solo invoice_items, agrupados por change order)
-      $all_co_keys_section6 = array_keys($items_change_order);
-      sort($all_co_keys_section6);
-
-      if (!empty($all_co_keys_section6)) {
-         $styleHeaderCO = [
-            'font' => ['bold' => true, 'size' => 10, 'color' => ['argb' => '000000']],
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['argb' => 'E7E7E7']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT, 'vertical' => Alignment::VERTICAL_CENTER],
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['argb' => '000000']]]
-         ];
-         $styleSeparator = [
-            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_NONE]],
-            'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE]
-         ];
-
-         $esPrimerGrupo = true;
-
-         foreach ($all_co_keys_section6 as $group_key) {
-            $group_items = $items_change_order[$group_key] ?? [];
-            if (empty($group_items)) {
-               continue;
-            }
-
-            $titulo = '';
-            if ($group_key !== 'no-date') {
-               $month = '';
-               $year = '';
-               $d = $group_items[0]->getProjectItem()->getChangeOrderDate();
-               if ($d) {
-                  $month = $d->format('F');
-                  $year = $d->format('Y');
-               }
-               if (!$month && preg_match('/^(\d{4})-(\d{2})$/', $group_key, $m)) {
-                  $dt = \DateTime::createFromFormat('Y-m', $group_key);
-                  if ($dt) {
-                     $month = $dt->format('F');
-                     $year = $dt->format('Y');
-                  }
-               }
-               if ($month) {
-                  $titulo = strtoupper("CHANGE ORDER IN {$month} {$year}");
-               }
-            }
-            if ($titulo === '') {
-               $titulo = 'CHANGE ORDER (NO DATE)';
-            }
-
-            if ($esPrimerGrupo) {
+      // Escribir todas las filas desde datos canónicos (misma fuente que el PDF)
+      foreach ($data['rows'] as $row) {
+         if (isset($row['header'])) {
+            if ($row['header'] === '') {
                $objWorksheet->getStyle("A{$fila}:S{$fila}")->applyFromArray($styleSeparator);
                $objWorksheet->getRowDimension($fila)->setRowHeight(10);
                $fila++;
-               $esPrimerGrupo = false;
-            }
-            $objWorksheet->setCellValue('B' . $fila, $titulo);
-            $objWorksheet->mergeCells("B{$fila}:D{$fila}");
-            $objWorksheet->getStyle("B{$fila}:S{$fila}")->applyFromArray($styleHeaderCO);
-            $objWorksheet->getStyle("A{$fila}")->applyFromArray(['borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]]);
-            $objWorksheet->getRowDimension($fila)->setRowHeight(22);
-            $fila++;
-
-            foreach ($group_items as $value) {
-               $em->refresh($value);
-               if (isset($mapa_datos_web[$value->getId()])) {
-                  $d = $mapa_datos_web[$value->getId()];
-                  $value->setUnpaidQty($d['unpaid_qty']);
-                  $value->setUnpaidFromPrevious($d['unpaid_from_previous']);
-               }
-
-               $prevBill = $this->EscribirFilaItem($objWorksheet, $fila, $item_number, $value, [], $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId);
-
-               $price = $value->getPrice();
-               $qty_this_period = $value->getQuantity();
-               $qty_brought_forward = $value->getQuantityBroughtForward() ? $value->getQuantityBroughtForward() : 0;
-               $final_invoiced_qty = $qty_this_period + $qty_brought_forward;
-
-               // --- ACUMULAR PARA PDF (Igual que arriba) ---
-               $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
-
-               $sum_H_contract      += ($value->getProjectItem()->getQuantity() * $price);
-               $sum_J_completed     += ($qty_completed * $price);
-               $sum_L_previous_bill += $prevBill[1];   // PREVIOUS BILL AMOUNT
-               $sum_N_pending       += $prevBill[3];   // PENDING BALANCE (BTD) = como en Payments
-               $sum_P_this_period   += ($value->getQuantity() * $price);
-               $sum_S_billed        += ($final_invoiced_qty * $price);
-               // --------------------------------------------
-
-               $objWorksheet->setCellValue("R{$fila}", $final_invoiced_qty);
-               $objWorksheet->setCellValue("S{$fila}", $final_invoiced_qty * $value->getPrice());
-
-               $aplicarFormatoFila($objWorksheet, $fila);
-
-               $item_number++;
+            } else {
+               $objWorksheet->setCellValue('B' . $fila, $row['header']);
+               $objWorksheet->mergeCells("B{$fila}:D{$fila}");
+               $objWorksheet->getStyle("B{$fila}:S{$fila}")->applyFromArray($styleHeaderCO);
+               $objWorksheet->getStyle("A{$fila}")->applyFromArray(['borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]]);
+               $objWorksheet->getRowDimension($fila)->setRowHeight(22);
                $fila++;
             }
+         } else {
+            $this->EscribirFilaDesdeDatos($objWorksheet, $fila, $row);
+            $aplicarFormatoFila($objWorksheet, $fila);
+            $fila++;
          }
       }
 
-      // 7. TOTALES FOOTER
-      $last_data_row = $fila_footer_inicio - 1;
+      // TOTALES FOOTER (Excel: fórmulas; valores vienen de $data por consistencia)
+      $last_data_row = $fila - 1;
       if ($last_data_row < $start_row_data) $last_data_row = $start_row_data;
 
-      // ==========================================
-      // BIFURCACIÓN: PDF (Valores) vs EXCEL (Fórmulas)
-      // ==========================================
-      if ($format === 'pdf') {
-         // USAMOS LAS VARIABLES PHP (Sin Fórmulas)
-         $objWorksheet->setCellValue('H' . $fila_footer_inicio, $sum_H_contract);
-         $objWorksheet->setCellValue('J' . $fila_footer_inicio, $sum_J_completed);
-         $objWorksheet->setCellValue('L' . $fila_footer_inicio, $sum_L_previous_bill);  // PREVIOUS BILL AMOUNT (suma de col L)
-         $objWorksheet->setCellValue('N' . $fila_footer_inicio, $sum_N_pending);
-         $objWorksheet->setCellValue('P' . $fila_footer_inicio, $sum_P_this_period);
-         $objWorksheet->setCellValue('S' . $fila_footer_inicio, $sum_S_billed);
-      } else {
-         // USAMOS FÓRMULAS DE EXCEL
-         $objWorksheet->setCellValue('H' . $fila_footer_inicio, "=SUM(H{$start_row_data}:H{$last_data_row})");
-         $objWorksheet->setCellValue('J' . $fila_footer_inicio, "=SUM(J{$start_row_data}:J{$last_data_row})");
-         $objWorksheet->setCellValue('L' . $fila_footer_inicio, "=SUM(L{$start_row_data}:L{$last_data_row})");
-         $objWorksheet->setCellValue('N' . $fila_footer_inicio, "=SUM(N{$start_row_data}:N{$last_data_row})");
-         $objWorksheet->setCellValue('P' . $fila_footer_inicio, "=SUM(P{$start_row_data}:P{$last_data_row})");
-         $objWorksheet->setCellValue('S' . $fila_footer_inicio, "=SUM(S{$start_row_data}:S{$last_data_row})");
-      }
+      $objWorksheet->setCellValue('H' . $fila_footer_inicio, "=SUM(H{$start_row_data}:H{$last_data_row})");
+      $objWorksheet->setCellValue('J' . $fila_footer_inicio, "=SUM(J{$start_row_data}:J{$last_data_row})");
+      $objWorksheet->setCellValue('L' . $fila_footer_inicio, "=SUM(L{$start_row_data}:L{$last_data_row})");
+      $objWorksheet->setCellValue('N' . $fila_footer_inicio, "=SUM(N{$start_row_data}:N{$last_data_row})");
+      $objWorksheet->setCellValue('P' . $fila_footer_inicio, "=SUM(P{$start_row_data}:P{$last_data_row})");
+      $objWorksheet->setCellValue('S' . $fila_footer_inicio, "=SUM(S{$start_row_data}:S{$last_data_row})");
 
       // Etiquetas y Estilos comunes (O se usa para la etiqueta "TOTAL AMT THIS PERIOD:", no para la suma)
       $objWorksheet->setCellValue('M' . $fila_footer_inicio, "TOTAL PENDING BALANCE:");
@@ -846,64 +541,35 @@ class InvoiceService extends Base
       $objWorksheet->getStyle('S' . $fila_footer_inicio)->getNumberFormat()->setFormatCode('"$"#,##0.00');
 
 
-      // 8. LESS RETAINERS (Excel/PDF): mismo cálculo que la vista (CalcularRetainageEfectivoParaInvoice)
-      $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
-      $current_retainage_amount = $retainage_efectivo['effective_current'];
-      $total_retainage_accumulated = $retainage_efectivo['total_retainage_accumulated'];
-
-      $std_retainage = (float)$project_entity->getRetainagePercentage();
-      $invoice_current_base = (float)($invoice_entity->getInvoiceCurrentRetainage() ?? 0);
-      $percentage_used_for_display = ($invoice_current_base > 0 && $current_retainage_amount !== 0.0)
-         ? ($current_retainage_amount / $invoice_current_base * 100) : $std_retainage;
-
-      // Escritura
-      $objWorksheet->setCellValue('R' . $fila_retainage, "CURRENT RETAINAGE @ " . number_format($percentage_used_for_display, 2) . "%");
+      // LESS RETAINERS: valores desde $data (misma fuente que PDF)
+      $objWorksheet->setCellValue('R' . $fila_retainage, "CURRENT RETAINAGE @ " . number_format($data['percentage_used'], 2) . "%");
       $objWorksheet->getStyle('R' . $fila_retainage)->getFont()->setSize(10)->setBold(true);
       $objWorksheet->getStyle('R' . $fila_retainage)->getAlignment()->setWrapText(true);
       $objWorksheet->getStyle('R' . $fila_retainage)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
       $objWorksheet->getRowDimension($fila_retainage)->setRowHeight(40);
 
-      $objWorksheet->setCellValue('S' . $fila_retainage, $current_retainage_amount);
+      $objWorksheet->setCellValue('S' . $fila_retainage, $data['current_retainage_amount']);
       $objWorksheet->getStyle('S' . $fila_retainage)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle('S' . $fila_retainage)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-      $objWorksheet->setCellValue('J' . $fila_retainage, $total_retainage_accumulated);
+      $objWorksheet->setCellValue('J' . $fila_retainage, $data['total_retainage_accumulated']);
       $objWorksheet->getStyle('J' . $fila_retainage)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle('J' . $fila_retainage)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-      // Amount Due (Bifurcado)
       $fila_amount_due = $fila_retainage + 1;
       $objWorksheet->setCellValue('R' . $fila_amount_due, "CURRENT AMOUNT DUE:");
       $objWorksheet->getStyle('R' . $fila_amount_due)->getFont()->setSize(10)->setBold(true);
       $objWorksheet->getStyle('R' . $fila_amount_due)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-
-      if ($format === 'pdf') {
-         // MODO PDF: Resta manual con variables ($sum_S_billed)
-         $amount_due_val = $sum_S_billed - $current_retainage_amount;
-         $objWorksheet->setCellValue('S' . $fila_amount_due, $amount_due_val);
-      } else {
-         // MODO EXCEL: Fórmula
-         $objWorksheet->setCellValue('S' . $fila_amount_due, "=S{$fila_footer_inicio}-S{$fila_retainage}");
-      }
+      $objWorksheet->setCellValue('S' . $fila_amount_due, "=S{$fila_footer_inicio}-S{$fila_retainage}");
       $objWorksheet->getStyle('S' . $fila_amount_due)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle('S' . $fila_amount_due)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-      // Columna J Balance (Bifurcado)
       $columna_btd = 'J';
       $fila_C = $fila_retainage + 1;
       $celda_C_valor = $columna_btd . $fila_C;
-
-      if ($format === 'pdf') {
-         // MODO PDF
-         $balance_j_val = $sum_J_completed - $total_retainage_accumulated;
-         $objWorksheet->setCellValue($celda_C_valor, $balance_j_val);
-      } else {
-         // MODO EXCEL
-         $fila_A = $fila_retainage - 1;
-         $fila_B = $fila_retainage;
-         $formula_C = "={$columna_btd}{$fila_A}-{$columna_btd}{$fila_B}";
-         $objWorksheet->setCellValue($celda_C_valor, $formula_C);
-      }
+      $fila_A = $fila_retainage - 1;
+      $fila_B = $fila_retainage;
+      $objWorksheet->setCellValue($celda_C_valor, "={$columna_btd}{$fila_A}-{$columna_btd}{$fila_B}");
       $objWorksheet->getStyle($celda_C_valor)->getNumberFormat()->setFormatCode('"$"#,##0.00');
       $objWorksheet->getStyle($celda_C_valor)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
@@ -912,15 +578,11 @@ class InvoiceService extends Base
 
       $objWorksheet->getPageSetup()->setPrintArea($rango_impresion);
 
-      // Opcional: Centrar en la página al imprimir
       $objWorksheet->getPageSetup()->setHorizontalCentered(true);
-      $nombre_base = $project_entity->getProjectNumber() . "-Invoice" . $invoice_entity->getNumber();
 
-      // ==========================================
-      // GENERACIÓN DEL ARCHIVO (solo Excel; PDF se genera en ExportarPdfDesdeTemplate)
-      // ==========================================
+      // GENERACIÓN DEL ARCHIVO (solo Excel; PDF se genera en ExportarPdf)
       if (false) { // PDF ahora usa plantilla Twig (ver early return al inicio)
-         $fichero = $nombre_base . ".pdf";
+         $fichero = $data['nombre_archivo'] . ".pdf";
 
          try {
             if (!class_exists('\Mpdf\Mpdf')) {
@@ -981,7 +643,7 @@ class InvoiceService extends Base
          }
       } else {
          // EXCEL NORMAL
-         $fichero = $nombre_base . ".xlsx";
+         $fichero = $data['nombre_archivo'] . ".xlsx";
          $path_archivo = "uploads" . DIRECTORY_SEPARATOR . "invoice" . DIRECTORY_SEPARATOR . $fichero;
          $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($objPHPExcel, 'Xlsx');
          $writer->save($path_archivo);
@@ -994,13 +656,13 @@ class InvoiceService extends Base
    }
 
    /**
-    * ExportarPdfDesdeTemplate: Genera el PDF del invoice usando la plantilla Twig (admin/invoice/pdf.html.twig).
+    * ExportarPdf: Genera el PDF del invoice usando la plantilla Twig (admin/invoice/pdf.html.twig).
     * Usa los mismos datos y cálculos que ExportarExcel para mantener consistencia.
     *
     * @param int|string $invoice_id
     * @return string|null URL del archivo generado
     */
-   public function ExportarPdfDesdeTemplate($invoice_id)
+   public function ExportarPdf($invoice_id)
    {
       set_time_limit(300);
       ini_set('memory_limit', '512M');
@@ -1045,13 +707,14 @@ class InvoiceService extends Base
    }
 
    /**
-    * PrepararDatosParaPdfTemplate: Prepara el array de datos para la plantilla Twig del invoice PDF.
-    * Replica la lógica de ExportarExcel para mantener los mismos valores.
+    * ObtenerDatosExportacionInvoice: Fuente única de datos y cálculos para exportación Excel y PDF.
+    * Toda la lógica de negocio (ítems, totales, retainage) vive aquí; Excel y PDF solo renderizan estos datos.
+    * Modificar cálculos o reglas solo en este método para que ambos formatos coincidan.
     *
     * @param int|string $invoice_id
-    * @return array|null Datos para el template, o null si el invoice no existe
+    * @return array|null { invoice_entity, project_entity, company, inspector, rows, totales, retainage, nombre_archivo } o null
     */
-   public function PrepararDatosParaPdfTemplate($invoice_id)
+   public function ObtenerDatosExportacionInvoice($invoice_id)
    {
       $em = $this->getDoctrine()->getManager();
       $invoiceItemRepo = $em->getRepository(InvoiceItem::class);
@@ -1127,8 +790,6 @@ class InvoiceService extends Base
 
       $company = $project_entity->getCompany();
       $insp = $project_entity->getInspector();
-      $projectDir = $this->getParameter('kernel.project_dir');
-      $logoPath = str_replace('\\', '/', $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'bundles' . DIRECTORY_SEPARATOR . 'metronic8' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'logo.jpg');
 
       $rows = [];
       $item_number = 1;
@@ -1244,7 +905,7 @@ class InvoiceService extends Base
 
          if ($esPrimerGrupo) {
             $esPrimerGrupo = false;
-            $rows[] = ['header' => '']; // Separador como en Excel
+            $rows[] = ['header' => ''];
          }
          $rows[] = ['header' => $titulo];
 
@@ -1283,6 +944,51 @@ class InvoiceService extends Base
       $amount_due = $sum_S_billed - $current_retainage_amount;
       $balance_after_retainage = $sum_J_completed - $total_retainage_accumulated;
 
+      $nombre_archivo = $project_entity->getProjectNumber() . '-Invoice' . $invoice_entity->getNumber();
+
+      return [
+         'invoice_entity' => $invoice_entity,
+         'project_entity' => $project_entity,
+         'company' => $company,
+         'inspector' => $insp,
+         'rows' => $rows,
+         'total_contract_amount' => $sum_H_contract,
+         'total_amount_btd' => $sum_J_completed,
+         'total_previous_bill' => $sum_L_previous_bill,
+         'total_pending_balance' => $sum_N_pending,
+         'total_amt_this_period' => $sum_P_this_period,
+         'total_billed_amount' => $sum_S_billed,
+         'current_retainage_amount' => $current_retainage_amount,
+         'total_retainage_accumulated' => $total_retainage_accumulated,
+         'percentage_used' => $percentage_used,
+         'balance_after_retainage' => $balance_after_retainage,
+         'current_amount_due' => $amount_due,
+         'nombre_archivo' => $nombre_archivo,
+      ];
+   }
+
+   /**
+    * PrepararDatosParaPdfTemplate: Prepara el array de datos para la plantilla Twig del invoice PDF.
+    * Usa ObtenerDatosExportacionInvoice como única fuente de datos/cálculos.
+    *
+    * @param int|string $invoice_id
+    * @return array|null Datos para el template, o null si el invoice no existe
+    */
+   public function PrepararDatosParaPdfTemplate($invoice_id)
+   {
+      $data = $this->ObtenerDatosExportacionInvoice($invoice_id);
+      if ($data === null) {
+         return null;
+      }
+
+      $invoice_entity = $data['invoice_entity'];
+      $project_entity = $data['project_entity'];
+      $company = $data['company'];
+      $insp = $data['inspector'];
+
+      $projectDir = $this->getParameter('kernel.project_dir');
+      $logoPath = str_replace('\\', '/', $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'bundles' . DIRECTORY_SEPARATOR . 'metronic8' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR . 'logo.jpg');
+
       $company_name = $company ? $company->getName() : '';
       $company_address = $company ? ($company->getAddress() ?? '') : '';
       $company_phone = $company ? ($company->getPhone() ?? '') : '';
@@ -1314,19 +1020,19 @@ class InvoiceService extends Base
          'start_date' => $invoice_entity->getStartDate()->format('m/d/Y'),
          'end_date' => $invoice_entity->getEndDate()->format('m/d/Y'),
          'notes' => $invoice_entity->getNotes() ?? '',
-         'rows' => $rows,
-         'total_contract_amount' => $sum_H_contract,
-         'total_amount_btd' => $sum_J_completed,
-         'total_previous_bill' => $sum_L_previous_bill,
-         'total_pending_balance' => $sum_N_pending,
-         'total_amt_this_period' => $sum_P_this_period,
-         'total_billed_amount' => $sum_S_billed,
-         'retainage_label' => 'CURRENT RETAINAGE @ ' . number_format($percentage_used, 2) . '%',
-         'current_retainage_amount' => $current_retainage_amount,
-         'total_retainage_accumulated' => $total_retainage_accumulated,
-         'balance_after_retainage' => $balance_after_retainage,
-         'current_amount_due' => $amount_due,
-         'nombre_archivo' => $project_entity->getProjectNumber() . '-Invoice' . $invoice_entity->getNumber(),
+         'rows' => $data['rows'],
+         'total_contract_amount' => $data['total_contract_amount'],
+         'total_amount_btd' => $data['total_amount_btd'],
+         'total_previous_bill' => $data['total_previous_bill'],
+         'total_pending_balance' => $data['total_pending_balance'],
+         'total_amt_this_period' => $data['total_amt_this_period'],
+         'total_billed_amount' => $data['total_billed_amount'],
+         'retainage_label' => 'CURRENT RETAINAGE @ ' . number_format($data['percentage_used'], 2) . '%',
+         'current_retainage_amount' => $data['current_retainage_amount'],
+         'total_retainage_accumulated' => $data['total_retainage_accumulated'],
+         'balance_after_retainage' => $data['balance_after_retainage'],
+         'current_amount_due' => $data['current_amount_due'],
+         'nombre_archivo' => $data['nombre_archivo'],
       ];
    }
 
@@ -1447,195 +1153,34 @@ class InvoiceService extends Base
    }
 
    /**
-    * EscribirFilaItem: Escribe una fila de ítem en el Excel/PDF.
-    * Columna K = PREVIOUS BILL QTY (Final Invoiced Quantity del invoice anterior).
-    * Columna L = PREVIOUS BILL AMOUNT (Final Amount This Period del invoice anterior).
-    * Columna M = PENDING QTY (BTD): quantity_final - paid_qty (mismo criterio que en Payments).
-    * Columna N = PENDING BALANCE (BTD): pending_qty_btd * price.
+    * EscribirFilaDesdeDatos: Escribe una fila de ítem en el Excel a partir del array de datos
+    * devuelto por ObtenerDatosExportacionInvoice (misma estructura que ObtenerFilaItemData).
+    * Solo escritura; no realiza cálculos. Usado por ExportarExcel para mantener una sola fuente de datos.
     *
-    * @return array [previous_bill_qty, previous_bill_amount, pending_qty_btd, pending_balance_btd] para totales del footer en PDF
+    * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $objWorksheet
+    * @param int $fila
+    * @param array $rowData keys: item_number, description, unit, unit_price, contract_qty, contract_amount, total_qty_btd, total_amount_btd, previous_bill_qty, previous_bill_amount, pending_qty, pending_balance, qty_this_period, amount_this_period, billed_qty, billed_amount
     */
-   private function EscribirFilaItem($objWorksheet, $fila, $item_number, $value, $styleArray, $allInvoicesHistory, $invoiceItemRepo, $currentInvoiceId)
+   private function EscribirFilaDesdeDatos($objWorksheet, $fila, array $rowData): void
    {
-      $price = $value->getPrice();
-      $contract_qty = $value->getProjectItem()->getQuantity();
-
-      $qty = $value->getQuantity();
-      $qbf = $value->getQuantityBroughtForward();
-
-      // Cálculo de totales actuales
-      $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
-
-      // K y L: PREVIOUS BILL QTY y PREVIOUS BILL AMOUNT = Final Invoiced Qty y Final Amount This Period del invoice anterior
-      $previous_bill_qty = 0.0;
-      $previous_bill_amount = 0.0;
-      $prevInvoice = null;
-      foreach ($allInvoicesHistory as $inv) {
-         if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
-            break;
-         }
-         $prevInvoice = $inv;
-      }
-      if ($prevInvoice !== null) {
-         $prev_items = $invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId());
-         $project_item_id = $value->getProjectItem()->getId();
-         foreach ($prev_items as $prevItem) {
-            if ($prevItem->getProjectItem()->getId() === $project_item_id) {
-               $prev_qty = (float) $prevItem->getQuantity();
-               $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
-               $previous_bill_qty = $prev_qty + $prev_qbf;
-               $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
-               break;
-            }
-         }
-      }
-
-      // PENDING QTY (BTD) y PENDING BALANCE (BTD) — solo para ítems NO Bond (el Bond no se toca).
-      // Pending QTY (BTD) = Suma (Qty This Period de invoices anteriores) − Suma (Paid Qty en pagos de invoices anteriores).
-      // Paid Qty: mismo campo que usa Payments (invoice_item.paid_qty, persistido en PaymentService al guardar pagos).
-      $pending_qty_btd = 0.0;
-      $pending_balance_btd = 0.0;
-      if (!$value->getProjectItem()->getItem()->getBond()) {
-         $sum_qty_this_period_previous = 0.0;
-         $sum_paid_qty_previous = 0.0;
-         $project_item_id = $value->getProjectItem()->getId();
-         foreach ($allInvoicesHistory as $inv) {
-            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) {
-               break;
-            }
-            $prev_items = $invoiceItemRepo->ListarItems($inv->getInvoiceId());
-            foreach ($prev_items as $prevItem) {
-               if ($prevItem->getProjectItem()->getId() === $project_item_id) {
-                  $sum_qty_this_period_previous += (float) $prevItem->getQuantity();
-                  // getPaidQty() = invoice_item.paid_qty, mismo valor que usa el módulo Payments
-                  $sum_paid_qty_previous += (float) ($prevItem->getPaidQty() ?? 0);
-                  break;
-               }
-            }
-         }
-         $pending_qty_btd = max(0.0, $sum_qty_this_period_previous - $sum_paid_qty_previous);
-         $pending_balance_btd = $pending_qty_btd * $price;
-
-         // Si hay una nota con override_unpaid_qty (Payments), usar ese valor en M y N también.
-         $notes = $this->ListarNotesDeItemInvoice($value->getId());
-         foreach ($notes as $note) {
-            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
-               $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
-               $pending_balance_btd = $pending_qty_btd * $price;
-               break;
-            }
-         }
-      } else {
-         // Ítem Bond: O y P se fijan después con bon_quantity/bon_amount en el flujo de exportación (no se toca aquí).
-         $quantity_final = $qty + ($qbf ?? 0.0);
-         $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
-         $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
-         $pending_balance_btd = $pending_qty_btd * $price;
-      }
-
-      $unit = $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '';
-
       $objWorksheet
-         ->setCellValue('A' . $fila, $item_number)
-         ->setCellValue('B' . $fila, $value->getProjectItem()->getItem()->getName())
-         ->setCellValue('E' . $fila, $unit)
-         ->setCellValue('F' . $fila, $price)
-         ->setCellValue('G' . $fila, $contract_qty)
-         ->setCellValue('H' . $fila, $contract_qty * $price)
-         ->setCellValue('I' . $fila, $qty_completed)
-         ->setCellValue('J' . $fila, $qty_completed * $price)
-
-         ->setCellValue('K' . $fila, $previous_bill_qty)    // PREVIOUS BILL QTY = Final Invoiced Quantity del invoice anterior
-         ->setCellValue('L' . $fila, $previous_bill_amount)  // PREVIOUS BILL AMOUNT = Final Amount This Period del invoice anterior
-
-         ->setCellValue('M' . $fila, $pending_qty_btd)       // PENDING QTY (BTD) = suma(Qty This Period anteriores) − suma(Paid Qty anteriores).
-         ->setCellValue('N' . $fila, $pending_balance_btd)   // PENDING BALANCE (BTD) = pending_qty_btd * price. Bond: O y P se sobrescriben después.
-
-         ->setCellValue('O' . $fila, $qty)           // QTY THIS PERIOD (Bond: se sobrescribe con bon_quantity)
-         ->setCellValue('P' . $fila, $qty * $price); // AMOUNT THIS PERIOD (Bond: se sobrescribe con bon_amount)
-
+         ->setCellValue('A' . $fila, $rowData['item_number'])
+         ->setCellValue('B' . $fila, $rowData['description'])
+         ->setCellValue('E' . $fila, $rowData['unit'] ?? '')
+         ->setCellValue('F' . $fila, $rowData['unit_price'])
+         ->setCellValue('G' . $fila, $rowData['contract_qty'])
+         ->setCellValue('H' . $fila, $rowData['contract_amount'])
+         ->setCellValue('I' . $fila, $rowData['total_qty_btd'])
+         ->setCellValue('J' . $fila, $rowData['total_amount_btd'])
+         ->setCellValue('K' . $fila, $rowData['previous_bill_qty'])
+         ->setCellValue('L' . $fila, $rowData['previous_bill_amount'])
+         ->setCellValue('M' . $fila, $rowData['pending_qty'])
+         ->setCellValue('N' . $fila, $rowData['pending_balance'])
+         ->setCellValue('O' . $fila, $rowData['qty_this_period'])
+         ->setCellValue('P' . $fila, $rowData['amount_this_period'])
+         ->setCellValue('R' . $fila, $rowData['billed_qty'])
+         ->setCellValue('S' . $fila, $rowData['billed_amount']);
       $objWorksheet->mergeCells("B{$fila}:D{$fila}");
-      if (!empty($styleArray)) {
-         $objWorksheet->getStyle("A{$fila}:R{$fila}")->applyFromArray($styleArray);
-         $objWorksheet->getStyle("A{$fila}:R{$fila}")->getFill()->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_NONE);
-      }
-
-      return [$previous_bill_qty, $previous_bill_amount, $pending_qty_btd, $pending_balance_btd];
-   }
-
-   /**
-    * EscribirFilaItemBond: Escribe una fila de ítem BOND en el Excel/PDF.
-    * Los items Bond no tienen data tracking ni InvoiceItem; solo aparecen en la exportación.
-    * Columnas con valor: description, unit, price, contract qty, contract amount (A–H). M, N, O, P en 0.
-    * El llamador sobrescribe O y P con bon_quantity y bon_amount del invoice.
-    *
-    * @return array ['contract_amount', 'pending_balance_btd' => 0]
-    */
-   private function EscribirFilaItemBond($objWorksheet, $fila, $item_number, ProjectItem $projectItem): array
-   {
-      $price = (float) $projectItem->getPrice();
-      $contract_qty = (float) $projectItem->getQuantity();
-      $contract_amount = $contract_qty * $price;
-      $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
-      $description = $projectItem->getItem()->getName();
-
-      // Bond: I y J = mismos que G y H (contract qty/amount del project_item); M y N en 0; O y P los escribe el llamador
-      $objWorksheet
-         ->setCellValue('A' . $fila, $item_number)
-         ->setCellValue('B' . $fila, $description)
-         ->setCellValue('E' . $fila, $unit)
-         ->setCellValue('F' . $fila, $price)
-         ->setCellValue('G' . $fila, $contract_qty)
-         ->setCellValue('H' . $fila, $contract_amount)
-         ->setCellValue('I' . $fila, $contract_qty)
-         ->setCellValue('J' . $fila, $contract_amount)
-         ->setCellValue('K' . $fila, 0)
-         ->setCellValue('L' . $fila, 0)
-         ->setCellValue('M' . $fila, 0)
-         ->setCellValue('N' . $fila, 0)
-         ->setCellValue('O' . $fila, 0)
-         ->setCellValue('P' . $fila, 0);
-
-      $objWorksheet->mergeCells("B{$fila}:D{$fila}");
-
-      return ['contract_amount' => $contract_amount, 'pending_balance_btd' => 0];
-   }
-
-   /**
-    * EscribirFilaItemSinCantidad: Escribe una fila de ítem del proyecto sin cantidad en este invoice.
-    * Ítems contratados que se listan con contract qty/amount y ceros en el resto (I–S).
-    *
-    * @return array ['contract_amount']
-    */
-   private function EscribirFilaItemSinCantidad($objWorksheet, $fila, $item_number, ProjectItem $projectItem): array
-   {
-      $price = (float) $projectItem->getPrice();
-      $contract_qty = (float) $projectItem->getQuantity();
-      $contract_amount = $contract_qty * $price;
-      $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
-      $description = $projectItem->getItem()->getName();
-
-      $objWorksheet
-         ->setCellValue('A' . $fila, $item_number)
-         ->setCellValue('B' . $fila, $description)
-         ->setCellValue('E' . $fila, $unit)
-         ->setCellValue('F' . $fila, $price)
-         ->setCellValue('G' . $fila, $contract_qty)
-         ->setCellValue('H' . $fila, $contract_amount)
-         ->setCellValue('I' . $fila, 0)
-         ->setCellValue('J' . $fila, 0)
-         ->setCellValue('K' . $fila, 0)
-         ->setCellValue('L' . $fila, 0)
-         ->setCellValue('M' . $fila, 0)
-         ->setCellValue('N' . $fila, 0)
-         ->setCellValue('O' . $fila, 0)
-         ->setCellValue('P' . $fila, 0)
-         ->setCellValue('R' . $fila, 0)
-         ->setCellValue('S' . $fila, 0);
-
-      $objWorksheet->mergeCells("B{$fila}:D{$fila}");
-
-      return ['contract_amount' => $contract_amount];
    }
 
    /**
