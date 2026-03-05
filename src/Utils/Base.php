@@ -164,11 +164,11 @@ class Base
       // Código copiado de http://cubiq.org/the-perfect-php-clean-url-generator
       setlocale(LC_ALL, 'en_US.UTF8');
       $slug = iconv('UTF-8', 'ASCII//TRANSLIT', $tex);
-      $slug = preg_replace_callback("/[^a-zA-Z0-9\/_|+ -]/", function ($c) {
+      $slug = preg_replace_callback("/[^a-zA-Z0-9\/_|+ \-\.\$]/", function ($c) {
          return '';
       }, $slug);
       $slug = strtolower(trim($slug, '-'));
-      $slug = preg_replace_callback("/[\/_|+ -]+/", function ($c) {
+      $slug = preg_replace_callback("/[^a-zA-Z0-9\/_|+ \-\.\$]/", function ($c) {
          return '-';
       }, $slug);
 
