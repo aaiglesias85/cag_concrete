@@ -228,6 +228,56 @@ class MessageController extends AbstractController
    }
 
    /**
+    * Enviar primer mensaje a un usuario: crea la conversación si no existe y envía el mensaje.
+    * Body JSON: other_user_id, body, source_lang (es|en).
+    */
+   #[OA\Post(
+      path: '/api/{lang}/message/enviar-primer-mensaje',
+      summary: 'Send first message',
+      description: 'Creates the conversation if it does not exist and sends the first message. JSON body: other_user_id, body, source_lang. Requires Bearer token.',
+      security: [['Bearer' => []]],
+      parameters: [new OA\Parameter(name: 'lang', in: 'path', required: true, schema: new OA\Schema(type: 'string', enum: ['es', 'en']))],
+      requestBody: new OA\RequestBody(
+         required: true,
+         content: new OA\JsonContent(required: ['other_user_id', 'body'], properties: [
+            new OA\Property(property: 'other_user_id', type: 'integer'),
+            new OA\Property(property: 'body', type: 'string'),
+            new OA\Property(property: 'source_lang', type: 'string', enum: ['es', 'en']),
+         ])
+      ),
+      responses: [
+         new OA\Response(response: 200, description: 'OK', content: new OA\JsonContent(properties: [
+            new OA\Property(property: 'success', type: 'boolean'),
+            new OA\Property(property: 'conversation_id', type: 'integer'),
+            new OA\Property(property: 'message', type: 'object'),
+         ])),
+         new OA\Response(response: 400, description: 'Bad request'),
+         new OA\Response(response: 401, description: 'Unauthorized'),
+      ]
+   )]
+   public function enviarPrimerMensaje(Request $request, string $lang = 'es'): JsonResponse
+   {
+      $request->setLocale($lang);
+      $this->translator->setLocale($lang);
+      $data = json_decode($request->getContent(), true) ?? [];
+      $otherUserId = (int) ($data['other_user_id'] ?? 0);
+      $body = trim((string) ($data['body'] ?? ''));
+      $sourceLang = isset($data['source_lang']) && $data['source_lang'] === 'en' ? 'en' : 'es';
+      if ($otherUserId <= 0) {
+         return $this->json(['success' => false, 'error' => 'other_user_id is required'], 400);
+      }
+      if ($body === '') {
+         return $this->json(['success' => false, 'error' => 'body is required'], 400);
+      }
+      $result = $this->messageService->EnviarPrimerMensaje($otherUserId, $body, $sourceLang);
+      if (!$result['success']) {
+         $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
+         return $this->json($result, $status);
+      }
+      return $this->json($result);
+   }
+
+   /**
     * Marcar como leídos los mensajes de una conversación.
     */
    #[OA\Post(

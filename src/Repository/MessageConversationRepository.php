@@ -38,9 +38,12 @@ class MessageConversationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar conversaciones de un usuario, ordenadas por última actividad.
+     * Listar conversaciones donde el usuario participa (está en user1_id o en user2_id).
+     * La tabla message_conversation tiene user1_id y user2_id: si el usuario actual coincide
+     * con uno de los dos, es una conversación en la que participa y debe listarse en /chat.
+     * Orden: última actividad (updated_at) descendente.
      *
-     * @param Usuario $user
+     * @param Usuario $user Usuario autenticado
      * @return MessageConversation[]
      */
     public function ListarConversacionesDeUsuario(Usuario $user): array
@@ -51,9 +54,7 @@ class MessageConversationRepository extends ServiceEntityRepository
         }
 
         return $this->createQueryBuilder('c')
-            ->leftJoin('c.user1', 'u1')
-            ->leftJoin('c.user2', 'u2')
-            ->where('u1.usuarioId = :user_id OR u2.usuarioId = :user_id')
+            ->where('IDENTITY(c.user1) = :user_id OR IDENTITY(c.user2) = :user_id')
             ->setParameter('user_id', $userId)
             ->orderBy('c.updatedAt', 'DESC')
             ->getQuery()

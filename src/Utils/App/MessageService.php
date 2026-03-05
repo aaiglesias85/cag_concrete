@@ -144,11 +144,12 @@ class MessageService extends Base
    }
 
    /**
-    * Obtener o crear conversación entre el usuario autenticado y otro usuario.
+    * Obtener conversación existente entre el usuario autenticado y otro usuario.
+    * No crea conversación: solo devuelve la existente. La conversación se crea al enviar el primer mensaje.
     *
     * @param int $otherUserId user_id del otro usuario
     * @param string $lang Idioma para mensajes
-    * @return array{success: bool, conversation_id?: int, other_user?: array, error?: string}
+    * @return array{success: bool, conversation_id?: int|null, other_user?: array, error?: string}
     */
    public function ObtenerOcrearConversacion(int $otherUserId, string $lang = 'es'): array
    {
@@ -175,27 +176,19 @@ class MessageService extends Base
 
       try {
          $conv = $this->conversationRepository->BuscarConversacionEntreUsuarios($userId, $otherUserId);
-         if (!$conv) {
-            $conv = new MessageConversation();
-            $user1Id = min($userId, $otherUserId);
-            $user2Id = max($userId, $otherUserId);
-            $user1 = $this->usuarioRepository->find($user1Id);
-            $user2 = $this->usuarioRepository->find($user2Id);
-            $conv->setUser1($user1);
-            $conv->setUser2($user2);
-            $now = new \DateTime();
-            $conv->setCreatedAt($now);
-            $conv->setUpdatedAt($now);
-            $this->em->persist($conv);
-            $this->em->flush();
-         } else {
+         if ($conv) {
             $conv->removeHiddenForUser($userId);
             $this->em->persist($conv);
             $this->em->flush();
+            return [
+               'success' => true,
+               'conversation_id' => $conv->getConversationId(),
+               'other_user' => $this->formatearUsuarioCorto($otherUser),
+            ];
          }
          return [
             'success' => true,
-            'conversation_id' => $conv->getConversationId(),
+            'conversation_id' => null,
             'other_user' => $this->formatearUsuarioCorto($otherUser),
          ];
       } catch (\Exception $e) {
@@ -348,6 +341,77 @@ class MessageService extends Base
                'created_at' => $now->format('c'),
                'read_at' => null,
             ],
+         ];
+      } catch (\Exception $e) {
+         $this->logger->error($e->getMessage());
+         return ['success' => false, 'error' => $e->getMessage()];
+      }
+   }
+
+   /**
+    * Enviar el primer mensaje a un usuario: crea la conversación si no existe y envía el mensaje.
+    * Es el único punto donde se crea una nueva fila en message_conversation.
+    *
+    * @param int $otherUserId user_id del destinatario
+    * @param string $body Texto del mensaje
+    * @param string $sourceLang es|en
+    * @return array{success: bool, conversation_id?: int, message?: array, error?: string}
+    */
+   public function EnviarPrimerMensaje(int $otherUserId, string $body, string $sourceLang = 'es'): array
+   {
+      $usuario = $this->getUser();
+      if (!$usuario instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario no autenticado'];
+      }
+      $forbidden = $this->checkPermisoChat($usuario);
+      if ($forbidden !== null) {
+         return $forbidden;
+      }
+      $userId = $usuario->getUsuarioId();
+      if ($userId === null) {
+         return ['success' => false, 'error' => 'Usuario no válido'];
+      }
+      if ($otherUserId === $userId) {
+         return ['success' => false, 'error' => 'No puede enviar mensaje a sí mismo'];
+      }
+
+      $otherUser = $this->usuarioRepository->find($otherUserId);
+      if (!$otherUser instanceof Usuario) {
+         return ['success' => false, 'error' => 'Usuario destinatario no encontrado'];
+      }
+
+      $body = trim($body);
+      if ($body === '') {
+         return ['success' => false, 'error' => 'El mensaje no puede estar vacío'];
+      }
+      $sourceLang = $sourceLang === 'en' ? 'en' : 'es';
+
+      try {
+         $conv = $this->conversationRepository->BuscarConversacionEntreUsuarios($userId, $otherUserId);
+         if (!$conv) {
+            $conv = new MessageConversation();
+            $user1Id = min($userId, $otherUserId);
+            $user2Id = max($userId, $otherUserId);
+            $user1 = $this->usuarioRepository->find($user1Id);
+            $user2 = $this->usuarioRepository->find($user2Id);
+            $conv->setUser1($user1);
+            $conv->setUser2($user2);
+            $now = new \DateTime();
+            $conv->setCreatedAt($now);
+            $conv->setUpdatedAt($now);
+            $this->em->persist($conv);
+            $this->em->flush();
+         }
+
+         $sendResult = $this->EnviarMensaje($conv->getConversationId(), $body, $sourceLang);
+         if (!$sendResult['success']) {
+            return $sendResult;
+         }
+
+         return [
+            'success' => true,
+            'conversation_id' => $conv->getConversationId(),
+            'message' => $sendResult['message'],
          ];
       } catch (\Exception $e) {
          $this->logger->error($e->getMessage());
