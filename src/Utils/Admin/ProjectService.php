@@ -3378,6 +3378,7 @@ class ProjectService extends Base
 
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
       $project = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
 
       if (!$project || !$project->getRetainage()) {
@@ -3394,9 +3395,18 @@ class ProjectService extends Base
       $resultado = [];
       $running_balance = 0;
 
-      $retainage_percentage = (float)$project->getRetainagePercentage();
-      $retainage_adjustment_percentage = (float)$project->getRetainageAdjustmentPercentage();
-      $retainage_adjustment_completion = (float)$project->getRetainageAdjustmentCompletion();
+      $std_retainage = (float)$project->getRetainagePercentage();
+      $red_retainage = (float)$project->getRetainageAdjustmentPercentage();
+      $target_completion = (float)$project->getRetainageAdjustmentCompletion();
+
+      // Calcular contract_amount_retainage_base (suma de qty × price de ítems con apply_retainage)
+      $contract_amount_retainage_base = 0;
+      $projectItems = $projectItemRepo->findBy(['project' => $project]);
+      foreach ($projectItems as $pItem) {
+         if ($pItem->getApplyRetainage()) {
+            $contract_amount_retainage_base += ($pItem->getQuantity() * $pItem->getPrice());
+         }
+      }
 
       foreach ($invoices as $invoice) {
          $invoice_id_str = (string) $invoice->getInvoiceId();
@@ -3405,17 +3415,52 @@ class ProjectService extends Base
          $invoice_amount = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id_str);
          $paid_amount_total_invoice = $invoiceItemRepo->TotalInvoicePaidAmount($invoice_id_str);
 
-         // Inv. Ret Amt = mismo valor que la caja "Current Retainage" del invoice
+         // Inv. Ret Amt = mismo valor que la caja "Current Retainage" del invoice (basado en facturado)
          $retainage_efectivo = $this->invoiceService->CalcularRetainageEfectivoParaInvoice($invoice_id_str);
          $retainage_entry = (float) $retainage_efectivo['effective_current'];
 
-         // Porcentaje para visualización: derivado del cálculo del invoice (base = Invoice Amt)
-         $porciento_retainage = ($invoice_amount > 0 && $retainage_entry > 0)
-            ? ($retainage_entry / $invoice_amount * 100)
-            : $retainage_percentage;
+         // --- CÁLCULO DE RETAINAGE BASADO EN PAGOS (como en Payments) ---
+         // Obtener historial previo de pagos
+         $historial_previo = $invoiceRepo->ObtenerTotalPagadoAnterior(
+            $project->getProjectId(),
+            $invoice->getStartDate(),
+            $invoice->getInvoiceId()
+         );
 
-         // Ajuste aplicado: inferido si se usó el porcentaje de ajuste (umbral basado en billed, no paid)
-         $ajuste_aplicado = ($retainage_adjustment_completion > 0 && abs($porciento_retainage - $retainage_adjustment_percentage) < 0.01);
+         // Obtener lo pagado en esta factura (ítems con apply_retainage)
+         $pagado_esta_factura = 0;
+         $current_items = $invoiceItemRepo->findBy(['invoice' => $invoice]);
+         foreach ($current_items as $item) {
+            if ($item->getProjectItem()->getApplyRetainage()) {
+               $pagado_esta_factura += (float)$item->getPaidAmount();
+            }
+         }
+
+         // Determinar porcentaje según el threshold
+         $total_al_momento = $historial_previo + $pagado_esta_factura;
+         $porciento_retainage = $std_retainage;
+
+         if ($contract_amount_retainage_base > 0 && $target_completion > 0) {
+            $threshold = $contract_amount_retainage_base * ($target_completion / 100);
+            if ($total_al_momento >= $threshold) {
+               $porciento_retainage = $red_retainage;
+            }
+         }
+
+         // Calcular retainage basado en paid_amount (como en Payments)
+         $retainage_amount_payments = 0;
+         foreach ($current_items as $item) {
+            if ($item->getProjectItem()->getApplyRetainage()) {
+               $paid_amount = (float)$item->getPaidAmount();
+               if ($paid_amount > 0) {
+                  $retainage_amount_payments += $paid_amount * ($porciento_retainage / 100);
+               }
+            }
+         }
+         $retainage_amount_payments = round($retainage_amount_payments, 2);
+
+         // Ajuste aplicado: inferido si se usó el porcentaje reducido
+         $ajuste_aplicado = ($target_completion > 0 && abs($porciento_retainage - $red_retainage) < 0.01);
 
          // Manejo de Reembolsos
          $reimbursed_real = 0;
@@ -3423,7 +3468,7 @@ class ProjectService extends Base
             $reimbursed_real += (float)$history->getAmount();
          }
 
-         $running_balance += $retainage_entry;
+         $running_balance += $retainage_amount_payments;
          $running_balance -= $reimbursed_real;
          $saldo_visual_fila = $running_balance;
 
@@ -3432,12 +3477,12 @@ class ProjectService extends Base
             'invoice_number' => $invoice->getNumber(),
             'invoice_date' => $invoice->getCreatedAt()->format('m/d/Y'),
             'invoice_amount' => $invoice_amount,
-            'paid_amount' => $paid_amount_total_invoice, // Mostramos lo que se pagó en total
+            'paid_amount' => $paid_amount_total_invoice,
             'paid' => $invoice->getPaid() ? 1 : 0,
             'retainage_percentage' => $porciento_retainage,
             'inv_ret_amt' => $retainage_entry,
-            'retainage_amount' => $retainage_entry,
-            'paid_ret_amt' => $retainage_entry, // Columna clave calculada correctamente
+            'retainage_amount' => $retainage_amount_payments,
+            'paid_ret_amt' => $retainage_amount_payments,
             'total_retainage_to_date' => $saldo_visual_fila,
             'ajuste_retainage' => $ajuste_aplicado ? 'Yes' : 'No',
             'retainage_reimbursed' => ($reimbursed_real > 0) ? 1 : 0,
