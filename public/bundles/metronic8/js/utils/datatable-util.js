@@ -28,19 +28,19 @@ var DatatableUtil = (function () {
          processing: 'Processing..',
          search: 'Search:',
          lengthMenu: 'Select _MENU_',
-         info: 'Showing _START_ a _END_ of _TOTAL_ records',
-         infoEmpty: 'Showing element 0 to 0 of 0 element',
-         infoFiltered: 'filtered by _MAX_ total elements',
+         info: 'Showing _START_ to _END_ of _TOTAL_ records',
+         infoEmpty: 'Showing 0 to 0 of 0 records',
+         infoFiltered: '(filtered from _MAX_ total records)',
          infoPostFix: '',
          loadingRecords: 'Please wait...',
          zeroRecords: 'There are no items to display',
          emptyTable: 'No data available in the table',
-         /*paginate: {
-              first:      "Primero",
-              previous:   "Anterior",
-              next:       "Siguiente",
-              last:       "Último"
-            },*/
+         paginate: {
+            first: 'First',
+            previous: 'Previous',
+            next: 'Next',
+            last: 'Last',
+         },
          aria: {
             sortAscending: ': Sort ascending',
             sortDescending: ': Sort descending',
@@ -291,37 +291,37 @@ var DatatableUtil = (function () {
    var getRenderAccionesDataSourceLocal = function (data, type, row, acciones, witdh = 50) {
       var html = '<div class="d-flex justify-content-center flex-shrink-0">';
 
-      // editar
+      // edit
       if (acciones.includes('edit')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Editar" class="edit btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Edit" class="edit btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">
               <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
             </a>`;
       }
 
-      // detalles
+      // details
       if (acciones.includes('detalle')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Detalles" class="detalle btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Details" class="detalle btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
               <i class="ki-duotone ki-eye fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 
       // download
       if (acciones.includes('download')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" target="_blank" title="Descargar" class="download btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" target="_blank" title="Download" class="download btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
               <i class="ki-duotone ki-cloud-download fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 
-      // eliminar
+      // delete
       if (acciones.includes('delete')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Eliminar" class="delete btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Delete" class="delete btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">
               <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 
-      // clonar
+      // clone
       if (acciones.includes('clonar')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Clonar" class="clonar btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="Clone" class="clonar btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
               <i class="ki-duotone ki-copy fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
