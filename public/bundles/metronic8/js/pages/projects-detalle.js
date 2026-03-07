@@ -209,8 +209,13 @@ var ProjectsDetalle = (function () {
 
          // prevailing wage
          $('#prevailing-wage-detalle').prop('checked', project.prevailing_wage);
+         if (project.prevailing_wage) {
+            $('#prevailing-wage-fields-detalle').show();
+         } else {
+            $('#prevailing-wage-fields-detalle').hide();
+         }
          $('#prevailing-county-detalle').val(project.prevailing_county || '');
-         $('#prevailing-role-detalle').val(project.prevailing_role || '');
+         $('#prevailing-roles-detalle').val(project.prevailing_roles || '');
          NumberUtil.setFormattedValue('#prevailing-rate-detalle', project.prevailing_rate, { decimals: 2 });
       }
    }

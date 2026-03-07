@@ -181,25 +181,6 @@ class ProjectRepository extends ServiceEntityRepository
    }
 
    /**
-    * ListarProjectsDePrevailingRole: Lista los projects de un prevailing role
-    *
-    * @return Project[]
-    */
-   public function ListarProjectsDePrevailingRole($prevailing_role_id)
-   {
-      $qb = $this->createQueryBuilder('p')
-         ->leftJoin('p.prevailingRole', 'p_r')
-         ->orderBy('p.projectId', 'ASC');
-
-      if (!empty($prevailing_role_id)) {
-         $qb->andWhere('p_r.roleId = :prevailing_role_id')
-            ->setParameter('prevailing_role_id', $prevailing_role_id);
-      }
-
-      return $qb->getQuery()->getResult();
-   }
-
-   /**
     * ListarProjects: Lista los projects con filtros y paginación
     * @param int $start Inicio
     * @param int $limit Limite

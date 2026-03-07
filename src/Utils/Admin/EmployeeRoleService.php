@@ -158,14 +158,8 @@ class EmployeeRoleService extends Base
     */
    private function EliminarInformacionRelacionada($role_id)
    {
-
-      // projects prevailing role
-      /** @var ProjectRepository $projectRepository */
-      $projectRepository = $this->getDoctrine()->getRepository(Project::class);
-      $projects = $projectRepository->ListarProjectsDePrevailingRole($role_id);
-      foreach ($projects as $project) {
-         $project->setPrevailingRole(null);
-      }
+      // Los prevailing roles se eliminan automáticamente por ON DELETE CASCADE
+      // en la tabla project_prevailing_role
    }
 
    /**

@@ -875,38 +875,39 @@
                            </div>
                         </div>
                      </div>
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-4" id="select-prevailing-county">
-                              <label class="form-label">
-                                 <span class="ic-step-number">2</span>
-                                 County
-                              </label>
-                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-county" name="prevailing_county_id">
-                                 <option value="">Select</option>
-                              </select>
+                     <div id="prevailing-wage-fields" style="display: none;">
+                        <div class="form-group ic-form-group">
+                           <div class="row">
+                              <div class="col-md-4" id="select-prevailing-county">
+                                 <label class="form-label">
+                                    <span class="ic-step-number">2</span>
+                                    County
+                                 </label>
+                                 <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-county" name="prevailing_county_id">
+                                    <option value="">Select</option>
+                                 </select>
+                              </div>
                            </div>
                         </div>
-                     </div>
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-4" id="select-prevailing-role">
-                              <label class="form-label">
-                                 <span class="ic-step-number">3</span>
-                                 Labor Type
-                              </label>
-                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-role" name="prevailing_role_id">
-                                 <option value="">Select</option>
-                                 {% for item in employee_roles %}
-                                 <option value="{{ item.roleId }}">{{ item.description }}</option>
-                                 {% endfor %}
-                              </select>
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Rate </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text">$</span>
-                                 <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate" name="prevailing_rate" />
+                        <div class="form-group ic-form-group">
+                           <div class="row">
+                              <div class="col-md-4" id="select-prevailing-role">
+                                 <label class="form-label">
+                                    <span class="ic-step-number">3</span>
+                                    Labor Type
+                                 </label>
+                                 <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-role" name="prevailing_role_ids" multiple="multiple" data-placeholder="Select Labor Types">
+                                    {% for item in employee_roles %}
+                                    <option value="{{ item.roleId }}">{{ item.description }}</option>
+                                    {% endfor %}
+                                 </select>
+                              </div>
+                              <div class="col-md-2">
+                                 <label class="form-label"> Rate </label>
+                                 <div class="input-group input-group-solid">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate" name="prevailing_rate" />
+                                 </div>
                               </div>
                            </div>
                         </div>
@@ -2226,36 +2227,38 @@
                         </label>
                         <div>
                            <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                              <input type="checkbox" id="prevailing-wage-detalle" class="form-check-input event-change" />
+                              <input type="checkbox" id="prevailing-wage-detalle" class="form-check-input event-change" disabled />
                               <label class="form-check-label" for="prevailing-wage-detalle"> Yes / No </label>
                            </div>
                         </div>
                      </div>
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-4" id="select-prevailing-county">
-                              <label class="form-label">
-                                 <span class="ic-step-number">2</span>
-                                 County
-                              </label>
-                              <input type="text" class="form-control form-control-solid" id="prevailing-county-detalle" disabled />
+                     <div id="prevailing-wage-fields-detalle" style="display: none;">
+                        <div class="form-group ic-form-group">
+                           <div class="row">
+                              <div class="col-md-4" id="select-prevailing-county">
+                                 <label class="form-label">
+                                    <span class="ic-step-number">2</span>
+                                    County
+                                 </label>
+                                 <input type="text" class="form-control form-control-solid" id="prevailing-county-detalle" disabled />
+                              </div>
                            </div>
                         </div>
-                     </div>
-                     <div class="form-group ic-form-group">
-                        <div class="row">
-                           <div class="col-md-4" id="select-prevailing-role">
-                              <label class="form-label">
-                                 <span class="ic-step-number">3</span>
-                                 Labor Type
-                              </label>
-                              <input type="text" class="form-control form-control-solid" id="prevailing-role-detalle" disabled />
-                           </div>
-                           <div class="col-md-2">
-                              <label class="form-label"> Rate </label>
-                              <div class="input-group input-group-solid">
-                                 <span class="input-group-text">$</span>
-                                 <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate-detalle" name="prevailing_rate" />
+                        <div class="form-group ic-form-group">
+                           <div class="row">
+                              <div class="col-md-4" id="select-prevailing-role">
+                                 <label class="form-label">
+                                    <span class="ic-step-number">3</span>
+                                    Labor Types
+                                 </label>
+                                 <input type="text" class="form-control form-control-solid" id="prevailing-roles-detalle" disabled />
+                              </div>
+                              <div class="col-md-2">
+                                 <label class="form-label"> Rate </label>
+                                 <div class="input-group input-group-solid">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control form-control-solid" id="prevailing-rate-detalle" disabled />
+                                 </div>
                               </div>
                            </div>
                         </div>

@@ -132,10 +132,6 @@ class Project
    #[ORM\JoinColumn(name: 'prevailing_county_id', referencedColumnName: 'county_id')]
    private ?County $prevailingCounty;
 
-   #[ORM\ManyToOne(targetEntity: 'App\Entity\EmployeeRole')]
-   #[ORM\JoinColumn(name: 'prevailing_role_id', referencedColumnName: 'role_id')]
-   private ?EmployeeRole $prevailingRole;
-
    #[ORM\Column(name: 'prevailing_rate', type: 'float', nullable: true)]
    private ?float $prevailingRate;
 
@@ -533,16 +529,6 @@ class Project
    public function setPrevailingCounty(?County $prevailingCounty): void
    {
       $this->prevailingCounty = $prevailingCounty;
-   }
-
-   public function getPrevailingRole(): ?EmployeeRole
-   {
-      return $this->prevailingRole;
-   }
-
-   public function setPrevailingRole(?EmployeeRole $prevailingRole): void
-   {
-      $this->prevailingRole = $prevailingRole;
    }
 
    public function getPrevailingRate(): ?float

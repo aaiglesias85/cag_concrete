@@ -473,8 +473,9 @@ var Projects = (function () {
 
       // prevailing wage - limpiar campos
       $('#prevailing-wage').prop('checked', false);
+      $('#prevailing-wage-fields').hide();
       $('#prevailing-county').val('').trigger('change');
-      $('#prevailing-role').val('').trigger('change');
+      $('#prevailing-role').val([]).trigger('change');
       NumberUtil.setFormattedValue('#prevailing-rate', '', { decimals: 2 });
       NumberUtil.setFormattedValue('#bon-general', '', { decimals: 2 });
 
@@ -919,8 +920,8 @@ var Projects = (function () {
       var prevailing_county_id = $('#prevailing-county').val();
       formData.set('prevailing_county_id', prevailing_county_id || '');
 
-      var prevailing_role_id = $('#prevailing-role').val();
-      formData.set('prevailing_role_id', prevailing_role_id || '');
+      var prevailing_role_ids = $('#prevailing-role').val();
+      formData.set('prevailing_role_ids', prevailing_role_ids ? prevailing_role_ids.join(',') : '');
 
       var prevailing_rate = NumberUtil.getNumericValue('#prevailing-rate');
       formData.set('prevailing_rate', prevailing_rate);
@@ -961,6 +962,7 @@ var Projects = (function () {
                      BlockUtil.unblock('#form-project');
                      cerrarFormsConfirmated();
                   } else if (!next) {
+                     BlockUtil.unblock('#form-project');
                      resetForms(false);
 
                      var project_id = response.project_id;
@@ -968,6 +970,7 @@ var Projects = (function () {
 
                      editRow(project_id, false, false);
                   } else {
+                     BlockUtil.unblock('#form-project');
                      var project_id = response.project_id;
                      $('#project_id').val(project_id);
 
@@ -1204,6 +1207,11 @@ var Projects = (function () {
 
          // prevailing wage
          $('#prevailing-wage').prop('checked', project.prevailing_wage);
+         if (project.prevailing_wage) {
+            $('#prevailing-wage-fields').show();
+         } else {
+            $('#prevailing-wage-fields').hide();
+         }
 
          // Primero poblar el dropdown de counties (esto se hace automáticamente con el trigger de change en county)
          // Luego establecer el valor seleccionado después de que se haya poblado el dropdown
@@ -1215,7 +1223,7 @@ var Projects = (function () {
             }
          }, 200);
 
-         $('#prevailing-role').val(project.prevailing_role_id);
+         $('#prevailing-role').val(project.prevailing_role_ids || []);
          $('#prevailing-role').trigger('change');
          NumberUtil.setFormattedValue('#prevailing-rate', project.prevailing_rate, { decimals: 2 });
 
@@ -5256,6 +5264,20 @@ var Projects = (function () {
    $(document).on('change', '#county', function () {
       // Siempre actualizar el dropdown cuando cambien los counties, sin importar el tab actual
       poblarPrevailingCounties();
+   });
+
+   // Función para mostrar/ocultar los campos de Prevailing Wage según el checkbox
+   var togglePrevailingWageFields = function () {
+      if ($('#prevailing-wage').prop('checked')) {
+         $('#prevailing-wage-fields').slideDown(200);
+      } else {
+         $('#prevailing-wage-fields').slideUp(200);
+      }
+   };
+
+   // Listener para el checkbox de Prevailing Wage
+   $(document).on('change', '#prevailing-wage', function () {
+      togglePrevailingWageFields();
    });
 
    // Lógica para botones de la tabla Wizard (Edición)

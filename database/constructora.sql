@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 01-03-2026 a las 19:53:54
+-- Tiempo de generación: 07-03-2026 a las 00:59:19
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1404,7 +1404,6 @@ CREATE TABLE `project` (
   `concrete_class_id` int(11) DEFAULT NULL,
   `prevailing_wage` tinyint(1) DEFAULT NULL,
   `prevailing_county_id` int(11) DEFAULT NULL,
-  `prevailing_role_id` int(11) DEFAULT NULL,
   `prevailing_rate` decimal(18,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1412,10 +1411,10 @@ CREATE TABLE `project` (
 -- Volcado de datos para la tabla `project`
 --
 
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_county_id`, `prevailing_role_id`, `prevailing_rate`) VALUES
-(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_county_id`, `prevailing_rate`) VALUES
+(1, '435435435', '0009001', '345435435', 'FL COUNTY', NULL, NULL, 'f345435435', 'rt54543', 1000.00, 0, 'TEst', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Andres', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-14 20:24:53', '2025-03-02 14:13:09', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', NULL, NULL, 'Marcel', 'M345435435', 45000.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', '2024-05-28', 'Dan', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:20:22', '2025-02-21 17:36:25', NULL, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(3, '3243545', '0009003', '434354', 'Houston Texas', NULL, NULL, 'Marcel', '896532', 844500.00, 1, 'Miami', 1, 'Marcel Curbelo Carmona', 1, '2024-11-06', '2024-11-29', '2025-01-29', 'Marcel', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-01-24 19:25:26', NULL, 3, 1, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1593,6 +1592,18 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (37, 'Change contract amount, old value: 0', '2025-03-01', 1),
 (38, 'Change status, old value: In Progress', '2025-03-02', 1),
 (39, 'Change status, old value: In Progress', '2025-03-02', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `project_prevailing_role`
+--
+
+CREATE TABLE `project_prevailing_role` (
+  `id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -2347,8 +2358,7 @@ ALTER TABLE `project`
   ADD KEY `county_id` (`county_id`),
   ADD KEY `vendor_id` (`vendor_id`),
   ADD KEY `concrete_class_id` (`concrete_class_id`),
-  ADD KEY `prevailing_county_id` (`prevailing_county_id`),
-  ADD KEY `prevailing_role_id` (`prevailing_role_id`);
+  ADD KEY `prevailing_county_id` (`prevailing_county_id`);
 
 --
 -- Indices de la tabla `project_attachment`
@@ -2405,6 +2415,15 @@ ALTER TABLE `project_item_history`
 ALTER TABLE `project_notes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Ref6678` (`project_id`);
+
+--
+-- Indices de la tabla `project_prevailing_role`
+--
+ALTER TABLE `project_prevailing_role`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_project_role` (`project_id`,`role_id`),
+  ADD KEY `idx_project_id` (`project_id`),
+  ADD KEY `idx_role_id` (`role_id`);
 
 --
 -- Indices de la tabla `project_price_adjustment`
@@ -2852,6 +2871,12 @@ ALTER TABLE `project_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
+-- AUTO_INCREMENT de la tabla `project_prevailing_role`
+--
+ALTER TABLE `project_prevailing_role`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
 --
 ALTER TABLE `project_price_adjustment`
@@ -3187,8 +3212,7 @@ ALTER TABLE `project`
   ADD CONSTRAINT `Refcontractor67` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refinspector73` FOREIGN KEY (`inspector_id`) REFERENCES `inspector` (`inspector_id`),
   ADD CONSTRAINT `Refprojectcountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`),
-  ADD CONSTRAINT `Refprojectprevailingcountyid` FOREIGN KEY (`prevailing_county_id`) REFERENCES `county` (`county_id`),
-  ADD CONSTRAINT `Refprojectprevailingroleid` FOREIGN KEY (`prevailing_role_id`) REFERENCES `employee_role` (`role_id`);
+  ADD CONSTRAINT `Refprojectprevailingcountyid` FOREIGN KEY (`prevailing_county_id`) REFERENCES `county` (`county_id`);
 
 --
 -- Filtros para la tabla `project_attachment`
@@ -3237,6 +3261,13 @@ ALTER TABLE `project_item_history`
 --
 ALTER TABLE `project_notes`
   ADD CONSTRAINT `Refproject78` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`);
+
+--
+-- Filtros para la tabla `project_prevailing_role`
+--
+ALTER TABLE `project_prevailing_role`
+  ADD CONSTRAINT `fk_project_prevailing_role_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_project_prevailing_role_role` FOREIGN KEY (`role_id`) REFERENCES `employee_role` (`role_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `project_price_adjustment`
