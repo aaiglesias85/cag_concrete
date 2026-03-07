@@ -5613,6 +5613,13 @@ var Projects = (function () {
 
          initAccionesReimbursement();
 
+         // ver detalle (desde otras páginas con icono eye)
+         var project_id_detalle = localStorage.getItem('project_id_detalle');
+         if (project_id_detalle) {
+            localStorage.removeItem('project_id_detalle');
+            ProjectsDetalle.openDetail(project_id_detalle);
+         }
+
          // editar
          var project_id_edit = localStorage.getItem('project_id_edit');
          if (project_id_edit) {

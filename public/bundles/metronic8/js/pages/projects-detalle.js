@@ -447,122 +447,104 @@ var ProjectsDetalle = (function () {
    var initTableItems = function () {
       const table = '#items-table-editable-detalle';
 
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
+
       // Procesar datos para agrupar por change_order_date
       var datosAgrupados = agruparItemsPorChangeOrder(items);
 
-      // columns
+      // columns (sin checkbox ni acciones, solo visualización)
       const columns = [
-         { data: 'apply_retainage' },
-         { data: 'item' },
-         { data: 'unit' },
-         { data: 'yield_calculation_name' },
-         { data: 'quantity' },
-         { data: 'price' },
-         { data: 'total' },
-         { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
+         { data: 'item' },         // 0 - Item
+         { data: 'unit' },         // 1 - Unit
+         { data: 'yield_calculation_name' }, // 2 - Yield Calculation
+         { data: 'quantity' },     // 3 - Quantity
+         { data: 'price' },        // 4 - Price
+         { data: 'total' },        // 5 - Total
+         { data: '_groupOrder', visible: false }, // 6 - Columna oculta para ordenamiento
       ];
 
-      // column defs
+      // column defs (igual que edición pero sin checkbox ni acciones)
       let columnDefs = [
-
          {
-            targets: 0,
-            orderable: false,
-            className: 'text-center',
+            targets: 0, // Item
             render: function (data, type, row) {
-                  var checked = (data == 1 || data === true) ? 'checked' : '';
-                  return `
-                     <div class="form-check form-check-sm form-check-custom form-check-solid justify-content-center">
-                        <input class="form-check-input chk-item-retainage" type="checkbox" value="${row.id}" ${checked} />
-                     </div>`;
-            }
-         },
-         {
-            
-            targets: 1,
-            render: function (data, type, row) {
-               // Si es encabezado de grupo, mostrar el título
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
-               
+
                var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               
+
                var badgeBond = '';
                if (row.bond == 1 || row.bond === true) {
                   badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
-               
+
                var badgeBonded = '';
                if (row.bonded == 1 || row.bonded === true) {
                   badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
-               
-               // Si es change order, agregar icono de +
+
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer change-order-history-icon" data-project-item-id="' +
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="white-space: nowrap; display: flex; align-items: center;"><span>${data || ''}</span>${badgeRetainage}${badgeBond}${badgeBonded}${icono}</div>`;
+
+               return `<div class="d-flex align-items-center" style="white-space: nowrap;">
+                           <span>${data || ''}</span>
+                           ${badgeRetainage} 
+                           ${badgeBond}
+                           ${badgeBonded}
+                           ${icono}
+                       </div>`;
             },
          },
          {
-            targets: 2,
+            targets: 1, // Unit
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return data || '';
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3,
+            targets: 2, // Yield Calculation
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 4,
+            targets: 3, // Quantity
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View quantity history"></i>';
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
-               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
-                  data,
-                  2,
-                  '.',
-                  ',',
-               )}</span>${icono}</div>`;
+               return `<div style="display:flex;"><span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>${icono}</div>`;
             },
          },
          {
-            targets: 5,
+            targets: 4, // Price
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-project-item-id="' +
-                     row.project_item_id +
-                     '" title="View price history"></i>';
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
-               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatMoney(
-                  data,
-               )}</span>${icono}</div>`;
+               return `<div style="display:flex;"><span>${MyApp.formatMoney(data)}</span>${icono}</div>`;
             },
          },
          {
-            targets: 6,
+            targets: 5, // Total
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
@@ -570,13 +552,9 @@ var ProjectsDetalle = (function () {
          },
       ];
 
-      // language
       const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[6, 'asc']]; // Ordenar por _groupOrder (columna 6)
 
-      // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[6, 'asc']];
-
-      // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
          displayLength: 30,
@@ -588,24 +566,18 @@ var ProjectsDetalle = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-         // marcar secondary, change order y encabezados de grupo
          createdRow: (row, data, index) => {
             if (data.isGroupHeader) {
                $(row).addClass('row-group-header');
-               $(row).css({
-                  'background-color': '#f5f5f5',
-                  'font-weight': 'bold',
-               });
-               // Hacer que la primera celda tenga colspan para ocupar todas las columnas excepto acciones
+               $(row).css({ 'background-color': '#f5f5f5', 'font-weight': 'bold' });
+
                var $firstCell = $(row).find('td:first');
-               $firstCell.attr('colspan', columns.length - 1);
                $firstCell.css('text-align', 'left');
-               // Ocultar las demás celdas
+               $firstCell.css('padding-left', '15px');
+               $firstCell.attr('colspan', 6); // Expandir para ocupar todas las columnas visibles
                $(row).find('td:not(:first)').hide();
             } else {
-               if (!data.principal) {
-                  $(row).addClass('row-secondary');
-               }
+               if (!data.principal) $(row).addClass('row-secondary');
             }
          },
       });
@@ -735,6 +707,11 @@ var ProjectsDetalle = (function () {
    var initTableNotes = function () {
       const table = '#notes-table-editable-detalle';
 
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
+
       // datasource
       const datasource = {
          url: `project/listarNotes`,
@@ -776,12 +753,6 @@ var ProjectsDetalle = (function () {
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
-         select: {
-            info: false,
-            style: 'multi',
-            selector: 'td:first-child input[type="checkbox"]',
-            className: 'row-selected',
-         },
          ajax: datasource,
          columns: columns,
          columnDefs: columnDefs,
@@ -813,6 +784,11 @@ var ProjectsDetalle = (function () {
    var oTableConcreteClasses;
    var initTableConcreteClasses = function () {
       const table = '#concrete-classes-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       // columns
       const columns = [{ data: 'concrete_class_name' }, { data: 'concrete_quote_price' }];
@@ -870,6 +846,11 @@ var ProjectsDetalle = (function () {
    var initTableContacts = function () {
       const table = '#contacts-table-editable-detalle';
 
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
+
       // columns
       const columns = [{ data: 'name' }, { data: 'email' }, { data: 'phone' }, { data: 'role' }, { data: 'notes' }];
 
@@ -926,6 +907,11 @@ var ProjectsDetalle = (function () {
    var invoices = [];
    var initTableInvoices = function () {
       const table = '#invoices-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       // columns
       const columns = [{ data: 'number' }, { data: 'startDate' }, { data: 'endDate' }, { data: 'total' }, { data: 'notes' }, { data: 'paid' }, { data: 'createdAt' }];
@@ -1027,6 +1013,11 @@ var ProjectsDetalle = (function () {
    var oTableDataTracking;
    var initTableDataTracking = function () {
       const table = '#data-tracking-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       // datasource
       const datasource = {
@@ -1158,13 +1149,6 @@ var ProjectsDetalle = (function () {
             [10, 25, 30, 50, 'Todos'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
-
-         select: {
-            info: false,
-            style: 'multi',
-            selector: 'td:first-child input[type="checkbox"]',
-            className: 'row-selected',
-         },
          ajax: datasource,
          columns: columns,
          columnDefs: columnDefs,
@@ -1232,6 +1216,11 @@ var ProjectsDetalle = (function () {
    var initTableListaAjustesPrecio = function () {
       const table = '#ajustes-precio-table-editable-detalle';
 
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
+
       // columns
       const columns = [
          { data: 'day' },
@@ -1289,6 +1278,11 @@ var ProjectsDetalle = (function () {
    var oTableArchivos;
    var initTableListaArchivos = function () {
       const table = '#archivo-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       const columns = [];
 
@@ -1463,6 +1457,11 @@ var ProjectsDetalle = (function () {
 
    var initTableItemsCompletion = function () {
       const table = '#items-completion-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       // Procesar datos para agrupar por change_order_date
       var datosAgrupados = agruparItemsPorChangeOrderCompletion(items_completion);
@@ -1691,6 +1690,11 @@ var ProjectsDetalle = (function () {
    var oTableInvoicesRetainageDetalle;
    var initTableInvoicesRetainageDetalle = function (data) {
       const table = '#invoices-retainage-table-editable-detalle';
+
+      // Destruir si ya existe para evitar error de reinicialización
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
 
       const columns = [
          { data: 'paid' },
@@ -1984,6 +1988,13 @@ var ProjectsDetalle = (function () {
          initTableItemsCompletion();
          initAccionFiltrarItemsCompletion();
 
+      },
+      openDetail: function (project_id) {
+         resetForms();
+         $('#project_id_detalle').val(project_id);
+         $('#form-project-detalle').removeClass('hide');
+         $('#lista-project').addClass('hide');
+         editRow(project_id);
       },
    };
 })();

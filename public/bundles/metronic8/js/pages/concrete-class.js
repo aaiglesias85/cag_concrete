@@ -732,7 +732,7 @@ var ConcreteClass = (function () {
       $(document).on('click', '#projects-table-editable a.detalle', function (e) {
          var posicion = $(this).data('posicion');
          if (projects[posicion]) {
-            localStorage.setItem('project_id_edit', projects[posicion].id);
+            localStorage.setItem('project_id_detalle', projects[posicion].id);
             // open
             window.location.href = url_project;
          }

@@ -635,7 +635,7 @@ var Index = function () {
             var project_id = $('#filtro-project').val();
             if (project_id && project_id !== '') {
 
-                localStorage.setItem('project_id_edit', project_id);
+                localStorage.setItem('project_id_detalle', project_id);
 
                 // open
                 window.location.href = url_project;

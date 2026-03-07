@@ -915,7 +915,7 @@ var Items = (function () {
       $(document).on('click', '#projects-table-editable a.detalle', function (e) {
          var posicion = $(this).data('posicion');
          if (projects[posicion]) {
-            localStorage.setItem('project_id_edit', projects[posicion].project_id);
+            localStorage.setItem('project_id_detalle', projects[posicion].project_id);
 
             // open
             window.location.href = url_project;
