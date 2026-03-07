@@ -438,62 +438,75 @@ var Equations = function () {
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
         $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
+            btnClickSalvarForm(false);
         });
+    }
 
-        function btnClickSalvarForm() {
-            KTUtil.scrollTop();
+    var btnClickSalvarForm = function (closeForm) {
+        KTUtil.scrollTop();
 
-            event_change = false;
+        event_change = false;
 
-            if (validateForm()) {
+        var isValid = validateForm();
 
-                var formData = new URLSearchParams();
+        if (closeForm && !isValid) {
+            cerrarFormsConfirmated();
+            return;
+        }
 
-                var equation_id = $('#equation_id').val();
-                formData.set("equation_id", equation_id);
+        if (isValid) {
 
-                var descripcion = $('#descripcion').val();
-                formData.set("description", descripcion);
+            var formData = new URLSearchParams();
 
-                var equation = $('#equation').val();
-                formData.set("equation", equation);
+            var equation_id = $('#equation_id').val();
+            formData.set("equation_id", equation_id);
 
-                var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
-                formData.set("status", status);
+            var descripcion = $('#descripcion').val();
+            formData.set("description", descripcion);
 
-                BlockUtil.block('#form-equation');
+            var equation = $('#equation').val();
+            formData.set("equation", equation);
 
-                axios.post("equation/salvarEquation", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
+            var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+            formData.set("status", status);
 
-                                cerrarForms();
+            BlockUtil.block('#form-equation');
 
-                                oTable.draw();
+            axios.post("equation/salvarEquation", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            oTable.draw();
+
+                            if (closeForm) {
+                                cerrarFormsConfirmated();
                             } else {
-                                toastr.error(response.error, "");
+                                var savedEquationId = response.equation_id;
+                                $('#equation_id').val(savedEquationId);
+                                editRow(savedEquationId);
                             }
+
                         } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
+                            toastr.error(response.error, "");
                         }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-equation");
-                    });
-            }
-        };
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-equation");
+                });
+        }
     }
     //Cerrar form
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-equation");
         $(document).on('click', ".cerrar-form-equation", function (e) {
-            cerrarForms();
+            btnClickSalvarForm(true);
         });
     }
     //Cerrar forms
@@ -520,56 +533,55 @@ var Equations = function () {
 
             editRow(equation_id);
         });
+    };
 
-        function editRow(equation_id) {
+    var editRow = function (equation_id) {
 
-            var formData = new URLSearchParams();
-            formData.set("equation_id", equation_id);
+        var formData = new URLSearchParams();
+        formData.set("equation_id", equation_id);
 
-            BlockUtil.block('#form-equation');
+        BlockUtil.block('#form-equation-body');
 
-            axios.post("equation/cargarDatos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
+        axios.post("equation/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                            //Datos unit
-                            cargarDatos(response.equation);
+                        //Datos unit
+                        cargarDatosEquation(response.equation);
 
-                        } else {
-                            toastr.error(response.error, "");
-                        }
                     } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
+                        toastr.error(response.error, "");
                     }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#form-equation");
-                });
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-equation-body");
+            });
+    };
 
-            function cargarDatos(equation) {
+    var cargarDatosEquation = function (equation) {
 
-                KTUtil.find(KTUtil.get("form-equation"), ".card-label").innerHTML = "Update Equation: " + equation.descripcion;
+        KTUtil.find(KTUtil.get("form-equation"), ".card-label").innerHTML = "Update Equation: " + equation.descripcion;
 
-                $('#descripcion').val(equation.descripcion);
-                $('#equation').val(equation.equation);
-                $('#estadoactivo').prop('checked', equation.status);
+        $('#descripcion').val(equation.descripcion);
+        $('#equation').val(equation.equation);
+        $('#estadoactivo').prop('checked', equation.status);
 
-                // items
-                items = equation.items;
-                actualizarTableListaItems();
+        // items
+        items = equation.items;
+        actualizarTableListaItems();
 
-                // habilitar tab
-                totalTabs = 2;
-                $('#nav-tabs-equation').removeClass('hide');
-                $('#btn-wizard-siguiente').removeClass('hide');
+        // habilitar tab
+        totalTabs = 2;
+        $('#nav-tabs-equation').removeClass('hide');
+        $('#btn-wizard-siguiente').removeClass('hide');
 
-                event_change = false;
-            }
-
-        }
+        event_change = false;
     };
     //Eliminar
     var initAccionEliminar = function () {

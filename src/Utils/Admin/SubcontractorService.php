@@ -692,6 +692,7 @@ class SubcontractorService extends Base
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
+         $resultado['subcontractor_id'] = $entity->getSubcontractorId();
 
          return $resultado;
       }
@@ -740,6 +741,7 @@ class SubcontractorService extends Base
       $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
       $resultado['success'] = true;
+      $resultado['subcontractor_id'] = $entity->getSubcontractorId();
 
       return $resultado;
    }

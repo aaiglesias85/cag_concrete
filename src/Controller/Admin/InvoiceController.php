@@ -122,6 +122,7 @@ class InvoiceController extends AbstractController
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
             $resultadoJson['url'] = $resultado['url'];
+            $resultadoJson['invoice_id'] = $resultado['invoice_id'];
 
             return $this->json($resultadoJson);
          } else {

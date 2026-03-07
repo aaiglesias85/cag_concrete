@@ -719,65 +719,74 @@ var DataTracking = (function () {
    };
 
    //Salvar
+   var closeFormAfterSave = false;
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
 
       $(document).off('click', '#btn-save-data-tracking-confirm');
       $(document).on('click', '#btn-save-data-tracking-confirm', function (e) {
-         SalvarDataTracking();
+         SalvarDataTracking(closeFormAfterSave);
       });
+   };
 
-      // primero verificar si ya existe
-      function btnClickSalvarForm() {
-         var data_tracking_id = $('#data_tracking_id').val();
-         var project_id = $('#project').val();
-         var date = FlatpickrUtil.getString('datetimepicker-date');
+   // primero verificar si ya existe
+   var btnClickSalvarForm = function (closeForm) {
+      closeFormAfterSave = closeForm;
+      var data_tracking_id = $('#data_tracking_id').val();
+      var project_id = $('#project').val();
+      var date = FlatpickrUtil.getString('datetimepicker-date');
 
-         if (validateForm() && date !== '' && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm() && date !== '' && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''));
 
-            formData.set('data_tracking_id', data_tracking_id);
-            formData.set('project_id', project_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            formData.set('date', date);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            BlockUtil.block('#form-data-tracking');
+         formData.set('data_tracking_id', data_tracking_id);
+         formData.set('project_id', project_id);
 
-            axios
-               .post('data-tracking/validarSiExiste', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        if (response.existe) {
-                           // mostar modal
-                           ModalUtil.show('modal-data-tracking-confirm', { backdrop: 'static', keyboard: true });
-                        } else {
-                           SalvarDataTracking();
-                        }
+         formData.set('date', date);
+
+         BlockUtil.block('#form-data-tracking');
+
+         axios
+            .post('data-tracking/validarSiExiste', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     if (response.existe) {
+                        // mostar modal
+                        ModalUtil.show('modal-data-tracking-confirm', { backdrop: 'static', keyboard: true });
                      } else {
-                        toastr.error(response.error, '');
+                        SalvarDataTracking(closeForm);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-data-tracking');
-               });
-         } else {
-            if (date === '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-date'), 'This field is required');
-            }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-data-tracking');
+            });
+      } else {
+         if (date === '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-date'), 'This field is required');
          }
       }
    };
 
-   var SalvarDataTracking = function () {
+   var SalvarDataTracking = function (closeForm) {
       var data_tracking_id = $('#data_tracking_id').val();
       var project_id = $('#project').val();
       if (validateForm() && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
@@ -837,10 +846,16 @@ var DataTracking = (function () {
                   if (response.success) {
                      toastr.success(response.message, '');
 
-                     cerrarForms();
-
                      //actualizar lista
                      btnClickFiltrar();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
+                     } else {
+                        var savedDataTrackingId = response.data_tracking_id;
+                        $('#data_tracking_id').val(savedDataTrackingId);
+                        editRow(savedDataTrackingId);
+                     }
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -849,7 +864,9 @@ var DataTracking = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () {});
+            .then(function () {
+               BlockUtil.unblock('#form-data-tracking');
+            });
       }
    };
 
@@ -857,7 +874,7 @@ var DataTracking = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-data-tracking');
       $(document).on('click', '.cerrar-form-data-tracking', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -911,7 +928,7 @@ var DataTracking = (function () {
       var formData = new URLSearchParams();
       formData.set('data_tracking_id', data_tracking_id);
 
-      BlockUtil.block('#form-data-tracking');
+      BlockUtil.block('#form-data-tracking-body');
 
       axios
          .post('data-tracking/cargarDatos', formData, { responseType: 'json' })
@@ -930,7 +947,7 @@ var DataTracking = (function () {
          })
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
-            BlockUtil.unblock('#form-data-tracking');
+            BlockUtil.unblock('#form-data-tracking-body');
          });
 
       function cargarDatos(data_tracking) {

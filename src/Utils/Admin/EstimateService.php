@@ -822,6 +822,7 @@ class EstimateService extends Base
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
+         $resultado['estimate_id'] = $entity->getEstimateId();
 
          return $resultado;
       }
@@ -1088,6 +1089,7 @@ class EstimateService extends Base
       $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
       $resultado['success'] = true;
+      $resultado['estimate_id'] = $entity->getEstimateId();
 
       return $resultado;
    }

@@ -276,11 +276,6 @@
                </h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -292,18 +287,23 @@
                </button>
 
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-wizard-finalizar" class="btn btn-success">
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-success me-2">
                   <i class="la la-check"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
                </button>
                {% endif %}
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
 
          <form class="form" id="data-tracking-form" action="javascript:;" enctype="multipart/form-data" method="post">
             <input type="hidden" id="data_tracking_id" name="data_tracking_id" />
 
-            <div class="card-body">
+            <div class="card-body" id="form-data-tracking-body">
                <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                   <li class="nav-item">
                      <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
@@ -1022,11 +1022,6 @@
                </h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking-detalle me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior-detalle" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -1036,6 +1031,11 @@
                   <span class="kt-hidden-mobile font-weight-bold">Next</span>
                   <i class="la la-arrow-right ms-2"></i>
                </button>
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking-detalle">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
 

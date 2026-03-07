@@ -607,27 +607,34 @@ var Estimates = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         var stage_id = $('#project-stage').val();
+      var stage_id = $('#project-stage').val();
 
-         if (validateForm() && stage_id !== '') {
-            SalvarEstimate();
-         } else {
-            if (stage_id === '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
-            }
+      var isValid = validateForm() && stage_id !== '';
+
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
+
+      if (isValid) {
+         SalvarEstimate(closeForm);
+      } else {
+         if (stage_id === '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
          }
       }
    };
 
-   var SalvarEstimate = function () {
+   var SalvarEstimate = function (closeForm) {
       var formData = new URLSearchParams();
 
       var estimate_id = $('#estimate_id').val();
@@ -733,9 +740,15 @@ var Estimates = (function () {
                if (response.success) {
                   toastr.success(response.message, '');
 
-                  cerrarForms();
-
                   btnClickFiltrar();
+
+                  if (closeForm) {
+                     cerrarFormsConfirmated();
+                  } else {
+                     var savedEstimateId = response.estimate_id;
+                     $('#estimate_id').val(savedEstimateId);
+                     editRow(savedEstimateId);
+                  }
                } else {
                   toastr.error(response.error, '');
                }
@@ -753,7 +766,7 @@ var Estimates = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-estimate');
       $(document).on('click', '.cerrar-form-estimate', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -805,7 +818,7 @@ var Estimates = (function () {
       var formData = new URLSearchParams();
       formData.set('estimate_id', estimate_id);
 
-      BlockUtil.block('#form-estimate');
+      BlockUtil.block('#form-estimate-body');
 
       axios
          .post('estimate/cargarDatos', formData, { responseType: 'json' })
@@ -824,7 +837,7 @@ var Estimates = (function () {
          })
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
-            BlockUtil.unblock('#form-estimate');
+            BlockUtil.unblock('#form-estimate-body');
          });
 
       function cargarDatos(estimate) {

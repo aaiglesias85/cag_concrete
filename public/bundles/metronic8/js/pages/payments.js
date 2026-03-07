@@ -478,45 +478,60 @@ var Payments = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-invoice');
       $(document).on('click', '#btn-salvar-invoice', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
-         event_change = false;
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
+      event_change = false;
 
-         if (validateForm()) {
-            var formData = new URLSearchParams();
-            var invoice_id = $('#invoice_id').val();
-            formData.set('invoice_id', invoice_id);
-            formData.set('payments', JSON.stringify(payments));
-            formData.set('archivos', JSON.stringify(archivos));
+      var isValid = validateForm();
 
-            BlockUtil.block('#form-payment');
-            axios
-               .post('payment/salvarPayment', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
-                        cerrarForms();
-                        btnClickFiltrar();
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
+
+      if (isValid) {
+         var formData = new URLSearchParams();
+         var invoice_id = $('#invoice_id').val();
+         formData.set('invoice_id', invoice_id);
+         formData.set('payments', JSON.stringify(payments));
+         formData.set('archivos', JSON.stringify(archivos));
+
+         BlockUtil.block('#form-payment');
+
+         axios
+            .post('payment/salvarPayment', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+                     btnClickFiltrar();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedInvoiceId = response.invoice_id || invoice_id;
+                        $('#invoice_id').val(savedInvoiceId);
+                        editRow(savedInvoiceId, false);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-payment');
-               });
-         } else {
-            if (project_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
-            }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-payment');
+            });
+      } else {
+         if (project_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
          }
       }
    };
@@ -524,7 +539,7 @@ var Payments = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-payment');
       $(document).on('click', '.cerrar-form-payment', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
 
@@ -585,7 +600,7 @@ var Payments = (function () {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
 
-      BlockUtil.block('#form-payment');
+      BlockUtil.block('#form-payment-body');
 
       axios
          .post('payment/cargarDatos', formData, { responseType: 'json' })
@@ -604,7 +619,7 @@ var Payments = (function () {
          })
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
-            BlockUtil.unblock('#form-payment');
+            BlockUtil.unblock('#form-payment-body');
 
             if (isReadOnly) {
                // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario

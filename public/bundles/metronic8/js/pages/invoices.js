@@ -866,85 +866,96 @@ var Invoices = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-invoice');
       $(document).on('click', '#btn-salvar-invoice', function (e) {
-         btnClickSalvarForm(false);
+         btnClickSalvarForm(false, false);
       });
 
       $(document).off('click', '#btn-salvar-exportar-invoice');
       $(document).on('click', '#btn-salvar-exportar-invoice', function (e) {
-         btnClickSalvarForm(true);
+         btnClickSalvarForm(true, true);
       });
+   };
 
-      function btnClickSalvarForm(exportar) {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (exportar, closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         var project_id = $('#project').val();
+      var project_id = $('#project').val();
 
-         if (validateForm() && project_id != '' && isValidNumber() && items_lista.length > 0) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm() && project_id != '' && isValidNumber() && items_lista.length > 0;
 
-            var invoice_id = $('#invoice_id').val();
-            formData.set('invoice_id', invoice_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            formData.set('project_id', project_id);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var number = $('#number').val();
-            formData.set('number', number);
+         var invoice_id = $('#invoice_id').val();
+         formData.set('invoice_id', invoice_id);
 
-            var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
-            formData.set('start_date', start_date);
+         formData.set('project_id', project_id);
 
-            var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
-            formData.set('end_date', end_date);
+         var number = $('#number').val();
+         formData.set('number', number);
 
-            var notes = $('#notes').val();
-            formData.set('notes', notes);
+         var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
+         formData.set('start_date', start_date);
 
-            var paid = $('#paidactivo').prop('checked') ? 1 : 0;
-            formData.set('paid', paid);
+         var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
+         formData.set('end_date', end_date);
 
-            actualizarItems();
+         var notes = $('#notes').val();
+         formData.set('notes', notes);
 
-            formData.set('items', JSON.stringify(items));
+         var paid = $('#paidactivo').prop('checked') ? 1 : 0;
+         formData.set('paid', paid);
 
-            formData.set('exportar', exportar ? 1 : 0);
+         actualizarItems();
 
-            BlockUtil.block('#form-invoice');
+         formData.set('items', JSON.stringify(items));
 
-            axios
-               .post('invoice/salvarInvoice', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         formData.set('exportar', exportar ? 1 : 0);
 
-                        cerrarForms();
+         BlockUtil.block('#form-invoice');
 
-                        btnClickFiltrar();
+         axios
+            .post('invoice/salvarInvoice', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
 
-                        if (response.url != '') {
-                           document.location = response.url;
-                        }
+                     btnClickFiltrar();
+
+                     if (response.url != '') {
+                        document.location = response.url;
+                     } else if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedInvoiceId = response.invoice_id;
+                        $('#invoice_id').val(savedInvoiceId);
+                        editRow(savedInvoiceId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-invoice');
-               });
-         } else {
-            if (project_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
-            }
-            if (items_lista.length == 0) {
-               toastr.error('The list of items is empty, please add at least one item.', '');
-            }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-invoice');
+            });
+      } else {
+         if (project_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
+         }
+         if (items_lista.length == 0) {
+            toastr.error('The list of items is empty, please add at least one item.', '');
          }
       }
    };
@@ -966,7 +977,7 @@ var Invoices = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-invoice');
       $(document).on('click', '.cerrar-form-invoice', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(false, true);
       });
    };
    //Cerrar forms
@@ -1023,7 +1034,7 @@ var Invoices = (function () {
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
 
-      BlockUtil.block('#form-invoice');
+      BlockUtil.block('#form-invoice-body');
 
       axios
          .post('invoice/cargarDatos', formData, { responseType: 'json' })
@@ -1042,7 +1053,7 @@ var Invoices = (function () {
          })
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
-            BlockUtil.unblock('#form-invoice');
+            BlockUtil.unblock('#form-invoice-body');
          });
 
          function cargarDatos(invoice) {

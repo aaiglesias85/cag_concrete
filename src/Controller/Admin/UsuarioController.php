@@ -277,6 +277,7 @@ class UsuarioController extends AbstractController
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['usuario_id'] = $resultado['usuario_id'];
 
             return $this->json($resultadoJson);
          } else {

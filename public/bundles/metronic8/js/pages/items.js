@@ -470,77 +470,90 @@ var Items = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         var unit_id = $('#unit').val();
+      var unit_id = $('#unit').val();
 
-         if (validateForm() && unit_id != '' && isValidYield()) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm() && unit_id != '' && isValidYield();
 
-            var item_id = $('#item_id').val();
-            formData.set('item_id', item_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            formData.set('unit_id', unit_id);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var name = $('#name').val();
-            formData.set('name', name);
+         var item_id = $('#item_id').val();
+         formData.set('item_id', item_id);
 
-            var descripcion = $('#descripcion').val();
-            formData.set('description', descripcion);
+         formData.set('unit_id', unit_id);
 
-            var status = $('#estadoactivo').prop('checked') ? 1 : 0;
-            formData.set('status', status);
+         var name = $('#name').val();
+         formData.set('name', name);
 
-            // Solo enviar bond si el usuario tiene permiso
-            var bond = 0;
-            if (permiso.usuario_bond) {
-               bond = $('#bond').prop('checked') ? 1 : 0;
-            }
-            formData.set('bond', bond);
+         var descripcion = $('#descripcion').val();
+         formData.set('description', descripcion);
 
-            var yield_calculation = $('#yield-calculation').val();
-            formData.set('yield_calculation', yield_calculation);
+         var status = $('#estadoactivo').prop('checked') ? 1 : 0;
+         formData.set('status', status);
 
-            var equation_id = $('#equation').val();
-            formData.set('equation_id', equation_id);
+         // Solo enviar bond si el usuario tiene permiso
+         var bond = 0;
+         if (permiso.usuario_bond) {
+            bond = $('#bond').prop('checked') ? 1 : 0;
+         }
+         formData.set('bond', bond);
 
-            BlockUtil.block('#form-item');
+         var yield_calculation = $('#yield-calculation').val();
+         formData.set('yield_calculation', yield_calculation);
 
-            axios
-               .post('item/salvarItem', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         var equation_id = $('#equation').val();
+         formData.set('equation_id', equation_id);
 
-                        cerrarForms();
+         BlockUtil.block('#form-item');
 
-                        oTable.draw();
+         axios
+            .post('item/salvarItem', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedItemId = response.item_id;
+                        $('#item_id').val(savedItemId);
+                        editRow(savedItemId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-item');
-               });
-         } else {
-            if (unit_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-unit'), 'This field is required');
-            }
-            if (!isValidYield()) {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-equation'), 'This field is required');
-            }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-item');
+            });
+      } else {
+         if (unit_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-unit'), 'This field is required');
+         }
+         if (!isValidYield()) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-equation'), 'This field is required');
          }
       }
    };
@@ -561,7 +574,7 @@ var Items = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-item');
       $(document).on('click', '.cerrar-form-item', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -606,82 +619,82 @@ var Items = (function () {
 
          editRow(item_id);
       });
+   };
 
-      function editRow(item_id) {
-         var formData = new URLSearchParams();
-         formData.set('item_id', item_id);
+   var editRow = function (item_id) {
+      var formData = new URLSearchParams();
+      formData.set('item_id', item_id);
 
-         BlockUtil.block('#form-item');
+      BlockUtil.block('#form-item-body');
 
-         axios
-            .post('item/cargarDatos', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     //cargar datos
-                     cargarDatos(response.item);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
+      axios
+         .post('item/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  //cargar datos
+                  cargarDatosItem(response.item);
                } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-item');
-            });
-
-         function cargarDatos(item) {
-            KTUtil.find(KTUtil.get('form-item'), '.card-label').innerHTML = 'Update Item: ' + (item.name || item.descripcion);
-
-            $('#name').val(item.name);
-            $('#descripcion').val(item.descripcion);
-
-            $('#unit').val(item.unit_id);
-            $('#unit').trigger('change');
-
-            $('#estadoactivo').prop('checked', item.status);
-            
-            // Si el usuario no tiene permiso pero el item tiene bond, mostrar campo deshabilitado (solo lectura)
-            if (!permiso.usuario_bond) {
-               if (item.bond == 1 || item.bond === true) {
-                  $('#div-bond-readonly').show();
-                  $('#bond').prop('checked', true);
-               } else {
-                  $('#div-bond-readonly').hide();
+                  toastr.error(response.error, '');
                }
             } else {
-               $('#bond').prop('checked', item.bond);
+               toastr.error('An internal error has occurred, please try again.', '');
             }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#form-item-body');
+         });
+   };
 
-            // yield
-            $('#yield-calculation').off('change', changeYield);
+   var cargarDatosItem = function (item) {
+      KTUtil.find(KTUtil.get('form-item'), '.card-label').innerHTML = 'Update Item: ' + (item.name || item.descripcion);
 
-            $('#yield-calculation').val(item.yield_calculation);
-            $('#yield-calculation').trigger('change');
+      $('#name').val(item.name);
+      $('#descripcion').val(item.descripcion);
 
-            $('#equation').val(item.equation_id);
-            $('#equation').trigger('change');
+      $('#unit').val(item.unit_id);
+      $('#unit').trigger('change');
 
-            if (item.yield_calculation === 'equation') {
-               $('#select-equation').removeClass('hide');
-            }
-
-            $('#yield-calculation').on('change', changeYield);
-
-            // projects
-            totalTabs = 2;
-            $('#btn-wizard-siguiente').removeClass('hide');
-            $('#nav-tabs-item').removeClass('hide');
-
-            projects = item.projects;
-            actualizarTableListaProjects();
-
-            event_change = false;
+      $('#estadoactivo').prop('checked', item.status);
+      
+      // Si el usuario no tiene permiso pero el item tiene bond, mostrar campo deshabilitado (solo lectura)
+      if (!permiso.usuario_bond) {
+         if (item.bond == 1 || item.bond === true) {
+            $('#div-bond-readonly').show();
+            $('#bond').prop('checked', true);
+         } else {
+            $('#div-bond-readonly').hide();
          }
+      } else {
+         $('#bond').prop('checked', item.bond);
       }
+
+      // yield
+      $('#yield-calculation').off('change', changeYield);
+
+      $('#yield-calculation').val(item.yield_calculation);
+      $('#yield-calculation').trigger('change');
+
+      $('#equation').val(item.equation_id);
+      $('#equation').trigger('change');
+
+      if (item.yield_calculation === 'equation') {
+         $('#select-equation').removeClass('hide');
+      }
+
+      $('#yield-calculation').on('change', changeYield);
+
+      // projects
+      totalTabs = 2;
+      $('#btn-wizard-siguiente').removeClass('hide');
+      $('#nav-tabs-item').removeClass('hide');
+
+      projects = item.projects;
+      actualizarTableListaProjects();
+
+      event_change = false;
    };
    //Eliminar
    var initAccionEliminar = function () {

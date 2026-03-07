@@ -206,11 +206,6 @@
                     </div>
                     <div class="card-toolbar">
 
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-equation me-2">
-                            <i class="la la-close"></i>
-                            <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-                        </a>
-
                         <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
                             <i class="la la-arrow-left me-2"></i>
                             <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -223,11 +218,16 @@
 
                         {% if permiso.agregar or permiso.editar %}
                             <button type="button" id="btn-wizard-finalizar"
-                                    class="btn btn-success">
+                                    class="btn btn-success me-2">
                                 <i class="la la-check"></i>
                                 <span class="kt-hidden-mobile font-weight-bold">Save</span>
                             </button>
                         {% endif %}
+
+                        <a href="javascript:;" class="btn btn-secondary cerrar-form-equation">
+                            <i class="la la-close"></i>
+                            <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+                        </a>
                     </div>
                 </div>
 
@@ -240,7 +240,7 @@
                 >
                     <input type="hidden" id="equation_id" name="equation_id"/>
 
-                    <div class="card-body">
+                    <div id="form-equation-body" class="card-body">
 
                         <ul id="nav-tabs-equation" class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6 hide">
                             <li class="nav-item">

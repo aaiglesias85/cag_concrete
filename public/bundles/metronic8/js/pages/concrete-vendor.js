@@ -456,66 +456,79 @@ var ConcreteVendor = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         if (validateForm()) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm();
 
-            var vendor_id = $('#vendor_id').val();
-            formData.set('vendor_id', vendor_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            var name = $('#name').val();
-            formData.set('name', name);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var phone = $('#phone').val();
-            formData.set('phone', phone);
+         var vendor_id = $('#vendor_id').val();
+         formData.set('vendor_id', vendor_id);
 
-            var contactEmail = $('#contactEmail').val();
-            formData.set('contactEmail', contactEmail);
+         var name = $('#name').val();
+         formData.set('name', name);
 
-            var address = $('#address').val();
-            formData.set('address', address);
+         var phone = $('#phone').val();
+         formData.set('phone', phone);
 
-            formData.set('contacts', JSON.stringify(contacts));
+         var contactEmail = $('#contactEmail').val();
+         formData.set('contactEmail', contactEmail);
 
-            BlockUtil.block('#form-concrete-vendor');
+         var address = $('#address').val();
+         formData.set('address', address);
 
-            axios
-               .post('concrete-vendor/salvar', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         formData.set('contacts', JSON.stringify(contacts));
 
-                        cerrarForms();
+         BlockUtil.block('#form-concrete-vendor');
 
-                        oTable.draw();
+         axios
+            .post('concrete-vendor/salvar', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedVendorId = response.vendor_id;
+                        $('#vendor_id').val(savedVendorId);
+                        editRow(savedVendorId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-concrete-vendor');
-               });
-         }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-concrete-vendor');
+            });
       }
    };
    //Cerrar form
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-concrete-vendor');
       $(document).on('click', '.cerrar-form-concrete-vendor', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -561,56 +574,56 @@ var ConcreteVendor = (function () {
 
          editRow(vendor_id);
       });
+   };
 
-      function editRow(vendor_id) {
-         var formData = new URLSearchParams();
-         formData.set('vendor_id', vendor_id);
+   var editRow = function (vendor_id) {
+      var formData = new URLSearchParams();
+      formData.set('vendor_id', vendor_id);
 
-         BlockUtil.block('#form-concrete-vendor');
+      BlockUtil.block('#form-concrete-vendor-body');
 
-         axios
-            .post('concrete-vendor/cargarDatos', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     //cargar datos
-                     cargarDatos(response.vendor);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
+      axios
+         .post('concrete-vendor/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  //cargar datos
+                  cargarDatosVendor(response.vendor);
                } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
+                  toastr.error(response.error, '');
                }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-concrete-vendor');
-            });
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#form-concrete-vendor-body');
+         });
+   };
 
-         function cargarDatos(vendor) {
-            KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = 'Update Concrete Vendors: ' + vendor.name;
+   var cargarDatosVendor = function (vendor) {
+      KTUtil.find(KTUtil.get('form-concrete-vendor'), '.card-label').innerHTML = 'Update Concrete Vendors: ' + vendor.name;
 
-            $('#name').val(vendor.name);
-            $('#phone').val(vendor.phone);
-            $('#address').val(vendor.address);
-            $('#contactEmail').val(vendor.contactEmail);
+      $('#name').val(vendor.name);
+      $('#phone').val(vendor.phone);
+      $('#address').val(vendor.address);
+      $('#contactEmail').val(vendor.contactEmail);
 
-            // contacts
-            contacts = vendor.contacts;
-            actualizarTableListaContacts();
+      // contacts
+      contacts = vendor.contacts;
+      actualizarTableListaContacts();
 
-            // projects
-            projects = vendor.projects;
-            actualizarTableListaProjects();
+      // projects
+      projects = vendor.projects;
+      actualizarTableListaProjects();
 
-            // habilitar tab
-            totalTabs = 3;
-            $('.nav-item-hide').removeClass('hide');
+      // habilitar tab
+      totalTabs = 3;
+      $('.nav-item-hide').removeClass('hide');
 
-            event_change = false;
-         }
-      }
+      event_change = false;
    };
    //Eliminar
    var initAccionEliminar = function () {

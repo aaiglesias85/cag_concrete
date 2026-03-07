@@ -169,11 +169,6 @@
                <h3 class="card-label">New company:</h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-company me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -189,11 +184,16 @@
                   <i class="la la-check"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
                </button>
-               <button type="button" id="btn-wizard-finalizar-exit" class="btn btn-success">
+               <button type="button" id="btn-wizard-finalizar-exit" class="btn btn-success me-2">
                   <i class="la la-check-double"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save & Exit</span>
                </button>
                {% endif %}
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-company">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
 

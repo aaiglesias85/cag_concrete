@@ -4,11 +4,6 @@
          <div class="modal-header">
             <h5 class="modal-title">New Invoice</h5>
             <div class="d-flex align-items-center gap-2">
-               <a href="javascript:;" class="btn btn-secondary cerrar-modal-invoice me-2" data-bs-dismiss="modal">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -24,10 +19,15 @@
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
                </button>
 
-               <button type="button" id="btn-salvar-exportar-invoice-modal" class="btn btn-primary btn-wizard-finalizar hide">
+               <button type="button" id="btn-salvar-exportar-invoice-modal" class="btn btn-primary btn-wizard-finalizar me-2 hide">
                   <i class="la la-file-excel-o"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save and Export</span>
                </button>
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-modal-invoice">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
          <div class="modal-body">

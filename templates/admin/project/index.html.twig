@@ -246,11 +246,6 @@
                <h3 class="card-label">New Project:</h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-project me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -262,18 +257,23 @@
                </button>
 
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-wizard-finalizar" class="btn btn-success">
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-success me-2">
                   <i class="la la-check"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Save</span>
                </button>
                {% endif %}
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-project">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
 
          <form class="form" id="project-form" action="javascript:;" enctype="multipart/form-data" method="post">
             <input type="hidden" id="project_id" name="project_id" />
 
-            <div class="card-body">
+            <div class="card-body" id="form-project-body">
                <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                   <li class="nav-item">
                      <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general" id="tab-general">
@@ -1647,11 +1647,6 @@
                <h3 class="card-label">View Project:</h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-project-detalle me-2">
-                  <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Cancel</span>
-               </a>
-
                <button id="btn-wizard-anterior-detalle" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
                   <span class="kt-hidden-mobile font-weight-bold">Back</span>
@@ -1661,6 +1656,11 @@
                   <span class="kt-hidden-mobile font-weight-bold">Next</span>
                   <i class="la la-arrow-right ms-2"></i>
                </button>
+
+               <a href="javascript:;" class="btn btn-secondary cerrar-form-project-detalle">
+                  <i class="la la-close"></i>
+                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
+               </a>
             </div>
          </div>
 

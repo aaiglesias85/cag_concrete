@@ -233,81 +233,95 @@ var ModalInvoice = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-invoice-modal');
       $(document).on('click', '#btn-salvar-invoice-modal', function (e) {
-         btnClickSalvarForm(false);
+         btnClickSalvarForm(false, false);
       });
 
       $(document).off('click', '#btn-salvar-exportar-invoice-modal');
       $(document).on('click', '#btn-salvar-exportar-invoice-modal', function (e) {
-         btnClickSalvarForm(true);
+         btnClickSalvarForm(true, true);
       });
 
-      function btnClickSalvarForm(exportar) {
-         var project_id = $('#project-invoice-modal').val();
-         var start_date = FlatpickrUtil.getString('start-date-invoice-modal');
-         var end_date = FlatpickrUtil.getString('end-date-invoice-modal');
+      $(document).off('click', '.cerrar-modal-invoice');
+      $(document).on('click', '.cerrar-modal-invoice', function (e) {
+         btnClickSalvarForm(false, true);
+      });
+   };
 
-         if (validateForm() && project_id != '' && isValidNumber() && start_date != '' && end_date != '') {
-            var formData = new URLSearchParams();
+   var btnClickSalvarForm = function (exportar, closeModal) {
+      var project_id = $('#project-invoice-modal').val();
+      var start_date = FlatpickrUtil.getString('start-date-invoice-modal');
+      var end_date = FlatpickrUtil.getString('end-date-invoice-modal');
 
-            var invoice_id = $('#modal-invoice [name="invoice_id"]').val() || '';
-            formData.set('invoice_id', invoice_id);
+      var isValid = validateForm() && project_id != '' && isValidNumber() && start_date != '' && end_date != '';
 
-            formData.set('project_id', project_id);
+      if (closeModal && !isValid) {
+         ModalUtil.hide('modal-invoice');
+         return;
+      }
 
-            var number = $('#number-invoice-modal').val();
-            formData.set('number', number);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            formData.set('start_date', start_date);
-            formData.set('end_date', end_date);
+         var invoice_id = $('#modal-invoice [name="invoice_id"]').val() || '';
+         formData.set('invoice_id', invoice_id);
 
-            var notes = $('#notes-invoice-modal').val();
-            formData.set('notes', notes);
+         formData.set('project_id', project_id);
 
-            formData.set('paid', 0);
+         var number = $('#number-invoice-modal').val();
+         formData.set('number', number);
 
-            actualizarItems();
+         formData.set('start_date', start_date);
+         formData.set('end_date', end_date);
 
-            formData.set('items', JSON.stringify(items));
+         var notes = $('#notes-invoice-modal').val();
+         formData.set('notes', notes);
 
-            formData.set('exportar', exportar ? 1 : 0);
+         formData.set('paid', 0);
 
-            BlockUtil.block('#modal-invoice .modal-content');
+         actualizarItems();
 
-            axios
-               .post('invoice/salvarInvoice', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         formData.set('items', JSON.stringify(items));
 
-                        // close modal
+         formData.set('exportar', exportar ? 1 : 0);
+
+         BlockUtil.block('#modal-invoice .modal-content');
+
+         axios
+            .post('invoice/salvarInvoice', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     if (response.url != '') {
+                        document.location = response.url;
+                     } else if (closeModal) {
                         ModalUtil.hide('modal-invoice');
-
-                        if (response.url != '') {
-                           document.location = response.url;
-                        }
                      } else {
-                        toastr.error(response.error, '');
+                        var savedInvoiceId = response.invoice_id;
+                        $('#modal-invoice [name="invoice_id"]').val(savedInvoiceId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#modal-invoice .modal-content');
-               });
-         } else {
-            if (project_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-invoice-modal'), 'This field is required');
-            }
-            if (start_date == '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('start-date-invoice-modal'), 'This field is required');
-            }
-            if (end_date == '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('end-date-invoice-modal'), 'This field is required');
-            }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#modal-invoice .modal-content');
+            });
+      } else {
+         if (project_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-invoice-modal'), 'This field is required');
+         }
+         if (start_date == '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('start-date-invoice-modal'), 'This field is required');
+         }
+         if (end_date == '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('end-date-invoice-modal'), 'This field is required');
          }
       }
    };

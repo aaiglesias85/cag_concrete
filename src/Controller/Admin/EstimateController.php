@@ -298,6 +298,7 @@ class EstimateController extends AbstractController
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['estimate_id'] = $resultado['estimate_id'];
 
 
             return $this->json($resultadoJson);

@@ -222,6 +222,7 @@ class DataTrackingController extends AbstractController
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['data_tracking_id'] = $resultado['data_tracking_id'];
 
             return $this->json($resultadoJson);
          } else {

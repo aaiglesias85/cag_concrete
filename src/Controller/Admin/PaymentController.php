@@ -118,6 +118,7 @@ class PaymentController extends AbstractController
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['invoice_id'] = $resultado['invoice_id'];
 
             return $this->json($resultadoJson);
          } else {

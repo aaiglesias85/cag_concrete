@@ -123,6 +123,7 @@ class ItemController extends AbstractController
 
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['item'] = $resultado['item'];
+            $resultadoJson['item_id'] = $resultado['item']['item_id'];
             $resultadoJson['message'] = "The operation was successful";
 
             return $this->json($resultadoJson);

@@ -460,71 +460,84 @@ var Subcontractors = function () {
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
         $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
+            btnClickSalvarForm(false);
         });
+    }
 
-        function btnClickSalvarForm() {
-            KTUtil.scrollTop();
+    var btnClickSalvarForm = function (closeForm) {
+        KTUtil.scrollTop();
 
-            event_change = false;
+        event_change = false;
 
-            if (validateForm()) {
+        var isValid = validateForm();
 
-                var formData = new URLSearchParams();
+        if (closeForm && !isValid) {
+            cerrarFormsConfirmated();
+            return;
+        }
 
-                var subcontractor_id = $('#subcontractor_id').val();
-                formData.set("subcontractor_id", subcontractor_id);
+        if (isValid) {
 
-                var name = $('#name').val();
-                formData.set("name", name);
+            var formData = new URLSearchParams();
 
-                var phone = $('#phone').val();
-                formData.set("phone", phone);
+            var subcontractor_id = $('#subcontractor_id').val();
+            formData.set("subcontractor_id", subcontractor_id);
 
-                var address = $('#address').val();
-                formData.set("address", address);
+            var name = $('#name').val();
+            formData.set("name", name);
 
-                var companyName = $('#companyName').val();
-                formData.set("companyName", companyName);
+            var phone = $('#phone').val();
+            formData.set("phone", phone);
 
-                var companyPhone = $('#companyPhone').val();
-                formData.set("companyPhone", companyPhone);
+            var address = $('#address').val();
+            formData.set("address", address);
 
-                var companyAddress = $('#companyAddress').val();
-                formData.set("companyAddress", companyAddress);
+            var companyName = $('#companyName').val();
+            formData.set("companyName", companyName);
 
-                BlockUtil.block('#form-subcontractor');
+            var companyPhone = $('#companyPhone').val();
+            formData.set("companyPhone", companyPhone);
 
-                axios.post("subcontractor/salvarSubcontractor", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
+            var companyAddress = $('#companyAddress').val();
+            formData.set("companyAddress", companyAddress);
 
-                                cerrarForms();
+            BlockUtil.block('#form-subcontractor');
 
-                                oTable.draw();
+            axios.post("subcontractor/salvarSubcontractor", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            oTable.draw();
+
+                            if (closeForm) {
+                                cerrarFormsConfirmated();
                             } else {
-                                toastr.error(response.error, "");
+                                var savedSubcontractorId = response.subcontractor_id;
+                                $('#subcontractor_id').val(savedSubcontractorId);
+                                editRow(savedSubcontractorId);
                             }
+
                         } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
+                            toastr.error(response.error, "");
                         }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-subcontractor");
-                    });
-            }
-        };
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-subcontractor");
+                });
+        }
     }
     //Cerrar form
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-subcontractor");
         $(document).on('click', ".cerrar-form-subcontractor", function (e) {
-            cerrarForms();
+            btnClickSalvarForm(true);
         });
     }
     //Cerrar forms
@@ -570,61 +583,60 @@ var Subcontractors = function () {
 
             editRow(subcontractor_id);
         });
+    };
 
-        function editRow(subcontractor_id) {
+    var editRow = function (subcontractor_id) {
 
-            var formData = new URLSearchParams();
-            formData.set("subcontractor_id", subcontractor_id);
+        var formData = new URLSearchParams();
+        formData.set("subcontractor_id", subcontractor_id);
 
-            BlockUtil.block('#form-subcontractor');
+        BlockUtil.block('#form-subcontractor-body');
 
-            axios.post("subcontractor/cargarDatos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
+        axios.post("subcontractor/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                            //cargar datos
-                            cargarDatos(response.subcontractor);
+                        //cargar datos
+                        cargarDatosSubcontractor(response.subcontractor);
 
-                        } else {
-                            toastr.error(response.error, "");
-                        }
                     } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
+                        toastr.error(response.error, "");
                     }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#form-subcontractor");
-                });
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-subcontractor-body");
+            });
+    };
 
-            function cargarDatos(subcontractor) {
+    var cargarDatosSubcontractor = function (subcontractor) {
 
-                KTUtil.find(KTUtil.get("form-subcontractor"), ".card-label").innerHTML = "Update Subcontractor: " + subcontractor.name;
+        KTUtil.find(KTUtil.get("form-subcontractor"), ".card-label").innerHTML = "Update Subcontractor: " + subcontractor.name;
 
-                $('#name').val(subcontractor.name);
-                $('#phone').val(subcontractor.phone);
-                $('#address').val(subcontractor.address);
+        $('#name').val(subcontractor.name);
+        $('#phone').val(subcontractor.phone);
+        $('#address').val(subcontractor.address);
 
-                $('#companyName').val(subcontractor.companyName);
-                $('#companyPhone').val(subcontractor.companyPhone);
-                $('#companyAddress').val(subcontractor.companyAddress);
+        $('#companyName').val(subcontractor.companyName);
+        $('#companyPhone').val(subcontractor.companyPhone);
+        $('#companyAddress').val(subcontractor.companyAddress);
 
-                // projects
-                projects = subcontractor.projects;
-                actualizarTableListaProjects();
+        // projects
+        projects = subcontractor.projects;
+        actualizarTableListaProjects();
 
-                // habilitar tab
-                totalTabs = 4;
-                $('#btn-wizard-siguiente').removeClass('hide');
-                $('.nav-item-hide').removeClass('hide');
+        // habilitar tab
+        totalTabs = 4;
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('.nav-item-hide').removeClass('hide');
 
-                event_change = false;
+        event_change = false;
 
-            }
-
-        }
     };
     //Eliminar
     var initAccionEliminar = function () {

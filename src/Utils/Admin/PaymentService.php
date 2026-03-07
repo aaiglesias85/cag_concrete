@@ -788,6 +788,7 @@ class PaymentService extends Base
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
+         $resultado['invoice_id'] = $entity->getInvoiceId();
 
          return $resultado;
       }

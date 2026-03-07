@@ -776,31 +776,38 @@ var Projects = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         var company_id = $('#company').val();
-         var county_ids = $('#county').val();
+      var company_id = $('#company').val();
+      var county_ids = $('#county').val();
 
-         if (validateForm() && company_id != '' && county_ids && county_ids.length > 0) {
-            SalvarProject();
-         } else {
-            if (company_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
-            }
-            if (!county_ids || county_ids.length == 0) {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-county'), 'This field is required');
-            }
+      var isValid = validateForm() && company_id != '' && county_ids && county_ids.length > 0;
+
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
+
+      if (isValid) {
+         SalvarProject(false, closeForm);
+      } else {
+         if (company_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company'), 'This field is required');
+         }
+         if (!county_ids || county_ids.length == 0) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-county'), 'This field is required');
          }
       }
    };
 
-   var SalvarProject = function (next = false) {
+   var SalvarProject = function (next = false, closeForm = false) {
       var formData = new URLSearchParams();
 
       var project_id = $('#project_id').val();
@@ -931,7 +938,6 @@ var Projects = (function () {
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
-               BlockUtil.unblock('#form-project');
                if (response.success) {
                   toastr.success(response.message, '');
 
@@ -951,7 +957,10 @@ var Projects = (function () {
                      });
                   }
 
-                  if (!next) {
+                  if (closeForm) {
+                     BlockUtil.unblock('#form-project');
+                     cerrarFormsConfirmated();
+                  } else if (!next) {
                      resetForms(false);
 
                      var project_id = response.project_id;
@@ -965,21 +974,25 @@ var Projects = (function () {
                      editRow(project_id, false, true);
                   }
                } else {
+                  BlockUtil.unblock('#form-project');
                   toastr.error(response.error, '');
                }
             } else {
+               BlockUtil.unblock('#form-project');
                toastr.error('An internal error has occurred, please try again.', '');
             }
          })
-         .catch(MyUtil.catchErrorAxios)
-         .then(function () {});
+         .catch(function (error) {
+            BlockUtil.unblock('#form-project');
+            MyUtil.catchErrorAxios(error);
+         });
    };
 
    //Cerrar form
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-project');
       $(document).on('click', '.cerrar-form-project', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -1056,7 +1069,7 @@ var Projects = (function () {
       var formData = new URLSearchParams();
       formData.set('project_id', project_id);
 
-      BlockUtil.block('#form-project');
+      BlockUtil.block('#form-project-body');
 
       axios
          .post('project/cargarDatos', formData, { responseType: 'json' })
@@ -1075,7 +1088,7 @@ var Projects = (function () {
          })
          .catch(MyUtil.catchErrorAxios)
          .then(function () {
-            BlockUtil.unblock('#form-project');
+            BlockUtil.unblock('#form-project-body');
          });
 
       function cargarDatos(project) {

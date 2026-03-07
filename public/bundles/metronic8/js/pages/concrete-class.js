@@ -358,58 +358,71 @@ var ConcreteClass = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         if (validateForm()) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm();
 
-            var concrete_class_id = $('#concrete_class_id').val();
-            formData.set('concrete_class_id', concrete_class_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            var name = $('#name').val();
-            formData.set('name', name);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var status = $('#estadoactivo').prop('checked') ? 1 : 0;
-            formData.set('status', status);
+         var concrete_class_id = $('#concrete_class_id').val();
+         formData.set('concrete_class_id', concrete_class_id);
 
-            BlockUtil.block('#form-concrete-class');
+         var name = $('#name').val();
+         formData.set('name', name);
 
-            axios
-               .post('concrete-class/salvar', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         var status = $('#estadoactivo').prop('checked') ? 1 : 0;
+         formData.set('status', status);
 
-                        cerrarForms();
+         BlockUtil.block('#form-concrete-class');
 
-                        oTable.draw();
+         axios
+            .post('concrete-class/salvar', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedConcreteClassId = response.concrete_class_id;
+                        $('#concrete_class_id').val(savedConcreteClassId);
+                        editRow(savedConcreteClassId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-concrete-class');
-               });
-         }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-concrete-class');
+            });
       }
    };
    //Cerrar form
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-concrete-class');
       $(document).on('click', '.cerrar-form-concrete-class', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
    //Cerrar forms
@@ -459,50 +472,50 @@ var ConcreteClass = (function () {
 
          editRow(concrete_class_id);
       });
+   };
 
-      function editRow(concrete_class_id) {
-         var formData = new URLSearchParams();
-         formData.set('concrete_class_id', concrete_class_id);
+   var editRow = function (concrete_class_id) {
+      var formData = new URLSearchParams();
+      formData.set('concrete_class_id', concrete_class_id);
 
-         BlockUtil.block('#form-concrete-class');
+      BlockUtil.block('#form-concrete-class-body');
 
-         axios
-            .post('concrete-class/cargarDatos', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     //cargar datos
-                     cargarDatos(response.class);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
+      axios
+         .post('concrete-class/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  //cargar datos
+                  cargarDatosClass(response.class);
                } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
+                  toastr.error(response.error, '');
                }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-concrete-class');
-            });
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#form-concrete-class-body');
+         });
+   };
 
-         function cargarDatos(class_data) {
-            KTUtil.find(KTUtil.get('form-concrete-class'), '.card-label').innerHTML = 'Update Concrete Class: ' + class_data.name;
+   var cargarDatosClass = function (class_data) {
+      KTUtil.find(KTUtil.get('form-concrete-class'), '.card-label').innerHTML = 'Update Concrete Class: ' + class_data.name;
 
-            $('#name').val(class_data.name);
-            $('#estadoactivo').prop('checked', class_data.status);
+      $('#name').val(class_data.name);
+      $('#estadoactivo').prop('checked', class_data.status);
 
-            // projects
-            projects = class_data.projects;
-            actualizarTableListaProjects();
+      // projects
+      projects = class_data.projects;
+      actualizarTableListaProjects();
 
-            // habilitar tab
-            totalTabs = 2;
-            $('.nav-item-hide').removeClass('hide');
+      // habilitar tab
+      totalTabs = 2;
+      $('.nav-item-hide').removeClass('hide');
 
-            event_change = false;
-         }
-      }
+      event_change = false;
    };
    //Eliminar
    var initAccionEliminar = function () {

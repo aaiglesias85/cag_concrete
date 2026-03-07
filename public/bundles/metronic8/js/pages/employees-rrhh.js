@@ -498,115 +498,128 @@ var EmployeesRrhh = (function () {
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-wizard-finalizar');
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
-         btnClickSalvarForm();
+         btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm() {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         if (validateForm()) {
-            var formData = new URLSearchParams();
+      var isValid = validateForm();
 
-            var employee_id = $('#employee_id').val();
-            formData.set('employee_id', employee_id);
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-            var name = $('#name').val();
-            formData.set('name', name);
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var address = $('#address').val();
-            formData.set('address', address);
+         var employee_id = $('#employee_id').val();
+         formData.set('employee_id', employee_id);
 
-            var phone = $('#phone').val();
-            formData.set('phone', phone);
+         var name = $('#name').val();
+         formData.set('name', name);
 
-            var cert_rate_type = $('#cert_rate_type').val();
-            formData.set('cert_rate_type', cert_rate_type);
+         var address = $('#address').val();
+         formData.set('address', address);
 
-            var social_security_number = $('#social_security_number').val();
-            formData.set('social_security_number', social_security_number);
+         var phone = $('#phone').val();
+         formData.set('phone', phone);
 
-            var apprentice_percentage = NumberUtil.getNumericValue('#apprentice_percentage');
-            formData.set('apprentice_percentage', apprentice_percentage);
+         var cert_rate_type = $('#cert_rate_type').val();
+         formData.set('cert_rate_type', cert_rate_type);
 
-            var work_code = $('#work_code').val();
-            formData.set('work_code', work_code);
+         var social_security_number = $('#social_security_number').val();
+         formData.set('social_security_number', social_security_number);
 
-            var gender = $('#gender').val();
-            formData.set('gender', gender);
+         var apprentice_percentage = NumberUtil.getNumericValue('#apprentice_percentage');
+         formData.set('apprentice_percentage', apprentice_percentage);
 
-            var race_id = $('#race').val();
-            formData.set('race_id', race_id);
+         var work_code = $('#work_code').val();
+         formData.set('work_code', work_code);
 
-            var date_hired = FlatpickrUtil.getString('date_hired');
-            formData.set('date_hired', date_hired);
+         var gender = $('#gender').val();
+         formData.set('gender', gender);
 
-            var date_terminated = FlatpickrUtil.getString('date_terminated');
-            formData.set('date_terminated', date_terminated);
+         var race_id = $('#race').val();
+         formData.set('race_id', race_id);
 
-            var reason_terminated = $('#reason_terminated').val();
-            formData.set('reason_terminated', reason_terminated);
+         var date_hired = FlatpickrUtil.getString('date_hired');
+         formData.set('date_hired', date_hired);
 
-            var time_card_notes = $('#time_card_notes').val();
-            formData.set('time_card_notes', time_card_notes);
+         var date_terminated = FlatpickrUtil.getString('date_terminated');
+         formData.set('date_terminated', date_terminated);
 
-            var regular_rate_per_hour = NumberUtil.getNumericValue('#regular_rate_per_hour');
-            formData.set('regular_rate_per_hour', regular_rate_per_hour);
+         var reason_terminated = $('#reason_terminated').val();
+         formData.set('reason_terminated', reason_terminated);
 
-            var overtime_rate_per_hour = NumberUtil.getNumericValue('#overtime_rate_per_hour');
-            formData.set('overtime_rate_per_hour', overtime_rate_per_hour);
+         var time_card_notes = $('#time_card_notes').val();
+         formData.set('time_card_notes', time_card_notes);
 
-            var special_rate_per_hour = NumberUtil.getNumericValue('#special_rate_per_hour');
-            formData.set('special_rate_per_hour', special_rate_per_hour);
+         var regular_rate_per_hour = NumberUtil.getNumericValue('#regular_rate_per_hour');
+         formData.set('regular_rate_per_hour', regular_rate_per_hour);
 
-            var trade_licenses_info = $('#trade_licenses').val();
-            formData.set('trade_licenses_info', trade_licenses_info);
+         var overtime_rate_per_hour = NumberUtil.getNumericValue('#overtime_rate_per_hour');
+         formData.set('overtime_rate_per_hour', overtime_rate_per_hour);
 
-            var notes = $('#notes').val();
-            formData.set('notes', notes);
+         var special_rate_per_hour = NumberUtil.getNumericValue('#special_rate_per_hour');
+         formData.set('special_rate_per_hour', special_rate_per_hour);
 
-            var is_osha_10_certified = $('#is_osha_10_certified').prop('checked') ? 1 : 0;
-            formData.set('is_osha_10_certified', is_osha_10_certified);
+         var trade_licenses_info = $('#trade_licenses').val();
+         formData.set('trade_licenses_info', trade_licenses_info);
 
-            var is_veteran = $('#is_veteran').prop('checked') ? 1 : 0;
-            formData.set('is_veteran', is_veteran);
+         var notes = $('#notes').val();
+         formData.set('notes', notes);
 
-            var status = $('#status').prop('checked') ? 1 : 0;
-            formData.set('status', status);
+         var is_osha_10_certified = $('#is_osha_10_certified').prop('checked') ? 1 : 0;
+         formData.set('is_osha_10_certified', is_osha_10_certified);
 
-            BlockUtil.block('#form-employee');
+         var is_veteran = $('#is_veteran').prop('checked') ? 1 : 0;
+         formData.set('is_veteran', is_veteran);
 
-            axios
-               .post('employee-rrhh/salvar', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         var status = $('#status').prop('checked') ? 1 : 0;
+         formData.set('status', status);
 
-                        cerrarForms();
+         BlockUtil.block('#form-employee');
 
-                        oTable.draw();
+         axios
+            .post('employee-rrhh/salvar', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+
+                     oTable.draw();
+
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        var savedEmployeeId = response.employee_id;
+                        $('#employee_id').val(savedEmployeeId);
+                        editRow(savedEmployeeId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-employee');
-               });
-         }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-employee');
+            });
       }
    };
    //Cerrar form
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-employee');
       $(document).on('click', '.cerrar-form-employee', function (e) {
-         cerrarForms();
+         btnClickSalvarForm(true);
       });
    };
 
@@ -652,78 +665,78 @@ var EmployeesRrhh = (function () {
 
          editRow(employee_id);
       });
+   };
 
-      function editRow(employee_id) {
-         var formData = new URLSearchParams();
-         formData.set('employee_id', employee_id);
+   var editRow = function (employee_id) {
+      var formData = new URLSearchParams();
+      formData.set('employee_id', employee_id);
 
-         BlockUtil.block('#form-employee');
+      BlockUtil.block('#form-employee-body');
 
-         axios
-            .post('employee-rrhh/cargarDatos', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     //Datos unit
-                     cargarDatos(response.employee);
-                  } else {
-                     toastr.error(response.error, '');
-                  }
+      axios
+         .post('employee-rrhh/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  //Datos unit
+                  cargarDatosEmployee(response.employee);
                } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
+                  toastr.error(response.error, '');
                }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-employee');
-            });
-
-         function cargarDatos(employee) {
-            KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = 'Update Employee: ' + employee.name;
-
-            $('#name').val(employee.name);
-
-            $('#address').val(employee.address);
-            $('#phone').val(employee.phone);
-            $('#cert_rate_type').val(employee.cert_rate_type);
-            $('#social_security_number').val(employee.social_security_number);
-
-            NumberUtil.setFormattedValue('#apprentice_percentage', employee.apprentice_percentage, { decimals: 2 });
-
-            $('#work_code').val(employee.work_code);
-            $('#gender').val(employee.gender);
-
-            $('#race').val(employee.race_id);
-            $('#race').trigger('change');
-
-            if (employee.date_hired) {
-               const date_hired = MyApp.convertirStringAFechaHora(employee.date_hired);
-               FlatpickrUtil.setDate('date_hired', date_hired);
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
             }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#form-employee-body');
+         });
+   };
 
-            if (employee.date_terminated) {
-               const date_terminated = MyApp.convertirStringAFechaHora(employee.date_terminated);
-               FlatpickrUtil.setDate('date_terminated', date_terminated);
-            }
+   var cargarDatosEmployee = function (employee) {
+      KTUtil.find(KTUtil.get('form-employee'), '.card-label').innerHTML = 'Update Employee: ' + employee.name;
 
-            $('#reason_terminated').val(employee.reason_terminated);
-            $('#time_card_notes').val(employee.time_card_notes);
+      $('#name').val(employee.name);
 
-            NumberUtil.setFormattedValue('#regular_rate_per_hour', employee.regular_rate_per_hour, { decimals: 2 });
-            NumberUtil.setFormattedValue('#overtime_rate_per_hour', employee.overtime_rate_per_hour, { decimals: 2 });
-            NumberUtil.setFormattedValue('#special_rate_per_hour', employee.special_rate_per_hour, { decimals: 2 });
+      $('#address').val(employee.address);
+      $('#phone').val(employee.phone);
+      $('#cert_rate_type').val(employee.cert_rate_type);
+      $('#social_security_number').val(employee.social_security_number);
 
-            $('#trade_licenses').val(employee.trade_licenses_info);
-            $('#notes').val(employee.notes);
+      NumberUtil.setFormattedValue('#apprentice_percentage', employee.apprentice_percentage, { decimals: 2 });
 
-            $('#is_osha_10_certified').prop('checked', employee.is_osha_10_certified);
-            $('#is_veteran').prop('checked', employee.is_veteran);
-            $('#status').prop('checked', employee.status);
+      $('#work_code').val(employee.work_code);
+      $('#gender').val(employee.gender);
 
-            event_change = false;
-         }
+      $('#race').val(employee.race_id);
+      $('#race').trigger('change');
+
+      if (employee.date_hired) {
+         const date_hired = MyApp.convertirStringAFechaHora(employee.date_hired);
+         FlatpickrUtil.setDate('date_hired', date_hired);
       }
+
+      if (employee.date_terminated) {
+         const date_terminated = MyApp.convertirStringAFechaHora(employee.date_terminated);
+         FlatpickrUtil.setDate('date_terminated', date_terminated);
+      }
+
+      $('#reason_terminated').val(employee.reason_terminated);
+      $('#time_card_notes').val(employee.time_card_notes);
+
+      NumberUtil.setFormattedValue('#regular_rate_per_hour', employee.regular_rate_per_hour, { decimals: 2 });
+      NumberUtil.setFormattedValue('#overtime_rate_per_hour', employee.overtime_rate_per_hour, { decimals: 2 });
+      NumberUtil.setFormattedValue('#special_rate_per_hour', employee.special_rate_per_hour, { decimals: 2 });
+
+      $('#trade_licenses').val(employee.trade_licenses_info);
+      $('#notes').val(employee.notes);
+
+      $('#is_osha_10_certified').prop('checked', employee.is_osha_10_certified);
+      $('#is_veteran').prop('checked', employee.is_veteran);
+      $('#status').prop('checked', employee.status);
+
+      event_change = false;
    };
    //Eliminar
    var initAccionEliminar = function () {

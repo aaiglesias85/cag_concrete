@@ -490,6 +490,7 @@ class UsuarioService extends Base
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
+         $resultado['usuario_id'] = $entity->getUsuarioId();
       } else {
          $resultado['success'] = false;
          $resultado['error'] = "The requested record does not exist";
@@ -580,6 +581,7 @@ class UsuarioService extends Base
       $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
       $resultado['success'] = true;
+      $resultado['usuario_id'] = $entity->getUsuarioId();
 
       return $resultado;
    }

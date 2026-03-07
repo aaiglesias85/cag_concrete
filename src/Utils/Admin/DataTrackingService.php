@@ -1009,6 +1009,7 @@ class DataTrackingService extends Base
       $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
       $resultado['success'] = true;
+      $resultado['data_tracking_id'] = $entity->getId();
 
       return $resultado;
    }

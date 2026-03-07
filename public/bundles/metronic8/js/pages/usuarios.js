@@ -560,7 +560,7 @@ var Usuarios = function () {
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-usuario");
         $(document).on('click', ".cerrar-form-usuario", function (e) {
-            cerrarForms();
+            btnClickSalvarForm(true);
         });
     }
     var cerrarForms = function () {
@@ -576,93 +576,106 @@ var Usuarios = function () {
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
         $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
+            btnClickSalvarForm(false);
         });
+    }
 
-        function btnClickSalvarForm() {
-            KTUtil.scrollTop();
+    function btnClickSalvarForm(closeForm) {
+        KTUtil.scrollTop();
 
-            event_change = false;
+        event_change = false;
 
-            devolverPermisos();
+        devolverPermisos();
 
-            var rol_id = $('#perfil').val();
+        var rol_id = $('#perfil').val();
 
-            if (validateForm() && rol_id != "" && permisos.length > 0) {
+        var isValid = validateForm() && rol_id != "" && permisos.length > 0;
 
-                var formData = new URLSearchParams();
+        if (closeForm && !isValid) {
+            cerrarFormsConfirmated();
+            return;
+        }
 
-                var usuario_id = $('#usuario_id').val();
-                formData.set("usuario_id", usuario_id);
+        if (isValid) {
 
-                formData.set("rol", rol_id);
+            var formData = new URLSearchParams();
 
-                var nombre = $('#nombre').val();
-                formData.set("nombre", nombre);
+            var usuario_id = $('#usuario_id').val();
+            formData.set("usuario_id", usuario_id);
 
-                var apellidos = $('#apellidos').val();
-                formData.set("apellidos", apellidos);
+            formData.set("rol", rol_id);
 
-                var email = $('#email').val();
-                formData.set("email", email);
+            var nombre = $('#nombre').val();
+            formData.set("nombre", nombre);
 
-                var estado = ($('#estadoactivo').prop('checked')) ? 1 : 0;
-                formData.set("habilitado", estado);
+            var apellidos = $('#apellidos').val();
+            formData.set("apellidos", apellidos);
 
-                var estimator = ($('#estimator').prop('checked')) ? 1 : 0;
-                formData.set("estimator", estimator);
+            var email = $('#email').val();
+            formData.set("email", email);
 
-                var bond = ($('#bond').prop('checked')) ? 1 : 0;
-                formData.set("bond", bond);
+            var estado = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+            formData.set("habilitado", estado);
 
-                var retainage = ($('#retainage').prop('checked')) ? 1 : 0;
-                formData.set("retainage", retainage);
+            var estimator = ($('#estimator').prop('checked')) ? 1 : 0;
+            formData.set("estimator", estimator);
 
-                var chat = ($('#chat').prop('checked')) ? 1 : 0;
-                formData.set("chat", chat);
+            var bond = ($('#bond').prop('checked')) ? 1 : 0;
+            formData.set("bond", bond);
 
-                var telefono = $('#telefono').val();
-                formData.set("telefono", telefono);
+            var retainage = ($('#retainage').prop('checked')) ? 1 : 0;
+            formData.set("retainage", retainage);
 
-                var password = $('#password').val();
-                formData.set("password", password);
+            var chat = ($('#chat').prop('checked')) ? 1 : 0;
+            formData.set("chat", chat);
 
-                formData.set("permisos", JSON.stringify(permisos));
+            var telefono = $('#telefono').val();
+            formData.set("telefono", telefono);
 
-                BlockUtil.block('#form-usuario');
+            var password = $('#password').val();
+            formData.set("password", password);
 
-                axios.post("usuario/salvarUsuario", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
+            formData.set("permisos", JSON.stringify(permisos));
 
-                                cerrarForms();
+            BlockUtil.block('#form-usuario');
 
-                                oTable.draw();
+            axios.post("usuario/salvarUsuario", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            oTable.draw();
+
+                            if (closeForm) {
+                                cerrarFormsConfirmated();
                             } else {
-                                toastr.error(response.error, "");
+                                var savedUsuarioId = response.usuario_id;
+                                $('#usuario_id').val(savedUsuarioId);
+                                editRow(savedUsuarioId);
                             }
-                        } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
-                        }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-usuario");
-                    });
 
-            } else {
-                if (rol_id == "") {
-                    MyApp.showErrorMessageValidateSelect(KTUtil.get("select-perfil"), "This field is required");
-                }
-                if (permisos.length == 0) {
-                    toastr.error("You must select the user's permissions", "");
-                }
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-usuario");
+                });
+
+        } else {
+            if (rol_id == "") {
+                MyApp.showErrorMessageValidateSelect(KTUtil.get("select-perfil"), "This field is required");
             }
-        };
+            if (permisos.length == 0) {
+                toastr.error("You must select the user's permissions", "");
+            }
+        }
     }
 
     //Editar
@@ -680,64 +693,64 @@ var Usuarios = function () {
 
             editRow(usuario_id);
         });
+    };
 
-        function editRow(usuario_id) {
+    var editRow = function (usuario_id) {
 
-            var formData = new URLSearchParams();
-            formData.set("usuario_id", usuario_id);
+        var formData = new URLSearchParams();
+        formData.set("usuario_id", usuario_id);
 
-            BlockUtil.block('#form-usuario');
+        BlockUtil.block('#form-usuario-body');
 
-            axios.post("usuario/cargarDatos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
+        axios.post("usuario/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                            //cargar datos
-                            cargarDatos(response.usuario);
+                        //cargar datos
+                        cargarDatos(response.usuario);
 
-                        } else {
-                            toastr.error(response.error, "");
-                        }
                     } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
+                        toastr.error(response.error, "");
                     }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#form-usuario");
-                });
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-usuario-body");
+            });
 
-            function cargarDatos(usuario) {
+        function cargarDatos(usuario) {
 
-                KTUtil.find(KTUtil.get("form-usuario"), ".card-label").innerHTML = "Update user: " + usuario.nombre;
+            KTUtil.find(KTUtil.get("form-usuario"), ".card-label").innerHTML = "Update user: " + usuario.nombre;
 
-                $('#perfil').off('change', cambiarPerfil);
+            $('#perfil').off('change', cambiarPerfil);
 
-                $('#perfil').val(usuario.rol);
-                $('#perfil').trigger('change');
+            $('#perfil').val(usuario.rol);
+            $('#perfil').trigger('change');
 
-                $('#perfil').on('change', cambiarPerfil);
+            $('#perfil').on('change', cambiarPerfil);
 
-                $('#nombre').val(usuario.nombre);
-                $('#apellidos').val(usuario.apellidos);
-                $('#email').val(usuario.email);
-                $('#telefono').val(usuario.telefono);
+            $('#nombre').val(usuario.nombre);
+            $('#apellidos').val(usuario.apellidos);
+            $('#email').val(usuario.email);
+            $('#telefono').val(usuario.telefono);
 
-                $('#estadoactivo').prop('checked', usuario.habilitado);
-                $('#estimator').prop('checked', usuario.estimator);
-                $('#bond').prop('checked', usuario.bond);
-                $('#retainage').prop('checked', usuario.retainage);
-                $('#chat').prop('checked', usuario.chat);
+            $('#estadoactivo').prop('checked', usuario.habilitado);
+            $('#estimator').prop('checked', usuario.estimator);
+            $('#bond').prop('checked', usuario.bond);
+            $('#retainage').prop('checked', usuario.retainage);
+            $('#chat').prop('checked', usuario.chat);
 
-                permisos = usuario.permisos;
-                marcarPermisos();
+            permisos = usuario.permisos;
+            marcarPermisos();
 
-                event_change = false;
-            }
-
+            event_change = false;
         }
+
     };
     //Activar
     var initAccionCambiarEstado = function () {

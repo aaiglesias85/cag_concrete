@@ -457,65 +457,78 @@ var Inspectors = function () {
     var initAccionSalvar = function () {
         $(document).off('click', "#btn-wizard-finalizar");
         $(document).on('click', "#btn-wizard-finalizar", function (e) {
-            btnClickSalvarForm();
+            btnClickSalvarForm(false);
         });
+    }
 
-        function btnClickSalvarForm() {
-            KTUtil.scrollTop();
+    var btnClickSalvarForm = function (closeForm) {
+        KTUtil.scrollTop();
 
-            event_change = false;
+        event_change = false;
 
-            if (validateForm()) {
+        var isValid = validateForm();
 
-                var formData = new URLSearchParams();
+        if (closeForm && !isValid) {
+            cerrarFormsConfirmated();
+            return;
+        }
 
-                var inspector_id = $('#inspector_id').val();
-                formData.set("inspector_id", inspector_id);
+        if (isValid) {
 
-                var name = $('#name').val();
-                formData.set("name", name);
+            var formData = new URLSearchParams();
 
-                var email = $('#email').val();
-                formData.set("email", email);
+            var inspector_id = $('#inspector_id').val();
+            formData.set("inspector_id", inspector_id);
 
-                var phone = $('#phone').val();
-                formData.set("phone", phone);
+            var name = $('#name').val();
+            formData.set("name", name);
 
-                var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
-                formData.set("status", status);
+            var email = $('#email').val();
+            formData.set("email", email);
 
-                BlockUtil.block('#form-inspector');
+            var phone = $('#phone').val();
+            formData.set("phone", phone);
 
-                axios.post("inspector/salvarInspector", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
+            var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
+            formData.set("status", status);
 
-                                cerrarForms();
+            BlockUtil.block('#form-inspector');
 
-                                oTable.draw();
+            axios.post("inspector/salvarInspector", formData, {responseType: "json"})
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
 
+                            oTable.draw();
+
+                            if (closeForm) {
+                                cerrarFormsConfirmated();
                             } else {
-                                toastr.error(response.error, "");
+                                var savedInspectorId = response.inspector_id;
+                                $('#inspector_id').val(savedInspectorId);
+                                editRow(savedInspectorId);
                             }
+
                         } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
+                            toastr.error(response.error, "");
                         }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-inspector");
-                    });
-            }
-        };
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-inspector");
+                });
+        }
     }
     //Cerrar form
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-inspector");
         $(document).on('click', ".cerrar-form-inspector", function (e) {
-            cerrarForms();
+            btnClickSalvarForm(true);
         });
     }
 
@@ -561,58 +574,57 @@ var Inspectors = function () {
 
             editRow(inspector_id);
         });
+    };
 
-        function editRow(inspector_id) {
+    var editRow = function (inspector_id) {
 
-            var formData = new URLSearchParams();
-            formData.set("inspector_id", inspector_id);
+        var formData = new URLSearchParams();
+        formData.set("inspector_id", inspector_id);
 
-            BlockUtil.block('#form-inspector');
+        BlockUtil.block('#form-inspector-body');
 
-            axios.post("inspector/cargarDatos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
+        axios.post("inspector/cargarDatos", formData, {responseType: "json"})
+            .then(function (res) {
+                if (res.status === 200 || res.status === 201) {
+                    var response = res.data;
+                    if (response.success) {
 
-                            //cargar datos
-                            cargarDatos(response.inspector);
+                        //cargar datos
+                        cargarDatosInspector(response.inspector);
 
-                        } else {
-                            toastr.error(response.error, "");
-                        }
                     } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
+                        toastr.error(response.error, "");
                     }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                    BlockUtil.unblock("#form-inspector");
-                });
+                } else {
+                    toastr.error("An internal error has occurred, please try again.", "");
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock("#form-inspector-body");
+            });
+    };
 
-            function cargarDatos(inspector) {
+    var cargarDatosInspector = function (inspector) {
 
-                KTUtil.find(KTUtil.get("form-inspector"), ".card-label").innerHTML = "Update Inspector: " + inspector.name;
+        KTUtil.find(KTUtil.get("form-inspector"), ".card-label").innerHTML = "Update Inspector: " + inspector.name;
 
-                $('#name').val(inspector.name);
-                $('#email').val(inspector.email);
-                $('#phone').val(inspector.phone);
+        $('#name').val(inspector.name);
+        $('#email').val(inspector.email);
+        $('#phone').val(inspector.phone);
 
-                $('#estadoactivo').prop('checked', inspector.status);
+        $('#estadoactivo').prop('checked', inspector.status);
 
-                // projects
-                projects = inspector.projects;
-                actualizarTableListaProjects();
+        // projects
+        projects = inspector.projects;
+        actualizarTableListaProjects();
 
-                // habilitar tab
-                totalTabs = 2;
-                $('#btn-wizard-siguiente').removeClass('hide');
-                $('.nav-item-hide').removeClass('hide');
+        // habilitar tab
+        totalTabs = 2;
+        $('#btn-wizard-siguiente').removeClass('hide');
+        $('.nav-item-hide').removeClass('hide');
 
-                event_change = false;
-            }
-
-        }
+        event_change = false;
     };
     //Eliminar
     var initAccionEliminar = function () {
