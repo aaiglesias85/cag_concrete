@@ -1306,9 +1306,10 @@ class InvoiceService extends Base
     * Devuelve config del proyecto y acumulados de invoices anteriores; el frontend calcula current y total con los ítems.
     *
     * @param string|int $project_id
+    * @param int|null $exclude_invoice_id Si se indica, no se incluye este invoice en los acumulados (para edición: "previous" = otros invoices).
     * @return array{contract_amount: float, retainage: bool, retainage_percentage: float, retainage_adjustment_percentage: float, retainage_adjustment_completion: float, accumulated_retainage_amount_previous: float, accumulated_base_retainage_previous: float, total_billed_previous: float}
     */
-   public function getRetainageContextForProject($project_id): array
+   public function getRetainageContextForProject($project_id, ?int $exclude_invoice_id = null): array
    {
       $project_id = (string) $project_id;
       $em = $this->getDoctrine()->getManager();
@@ -1338,6 +1339,9 @@ class InvoiceService extends Base
       $cumulative_billed = 0.0;
 
       foreach ($allInvoices as $inv) {
+         if ((int) $inv->getInvoiceId() === (int) $exclude_invoice_id) {
+            continue;
+         }
          if ($inv->getInvoiceRetainageCalculated() === null) {
             $this->CalcularYGuardarRetainageInvoice($inv);
             $em->flush();
@@ -1366,6 +1370,38 @@ class InvoiceService extends Base
          'accumulated_base_retainage_previous' => round($accumulated_previous_base_retainage, 2),
          'total_billed_previous' => round($cumulative_billed, 2),
       ];
+   }
+
+   /**
+    * Bond disponible antes de aplicar este invoice (para preview en frontend al cambiar QBF).
+    *
+    * @param string|int $project_id
+    * @param Invoice $entity invoice actual
+    * @return float valor entre 0 y 1
+    */
+   private function getBonQuantityAvailableBeforeInvoice($project_id, Invoice $entity): float
+   {
+      $project_id = (string) $project_id;
+      $invoice_id = (int) $entity->getInvoiceId();
+      $start_date_str = $entity->getStartDate() instanceof \DateTimeInterface
+         ? $entity->getStartDate()->format('m/d/Y') : '';
+
+      /** @var \App\Repository\InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+      $bon_used_before_or_on = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $start_date_str);
+      $bond_paid_before_or_on = (float) $invoiceItemRepo->SumBondPaidQtyForInvoicesBeforeOrOnDate($project_id, $start_date_str);
+
+      $this_bon_qty = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : 0.0;
+      $this_bond_paid = (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice_id);
+
+      $used_before_this = $bon_used_before_or_on - $this_bon_qty;
+      $paid_before_this = $bond_paid_before_or_on - $this_bond_paid;
+      $consumed_before_this = $used_before_this - $paid_before_this;
+
+      return max(0.0, min(1.0, 1.0 - $consumed_before_this));
    }
 
    /**
@@ -1583,6 +1619,12 @@ class InvoiceService extends Base
             $arreglo_resultado['bond_price'] = 0;
             $arreglo_resultado['bond_general'] = 0;
          }
+
+         // Contexto de retainage para recálculo en frontend al cambiar QBF (excluye este invoice)
+         $arreglo_resultado['retainage_context'] = $this->getRetainageContextForProject($project_id, (int) $invoice_id);
+
+         // Bond disponible para este invoice (cuánto queda antes de aplicar este invoice) para preview al cambiar QBF
+         $arreglo_resultado['bon_quantity_available'] = $this->getBonQuantityAvailableBeforeInvoice($project_id, $entity);
 
          // payments
          $payments = $this->ListarPaymentsDeInvoice($invoice_id);

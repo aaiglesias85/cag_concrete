@@ -1145,6 +1145,9 @@ var Invoices = (function () {
             if (items[0].bond_price !== undefined) bond_price = Number(items[0].bond_price || 0);
             if (items[0].bond_general !== undefined) bond_general = Number(items[0].bond_general || 0);
          }
+         // Contexto de retainage y bond disponible para recálculo en tiempo real al cambiar QBF (vienen de cargarDatos al editar)
+         if (invoice.retainage_context != null) retainageContext = invoice.retainage_context;
+         if (invoice.bon_quantity_available != null && invoice.bon_quantity_available !== '') bon_quantity_available = Number(invoice.bon_quantity_available);
 
          actualizarTableListaItems();
 
@@ -1674,6 +1677,7 @@ var Invoices = (function () {
    var actualizarRetainagePreview = function () {
       var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       if (!retainageContext || items_a_calcular.length === 0) {
+         console.log('[Retainage] No se calcula: sin retainageContext o sin ítems');
          $('#invoice_current_retainage_display').val('$0.00');
          $('#invoice_retainage_calculated_display').val('$0.00');
          return;
@@ -1702,6 +1706,7 @@ var Invoices = (function () {
       });
 
       if (contract_amount > 0 && total_billed_previous + total_billed_current > contract_amount) {
+         console.log('[Retainage] Límite superado (total_billed > contract_amount) → $0.00');
          $('#invoice_current_retainage_display').val('$0.00');
          $('#invoice_retainage_calculated_display').val('$0.00');
          return;
@@ -1715,6 +1720,17 @@ var Invoices = (function () {
       }
       var current_retainage = base_current_retainage * (pct_to_use / 100);
       var total_accumulated = accumulated_retainage_previous + current_retainage;
+
+      console.log('[Retainage] Cálculo JS', {
+         total_billed_current: total_billed_current,
+         base_current_retainage: base_current_retainage,
+         total_billed_previous: total_billed_previous,
+         contract_amount: contract_amount,
+         completion_pct: completion_pct.toFixed(2) + '%',
+         pct_to_use: pct_to_use,
+         current_retainage: current_retainage,
+         total_accumulated: total_accumulated
+      });
 
       $('#invoice_current_retainage_display').val(MyApp.formatMoney(current_retainage, 2, '.', ','));
       $('#invoice_retainage_calculated_display').val(MyApp.formatMoney(total_accumulated, 2, '.', ','));
@@ -2261,6 +2277,7 @@ var Invoices = (function () {
       var items_a_calcular = (items_lista && items_lista.length > 0) ? items_lista : (items || []);
       
       var sum_bonded_invoices = 0;
+      var bonded_items_detail = [];
       
       // Sumar solo items con bonded activo
       items_a_calcular.forEach(function(item) {
@@ -2268,9 +2285,9 @@ var Invoices = (function () {
             var quantity = parseFloat(item.quantity) || 0;
             var qbf = parseFloat(item.quantity_brought_forward) || 0;
             var price = parseFloat(item.price) || 0;
-            
-            // Sumar al total
-            sum_bonded_invoices += ((quantity + qbf) * price);
+            var amount = (quantity + qbf) * price;
+            sum_bonded_invoices += amount;
+            bonded_items_detail.push({ item: item.item, quantity: quantity, qbf: qbf, price: price, amount: amount });
          }
       });
 
@@ -2289,7 +2306,20 @@ var Invoices = (function () {
       var applied = Math.min(x, available);
 
       // Y = Bond General × aplicado (no × X crudo)
-      var y = (parseFloat(bond_general) || parseFloat(bond_price) || 0) * applied;
+      var base_bond = parseFloat(bond_general) || parseFloat(bond_price) || 0;
+      var y = base_bond * applied;
+
+      console.log('[Bond] Cálculo JS', {
+         sum_bonded_invoices: sum_bonded_invoices,
+         sum_bonded_project: sum_bonded_project,
+         bonded_items: bonded_items_detail,
+         x: x,
+         bon_quantity_available: available,
+         applied: applied,
+         bond_general: bond_general,
+         bond_price: bond_price,
+         y: y
+      });
 
       // Mostrar valores aplicados en la card (mismo criterio que al cargar invoice guardado)
       $('#total_bonded_x').val(MyApp.formatearNumero(applied, 5, '.', ','));
@@ -2649,8 +2679,22 @@ var Invoices = (function () {
          $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
          $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
          actualizarFooterTotalesPage();
-         // Bond no se recalcula en frontend; las cajas amarillas solo muestran bon_quantity/bon_amount del backend
-         if (retainageContext) actualizarRetainagePreview();
+         // Log: QBF modificado → dispara recálculo retainage y bond
+         console.log('[QBF] Cambio en Quantity Brought Forward', {
+            posicion: posicion,
+            item: item.item,
+            new_qbf: new_qbf,
+            quantity_final: item.quantity_final,
+            amount_final: item.amount_final,
+            unpaid_qty: item.unpaid_qty,
+            unpaid_amount: item.unpaid_amount,
+            ejecutando_retainage: !!retainageContext,
+            ejecutando_bond: true
+         });
+         // Recalcular Bond en tiempo real (usa quantity + qbf de ítems bonded)
+         if (typeof calcularYMostrarXBondedEnJS === 'function') calcularYMostrarXBondedEnJS();
+         // Recalcular Retainage en tiempo real
+         if (retainageContext) actualizarRetainagePreview(); else { $('#invoice_current_retainage_display').val('$0.00'); $('#invoice_retainage_calculated_display').val('$0.00'); }
          // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
          if (isEmpty) $this.val('');
       });

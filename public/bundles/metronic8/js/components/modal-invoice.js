@@ -625,6 +625,8 @@ var ModalInvoice = (function () {
       var current_retainage = base_current_retainage * (pct_to_use / 100);
       var total_accumulated = accumulated_retainage_previous + current_retainage;
 
+      console.log('[Retainage Modal] Cálculo JS', { total_billed_current: total_billed_current, base_current_retainage: base_current_retainage, completion_pct: (contract_amount > 0 ? (total_base_retainage / contract_amount * 100) : 0).toFixed(2) + '%', pct_to_use: pct_to_use, current_retainage: current_retainage, total_accumulated: total_accumulated });
+
       $('#modal_invoice_current_retainage').val(MyApp.formatearNumero(current_retainage, 2, '.', ','));
       $('#modal_invoice_retainage_calculated').val(MyApp.formatearNumero(total_accumulated, 2, '.', ','));
    };
@@ -1471,7 +1473,11 @@ var ModalInvoice = (function () {
          $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
          $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
          actualizarFooterTotalesModal();
-         if (retainageContext) actualizarRetainagePreviewModal();
+         console.log('[QBF Modal] Cambio en Quantity Brought Forward', { posicion: posicion, item: item.item, new_qbf: quantity, quantity_final: item.quantity_final, amount_final: item.amount_final, ejecutando_retainage: !!retainageContext, ejecutando_bond: true });
+         // Recalcular Bond en tiempo real (usa quantity + qbf de ítems bonded)
+         if (typeof calcularYMostrarXBondedEnJSModal === 'function') calcularYMostrarXBondedEnJSModal();
+         // Recalcular Retainage en tiempo real
+         if (retainageContext) actualizarRetainagePreviewModal(); else { $('#modal_invoice_current_retainage').val('0.00'); $('#modal_invoice_retainage_calculated').val('0.00'); }
          // Permitir campo vacío: si el usuario lo dejó vacío para escribir, no sobrescribir con 0
          if (isEmpty) $this.val('');
       });
