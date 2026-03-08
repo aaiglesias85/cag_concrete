@@ -890,24 +890,42 @@
                            </div>
                         </div>
                         <div class="form-group ic-form-group">
-                           <div class="row">
-                              <div class="col-md-4" id="select-prevailing-role">
+                           <div class="row mb-3">
+                              <div class="col-md-12">
                                  <label class="form-label">
                                     <span class="ic-step-number">3</span>
-                                    Labor Type
+                                    Labor Types & Rate
                                  </label>
-                                 <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-role" name="prevailing_role_ids" multiple="multiple" data-placeholder="Select Labor Types">
-                                    {% for item in employee_roles %}
-                                    <option value="{{ item.roleId }}">{{ item.description }}</option>
-                                    {% endfor %}
-                                 </select>
                               </div>
-                              <div class="col-md-2">
-                                 <label class="form-label"> Rate </label>
-                                 <div class="input-group input-group-solid">
-                                    <span class="input-group-text">$</span>
-                                    <input type="text" class="form-control form-control-validate form-control-number event-change" id="prevailing-rate" name="prevailing_rate" />
+                           </div>
+                           <div class="row" id="lista-prevailing-roles">
+                              <div class="col-md-12">
+                                 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                    <div class="d-flex flex-wrap gap-3">
+                                       {% if permiso.agregar or permiso.editar %}
+                                       <button id="btn-agregar-prevailing-role" class="btn btn-success w-125px">
+                                          <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                          Add
+                                       </button>
+                                       {% endif %}
+                                    </div>
+                                    <div class="d-flex flex-wrap align-items-center gap-3">
+                                       <div class="position-relative w-250px">
+                                          <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                          <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                       </div>
+                                    </div>
                                  </div>
+                                 <table id="prevailing-roles-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                    <thead>
+                                       <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                          <th>Labor Type</th>
+                                          <th>Rate</th>
+                                          <th>Actions</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 fw-semibold"></tbody>
+                                 </table>
                               </div>
                            </div>
                         </div>
@@ -2245,20 +2263,33 @@
                            </div>
                         </div>
                         <div class="form-group ic-form-group">
-                           <div class="row">
-                              <div class="col-md-4" id="select-prevailing-role">
+                           <div class="row mb-3">
+                              <div class="col-md-12">
                                  <label class="form-label">
                                     <span class="ic-step-number">3</span>
-                                    Labor Types
+                                    Labor Types & Rate
                                  </label>
-                                 <input type="text" class="form-control form-control-solid" id="prevailing-roles-detalle" disabled />
                               </div>
-                              <div class="col-md-2">
-                                 <label class="form-label"> Rate </label>
-                                 <div class="input-group input-group-solid">
-                                    <span class="input-group-text">$</span>
-                                    <input type="text" class="form-control form-control-solid" id="prevailing-rate-detalle" disabled />
+                           </div>
+                           <div class="row mt-3" id="lista-prevailing-roles-detalle">
+                              <div class="col-md-12">
+                                 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                    <div class="d-flex flex-wrap align-items-center gap-3">
+                                       <div class="position-relative w-250px">
+                                          <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                          <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                       </div>
+                                    </div>
                                  </div>
+                                 <table id="prevailing-roles-table-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                    <thead>
+                                       <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                          <th>Labor Type</th>
+                                          <th>Rate</th>
+                                       </tr>
+                                    </thead>
+                                    <tbody class="text-gray-600 fw-semibold"></tbody>
+                                 </table>
                               </div>
                            </div>
                         </div>
@@ -3226,6 +3257,50 @@
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-success" id="btn-salvar-concrete-class">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- prevailing role (labor type + rate) -->
+<div class="modal fade" id="modal-prevailing-role" tabindex="-1" role="dialog" aria-labelledby="modalPrevailingRoleLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">Labor Type & Rate</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="prevailing-role-form" action="#" enctype="multipart/form-data" method="post">
+               <div class="form-group ic-form-group" id="select-prevailing-role-modal">
+                  <label class="form-label required">
+                     <span class="ic-step-number">1</span>
+                     Labor Type
+                  </label>
+                  <select id="prevailing-role-modal" class="form-control form-select form-select2 select-validate form-select-solid">
+                     <option value="">Select</option>
+                     {% for item in employee_roles %}
+                     <option value="{{ item.roleId }}">{{ item.description }}</option>
+                     {% endfor %}
+                  </select>
+               </div>
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">
+                     <span class="ic-step-number">2</span>
+                     Rate
+                  </label>
+                  <div class="input-group input-group-solid">
+                     <span class="input-group-text">$</span>
+                     <input type="text" class="form-control form-control-validate form-control-number" id="prevailing-rate-modal" name="rate" />
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-prevailing-role">Save</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
          </div>
       </div>

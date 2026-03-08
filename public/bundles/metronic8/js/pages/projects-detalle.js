@@ -215,8 +215,8 @@ var ProjectsDetalle = (function () {
             $('#prevailing-wage-fields-detalle').hide();
          }
          $('#prevailing-county-detalle').val(project.prevailing_county || '');
-         $('#prevailing-roles-detalle').val(project.prevailing_roles || '');
-         NumberUtil.setFormattedValue('#prevailing-rate-detalle', project.prevailing_rate, { decimals: 2 });
+         prevailing_roles_detalle = project.prevailing_roles && Array.isArray(project.prevailing_roles) ? project.prevailing_roles : [];
+         actualizarTableListaPrevailingRolesDetalle();
       }
    }
 
@@ -838,6 +838,59 @@ var ProjectsDetalle = (function () {
       }
 
       initTableConcreteClasses();
+   };
+
+   // Prevailing Roles (detalle - solo lectura)
+   var prevailing_roles_detalle = [];
+   var oTablePrevailingRolesDetalle;
+   var initTablePrevailingRolesDetalle = function () {
+      var table = '#prevailing-roles-table-detalle';
+
+      if ($.fn.DataTable.isDataTable(table)) {
+         $(table).DataTable().destroy();
+      }
+
+      var columns = [{ data: 'role_description' }, { data: 'rate' }];
+      var columnDefs = [
+         {
+            targets: 1,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return '<span>' + MyApp.formatMoney(data) + '</span>';
+            },
+         },
+      ];
+
+      var language = DatatableUtil.getDataTableLenguaje();
+      var order = [[0, 'asc']];
+
+      oTablePrevailingRolesDetalle = DatatableUtil.initSafeDataTable(table, {
+         data: prevailing_roles_detalle,
+         displayLength: 30,
+         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatablePrevailingRolesDetalle();
+   };
+
+   var handleSearchDatatablePrevailingRolesDetalle = function () {
+      $(document).off('keyup', '#lista-prevailing-roles-detalle [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-prevailing-roles-detalle [data-table-filter="search"]', function (e) {
+         if (oTablePrevailingRolesDetalle) {
+            oTablePrevailingRolesDetalle.search(e.target.value).draw();
+         }
+      });
+   };
+
+   var actualizarTableListaPrevailingRolesDetalle = function () {
+      if (oTablePrevailingRolesDetalle) {
+         oTablePrevailingRolesDetalle.destroy();
+      }
+      initTablePrevailingRolesDetalle();
    };
 
    // Contacts

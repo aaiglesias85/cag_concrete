@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-03-2026 a las 00:59:19
+-- Tiempo de generación: 08-03-2026 a las 15:50:13
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1602,7 +1602,8 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 CREATE TABLE `project_prevailing_role` (
   `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL
+  `role_id` int(11) NOT NULL,
+  `rate` decimal(18,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

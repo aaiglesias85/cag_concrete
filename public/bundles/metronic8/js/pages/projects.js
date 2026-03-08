@@ -475,8 +475,8 @@ var Projects = (function () {
       $('#prevailing-wage').prop('checked', false);
       $('#prevailing-wage-fields').hide();
       $('#prevailing-county').val('').trigger('change');
-      $('#prevailing-role').val([]).trigger('change');
-      NumberUtil.setFormattedValue('#prevailing-rate', '', { decimals: 2 });
+      prevailing_roles_array = [];
+      actualizarTableListaPrevailingRoles();
       NumberUtil.setFormattedValue('#bon-general', '', { decimals: 2 });
 
       //Mostrar el primer tab
@@ -577,6 +577,7 @@ var Projects = (function () {
                break;
             case 5:
                poblarPrevailingCounties();
+               actualizarTableListaPrevailingRoles();
                break;
             case 6:
                actualizarTableListaConcreteClasses();
@@ -671,6 +672,7 @@ var Projects = (function () {
             case 5:
                $('#tab-prevailing-wage').tab('show');
                poblarPrevailingCounties();
+               actualizarTableListaPrevailingRoles();
                break;
             case 6:
                $('#tab-concrete-vendor').tab('show');
@@ -920,11 +922,10 @@ var Projects = (function () {
       var prevailing_county_id = $('#prevailing-county').val();
       formData.set('prevailing_county_id', prevailing_county_id || '');
 
-      var prevailing_role_ids = $('#prevailing-role').val();
-      formData.set('prevailing_role_ids', prevailing_role_ids ? prevailing_role_ids.join(',') : '');
-
-      var prevailing_rate = NumberUtil.getNumericValue('#prevailing-rate');
-      formData.set('prevailing_rate', prevailing_rate);
+      var prevailing_roles = prevailing_roles_array.map(function (r) {
+         return { role_id: r.role_id, rate: r.rate };
+      });
+      formData.set('prevailing_roles', JSON.stringify(prevailing_roles));
 
       formData.set('items', JSON.stringify(items));
       formData.set('contacts', JSON.stringify(contacts));
@@ -1223,9 +1224,15 @@ var Projects = (function () {
             }
          }, 200);
 
-         $('#prevailing-role').val(project.prevailing_role_ids || []);
-         $('#prevailing-role').trigger('change');
-         NumberUtil.setFormattedValue('#prevailing-rate', project.prevailing_rate, { decimals: 2 });
+         prevailing_roles_array = (project.prevailing_roles || []).map(function (r, i) {
+            return {
+               role_id: r.role_id,
+               role_description: r.role_description || '',
+               rate: r.rate,
+               posicion: i
+            };
+         });
+         actualizarTableListaPrevailingRoles();
 
          // habilitar tab
          totalTabs = 12;
@@ -5270,6 +5277,7 @@ var Projects = (function () {
    var togglePrevailingWageFields = function () {
       if ($('#prevailing-wage').prop('checked')) {
          $('#prevailing-wage-fields').slideDown(200);
+         actualizarTableListaPrevailingRoles();
       } else {
          $('#prevailing-wage-fields').slideUp(200);
       }
@@ -5279,6 +5287,156 @@ var Projects = (function () {
    $(document).on('change', '#prevailing-wage', function () {
       togglePrevailingWageFields();
    });
+
+   // Prevailing roles (estilo Concrete Quote: tabla + modal)
+   var prevailing_roles_array = [];
+   var oTablePrevailingRoles;
+   var nEditingRowPrevailingRole = null;
+
+   var initTablePrevailingRoles = function () {
+      var table = '#prevailing-roles-table-editable';
+      var columns = [{ data: 'role_description' }, { data: 'rate' }, { data: null }];
+      var columnDefs = [
+         {
+            targets: 1,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return '<span>' + MyApp.formatMoney(data) + '</span>';
+            },
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+            },
+         },
+      ];
+      var language = DatatableUtil.getDataTableLenguaje();
+      var order = [[0, 'asc']];
+      oTablePrevailingRoles = DatatableUtil.initSafeDataTable(table, {
+         data: prevailing_roles_array,
+         displayLength: 30,
+         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+      handleSearchDatatablePrevailingRoles();
+   };
+
+   var handleSearchDatatablePrevailingRoles = function () {
+      $(document).off('keyup', '#lista-prevailing-roles [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-prevailing-roles [data-table-filter="search"]', function (e) {
+         if (oTablePrevailingRoles) {
+            oTablePrevailingRoles.search(e.target.value).draw();
+         }
+      });
+   };
+
+   var actualizarTableListaPrevailingRoles = function () {
+      if (oTablePrevailingRoles) {
+         oTablePrevailingRoles.destroy();
+      }
+      initTablePrevailingRoles();
+   };
+
+   var resetFormPrevailingRole = function () {
+      MyUtil.resetForm('prevailing-role-form');
+      $('#prevailing-role-modal').val('');
+      $('#prevailing-role-modal').trigger('change');
+      MyApp.resetErrorMessageValidateSelect(KTUtil.get('prevailing-role-form'));
+      nEditingRowPrevailingRole = null;
+   };
+
+   var initAccionesPrevailingRoles = function () {
+      $(document).off('click', '#btn-agregar-prevailing-role');
+      $(document).on('click', '#btn-agregar-prevailing-role', function (e) {
+         resetFormPrevailingRole();
+         if (typeof $().select2 !== 'undefined') {
+            $('#prevailing-role-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
+         }
+         ModalUtil.show('modal-prevailing-role', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-prevailing-role');
+      $(document).on('click', '#btn-salvar-prevailing-role', function (e) {
+         e.preventDefault();
+         var role_id = $('#prevailing-role-modal').val();
+         var role_description = $('#prevailing-role-modal option:selected').text();
+         var rate = NumberUtil.getNumericValue('#prevailing-rate-modal');
+         if (rate !== rate) rate = null;
+         if (!role_id || role_id === '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-prevailing-role-modal'), 'This field is required');
+            return;
+         }
+         if (nEditingRowPrevailingRole == null) {
+            prevailing_roles_array.push({
+               role_id: parseInt(role_id, 10),
+               role_description: role_description,
+               rate: rate,
+               posicion: prevailing_roles_array.length,
+            });
+         } else {
+            var pos = nEditingRowPrevailingRole;
+            if (prevailing_roles_array[pos]) {
+               prevailing_roles_array[pos].role_id = parseInt(role_id, 10);
+               prevailing_roles_array[pos].role_description = role_description;
+               prevailing_roles_array[pos].rate = rate;
+            }
+         }
+         actualizarTableListaPrevailingRoles();
+         resetFormPrevailingRole();
+         ModalUtil.hide('modal-prevailing-role');
+      });
+
+      $(document).off('click', '#prevailing-roles-table-editable a.edit');
+      $(document).on('click', '#prevailing-roles-table-editable a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (prevailing_roles_array[posicion]) {
+            resetFormPrevailingRole();
+            nEditingRowPrevailingRole = posicion;
+            if (typeof $().select2 !== 'undefined') {
+               $('#prevailing-role-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
+            }
+            $('#prevailing-role-modal').val(prevailing_roles_array[posicion].role_id);
+            $('#prevailing-role-modal').trigger('change');
+            NumberUtil.setFormattedValue('#prevailing-rate-modal', prevailing_roles_array[posicion].rate, { decimals: 2 });
+            ModalUtil.show('modal-prevailing-role', { backdrop: 'static', keyboard: true });
+         }
+      });
+
+      $(document).off('click', '#prevailing-roles-table-editable a.delete');
+      $(document).on('click', '#prevailing-roles-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (prevailing_roles_array[posicion]) {
+            Swal.fire({
+               text: 'Are you sure you want to delete this labor type?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               cancelButtonText: 'No, cancel',
+               customClass: {
+                  confirmButton: 'btn fw-bold btn-success',
+                  cancelButton: 'btn fw-bold btn-danger',
+               },
+            }).then(function (result) {
+               if (result.value) {
+                  prevailing_roles_array.splice(posicion, 1);
+                  for (var i = 0; i < prevailing_roles_array.length; i++) {
+                     prevailing_roles_array[i].posicion = i;
+                  }
+                  actualizarTableListaPrevailingRoles();
+               }
+            });
+         }
+      });
+   };
 
    // Lógica para botones de la tabla Wizard (Edición)
    var initAccionesRetainageWizard = function () {
@@ -5580,6 +5738,9 @@ var Projects = (function () {
 
          // concrete classes
          initAccionesConcreteClasses();
+
+         // prevailing roles
+         initAccionesPrevailingRoles();
 
          // invoices
          initTableInvoices();

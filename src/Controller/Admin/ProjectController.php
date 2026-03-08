@@ -205,8 +205,7 @@ class ProjectController extends AbstractController
 
       $prevailing_wage = $request->get('prevailing_wage');
       $prevailing_county_id = $request->get('prevailing_county_id');
-      $prevailing_role_ids = $request->get('prevailing_role_ids');
-      $prevailing_rate = $request->get('prevailing_rate');
+      $prevailing_roles = $request->get('prevailing_roles');
 
       // items
       $items = $request->get('items');
@@ -270,8 +269,7 @@ class ProjectController extends AbstractController
                $retainage_adjustment_completion,
                $prevailing_wage,
                $prevailing_county_id,
-               $prevailing_role_ids,
-               $prevailing_rate
+               $prevailing_roles
             );
          } else {
             $resultado = $this->projectService->ActualizarProject(
@@ -316,8 +314,7 @@ class ProjectController extends AbstractController
                $retainage_adjustment_completion,
                $prevailing_wage,
                $prevailing_county_id,
-               $prevailing_role_ids,
-               $prevailing_rate
+               $prevailing_roles
             );
          }
 

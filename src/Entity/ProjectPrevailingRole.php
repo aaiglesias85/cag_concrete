@@ -21,6 +21,9 @@ class ProjectPrevailingRole
    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "role_id", nullable: false, onDelete: "CASCADE")]
    private ?EmployeeRole $role;
 
+   #[ORM\Column(name: "rate", type: "float", nullable: true)]
+   private ?float $rate;
+
    public function getId(): ?int
    {
       return $this->id;
@@ -44,5 +47,15 @@ class ProjectPrevailingRole
    public function setRole(?EmployeeRole $role): void
    {
       $this->role = $role;
+   }
+
+   public function getRate(): ?float
+   {
+      return $this->rate;
+   }
+
+   public function setRate(?float $rate): void
+   {
+      $this->rate = $rate;
    }
 }

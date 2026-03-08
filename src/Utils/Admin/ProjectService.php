@@ -1378,23 +1378,23 @@ class ProjectService extends Base
          $arreglo_resultado['prevailing_wage'] = $entity->getPrevailingWage();
          $arreglo_resultado['prevailing_county_id'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getCountyId() : '';
          $arreglo_resultado['prevailing_county'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getDescription() : '';
-         $arreglo_resultado['prevailing_rate'] = $entity->getPrevailingRate();
 
-         // Cargar prevailing roles desde la tabla intermedia
+         // Cargar prevailing roles con rate desde la tabla intermedia
          /** @var ProjectPrevailingRoleRepository $projectPrevailingRoleRepo */
          $projectPrevailingRoleRepo = $this->getDoctrine()->getRepository(ProjectPrevailingRole::class);
          $projectPrevailingRoles = $projectPrevailingRoleRepo->ListarRolesDeProject($project_id);
-         $prevailing_role_ids = [];
-         $prevailing_role_descriptions = [];
+         $prevailing_roles = [];
          foreach ($projectPrevailingRoles as $projectPrevailingRole) {
             $role = $projectPrevailingRole->getRole();
             if ($role !== null) {
-               $prevailing_role_ids[] = $role->getRoleId();
-               $prevailing_role_descriptions[] = $role->getDescription();
+               $prevailing_roles[] = [
+                  'role_id' => $role->getRoleId(),
+                  'role_description' => $role->getDescription(),
+                  'rate' => $projectPrevailingRole->getRate()
+               ];
             }
          }
-         $arreglo_resultado['prevailing_role_ids'] = $prevailing_role_ids;
-         $arreglo_resultado['prevailing_roles'] = implode(', ', $prevailing_role_descriptions);
+         $arreglo_resultado['prevailing_roles'] = $prevailing_roles;
          // Bon General = monto del ítem Bond en el proyecto (calculado, no se guarda en project)
          /** @var ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
@@ -2114,8 +2114,7 @@ class ProjectService extends Base
       $retainage_adjustment_completion,
       $prevailing_wage,
       $prevailing_county_id,
-      $prevailing_role_ids,
-      $prevailing_rate
+      $prevailing_roles
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2479,15 +2478,6 @@ class ProjectService extends Base
             $entity->setPrevailingCounty(null);
          }
 
-         $valPrevRate = ($prevailing_rate !== '' && $prevailing_rate !== null) ? (float)$prevailing_rate : null;
-         if ($valPrevRate != $entity->getPrevailingRate()) {
-            $notas[] = [
-               'notes' => 'Change prevailing rate, old value: ' . $entity->getPrevailingRate(),
-               'date' => new \DateTime()
-            ];
-         }
-         $entity->setPrevailingRate($valPrevRate);
-
          $entity->setUpdatedAt(new \DateTime());
 
          // counties
@@ -2499,8 +2489,8 @@ class ProjectService extends Base
             ];
          }
 
-         // prevailing roles
-         $prevailing_role_changes = $this->SalvarPrevailingRoles($entity, $prevailing_role_ids, true);
+         // prevailing roles (cada uno con role_id y rate)
+         $prevailing_role_changes = $this->SalvarPrevailingRoles($entity, $prevailing_roles, true);
          if ($prevailing_role_changes['changed']) {
             $notas[] = [
                'notes' => 'Change prevailing labor types, old values: ' . $prevailing_role_changes['old_descriptions'],
@@ -2581,8 +2571,7 @@ class ProjectService extends Base
       $retainage_adjustment_completion,
       $prevailing_wage,
       $prevailing_county_id,
-      $prevailing_role_ids,
-      $prevailing_rate
+      $prevailing_roles
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -2693,8 +2682,6 @@ class ProjectService extends Base
 
 
       $entity->setPrevailingWage($prevailing_wage);
-      $valPrevRate = ($prevailing_rate !== '' && $prevailing_rate !== null) ? (float)$prevailing_rate : null;
-      $entity->setPrevailingRate($valPrevRate);
       if ($prevailing_county_id != '') {
          $prevailing_county = $this->getDoctrine()->getRepository(County::class)
             ->find($prevailing_county_id);
@@ -2718,8 +2705,8 @@ class ProjectService extends Base
       // counties
       $this->SalvarCounties($entity, $county_ids, false);
 
-      // prevailing roles
-      $this->SalvarPrevailingRoles($entity, $prevailing_role_ids, false);
+      // prevailing roles (cada uno con role_id y rate)
+      $this->SalvarPrevailingRoles($entity, $prevailing_roles, false);
 
       $em->flush();
 
@@ -2889,14 +2876,15 @@ class ProjectService extends Base
 
    /**
     * SalvarPrevailingRoles
-    * Guarda los prevailing roles (labor types) de un project en la tabla intermedia
+    * Guarda los prevailing roles (labor types) con rate en la tabla intermedia
+    * $prevailing_roles: array de objetos con role_id y rate (ej. [ { role_id: 1, rate: 25.50 }, ... ])
     *
     * @param Project $entity
-    * @param array|string $role_ids
+    * @param array $prevailing_roles
     * @param bool $check_changes
     * @return array
     */
-   public function SalvarPrevailingRoles($entity, $role_ids, $check_changes = false)
+   public function SalvarPrevailingRoles($entity, $prevailing_roles, $check_changes = false)
    {
       $roleRepo = $this->getDoctrine()->getRepository(EmployeeRole::class);
       $projectPrevailingRoleRepo = $this->getDoctrine()->getRepository(ProjectPrevailingRole::class);
@@ -2907,36 +2895,25 @@ class ProjectService extends Base
          'old_descriptions' => ''
       ];
 
-      // Convertir $role_ids a array si viene como string o array
-      if (is_string($role_ids)) {
-         $role_ids = !empty($role_ids) ? explode(',', $role_ids) : [];
+      if (is_string($prevailing_roles)) {
+         $prevailing_roles = json_decode($prevailing_roles, true);
       }
-      if (!is_array($role_ids)) {
-         $role_ids = [];
+      if (!is_array($prevailing_roles)) {
+         $prevailing_roles = [];
       }
-      $role_ids = array_filter(array_map('trim', $role_ids));
 
       // Si check_changes es true, obtener roles antiguos para comparación
       if ($check_changes && $entity->getProjectId()) {
          $projectPrevailingRoles_old = $projectPrevailingRoleRepo->ListarRolesDeProject($entity->getProjectId());
-         $role_ids_old = [];
          $role_descriptions_old = [];
          foreach ($projectPrevailingRoles_old as $projectPrevailingRole) {
             $role = $projectPrevailingRole->getRole();
             if ($role !== null) {
-               $role_ids_old[] = $role->getRoleId();
-               $role_descriptions_old[] = $role->getDescription();
+               $role_descriptions_old[] = $role->getDescription() . ' ($' . ($projectPrevailingRole->getRate() ?? '') . ')';
             }
          }
-
-         // Comparar cambios
-         sort($role_ids_old);
-         $role_ids_sorted = $role_ids;
-         sort($role_ids_sorted);
-         if ($role_ids_old != $role_ids_sorted) {
-            $result['changed'] = true;
-            $result['old_descriptions'] = implode(', ', $role_descriptions_old);
-         }
+         $result['old_descriptions'] = implode(', ', $role_descriptions_old);
+         $result['changed'] = true; // consideramos cambiado si se llama a guardar
       }
 
       // Eliminar roles existentes (solo si el proyecto ya existe)
@@ -2944,14 +2921,18 @@ class ProjectService extends Base
          $projectPrevailingRoleRepo->EliminarRolesDeProject($entity->getProjectId());
       }
 
-      // Agregar nuevos roles
-      foreach ($role_ids as $role_id) {
+      // Agregar nuevos roles con rate
+      foreach ($prevailing_roles as $item) {
+         $role_id = is_object($item) ? ($item->role_id ?? null) : ($item['role_id'] ?? null);
+         $rate = is_object($item) ? ($item->rate ?? null) : ($item['rate'] ?? null);
          if (!empty($role_id)) {
             $role = $roleRepo->find($role_id);
             if ($role !== null) {
                $projectPrevailingRole = new ProjectPrevailingRole();
                $projectPrevailingRole->setProject($entity);
                $projectPrevailingRole->setRole($role);
+               $valRate = ($rate !== '' && $rate !== null) ? (float)$rate : null;
+               $projectPrevailingRole->setRate($valRate);
                $em->persist($projectPrevailingRole);
             }
          }

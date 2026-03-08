@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 07-03-2026 a las 00:59:40
+-- Tiempo de generación: 08-03-2026 a las 15:50:02
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -30030,7 +30030,11 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (392, 'Update', 'Inspector', 'The inspector is modified: Empleado_Prueba_1', '::1', '2026-03-07 00:41:25', 27),
 (393, 'Update', 'Inspector', 'The inspector is modified: Empleado_Prueba_1', '::1', '2026-03-07 00:41:27', 27),
 (394, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-07 00:42:04', 27),
-(395, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-07 00:42:07', 27);
+(395, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-07 00:42:07', 27),
+(396, 'Update', 'Project', 'The project is modified: FL MIAMI', '::1', '2026-03-07 01:08:53', 27),
+(397, 'Update', 'Project', 'The project is modified: FL MIAMI', '::1', '2026-03-07 01:11:19', 27),
+(398, 'Update', 'Project', 'The project is modified: FL MIAMI', '::1', '2026-03-07 01:14:33', 27),
+(399, 'Update', 'Project', 'The project is modified: Houston Texas', '::1', '2026-03-07 01:20:07', 27);
 
 -- --------------------------------------------------------
 
@@ -30380,8 +30384,8 @@ CREATE TABLE `project` (
 --
 
 INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_county_id`, `prevailing_rate`) VALUES
-(2, '34435435', '0009002', '34345435', 'FL MIAMI', 'FL MIAMI', 'undefined', 'FL MIAMI', 'M345435435', 13117.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Dan', 1, 'undefined', 'undefined', NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-04-24 04:20:22', '2026-02-08 03:05:47', '2025-09-28 19:21:31', 1, 1, NULL, NULL, NULL, 0, NULL, 0.00),
-(3, '3243545', '0009003', '434354', 'Houston Texas', 'Houston Texas', 'undefined', 'Houston Texas', '896532', 0.00, 1, 'Miami', 1, '', 1, '2024-11-06', '2024-11-29', '2025-01-29', '', 2, 'undefined', 'undefined', 0.00, 0.00, 0, '', NULL, NULL, NULL, NULL, '2024-04-24 04:24:02', '2025-09-28 19:22:44', '2025-09-28 19:20:06', 3, 1, NULL, NULL, NULL, NULL, NULL, NULL),
+(2, '34435435', '0009002', '34345435', 'FL MIAMI', 'FL MIAMI', 'undefined', 'FL MIAMI', 'M345435435', 23117.00, 0, 'Miami', 0, '', 0, '2025-02-01', '2025-02-28', NULL, 'Dan', 1, 'undefined', 'undefined', NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-04-24 04:20:22', '2026-03-07 01:14:33', '2025-09-28 19:21:31', 1, 1, NULL, NULL, NULL, 1, NULL, 0.00),
+(3, '3243545', '0009003', '434354', 'Houston Texas', 'Houston Texas', 'undefined', 'Houston Texas', '896532', 782.00, 1, 'Miami', 1, '', 1, '2024-11-06', '2024-11-29', '2025-01-29', '', 2, 'undefined', 'undefined', NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-04-24 04:24:02', '2026-03-07 01:20:07', '2025-09-28 19:20:06', 3, 1, NULL, NULL, NULL, 0, NULL, 0.00),
 (6, 'N/A', 'ERS05039', 'N/A', 'BUFORD HWY PED IMPROVEMENTS', 'BUFORD HWY', NULL, 'DOT', '60294-9754', 1371500.00, 1, 'DeKalb', 0, 'NFARMER@ERSNELL.COM', 1, '2023-05-10', '2025-03-31', '2024-07-25', '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-07-08 14:37:28', '2025-08-01 14:58:16', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (7, 'N/A', 'ERS05066', 'N/A', 'BEN EPPS TAXIWAY', 'BEN EPPS TAXIWAY', NULL, 'UNIFIED GOV. OF ATHENS-CLARKE', '50429-9754', 77691.00, 1, 'CLARKE', 0, '', 0, '2024-06-24', '2024-10-31', '2024-07-31', '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-07-08 15:12:55', '2025-08-01 14:58:55', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (8, 'N/A', 'PO-0195-GRW', '', 'WOODLANDS SUBDIVISION', 'WOODLANDS TRINITY', NULL, 'Woodlands Subdivision', 'N/A', 0.00, 0, 'HOUSTON', 0, 'cagii@msn.com', 0, '2020-09-07', '2025-08-27', NULL, 'Cliff Gradwell', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-07-08 15:27:25', '2025-08-27 17:06:55', NULL, 6, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -31110,8 +31114,8 @@ CREATE TABLE `project_county` (
 --
 
 INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
-(618, 2, 1),
-(2, 3, 1),
+(633, 2, 1),
+(634, 3, 1),
 (3, 6, 2),
 (20, 7, 3),
 (24, 8, 4),
@@ -36507,7 +36511,13 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2043, 'Change Quantity Item: CONC DRIVEWAY, 6 IN, Previous Quantity: 53, New Quantity: 48', '2026-02-11', 28),
 (2044, 'Change contract amount, old value: 268533.25', '2026-02-12', 28),
 (2045, 'Change Quantity Item: CONC SIDEWALK, 4 IN, Previous Quantity: 1500, New Quantity: 1', '2026-02-20', 28),
-(2046, 'Change contract amount, old value: 268718.25', '2026-02-20', 28);
+(2046, 'Change contract amount, old value: 268718.25', '2026-02-20', 28),
+(2047, 'Change contract amount, old value: 13117', '2026-03-07', 2),
+(2048, 'Yes', '2026-03-07', 2),
+(2049, 'Change prevailing labor types, old values: ', '2026-03-07', 2),
+(2050, 'Change contract amount, old value: 0', '2026-03-07', 3),
+(2051, 'Yes', '2026-03-07', 3),
+(2052, 'Yes', '2026-03-07', 3);
 
 -- --------------------------------------------------------
 
@@ -36518,16 +36528,19 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 CREATE TABLE `project_prevailing_role` (
   `id` int(11) NOT NULL,
   `project_id` int(11) NOT NULL,
-  `role_id` int(11) NOT NULL
+  `role_id` int(11) NOT NULL,
+  `rate` decimal(18,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project_prevailing_role`
 --
 
-INSERT INTO `project_prevailing_role` (`id`, `project_id`, `role_id`) VALUES
-(1, 28, 1),
-(2, 525, 1);
+INSERT INTO `project_prevailing_role` (`id`, `project_id`, `role_id`, `rate`) VALUES
+(1, 28, 1, 0.00),
+(2, 525, 1, 11.96),
+(8, 2, 1, 0.00),
+(9, 2, 4, 0.00);
 
 -- --------------------------------------------------------
 
@@ -42560,7 +42573,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=396;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=400;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -42632,7 +42645,7 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_county`
 --
 ALTER TABLE `project_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=631;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=635;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -42650,13 +42663,13 @@ ALTER TABLE `project_item_history`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2047;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2053;
 
 --
 -- AUTO_INCREMENT de la tabla `project_prevailing_role`
 --
 ALTER TABLE `project_prevailing_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`
