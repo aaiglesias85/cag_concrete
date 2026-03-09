@@ -5,7 +5,7 @@ namespace App\Utils\Admin;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
-use App\Entity\EstimateQuote;
+use App\Entity\EstimateQuoteItem;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
 use App\Entity\DataTracking;
@@ -14,7 +14,7 @@ use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
 use App\Repository\DataTrackingItemRepository;
 use App\Repository\DataTrackingSubcontractRepository;
-use App\Repository\EstimateQuoteRepository;
+use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectItemRepository;
@@ -183,10 +183,10 @@ class ItemService extends Base
          $em->remove($subcontract_item);
       }
 
-      // estimates
-      /** @var EstimateQuoteRepository $estimateQuoteRepo */
-      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-      $estimate_items = $estimateQuoteRepo->ListarEstimatesDeItem($item_id);
+      // estimates (quote items)
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      $estimate_items = $estimateQuoteItemRepo->ListarEstimatesDeItem($item_id);
       foreach ($estimate_items as $estimate_item) {
          $em->remove($estimate_item);
       }

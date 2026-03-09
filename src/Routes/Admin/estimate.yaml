@@ -42,3 +42,32 @@ agregarItemEstimateAdmin:
 eliminarCompanyEstimateAdmin:
   path: /estimate/eliminarCompany
   defaults: { _controller: App\Controller\Admin\EstimateController::eliminarCompany, _format: json }
+
+# quotes (cuotas)
+salvarQuoteEstimateAdmin:
+  path: /estimate/salvarQuote
+  defaults: { _controller: App\Controller\Admin\EstimateController::salvarQuote, _format: json }
+
+eliminarQuoteEstimateAdmin:
+  path: /estimate/eliminarQuote
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarQuote, _format: json }
+
+cargarDatosQuoteEstimateAdmin:
+  path: /estimate/cargarDatosQuote
+  defaults: { _controller: App\Controller\Admin\EstimateController::cargarDatosQuote, _format: json }
+
+salvarQuoteCompaniesEstimateAdmin:
+  path: /estimate/salvarQuoteCompanies
+  defaults: { _controller: App\Controller\Admin\EstimateController::salvarQuoteCompanies, _format: json }
+
+eliminarQuoteCompaniesEstimateAdmin:
+  path: /estimate/eliminarQuoteCompanies
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarQuoteCompanies, _format: json }
+
+enviarQuotesEstimateAdmin:
+  path: /estimate/enviarQuotes
+  defaults: { _controller: App\Controller\Admin\EstimateController::enviarQuotes, _format: json }
+
+exportarExcelQuoteEstimateAdmin:
+  path: /estimate/exportarExcelQuote
+  defaults: { _controller: App\Controller\Admin\EstimateController::exportarExcelQuote, _format: json }

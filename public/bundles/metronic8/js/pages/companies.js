@@ -459,10 +459,6 @@ var Companies = (function () {
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
          btnClickSalvarForm(false);
       });
-      $(document).off('click', '#btn-wizard-finalizar-exit');
-      $(document).on('click', '#btn-wizard-finalizar-exit', function (e) {
-         btnClickSalvarForm(true);
-      });
 
       function btnClickSalvarForm(closeForm) {
          KTUtil.scrollTop();
@@ -501,8 +497,6 @@ var Companies = (function () {
 
             BlockUtil.block('#form-company');
 
-            var shouldUnblock = true;
-
             axios
                .post('company/salvarCompany', formData, { responseType: 'json' })
                .then(function (res) {
@@ -520,8 +514,7 @@ var Companies = (function () {
                         if (closeForm) {
                            cerrarFormsConfirmated();
                         } else {
-                           shouldUnblock = false;
-                           // Cargar datos completos (contacts, projects, etc.) como en projects
+                           // Cargar datos completos (contacts, projects, etc.) - usa #form-company-body
                            editRow(savedCompanyId);
                         }
                      } else {
@@ -533,9 +526,7 @@ var Companies = (function () {
                })
                .catch(MyUtil.catchErrorAxios)
                .then(function () {
-                  if (shouldUnblock) {
-                     BlockUtil.unblock('#form-company');
-                  }
+                  BlockUtil.unblock('#form-company');
                });
          }
       }

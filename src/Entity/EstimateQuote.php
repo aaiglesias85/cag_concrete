@@ -13,40 +13,26 @@ class EstimateQuote
     #[ORM\Column(name: "id", type: "integer", nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "quantity", type: "float", nullable: true)]
-    private ?float $quantity;
+    #[ORM\Column(name: "name", type: "string", length: 255, nullable: false)]
+    private ?string $name;
 
-    #[ORM\Column(name: "price", type: "float", nullable: true)]
-    private ?float $price;
-
-    #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
-    private ?string $yieldCalculation;
-
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Estimate")]
-    #[ORM\JoinColumn(name: "estimate_id", referencedColumnName: "estimate_id", nullable: true)]
-    private ?Estimate $estimate;
-
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Item")]
-    #[ORM\JoinColumn(name: "item_id", referencedColumnName: "item_id", nullable: true)]
-    private ?Item $item;
-
-    #[ORM\ManyToOne(targetEntity: "App\Entity\Equation")]
-    #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
-    private ?Equation $equation = null;
+    #[ORM\ManyToOne(targetEntity: Estimate::class)]
+    #[ORM\JoinColumn(name: "estimate_id", referencedColumnName: "estimate_id", nullable: false)]
+    private ?Estimate $estimate = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getPrice(): ?float
+    public function getName(): ?string
     {
-        return $this->price;
+        return $this->name;
     }
 
-    public function setPrice(?float $price): void
+    public function setName(?string $name): void
     {
-        $this->price = $price;
+        $this->name = $name;
     }
 
     public function getEstimate(): ?Estimate
@@ -57,45 +43,5 @@ class EstimateQuote
     public function setEstimate(?Estimate $estimate): void
     {
         $this->estimate = $estimate;
-    }
-
-    public function getItem(): ?Item
-    {
-        return $this->item;
-    }
-
-    public function setItem(?Item $item): void
-    {
-        $this->item = $item;
-    }
-
-    public function getYieldCalculation(): ?string
-    {
-        return $this->yieldCalculation;
-    }
-
-    public function setYieldCalculation(?string $yieldCalculation): void
-    {
-        $this->yieldCalculation = $yieldCalculation;
-    }
-
-    public function getEquation(): ?Equation
-    {
-        return $this->equation;
-    }
-
-    public function setEquation(?Equation $equation): void
-    {
-        $this->equation = $equation;
-    }
-
-    public function getQuantity(): ?float
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(?float $quantity): void
-    {
-        $this->quantity = $quantity;
     }
 }

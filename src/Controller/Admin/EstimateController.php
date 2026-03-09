@@ -496,6 +496,7 @@ class EstimateController extends AbstractController
    {
       $estimate_item_id = $request->get('estimate_item_id');
       $estimate_id = $request->get('estimate_id');
+      $quote_id = $request->get('quote_id');
       $item_id = $request->get('item_id');
       $item_name = $request->get('item');
       $unit_id = $request->get('unit_id');
@@ -505,7 +506,7 @@ class EstimateController extends AbstractController
       $equation_id = $request->get('equation_id');
 
       try {
-         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id);
+         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
@@ -549,6 +550,130 @@ class EstimateController extends AbstractController
          $resultadoJson['error'] = $e->getMessage();
 
          return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * salvarQuote: Crea o actualiza una cuota
+    */
+   public function salvarQuote(Request $request)
+   {
+      $estimate_id = $request->get('estimate_id');
+      $quote_id = $request->get('quote_id');
+      $name = $request->get('name');
+      try {
+         $resultado = $this->estimateService->SalvarQuote($estimate_id, $quote_id ?? '', $name);
+         if ($resultado['success']) {
+            return $this->json(['success' => true, 'message' => 'The operation was successful', 'quote_id' => $resultado['quote_id']]);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error']]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * eliminarQuote: Elimina una cuota
+    */
+   public function eliminarQuote(Request $request)
+   {
+      $quote_id = $request->get('quote_id');
+      try {
+         $resultado = $this->estimateService->EliminarQuote($quote_id);
+         if ($resultado['success']) {
+            return $this->json(['success' => true, 'message' => 'The operation was successful']);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error']]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * eliminarQuoteCompanies: Elimina los registros estimate_quote_company de una cuota (desasigna empresas)
+    */
+   public function eliminarQuoteCompanies(Request $request)
+   {
+      $quote_id = $request->get('quote_id');
+      try {
+         $resultado = $this->estimateService->EliminarQuoteCompanies($quote_id);
+         if ($resultado['success']) {
+            return $this->json(['success' => true, 'message' => 'The operation was successful']);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error']]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * cargarDatosQuote: Carga una cuota con ítems y compañías
+    */
+   public function cargarDatosQuote(Request $request)
+   {
+      $quote_id = $request->get('quote_id');
+      try {
+         $resultado = $this->estimateService->CargarDatosQuote($quote_id);
+         return $this->json($resultado);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * salvarQuoteCompanies: Asigna compañías a una cuota
+    */
+   public function salvarQuoteCompanies(Request $request)
+   {
+      $quote_id = $request->get('quote_id');
+      $company_ids = $request->get('company_ids');
+      if (is_string($company_ids)) {
+         $company_ids = $company_ids === '' ? [] : explode(',', $company_ids);
+      }
+      try {
+         $resultado = $this->estimateService->SalvarQuoteCompanies($quote_id, $company_ids ?? []);
+         if ($resultado['success']) {
+            return $this->json(['success' => true, 'message' => 'The operation was successful']);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error']]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * enviarQuotes: Genera Excel y envía email por cada cuota a sus compañías asignadas
+    */
+   public function enviarQuotes(Request $request)
+   {
+      $quote_ids = $request->get('quote_ids');
+      try {
+         $resultado = $this->estimateService->EnviarQuotes($quote_ids ?? '');
+         return $this->json([
+            'success' => $resultado['success'],
+            'message' => $resultado['message'],
+            'enviados' => $resultado['enviados'] ?? 0,
+            'errores' => $resultado['errores'] ?? [],
+         ]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * exportarExcelQuote: Genera el PDF de una cuota (desde el mismo contenido que el Excel) y devuelve la URL para descarga
+    */
+   public function exportarExcelQuote(Request $request)
+   {
+      $quote_id = $request->get('quote_id');
+      try {
+         $url = $this->estimateService->ExportarExcelQuote($quote_id);
+         if ($url === null) {
+            return $this->json(['success' => false, 'error' => 'No se pudo generar el archivo.']);
+         }
+         return $this->json(['success' => true, 'message' => 'The operation was successful', 'url' => $url]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
       }
    }
 }

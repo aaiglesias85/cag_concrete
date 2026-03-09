@@ -14,7 +14,7 @@ use App\Entity\DataTrackingMaterial;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\District;
 use App\Entity\EstimateEstimator;
-use App\Entity\EstimateQuote;
+use App\Entity\EstimateQuoteItem;
 use App\Entity\Holiday;
 use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemNotes;
@@ -741,6 +741,21 @@ class Base
    }
 
    /**
+    * Normaliza texto para guardar en BD (evita caracteres Unicode que fallan en charset latin1/utf8).
+    * Reemplaza espacio estrecho (U+202F), no-break space (U+00A0), BOM (U+FEFF), etc. por espacio normal.
+    */
+   protected function normalizarTextoParaDb(?string $text): string
+   {
+      if ($text === null || $text === '') {
+         return (string) $text;
+      }
+      $normalized = preg_replace('/[\x{202F}\x{00A0}\x{200B}\x{200C}\x{200D}\x{FEFF}\x{200E}\x{200F}]/u', ' ', $text);
+      $normalized = preg_replace('/\s+/u', ' ', $normalized);
+
+      return trim($normalized);
+   }
+
+   /**
     * SalvarLog
     * @param $operacion
     * @param $categoria
@@ -758,7 +773,7 @@ class Base
 
          $entity->setOperacion($operacion);
          $entity->setCategoria($categoria);
-         $entity->setDescripcion($descripcion);
+         $entity->setDescripcion($this->normalizarTextoParaDb($descripcion));
 
          $ip = $this->getIP();
          $entity->setIp($ip);
@@ -873,7 +888,7 @@ class Base
 
    /**
     * DevolverYieldCalculationDeItemProject
-    * @param ProjectItem|EstimateQuote $item_entity
+    * @param ProjectItem|EstimateQuoteItem $item_entity
     * @return string
     */
    public function DevolverYieldCalculationDeItemProject($item_entity)

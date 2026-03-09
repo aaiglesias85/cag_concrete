@@ -13,6 +13,8 @@ use App\Entity\EstimateCompany;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateProjectType;
 use App\Entity\EstimateQuote;
+use App\Entity\EstimateQuoteCompany;
+use App\Entity\EstimateQuoteItem;
 use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
@@ -24,9 +26,18 @@ use App\Repository\EstimateBidDeadlineRepository;
 use App\Repository\EstimateCompanyRepository;
 use App\Repository\EstimateEstimatorRepository;
 use App\Repository\EstimateProjectTypeRepository;
+use App\Repository\EstimateQuoteCompanyRepository;
+use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\EstimateQuoteRepository;
 use App\Repository\EstimateRepository;
 use App\Utils\Base;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Mime\Address;
 
 class EstimateService extends Base
 {
@@ -67,6 +78,429 @@ class EstimateService extends Base
    }
 
    /**
+    * ListarQuotesDeEstimate: Lista las cuotas de un estimate
+    */
+   public function ListarQuotesDeEstimate($estimate_id)
+   {
+      /** @var EstimateQuoteRepository $estimateQuoteRepo */
+      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
+      $quotes = $estimateQuoteRepo->ListarQuotesDeEstimate($estimate_id);
+      $lista = [];
+      foreach ($quotes as $q) {
+         /** @var EstimateQuote $q */
+         /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+         $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+         $items = $estimateQuoteItemRepo->ListarItemsDeQuote($q->getId());
+         /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+         $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+         $companies = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($q->getId());
+         $company_names = array_map(function ($eqc) { return $eqc->getCompany()->getName(); }, $companies);
+         $lista[] = [
+            'id' => $q->getId(),
+            'name' => $q->getName(),
+            'items_count' => count($items),
+            'companies_count' => count($companies),
+            'companies' => $company_names,
+         ];
+      }
+      return $lista;
+   }
+
+   /**
+    * SalvarQuote: Crea o actualiza una cuota
+    */
+   public function SalvarQuote($estimate_id, $quote_id, $name)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $estimate = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
+      if ($estimate === null) {
+         return ['success' => false, 'error' => 'Estimate not found'];
+      }
+      if ($quote_id !== '' && is_numeric($quote_id)) {
+         $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+         if ($quote === null) {
+            return ['success' => false, 'error' => 'Quote not found'];
+         }
+         $quote->setName($name);
+         $em->flush();
+         return ['success' => true, 'quote_id' => $quote->getId()];
+      }
+      $quote = new EstimateQuote();
+      $quote->setEstimate($estimate);
+      $quote->setName($name);
+      $em->persist($quote);
+      $em->flush();
+      $this->SalvarLog('Add', 'Estimate Quote', 'Quote added: ' . $name);
+      return ['success' => true, 'quote_id' => $quote->getId()];
+   }
+
+   /**
+    * EliminarQuote: Elimina una cuota (cascade elimina ítems y companies)
+    */
+   public function EliminarQuote($quote_id)
+   {
+      if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+         return ['success' => false, 'error' => 'Invalid quote'];
+      }
+      $em = $this->getDoctrine()->getManager();
+      $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+      if ($quote === null) {
+         return ['success' => false, 'error' => 'Quote not found'];
+      }
+      $name = $quote->getName();
+      $em->remove($quote);
+      $em->flush();
+      $this->SalvarLog('Delete', 'Estimate Quote', 'Quote deleted: ' . $name);
+      return ['success' => true];
+   }
+
+   /**
+    * CargarDatosQuote: Devuelve cuota con ítems y compañías asignadas
+    */
+   public function CargarDatosQuote($quote_id)
+   {
+      if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+         return ['success' => false, 'error' => 'Invalid quote'];
+      }
+      $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+      if ($quote === null) {
+         return ['success' => false, 'error' => 'Quote not found'];
+      }
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      $items = $estimateQuoteItemRepo->ListarItemsDeQuote($quote_id);
+      $items_data = [];
+      foreach ($items as $key => $value) {
+         $items_data[] = $this->DevolverItemDeEstimate($value, $key);
+      }
+      /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+      $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+      $companies = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
+      $companies_data = [];
+      foreach ($companies as $eqc) {
+         $companies_data[] = [
+            'id' => $eqc->getId(),
+            'company_id' => $eqc->getCompany()->getCompanyId(),
+            'company' => $eqc->getCompany()->getName(),
+            'email' => $eqc->getCompany()->getEmail() ?? $eqc->getCompany()->getContactEmail() ?? '',
+         ];
+      }
+      return [
+         'success' => true,
+         'quote' => [
+            'id' => $quote->getId(),
+            'name' => $quote->getName(),
+            'estimate_id' => $quote->getEstimate()->getEstimateId(),
+            'items' => $items_data,
+            'companies' => $companies_data,
+         ],
+      ];
+   }
+
+   /**
+    * SalvarQuoteCompanies: Asigna compañías a una cuota (reemplaza las actuales)
+    */
+   public function SalvarQuoteCompanies($quote_id, $company_ids)
+   {
+      if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+         return ['success' => false, 'error' => 'Invalid quote'];
+      }
+      $em = $this->getDoctrine()->getManager();
+      $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+      if ($quote === null) {
+         return ['success' => false, 'error' => 'Quote not found'];
+      }
+      /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+      $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+      $existing = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
+      foreach ($existing as $eqc) {
+         $em->remove($eqc);
+      }
+      $ids = is_array($company_ids) ? $company_ids : (strpos((string)$company_ids, ',') !== false ? explode(',', $company_ids) : [$company_ids]);
+      $companyRepo = $this->getDoctrine()->getRepository(Company::class);
+      foreach ($ids as $cid) {
+         $cid = trim($cid);
+         if ($cid === '') continue;
+         $company = $companyRepo->find($cid);
+         if ($company !== null) {
+            $eqc = new EstimateQuoteCompany();
+            $eqc->setQuote($quote);
+            $eqc->setCompany($company);
+            $em->persist($eqc);
+         }
+      }
+      $em->flush();
+      return ['success' => true];
+   }
+
+   /**
+    * EliminarQuoteCompanies: Elimina todos los registros estimate_quote_company de una cuota
+    */
+   public function EliminarQuoteCompanies($quote_id)
+   {
+      if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+         return ['success' => false, 'error' => 'Invalid quote'];
+      }
+      $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+      if ($quote === null) {
+         return ['success' => false, 'error' => 'Quote not found'];
+      }
+      $em = $this->getDoctrine()->getManager();
+      /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+      $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+      $existing = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
+      foreach ($existing as $eqc) {
+         $em->remove($eqc);
+      }
+      $em->flush();
+      return ['success' => true];
+   }
+
+   /**
+    * EnviarQuotes: Genera Excel por cuota y envía email a cada compañía asignada
+    * @param string|array $quote_ids Id(s) de cuota (coma o array)
+    */
+   public function EnviarQuotes($quote_ids)
+   {
+      $ids = is_array($quote_ids) ? $quote_ids : explode(',', $quote_ids);
+      $ids = array_map('trim', $ids);
+      $ids = array_filter($ids, function ($id) { return $id !== '' && is_numeric($id); });
+      $enviados = 0;
+      $errores = [];
+      $fromAddress = $this->getParameter('mailer_sender_address');
+      $fromName = $this->getParameter('mailer_from_name') ?? '';
+
+      foreach ($ids as $quote_id) {
+         $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+         if ($quote === null) {
+            $errores[] = "Quote $quote_id not found";
+            continue;
+         }
+         /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+         $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+         $quoteCompanies = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
+         if (empty($quoteCompanies)) {
+            $errores[] = "Quote \"{$quote->getName()}\" has no companies assigned";
+            continue;
+         }
+         $pdfPath = $this->GenerarPdfQuote($quote_id);
+         if ($pdfPath === null || !is_file($pdfPath)) {
+            $errores[] = "Could not generate PDF for quote \"{$quote->getName()}\"";
+            continue;
+         }
+         $quoteName = $quote->getName();
+         $estimateName = $quote->getEstimate()->getName();
+         foreach ($quoteCompanies as $eqc) {
+            $company = $eqc->getCompany();
+            $email = $company->getEmail() ?? $company->getContactEmail() ?? '';
+            if ($email === '') {
+               $errores[] = "Company \"{$company->getName()}\" has no email";
+               continue;
+            }
+            try {
+               $mensaje = (new TemplatedEmail())
+                  ->from(new Address($fromAddress, $fromName))
+                  ->to(new Address($email, $company->getName()))
+                  ->subject("Quote: $quoteName - $estimateName")
+                  ->htmlTemplate('admin/estimate/mail_quote.html.twig')
+                  ->context([
+                     'quote_name' => $quoteName,
+                     'estimate_name' => $estimateName,
+                     'company_name' => $company->getName(),
+                     'direccion_url' => $this->ObtenerURL(),
+                  ])
+                  ->attachFromPath($pdfPath, basename($pdfPath), 'application/pdf');
+               $this->mailer->send($mensaje);
+               $enviados++;
+            } catch (\Throwable $e) {
+               $errores[] = "Email to {$company->getName()}: " . $e->getMessage();
+            }
+         }
+         @unlink($pdfPath);
+      }
+
+      $success = $enviados > 0;
+      $message = $enviados . ' email(s) sent.';
+      if (!empty($errores)) {
+         $message .= ' ' . implode(' ', $errores);
+      }
+      return ['success' => $success, 'message' => $message, 'enviados' => $enviados, 'errores' => $errores];
+   }
+
+   /**
+    * Construye el spreadsheet de una quote desde plantilla (bid_letting o bid_bids).
+    * Se usa para generar primero el Excel en memoria y luego convertirlo a PDF.
+    * @return Spreadsheet|null
+    */
+   private function buildSpreadsheetForQuote($quote_id)
+   {
+      if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+         return null;
+      }
+      $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+      if ($quote === null) return null;
+      $estimate = $quote->getEstimate();
+      $proposalType = $estimate->getProposalType();
+      $templateName = ($proposalType && (int)$proposalType->getTypeId() === 2) ? 'bid_letting.xlsx' : 'bid_bids.xlsx';
+      $templatePath = $this->getParameter('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'bundles' . DIRECTORY_SEPARATOR . 'metronic8' . DIRECTORY_SEPARATOR . 'excel' . DIRECTORY_SEPARATOR . $templateName;
+      if (!is_file($templatePath)) return null;
+
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      $items = $estimateQuoteItemRepo->ListarItemsDeQuote($quote_id);
+
+      $reader = IOFactory::createReader('Xlsx');
+      $spreadsheet = $reader->load($templatePath);
+      $sheet = $spreadsheet->getActiveSheet();
+
+      $bidDeadlineStr = $estimate->getBidDeadline() ? $estimate->getBidDeadline()->format('m/d/Y') : '';
+      $awardedDateStr = $estimate->getAwardedDate() ? $estimate->getAwardedDate()->format('m/d/Y') : '';
+
+      if ($templateName === 'bid_bids.xlsx') {
+         $sheet->setCellValue('E3', $bidDeadlineStr);
+         $sheet->setCellValue('E4', $estimate->getProjectId() ?? '');
+         $sheet->setCellValue('E5', $estimate->getBidNo() ?? '');
+         $sheet->setCellValue('E6', $estimate->getName() ?? '');
+         $sheet->setCellValue('E8', $estimate->getLocation() ?? '');
+         $sheet->setCellValue('E9', $awardedDateStr);
+      } else {
+         $sheet->setCellValue('E3', $bidDeadlineStr);
+         $sheet->setCellValue('E4', $estimate->getProjectId() ?? '');
+         $sheet->setCellValue('E5', $estimate->getBidNo() ?? '');
+         $sheet->setCellValue('E6', '');
+         $sheet->setCellValue('E7', $estimate->getLocation() ?? '');
+         $sheet->setCellValue('E8', $awardedDateStr);
+      }
+
+      // Reducir tamaño de fuente y dar más ancho a columna D (labels) para que se vean en una sola línea en el PDF
+      $sheet->getStyle('D1:D50')->getFont()->setSize(8);
+      $sheet->getColumnDimension('D')->setWidth(24); // ancho en caracteres para que "PROPOSAL NO" etc. quepa en una línea
+      $sheet->getStyle('D1:D50')->getAlignment()->setWrapText(false);
+
+      $firstDataRow = ($templateName === 'bid_letting.xlsx') ? 11 : 12;
+      $totalItemRows = 27; // filas reservadas en el template para ítems
+      $fila = $firstDataRow;
+      $sumTotal = 0.0;
+      foreach ($items as $row) {
+         /** @var EstimateQuoteItem $row */
+         $item = $row->getItem();
+         $qty = (float) $row->getQuantity();
+         $price = (float) $row->getPrice();
+         $total = $qty * $price;
+         $sumTotal += $total;
+         $description = $item ? $item->getName() : '';
+         $unit = ($item && $item->getUnit()) ? $item->getUnit()->getDescription() : '';
+         $sheet->setCellValue('B' . $fila, $description);
+         $sheet->mergeCells('B' . $fila . ':C' . $fila);
+         $sheet->setCellValue('D' . $fila, $unit);
+         $sheet->setCellValue('E' . $fila, $qty);
+         $sheet->setCellValue('F' . $fila, $price);
+         $sheet->setCellValue('G' . $fila, $total);
+         $fila++;
+      }
+      $numItems = count($items);
+
+      // Quitar solo las filas vacías de las 27 de ítems (las que quedaron sin usar)
+      if ($numItems < $totalItemRows) {
+         $filasVacias = $totalItemRows - $numItems;
+         $sheet->removeRow($firstDataRow + $numItems, $filasVacias);
+      }
+
+      // Fila de sumatoria: en el template es la primera fila después de las 27 de ítems; tras quitar filas vacías queda en firstDataRow + numItems (solo una celda con el total)
+      $filaSumatoria = $firstDataRow + $numItems;
+      $sheet->setCellValue('G' . $filaSumatoria, $sumTotal);
+
+      // Ocultar solo las filas vacías al final del sheet (después de la última con contenido). No tocamos las filas en blanco entre total y TERMS AND CONDITIONS.
+      $highestRow = $sheet->getHighestDataRow();
+      $highestCol = $sheet->getHighestDataColumn();
+      $maxCol = Coordinate::columnIndexFromString($highestCol);
+      $lastRowWithContent = $filaSumatoria;
+      for ($r = $filaSumatoria + 1; $r <= $highestRow; $r++) {
+         $hasContent = false;
+         for ($c = 1; $c <= $maxCol; $c++) {
+            $colStr = Coordinate::stringFromColumnIndex($c);
+            $addr = $colStr . $r;
+            if ($sheet->getCellCollection()->has($addr)) {
+               $val = $sheet->getCell($addr)->getCalculatedValue();
+               if ($val !== null && trim((string) $val) !== '') {
+                  $hasContent = true;
+                  break;
+               }
+            }
+         }
+         if ($hasContent) {
+            $lastRowWithContent = $r;
+         }
+      }
+      // Ocultar solo desde la fila siguiente a la última con contenido hasta el final
+      for ($r = $lastRowWithContent + 1; $r <= $highestRow; $r++) {
+         $sheet->getRowDimension($r)->setVisible(false);
+      }
+
+      // Igual que InvoiceService PDF: escala para 1 página de ancho (setFitToHeight(0)) para que no salga en miniatura
+      $pageSetup = $sheet->getPageSetup();
+      $pageSetup->setFitToPage(true);
+      $pageSetup->setFitToWidth(1);
+      $pageSetup->setFitToHeight(0); // 0 = sin límite de alto; escala solo por ancho → texto legible
+      $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
+      $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LEGAL);
+      $margins = $sheet->getPageMargins();
+      $margins->setTop(0.5);
+      $margins->setBottom(0.5);
+      $margins->setLeft(0.35);
+      $margins->setRight(0.35);
+      $sheet->setShowGridlines(false);
+      $pageSetup->setHorizontalCentered(true);
+
+      return $spreadsheet;
+   }
+
+   /**
+    * Genera el PDF de una quote: construye el Excel en memoria y lo convierte a PDF con Mpdf.
+    * @return string|null Ruta al archivo .pdf generado
+    */
+   private function GenerarPdfQuote($quote_id)
+   {
+      $spreadsheet = $this->buildSpreadsheetForQuote($quote_id);
+      if ($spreadsheet === null) {
+         return null;
+      }
+      $projectDir = $this->getParameter('kernel.project_dir');
+      $dir = $projectDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'excel';
+      if (!is_dir($dir)) {
+         mkdir($dir, 0777, true);
+      }
+      $filename = 'quote_' . $quote_id . '_' . date('YmdHis') . '.pdf';
+      $path = $dir . DIRECTORY_SEPARATOR . $filename;
+
+      $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf($spreadsheet);
+      $writer->setPreCalculateFormulas(true); // para que columnas con fórmulas (p. ej. G y G39) muestren el valor en el PDF
+      $tempDir = $projectDir . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR . 'phpsppdf';
+      if (!is_dir($tempDir)) {
+         @mkdir($tempDir, 0777, true);
+      }
+      if (is_dir($tempDir) && method_exists($writer, 'setTempDir')) {
+         $writer->setTempDir($tempDir);
+      }
+      $writer->save($path);
+      return is_file($path) ? $path : null;
+   }
+
+   /**
+    * ExportarExcelQuote: Genera el PDF de una cuota (desde el mismo contenido que el Excel) y devuelve la URL para descarga.
+    * @param int|string $quote_id
+    * @return string|null URL del archivo PDF generado o null
+    */
+   public function ExportarExcelQuote($quote_id)
+   {
+      $path = $this->GenerarPdfQuote($quote_id);
+      if ($path === null || !is_file($path)) {
+         return null;
+      }
+      return $this->ObtenerURL() . 'uploads/excel/' . basename($path);
+   }
+
+   /**
     * AgregarItem
     * @param $item_id
     * @param $item_name
@@ -77,21 +511,24 @@ class EstimateService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($estimate_item_id, $estimate_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
+   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
    {
       $resultado = [];
 
       $em = $this->getDoctrine()->getManager();
 
-      // validar si existe
+      // validar si existe el mismo item en la misma cuota (puede repetirse en otra quote)
       if ($item_id !== '') {
-         /** @var EstimateQuoteRepository $estimateQuoteRepo */
-         $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-         $estimate_item = $estimateQuoteRepo->BuscarItemEstimate($estimate_id, $item_id);
-         if (!empty($estimate_item) && $estimate_item_id != $estimate_item[0]->getId()) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The item already exists in the project estimate";
-            return $resultado;
+         $quote_id_check = ($quote_id !== '' && $quote_id !== null && is_numeric($quote_id)) ? $quote_id : null;
+         if ($quote_id_check !== null) {
+            /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+            $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+            $estimate_item = $estimateQuoteItemRepo->BuscarItemEstimateEnQuote($estimate_id, $quote_id_check, $item_id);
+            if (!empty($estimate_item) && (string)$estimate_item_id !== (string)$estimate_item[0]->getId()) {
+               $resultado['success'] = false;
+               $resultado['error'] = "The item already exists in the project estimate";
+               return $resultado;
+            }
          }
       } else {
 
@@ -108,16 +545,37 @@ class EstimateService extends Base
 
       $estimate_entity = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
       if ($estimate_entity != null) {
+         /** @var EstimateQuoteRepository $estimateQuoteRepo */
+         $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
+         $quotes = $estimateQuoteRepo->ListarQuotesDeEstimate($estimate_id);
+         $default_quote = !empty($quotes) ? $quotes[0] : null;
+         $quote_created_in_request = false;
+         if ($default_quote === null) {
+            $default_quote = new EstimateQuote();
+            $default_quote->setName('Quote 1');
+            $default_quote->setEstimate($estimate_entity);
+            $em->persist($default_quote);
+            $em->flush();
+            $quote_created_in_request = true;
+         }
+         // Si se envió quote_id y es válido, usar esa cuota para el ítem nuevo
+         if ($quote_id !== '' && is_numeric($quote_id)) {
+            $quote_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+            if ($quote_entity !== null && $quote_entity->getEstimate()->getEstimateId() == (int) $estimate_id) {
+               $default_quote = $quote_entity;
+            }
+         }
+
          $estimate_item_entity = null;
 
          if (is_numeric($estimate_item_id)) {
-            $estimate_item_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+            $estimate_item_entity = $this->getDoctrine()->getRepository(EstimateQuoteItem::class)
                ->find($estimate_item_id);
          }
 
          $is_new_estimate_item = false;
          if ($estimate_item_entity == null) {
-            $estimate_item_entity = new EstimateQuote();
+            $estimate_item_entity = new EstimateQuoteItem();
             $is_new_estimate_item = true;
          }
 
@@ -152,8 +610,8 @@ class EstimateService extends Base
 
          $estimate_item_entity->setItem($item_entity);
 
-         if ($is_new_estimate_item) {
-            $estimate_item_entity->setEstimate($estimate_entity);
+         if ($is_new_estimate_item && $default_quote !== null) {
+            $estimate_item_entity->setQuote($default_quote);
 
             $em->persist($estimate_item_entity);
          }
@@ -166,6 +624,9 @@ class EstimateService extends Base
          $item = $this->DevolverItemDeEstimate($estimate_item_entity);
          $resultado['item'] = $item;
          $resultado['is_new_item'] = $is_new_item;
+         if ($quote_created_in_request && $default_quote !== null) {
+            $resultado['quote_created'] = ['id' => $default_quote->getId(), 'name' => $default_quote->getName()];
+         }
       } else {
          $resultado['success'] = false;
          $resultado['error'] = 'The project not exist';
@@ -183,9 +644,9 @@ class EstimateService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
-      $entity = $this->getDoctrine()->getRepository(EstimateQuote::class)
+      $entity = $this->getDoctrine()->getRepository(EstimateQuoteItem::class)
          ->find($estimate_item_id);
-      /**@var EstimateQuote $entity */
+      /**@var EstimateQuoteItem $entity */
       if ($entity != null) {
 
          $item_name = $entity->getItem()->getName();
@@ -345,7 +806,11 @@ class EstimateService extends Base
          $bid_deadlines = $this->ListarBidDeadlines($estimate_id);
          $arreglo_resultado['bid_deadlines'] = $bid_deadlines;
 
-         // items
+         // quotes con items y companies (agrupados)
+         $quotes = $this->ListarQuotesDeEstimate($estimate_id);
+         $arreglo_resultado['quotes'] = $quotes;
+
+         // items planos (con quote_id) para la tabla agrupada en front
          $items = $this->ListarItemsDeEstimate($estimate_id);
          $arreglo_resultado['items'] = $items;
 
@@ -411,9 +876,9 @@ class EstimateService extends Base
    {
       $items = [];
 
-      /** @var EstimateQuoteRepository $estimateQuoteRepo */
-      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-      $lista = $estimateQuoteRepo->ListarItemsDeEstimate($estimate_id);
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      $lista = $estimateQuoteItemRepo->ListarItemsDeEstimate($estimate_id);
       foreach ($lista as $key => $value) {
 
          $item = $this->DevolverItemDeEstimate($value, $key);
@@ -425,7 +890,7 @@ class EstimateService extends Base
 
    /**
     * DevolverItemDeEstimate
-    * @param EstimateQuote $value
+    * @param EstimateQuoteItem $value
     * @return array
     */
    public function DevolverItemDeEstimate($value, $key = -1)
@@ -438,6 +903,7 @@ class EstimateService extends Base
 
       return [
          'estimate_item_id' => $value->getId(),
+         'quote_id' => $value->getQuote() !== null ? $value->getQuote()->getId() : null,
          "item_id" => $value->getItem()->getItemId(),
          "item" => $value->getItem()->getName(),
          "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
@@ -624,10 +1090,10 @@ class EstimateService extends Base
          $em->remove($bid_deadline);
       }
 
-      // items
-      /** @var EstimateQuoteRepository $estimateQuoteRepo */
-      $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-      $estimate_items = $estimateQuoteRepo->ListarItemsDeEstimate($estimate_id);
+      // items (quote items)
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      $estimate_items = $estimateQuoteItemRepo->ListarItemsDeEstimate($estimate_id);
       foreach ($estimate_items as $estimate_item) {
          $em->remove($estimate_item);
       }

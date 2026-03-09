@@ -2,12 +2,12 @@
 
 namespace App\Utils\Admin;
 
-use App\Entity\EstimateQuote;
+use App\Entity\EstimateQuoteItem;
 use App\Entity\Item;
 use App\Entity\Equation;
 use App\Entity\ProjectItem;
 use App\Repository\EquationRepository;
-use App\Repository\EstimateQuoteRepository;
+use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectItemRepository;
 use App\Utils\Base;
@@ -165,13 +165,13 @@ class EquationService extends Base
             $item->setEquation(null);
          }
 
-         // estimates
-         /** @var EstimateQuoteRepository $estimateQuoteRepo */
-         $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-         $estimates = $estimateQuoteRepo->ListarEstimateQuotesDeEquation($equation_id);
-         foreach ($estimates as $estimate) {
-            $estimate->setYieldCalculation(null);
-            $estimate->setEquation(null);
+         // estimate quote items
+         /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+         $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+         $estimate_quote_items = $estimateQuoteItemRepo->ListarEstimateQuoteItemsDeEquation($equation_id);
+         foreach ($estimate_quote_items as $estimate_quote_item) {
+            $estimate_quote_item->setYieldCalculation(null);
+            $estimate_quote_item->setEquation(null);
          }
 
          $equation_descripcion = $entity->getDescription();
@@ -232,13 +232,13 @@ class EquationService extends Base
                         $item->setEquation(null);
                      }
 
-                     // estimates
-                     /** @var EstimateQuoteRepository $estimateQuoteRepo */
-                     $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-                     $estimates = $estimateQuoteRepo->ListarEstimateQuotesDeEquation($equation_id);
-                     foreach ($estimates as $estimate) {
-                        $estimate->setYieldCalculation(null);
-                        $estimate->setEquation(null);
+                     // estimate quote items
+                     /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+                     $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+                     $estimate_quote_items = $estimateQuoteItemRepo->ListarEstimateQuoteItemsDeEquation($equation_id);
+                     foreach ($estimate_quote_items as $estimate_quote_item) {
+                        $estimate_quote_item->setYieldCalculation(null);
+                        $estimate_quote_item->setEquation(null);
                      }
 
                      $equation_descripcion = $entity->getDescription();

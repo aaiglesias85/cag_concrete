@@ -942,8 +942,9 @@ var Estimates = (function () {
          actualizarTableListaBidDeadLines();
          actualizarTableListaProjectInformation();
 
-         // items
-         items = estimate.items;
+         // items y quotes (cuotas con items agrupados; quotes para pestaña Send)
+         items = estimate.items || [];
+         quotes = estimate.quotes || [];
          actualizarTableListaItems();
 
          // companys
@@ -951,8 +952,13 @@ var Estimates = (function () {
          actualizarTableListaCompanysEstimate();
 
          // habilitar tab
-         totalTabs = 4;
+         totalTabs = 5;
          $('#btn-wizard-siguiente').removeClass('hide');
+
+         // pestaña Send quotes usa la variable quotes ya cargada
+         renderQuotesSendTab();
+         actualizarSelectQuoteEnModalItem();
+
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
@@ -1949,28 +1955,89 @@ var Estimates = (function () {
       });
    };
 
-   // items
+   // items (flat) y quotes (para agrupar y pestaña Send)
    var oTableItems;
+   var oTableQuotesSend = null;
    var items = [];
+   var quotes = [];
    var nEditingRowItem = null;
    var rowDeleteItem = null;
+
+   var agruparItemsPorQuote = function (itemsList, quotesList) {
+      var resultado = [];
+      var orderCounter = 0;
+      (quotesList || []).forEach(function (quote) {
+         var quoteItems = itemsList.filter(function (it) { return it.quote_id == quote.id; });
+         if (quoteItems.length === 0) return;
+         resultado.push({
+            isGroupHeader: true,
+            groupTitle: quote.name,
+            quote_id: quote.id,
+            _groupOrder: orderCounter++,
+            item: null,
+            unit: null,
+            yield_calculation_name: null,
+            quantity: null,
+            price: null,
+            total: null,
+         });
+         quoteItems.forEach(function (item) {
+            item._groupOrder = orderCounter++;
+            resultado.push(item);
+         });
+      });
+      return resultado;
+   };
+
    var initTableItems = function () {
       const table = '#items-table-editable';
 
-      // columns
-      const columns = [{ data: 'item' }, { data: 'unit' }, { data: 'yield_calculation_name' }, { data: 'quantity' }, { data: 'price' }, { data: 'total' }, { data: null }];
+      // columns (incl. _groupOrder para orden)
+      const columns = [
+         { data: 'item' },
+         { data: 'unit' },
+         { data: 'yield_calculation_name' },
+         { data: 'quantity' },
+         { data: 'price' },
+         { data: 'total' },
+         { data: '_groupOrder', visible: false },
+         { data: null },
+      ];
 
       // column defs
       let columnDefs = [
          {
+            targets: 0,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '<strong>' + (row.groupTitle || '') + '</strong>';
+               return data || '';
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return data || '';
+            },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return data || '';
+            },
+         },
+         {
             targets: 3,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          {
             targets: 4,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                var output = `<input type="number" class="form-control price-item" value="${data}" data-position="${row.posicion}" />`;
                return `<div class="w-100px">${output}</div>`;
             },
@@ -1978,6 +2045,7 @@ var Estimates = (function () {
          {
             targets: 5,
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
@@ -1987,6 +2055,7 @@ var Estimates = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -1995,12 +2064,13 @@ var Estimates = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = [[0, 'asc']];
+      // order por grupo
+      const order = [[7, 'asc']];
 
-      // escapar contenido de la tabla
+      var datosAgrupados = agruparItemsPorQuote(items, quotes);
+
       oTableItems = DatatableUtil.initSafeDataTable(table, {
-         data: items,
+         data: datosAgrupados,
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
@@ -2010,11 +2080,17 @@ var Estimates = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         createdRow: function (row, data) {
+            if (data.isGroupHeader) {
+               $(row).addClass('row-group-header');
+               $(row).css({ 'background-color': '#f5f5f5', 'font-weight': 'bold' });
+            }
+         },
       });
 
       handleSearchDatatableItems();
 
-      // totals
+      // totals (solo ítems reales)
       $('#total_count_items').val(items.length);
 
       var total = calcularMontoTotalItems();
@@ -2067,9 +2143,25 @@ var Estimates = (function () {
       $(document).on('click', '#btn-agregar-item', function (e) {
          // reset
          resetFormItem();
+         actualizarSelectQuoteEnModalItem();
+         $('#quote_id_item').val('');
 
          // mostar modal
          ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-add-quote-item');
+      $(document).on('click', '#btn-add-quote-item', function (e) {
+         e.preventDefault();
+         var estimateId = $('#estimate_id').val();
+         if (!estimateId) {
+            toastr.error('Save the estimate first before adding a quote.');
+            return;
+         }
+         $('#quote_id').val('');
+         $('#quote_name').val('Quote ' + ((quotes && quotes.length) ? quotes.length + 1 : 1));
+         $('#modal-quote-title').text('New quote');
+         new bootstrap.Modal(document.getElementById('modal-quote')).show();
       });
 
       $(document).off('click', '#btn-salvar-item');
@@ -2092,6 +2184,9 @@ var Estimates = (function () {
 
             var estimate_id = $('#estimate_id').val();
             formData.set('estimate_id', estimate_id);
+
+            var quote_id = $('#quote_id_item').val();
+            formData.set('quote_id', quote_id || '');
 
             formData.set('item_id', item_id);
 
@@ -2126,8 +2221,21 @@ var Estimates = (function () {
                         //add item
                         var item_new = response.item;
                         if (nEditingRowItem == null) {
+                           if (response.quote_created) {
+                              quotes.push({
+                                 id: response.quote_created.id,
+                                 name: response.quote_created.name,
+                                 items_count: 0,
+                                 companies_count: 0,
+                                 companies: []
+                              });
+                              actualizarSelectQuoteEnModalItem();
+                              renderQuotesSendTab();
+                           }
                            item_new.posicion = items.length;
                            items.push(item_new);
+                           var q = quotes.find(function (x) { return x.id == item_new.quote_id; });
+                           if (q) q.items_count = (q.items_count || 0) + 1;
                         } else {
                            item_new.posicion = items[nEditingRowItem].posicion;
                            items[nEditingRowItem] = item_new;
@@ -2193,6 +2301,8 @@ var Estimates = (function () {
             var estimate_id = $('#estimate_id').val();
             formData.set('estimate_id', estimate_id);
 
+            formData.set('quote_id', items[posicion].quote_id || '');
+
             formData.set('item_id', items[posicion].item_id);
 
             formData.set('item', items[posicion].item);
@@ -2249,6 +2359,9 @@ var Estimates = (function () {
             nEditingRowItem = posicion;
 
             $('#estimate_item_id').val(items[posicion].estimate_item_id);
+
+            actualizarSelectQuoteEnModalItem();
+            $('#quote_id_item').val(items[posicion].quote_id || '');
 
             $('#item').off('change', changeItem);
 
@@ -2399,16 +2512,28 @@ var Estimates = (function () {
       }
 
       function deleteItem(posicion) {
-         //Eliminar
+         var removed = items[posicion];
          items.splice(posicion, 1);
-         //actualizar posiciones
+         var q = quotes.find(function (x) { return x.id == removed.quote_id; });
+         if (q && (q.items_count || 0) > 0) q.items_count--;
          for (var i = 0; i < items.length; i++) {
             items[i].posicion = i;
          }
-         //actualizar lista
          actualizarTableListaItems();
+         renderQuotesSendTab();
       }
    };
+   var actualizarSelectQuoteEnModalItem = function () {
+      var sel = $('#quote_id_item');
+      if (!sel.length) return;
+      var current = sel.val();
+      sel.empty().append('<option value="">Select quote</option>');
+      (quotes || []).forEach(function (q) {
+         sel.append($('<option></option>').attr('value', q.id).text(q.name || 'Quote ' + q.id));
+      });
+      if (current) sel.val(current);
+   };
+
    var resetFormItem = function () {
       // reset form
       MyUtil.resetForm('item-form');
@@ -2787,6 +2912,390 @@ var Estimates = (function () {
       nEditingRowCompany = null;
    };
 
+   // --- Send quotes (cuotas): DataTable con nombres de ítems y companies ---
+   var renderQuotesSendTab = function () {
+      var withCompanies = (quotes || []).filter(function (q) {
+         return (q.companies_count || 0) > 0 || (q.companies && q.companies.length > 0);
+      });
+
+      if (withCompanies.length === 0) {
+         $('#lista-quotes-empty').removeClass('hide');
+         if (oTableQuotesSend) {
+            oTableQuotesSend.destroy();
+            oTableQuotesSend = null;
+         }
+         $('#quotes-send-table-editable').addClass('hide');
+         return;
+      }
+
+      $('#lista-quotes-empty').addClass('hide');
+      $('#quotes-send-table-editable').removeClass('hide');
+
+      var table = '#quotes-send-table-editable';
+      if (oTableQuotesSend) {
+         oTableQuotesSend.destroy();
+         oTableQuotesSend = null;
+      }
+
+      var dataRows = withCompanies.map(function (row) {
+         var itemsNames = (items || []).filter(function (it) { return it.quote_id == row.id; }).map(function (it) { return it.item || ''; });
+         var itemsText = itemsNames.length ? itemsNames.join(', ') : '—';
+         var companiesText = (row.companies && row.companies.length) ? row.companies.join(', ') : '—';
+         var actions =
+            '<div class="d-flex justify-content-center flex-shrink-0">' +
+            (permiso.editar || permiso.agregar
+               ? '<a href="javascript:;" data-id="' + row.id + '" data-name="' + (row.name || '').replace(/"/g, '&quot;') + '" title="Edit" class="btn-edit-quote btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">' +
+                 '<i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i></a>'
+               : '') +
+            '<a href="javascript:;" data-id="' + row.id + '" title="Export PDF" class="btn-export-excel-quote btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">' +
+            '<i class="ki-duotone ki-file-down fs-3"><span class="path1"></span><span class="path2"></span></i></a>' +
+            '<a href="javascript:;" data-id="' + row.id + '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">' +
+            '<i class="ki-duotone ki-sms fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>' +
+            (permiso.eliminar
+               ? '<a href="javascript:;" data-id="' + row.id + '" data-name="' + (row.name || '').replace(/"/g, '&quot;') + '" title="Delete" class="btn-delete-quote btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">' +
+                 '<i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>'
+               : '') +
+            '</div>';
+         return { name: row.name || '', items_text: itemsText, companies_text: companiesText, acciones: actions };
+      });
+
+      var columns = [{ data: 'name' }, { data: 'items_text' }, { data: 'companies_text' }, { data: 'acciones' }];
+      var columnDefs = [
+         { targets: 0, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 200); } },
+         { targets: 1, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); } },
+         { targets: 2, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); } },
+         { targets: -1, orderable: false, className: 'text-center', render: function (data, type, row) { return row.acciones; } },
+      ];
+
+      oTableQuotesSend = DatatableUtil.initSafeDataTable(table, {
+         data: dataRows,
+         displayLength: 30,
+         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         order: [[0, 'asc']],
+         columns: columns,
+         columnDefs: columnDefs,
+         language: DatatableUtil.getDataTableLenguaje(),
+      });
+
+      handleSearchDatatableQuotesSend();
+   };
+
+   var handleSearchDatatableQuotesSend = function () {
+      $(document).off('keyup', '#lista-quotes-send [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-quotes-send [data-table-filter="search"]', function () {
+         if (oTableQuotesSend) oTableQuotesSend.search(this.value).draw();
+      });
+   };
+
+   var getCompaniesFromBidDeadlines = function () {
+      var seen = {};
+      var list = [];
+      (bid_deadlines || []).forEach(function (b) {
+         if (b.company_id && !seen[b.company_id]) {
+            seen[b.company_id] = true;
+            list.push({ company_id: b.company_id, company: b.company || 'Company ' + b.company_id });
+         }
+      });
+      return list;
+   };
+
+   var openModalQuoteCompanies = function (preselectQuoteId) {
+      var $modal = $('#modal-quote-companies');
+      var $quoteSelect = $('#quote-select-in-modal');
+      var $companiesSelect = $('#quote-companies-select');
+
+      $quoteSelect.empty().append('<option value="">Select quote</option>');
+      (quotes || []).forEach(function (q) {
+         $quoteSelect.append($('<option></option>').attr('value', q.id).text(q.name || 'Quote ' + q.id));
+      });
+      var companiesFromBid = getCompaniesFromBidDeadlines();
+      $companiesSelect.empty();
+      companiesFromBid.forEach(function (c) {
+         $companiesSelect.append($('<option></option>').attr('value', c.company_id).text(c.company));
+      });
+      var $hint = $('#quote-companies-empty-hint');
+      if ($hint.length) {
+         if (companiesFromBid.length === 0) $hint.removeClass('hide'); else $hint.addClass('hide');
+      }
+
+      if ($quoteSelect.hasClass('select2-hidden-accessible')) {
+         try { $quoteSelect.select2('destroy'); } catch (e) {}
+      }
+      $quoteSelect.select2({ dropdownParent: $modal, width: '100%' });
+
+      if ($companiesSelect.hasClass('select2-hidden-accessible')) {
+         try { $companiesSelect.select2('destroy'); } catch (e) {}
+      }
+      $companiesSelect.select2({ dropdownParent: $modal, width: '100%' });
+
+      if (preselectQuoteId) {
+         $('#quote_id_companies').val(preselectQuoteId);
+         $quoteSelect.val(preselectQuoteId);
+         var formData = new URLSearchParams();
+         formData.set('quote_id', preselectQuoteId);
+         axios
+            .post('estimate/cargarDatosQuote', formData, { responseType: 'json' })
+            .then(function (response) {
+               if (response.data.success && response.data.quote && response.data.quote.companies) {
+                  var ids = response.data.quote.companies.map(function (c) { return String(c.company_id); });
+                  $companiesSelect.val(ids).trigger('change');
+               }
+               new bootstrap.Modal(document.getElementById('modal-quote-companies')).show();
+            })
+            .catch(MyUtil.catchErrorAxios);
+      } else {
+         $('#quote_id_companies').val('');
+         if (quotes && quotes.length > 0) $quoteSelect.val(quotes[0].id);
+         $companiesSelect.val([]).trigger('change');
+         new bootstrap.Modal(document.getElementById('modal-quote-companies')).show();
+      }
+   };
+
+   var initQuotesSend = function () {
+      $(document).off('shown.bs.tab', '#tab-send-quotes');
+      $(document).on('shown.bs.tab', '#tab-send-quotes', function () {
+         renderQuotesSendTab();
+      });
+
+      $(document).off('click', '#btn-nuevo-send');
+      $(document).on('click', '#btn-nuevo-send', function () {
+         if (!quotes || quotes.length === 0) {
+            toastr.error('Add at least one quote (e.g. add items in "List of items" tab first).');
+            return;
+         }
+         openModalQuoteCompanies(null);
+      });
+
+      $(document).off('click', '#btn-salvar-quote');
+      $(document).on('click', '#btn-salvar-quote', function () {
+         var estimateId = $('#estimate_id').val();
+         var quoteId = $('#quote_id').val();
+         var name = $('#quote_name').val();
+         if (!name || !estimateId) {
+            toastr.error('Quote name and estimate are required.');
+            return;
+         }
+         var formData = new FormData();
+         formData.append('estimate_id', estimateId);
+         formData.append('quote_id', quoteId);
+         formData.append('name', name);
+         axios
+            .post('estimate/salvarQuote', formData, { responseType: 'json' })
+            .then(function (response) {
+               if (response.data.success) {
+                  bootstrap.Modal.getInstance(document.getElementById('modal-quote')).hide();
+                  var newId = response.data.quote_id;
+                  quotes.push({ id: newId, name: name, items_count: 0, companies_count: 0, companies: [] });
+                  renderQuotesSendTab();
+                  actualizarSelectQuoteEnModalItem();
+                  if ($('#quote_id_item').length) {
+                     $('#quote_id_item').val(newId).trigger('change');
+                  }
+                  toastr.success(response.data.message || 'Saved.');
+               } else {
+                  toastr.error(response.data.error || 'Error saving quote.');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios);
+      });
+
+      $(document).off('click', '.btn-edit-quote');
+      $(document).on('click', '.btn-edit-quote', function () {
+         var quoteId = $(this).data('id');
+         openModalQuoteCompanies(quoteId);
+      });
+
+      $(document).off('click', '#btn-salvar-quote-companies');
+      $(document).on('click', '#btn-salvar-quote-companies', function () {
+         var quoteId = $('#quote-select-in-modal').val() || $('#quote_id_companies').val();
+         if (!quoteId) {
+            toastr.error('Please select a quote.');
+            return;
+         }
+         var selected = $('#quote-companies-select').val();
+         var companyIds = Array.isArray(selected) ? selected : [];
+         var formData = new FormData();
+         formData.append('quote_id', quoteId);
+         formData.append('company_ids', companyIds.join(','));
+         axios
+            .post('estimate/salvarQuoteCompanies', formData, { responseType: 'json' })
+            .then(function (response) {
+               if (response.data.success) {
+                  bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
+                  var q = quotes.find(function (x) { return x.id == quoteId; });
+                  if (q) {
+                     q.companies_count = companyIds.length;
+                     var names = [];
+                     var companyIdsArr = Array.isArray(selected) ? selected : [];
+                     companyIdsArr.forEach(function (cid) {
+                        var c = getCompaniesFromBidDeadlines().find(function (x) { return x.company_id == cid; });
+                        if (c) names.push(c.company);
+                     });
+                     q.companies = names;
+                  }
+                  renderQuotesSendTab();
+                  toastr.success(response.data.message || 'Saved.');
+               } else {
+                  toastr.error(response.data.error || 'Error saving.');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios);
+      });
+
+      $(document).off('click', '#btn-salvar-y-enviar-quote-companies');
+      $(document).on('click', '#btn-salvar-y-enviar-quote-companies', function () {
+         var quoteId = $('#quote-select-in-modal').val() || $('#quote_id_companies').val();
+         if (!quoteId) {
+            toastr.error('Please select a quote.');
+            return;
+         }
+         var selected = $('#quote-companies-select').val();
+         var companyIds = Array.isArray(selected) ? selected : [];
+         var formData = new FormData();
+         formData.append('quote_id', quoteId);
+         formData.append('company_ids', companyIds.join(','));
+         axios
+            .post('estimate/salvarQuoteCompanies', formData, { responseType: 'json' })
+            .then(function (response) {
+               if (response.data.success) {
+                  bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
+                  var q = quotes.find(function (x) { return x.id == quoteId; });
+                  if (q) {
+                     q.companies_count = companyIds.length;
+                     var names = [];
+                     companyIds.forEach(function (cid) {
+                        var c = getCompaniesFromBidDeadlines().find(function (x) { return x.company_id == cid; });
+                        if (c) names.push(c.company);
+                     });
+                     q.companies = names;
+                  }
+                  renderQuotesSendTab();
+                  toastr.success(response.data.message || 'Saved.');
+                  var fd = new URLSearchParams();
+                  fd.set('quote_ids', String(quoteId));
+                  axios.post('estimate/enviarQuotes', fd, { responseType: 'json' })
+                     .then(function (r) {
+                        if (r.data.success) {
+                           toastr.success(r.data.message || 'Email sent.');
+                        } else {
+                           toastr.error(r.data.error || r.data.errores || 'Error sending email.');
+                        }
+                     })
+                     .catch(MyUtil.catchErrorAxios);
+               } else {
+                  toastr.error(response.data.error || 'Error saving.');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios);
+      });
+
+      $(document).off('click', '.btn-export-excel-quote');
+      $(document).on('click', '.btn-export-excel-quote', function () {
+         var quoteId = $(this).data('id');
+         var formData = new URLSearchParams();
+         formData.set('quote_id', quoteId);
+         BlockUtil.block('#lista-quotes-send');
+         axios
+            .post('estimate/exportarExcelQuote', formData, { responseType: 'json' })
+            .then(function (response) {
+               if (response.data.success && response.data.url) {
+                  var url = response.data.url;
+                  var filename = url.substring(url.lastIndexOf('/') + 1);
+                  var link = document.createElement('a');
+                  link.href = url + '?t=' + new Date().getTime();
+                  link.setAttribute('download', filename);
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  toastr.success(response.data.message || 'Excel exported.');
+               } else {
+                  toastr.error(response.data.error || 'Could not generate Excel.');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-quotes-send');
+            });
+      });
+
+      $(document).off('click', '.btn-send-quote');
+      $(document).on('click', '.btn-send-quote', function () {
+         var quoteId = $(this).data('id');
+         var name = $(this).data('name');
+         Swal.fire({
+            text: 'Send this quote by email to all assigned companies?' + (name ? ' (' + name + ')' : ''),
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, send it!',
+            cancelButtonText: 'No, cancel',
+            customClass: {
+               confirmButton: 'btn fw-bold btn-success',
+               cancelButton: 'btn fw-bold btn-danger',
+            },
+         }).then(function (result) {
+            if (result.value) {
+               var formData = new URLSearchParams();
+               formData.set('quote_ids', String(quoteId));
+               BlockUtil.block('#lista-quotes-send');
+               axios
+                  .post('estimate/enviarQuotes', formData, { responseType: 'json' })
+                  .then(function (response) {
+                     if (response.data.success) {
+                        toastr.success(response.data.message || 'Sent.');
+                     } else {
+                        toastr.error(response.data.message || response.data.error || 'Error sending.');
+                     }
+                  })
+                  .catch(MyUtil.catchErrorAxios)
+                  .then(function () {
+                     BlockUtil.unblock('#lista-quotes-send');
+                  });
+            }
+         });
+      });
+
+      $(document).off('click', '.btn-delete-quote');
+      $(document).on('click', '.btn-delete-quote', function () {
+         var quoteId = $(this).data('id');
+         var name = $(this).data('name');
+         Swal.fire({
+            text: 'Are you sure you want to remove the send for "' + (name || 'this quote') + '"? This will delete the assignment of companies to this quote.',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: {
+               confirmButton: 'btn fw-bold btn-success',
+               cancelButton: 'btn fw-bold btn-danger',
+            },
+         }).then(function (result) {
+            if (result.value) {
+               var formData = new URLSearchParams();
+               formData.set('quote_id', quoteId);
+               axios
+                  .post('estimate/eliminarQuoteCompanies', formData, { responseType: 'json' })
+                  .then(function (response) {
+                     if (response.data.success) {
+                        var q = quotes.find(function (x) { return x.id == quoteId; });
+                        if (q) {
+                           q.companies_count = 0;
+                           q.companies = [];
+                        }
+                        renderQuotesSendTab();
+                        toastr.success(response.data.message || 'The operation was successful.');
+                     } else {
+                        toastr.error(response.data.error || 'Error.');
+                     }
+                  })
+                  .catch(MyUtil.catchErrorAxios);
+            }
+         });
+      });
+   };
+
    return {
       //main function to initiate the module
       init: function () {
@@ -2821,6 +3330,9 @@ var Estimates = (function () {
          initAccionesUnit();
          // equations
          initAccionesEquation();
+
+         // send quotes (cuotas)
+         initQuotesSend();
 
          initAccionChange();
       },
