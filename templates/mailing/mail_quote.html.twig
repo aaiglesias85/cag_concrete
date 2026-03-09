@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Quote: {{ quote_name }}</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800');
+
+        body {
+            font-family: "Open Sans", Helvetica, Arial, sans-serif;
+            color: #000;
+            margin: 0;
+            font-weight: 300;
+            font-size: 15px;
+        }
+
+        .container {
+            width: 600px;
+            margin: auto;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        .centrado {
+            margin: auto;
+            float: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .header img {
+            width: 180px;
+        }
+
+        a {
+            color: #2C3691;
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #111;
+        }
+
+        p a {
+            color: #2C3691;
+            font-weight: bold;
+        }
+
+        .cabecera {
+            color: #fff;
+            padding: 8px;
+            border-bottom: 1px solid #2C3691;
+        }
+
+        h1 {
+            color: #000;
+            text-transform: uppercase;
+            font-size: 18px;
+            margin-top: 15px;
+            line-height: 2rem;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 15px;
+            margin: 10px 0 5px 0;
+            text-align: left !important;
+        }
+
+        p {
+            text-align: left !important;
+        }
+
+        .footer {
+            border-top: 1px solid #2C3691;
+            margin-top: 1em;
+            padding-top: 1em;
+        }
+
+        .footer p {
+            text-align: center !important;
+            font-size: 12px;
+        }
+
+        .info-footer {
+            margin-top: 10px;
+        }
+
+        .info-footer p.small {
+            font-size: 11px !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- cabecera -->
+<div class="header container centrado">
+    <div class="row">
+        <div class="text-center cabecera">
+            <img src="{{ direccion_url }}/bundles/metronic8/img/logo.jpg" style="width: 180px;"/>
+        </div>
+    </div>
+</div>
+
+<!-- contenido -->
+<div class="titulos">
+    <div class="container">
+        <div class="row">
+            <div class="centrado text-center">
+                <h1>Quote</h1>
+
+                <h3>Dear {{ company_name }},</h3>
+
+                <p>
+                    Please find attached the quote <strong>{{ quote_name }}</strong> for the estimate <strong>{{ estimate_name }}</strong>.
+                </p>
+                <p>
+                    The PDF file contains the items, quantities and prices.
+                </p>
+
+                <br><br>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container info-footer">
+    <div class="row">
+        <p class="small">* This message has been generated automatically. Please do not reply.</p>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer container centrado">
+    <div class="row">
+        <div class="text-center">
+            <p style="display:inline;vertical-align:top;font-size:14px;line-height:1.42857">
+                Kind regards,<br>Construction Team
+            </p>
+            <p>{{ "now"|date("Y") }} © data tracking</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

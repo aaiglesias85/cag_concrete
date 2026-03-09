@@ -302,7 +302,7 @@ class EstimateService extends Base
                   ->from(new Address($fromAddress, $fromName))
                   ->to(new Address($email, $company->getName()))
                   ->subject("Quote: $quoteName - $estimateName")
-                  ->htmlTemplate('admin/estimate/mail_quote.html.twig')
+                  ->htmlTemplate('mailing/mail_quote.html.twig')
                   ->context([
                      'quote_name' => $quoteName,
                      'estimate_name' => $estimateName,
