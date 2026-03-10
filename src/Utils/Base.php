@@ -399,6 +399,7 @@ class Base
       $menuEmployeeRrhh = false;
       $menuConcreteClass = false;
       $menuEmployeeRole = false;
+      $menuEstimateNoteItem = false;
 
       // obtener permisos
       $permisos = $this->ListarPermisosDeUsuario($usuario_id);
@@ -518,6 +519,9 @@ class Base
          if ($permiso['funcion_id'] == 37 && $permiso['ver']) {
             $menuEmployeeRole = true;
          }
+         if ($permiso['funcion_id'] == 38 && $permiso['ver']) {
+            $menuEstimateNoteItem = true;
+         }
       }
 
       return [
@@ -558,6 +562,7 @@ class Base
          'menuEmployeeRrhh' => $menuEmployeeRrhh,
          'menuConcreteClass' => $menuConcreteClass,
          'menuEmployeeRole' => $menuEmployeeRole,
+         'menuEstimateNoteItem' => $menuEstimateNoteItem,
       ];
    }
 

@@ -173,14 +173,14 @@
 
                <!-- menu estimates -->
                {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuEstimate or menu.menuPlanDownloading or
-               menu.menuCounty %}
+               menu.menuCounty or menu.menuEstimateNoteItem %}
                <!--begin:Menu item-->
                <div
                   data-kt-menu-trigger="click"
                   class="menu-item menu-accordion
                             {{ activeRoute == 'estimate' or activeRoute == 'project_stage' or activeRoute == 'project_type' or
                             activeRoute == 'proposal_type' or activeRoute == 'plan_status' or
-                            activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' ? 'here show' }}
+                            activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' or activeRoute == 'estimate_note_item' ? 'here show' }}
                             "
                >
                   <!--begin:Menu link-->
@@ -210,7 +210,7 @@
                      {% endif %}
                      <!--end:Menu item-->
 
-                     {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuPlanDownloading %}
+                     {% if menu.menuProjectStage or menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or menu.menuPlanDownloading or menu.menuEstimateNoteItem %}
 
                      <!--begin:Menu item-->
                      <div
@@ -218,7 +218,7 @@
                         class="menu-item menu-accordion
                                             {{ activeRoute == 'project_stage' or activeRoute == 'project_type' or
                                         activeRoute == 'proposal_type' or activeRoute == 'plan_status' or
-                                        activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' ? 'here show' }}
+                                        activeRoute == 'district' or activeRoute == 'county' or activeRoute == 'plan_downloading' or activeRoute == 'estimate_note_item' ? 'here show' }}
                                         "
                      >
                         <!--begin:Menu link-->
@@ -295,6 +295,15 @@
                                     <span class="bullet bullet-dot"></span>
                                  </span>
                                  <span class="menu-title">Plans Downloading</span>
+                              </a>
+                           </div>
+                           {% endif %} {% if menu.menuEstimateNoteItem %}
+                           <div class="menu-item">
+                              <a class="menu-link {{ activeRoute == 'estimate_note_item' ? 'active' }}" href="{{ url('estimate_note_item') }}">
+                                 <span class="menu-bullet">
+                                    <span class="bullet bullet-dot"></span>
+                                 </span>
+                                 <span class="menu-title">Note Items</span>
                               </a>
                            </div>
                            {% endif %}

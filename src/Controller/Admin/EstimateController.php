@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Equation;
+use App\Entity\EstimateNoteItem;
 use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
@@ -85,6 +86,8 @@ class EstimateController extends AbstractController
 
             $yields_calculation = $this->estimateService->ListarYieldsCalculation();
 
+            $estimate_note_items = $this->estimateService->getDoctrine()->getRepository(EstimateNoteItem::class)
+               ->ListarOrdenados();
 
             return $this->render('admin/estimate/index.html.twig', array(
                'permiso' => $permiso[0],
@@ -100,7 +103,8 @@ class EstimateController extends AbstractController
                'items' => $items,
                'equations' => $equations,
                'yields_calculation' => $yields_calculation,
-               'units' => $units
+               'units' => $units,
+               'estimate_note_items' => $estimate_note_items
             ));
          }
       } else {
@@ -504,9 +508,15 @@ class EstimateController extends AbstractController
       $price = $request->get('price');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
+      $note_ids = $request->get('note_ids');
+      if (is_string($note_ids)) {
+         $note_ids = $note_ids === '' ? [] : array_filter(array_map('intval', explode(',', $note_ids)));
+      } elseif (!is_array($note_ids)) {
+         $note_ids = [];
+      }
 
       try {
-         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id);
+         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";

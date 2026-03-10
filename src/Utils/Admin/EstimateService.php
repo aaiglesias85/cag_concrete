@@ -15,6 +15,8 @@ use App\Entity\EstimateProjectType;
 use App\Entity\EstimateQuote;
 use App\Entity\EstimateQuoteCompany;
 use App\Entity\EstimateQuoteItem;
+use App\Entity\EstimateQuoteItemNote;
+use App\Entity\EstimateNoteItem;
 use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
@@ -28,6 +30,7 @@ use App\Repository\EstimateEstimatorRepository;
 use App\Repository\EstimateProjectTypeRepository;
 use App\Repository\EstimateQuoteCompanyRepository;
 use App\Repository\EstimateQuoteItemRepository;
+use App\Repository\EstimateQuoteItemNoteRepository;
 use App\Repository\EstimateQuoteRepository;
 use App\Repository\EstimateRepository;
 use App\Utils\Base;
@@ -403,6 +406,9 @@ class EstimateService extends Base
       $totalItemRows = 27; // filas reservadas en el template para ítems
       $fila = $firstDataRow;
       $sumTotal = 0.0;
+      /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+      $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+
       foreach ($items as $row) {
          /** @var EstimateQuoteItem $row */
          $item = $row->getItem();
@@ -411,6 +417,17 @@ class EstimateService extends Base
          $total = $qty * $price;
          $sumTotal += $total;
          $description = $item ? $item->getName() : '';
+         $quoteItemNotes = $eqinRepo->findByQuoteItemId($row->getId());
+         $noteDescriptions = [];
+         foreach ($quoteItemNotes as $eqin) {
+            $n = $eqin->getNoteItem();
+            if ($n !== null && $n->getDescription() !== null && $n->getDescription() !== '') {
+               $noteDescriptions[] = $n->getDescription();
+            }
+         }
+         if (count($noteDescriptions) > 0) {
+            $description .= ' - ' . implode(' - ', $noteDescriptions);
+         }
          $unit = ($item && $item->getUnit()) ? $item->getUnit()->getDescription() : '';
          $sheet->setCellValue('B' . $fila, $description);
          $sheet->mergeCells('B' . $fila . ':C' . $fila);
@@ -533,7 +550,7 @@ class EstimateService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id)
+   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids = [])
    {
       $resultado = [];
 
@@ -634,10 +651,29 @@ class EstimateService extends Base
 
          if ($is_new_estimate_item && $default_quote !== null) {
             $estimate_item_entity->setQuote($default_quote);
-
             $em->persist($estimate_item_entity);
          }
 
+         $em->flush(); // obtener id del quote item antes de asociar notas
+
+         // Notas: reemplazar asociaciones (many-to-many)
+         $noteIds = is_array($note_ids) ? $note_ids : (is_string($note_ids) && $note_ids !== '' ? array_filter(array_map('intval', explode(',', $note_ids))) : []);
+         /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+         $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+         foreach ($eqinRepo->findByQuoteItemId($estimate_item_entity->getId()) as $existingNote) {
+            $em->remove($existingNote);
+         }
+         $estimateNoteItemRepo = $this->getDoctrine()->getRepository(EstimateNoteItem::class);
+         foreach ($noteIds as $nid) {
+            if ($nid <= 0) continue;
+            $noteEntity = $estimateNoteItemRepo->find($nid);
+            if ($noteEntity !== null) {
+               $eqin = new EstimateQuoteItemNote();
+               $eqin->setQuoteItem($estimate_item_entity);
+               $eqin->setNoteItem($noteEntity);
+               $em->persist($eqin);
+            }
+         }
          $em->flush();
 
          $resultado['success'] = true;
@@ -923,6 +959,19 @@ class EstimateService extends Base
       $price = $value->getPrice();
       $total = $quantity * $price;
 
+      /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+      $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+      $quoteItemNotes = $eqinRepo->findByQuoteItemId($value->getId());
+      $notes = [];
+      $note_ids = [];
+      foreach ($quoteItemNotes as $eqin) {
+         $n = $eqin->getNoteItem();
+         if ($n !== null) {
+            $notes[] = $n->getDescription() ?? '';
+            $note_ids[] = $n->getId();
+         }
+      }
+
       return [
          'estimate_item_id' => $value->getId(),
          'quote_id' => $value->getQuote() !== null ? $value->getQuote()->getId() : null,
@@ -935,6 +984,8 @@ class EstimateService extends Base
          "yield_calculation" => $value->getYieldCalculation(),
          "yield_calculation_name" => $yield_calculation_name,
          "equation_id" => $value->getEquation() != null ? $value->getEquation()->getEquationId() : '',
+         "notes" => $notes,
+         "note_ids" => $note_ids,
          "posicion" => $key
       ];
    }

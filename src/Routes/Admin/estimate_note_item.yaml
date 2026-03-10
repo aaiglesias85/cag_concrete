@@ -1,0 +1,23 @@
+estimate_note_item:
+  path: /estimate-note-item
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::index }
+
+listarEstimateNoteItemAdmin:
+  path: /estimate-note-item/listar
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::listar, _format: json }
+
+salvarEstimateNoteItemAdmin:
+  path: /estimate-note-item/salvar
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::salvar, _format: json }
+
+eliminarEstimateNoteItemAdmin:
+  path: /estimate-note-item/eliminar
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::eliminar, _format: json }
+
+eliminarVariosEstimateNoteItemAdmin:
+  path: /estimate-note-item/eliminarVarios
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::eliminarVarios, _format: json }
+
+cargarDatosEstimateNoteItemAdmin:
+  path: /estimate-note-item/cargarDatos
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::cargarDatos, _format: json }

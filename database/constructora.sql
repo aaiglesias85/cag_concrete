@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 10-03-2026 a las 00:30:08
+-- Tiempo de generación: 10-03-2026 a las 01:47:07
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -526,6 +526,17 @@ CREATE TABLE `estimate_estimator` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `estimate_note_item`
+--
+
+CREATE TABLE `estimate_note_item` (
+  `id` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `estimate_project_type`
 --
 
@@ -572,7 +583,20 @@ CREATE TABLE `estimate_quote_items` (
   `yield_calculation` varchar(50) DEFAULT NULL,
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL,
+  `estimate_note_item_id` int(11) DEFAULT NULL,
   `estimate_quote_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_quote_item_note`
+--
+
+CREATE TABLE `estimate_quote_item_note` (
+  `id` int(11) NOT NULL,
+  `estimate_quote_item_id` int(11) NOT NULL,
+  `estimate_note_item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -628,7 +652,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (34, 'race', 'Races'),
 (35, 'employee_rrhh', 'Employees'),
 (36, 'concrete_class', 'Concrete Class'),
-(37, 'employee_role', 'Employee Role');
+(37, 'employee_role', 'Employee Role'),
+(38, 'note_estimate_item', 'Items Notes');
 
 -- --------------------------------------------------------
 
@@ -1812,7 +1837,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (46, 1, 1, 1, 1, 1, 34),
 (47, 1, 1, 1, 1, 1, 35),
 (48, 1, 1, 1, 1, 1, 36),
-(49, 1, 1, 1, 1, 1, 37);
+(49, 1, 1, 1, 1, 1, 37),
+(50, 1, 1, 1, 1, 1, 38);
 
 -- --------------------------------------------------------
 
@@ -2048,7 +2074,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (38, 1, 1, 1, 1, 1, 34),
 (39, 1, 1, 1, 1, 1, 35),
 (40, 1, 1, 1, 1, 1, 36),
-(41, 1, 1, 1, 1, 1, 37);
+(41, 1, 1, 1, 1, 1, 37),
+(42, 1, 1, 1, 1, 1, 38);
 
 -- --------------------------------------------------------
 
@@ -2237,6 +2264,12 @@ ALTER TABLE `estimate_estimator`
   ADD KEY `Refestimate_estimator2` (`user_id`);
 
 --
+-- Indices de la tabla `estimate_note_item`
+--
+ALTER TABLE `estimate_note_item`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
@@ -2266,7 +2299,17 @@ ALTER TABLE `estimate_quote_items`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Refestimate_quote2` (`item_id`),
   ADD KEY `Refestimate_quote3` (`equation_id`),
-  ADD KEY `Refestimate_quote_items_quote` (`estimate_quote_id`);
+  ADD KEY `Refestimate_quote_items_quote` (`estimate_quote_id`),
+  ADD KEY `Refestimate_quote_items_note` (`estimate_note_item_id`);
+
+--
+-- Indices de la tabla `estimate_quote_item_note`
+--
+ALTER TABLE `estimate_quote_item_note`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_quote_item_note` (`estimate_quote_item_id`,`estimate_note_item_id`),
+  ADD KEY `estimate_quote_item_id` (`estimate_quote_item_id`),
+  ADD KEY `estimate_note_item_id` (`estimate_note_item_id`);
 
 --
 -- Indices de la tabla `function`
@@ -2749,6 +2792,12 @@ ALTER TABLE `estimate_estimator`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_note_item`
+--
+ALTER TABLE `estimate_note_item`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
@@ -2773,10 +2822,16 @@ ALTER TABLE `estimate_quote_items`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_quote_item_note`
+--
+ALTER TABLE `estimate_quote_item_note`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -2980,7 +3035,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -3046,7 +3101,7 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=42;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -3196,7 +3251,15 @@ ALTER TABLE `estimate_quote_company`
 ALTER TABLE `estimate_quote_items`
   ADD CONSTRAINT `Refestimate_quote2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
   ADD CONSTRAINT `Refestimate_quote3` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`),
+  ADD CONSTRAINT `Refestimate_quote_items_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `Refestimate_quote_items_quote` FOREIGN KEY (`estimate_quote_id`) REFERENCES `estimate_quote` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estimate_quote_item_note`
+--
+ALTER TABLE `estimate_quote_item_note`
+  ADD CONSTRAINT `Refestimate_quote_item_note_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_quote_item_note_quote_item` FOREIGN KEY (`estimate_quote_item_id`) REFERENCES `estimate_quote_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `invoice`

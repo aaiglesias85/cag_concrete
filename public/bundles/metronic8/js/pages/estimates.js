@@ -2010,7 +2010,18 @@ var Estimates = (function () {
             targets: 0,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '<strong>' + (row.groupTitle || '') + '</strong>';
-               return data || '';
+               var itemName = (data || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+               if (!row.notes || row.notes.length === 0) {
+                  return itemName;
+               }
+               var badges = row.notes.map(function (note) {
+                  var safe = (note || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                  return '<span class="badge badge-light-primary fs-8 fw-normal me-1 mb-1">' + safe + '</span>';
+               }).join('');
+               return '<div class="d-flex flex-column">' +
+                  '<span class="fw-semibold">' + itemName + '</span>' +
+                  '<div class="mt-1 flex-wrap gap-1 d-flex">' + badges + '</div>' +
+                  '</div>';
             },
          },
          {
@@ -2064,8 +2075,8 @@ var Estimates = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order por grupo
-      const order = [[7, 'asc']];
+      // order por grupo (columna 6 = _groupOrder oculta)
+      const order = [[6, 'asc']];
 
       var datosAgrupados = agruparItemsPorQuote(items, quotes);
 
@@ -2207,6 +2218,9 @@ var Estimates = (function () {
 
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
+
+            var noteIds = $('#item_notes').val();
+            formData.set('note_ids', Array.isArray(noteIds) ? noteIds.join(',') : (noteIds || ''));
 
             BlockUtil.block('#modal-item .modal-content');
 
@@ -2388,6 +2402,8 @@ var Estimates = (function () {
 
             $('#yield-calculation').on('change', changeYield);
 
+            $('#item_notes').val(items[posicion].note_ids || []);
+
             if (items[posicion].item_id == '') {
                $('#item-type-new').prop('checked', true);
 
@@ -2557,6 +2573,8 @@ var Estimates = (function () {
       $('#unit').val('');
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
+
+      $('#item_notes').val([]);
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));

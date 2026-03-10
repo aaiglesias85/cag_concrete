@@ -872,7 +872,8 @@
                                     <th>Quantity</th>
                                     <th>Price</th>
                                     <th>Total</th>
-                                    <th>Actions</th>
+                                    <th class="d-none" aria-hidden="true"></th>
+                                    <th class="text-end">Actions</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -1252,24 +1253,29 @@
                </div>
 
                <div class="form-group">
-                  <label class="form-label required"> Quantity </label>
                   <div class="row">
                      <div class="col-md-6">
+                        <label class="form-label required"> Quantity </label>
                         <input type="text" class="form-control form-control-validate form-control-solid form-control-number" id="item-quantity" name="quantity" />
                      </div>
-                  </div>
-               </div>
-
-               <div class="form-group">
-                  <label class="form-label required"> Price </label>
-                  <div class="row">
                      <div class="col-md-6">
+                        <label class="form-label required"> Price </label>
                         <div class="input-group input-group-solid">
                            <span class="input-group-text">$</span>
                            <input type="text" class="form-control form-control-validate form-control-price event-change" id="item-price" name="price" />
                         </div>
                      </div>
                   </div>
+               </div>
+
+               <div class="form-group">
+                  <label class="form-label"> Notes </label>
+                  <select id="item_notes" name="item_notes[]" class="form-select form-select-solid select-modal-item" multiple="multiple">
+                     {% for note in estimate_note_items|default([]) %}
+                     <option value="{{ note.id }}">{{ note.description }}</option>
+                     {% endfor %}
+                  </select>
+                  <div class="form-text">You can select more than one note.</div>
                </div>
             </form>
          </div>

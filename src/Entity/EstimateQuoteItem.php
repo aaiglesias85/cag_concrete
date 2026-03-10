@@ -34,6 +34,10 @@ class EstimateQuoteItem
     #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
     private ?Equation $equation = null;
 
+    /** Notas asociadas (many-to-many con estimate_note_item vía estimate_quote_item_note) */
+    #[ORM\OneToMany(targetEntity: EstimateQuoteItemNote::class, mappedBy: 'quoteItem', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private $quoteItemNotes = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -97,5 +101,30 @@ class EstimateQuoteItem
     public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    /**
+     * @return EstimateQuoteItemNote[]
+     */
+    public function getQuoteItemNotes(): array
+    {
+        return $this->quoteItemNotes instanceof \Doctrine\ORM\PersistentCollection
+            ? $this->quoteItemNotes->getValues()
+            : (is_array($this->quoteItemNotes) ? $this->quoteItemNotes : []);
+    }
+
+    public function addQuoteItemNote(EstimateQuoteItemNote $note): void
+    {
+        $this->quoteItemNotes[] = $note;
+        $note->setQuoteItem($this);
+    }
+
+    public function removeQuoteItemNote(EstimateQuoteItemNote $note): void
+    {
+        if ($this->quoteItemNotes instanceof \Doctrine\ORM\PersistentCollection) {
+            $this->quoteItemNotes->removeElement($note);
+        } elseif (is_array($this->quoteItemNotes)) {
+            $this->quoteItemNotes = array_values(array_filter($this->quoteItemNotes, fn($n) => $n !== $note));
+        }
     }
 }
