@@ -949,9 +949,9 @@
                            </div>
                            <!--end::Wrapper-->
 
-                           <p class="text-muted mb-3">Quotes are sent to the companies selected for this estimate (in <strong>Bid Deadlines</strong>). Use New to assign which of those companies receive each quote.</p>
+                           <p class="text-muted mb-3">Quotes are sent to the companies of this estimate (in <strong>Companies</strong>). Use New to assign which of those companies receive each quote.</p>
                            <div id="lista-quotes-container">
-                              <div id="lista-quotes-empty" class="text-muted text-center py-5 hide">No sends yet. Click "New" to assign companies (from bid deadlines) to a quote; only then will it appear here.</div>
+                              <div id="lista-quotes-empty" class="text-muted text-center py-5 hide">No sends yet. Click "New" to assign companies (from this estimate's Companies) to a quote; only then will it appear here.</div>
                               <!--begin::Datatable-->
                               <table id="quotes-send-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                                  <thead>
@@ -1363,7 +1363,7 @@
    </div>
 </div>
 
-<!-- modal assign companies to quote (companies = from estimate bid_deadlines) -->
+<!-- modal assign companies to quote (companies = from estimate_company) -->
 <div class="modal fade" id="modal-quote-companies" tabindex="-1" role="dialog">
    <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -1375,7 +1375,7 @@
          </div>
          <div class="modal-body">
             <input type="hidden" id="quote_id_companies" name="quote_id_companies" />
-            <p class="text-muted small mb-3">Quotes are sent to the companies selected for this estimate (those in <strong>Bid Deadlines</strong>). Choose a quote and which of those companies will receive it by email when you click "Send".</p>
+            <p class="text-muted small mb-3">Quotes are sent to the companies of this estimate (in <strong>Companies</strong>). Choose a quote and which of those companies will receive it by email when you click "Send".</p>
             <div class="form-group mb-4">
                <label class="form-label required">Quote</label>
                <select id="quote-select-in-modal" class="form-select form-select2 form-select-solid">
@@ -1385,9 +1385,9 @@
             <div class="form-group">
                <label class="form-label">Companies (from this estimate's bid deadlines)</label>
                <select id="quote-companies-select" class="form-select form-select2 form-select-solid" multiple>
-                  <!-- filled in JS from bid_deadlines -->
+                  <!-- filled in JS from estimate companies (estimate_company) -->
                </select>
-               <div id="quote-companies-empty-hint" class="form-text text-warning hide">No companies yet. Add companies in the <strong>Bid Deadlines</strong> step first.</div>
+               <div id="quote-companies-empty-hint" class="form-text text-warning hide">No companies yet. Add companies in the <strong>Companies</strong> step first.</div>
             </div>
          </div>
          <div class="modal-footer">

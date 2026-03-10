@@ -2940,7 +2940,13 @@ var Estimates = (function () {
       var dataRows = withCompanies.map(function (row) {
          var itemsNames = (items || []).filter(function (it) { return it.quote_id == row.id; }).map(function (it) { return it.item || ''; });
          var itemsText = itemsNames.length ? itemsNames.join(', ') : '—';
-         var companiesText = (row.companies && row.companies.length) ? row.companies.join(', ') : '—';
+         var companiesText = (row.companies && row.companies.length)
+            ? row.companies.map(function (c) {
+                 return typeof c === 'object' && c && c.company != null
+                    ? (c.company + (c.email ? ' (' + c.email + ')' : ''))
+                    : String(c);
+              }).join(', ')
+            : '—';
          var actions =
             '<div class="d-flex justify-content-center flex-shrink-0">' +
             (permiso.editar || permiso.agregar
@@ -2987,14 +2993,17 @@ var Estimates = (function () {
       });
    };
 
-   var getCompaniesFromBidDeadlines = function () {
-      var seen = {};
+   var getCompaniesFromEstimateCompanies = function () {
       var list = [];
-      (bid_deadlines || []).forEach(function (b) {
-         if (b.company_id && !seen[b.company_id]) {
-            seen[b.company_id] = true;
-            list.push({ company_id: b.company_id, company: b.company || 'Company ' + b.company_id });
-         }
+      (companys || []).forEach(function (ec) {
+         if (!ec.id) return;
+         var label = (ec.company || 'Company') + (ec.email ? ' (' + ec.email + ')' : ' (no email)');
+         list.push({
+            estimate_company_id: ec.id,
+            company: ec.company || '',
+            email: ec.email || '',
+            label: label
+         });
       });
       return list;
    };
@@ -3008,14 +3017,14 @@ var Estimates = (function () {
       (quotes || []).forEach(function (q) {
          $quoteSelect.append($('<option></option>').attr('value', q.id).text(q.name || 'Quote ' + q.id));
       });
-      var companiesFromBid = getCompaniesFromBidDeadlines();
+      var companiesList = getCompaniesFromEstimateCompanies();
       $companiesSelect.empty();
-      companiesFromBid.forEach(function (c) {
-         $companiesSelect.append($('<option></option>').attr('value', c.company_id).text(c.company));
+      companiesList.forEach(function (c) {
+         $companiesSelect.append($('<option></option>').attr('value', c.estimate_company_id).text(c.label));
       });
       var $hint = $('#quote-companies-empty-hint');
       if ($hint.length) {
-         if (companiesFromBid.length === 0) $hint.removeClass('hide'); else $hint.addClass('hide');
+         if (companiesList.length === 0) $hint.removeClass('hide'); else $hint.addClass('hide');
       }
 
       if ($quoteSelect.hasClass('select2-hidden-accessible')) {
@@ -3037,7 +3046,7 @@ var Estimates = (function () {
             .post('estimate/cargarDatosQuote', formData, { responseType: 'json' })
             .then(function (response) {
                if (response.data.success && response.data.quote && response.data.quote.companies) {
-                  var ids = response.data.quote.companies.map(function (c) { return String(c.company_id); });
+                  var ids = response.data.quote.companies.map(function (c) { return String(c.estimate_company_id); });
                   $companiesSelect.val(ids).trigger('change');
                }
                new bootstrap.Modal(document.getElementById('modal-quote-companies')).show();
@@ -3113,10 +3122,10 @@ var Estimates = (function () {
             return;
          }
          var selected = $('#quote-companies-select').val();
-         var companyIds = Array.isArray(selected) ? selected : [];
+         var estimateCompanyIds = Array.isArray(selected) ? selected : [];
          var formData = new FormData();
          formData.append('quote_id', quoteId);
-         formData.append('company_ids', companyIds.join(','));
+         formData.append('company_ids', estimateCompanyIds.join(','));
          axios
             .post('estimate/salvarQuoteCompanies', formData, { responseType: 'json' })
             .then(function (response) {
@@ -3124,14 +3133,12 @@ var Estimates = (function () {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
                   var q = quotes.find(function (x) { return x.id == quoteId; });
                   if (q) {
-                     q.companies_count = companyIds.length;
-                     var names = [];
-                     var companyIdsArr = Array.isArray(selected) ? selected : [];
-                     companyIdsArr.forEach(function (cid) {
-                        var c = getCompaniesFromBidDeadlines().find(function (x) { return x.company_id == cid; });
-                        if (c) names.push(c.company);
-                     });
-                     q.companies = names;
+                     q.companies_count = estimateCompanyIds.length;
+                     var list = getCompaniesFromEstimateCompanies();
+                     q.companies = estimateCompanyIds.map(function (eid) {
+                        var c = list.find(function (x) { return String(x.estimate_company_id) === String(eid); });
+                        return c ? { company: c.company, email: c.email } : null;
+                     }).filter(Boolean);
                   }
                   renderQuotesSendTab();
                   toastr.success(response.data.message || 'Saved.');
@@ -3150,10 +3157,10 @@ var Estimates = (function () {
             return;
          }
          var selected = $('#quote-companies-select').val();
-         var companyIds = Array.isArray(selected) ? selected : [];
+         var estimateCompanyIds = Array.isArray(selected) ? selected : [];
          var formData = new FormData();
          formData.append('quote_id', quoteId);
-         formData.append('company_ids', companyIds.join(','));
+         formData.append('company_ids', estimateCompanyIds.join(','));
          axios
             .post('estimate/salvarQuoteCompanies', formData, { responseType: 'json' })
             .then(function (response) {
@@ -3161,13 +3168,12 @@ var Estimates = (function () {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
                   var q = quotes.find(function (x) { return x.id == quoteId; });
                   if (q) {
-                     q.companies_count = companyIds.length;
-                     var names = [];
-                     companyIds.forEach(function (cid) {
-                        var c = getCompaniesFromBidDeadlines().find(function (x) { return x.company_id == cid; });
-                        if (c) names.push(c.company);
-                     });
-                     q.companies = names;
+                     q.companies_count = estimateCompanyIds.length;
+                     var list = getCompaniesFromEstimateCompanies();
+                     q.companies = estimateCompanyIds.map(function (eid) {
+                        var c = list.find(function (x) { return String(x.estimate_company_id) === String(eid); });
+                        return c ? { company: c.company, email: c.email } : null;
+                     }).filter(Boolean);
                   }
                   renderQuotesSendTab();
                   toastr.success(response.data.message || 'Saved.');

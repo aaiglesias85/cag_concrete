@@ -94,13 +94,24 @@ class EstimateService extends Base
          /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
          $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
          $companies = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($q->getId());
-         $company_names = array_map(function ($eqc) { return $eqc->getCompany()->getName(); }, $companies);
+         $companies_data = [];
+         foreach ($companies as $eqc) {
+            $ec = $eqc->getEstimateCompany();
+            if ($ec === null) continue;
+            $companyName = $ec->getCompany() ? $ec->getCompany()->getName() : '';
+            $email = $ec->getContact() ? $ec->getContact()->getEmail() : '';
+            $companies_data[] = [
+               'estimate_company_id' => $ec->getId(),
+               'company' => $companyName,
+               'email' => $email ?? '',
+            ];
+         }
          $lista[] = [
             'id' => $q->getId(),
             'name' => $q->getName(),
             'items_count' => count($items),
-            'companies_count' => count($companies),
-            'companies' => $company_names,
+            'companies_count' => count($companies_data),
+            'companies' => $companies_data,
          ];
       }
       return $lista;
@@ -178,11 +189,15 @@ class EstimateService extends Base
       $companies = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
       $companies_data = [];
       foreach ($companies as $eqc) {
+         $ec = $eqc->getEstimateCompany();
+         if ($ec === null) continue;
+         $companyName = $ec->getCompany() ? $ec->getCompany()->getName() : '';
+         $email = $ec->getContact() ? $ec->getContact()->getEmail() : '';
          $companies_data[] = [
             'id' => $eqc->getId(),
-            'company_id' => $eqc->getCompany()->getCompanyId(),
-            'company' => $eqc->getCompany()->getName(),
-            'email' => $eqc->getCompany()->getEmail() ?? $eqc->getCompany()->getContactEmail() ?? '',
+            'estimate_company_id' => $ec->getId(),
+            'company' => $companyName,
+            'email' => $email ?? '',
          ];
       }
       return [
@@ -198,9 +213,11 @@ class EstimateService extends Base
    }
 
    /**
-    * SalvarQuoteCompanies: Asigna compañías a una cuota (reemplaza las actuales)
+    * SalvarQuoteCompanies: Asigna registros estimate_company a una cuota (reemplaza las actuales).
+    * Cada estimate_company tiene contact_id → el email del contacto es a quien se envía.
+    * @param string|array $estimate_company_ids IDs de estimate_company (coma o array)
     */
-   public function SalvarQuoteCompanies($quote_id, $company_ids)
+   public function SalvarQuoteCompanies($quote_id, $estimate_company_ids)
    {
       if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
          return ['success' => false, 'error' => 'Invalid quote'];
@@ -216,16 +233,16 @@ class EstimateService extends Base
       foreach ($existing as $eqc) {
          $em->remove($eqc);
       }
-      $ids = is_array($company_ids) ? $company_ids : (strpos((string)$company_ids, ',') !== false ? explode(',', $company_ids) : [$company_ids]);
-      $companyRepo = $this->getDoctrine()->getRepository(Company::class);
-      foreach ($ids as $cid) {
-         $cid = trim($cid);
-         if ($cid === '') continue;
-         $company = $companyRepo->find($cid);
-         if ($company !== null) {
+      $ids = is_array($estimate_company_ids) ? $estimate_company_ids : (strpos((string)$estimate_company_ids, ',') !== false ? explode(',', $estimate_company_ids) : [$estimate_company_ids]);
+      $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
+      foreach ($ids as $eid) {
+         $eid = trim((string)$eid);
+         if ($eid === '') continue;
+         $estimateCompany = $estimateCompanyRepo->find($eid);
+         if ($estimateCompany !== null) {
             $eqc = new EstimateQuoteCompany();
             $eqc->setQuote($quote);
-            $eqc->setCompany($company);
+            $eqc->setEstimateCompany($estimateCompany);
             $em->persist($eqc);
          }
       }
@@ -291,29 +308,34 @@ class EstimateService extends Base
          $quoteName = $quote->getName();
          $estimateName = $quote->getEstimate()->getName();
          foreach ($quoteCompanies as $eqc) {
-            $company = $eqc->getCompany();
-            $email = $company->getEmail() ?? $company->getContactEmail() ?? '';
-            if ($email === '') {
-               $errores[] = "Company \"{$company->getName()}\" has no email";
+            $ec = $eqc->getEstimateCompany();
+            if ($ec === null) continue;
+            $contact = $ec->getContact();
+            $email = $contact ? $contact->getEmail() : '';
+            if ($email === '' || $email === null) {
+               $companyName = $ec->getCompany() ? $ec->getCompany()->getName() : 'Company';
+               $errores[] = "Company \"{$companyName}\" has no contact email";
                continue;
             }
+            $companyName = $ec->getCompany() ? $ec->getCompany()->getName() : '';
+            $toName = $contact ? $contact->getName() : $companyName;
             try {
                $mensaje = (new TemplatedEmail())
                   ->from(new Address($fromAddress, $fromName))
-                  ->to(new Address($email, $company->getName()))
+                  ->to(new Address($email, $toName))
                   ->subject("Quote: $quoteName - $estimateName")
                   ->htmlTemplate('mailing/mail_quote.html.twig')
                   ->context([
                      'quote_name' => $quoteName,
                      'estimate_name' => $estimateName,
-                     'company_name' => $company->getName(),
+                     'company_name' => $companyName,
                      'direccion_url' => $this->ObtenerURL(),
                   ])
                   ->attachFromPath($pdfPath, basename($pdfPath), 'application/pdf');
                $this->mailer->send($mensaje);
                $enviados++;
             } catch (\Throwable $e) {
-               $errores[] = "Email to {$company->getName()}: " . $e->getMessage();
+               $errores[] = "Email to {$companyName} ({$email}): " . $e->getMessage();
             }
          }
          @unlink($pdfPath);

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-03-2026 a las 15:50:13
+-- Tiempo de generación: 10-03-2026 a las 00:30:08
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -543,12 +543,36 @@ CREATE TABLE `estimate_project_type` (
 
 CREATE TABLE `estimate_quote` (
   `id` int(11) NOT NULL,
+  `estimate_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_quote_company`
+--
+
+CREATE TABLE `estimate_quote_company` (
+  `id` int(11) NOT NULL,
+  `estimate_quote_id` int(11) NOT NULL,
+  `estimate_company_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_quote_items`
+--
+
+CREATE TABLE `estimate_quote_items` (
+  `id` int(11) NOT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
   `price` decimal(18,6) DEFAULT NULL,
   `yield_calculation` varchar(50) DEFAULT NULL,
-  `estimate_id` int(11) DEFAULT NULL,
   `item_id` int(11) DEFAULT NULL,
-  `equation_id` int(11) DEFAULT NULL
+  `equation_id` int(11) DEFAULT NULL,
+  `estimate_quote_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -2225,9 +2249,24 @@ ALTER TABLE `estimate_project_type`
 --
 ALTER TABLE `estimate_quote`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `Refestimate_quote1` (`estimate_id`),
+  ADD KEY `idx_estimate_quote_estimate_id` (`estimate_id`);
+
+--
+-- Indices de la tabla `estimate_quote_company`
+--
+ALTER TABLE `estimate_quote_company`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_quote_company1` (`estimate_quote_id`),
+  ADD KEY `Refestimate_quote_company_estimate_company` (`estimate_company_id`);
+
+--
+-- Indices de la tabla `estimate_quote_items`
+--
+ALTER TABLE `estimate_quote_items`
+  ADD PRIMARY KEY (`id`),
   ADD KEY `Refestimate_quote2` (`item_id`),
-  ADD KEY `Refestimate_quote3` (`equation_id`);
+  ADD KEY `Refestimate_quote3` (`equation_id`),
+  ADD KEY `Refestimate_quote_items_quote` (`estimate_quote_id`);
 
 --
 -- Indices de la tabla `function`
@@ -2722,6 +2761,18 @@ ALTER TABLE `estimate_quote`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_quote_company`
+--
+ALTER TABLE `estimate_quote_company`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_quote_items`
+--
+ALTER TABLE `estimate_quote_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
@@ -3130,9 +3181,22 @@ ALTER TABLE `estimate_project_type`
 -- Filtros para la tabla `estimate_quote`
 --
 ALTER TABLE `estimate_quote`
-  ADD CONSTRAINT `Refestimate_quote1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
+  ADD CONSTRAINT `Refestimate_quote_estimate` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estimate_quote_company`
+--
+ALTER TABLE `estimate_quote_company`
+  ADD CONSTRAINT `Refestimate_quote_company1` FOREIGN KEY (`estimate_quote_id`) REFERENCES `estimate_quote` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_quote_company_estimate_company` FOREIGN KEY (`estimate_company_id`) REFERENCES `estimate_company` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estimate_quote_items`
+--
+ALTER TABLE `estimate_quote_items`
   ADD CONSTRAINT `Refestimate_quote2` FOREIGN KEY (`item_id`) REFERENCES `item` (`item_id`),
-  ADD CONSTRAINT `Refestimate_quote3` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`);
+  ADD CONSTRAINT `Refestimate_quote3` FOREIGN KEY (`equation_id`) REFERENCES `equation` (`equation_id`),
+  ADD CONSTRAINT `Refestimate_quote_items_quote` FOREIGN KEY (`estimate_quote_id`) REFERENCES `estimate_quote` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `invoice`

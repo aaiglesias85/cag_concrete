@@ -22,14 +22,15 @@ class EstimateQuoteCompanyRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('eqc')
             ->leftJoin('eqc.quote', 'q')
-            ->leftJoin('eqc.company', 'c');
+            ->leftJoin('eqc.estimateCompany', 'ec')
+            ->leftJoin('ec.company', 'c');
 
         if ($estimate_quote_id != '') {
             $consulta->andWhere('q.id = :estimate_quote_id')
                 ->setParameter('estimate_quote_id', $estimate_quote_id);
         }
 
-        $consulta->orderBy('c.name', "ASC");
+        $consulta->orderBy('c.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }

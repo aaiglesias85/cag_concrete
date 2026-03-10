@@ -17,9 +17,9 @@ class EstimateQuoteCompany
     #[ORM\JoinColumn(name: "estimate_quote_id", referencedColumnName: "id", nullable: false)]
     private ?EstimateQuote $quote = null;
 
-    #[ORM\ManyToOne(targetEntity: Company::class)]
-    #[ORM\JoinColumn(name: "company_id", referencedColumnName: "company_id", nullable: false)]
-    private ?Company $company = null;
+    #[ORM\ManyToOne(targetEntity: EstimateCompany::class)]
+    #[ORM\JoinColumn(name: "estimate_company_id", referencedColumnName: "id", nullable: false)]
+    private ?EstimateCompany $estimateCompany = null;
 
     public function getId(): ?int
     {
@@ -36,13 +36,19 @@ class EstimateQuoteCompany
         $this->quote = $quote;
     }
 
-    public function getCompany(): ?Company
+    public function getEstimateCompany(): ?EstimateCompany
     {
-        return $this->company;
+        return $this->estimateCompany;
     }
 
-    public function setCompany(?Company $company): void
+    public function setEstimateCompany(?EstimateCompany $estimateCompany): void
     {
-        $this->company = $company;
+        $this->estimateCompany = $estimateCompany;
+    }
+
+    /** @deprecated Use getEstimateCompany()->getCompany() */
+    public function getCompany(): ?Company
+    {
+        return $this->estimateCompany?->getCompany();
     }
 }
