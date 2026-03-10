@@ -162,6 +162,28 @@ class EstimateService extends Base
          return ['success' => false, 'error' => 'Quote not found'];
       }
       $name = $quote->getName();
+
+      // Eliminar ítems de la quote (y sus notas estimate_quote_item_note)
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+      $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+      $items = $estimateQuoteItemRepo->ListarItemsDeQuote($quote_id);
+      foreach ($items as $estimate_item) {
+         foreach ($eqinRepo->findByQuoteItemId($estimate_item->getId()) as $quoteItemNote) {
+            $em->remove($quoteItemNote);
+         }
+         $em->remove($estimate_item);
+      }
+
+      // Eliminar companies de la quote
+      /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+      $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+      $existing = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
+      foreach ($existing as $eqc) {
+         $em->remove($eqc);
+      }
+
       $em->remove($quote);
       $em->flush();
       $this->SalvarLog('Delete', 'Estimate Quote', 'Quote deleted: ' . $name);
@@ -709,6 +731,13 @@ class EstimateService extends Base
 
          $item_name = $entity->getItem()->getName();
 
+         // Eliminar notas del ítem (estimate_quote_item_note)
+         /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+         $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+         foreach ($eqinRepo->findByQuoteItemId($entity->getId()) as $quoteItemNote) {
+            $em->remove($quoteItemNote);
+         }
+
          $em->remove($entity);
          $em->flush();
 
@@ -1139,7 +1168,36 @@ class EstimateService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
-      // estimators
+      // 1) Quote items (y sus notas estimate_quote_item_note se eliminan por CASCADE en BD o explícitamente)
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      /** @var EstimateQuoteItemNoteRepository $eqinRepo */
+      $eqinRepo = $this->getDoctrine()->getRepository(EstimateQuoteItemNote::class);
+      $estimate_items = $estimateQuoteItemRepo->ListarItemsDeEstimate($estimate_id);
+      foreach ($estimate_items as $estimate_item) {
+         foreach ($eqinRepo->findByQuoteItemId($estimate_item->getId()) as $quoteItemNote) {
+            $em->remove($quoteItemNote);
+         }
+         $em->remove($estimate_item);
+      }
+
+      // 2) Quote companies y quotes del estimate
+      $quotes = $this->ListarQuotesDeEstimate($estimate_id);
+      /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
+      $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
+      foreach ($quotes as $q) {
+         $quoteId = $q['id'];
+         $existing = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quoteId);
+         foreach ($existing as $eqc) {
+            $em->remove($eqc);
+         }
+         $quoteEntity = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quoteId);
+         if ($quoteEntity !== null) {
+            $em->remove($quoteEntity);
+         }
+      }
+
+      // 3) estimators
       /** @var EstimateEstimatorRepository $estimateEstimatorRepo */
       $estimateEstimatorRepo = $this->getDoctrine()->getRepository(EstimateEstimator::class);
       $estimates_estimators = $estimateEstimatorRepo->ListarUsuariosDeEstimate($estimate_id);
@@ -1147,7 +1205,7 @@ class EstimateService extends Base
          $em->remove($estimate_estimator);
       }
 
-      // project types
+      // 4) project types
       /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
       $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
       $estimates_project_types = $estimateProjectTypeRepo->ListarTypesDeEstimate($estimate_id);
@@ -1155,7 +1213,7 @@ class EstimateService extends Base
          $em->remove($estimate_project_type);
       }
 
-      // bid deadlines
+      // 5) bid deadlines
       /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
       $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
       $bid_deadlines = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate_id);
@@ -1163,15 +1221,7 @@ class EstimateService extends Base
          $em->remove($bid_deadline);
       }
 
-      // items (quote items)
-      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
-      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
-      $estimate_items = $estimateQuoteItemRepo->ListarItemsDeEstimate($estimate_id);
-      foreach ($estimate_items as $estimate_item) {
-         $em->remove($estimate_item);
-      }
-
-      // companys
+      // 6) companys (estimate_company)
       /** @var EstimateCompanyRepository $estimateCompanyRepo */
       $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
       $companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate_id);
