@@ -2634,6 +2634,29 @@ var Estimates = (function () {
       });
    };
 
+   // estimate note item (add new note from item modal)
+   var initAccionesEstimateNoteItem = function () {
+      $(document).off('click', '#btn-add-estimate-note-item');
+      $(document).on('click', '#btn-add-estimate-note-item', function (e) {
+         e.preventDefault();
+         if (typeof ModalEstimateNoteItem !== 'undefined') {
+            ModalEstimateNoteItem.mostrarModal();
+         }
+      });
+
+      $('#modal-estimate-note-item').on('hidden.bs.modal', function () {
+         if (typeof ModalEstimateNoteItem === 'undefined') return;
+         var note = ModalEstimateNoteItem.getNote();
+         if (note != null) {
+            $('#item_notes').append(new Option(note.description, note.id, false, false));
+            var current = $('#item_notes').val() || [];
+            current.push(String(note.id));
+            $('#item_notes').val(current);
+            $('#item_notes').trigger('change');
+         }
+      });
+   };
+
    // Companys
    var companys = [];
    var nEditingRowCompany = null;
@@ -3354,6 +3377,8 @@ var Estimates = (function () {
          initAccionesUnit();
          // equations
          initAccionesEquation();
+         // estimate note item
+         initAccionesEstimateNoteItem();
 
          // send quotes (cuotas)
          initQuotesSend();

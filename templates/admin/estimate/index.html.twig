@@ -1270,11 +1270,18 @@
 
                <div class="form-group">
                   <label class="form-label"> Notes </label>
-                  <select id="item_notes" name="item_notes[]" class="form-select form-select-solid select-modal-item" multiple="multiple">
-                     {% for note in estimate_note_items|default([]) %}
-                     <option value="{{ note.id }}">{{ note.description }}</option>
-                     {% endfor %}
-                  </select>
+                  <div class="input-group input-group-solid flex-nowrap">
+                     <div class="overflow-hidden flex-grow-1">
+                        <select id="item_notes" name="item_notes[]" class="form-select form-select-solid select-modal-item rounded-end-0 border-end" multiple="multiple">
+                           {% for note in estimate_note_items|default([]) %}
+                           <option value="{{ note.id }}">{{ note.description }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <span class="input-group-text" title="Add note" id="btn-add-estimate-note-item" style="cursor: pointer">
+                        <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     </span>
+                  </div>
                   <div class="form-text">You can select more than one note.</div>
                </div>
             </form>
@@ -1412,6 +1419,7 @@
 <!-- components -->
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEquation')) }}
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalUnit')) }}
+{{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalEstimateNoteItem')) }}
 
 {% endblock %} {% block javascriptsspecific %}
 
@@ -1471,6 +1479,7 @@
        ModalContactCompany.init();
        ModalUnit.init();
        ModalEquation.init();
+       if (typeof ModalEstimateNoteItem !== 'undefined') ModalEstimateNoteItem.init();
 
        Estimates.init();
    });

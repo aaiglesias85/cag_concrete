@@ -198,6 +198,11 @@ class DefaultController extends AbstractController
       return $this->render('admin/block/modal-unit.html.twig', array());
    }
 
+   public function renderModalEstimateNoteItem()
+   {
+      return $this->render('admin/block/modal-estimate-note-item.html.twig', array());
+   }
+
    public function renderModalEmployee()
    {
       return $this->render('admin/block/modal-employee.html.twig', array());
