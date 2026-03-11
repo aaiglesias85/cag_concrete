@@ -333,19 +333,19 @@ var ModalNewProjectCompany = (function () {
       var newQty = sign === '+' ? oldQty + number : sign === '-' ? oldQty - number : number;
       return newQty < 0 ? 0 : newQty;
    };
-   /** Price: si es edición y el valor empieza con + o -, sumar/restar al valor actual (como en Projects). */
+   /** Price: si es edición y el valor empieza con + o -, sumar/restar al valor actual (como en Projects). Permite valores negativos. */
    var getPriceItemModalProject = function (editIndex) {
       var price = (jQuery('#item-price-modal-project').val() || '').trim().replace(/,/g, '');
       if (editIndex === '' || editIndex === undefined) {
-         price = price.replace(/^[-+]/, '');
          return parseFloat(price) || 0;
       }
       var pos = parseInt(editIndex, 10);
       var oldPrice = npItems[pos] && npItems[pos].price != null ? parseFloat(npItems[pos].price) : 0;
+      if (isNaN(oldPrice)) oldPrice = 0;
       var sign = price.charAt(0);
       var number = parseFloat(price.replace(/^[-+]/, '')) || 0;
       var newPrice = sign === '+' ? oldPrice + number : sign === '-' ? oldPrice - number : number;
-      return newPrice < 0 ? 0 : newPrice;
+      return newPrice;
    };
    var validateFormItem = function () {
       var q = (jQuery('#item-quantity-modal-project').val() || '').trim();

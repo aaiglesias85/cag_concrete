@@ -2094,10 +2094,13 @@ var Projects = (function () {
       }
 
       if (nEditingRowItem == null) {
-         price = price.trim().replace(/^[-+]/, '').replace(/,/g, '');
-         price = parseFloat(price) || 0;
+         // Permitir valores negativos (ej. créditos, descuentos)
+         price = price.trim().replace(/,/g, '');
+         price = parseFloat(price);
+         return isNaN(price) ? 0 : price;
       } else {
-         var old_price = items[nEditingRowItem].price > 0 ? parseFloat(items[nEditingRowItem].price) : 0;
+         var old_price = parseFloat(items[nEditingRowItem].price);
+         if (isNaN(old_price)) old_price = 0;
          var raw_price = price.trim();
          var sign = raw_price.charAt(0);
          var number = parseFloat(raw_price.replace(/^[-+]/, '').replace(/,/g, '')) || 0;
@@ -2112,7 +2115,7 @@ var Projects = (function () {
             new_price = number;
          }
 
-         price = new_price < 0 ? 0 : new_price;
+         price = new_price;
       }
 
       return price;
