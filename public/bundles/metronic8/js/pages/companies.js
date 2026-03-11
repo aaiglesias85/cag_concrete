@@ -459,76 +459,76 @@ var Companies = (function () {
       $(document).on('click', '#btn-wizard-finalizar', function (e) {
          btnClickSalvarForm(false);
       });
+   };
 
-      function btnClickSalvarForm(closeForm) {
-         KTUtil.scrollTop();
+   var btnClickSalvarForm = function (closeForm) {
+      KTUtil.scrollTop();
 
-         event_change = false;
+      event_change = false;
 
-         var isValid = validateForm();
+      var isValid = validateForm();
 
-         if (closeForm && !isValid) {
-            cerrarFormsConfirmated();
-            return;
-         }
+      if (closeForm && !isValid) {
+         cerrarFormsConfirmated();
+         return;
+      }
 
-         if (isValid) {
-            var formData = new URLSearchParams();
+      if (isValid) {
+         var formData = new URLSearchParams();
 
-            var company_id = $('#company_id').val();
-            formData.set('company_id', company_id);
+         var company_id = $('#company_id').val();
+         formData.set('company_id', company_id);
 
-            var name = $('#name').val();
-            formData.set('name', name);
+         var name = $('#name').val();
+         formData.set('name', name);
 
-            var phone = $('#phone').val();
-            formData.set('phone', phone);
+         var phone = $('#phone').val();
+         formData.set('phone', phone);
 
-            var address = $('#address').val();
-            formData.set('address', address);
+         var address = $('#address').val();
+         formData.set('address', address);
 
-            var email = $('#email').val();
-            formData.set('email', email);
+         var email = $('#email').val();
+         formData.set('email', email);
 
-            var website = $('#website').val();
-            formData.set('website', website);
+         var website = $('#website').val();
+         formData.set('website', website);
 
-            formData.set('contacts', JSON.stringify(contacts));
+         formData.set('contacts', JSON.stringify(contacts));
 
-            BlockUtil.block('#form-company');
+         BlockUtil.block('#form-company');
 
-            axios
-               .post('company/salvarCompany', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
+         axios
+            .post('company/salvarCompany', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
 
-                        // Recuperar company_id del backend (necesario cuando es compañía nueva)
-                        var savedCompanyId = response.company_id;
-                        $('#company_id').val(savedCompanyId);
+                     // Recuperar company_id del backend (necesario cuando es compañía nueva)
+                     var savedCompanyId = response.company_id;
+                     $('#company_id').val(savedCompanyId);
 
-                        oTable.draw();
+                     oTable.draw();
 
-                        if (closeForm) {
-                           cerrarFormsConfirmated();
-                        } else {
-                           // Cargar datos completos (contacts, projects, etc.) - usa #form-company-body
-                           editRow(savedCompanyId);
-                        }
+                     if (closeForm) {
+                        cerrarFormsConfirmated();
                      } else {
-                        toastr.error(response.error, '');
+                        // Cargar datos completos (contacts, projects, etc.) - usa #form-company-body
+                        editRow(savedCompanyId);
                      }
                   } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
+                     toastr.error(response.error, '');
                   }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock('#form-company');
-               });
-         }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#form-company');
+            });
       }
    };
    //Cerrar form
