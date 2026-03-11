@@ -401,6 +401,10 @@ var Estimates = (function () {
       companys = [];
       actualizarTableListaCompanysEstimate();
 
+      // template notes (Notes tab)
+      template_notes = [];
+      actualizarTableListaTemplateNotes();
+
       //Mostrar el primer tab
       resetWizard();
 
@@ -477,6 +481,9 @@ var Estimates = (function () {
                break;
             case 3:
                actualizarTableListaItems();
+               break;
+            case 5:
+               actualizarTableListaTemplateNotes();
                break;
             // case 4:
             //     actualizarTableListaProjectInformation();
@@ -950,6 +957,13 @@ var Estimates = (function () {
          // companys
          companys = estimate.companys;
          actualizarTableListaCompanysEstimate();
+
+         // template notes (Notes tab)
+         template_notes = (estimate.template_notes || []).map(function (tn, i) {
+            tn.posicion = i;
+            return tn;
+         });
+         actualizarTableListaTemplateNotes();
 
          // habilitar tab
          totalTabs = 5;
@@ -1587,6 +1601,175 @@ var Estimates = (function () {
             if (stage_id === '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage-change'), 'This field is required');
             }
+         }
+      });
+   };
+
+   // Template notes (Notes tab)
+   var template_notes = [];
+   var oTableTemplateNotes;
+   var initTableTemplateNotes = function () {
+      var table = '#template-notes-table-editable';
+      var columns = [{ data: 'description' }, { data: null }];
+      var columnDefs = [
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['delete']);
+            },
+         },
+      ];
+      oTableTemplateNotes = DatatableUtil.initSafeDataTable(table, {
+         data: template_notes,
+         displayLength: 30,
+         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         order: [[0, 'asc']],
+         columns: columns,
+         columnDefs: columnDefs,
+         language: DatatableUtil.getDataTableLenguaje(),
+      });
+      $(table).on('draw', function () {
+         initAccionesTemplateNotesDelete();
+      });
+      initAccionesTemplateNotesDelete();
+   };
+   var actualizarTableListaTemplateNotes = function () {
+      if (oTableTemplateNotes) {
+         oTableTemplateNotes.destroy();
+         oTableTemplateNotes = null;
+      }
+      initTableTemplateNotes();
+   };
+   var handleSearchDatatableTemplateNotes = function () {
+      $(document).off('keyup', '#lista-template-notes [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-template-notes [data-table-filter="search"]', function (e) {
+         if (oTableTemplateNotes) oTableTemplateNotes.search(e.target.value).draw();
+      });
+   };
+   var initAccionesTemplateNotes = function () {
+      $(document).off('click', '#btn-agregar-template-note');
+      $(document).on('click', '#btn-agregar-template-note', function (e) {
+         e.preventDefault();
+         var estimateId = $('#estimate_id').val();
+         if (!estimateId) {
+            toastr.error('Save the estimate first before adding template notes.');
+            return;
+         }
+         $('#template-note-select').val('');
+         $('#template-note-select').trigger('change');
+         MyApp.resetErrorMessageValidateSelect(KTUtil.get('template-note-form'));
+         if ($('#template-note-select').length && !$('#template-note-select').hasClass('select2-hidden-accessible')) {
+            $('#template-note-select').select2({ dropdownParent: $('#modal-template-note'), width: '100%' });
+         }
+         ModalUtil.show('modal-template-note', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-template-note');
+      $(document).on('click', '#btn-salvar-template-note', function (e) {
+         e.preventDefault();
+         var estimate_id = $('#estimate_id').val();
+         var estimate_note_item_id = $('#template-note-select').val();
+         if (!estimate_note_item_id || estimate_note_item_id === '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-template-note-modal'), 'This field is required');
+            return;
+         }
+         var formData = new URLSearchParams();
+         formData.set('estimate_id', estimate_id);
+         formData.set('estimate_note_item_id', estimate_note_item_id);
+         BlockUtil.block('#modal-template-note .modal-content');
+         axios.post('estimate/agregarTemplateNote', formData, { responseType: 'json' })
+            .then(function (res) {
+               if ((res.status === 200 || res.status === 201) && res.data.success) {
+                  template_notes.push({
+                     id: res.data.id,
+                     estimate_note_item_id: res.data.estimate_note_item_id,
+                     description: res.data.description,
+                     posicion: template_notes.length,
+                  });
+                  actualizarTableListaTemplateNotes();
+                  ModalUtil.hide('modal-template-note');
+                  toastr.success('Template note added.', '');
+               } else {
+                  toastr.error(res.data.error || 'Error');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () { BlockUtil.unblock('#modal-template-note .modal-content'); });
+      });
+
+      $(document).off('click', '#btn-add-template-note-new');
+      $(document).on('click', '#btn-add-template-note-new', function (e) {
+         e.preventDefault();
+         $('#new-template-note-description').val('');
+         ModalUtil.show('modal-new-template-note', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-new-template-note');
+      $(document).on('click', '#btn-salvar-new-template-note', function (e) {
+         e.preventDefault();
+         var desc = $('#new-template-note-description').val();
+         if (!desc || desc.trim() === '') {
+            toastr.error('Description is required.');
+            return;
+         }
+         var formData = new URLSearchParams();
+         formData.set('id', '');
+         formData.set('description', desc.trim());
+         formData.set('type', 'template');
+         BlockUtil.block('#modal-new-template-note .modal-content');
+         axios.post('estimate-note-item/salvar', formData, { responseType: 'json' })
+            .then(function (res) {
+               if ((res.status === 200 || res.status === 201) && res.data.success) {
+                  var newId = res.data.id;
+                  var opt = new Option(desc.trim(), newId, false, false);
+                  $('#template-note-select').append(opt).val(newId).trigger('change');
+                  ModalUtil.hide('modal-new-template-note');
+                  toastr.success('Template note created. Select it and click Save to add to estimate.', '');
+               } else {
+                  toastr.error(res.data.error || 'Error');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () { BlockUtil.unblock('#modal-new-template-note .modal-content'); });
+      });
+   };
+   var initAccionesTemplateNotesDelete = function () {
+      $(document).off('click', '#template-notes-table-editable a.delete');
+      $(document).on('click', '#template-notes-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         if (template_notes[posicion] && template_notes[posicion].id) {
+            Swal.fire({
+               text: 'Remove this template note from the estimate?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes',
+               cancelButtonText: 'Cancel',
+               customClass: { confirmButton: 'btn btn-success', cancelButton: 'btn btn-danger' },
+            }).then(function (result) {
+               if (result.value) {
+                  var formData = new URLSearchParams();
+                  formData.set('id', template_notes[posicion].id);
+                  BlockUtil.block('#lista-template-notes');
+                  axios.post('estimate/eliminarTemplateNote', formData, { responseType: 'json' })
+                     .then(function (res) {
+                        if (res.status === 200 || res.status === 201 && res.data.success) {
+                           template_notes.splice(posicion, 1);
+                           template_notes.forEach(function (tn, i) { tn.posicion = i; });
+                           actualizarTableListaTemplateNotes();
+                           toastr.success(res.data.message || 'Removed.');
+                        } else {
+                           toastr.error(res.data.error || 'Error');
+                        }
+                     })
+                     .catch(MyUtil.catchErrorAxios)
+                     .then(function () { BlockUtil.unblock('#lista-template-notes'); });
+               }
+            });
          }
       });
    };
@@ -3379,6 +3562,11 @@ var Estimates = (function () {
          initAccionesEquation();
          // estimate note item
          initAccionesEstimateNoteItem();
+
+         // template notes (Notes tab)
+         initTableTemplateNotes();
+         initAccionesTemplateNotes();
+         handleSearchDatatableTemplateNotes();
 
          // send quotes (cuotas)
          initQuotesSend();

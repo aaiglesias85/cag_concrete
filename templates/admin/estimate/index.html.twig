@@ -1007,6 +1007,41 @@
                            <label class="form-check-label" for="flexCheckDefault"> Concrete Quote Received </label>
                         </div>
                      </div>
+
+                     <div class="form-group ic-form-group mt-5">
+                        <label class="form-label">
+                           <span class="ic-step-number">3</span>
+                           Template Notes
+                        </label>
+                        <div class="row" id="lista-template-notes">
+                           <div class="col-md-12">
+                              <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                                 <div class="d-flex flex-wrap gap-3">
+                                    <button type="button" id="btn-agregar-template-note" class="btn btn-success w-125px">
+                                       <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                       New
+                                    </button>
+                                 </div>
+                                 <div class="d-flex flex-wrap align-items-center gap-3">
+                                    <div class="position-relative w-250px">
+                                       <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                                       <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                                    </div>
+                                 </div>
+                              </div>
+                              <table id="template-notes-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                                 <thead>
+                                    <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                       <th>Note</th>
+                                       <th class="text-end min-w-100px">Actions</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody class="text-gray-600 fw-semibold">
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+                     </div>
                   </div>
                </div>
             </div>
@@ -1274,7 +1309,9 @@
                      <div class="overflow-hidden flex-grow-1">
                         <select id="item_notes" name="item_notes[]" class="form-select form-select-solid select-modal-item rounded-end-0 border-end" multiple="multiple">
                            {% for note in estimate_note_items|default([]) %}
+                           {% if note.type == 'item' %}
                            <option value="{{ note.id }}">{{ note.description }}</option>
+                           {% endif %}
                            {% endfor %}
                         </select>
                      </div>
@@ -1345,6 +1382,72 @@
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-success" id="btn-salvar-company-estimate">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- modal add template note to estimate -->
+<div class="modal fade" id="modal-template-note" tabindex="-1" role="dialog" aria-labelledby="modalTemplateNoteLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">Add template note</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="template-note-form" action="#" method="post">
+               <div class="form-group ic-form-group" id="select-template-note-modal">
+                  <label class="form-label required">Template note</label>
+                  <div class="input-group input-group-solid flex-nowrap">
+                     <div class="overflow-hidden flex-grow-1">
+                        <select id="template-note-select" class="form-control form-select form-select2 select-validate form-select-solid rounded-end-0 border-end">
+                           <option value="">Select</option>
+                           {% for note in estimate_note_items|default([]) %}
+                           {% if note.type == 'template' %}
+                           <option value="{{ note.id }}">{{ note.description }}</option>
+                           {% endif %}
+                           {% endfor %}
+                        </select>
+                     </div>
+                     <span class="input-group-text" title="Add template note" id="btn-add-template-note-new" style="cursor: pointer">
+                        <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     </span>
+                  </div>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-template-note">Save</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- modal new template note (create note type template) -->
+<div class="modal fade" id="modal-new-template-note" tabindex="-1" role="dialog" aria-labelledby="modalNewTemplateNoteLabel">
+   <div class="modal-dialog" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title">New template note</h5>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="new-template-note-form" action="#" method="post">
+               <div class="form-group ic-form-group">
+                  <label class="form-label required">Description</label>
+                  <textarea class="form-control form-control-solid form-control-validate" id="new-template-note-description" name="description" rows="4" placeholder="Enter note description"></textarea>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-success" id="btn-salvar-new-template-note">Save</button>
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
          </div>
       </div>

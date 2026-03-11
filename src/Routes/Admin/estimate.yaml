@@ -43,6 +43,14 @@ eliminarCompanyEstimateAdmin:
   path: /estimate/eliminarCompany
   defaults: { _controller: App\Controller\Admin\EstimateController::eliminarCompany, _format: json }
 
+agregarTemplateNoteEstimateAdmin:
+  path: /estimate/agregarTemplateNote
+  defaults: { _controller: App\Controller\Admin\EstimateController::agregarTemplateNote, _format: json }
+
+eliminarTemplateNoteEstimateAdmin:
+  path: /estimate/eliminarTemplateNote
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarTemplateNote, _format: json }
+
 # quotes (cuotas)
 salvarQuoteEstimateAdmin:
   path: /estimate/salvarQuote

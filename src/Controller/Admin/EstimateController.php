@@ -375,6 +375,46 @@ class EstimateController extends AbstractController
    }
 
    /**
+    * agregarTemplateNote: Asocia una nota tipo template al estimate
+    */
+   public function agregarTemplateNote(Request $request)
+   {
+      $estimate_id = $request->get('estimate_id');
+      $estimate_note_item_id = $request->get('estimate_note_item_id');
+      try {
+         $resultado = $this->estimateService->AgregarTemplateNote($estimate_id, $estimate_note_item_id);
+         if ($resultado['success']) {
+            return $this->json([
+               'success' => true,
+               'id' => $resultado['id'],
+               'description' => $resultado['description'],
+               'estimate_note_item_id' => $resultado['estimate_note_item_id'],
+            ]);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * eliminarTemplateNote: Quita una nota template del estimate
+    */
+   public function eliminarTemplateNote(Request $request)
+   {
+      $id = $request->get('id');
+      try {
+         $resultado = $this->estimateService->EliminarTemplateNote($id);
+         if ($resultado['success']) {
+            return $this->json(['success' => true, 'message' => 'The operation was successful']);
+         }
+         return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
     * cargarDatos Acción que carga los datos del estimate en la BD
     *
     */

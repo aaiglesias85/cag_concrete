@@ -33,6 +33,27 @@ class EstimateNoteItemRepository extends ServiceEntityRepository
     }
 
     /**
+     * ListarOrdenadosPorTipo: Lista los ítems de un tipo ordenados por descripción
+     *
+     * @return EstimateNoteItem[]
+     */
+    public function ListarOrdenadosPorTipo(string $type, string $sSearch = ""): array
+    {
+        $consulta = $this->createQueryBuilder('e_n_i')
+            ->andWhere('e_n_i.type = :type')
+            ->setParameter('type', $type);
+
+        if ($sSearch !== "") {
+            $consulta->andWhere('e_n_i.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        $consulta->orderBy('e_n_i.description', 'ASC');
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarConTotal: Lista los ítems con paginación y total
      */
     public function ListarConTotal(int $start, int $limit, ?string $sSearch, string $sortColumn = 'description', string $sortDirection = 'ASC'): array

@@ -17,6 +17,7 @@ use App\Entity\EstimateQuoteCompany;
 use App\Entity\EstimateQuoteItem;
 use App\Entity\EstimateQuoteItemNote;
 use App\Entity\EstimateNoteItem;
+use App\Entity\EstimateTemplateNote;
 use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
@@ -33,6 +34,7 @@ use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\EstimateQuoteItemNoteRepository;
 use App\Repository\EstimateQuoteRepository;
 use App\Repository\EstimateRepository;
+use App\Repository\EstimateTemplateNoteRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -471,6 +473,21 @@ class EstimateService extends Base
       $filaSumatoria = $firstDataRow + $numItems;
       $sheet->setCellValue('G' . $filaSumatoria, $sumTotal);
 
+      // Template notes del estimate: letting → B41, bids → B42; tras removeRow las filas bajaron, restar filasVacias.
+      $templateNotes = $this->ListarTemplateNotesDeEstimate($estimate->getEstimateId());
+      $filasVacias = ($numItems < $totalItemRows) ? ($totalItemRows - $numItems) : 0;
+      $notesRowBase = ($templateName === 'bid_letting.xlsx') ? 41 : 42;
+      $notesRow = $notesRowBase - $filasVacias;
+      $notesCell = 'B' . $notesRow;
+      if (!empty($templateNotes)) {
+         $notesText = implode("\n", array_map(function ($n) {
+            return (string) ($n['description'] ?? '');
+         }, $templateNotes));
+         $sheet->setCellValue($notesCell, $notesText);
+         $sheet->mergeCells('B' . $notesRow . ':G' . $notesRow);
+         $sheet->getStyle('B' . $notesRow . ':G' . $notesRow)->getAlignment()->setWrapText(true);
+      }
+
       // Ocultar solo las filas vacías al final del sheet (después de la última con contenido). No tocamos las filas en blanco entre total y TERMS AND CONDITIONS.
       $highestRow = $sheet->getHighestDataRow();
       $highestCol = $sheet->getHighestDataColumn();
@@ -905,6 +922,10 @@ class EstimateService extends Base
          $companys = $this->ListarCompanys($estimate_id);
          $arreglo_resultado['companys'] = $companys;
 
+         // template notes (notas tipo template asociadas al estimate)
+         $template_notes = $this->ListarTemplateNotesDeEstimate($estimate_id);
+         $arreglo_resultado['template_notes'] = $template_notes;
+
          $resultado['success'] = true;
          $resultado['estimate'] = $arreglo_resultado;
       }
@@ -952,6 +973,80 @@ class EstimateService extends Base
       }
 
       return $companys;
+   }
+
+   /**
+    * ListarTemplateNotesDeEstimate: Notas tipo template asociadas al estimate
+    *
+    * @param int $estimate_id
+    * @return array
+    */
+   public function ListarTemplateNotesDeEstimate($estimate_id)
+   {
+      /** @var EstimateTemplateNoteRepository $repo */
+      $repo = $this->getDoctrine()->getRepository(EstimateTemplateNote::class);
+      $list = $repo->findByEstimateId((int) $estimate_id);
+      $out = [];
+      foreach ($list as $key => $etn) {
+         $n = $etn->getNoteItem();
+         $out[] = [
+            'id' => $etn->getId(),
+            'estimate_note_item_id' => $n ? $n->getId() : null,
+            'description' => $n ? $n->getDescription() : '',
+            'posicion' => $key,
+         ];
+      }
+      return $out;
+   }
+
+   /**
+    * AgregarTemplateNote: Asocia una nota tipo template al estimate
+    *
+    * @param int $estimate_id
+    * @param int $estimate_note_item_id
+    * @return array
+    */
+   public function AgregarTemplateNote($estimate_id, $estimate_note_item_id)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $estimate = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
+      $noteItem = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($estimate_note_item_id);
+      if ($estimate === null || $noteItem === null) {
+         return ['success' => false, 'error' => 'Estimate or note not found'];
+      }
+      if ($noteItem->getType() !== 'template') {
+         return ['success' => false, 'error' => 'Note must be of type template'];
+      }
+      /** @var EstimateTemplateNoteRepository $repo */
+      $repo = $this->getDoctrine()->getRepository(EstimateTemplateNote::class);
+      $existing = $repo->findOneBy(['estimate' => $estimate, 'noteItem' => $noteItem]);
+      if ($existing !== null) {
+         return ['success' => false, 'error' => 'This template note is already added'];
+      }
+      $etn = new EstimateTemplateNote();
+      $etn->setEstimate($estimate);
+      $etn->setNoteItem($noteItem);
+      $em->persist($etn);
+      $em->flush();
+      return ['success' => true, 'id' => $etn->getId(), 'description' => $noteItem->getDescription(), 'estimate_note_item_id' => $noteItem->getId()];
+   }
+
+   /**
+    * EliminarTemplateNote: Quita una nota template del estimate
+    *
+    * @param int $id estimate_template_note.id
+    * @return array
+    */
+   public function EliminarTemplateNote($id)
+   {
+      $em = $this->getDoctrine()->getManager();
+      $entity = $this->getDoctrine()->getRepository(EstimateTemplateNote::class)->find($id);
+      if ($entity === null) {
+         return ['success' => false, 'error' => 'Record not found'];
+      }
+      $em->remove($entity);
+      $em->flush();
+      return ['success' => true];
    }
 
    /**

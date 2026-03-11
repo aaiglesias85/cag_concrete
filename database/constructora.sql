@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-03-2026 a las 01:22:18
+-- Tiempo de generación: 11-03-2026 a las 01:36:33
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -597,6 +597,18 @@ CREATE TABLE `estimate_quote_items` (
 CREATE TABLE `estimate_quote_item_note` (
   `id` int(11) NOT NULL,
   `estimate_quote_item_id` int(11) NOT NULL,
+  `estimate_note_item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_template_note`
+--
+
+CREATE TABLE `estimate_template_note` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) NOT NULL,
   `estimate_note_item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -2313,6 +2325,15 @@ ALTER TABLE `estimate_quote_item_note`
   ADD KEY `estimate_note_item_id` (`estimate_note_item_id`);
 
 --
+-- Indices de la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_estimate_template_note` (`estimate_id`,`estimate_note_item_id`),
+  ADD KEY `idx_estimate_template_note_estimate_id` (`estimate_id`),
+  ADD KEY `idx_estimate_template_note_note_id` (`estimate_note_item_id`);
+
+--
 -- Indices de la tabla `function`
 --
 ALTER TABLE `function`
@@ -2829,6 +2850,12 @@ ALTER TABLE `estimate_quote_item_note`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
@@ -3261,6 +3288,13 @@ ALTER TABLE `estimate_quote_items`
 ALTER TABLE `estimate_quote_item_note`
   ADD CONSTRAINT `Refestimate_quote_item_note_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `Refestimate_quote_item_note_quote_item` FOREIGN KEY (`estimate_quote_item_id`) REFERENCES `estimate_quote_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  ADD CONSTRAINT `Refestimate_template_note_estimate` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_template_note_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `invoice`

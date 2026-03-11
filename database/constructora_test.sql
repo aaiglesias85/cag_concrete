@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-03-2026 a las 01:21:58
+-- Tiempo de generación: 11-03-2026 a las 01:36:09
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -27046,7 +27046,7 @@ INSERT INTO `estimate_note_item` (`id`, `description`, `type`) VALUES
 (1, 'Price increased due to material cost', 'item'),
 (2, 'Subject to field verification', 'item'),
 (3, 'Estimated quantity may change', 'item'),
-(4, 'test', 'item');
+(5, 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', 'template');
 
 -- --------------------------------------------------------
 
@@ -28024,8 +28024,19 @@ CREATE TABLE `estimate_quote_item_note` (
 --
 
 INSERT INTO `estimate_quote_item_note` (`id`, `estimate_quote_item_id`, `estimate_note_item_id`) VALUES
-(1, 152, 3),
-(2, 428, 4);
+(1, 152, 3);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_template_note`
+--
+
+CREATE TABLE `estimate_template_note` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) NOT NULL,
+  `estimate_note_item_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
@@ -30380,7 +30391,11 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (420, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-03-11 00:33:13', 27),
 (421, 'Update', 'Company', 'The company is modified: AMERICAN LIGHTING & SIGNALIZATION, LLC.', '::1', '2026-03-11 00:38:08', 27),
 (422, 'Add', 'Estimate Note Item', 'The estimate note item is added: test', '::1', '2026-03-11 00:54:07', 27),
-(423, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-11 00:54:11', 27);
+(423, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-11 00:54:11', 27),
+(424, 'Add', 'Estimate Note Item', 'The estimate note item is added: Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.', '::1', '2026-03-11 01:23:07', 27),
+(425, 'Delete', 'Estimate Note Item', 'The estimate note item is deleted: test', '::1', '2026-03-11 01:23:27', 27),
+(426, 'Add', 'Estimate Note Item', 'The estimate note item is added: test', '::1', '2026-03-11 01:28:58', 27),
+(427, 'Delete', 'Estimate Note Item', 'The estimate note item is deleted: test', '::1', '2026-03-11 01:29:21', 27);
 
 -- --------------------------------------------------------
 
@@ -42405,6 +42420,15 @@ ALTER TABLE `estimate_quote_item_note`
   ADD KEY `estimate_note_item_id` (`estimate_note_item_id`);
 
 --
+-- Indices de la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_estimate_template_note` (`estimate_id`,`estimate_note_item_id`),
+  ADD KEY `idx_estimate_template_note_estimate_id` (`estimate_id`),
+  ADD KEY `idx_estimate_template_note_note_id` (`estimate_note_item_id`);
+
+--
 -- Indices de la tabla `function`
 --
 ALTER TABLE `function`
@@ -42892,7 +42916,7 @@ ALTER TABLE `estimate_estimator`
 -- AUTO_INCREMENT de la tabla `estimate_note_item`
 --
 ALTER TABLE `estimate_note_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
@@ -42922,7 +42946,13 @@ ALTER TABLE `estimate_quote_items`
 -- AUTO_INCREMENT de la tabla `estimate_quote_item_note`
 --
 ALTER TABLE `estimate_quote_item_note`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `function`
@@ -42982,7 +43012,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=424;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=428;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -43363,6 +43393,13 @@ ALTER TABLE `estimate_quote_items`
 ALTER TABLE `estimate_quote_item_note`
   ADD CONSTRAINT `Refestimate_quote_item_note_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `Refestimate_quote_item_note_quote_item` FOREIGN KEY (`estimate_quote_item_id`) REFERENCES `estimate_quote_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `estimate_template_note`
+--
+ALTER TABLE `estimate_template_note`
+  ADD CONSTRAINT `Refestimate_template_note_estimate` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_template_note_note` FOREIGN KEY (`estimate_note_item_id`) REFERENCES `estimate_note_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `invoice_attachment`
