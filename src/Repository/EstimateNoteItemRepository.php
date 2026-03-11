@@ -40,6 +40,7 @@ class EstimateNoteItemRepository extends ServiceEntityRepository
         $sortable = [
             'id' => 'e_n_i.id',
             'description' => 'e_n_i.description',
+            'type' => 'e_n_i.type',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'e_n_i.description';
         $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';

@@ -45,6 +45,7 @@ var ModalEstimateNoteItem = function () {
                 var formData = new URLSearchParams();
                 formData.set('id', '');
                 formData.set('description', $('#estimate-note-item-description').val());
+                formData.set('type', 'item');
 
                 BlockUtil.block('#modal-estimate-note-item .modal-content');
 

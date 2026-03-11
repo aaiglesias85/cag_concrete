@@ -33,7 +33,7 @@ class EstimateNoteItemController extends AbstractController
         try {
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'description'],
+                allowedOrderFields: ['id', 'description', 'type'],
                 defaultOrderField: 'description'
             );
 
@@ -60,12 +60,13 @@ class EstimateNoteItemController extends AbstractController
     {
         $id = $request->get('id');
         $description = $request->get('description');
+        $type = $request->get('type', 'item');
 
         try {
             if ($id === '' || $id === null) {
-                $resultado = $this->estimateNoteItemService->Salvar($description);
+                $resultado = $this->estimateNoteItemService->Salvar($description, $type);
             } else {
-                $resultado = $this->estimateNoteItemService->Actualizar($id, $description);
+                $resultado = $this->estimateNoteItemService->Actualizar($id, $description, $type);
             }
 
             if ($resultado['success']) {

@@ -13,8 +13,11 @@ class EstimateNoteItem
     #[ORM\Column(name: "id", type: "integer", nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "description", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: "description", type: "text", nullable: true)]
     private ?string $description;
+
+    #[ORM\Column(name: "type", type: "string", length: 20, nullable: false, options: ["default" => "item"])]
+    private string $type = 'item';
 
     public function getId(): ?int
     {
@@ -29,5 +32,15 @@ class EstimateNoteItem
     public function setDescription(?string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): void
+    {
+        $this->type = $type;
     }
 }

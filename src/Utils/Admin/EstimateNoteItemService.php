@@ -20,6 +20,7 @@ class EstimateNoteItemService extends Base
             $resultado['success'] = true;
             $resultado['item'] = [
                 'description' => $entity->getDescription(),
+                'type' => $entity->getType(),
             ];
         }
 
@@ -87,13 +88,15 @@ class EstimateNoteItemService extends Base
     /**
      * Actualizar: Actualiza los datos del estimate note item en la BD
      */
-    public function Actualizar($id, $description): array
+    public function Actualizar($id, $description, $type = 'item'): array
     {
+        $type = $this->normalizeType($type);
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
 
         if ($entity !== null) {
             $entity->setDescription($description);
+            $entity->setType($type);
             $em->flush();
 
             $this->SalvarLog('Update', 'Estimate Note Item', "The estimate note item is modified: $description");
@@ -105,18 +108,27 @@ class EstimateNoteItemService extends Base
 
     /**
      * Salvar: Guarda un nuevo estimate note item en la BD
+     * @param string $type 'item' o 'template'; si se omite o está vacío se usa 'item' (ej. creación desde modal de ítem)
      */
-    public function Salvar($description): array
+    public function Salvar($description, $type = 'item'): array
     {
+        $type = $this->normalizeType($type);
         $em = $this->getDoctrine()->getManager();
 
         $entity = new EstimateNoteItem();
         $entity->setDescription($description);
+        $entity->setType($type);
         $em->persist($entity);
         $em->flush();
 
         $this->SalvarLog('Add', 'Estimate Note Item', "The estimate note item is added: $description");
         return ['success' => true, 'id' => $entity->getId()];
+    }
+
+    private function normalizeType(?string $type): string
+    {
+        $type = $type === null || $type === '' ? 'item' : strtolower(trim($type));
+        return in_array($type, ['item', 'template'], true) ? $type : 'item';
     }
 
     /**
@@ -133,6 +145,7 @@ class EstimateNoteItemService extends Base
             $data[] = [
                 'id' => $value->getId(),
                 'description' => $value->getDescription(),
+                'type' => $value->getType(),
             ];
         }
 

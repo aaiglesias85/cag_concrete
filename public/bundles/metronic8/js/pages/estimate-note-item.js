@@ -51,6 +51,7 @@ var EstimateNoteItem = function () {
         }
         columns.push(
             { data: 'description' },
+            { data: 'type' },
             { data: null }
         );
         return columns;
@@ -65,6 +66,12 @@ var EstimateNoteItem = function () {
                 render: DatatableUtil.getRenderColumnCheck
             });
         }
+        columnDefs.push({
+            targets: permiso.eliminar ? 2 : 1,
+            render: function (data) {
+                return data === 'template' ? 'Template' : 'Item';
+            }
+        });
         columnDefs.push({
             targets: -1,
             data: null,
@@ -149,12 +156,21 @@ var EstimateNoteItem = function () {
 
     var resetForms = function () {
         MyUtil.resetForm("estimate-note-item-form");
+        $('#type').val('item');
+        $('#type').trigger('change');
         event_change = false;
+    };
+
+    var initSelectType = function () {
+        if ($('#type').length && !$('#type').hasClass('select2-hidden-accessible')) {
+            $('#type').select2({ width: '100%' });
+        }
     };
 
     var validateForm = function () {
         var form = KTUtil.get('estimate-note-item-form');
         var constraints = {
+            type: { presence: { message: "This field is required" } },
             description: { presence: { message: "This field is required" } }
         };
         var errors = validate(form, constraints);
@@ -163,6 +179,9 @@ var EstimateNoteItem = function () {
         }
         MyApp.showErrorsValidateForm(form, errors);
         MyUtil.attachChangeValidacion(form, constraints);
+        if (errors.type) {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-type'), errors.type[0] || 'This field is required');
+        }
         return false;
     };
 
@@ -170,6 +189,7 @@ var EstimateNoteItem = function () {
         $(document).off('click', "#btn-nuevo-estimate-note-item");
         $(document).on('click', "#btn-nuevo-estimate-note-item", function (e) {
             resetForms();
+            MyApp.resetErrorMessageValidateSelect(KTUtil.get('estimate-note-item-form'));
             KTUtil.find(KTUtil.get('form-estimate-note-item'), '.card-label').innerHTML = "New Estimate Note Item:";
             mostrarForm();
         });
@@ -178,6 +198,7 @@ var EstimateNoteItem = function () {
     var mostrarForm = function () {
         KTUtil.removeClass(KTUtil.get('form-estimate-note-item'), 'hide');
         KTUtil.addClass(KTUtil.get('lista-estimate-note-item'), 'hide');
+        initSelectType();
     };
 
     //Salvar
@@ -201,6 +222,9 @@ var EstimateNoteItem = function () {
 
                 var description = $('#description').val();
                 formData.set("description", description);
+
+                var typeVal = $('#type').val();
+                formData.set("type", typeVal || 'item');
 
                 BlockUtil.block('#form-estimate-note-item');
 
@@ -281,6 +305,8 @@ var EstimateNoteItem = function () {
                         var response = res.data;
                         if (response.success) {
                             KTUtil.find(KTUtil.get("form-estimate-note-item"), ".card-label").innerHTML = "Update Estimate Note Item: " + response.item.description;
+                            $('#type').val(response.item.type || 'item');
+                            $('#type').trigger('change');
                             $('#description').val(response.item.description);
                             event_change = false;
                         } else {

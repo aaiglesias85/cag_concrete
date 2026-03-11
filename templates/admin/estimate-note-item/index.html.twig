@@ -112,6 +112,7 @@
                                 </th>
                             {% endif %}
                             <th>Description</th>
+                            <th>Type</th>
                             <th class="text-end min-w-100px">Actions</th>
                         </tr>
                         </thead>
@@ -157,13 +158,24 @@
                     <input type="hidden" id="id" name="id"/>
                     <div class="card-body">
                         <div class="form-group ic-form-group">
+                            <div class="w-150px" id="select-type">
+                                <label class="form-label required">
+                                    <span class="ic-step-number">1</span>
+                                    Type
+                                </label>
+                                <select id="type" name="type" class="form-select form-select2 select-validate form-select-solid event-change">
+                                    <option value="item">Item</option>
+                                    <option value="template">Template</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group ic-form-group">
                             <label class="form-label required">
-                                <span class="ic-step-number">1</span>
+                                <span class="ic-step-number">2</span>
                                 Description
                             </label>
-                            <input type="text"
-                                   class="form-control form-control-validate form-control-solid event-change"
-                                   id="description" name="description"/>
+                            <textarea class="form-control form-control-validate form-control-solid event-change"
+                                      id="description" name="description" rows="4"></textarea>
                         </div>
                     </div>
                 </form>

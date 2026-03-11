@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 10-03-2026 a las 01:47:29
+-- Tiempo de generación: 11-03-2026 a las 01:21:58
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -78,7 +78,7 @@ INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`,
 (11, 'REEDWICK, LLC', '', '', '', '', '2024-07-09 16:04:09', NULL, NULL, NULL),
 (12, 'PITTMAN CONSTRUCTION CO INC', '', '', '', '', '2024-07-09 16:05:43', '2025-04-10 16:45:07', NULL, NULL),
 (13, 'APAC-ATLANTIC, INC. ', '', '', '', '', '2024-07-09 18:45:49', '2025-07-31 19:57:26', NULL, NULL),
-(14, 'AMERICAN LIGHTING & SIGNALIZATION, LLC.', '', '', NULL, NULL, '2024-07-09 18:49:38', '2026-02-09 01:15:19', '', ''),
+(14, 'AMERICAN LIGHTING & SIGNALIZATION, LLC.', '', '', NULL, NULL, '2024-07-09 18:49:38', '2026-03-11 00:38:08', '', ''),
 (15, 'ARCHER WESTERN CONSTRUCTION', '', '', '', '', '2024-07-09 19:07:16', '2025-07-31 20:00:54', NULL, NULL),
 (16, 'ASTRA GROUP, LLC', '', '', '', '', '2024-07-09 19:11:31', '2025-07-31 20:00:57', NULL, NULL),
 (17, 'BALDWIN PAVING COMPANY, INC', '', '', '', '', '2024-07-09 19:14:13', '2024-12-12 17:58:11', NULL, NULL),
@@ -27034,17 +27034,19 @@ INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
 
 CREATE TABLE `estimate_note_item` (
   `id` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL
+  `description` text,
+  `type` varchar(20) NOT NULL DEFAULT 'item'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `estimate_note_item`
 --
 
-INSERT INTO `estimate_note_item` (`id`, `description`) VALUES
-(1, 'Price increased due to material cost'),
-(2, 'Subject to field verification'),
-(3, 'Estimated quantity may change');
+INSERT INTO `estimate_note_item` (`id`, `description`, `type`) VALUES
+(1, 'Price increased due to material cost', 'item'),
+(2, 'Subject to field verification', 'item'),
+(3, 'Estimated quantity may change', 'item'),
+(4, 'test', 'item');
 
 -- --------------------------------------------------------
 
@@ -27255,7 +27257,7 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (1016, 234, 25),
 (1020, 241, 36),
 (1021, 62, 43),
-(1030, 43, 41);
+(1033, 43, 41);
 
 -- --------------------------------------------------------
 
@@ -28003,7 +28005,7 @@ INSERT INTO `estimate_quote_items` (`id`, `quantity`, `price`, `yield_calculatio
 (468, 6310.000000, 31.000000, 'equation', 644, 8, NULL, 151),
 (469, 20.000000, 2800.000000, 'equation', 37, 15, NULL, 151),
 (470, 9.000000, 1750.000000, 'equation', 368, 16, NULL, 151),
-(471, 5.000000, 100.000000, 'equation', 125, 12, NULL, 256);
+(471, 5.000000, -100.000000, 'equation', 125, 12, NULL, 256);
 
 -- --------------------------------------------------------
 
@@ -28016,6 +28018,14 @@ CREATE TABLE `estimate_quote_item_note` (
   `estimate_quote_item_id` int(11) NOT NULL,
   `estimate_note_item_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_quote_item_note`
+--
+
+INSERT INTO `estimate_quote_item_note` (`id`, `estimate_quote_item_id`, `estimate_note_item_id`) VALUES
+(1, 152, 3),
+(2, 428, 4);
 
 -- --------------------------------------------------------
 
@@ -30364,7 +30374,13 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (414, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-10 00:33:45', 27),
 (415, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-10 00:33:59', 27),
 (416, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-10 00:34:17', 27),
-(417, 'Add', 'Estimate Note Item', 'The estimate note item is added: Price increased due to material cost', '::1', '2026-03-10 01:28:41', 27);
+(417, 'Add', 'Estimate Note Item', 'The estimate note item is added: Price increased due to material cost', '::1', '2026-03-10 01:28:41', 27),
+(418, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-10 02:03:12', 27),
+(419, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-11 00:27:57', 27),
+(420, 'Update', 'Project', 'The project is modified: Lakeview Road Bridge', '::1', '2026-03-11 00:33:13', 27),
+(421, 'Update', 'Company', 'The company is modified: AMERICAN LIGHTING & SIGNALIZATION, LLC.', '::1', '2026-03-11 00:38:08', 27),
+(422, 'Add', 'Estimate Note Item', 'The estimate note item is added: test', '::1', '2026-03-11 00:54:07', 27),
+(423, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-11 00:54:11', 27);
 
 -- --------------------------------------------------------
 
@@ -30732,7 +30748,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (22, '1148.02', 'BP02020', '', 'WINDY HILL BOULEVARD', 'WINDY HILL BOULEVARD', NULL, 'CITY OF SMYRNA', '159944-01', 529111.75, 0, 'COBB', 0, '', 0, '2024-08-10', '2025-03-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 15:04:04', '2025-04-22 19:12:53', NULL, 17, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (23, '019-45', 'ERS05070', '', 'White Sulphur Road  Realignment Project', 'White Sulphur Road', NULL, 'Hall County Board of Comm', '50446-9754', 731972.72, 0, 'Hall', 0, '', 0, '2024-08-01', '2025-07-02', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 18:11:30', '2025-08-08 13:49:07', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (25, '0013809', 'CMES60005', 'B1CBA2402186-0', 'BRIDGE CONSTRUCTION ON SR 14 COVER CSX RAILROAD', 'BRIDGE CONSTRUCTION ON SR 14 COVER CSX RAILROAD', NULL, 'GDOT', '24030', 445588.50, 1, 'Fulton', 0, '', 0, '2024-08-03', '2027-09-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-04 19:59:12', '2025-04-22 19:49:26', NULL, 26, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', 'Lakeview Road Bridge', 'Lakeview Road Bridge', 'undefined', 'Gwinnett County Tax Commission', '50445', 181776.25, 0, 'Gwinnett', 0, 'Carlos', 0, '2024-08-13', '2025-03-01', NULL, '', 1, 'undefined', 'undefined', NULL, 8.00, 6, 'month', 1, 10.00, 5.00, 50.00, '2024-10-09 13:21:47', '2026-03-08 15:54:20', '2026-01-23 21:36:11', 5, 13, NULL, 32, NULL, 1, 14, 0.00),
+(28, 'F-1251-01 & M-1238-31', 'ERS05071', 'BL079-24', 'Lakeview Road Bridge', 'Lakeview Road Bridge', 'undefined', 'Gwinnett County Tax Commission', '50445', 181776.25, 0, 'Gwinnett', 0, 'Carlos', 0, '2024-08-13', '2025-03-01', NULL, '', 1, 'undefined', 'undefined', NULL, 8.00, 6, 'month', 1, 10.00, 5.00, 50.00, '2024-10-09 13:21:47', '2026-03-11 00:33:13', '2026-01-23 21:36:11', 5, 13, NULL, 32, NULL, 1, 14, 0.00),
 (29, 'M006298', 'ERS05072', '', 'I-285 RESURFACING', 'I-285 RESURFACING', NULL, 'GDOT', '60385', 80243.62, 1, 'Cobb Fulton', 1, '', 1, '2024-08-19', '2025-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-09 18:14:26', '2025-09-17 12:26:39', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (30, '0015656', 'ERS05073', '', 'Clotfelter Road Bridge', 'Clotfelter Road Bridge', NULL, 'GDOT', '60386', 15462.16, 1, 'Oconee', 0, '', 1, '2023-01-30', '2025-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-10 14:51:15', '2025-09-18 13:33:26', NULL, 5, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (31, '0011434', 'SCR16010', 'B3TIA2202312-0', 'Cusseta Road GDOT Project 0011434', 'Cusseta Road Roundabout', NULL, 'GDOT', '2117004', 1814416.50, 1, 'Muscogee', 0, '', 0, '2024-08-12', '2026-03-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-10 15:29:42', '2025-09-25 16:56:08', NULL, 37, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -31462,7 +31478,7 @@ INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
 (115, 22, 12),
 (128, 23, 13),
 (55, 25, 8),
-(636, 28, 14),
+(637, 28, 14),
 (148, 29, 15),
 (149, 30, 16),
 (152, 31, 17),
@@ -34846,7 +34862,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (3078, 12.000000, 12.00, 'equation', NULL, NULL, 1, 0, NULL, 513, 311, 41, 0, NULL),
 (3079, 1.000000, 1.00, 'equation', NULL, NULL, 1, 0, NULL, 2, 420, 23, 0, NULL),
 (3080, 1.000000, 1.00, 'none', NULL, NULL, 0, 0, NULL, 2, 847, NULL, 0, NULL),
-(3081, 5.000000, 124.00, 'equation', 0.000000, NULL, 0, 1, '2025-10-09 15:54:20', 28, 848, 38, 0, 0),
+(3081, 5.000000, 124.00, 'equation', 0.000000, NULL, 0, 1, '2025-10-09 00:33:13', 28, 848, 38, 0, 0),
 (3082, 1.000000, -1800.00, 'none', NULL, NULL, 1, 0, NULL, 513, 602, NULL, 0, NULL),
 (3083, 15.000000, 1.00, 'none', NULL, NULL, 1, 0, NULL, 2, 849, NULL, 0, NULL),
 (3086, 150.000000, 10.00, 'equation', NULL, NULL, 1, 0, NULL, 28, 417, 11, 1, 1),
@@ -36850,7 +36866,8 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2052, 'Yes', '2026-03-07', 3),
 (2053, 'Yes', '2026-03-08', 28),
 (2054, 'Change prevailing labor types, old values: Laborer ($0)', '2026-03-08', 28),
-(2055, 'Change prevailing labor types, old values: Laborer ($10)', '2026-03-08', 28);
+(2055, 'Change prevailing labor types, old values: Laborer ($10)', '2026-03-08', 28),
+(2056, 'Change prevailing labor types, old values: Laborer ($10)', '2026-03-11', 28);
 
 -- --------------------------------------------------------
 
@@ -36873,7 +36890,8 @@ INSERT INTO `project_prevailing_role` (`id`, `project_id`, `role_id`, `rate`) VA
 (2, 525, 1, 11.96),
 (8, 2, 1, 0.00),
 (9, 2, 4, 0.00),
-(11, 28, 1, 10.00);
+(12, 28, 1, 10.00),
+(13, 28, 5, 90.00);
 
 -- --------------------------------------------------------
 
@@ -42874,13 +42892,13 @@ ALTER TABLE `estimate_estimator`
 -- AUTO_INCREMENT de la tabla `estimate_note_item`
 --
 ALTER TABLE `estimate_note_item`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1031;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1034;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -42904,7 +42922,7 @@ ALTER TABLE `estimate_quote_items`
 -- AUTO_INCREMENT de la tabla `estimate_quote_item_note`
 --
 ALTER TABLE `estimate_quote_item_note`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `function`
@@ -42964,7 +42982,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=418;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=424;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -43036,7 +43054,7 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_county`
 --
 ALTER TABLE `project_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=637;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=638;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -43054,13 +43072,13 @@ ALTER TABLE `project_item_history`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2056;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2057;
 
 --
 -- AUTO_INCREMENT de la tabla `project_prevailing_role`
 --
 ALTER TABLE `project_prevailing_role`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `project_price_adjustment`

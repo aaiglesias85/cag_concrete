@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 10-03-2026 a las 01:47:07
+-- Tiempo de generación: 11-03-2026 a las 01:22:18
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -531,7 +531,8 @@ CREATE TABLE `estimate_estimator` (
 
 CREATE TABLE `estimate_note_item` (
   `id` int(11) NOT NULL,
-  `description` varchar(255) DEFAULT NULL
+  `description` text,
+  `type` varchar(20) NOT NULL DEFAULT 'item'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
