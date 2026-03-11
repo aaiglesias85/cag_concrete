@@ -5383,6 +5383,9 @@ var Projects = (function () {
                rate: rate,
                posicion: prevailing_roles_array.length,
             });
+            actualizarTableListaPrevailingRoles();
+            resetFormPrevailingRole();
+            // Mantener el modal abierto para poder agregar más labor types
          } else {
             var pos = nEditingRowPrevailingRole;
             if (prevailing_roles_array[pos]) {
@@ -5390,10 +5393,10 @@ var Projects = (function () {
                prevailing_roles_array[pos].role_description = role_description;
                prevailing_roles_array[pos].rate = rate;
             }
+            actualizarTableListaPrevailingRoles();
+            resetFormPrevailingRole();
+            ModalUtil.hide('modal-prevailing-role');
          }
-         actualizarTableListaPrevailingRoles();
-         resetFormPrevailingRole();
-         ModalUtil.hide('modal-prevailing-role');
       });
 
       $(document).off('click', '#prevailing-roles-table-editable a.edit');
