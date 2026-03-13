@@ -895,6 +895,9 @@ var Projects = (function () {
       var vendor_id = $('#concrete-vendor').val();
       formData.set('vendor_id', vendor_id);
 
+      var concrete_start_date = FlatpickrUtil.getString('datetimepicker-concrete-start-date');
+      formData.set('concrete_start_date', concrete_start_date);
+
       var concrete_quote_price_escalator = NumberUtil.getNumericValue('#concrete_quote_price_escalator');
       formData.set('concrete_quote_price_escalator', concrete_quote_price_escalator);
 
@@ -1154,6 +1157,10 @@ var Projects = (function () {
 
          $('#concrete-vendor').val(project.vendor_id);
          $('#concrete-vendor').trigger('change');
+
+         if (project.concrete_start_date && project.concrete_start_date !== '') {
+            FlatpickrUtil.setDate('datetimepicker-concrete-start-date', project.concrete_start_date);
+         }
 
          $('#concrete_quote_price_escalator').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
@@ -1459,6 +1466,11 @@ var Projects = (function () {
 
       // start date
       FlatpickrUtil.initDate('datetimepicker-start-date', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+      });
+
+      // concrete start date
+      FlatpickrUtil.initDate('datetimepicker-concrete-start-date', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
       });
 

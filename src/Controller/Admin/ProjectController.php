@@ -194,6 +194,7 @@ class ProjectController extends AbstractController
       $vendor_id = $request->get('vendor_id');
       $concrete_class_id = $request->get('concrete_class_id');
       $concrete_quote_price = $request->get('concrete_quote_price');
+      $concrete_start_date = $request->get('concrete_start_date');
       $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
       $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
       $concrete_time_period_unit = $request->get('concrete_time_period_unit');
@@ -260,6 +261,7 @@ class ProjectController extends AbstractController
                $vendor_id,
                $concrete_class_id,
                $concrete_quote_price,
+               $concrete_start_date,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,
                $concrete_time_period_unit,
@@ -305,6 +307,7 @@ class ProjectController extends AbstractController
                $vendor_id,
                $concrete_class_id,
                $concrete_quote_price,
+               $concrete_start_date,
                $concrete_quote_price_escalator,
                $concrete_time_period_every_n,
                $concrete_time_period_unit,

@@ -1366,6 +1366,7 @@ class ProjectService extends Base
          $arreglo_resultado['concrete_class_id'] = $entity->getConcreteClass() != null ? $entity->getConcreteClass()->getConcreteClassId() : '';
          $arreglo_resultado['concrete_vendor'] = $entity->getConcreteVendor() != null ? $entity->getConcreteVendor()->getName() : '';
          $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
+         $arreglo_resultado['concrete_start_date'] = $entity->getConcreteStartDate() != '' && $entity->getConcreteStartDate() !== null ? $entity->getConcreteStartDate()->format('m/d/Y') : '';
          $arreglo_resultado['concrete_quote_price_escalator'] = $entity->getConcreteQuotePriceEscalator() ?? '';
          $arreglo_resultado['concrete_time_period_every_n'] = $entity->getConcreteTimePeriodEveryN() ?? '';
          $arreglo_resultado['concrete_time_period_unit'] = $entity->getConcreteTimePeriodUnit() ?? '';
@@ -2105,6 +2106,7 @@ class ProjectService extends Base
       $vendor_id,
       $concrete_class_id,
       $concrete_quote_price,
+      $concrete_start_date,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
       $concrete_time_period_unit,
@@ -2353,6 +2355,27 @@ class ProjectService extends Base
             $entity->setDueDate($due_date);
          }
 
+         // concrete start date
+         $concrete_start_date_old = $entity->getConcreteStartDate() != '' && $entity->getConcreteStartDate() !== null ? $entity->getConcreteStartDate()->format('m/d/Y') : '';
+         if ($concrete_start_date === '' || $concrete_start_date === null) {
+            if ($concrete_start_date_old !== '') {
+               $notas[] = [
+                  'notes' => 'Change concrete start date, old value: ' . $concrete_start_date_old,
+                  'date' => new \DateTime()
+               ];
+            }
+            $entity->setConcreteStartDate(null);
+         } else {
+            if ($concrete_start_date != $concrete_start_date_old) {
+               $notas[] = [
+                  'notes' => 'Change concrete start date, old value: ' . $concrete_start_date_old,
+                  'date' => new \DateTime()
+               ];
+            }
+
+            $dateConcreteStart = \DateTime::createFromFormat('m/d/Y', $concrete_start_date);
+            $entity->setConcreteStartDate($dateConcreteStart);
+         }
 
          // conc vendor
          $vendor_id_old = $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getVendorId() : "";
@@ -2562,6 +2585,7 @@ class ProjectService extends Base
       $vendor_id,
       $concrete_class_id,
       $concrete_quote_price,
+      $concrete_start_date,
       $concrete_quote_price_escalator,
       $concrete_time_period_every_n,
       $concrete_time_period_unit,
@@ -2630,6 +2654,11 @@ class ProjectService extends Base
       if ($due_date != '') {
          $due_date = \DateTime::createFromFormat('m/d/Y', $due_date);
          $entity->setDueDate($due_date);
+      }
+
+      if ($concrete_start_date != '') {
+         $date = \DateTime::createFromFormat('m/d/Y', $concrete_start_date);
+         $entity->setConcreteStartDate($date);
       }
 
       if ($vendor_id !== "") {

@@ -82,10 +82,13 @@ class Project
    #[ORM\Column(name: 'proposal_number', type: 'string', length: 255)]
    private ?string $proposalNumber;
 
-   #[ORM\Column(name: 'concrete_quote_price', type: 'float')]
+   #[ORM\Column(name: 'concrete_quote_price', type: 'float', nullable: true)]
    private ?float $concreteQuotePrice;
 
-   #[ORM\Column(name: 'concrete_quote_price_escalator', type: 'float')]
+   #[ORM\Column(name: 'concrete_start_date', type: 'date', nullable: true)]
+   private ?\DateTimeInterface $concreteStartDate;
+
+   #[ORM\Column(name: 'concrete_quote_price_escalator', type: 'float', nullable: true)]
    private ?float $concreteQuotePriceEscalator;
 
    #[ORM\Column(name: 'concrete_time_period_every_n', type: 'integer')]
@@ -158,6 +161,16 @@ class Project
    public function setCreatedAt(?\DateTimeInterface $createdAt): void
    {
       $this->createdAt = $createdAt;
+   }
+
+   public function getConcreteStartDate(): ?\DateTimeInterface
+   {
+      return $this->concreteStartDate;
+   }
+
+   public function setConcreteStartDate(?\DateTimeInterface $concreteStartDate): void
+   {
+      $this->concreteStartDate = $concreteStartDate;
    }
 
    public function getUpdatedAt(): ?\DateTimeInterface

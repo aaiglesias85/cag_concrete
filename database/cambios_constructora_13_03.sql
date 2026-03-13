@@ -1,0 +1,1 @@
+ALTER TABLE `project` ADD `concrete_start_date` DATE NULL AFTER `concrete_quote_price`;

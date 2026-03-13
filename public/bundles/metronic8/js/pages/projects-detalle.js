@@ -144,6 +144,8 @@ var ProjectsDetalle = (function () {
          $('#concrete-vendor-detalle').val(project.vendor_id);
          $('#concrete-vendor-detalle').trigger('change');
 
+         $('#concrete_start_date-detalle').val(project.concrete_start_date);
+
          $('#concrete_quote_price_escalator-detalle').val(MyApp.formatearNumero(project.concrete_quote_price_escalator, 2, '.', ','));
 
          $('#tp-every-n-detalle').val(project.concrete_time_period_every_n);
