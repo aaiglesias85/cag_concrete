@@ -5376,9 +5376,22 @@ var Projects = (function () {
             MyApp.showErrorMessageValidateSelect(KTUtil.get('select-prevailing-role-modal'), 'This field is required');
             return;
          }
+         // Validar que no se repita el mismo role_id en la lista (frontend)
+         var roleIdInt = parseInt(role_id, 10);
+         var existeDuplicado = prevailing_roles_array.some(function (r, index) {
+            // Si estamos editando, permitir el mismo índice
+            if (nEditingRowPrevailingRole !== null && index === nEditingRowPrevailingRole) {
+               return false;
+            }
+            return parseInt(r.role_id, 10) === roleIdInt;
+         });
+         if (existeDuplicado) {
+            toastr.error('This labor type has already been added.', '');
+            return;
+         }
          if (nEditingRowPrevailingRole == null) {
             prevailing_roles_array.push({
-               role_id: parseInt(role_id, 10),
+               role_id: roleIdInt,
                role_description: role_description,
                rate: rate,
                posicion: prevailing_roles_array.length,
@@ -5389,7 +5402,7 @@ var Projects = (function () {
          } else {
             var pos = nEditingRowPrevailingRole;
             if (prevailing_roles_array[pos]) {
-               prevailing_roles_array[pos].role_id = parseInt(role_id, 10);
+               prevailing_roles_array[pos].role_id = roleIdInt;
                prevailing_roles_array[pos].role_description = role_description;
                prevailing_roles_array[pos].rate = rate;
             }
