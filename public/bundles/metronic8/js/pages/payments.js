@@ -998,11 +998,29 @@ var Payments = (function () {
                var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
                var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (parseFloat(item.unpaid_qty) <= 0));
 
+               // Determinar si el ítem tiene notas para colorear el ícono
+               var hasNotes =
+                  item &&
+                  Array.isArray(item.notes) &&
+                  item.notes.length > 0;
+               var noteColorClass = hasNotes ? 'text-danger' : 'text-primary';
+
                if (isClosed) {
-                  return `<div class="d-flex align-items-center gap-2 w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span><a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
+                  return `<div class="d-flex align-items-center gap-2 w-100px">
+                           <span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span>
+                           <a href="javascript:void(0)" class="${noteColorClass} add-note-btn" title="Notes" data-position="${row.posicion}">
+                              <i class="ki-outline ki-message-text fs-2 ${noteColorClass}"></i>
+                           </a>
+                          </div>`;
                }
+
                let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" />`;
-               return `<div class="d-flex align-items-center gap-2 w-100px">${valueHtml}<a href="javascript:void(0)" class="text-primary add-note-btn" title="Notes" data-position="${row.posicion}"><i class="ki-outline ki-message-text fs-2 text-primary"></i></a></div>`;
+               return `<div class="d-flex align-items-center gap-2 w-100px">
+                        ${valueHtml}
+                        <a href="javascript:void(0)" class="${noteColorClass} add-note-btn" title="Notes" data-position="${row.posicion}">
+                           <i class="ki-outline ki-message-text fs-2 ${noteColorClass}"></i>
+                        </a>
+                       </div>`;
             },
          },
 
@@ -1551,6 +1569,24 @@ var Payments = (function () {
                         $('#manual-unpaid-qty').val('');
                         // Si no se ingresó valor en Notas, Paid Qty y Unpaid Qty permanecen sin cambios (no hacemos nada).
                         // =======================================================
+
+                        // Actualizar color del ícono de notas en la tabla principal en tiempo real
+                        if (nEditingRowPayment !== null && payments[nEditingRowPayment]) {
+                           var tieneNotas = Array.isArray(notes_item) && notes_item.length > 0;
+                           var $noteLink = $('#payments-table-editable a.add-note-btn').filter(function () {
+                              return $(this).attr('data-position') == nEditingRowPayment;
+                           });
+                           if ($noteLink.length > 0) {
+                              var $icon = $noteLink.find('i.ki-outline.ki-message-text');
+                              if (tieneNotas) {
+                                 $noteLink.removeClass('text-primary').addClass('text-danger');
+                                 $icon.removeClass('text-primary').addClass('text-danger');
+                              } else {
+                                 $noteLink.removeClass('text-danger').addClass('text-primary');
+                                 $icon.removeClass('text-danger').addClass('text-primary');
+                              }
+                           }
+                        }
                      } else {
                         toastr.error(response.error, '');
                      }
@@ -1633,6 +1669,24 @@ var Payments = (function () {
          notes_item.splice(posicion, 1);
          for (var i = 0; i < notes_item.length; i++) notes_item[i].posicion = i;
          actualizarTableListaNotesItem();
+         // Actualizar notas en memoria global del ítem y el icono en la tabla principal en tiempo real
+         if (nEditingRowPayment !== null && payments[nEditingRowPayment]) {
+            payments[nEditingRowPayment].notes = notes_item;
+            var hasNotes = Array.isArray(notes_item) && notes_item.length > 0;
+            var $noteLink = $('#payments-table-editable a.add-note-btn').filter(function () {
+               return $(this).attr('data-position') == nEditingRowPayment;
+            });
+            if ($noteLink.length > 0) {
+               var $icon = $noteLink.find('i.ki-outline.ki-message-text');
+               if (hasNotes) {
+                  $noteLink.removeClass('text-primary').addClass('text-danger');
+                  $icon.removeClass('text-primary').addClass('text-danger');
+               } else {
+                  $noteLink.removeClass('text-danger').addClass('text-primary');
+                  $icon.removeClass('text-danger').addClass('text-primary');
+               }
+            }
+         }
       }
    };
 
