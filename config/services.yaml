@@ -7,6 +7,8 @@ parameters:
    locale: 'es'
    mailer_sender_address: '%env(MAILER_SENDER_ADDRESS)%'
    mailer_from_name: '%env(MAILER_FROM_NAME)%'
+   mailer_quotes_sender_address: '%env(MAILER_QUOTES_SENDER_ADDRESS)%'
+   mailer_quotes_from_name: '%env(MAILER_QUOTES_FROM_NAME)%'
    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
    recaptcha_publick_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
    recaptcha_private_key: '%env(GOOGLE_RECAPTCHA_SECRET)%'
@@ -69,6 +71,22 @@ services:
          $pushNotificationService: '@App\Service\PushNotificationService'
          $httpClient: '@http_client'
          $projectDir: '%kernel.project_dir%'
+
+   App\Utils\Admin\EstimateService:
+      arguments:
+         $mailerQuotes: '@mailer.quotes'
+
+   # Transport y mailer específicos para quotes, usando MAILER_QUOTES_DSN directamente
+   mailer.quotes_transport:
+      class: Symfony\Component\Mailer\Transport\TransportInterface
+      factory: ['Symfony\Component\Mailer\Transport', 'fromDsn']
+      arguments:
+         - '%env(MAILER_QUOTES_DSN)%'
+
+   mailer.quotes:
+      class: Symfony\Component\Mailer\Mailer
+      arguments:
+         $transport: '@mailer.quotes_transport'
 
    # add more service definitions when explicit configuration is needed
    # please note that last definitions always *replace* previous ones

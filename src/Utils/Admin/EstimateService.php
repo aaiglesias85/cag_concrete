@@ -39,13 +39,31 @@ use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 
 class EstimateService extends Base
 {
+
+   private MailerInterface $mailerQuotes;
+
+   public function __construct(
+      ContainerInterface    $container,
+      MailerInterface       $mailer,
+      ContainerBagInterface $containerBag,
+      Security              $security,
+      LoggerInterface       $logger,
+      MailerInterface       $mailerQuotes
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+      $this->mailerQuotes = $mailerQuotes;
+   }
 
    /**
     * EliminarCompany: Elimina un company en la BD
@@ -311,8 +329,8 @@ class EstimateService extends Base
       $ids = array_filter($ids, function ($id) { return $id !== '' && is_numeric($id); });
       $enviados = 0;
       $errores = [];
-      $fromAddress = $this->getParameter('mailer_sender_address');
-      $fromName = $this->getParameter('mailer_from_name') ?? '';
+      $fromAddress = $this->getParameter('mailer_quotes_sender_address');
+      $fromName = $this->getParameter('mailer_quotes_from_name') ?? '';
 
       foreach ($ids as $quote_id) {
          $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
@@ -359,7 +377,7 @@ class EstimateService extends Base
                      'direccion_url' => $this->ObtenerURL(),
                   ])
                   ->attachFromPath($pdfPath, basename($pdfPath), 'application/pdf');
-               $this->mailer->send($mensaje);
+               $this->mailerQuotes->send($mensaje);
                $enviados++;
             } catch (\Throwable $e) {
                $errores[] = "Email to {$companyName} ({$email}): " . $e->getMessage();
