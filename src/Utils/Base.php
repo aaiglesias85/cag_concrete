@@ -1551,13 +1551,17 @@ class Base
          }
 
          $project_item_id = $value->getProjectItem()->getId();
+         $invoice_item_id = $value->getId();
          /** @var \App\Repository\ProjectItemHistoryRepository $historyRepo */
          $historyRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItemHistory::class);
          $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
          $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+         /** @var \App\Repository\InvoiceItemUnpaidQtyHistoryRepository $unpaidHistoryRepo */
+         $unpaidHistoryRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemUnpaidQtyHistory::class);
+         $has_unpaid_qty_history = $unpaidHistoryRepo->TieneHistorial($invoice_item_id);
 
          $payments[] = [
-            "invoice_item_id" => $value->getId(),
+            "invoice_item_id" => $invoice_item_id,
             "project_item_id" => $project_item_id,
 
             "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
@@ -1585,6 +1589,7 @@ class Base
             "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
             "has_quantity_history" => $has_quantity_history,
             "has_price_history" => $has_price_history,
+            "has_unpaid_qty_history" => $has_unpaid_qty_history,
             "notes" => $notes,
             "posicion" => $key
          ];

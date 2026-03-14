@@ -57,6 +57,10 @@ eliminarNotesItemPaymentAdmin:
    path: /payment/eliminarNotesItem
    defaults: { _controller: App\Controller\Admin\PaymentController::eliminarNotesItem, _format: json }
 
+listarHistorialUnpaidQtyItemPaymentAdmin:
+   path: /payment/listarHistorialUnpaidQtyItem
+   defaults: { _controller: App\Controller\Admin\PaymentController::listarHistorialUnpaidQtyItem, _format: json }
+
 paidInvoiceAdmin:
    path: /payment/paid
    defaults: { _controller: App\Controller\Admin\PaymentController::paid, _format: json }

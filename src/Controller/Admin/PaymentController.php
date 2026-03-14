@@ -464,6 +464,25 @@ class PaymentController extends AbstractController
    }
 
    /**
+    * listarHistorialUnpaidQtyItem Lista el historial de cambios de unpaid qty de un ítem (notas con override).
+    */
+   public function listarHistorialUnpaidQtyItem(Request $request)
+   {
+      $invoice_item_id = $request->get('invoice_item_id');
+
+      try {
+         $historial = $this->paymentService->ListarHistorialUnpaidQtyItem($invoice_item_id);
+         $resultadoJson['success'] = true;
+         $resultadoJson['historial'] = $historial;
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * eliminarNotesItem Acción que elimina un notes en la BD
     *
     */

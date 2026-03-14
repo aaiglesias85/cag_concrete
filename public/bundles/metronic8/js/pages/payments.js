@@ -352,7 +352,8 @@ var Payments = (function () {
       $(document).on('click', '#form-payment .wizard-tab', function (e) {
          e.preventDefault();
          var item = $(this).data('item');
-         if (item > activeTab && !validWizard()) {
+         var skipValidation = paymentFormReadOnly;
+         if (item > activeTab && !skipValidation && !validWizard()) {
             mostrarTab();
             return;
          }
@@ -371,6 +372,9 @@ var Payments = (function () {
          if (activeTab == totalTabs) {
             $('.btn-wizard-finalizar').removeClass('hide');
             $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+         }
+         if (paymentFormReadOnly) {
+            aplicarBotonesWizardReadOnly();
          }
          marcarPasosValidosWizard();
          switch (activeTab) {
@@ -391,6 +395,12 @@ var Payments = (function () {
 
       $(document).off('click', '#btn-wizard-siguiente');
       $(document).on('click', '#btn-wizard-siguiente', function (e) {
+         if (paymentFormReadOnly) {
+            activeTab++;
+            mostrarTab();
+            aplicarBotonesWizardReadOnly();
+            return;
+         }
          if (validWizard()) {
             activeTab++;
             $('#btn-wizard-anterior').removeClass('hide');
@@ -404,6 +414,11 @@ var Payments = (function () {
       $(document).off('click', '#btn-wizard-anterior');
       $(document).on('click', '#btn-wizard-anterior', function (e) {
          activeTab--;
+         if (paymentFormReadOnly) {
+            mostrarTab();
+            aplicarBotonesWizardReadOnly();
+            return;
+         }
          if (activeTab == 1) {
             $('#btn-wizard-anterior').addClass('hide');
          }
@@ -413,6 +428,22 @@ var Payments = (function () {
          }
          mostrarTab();
       });
+   };
+
+   var aplicarBotonesWizardReadOnly = function () {
+      if (!paymentFormReadOnly) return;
+      $('.btn-wizard-finalizar').addClass('hide');
+      $('.cerrar-form-payment').prop('disabled', false).removeClass('hide');
+      if (activeTab === 1) {
+         $('#btn-wizard-anterior').addClass('hide');
+         $('#btn-wizard-siguiente').prop('disabled', false).removeClass('hide');
+      } else if (activeTab === totalTabs) {
+         $('#btn-wizard-anterior').prop('disabled', false).removeClass('hide');
+         $('#btn-wizard-siguiente').addClass('hide');
+      } else {
+         $('#btn-wizard-anterior').prop('disabled', false).removeClass('hide');
+         $('#btn-wizard-siguiente').prop('disabled', false).removeClass('hide');
+      }
    };
 
    var mostrarTab = function () {
@@ -539,6 +570,10 @@ var Payments = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-payment');
       $(document).on('click', '.cerrar-form-payment', function (e) {
+         if (paymentFormReadOnly) {
+            cerrarFormsConfirmated();
+            return;
+         }
          btnClickSalvarForm(true);
       });
    };
@@ -552,6 +587,8 @@ var Payments = (function () {
    };
 
    var event_change = false;
+   var paymentFormReadOnly = false;
+
    var initAccionChange = function () {
       $(document).off('change', '.event-change');
       $(document).on('change', '.event-change', function (e) {
@@ -564,6 +601,7 @@ var Payments = (function () {
    };
 
    var cerrarFormsConfirmated = function () {
+      paymentFormReadOnly = false;
       resetForms();
       $('#form-payment').addClass('hide');
       $('#lista-payment').removeClass('hide');
@@ -622,21 +660,26 @@ var Payments = (function () {
             BlockUtil.unblock('#form-payment-body');
 
             if (isReadOnly) {
-               // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario
+               paymentFormReadOnly = true;
+               // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario (no los enlaces del wizard)
                $('#form-payment').find('input, select, textarea, button').prop('disabled', true);
 
-               // 2. Ocultar botones de guardar específicamente
-               $('#btn-salvar-invoice, #btn-save-changes, #btn-wizard-siguiente, .btn-wizard-finalizar').addClass('hide');
+               // 2. Ocultar solo botones de guardar y finalizar; Next/Back se muestran según tab en aplicarBotonesWizardReadOnly
+               $('#btn-salvar-invoice, #btn-save-changes, .btn-wizard-finalizar').addClass('hide');
 
-               // 3. Asegurar que los botones de cerrar/cancelar sigan funcionando y visibles
-               $('.cerrar-form-payment, #btn-wizard-anterior').prop('disabled', false).removeClass('hide');
+               // 3. Tab 1: Back oculto, Next visible y habilitado; Exit siempre visible
+               aplicarBotonesWizardReadOnly();
 
-               // 4. Deshabilitar clicks en la tabla de items (para que no abran modales internos)
+               // 4. Habilitar las pestañas del wizard para poder cambiar de tab en modo solo lectura
+               $('#form-payment .wizard-tab').css('pointer-events', 'auto').prop('tabIndex', 0);
+
+               // 5. Deshabilitar clicks en la tabla de items (para que no abran modales internos)
                $('#payments-table-editable').find('a, input').addClass('disabled').prop('disabled', true).css('pointer-events', 'none');
 
                // Título visual para saber que es modo vista
                KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'View Payment: #' + invoice.number + ' (Read Only)';
             } else {
+               paymentFormReadOnly = false;
                // Asegurar que los botones de guardar sean visibles si es edición normal
                $('#btn-salvar-invoice').removeClass('hide');
                // Habilitar todo por si acaso venía de un view
@@ -1005,9 +1048,18 @@ var Payments = (function () {
                   item.notes.length > 0;
                var noteColorClass = hasNotes ? 'text-danger' : 'text-primary';
 
+               var unpaidHistoryIcon = '';
+               if (row.has_unpaid_qty_history && !row.isGroupHeader && row.invoice_item_id) {
+                  unpaidHistoryIcon =
+                     '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer unpaid-qty-history-icon" style="cursor: pointer; display: inline-block; flex-shrink: 0;" data-invoice-item-id="' +
+                     row.invoice_item_id +
+                     '" title="View unpaid qty history"></i>';
+               }
+
                if (isClosed) {
-                  return `<div class="d-flex align-items-center gap-2 w-100px">
+                  return `<div class="d-flex align-items-center gap-2" style="min-width: 150px;">
                            <span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span>
+                           ${unpaidHistoryIcon}
                            <a href="javascript:void(0)" class="${noteColorClass} add-note-btn" title="Notes" data-position="${row.posicion}">
                               <i class="ki-outline ki-message-text fs-2 ${noteColorClass}"></i>
                            </a>
@@ -1015,8 +1067,9 @@ var Payments = (function () {
                }
 
                let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" />`;
-               return `<div class="d-flex align-items-center gap-2 w-100px">
+               return `<div class="d-flex align-items-center gap-2" style="min-width: 150px;">
                         ${valueHtml}
+                        ${unpaidHistoryIcon}
                         <a href="javascript:void(0)" class="${noteColorClass} add-note-btn" title="Notes" data-position="${row.posicion}">
                            <i class="ki-outline ki-message-text fs-2 ${noteColorClass}"></i>
                         </a>
@@ -1096,6 +1149,7 @@ var Payments = (function () {
             handleChangeOrderHistory();
             handleQuantityHistory();
             handlePriceHistory();
+            handleUnpaidQtyHistory();
          },
          footerCallback: function (row, data, start, end, display) {
             const api = this.api();
@@ -1120,6 +1174,7 @@ var Payments = (function () {
       handleChangeOrderHistory();
       handleQuantityHistory();
       handlePriceHistory();
+      handleUnpaidQtyHistory();
    };
 
    var handleSearchDatatablePayments = function () {
@@ -1161,6 +1216,52 @@ var Payments = (function () {
             cargarHistorialChangeOrder(project_item_id, 'update_price');
          }
       });
+   };
+
+   var handleUnpaidQtyHistory = function () {
+      $(document).off('click', '#payments-table-editable .unpaid-qty-history-icon');
+      $(document).on('click', '#payments-table-editable .unpaid-qty-history-icon', function (e) {
+         e.preventDefault();
+         e.stopPropagation();
+         var invoice_item_id = $(this).data('invoice-item-id');
+         if (invoice_item_id) {
+            cargarHistorialUnpaidQty(invoice_item_id);
+         }
+      });
+   };
+
+   var cargarHistorialUnpaidQty = function (invoice_item_id) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      axios
+         .get('payment/listarHistorialUnpaidQtyItem', { params: { invoice_item_id: invoice_item_id }, responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var historial = response.historial || [];
+                  var html = '';
+                  if (historial.length === 0) {
+                     html = '<div class="alert alert-info">No unpaid qty change history available for this item.</div>';
+                  } else {
+                     html = '<ul class="list-unstyled">';
+                     historial.forEach(function (item) {
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                     });
+                     html += '</ul>';
+                  }
+                  $('#modal-change-order-history .modal-body').html(html);
+                  ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+               } else {
+                  toastr.error(response.error || 'Error loading history', '');
+               }
+            }
+         })
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
    };
 
    var cargarHistorialChangeOrder = function (project_item_id, filterType) {
@@ -1553,6 +1654,7 @@ var Payments = (function () {
 
                         // Regla: Si se ingresó Override Unpaid Qty en Notas, solo sobrescribir Unpaid Qty; Paid Qty no se modifica.
                         var valorManual = parseFloat($('#manual-unpaid-qty').val());
+                        var seGuardoOverride = overrideUnpaidQty !== '' && overrideUnpaidQty !== undefined && !isNaN(valorManual);
                         if (!isNaN(valorManual) && nEditingRowPayment !== null && payments[nEditingRowPayment]) {
                            payments[nEditingRowPayment].unpaid_qty = valorManual;
                            var $inputUnpaid = $('#payments-table-editable input.unpaid_qty').filter(function () {
@@ -1564,6 +1666,10 @@ var Payments = (function () {
                               setTimeout(function () {
                                  $inputUnpaid.removeClass('bg-light-success');
                               }, 1000);
+                           }
+                           if (seGuardoOverride) {
+                              payments[nEditingRowPayment].has_unpaid_qty_history = true;
+                              actualizarTableListaPayments();
                            }
                         }
                         $('#manual-unpaid-qty').val('');

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 13-03-2026 a las 17:32:48
+-- Tiempo de generación: 13-03-2026 a las 23:37:34
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -806,6 +806,21 @@ CREATE TABLE `invoice_item_notes` (
   `date` date DEFAULT NULL,
   `invoice_item_id` int(11) DEFAULT NULL,
   `override_unpaid_qty` decimal(18,6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_item_unpaid_qty_history`
+--
+
+CREATE TABLE `invoice_item_unpaid_qty_history` (
+  `id` int(11) NOT NULL,
+  `invoice_item_id` int(11) NOT NULL,
+  `old_value` decimal(18,6) DEFAULT NULL,
+  `new_value` decimal(18,6) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -2382,6 +2397,14 @@ ALTER TABLE `invoice_item_notes`
   ADD KEY `Refinvoice_item_notes1` (`invoice_item_id`);
 
 --
+-- Indices de la tabla `invoice_item_unpaid_qty_history`
+--
+ALTER TABLE `invoice_item_unpaid_qty_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `invoice_item_id` (`invoice_item_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indices de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -2899,6 +2922,12 @@ ALTER TABLE `invoice_item_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `invoice_item_unpaid_qty_history`
+--
+ALTER TABLE `invoice_item_unpaid_qty_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `invoice_notes`
 --
 ALTER TABLE `invoice_notes`
@@ -3321,6 +3350,13 @@ ALTER TABLE `invoice_item`
 --
 ALTER TABLE `invoice_item_notes`
   ADD CONSTRAINT `Refinvoice_item_notes1` FOREIGN KEY (`invoice_item_id`) REFERENCES `invoice_item` (`id`);
+
+--
+-- Filtros para la tabla `invoice_item_unpaid_qty_history`
+--
+ALTER TABLE `invoice_item_unpaid_qty_history`
+  ADD CONSTRAINT `invoice_item_unpaid_qty_history_ibfk_1` FOREIGN KEY (`invoice_item_id`) REFERENCES `invoice_item` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `invoice_item_unpaid_qty_history_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL;
 
 --
 -- Filtros para la tabla `invoice_notes`

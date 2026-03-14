@@ -7,11 +7,14 @@ use App\Entity\InvoiceNotes;
 use App\Entity\Project;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemUnpaidQtyHistory;
 
 use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectItemHistory;
 use App\Repository\InvoiceAttachmentRepository;
+use App\Repository\InvoiceItemNotesRepository;
 use App\Repository\InvoiceItemRepository;
+use App\Repository\InvoiceItemUnpaidQtyHistoryRepository;
 use App\Repository\InvoiceNotesRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
@@ -115,6 +118,8 @@ class PaymentService extends Base
          $entity->setNotes($notes);
          if ($override_unpaid_qty !== null && $override_unpaid_qty !== '') {
             $entity->setOverrideUnpaidQty((float) $override_unpaid_qty);
+            // Registrar historial de cambio de unpaid qty (cantidad anterior -> nueva)
+            $this->RegistrarHistorialUnpaidQty($invoice_item_entity, (float) $override_unpaid_qty);
          }
 
          $log_operacion = "Add";
@@ -150,6 +155,79 @@ class PaymentService extends Base
       }
 
       return $resultado;
+   }
+
+   /**
+    * Obtiene el unpaid qty efectivo actual para un invoice item (misma lógica que listado Payments: quantity_final - paid_qty o override de la nota más reciente).
+    */
+   private function ObtenerUnpaidQtyEfectivoActual(InvoiceItem $invoice_item_entity): float
+   {
+      $quantity = (float) ($invoice_item_entity->getQuantity() ?? 0);
+      $quantity_brought_forward = (float) ($invoice_item_entity->getQuantityBroughtForward() ?? 0);
+      $paid_qty = (float) ($invoice_item_entity->getPaidQty() ?? 0);
+      $quantity_final = $quantity + $quantity_brought_forward;
+      $unpaid_effective = max(0.0, $quantity_final - $paid_qty);
+
+      $notes = $this->ListarNotesDeItemInvoice($invoice_item_entity->getId());
+      foreach ($notes as $note) {
+         if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+            $unpaid_effective = (float) $note['override_unpaid_qty'];
+            break;
+         }
+      }
+      return $unpaid_effective;
+   }
+
+   /**
+    * Registra en historial el cambio de unpaid qty cuando se guarda una nota con override.
+    */
+   private function RegistrarHistorialUnpaidQty(InvoiceItem $invoice_item_entity, float $new_value): void
+   {
+      $old_value = $this->ObtenerUnpaidQtyEfectivoActual($invoice_item_entity);
+      if ($old_value == $new_value) {
+         return;
+      }
+      $em = $this->getDoctrine()->getManager();
+      $history = new InvoiceItemUnpaidQtyHistory();
+      $history->setInvoiceItem($invoice_item_entity);
+      $history->setOldValue((string) $old_value);
+      $history->setNewValue((string) $new_value);
+      $history->setCreatedAt(new \DateTime());
+      $history->setUser($this->getUser());
+      $em->persist($history);
+   }
+
+   /**
+    * ListarHistorialUnpaidQtyItem: Lista el historial de cambios de unpaid qty de un InvoiceItem (para Payments).
+    * @param int $invoice_item_id
+    * @return array
+    */
+   public function ListarHistorialUnpaidQtyItem($invoice_item_id): array
+   {
+      $historial = [];
+      /** @var InvoiceItemUnpaidQtyHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
+      $lista = $historyRepo->ListarHistorialDeItem((int) $invoice_item_id);
+
+      foreach ($lista as $value) {
+         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+         $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
+         $old_value_raw = $value->getOldValue();
+         $new_value_raw = $value->getNewValue();
+         $old_value = $old_value_raw !== null && $old_value_raw !== '' ? number_format((float) $old_value_raw, 2, '.', ',') : $old_value_raw;
+         $new_value = $new_value_raw !== null && $new_value_raw !== '' ? number_format((float) $new_value_raw, 2, '.', ',') : $new_value_raw;
+         $mensaje = "{$fecha} Updated unpaid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+
+         $historial[] = [
+            'id' => $value->getId(),
+            'mensaje' => $mensaje,
+            'fecha' => $value->getCreatedAt()->format('m/d/Y'),
+            'user_name' => $user_name,
+            'old_value' => $old_value,
+            'new_value' => $new_value,
+         ];
+      }
+      return $historial;
    }
 
    /**
