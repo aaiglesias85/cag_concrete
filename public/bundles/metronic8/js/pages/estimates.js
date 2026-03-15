@@ -586,12 +586,20 @@ var Estimates = (function () {
       var result = true;
       if (activeTab == 1) {
          var stage_id = $('#project-stage').val();
+         var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
+         var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
 
-         if (!validateForm() || stage_id == '') {
+         if (!validateForm() || stage_id == '' || projectStart == '' || projectEnd == '') {
             result = false;
 
             if (stage_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
+            }
+            if (projectStart == '') {
+               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
+            }
+            if (projectEnd == '') {
+               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
             }
          }
       }
@@ -650,8 +658,10 @@ var Estimates = (function () {
       event_change = false;
 
       var stage_id = $('#project-stage').val();
+      var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
+      var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
 
-      var isValid = validateForm() && stage_id !== '';
+      var isValid = validateForm() && stage_id !== '' && projectStart !== '' && projectEnd !== '';
 
       if (closeForm && !isValid) {
          cerrarFormsConfirmated();
@@ -663,6 +673,12 @@ var Estimates = (function () {
       } else {
          if (stage_id === '') {
             MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
+         }
+         if (projectStart === '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
+         }
+         if (projectEnd === '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
          }
       }
    };
