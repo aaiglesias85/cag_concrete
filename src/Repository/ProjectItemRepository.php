@@ -123,7 +123,8 @@ class ProjectItemRepository extends ServiceEntityRepository
       ?string $inspector_id = '',
       ?string $status = '',
       ?string $fecha_inicial = '',
-      ?string $fecha_fin = ''
+      ?string $fecha_fin = '',
+      bool $missing_info = false
    ): array {
       $qb = $this->createQueryBuilder('p_i')
          ->leftJoin('p_i.project', 'p')
@@ -132,6 +133,24 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->leftJoin('p.inspector', 'i')
          ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
          ->leftJoin('p_c.county', 'county');
+
+      // Filtrar por proyectos con información faltante (solo campos requeridos del tab General + Prevailing Wage + Escalator)
+      if ($missing_info) {
+         $qb->andWhere('(
+            p.company IS NULL OR
+            (p.projectNumber IS NULL OR p.projectNumber = \'\') OR
+            (p.subcontract IS NULL OR p.subcontract = \'\') OR
+            (p.name IS NULL OR p.name = \'\') OR
+            (p.owner IS NULL OR p.owner = \'\') OR
+            (p.projectIdNumber IS NULL OR p.projectIdNumber = \'\') OR
+            (p.description IS NULL OR p.description = \'\') OR
+            p.status IS NULL OR
+            p.endDate IS NULL OR
+            p.prevailingWage IS NULL OR
+            p.concreteQuotePriceEscalator IS NULL OR
+            NOT EXISTS (SELECT pc FROM App\Entity\ProjectCounty pc WHERE pc.project = p)
+         )');
+      }
 
       // Filtro por búsqueda
       if (!empty($sSearch)) {
@@ -204,7 +223,7 @@ class ProjectItemRepository extends ServiceEntityRepository
     *
     * @return int
     */
-   public function TotalProjects(?string $sSearch, ?string $company_id = '', ?string $inspector_id = '', ?string $status = '', ?string $fecha_inicial = '', ?string $fecha_fin = ''): int
+   public function TotalProjects(?string $sSearch, ?string $company_id = '', ?string $inspector_id = '', ?string $status = '', ?string $fecha_inicial = '', ?string $fecha_fin = '', bool $missing_info = false): int
    {
       $qb = $this->createQueryBuilder('p_i')
          ->select('COUNT(DISTINCT p.projectId)') // Contar proyectos únicos
@@ -214,6 +233,24 @@ class ProjectItemRepository extends ServiceEntityRepository
          ->leftJoin('p.inspector', 'i')
          ->leftJoin('App\Entity\ProjectCounty', 'p_c', 'WITH', 'p_c.project = p.projectId')
          ->leftJoin('p_c.county', 'county');
+
+      // Filtrar por proyectos con información faltante (solo campos requeridos del tab General + Prevailing Wage + Escalator)
+      if ($missing_info) {
+         $qb->andWhere('(
+            p.company IS NULL OR
+            (p.projectNumber IS NULL OR p.projectNumber = \'\') OR
+            (p.subcontract IS NULL OR p.subcontract = \'\') OR
+            (p.name IS NULL OR p.name = \'\') OR
+            (p.owner IS NULL OR p.owner = \'\') OR
+            (p.projectIdNumber IS NULL OR p.projectIdNumber = \'\') OR
+            (p.description IS NULL OR p.description = \'\') OR
+            p.status IS NULL OR
+            p.endDate IS NULL OR
+            p.prevailingWage IS NULL OR
+            p.concreteQuotePriceEscalator IS NULL OR
+            NOT EXISTS (SELECT pc FROM App\Entity\ProjectCounty pc WHERE pc.project = p)
+         )');
+      }
 
       // Filtro por búsqueda
       if (!empty($sSearch)) {

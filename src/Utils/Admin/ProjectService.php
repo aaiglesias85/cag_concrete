@@ -3211,7 +3211,8 @@ class ProjectService extends Base
       $company_id,
       $status,
       $fecha_inicial,
-      $fecha_fin
+      $fecha_fin,
+      $missing_info = false
    ) {
       $arreglo_resultado = array();
       $cont = 0;
@@ -3231,7 +3232,8 @@ class ProjectService extends Base
             '',
             $status,
             $fecha_inicial,
-            $fecha_fin
+            $fecha_fin,
+            $missing_info
          );
          foreach ($lista as $p_i) {
             $projects[] = $p_i->getProject();
@@ -3251,7 +3253,8 @@ class ProjectService extends Base
                '',
                $status,
                $fecha_inicial,
-               $fecha_fin
+               $fecha_fin,
+               $missing_info
             );
          }
       } else {
@@ -3267,7 +3270,8 @@ class ProjectService extends Base
             '',
             $status,
             $fecha_inicial,
-            $fecha_fin
+            $fecha_fin,
+            $missing_info
          );
       }
 
@@ -3307,16 +3311,16 @@ class ProjectService extends Base
     * @param string $sSearch Para buscar
     * @author Marcel
     */
-   public function TotalProjects($sSearch, $company_id, $status, $fecha_inicial, $fecha_fin)
+   public function TotalProjects($sSearch, $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info = false)
    {
       if ($sSearch != '') {
          /** @var ProjectItemRepository $projectItemRepo */
          $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
-         $total = $projectItemRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
+         $total = $projectItemRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin, $missing_info);
       } else {
          /** @var ProjectRepository $projectRepo */
          $projectRepo = $this->getDoctrine()->getRepository(Project::class);
-         $total = $projectRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin);
+         $total = $projectRepo->TotalProjects($sSearch, $company_id, '', $status, $fecha_inicial, $fecha_fin, $missing_info);
       }
 
 

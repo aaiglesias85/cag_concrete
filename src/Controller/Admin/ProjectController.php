@@ -119,7 +119,7 @@ class ProjectController extends AbstractController
          $status = $request->get('status');
          $fecha_inicial = $request->get('fechaInicial');
          $fecha_fin = $request->get('fechaFin');
-
+         $missing_info = $request->get('missing_info') ? true : false;
 
          $data = $this->projectService->ListarProjects(
             $dt['start'],
@@ -130,10 +130,11 @@ class ProjectController extends AbstractController
             $company_id,
             $status,
             $fecha_inicial,
-            $fecha_fin
+            $fecha_fin,
+            $missing_info
          );
 
-         $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin);
+         $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info);
 
          $resultadoJson = [
             'draw'            => $dt['draw'],

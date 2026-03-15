@@ -15,6 +15,7 @@ var Projects = (function () {
                status: $('#filtro-status').val(),
                fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
                fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+               missing_info: $('#filtro-missing-info').is(':checked') ? 1 : 0,
             });
          },
          method: 'post',
@@ -399,6 +400,8 @@ var Projects = (function () {
 
       FlatpickrUtil.clear('datetimepicker-desde');
       FlatpickrUtil.clear('datetimepicker-hasta');
+
+      $('#filtro-missing-info').prop('checked', false);
 
       oTable.search('').draw();
    };
