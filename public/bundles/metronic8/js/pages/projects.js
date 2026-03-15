@@ -477,7 +477,6 @@ var Projects = (function () {
       // prevailing wage - limpiar campos
       $('#prevailing-wage').prop('checked', false);
       $('#prevailing-wage-fields').hide();
-      $('#prevailing-county').val('').trigger('change');
       prevailing_roles_array = [];
       actualizarTableListaPrevailingRoles();
       NumberUtil.setFormattedValue('#bon-general', '', { decimals: 2 });
@@ -579,7 +578,7 @@ var Projects = (function () {
                actualizarTableListaAjustesPrecio();
                break;
             case 5:
-               poblarPrevailingCounties();
+               poblarPrevailingCountyModal();
                actualizarTableListaPrevailingRoles();
                break;
             case 6:
@@ -674,7 +673,7 @@ var Projects = (function () {
                break;
             case 5:
                $('#tab-prevailing-wage').tab('show');
-               poblarPrevailingCounties();
+               poblarPrevailingCountyModal();
                actualizarTableListaPrevailingRoles();
                break;
             case 6:
@@ -925,11 +924,8 @@ var Projects = (function () {
       var prevailing_wage = $('#prevailing-wage').prop('checked') ? 1 : 0;
       formData.set('prevailing_wage', prevailing_wage);
 
-      var prevailing_county_id = $('#prevailing-county').val();
-      formData.set('prevailing_county_id', prevailing_county_id || '');
-
       var prevailing_roles = prevailing_roles_array.map(function (r) {
-         return { role_id: r.role_id, rate: r.rate };
+         return { county_id: r.county_id, role_id: r.role_id, rate: r.rate };
       });
       formData.set('prevailing_roles', JSON.stringify(prevailing_roles));
 
@@ -1232,18 +1228,10 @@ var Projects = (function () {
             $('#prevailing-wage-fields').hide();
          }
 
-         // Primero poblar el dropdown de counties (esto se hace automáticamente con el trigger de change en county)
-         // Luego establecer el valor seleccionado después de que se haya poblado el dropdown
-         setTimeout(function () {
-            poblarPrevailingCounties();
-            if (project.prevailing_county_id) {
-               $('#prevailing-county').val(project.prevailing_county_id);
-               $('#prevailing-county').trigger('change');
-            }
-         }, 200);
-
          prevailing_roles_array = (project.prevailing_roles || []).map(function (r, i) {
             return {
+               county_id: r.county_id,
+               county_description: r.county_description || '',
                role_id: r.role_id,
                role_description: r.role_description || '',
                rate: r.rate,
@@ -5233,47 +5221,36 @@ var Projects = (function () {
          .catch(function (error) {});
    };
 
-   var poblarPrevailingCounties = function () {
+   // Llena el select de County del modal (Prevailing Wage) con los counties seleccionados en el tab General
+   var poblarPrevailingCountyModal = function () {
       var county_ids = $('#county').val();
-      var $prevailingCountySelect = $('#prevailing-county');
+      var $target = $('#prevailing-county-modal');
       var $countySelect = $('#county');
 
-      // Guardar el valor actualmente seleccionado en Prevailing Wage
-      var currentSelectedValue = $prevailingCountySelect.val();
-
-      // Limpiar opciones actuales excepto "Select"
-      $prevailingCountySelect.html('<option value="">Select</option>');
+      var currentSelectedValue = $target.val();
+      $target.html('<option value="">Select</option>');
 
       if (!county_ids || county_ids.length === 0) {
-         // Si no hay counties seleccionados, limpiar también el valor seleccionado
-         $prevailingCountySelect.val('').trigger('change');
+         $target.val('').trigger('change');
          return;
       }
 
-      // Si county_ids es un array, usar directamente; si es string, convertir
       if (typeof county_ids === 'string') {
          county_ids = [county_ids];
       }
 
       var currentSelectedStillAvailable = false;
-
-      // Agregar solo los condados que están seleccionados en el paso 1
       $countySelect.find('option').each(function () {
          var countyId = $(this).val();
          var countyName = $(this).text();
-
-         // Verificar si este condado está en la lista de seleccionados
          if (countyId) {
             var countyIdInt = parseInt(countyId);
             var isSelected = county_ids.some(function (id) {
                return parseInt(id) === countyIdInt || id === countyId;
             });
-
             if (isSelected) {
                var $option = $('<option></option>').attr('value', countyId).text(countyName);
-               $prevailingCountySelect.append($option);
-
-               // Verificar si el valor actualmente seleccionado aún está disponible
+               $target.append($option);
                if (currentSelectedValue && (countyId == currentSelectedValue || parseInt(countyId) === parseInt(currentSelectedValue))) {
                   currentSelectedStillAvailable = true;
                }
@@ -5281,23 +5258,14 @@ var Projects = (function () {
          }
       });
 
-      // Si el valor previamente seleccionado ya no está disponible, limpiarlo
       if (currentSelectedValue && !currentSelectedStillAvailable) {
-         $prevailingCountySelect.val('').trigger('change');
+         $target.val('').trigger('change');
       } else if (currentSelectedValue && currentSelectedStillAvailable) {
-         // Mantener el valor seleccionado si aún está disponible
-         $prevailingCountySelect.val(currentSelectedValue).trigger('change');
+         $target.val(currentSelectedValue).trigger('change');
       } else {
-         // Solo trigger change para actualizar el select2
-         $prevailingCountySelect.trigger('change');
+         $target.trigger('change');
       }
    };
-
-   // Listener para actualizar el dropdown de Prevailing Wage cuando cambien los condados en el paso 1
-   $(document).on('change', '#county', function () {
-      // Siempre actualizar el dropdown cuando cambien los counties, sin importar el tab actual
-      poblarPrevailingCounties();
-   });
 
    // Función para mostrar/ocultar los campos de Prevailing Wage según el checkbox
    var togglePrevailingWageFields = function () {
@@ -5321,10 +5289,10 @@ var Projects = (function () {
 
    var initTablePrevailingRoles = function () {
       var table = '#prevailing-roles-table-editable';
-      var columns = [{ data: 'role_description' }, { data: 'rate' }, { data: null }];
+      var columns = [{ data: 'county_description' }, { data: 'role_description' }, { data: 'rate' }, { data: null }];
       var columnDefs = [
          {
-            targets: 1,
+            targets: 2,
             className: 'text-end',
             render: function (data, type, row) {
                return '<span>' + MyApp.formatMoney(data) + '</span>';
@@ -5372,6 +5340,8 @@ var Projects = (function () {
 
    var resetFormPrevailingRole = function () {
       MyUtil.resetForm('prevailing-role-form');
+      $('#prevailing-county-modal').val('');
+      $('#prevailing-county-modal').trigger('change');
       $('#prevailing-role-modal').val('');
       $('#prevailing-role-modal').trigger('change');
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('prevailing-role-form'));
@@ -5382,7 +5352,9 @@ var Projects = (function () {
       $(document).off('click', '#btn-agregar-prevailing-role');
       $(document).on('click', '#btn-agregar-prevailing-role', function (e) {
          resetFormPrevailingRole();
+         poblarPrevailingCountyModal();
          if (typeof $().select2 !== 'undefined') {
+            $('#prevailing-county-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
             $('#prevailing-role-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
          }
          ModalUtil.show('modal-prevailing-role', { backdrop: 'static', keyboard: true });
@@ -5391,29 +5363,36 @@ var Projects = (function () {
       $(document).off('click', '#btn-salvar-prevailing-role');
       $(document).on('click', '#btn-salvar-prevailing-role', function (e) {
          e.preventDefault();
+         var county_id = $('#prevailing-county-modal').val();
+         var county_description = $('#prevailing-county-modal option:selected').text();
          var role_id = $('#prevailing-role-modal').val();
          var role_description = $('#prevailing-role-modal option:selected').text();
          var rate = NumberUtil.getNumericValue('#prevailing-rate-modal');
          if (rate !== rate) rate = null;
+         if (!county_id || county_id === '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-prevailing-county-modal'), 'This field is required');
+            return;
+         }
          if (!role_id || role_id === '') {
             MyApp.showErrorMessageValidateSelect(KTUtil.get('select-prevailing-role-modal'), 'This field is required');
             return;
          }
-         // Validar que no se repita el mismo role_id en la lista (frontend)
+         var countyIdInt = parseInt(county_id, 10);
          var roleIdInt = parseInt(role_id, 10);
          var existeDuplicado = prevailing_roles_array.some(function (r, index) {
-            // Si estamos editando, permitir el mismo índice
             if (nEditingRowPrevailingRole !== null && index === nEditingRowPrevailingRole) {
                return false;
             }
-            return parseInt(r.role_id, 10) === roleIdInt;
+            return parseInt(r.county_id, 10) === countyIdInt && parseInt(r.role_id, 10) === roleIdInt;
          });
          if (existeDuplicado) {
-            toastr.error('This labor type has already been added.', '');
+            toastr.error('This County and Labor Type combination has already been added.', '');
             return;
          }
          if (nEditingRowPrevailingRole == null) {
             prevailing_roles_array.push({
+               county_id: countyIdInt,
+               county_description: county_description,
                role_id: roleIdInt,
                role_description: role_description,
                rate: rate,
@@ -5421,10 +5400,11 @@ var Projects = (function () {
             });
             actualizarTableListaPrevailingRoles();
             resetFormPrevailingRole();
-            // Mantener el modal abierto para poder agregar más labor types
          } else {
             var pos = nEditingRowPrevailingRole;
             if (prevailing_roles_array[pos]) {
+               prevailing_roles_array[pos].county_id = countyIdInt;
+               prevailing_roles_array[pos].county_description = county_description;
                prevailing_roles_array[pos].role_id = roleIdInt;
                prevailing_roles_array[pos].role_description = role_description;
                prevailing_roles_array[pos].rate = rate;
@@ -5441,9 +5421,13 @@ var Projects = (function () {
          if (prevailing_roles_array[posicion]) {
             resetFormPrevailingRole();
             nEditingRowPrevailingRole = posicion;
+            poblarPrevailingCountyModal();
             if (typeof $().select2 !== 'undefined') {
+               $('#prevailing-county-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
                $('#prevailing-role-modal').select2({ dropdownParent: $('#modal-prevailing-role'), width: '100%' });
             }
+            $('#prevailing-county-modal').val(prevailing_roles_array[posicion].county_id);
+            $('#prevailing-county-modal').trigger('change');
             $('#prevailing-role-modal').val(prevailing_roles_array[posicion].role_id);
             $('#prevailing-role-modal').trigger('change');
             NumberUtil.setFormattedValue('#prevailing-rate-modal', prevailing_roles_array[posicion].rate, { decimals: 2 });

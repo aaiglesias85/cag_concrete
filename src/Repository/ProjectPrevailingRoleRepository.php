@@ -22,6 +22,7 @@ class ProjectPrevailingRoleRepository extends ServiceEntityRepository
    {
       $consulta = $this->createQueryBuilder('p_r')
          ->leftJoin('p_r.project', 'p')
+         ->leftJoin('p_r.county', 'c')
          ->leftJoin('p_r.role', 'r');
 
       if ($project_id != '') {
@@ -29,7 +30,7 @@ class ProjectPrevailingRoleRepository extends ServiceEntityRepository
             ->setParameter('project_id', $project_id);
       }
 
-      $consulta->orderBy('r.description', "ASC");
+      $consulta->orderBy('c.description', 'ASC')->addOrderBy('r.description', 'ASC');
 
       return $consulta->getQuery()->getResult();
    }

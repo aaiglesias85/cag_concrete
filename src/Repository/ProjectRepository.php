@@ -162,25 +162,6 @@ class ProjectRepository extends ServiceEntityRepository
    }
 
    /**
-    * ListarProjectsDePrevailingCounty: Lista los projects de un prevailing county
-    *
-    * @return Project[]
-    */
-   public function ListarProjectsDePrevailingCounty($prevailing_county_id)
-   {
-      $qb = $this->createQueryBuilder('p')
-         ->leftJoin('p.prevailingCounty', 'p_c')
-         ->orderBy('p.projectId', 'ASC');
-
-      if (!empty($prevailing_county_id)) {
-         $qb->andWhere('p_c.countyId = :prevailing_county_id')
-            ->setParameter('prevailing_county_id', $prevailing_county_id);
-      }
-
-      return $qb->getQuery()->getResult();
-   }
-
-   /**
     * ListarProjects: Lista los projects con filtros y paginación
     * @param int $start Inicio
     * @param int $limit Limite

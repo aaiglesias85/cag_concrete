@@ -169,14 +169,7 @@ class CountyService extends Base
          $em->remove($projectCounty);
       }
 
-
-      // projects prevailing county
-      /** @var ProjectRepository $projectRepository */
-      $projectRepository = $this->getDoctrine()->getRepository(Project::class);
-      $projects = $projectRepository->ListarProjectsDePrevailingCounty($county_id);
-      foreach ($projects as $project) {
-         $project->setPrevailingCounty(null);
-      }
+      // project_prevailing_role con county_id se eliminan por ON DELETE CASCADE al borrar el county
    }
 
 

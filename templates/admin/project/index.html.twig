@@ -878,25 +878,13 @@
                      </div>
                      <div id="prevailing-wage-fields" style="display: none;">
                         <div class="form-group ic-form-group">
-                           <div class="row">
-                              <div class="col-md-4" id="select-prevailing-county">
-                                 <label class="form-label">
-                                    <span class="ic-step-number">2</span>
-                                    County
-                                 </label>
-                                 <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="prevailing-county" name="prevailing_county_id">
-                                    <option value="">Select</option>
-                                 </select>
-                              </div>
-                           </div>
-                        </div>
-                        <div class="form-group ic-form-group">
                            <div class="row mb-3">
                               <div class="col-md-12">
                                  <label class="form-label">
-                                    <span class="ic-step-number">3</span>
-                                    Labor Types & Rate
+                                    <span class="ic-step-number">2</span>
+                                    Counties & Labor Types & Rate
                                  </label>
+                                 <p class="form-text text-muted">Add one or more County; for each County add Labor Types with their Rate.</p>
                               </div>
                            </div>
                            <div class="row" id="lista-prevailing-roles">
@@ -920,6 +908,7 @@
                                  <table id="prevailing-roles-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                                     <thead>
                                        <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                          <th>County</th>
                                           <th>Labor Type</th>
                                           <th>Rate</th>
                                           <th>Actions</th>
@@ -2271,22 +2260,11 @@
                      </div>
                      <div id="prevailing-wage-fields-detalle" style="display: none;">
                         <div class="form-group ic-form-group">
-                           <div class="row">
-                              <div class="col-md-4" id="select-prevailing-county">
-                                 <label class="form-label">
-                                    <span class="ic-step-number">2</span>
-                                    County
-                                 </label>
-                                 <input type="text" class="form-control form-control-solid" id="prevailing-county-detalle" disabled />
-                              </div>
-                           </div>
-                        </div>
-                        <div class="form-group ic-form-group">
                            <div class="row mb-3">
                               <div class="col-md-12">
                                  <label class="form-label">
-                                    <span class="ic-step-number">3</span>
-                                    Labor Types & Rate
+                                    <span class="ic-step-number">2</span>
+                                    Counties & Labor Types & Rate
                                  </label>
                               </div>
                            </div>
@@ -2303,6 +2281,7 @@
                                  <table id="prevailing-roles-table-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                                     <thead>
                                        <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                          <th>County</th>
                                           <th>Labor Type</th>
                                           <th>Rate</th>
                                        </tr>
@@ -3282,21 +3261,30 @@
    </div>
 </div>
 
-<!-- prevailing role (labor type + rate) -->
+<!-- prevailing role (county + labor type + rate) -->
 <div class="modal fade" id="modal-prevailing-role" tabindex="-1" role="dialog" aria-labelledby="modalPrevailingRoleLabel">
    <div class="modal-dialog" role="document">
       <div class="modal-content">
          <div class="modal-header">
-            <h5 class="modal-title">Labor Type & Rate</h5>
+            <h5 class="modal-title">County & Labor Type & Rate</h5>
             <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
          <div class="modal-body">
             <form class="m-form" id="prevailing-role-form" action="#" enctype="multipart/form-data" method="post">
-               <div class="form-group ic-form-group" id="select-prevailing-role-modal">
+               <div class="form-group ic-form-group" id="select-prevailing-county-modal">
                   <label class="form-label required">
                      <span class="ic-step-number">1</span>
+                     County
+                  </label>
+                  <select id="prevailing-county-modal" class="form-control form-select form-select2 select-validate form-select-solid">
+                     <option value="">Select</option>
+                  </select>
+               </div>
+               <div class="form-group ic-form-group" id="select-prevailing-role-modal">
+                  <label class="form-label required">
+                     <span class="ic-step-number">2</span>
                      Labor Type
                   </label>
                   <select id="prevailing-role-modal" class="form-control form-select form-select2 select-validate form-select-solid">
@@ -3308,7 +3296,7 @@
                </div>
                <div class="form-group ic-form-group">
                   <label class="form-label required">
-                     <span class="ic-step-number">2</span>
+                     <span class="ic-step-number">3</span>
                      Rate
                   </label>
                   <div class="input-group input-group-solid">

@@ -206,7 +206,6 @@ class ProjectController extends AbstractController
       $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
 
       $prevailing_wage = $request->get('prevailing_wage');
-      $prevailing_county_id = $request->get('prevailing_county_id');
       $prevailing_roles = $request->get('prevailing_roles');
 
       // items
@@ -271,7 +270,6 @@ class ProjectController extends AbstractController
                $retainage_adjustment_percentage,
                $retainage_adjustment_completion,
                $prevailing_wage,
-               $prevailing_county_id,
                $prevailing_roles
             );
          } else {
@@ -317,7 +315,6 @@ class ProjectController extends AbstractController
                $retainage_adjustment_percentage,
                $retainage_adjustment_completion,
                $prevailing_wage,
-               $prevailing_county_id,
                $prevailing_roles
             );
          }

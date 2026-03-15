@@ -1377,18 +1377,19 @@ class ProjectService extends Base
          $arreglo_resultado['retainage_adjustment_completion'] = $entity->getRetainageAdjustmentCompletion() ?? '';
 
          $arreglo_resultado['prevailing_wage'] = $entity->getPrevailingWage();
-         $arreglo_resultado['prevailing_county_id'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getCountyId() : '';
-         $arreglo_resultado['prevailing_county'] = $entity->getPrevailingCounty() != null ? $entity->getPrevailingCounty()->getDescription() : '';
 
-         // Cargar prevailing roles con rate desde la tabla intermedia
+         // Cargar prevailing roles (county + labor type + rate) desde project_prevailing_role
          /** @var ProjectPrevailingRoleRepository $projectPrevailingRoleRepo */
          $projectPrevailingRoleRepo = $this->getDoctrine()->getRepository(ProjectPrevailingRole::class);
          $projectPrevailingRoles = $projectPrevailingRoleRepo->ListarRolesDeProject($project_id);
          $prevailing_roles = [];
          foreach ($projectPrevailingRoles as $projectPrevailingRole) {
             $role = $projectPrevailingRole->getRole();
+            $county = $projectPrevailingRole->getCounty();
             if ($role !== null) {
                $prevailing_roles[] = [
+                  'county_id' => $county !== null ? $county->getCountyId() : '',
+                  'county_description' => $county !== null ? $county->getDescription() : '',
                   'role_id' => $role->getRoleId(),
                   'role_description' => $role->getDescription(),
                   'rate' => $projectPrevailingRole->getRate()
@@ -2115,7 +2116,6 @@ class ProjectService extends Base
       $retainage_adjustment_percentage,
       $retainage_adjustment_completion,
       $prevailing_wage,
-      $prevailing_county_id,
       $prevailing_roles
    ) {
       $em = $this->getDoctrine()->getManager();
@@ -2482,25 +2482,6 @@ class ProjectService extends Base
          }
          $entity->setPrevailingWage($prevailing_wage);
 
-         $prevailingCountyOld = $entity->getPrevailingCounty();
-         $prevailingCountyOldId = $prevailingCountyOld != null ? $prevailingCountyOld->getCountyId() : null;
-         if ($prevailing_county_id != $prevailingCountyOldId) {
-            $oldValue = $prevailingCountyOld != null ? $prevailingCountyOld->getDescription() : 'None';
-            $notas[] = [
-               'notes' => 'Change prevailing county, old value: ' . $oldValue,
-               'date' => new \DateTime()
-            ];
-         }
-
-         // Buscar y establecer el objeto County
-         if ($prevailing_county_id != '') {
-            $prevailing_county = $this->getDoctrine()->getRepository(County::class)
-               ->find($prevailing_county_id);
-            $entity->setPrevailingCounty($prevailing_county);
-         } else {
-            $entity->setPrevailingCounty(null);
-         }
-
          $entity->setUpdatedAt(new \DateTime());
 
          // counties
@@ -2594,7 +2575,6 @@ class ProjectService extends Base
       $retainage_adjustment_percentage,
       $retainage_adjustment_completion,
       $prevailing_wage,
-      $prevailing_county_id,
       $prevailing_roles
    ) {
       $em = $this->getDoctrine()->getManager();
@@ -2711,11 +2691,6 @@ class ProjectService extends Base
 
 
       $entity->setPrevailingWage($prevailing_wage);
-      if ($prevailing_county_id != '') {
-         $prevailing_county = $this->getDoctrine()->getRepository(County::class)
-            ->find($prevailing_county_id);
-         $entity->setPrevailingCounty($prevailing_county);
-      }
 
       $entity->setCreatedAt(new \DateTime());
 
@@ -2937,8 +2912,10 @@ class ProjectService extends Base
          $role_descriptions_old = [];
          foreach ($projectPrevailingRoles_old as $projectPrevailingRole) {
             $role = $projectPrevailingRole->getRole();
+            $county = $projectPrevailingRole->getCounty();
+            $countyDesc = $county !== null ? $county->getDescription() : '';
             if ($role !== null) {
-               $role_descriptions_old[] = $role->getDescription() . ' ($' . ($projectPrevailingRole->getRate() ?? '') . ')';
+               $role_descriptions_old[] = $countyDesc . ' - ' . $role->getDescription() . ' ($' . ($projectPrevailingRole->getRate() ?? '') . ')';
             }
          }
          $result['old_descriptions'] = implode(', ', $role_descriptions_old);
@@ -2950,15 +2927,19 @@ class ProjectService extends Base
          $projectPrevailingRoleRepo->EliminarRolesDeProject($entity->getProjectId());
       }
 
-      // Agregar nuevos roles con rate
+      // Agregar nuevos roles (county_id + role_id + rate)
+      $countyRepo = $this->getDoctrine()->getRepository(County::class);
       foreach ($prevailing_roles as $item) {
+         $county_id = is_object($item) ? ($item->county_id ?? null) : ($item['county_id'] ?? null);
          $role_id = is_object($item) ? ($item->role_id ?? null) : ($item['role_id'] ?? null);
          $rate = is_object($item) ? ($item->rate ?? null) : ($item['rate'] ?? null);
-         if (!empty($role_id)) {
+         if (!empty($role_id) && !empty($county_id)) {
+            $county = $countyRepo->find($county_id);
             $role = $roleRepo->find($role_id);
-            if ($role !== null) {
+            if ($county !== null && $role !== null) {
                $projectPrevailingRole = new ProjectPrevailingRole();
                $projectPrevailingRole->setProject($entity);
+               $projectPrevailingRole->setCounty($county);
                $projectPrevailingRole->setRole($role);
                $valRate = ($rate !== '' && $rate !== null) ? (float)$rate : null;
                $projectPrevailingRole->setRate($valRate);

@@ -17,6 +17,10 @@ class ProjectPrevailingRole
    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: false, onDelete: "CASCADE")]
    private ?Project $project;
 
+   #[ORM\ManyToOne(targetEntity: "App\Entity\County")]
+   #[ORM\JoinColumn(name: "county_id", referencedColumnName: "county_id", nullable: true, onDelete: "CASCADE")]
+   private ?County $county;
+
    #[ORM\ManyToOne(targetEntity: "App\Entity\EmployeeRole")]
    #[ORM\JoinColumn(name: "role_id", referencedColumnName: "role_id", nullable: false, onDelete: "CASCADE")]
    private ?EmployeeRole $role;
@@ -37,6 +41,16 @@ class ProjectPrevailingRole
    public function setProject(?Project $project): void
    {
       $this->project = $project;
+   }
+
+   public function getCounty(): ?County
+   {
+      return $this->county;
+   }
+
+   public function setCounty(?County $county): void
+   {
+      $this->county = $county;
    }
 
    public function getRole(): ?EmployeeRole

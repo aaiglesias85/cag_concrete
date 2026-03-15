@@ -216,7 +216,6 @@ var ProjectsDetalle = (function () {
          } else {
             $('#prevailing-wage-fields-detalle').hide();
          }
-         $('#prevailing-county-detalle').val(project.prevailing_county || '');
          prevailing_roles_detalle = project.prevailing_roles && Array.isArray(project.prevailing_roles) ? project.prevailing_roles : [];
          actualizarTableListaPrevailingRolesDetalle();
       }
@@ -852,10 +851,10 @@ var ProjectsDetalle = (function () {
          $(table).DataTable().destroy();
       }
 
-      var columns = [{ data: 'role_description' }, { data: 'rate' }];
+      var columns = [{ data: 'county_description' }, { data: 'role_description' }, { data: 'rate' }];
       var columnDefs = [
          {
-            targets: 1,
+            targets: 2,
             className: 'text-end',
             render: function (data, type, row) {
                return '<span>' + MyApp.formatMoney(data) + '</span>';
