@@ -964,11 +964,12 @@ var Schedules = (function () {
       return valid;
    };
 
-   //Cerrar form
+   //Cerrar form: mostrar confirmación (guardar y cerrar / descartar y cerrar)
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-schedule');
       $(document).on('click', '.cerrar-form-schedule', function (e) {
-         cerrarForms();
+         e.preventDefault();
+         ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
       });
    };
    //Cerrar forms
@@ -976,12 +977,11 @@ var Schedules = (function () {
       if (!event_change) {
          cerrarFormsConfirmated();
       } else {
-         // mostar modal
          ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
       }
    };
 
-   //Eventos change
+   //Eventos change y botones del modal de salida
    var event_change = false;
    var initAccionChange = function () {
       $(document).off('change', '.event-change');
@@ -989,8 +989,16 @@ var Schedules = (function () {
          event_change = true;
       });
 
-      $(document).off('click', '#btn-save-changes');
-      $(document).on('click', '#btn-save-changes', function (e) {
+      $(document).off('click', '#btn-exit-save-and-close');
+      $(document).on('click', '#btn-exit-save-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
+         $('#btn-salvar-schedule').trigger('click');
+      });
+      $(document).off('click', '#btn-exit-discard-and-close');
+      $(document).on('click', '#btn-exit-discard-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
          cerrarFormsConfirmated();
       });
    };

@@ -422,7 +422,8 @@ var ConcreteClass = (function () {
    var initAccionCerrar = function () {
       $(document).off('click', '.cerrar-form-concrete-class');
       $(document).on('click', '.cerrar-form-concrete-class', function (e) {
-         btnClickSalvarForm(true);
+         e.preventDefault();
+         ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
       });
    };
    //Cerrar forms
@@ -430,7 +431,6 @@ var ConcreteClass = (function () {
       if (!event_change) {
          cerrarFormsConfirmated();
       } else {
-         // mostar modal
          ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
       }
    };
@@ -448,8 +448,16 @@ var ConcreteClass = (function () {
          event_change = true;
       });
 
-      $(document).off('click', '#btn-save-changes');
-      $(document).on('click', '#btn-save-changes', function (e) {
+      $(document).off('click', '#btn-exit-save-and-close');
+      $(document).on('click', '#btn-exit-save-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
+         btnClickSalvarForm(true);
+      });
+      $(document).off('click', '#btn-exit-discard-and-close');
+      $(document).on('click', '#btn-exit-discard-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
          cerrarFormsConfirmated();
       });
    };

@@ -88,8 +88,7 @@
                                     id="btn-nuevo-perfil"
                                     class="btn btn-success me-2"
                             >
-                                <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span
-                                            class="path3"></span><span class="path4"></span></i>
+                     <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                 <span class="kt-hidden-mobile font-weight-bold">New</span>
                             </button>
                             {% endif %}
@@ -101,8 +100,7 @@
                                     id="btn-eliminar-perfil"
                                     class="btn btn-danger me-2 hide"
                             >
-                                <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span
-                                            class="path3"></span><span class="path4"></span></i>
+                     <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                 <span class="kt-hidden-mobile font-weight-bold">Delete</span>
                             </button>
                             {% endif %}
@@ -116,7 +114,7 @@
                                 <!--begin::Export dropdown-->
                                 <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
                                         data-kt-menu-placement="bottom-end">
-                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">Export</span>
                                 </button>
 
@@ -203,14 +201,8 @@
                         <h3 class="card-label">New profile:</h3>
                     </div>
                     <div class="card-toolbar">
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-perfil me-2">
-
-                            <i class="ki-duotone ki-arrow-left fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-
-                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
+                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-perfil me-2" title="Back" data-bs-toggle="tooltip">
+                  <i class="ki-duotone ki-arrow-left fs-1"><span class="path1"></span><span class="path2"></span></i>
                         </a>
 
                         {% if permiso.agregar or permiso.editar %}
@@ -223,7 +215,7 @@
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                 </i>
-                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                               
                             </button>
                         {% endif %}
                     </div>

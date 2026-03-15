@@ -79,12 +79,8 @@
                             {% if permiso.agregar %}
                                 <button
                                         type="button"
-                                        id="btn-nuevo-equation"
-                                        class="btn btn-success me-2"
-                                >
-                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span
-                                                class="path2"></span><span
-                                                class="path3"></span><span class="path4"></span></i>
+                                        id="btn-nuevo-equation" class="btn btn-success me-2">
+                     <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">New</span>
                                 </button>
                             {% endif %}
@@ -93,12 +89,8 @@
                             {% if permiso.eliminar %}
                                 <button
                                         type="button"
-                                        id="btn-eliminar-equation"
-                                        class="btn btn-danger me-2 hide"
-                                >
-                                    <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span
-                                                class="path2"></span><span
-                                                class="path3"></span><span class="path4"></span></i>
+                                        id="btn-eliminar-equation" class="btn btn-danger me-2 hide">
+                     <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">Delete</span>
                                 </button>
                             {% endif %}
@@ -110,13 +102,10 @@
                                 <!--end::Export buttons-->
 
                                 <!--begin::Export dropdown-->
-                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
-                                        data-kt-menu-placement="bottom-end">
-                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
-                                                class="path2"></span></i>
+                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">Export</span>
                                 </button>
-
                                 <!--begin::Menu-->
                                 <div id="equation_export_menu"
                                      class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
@@ -206,28 +195,25 @@
                     </div>
                     <div class="card-toolbar">
 
-                        <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
-                            <i class="la la-arrow-left me-2"></i>
-                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
-                        </button>
+                        <button id="btn-wizard-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-left"></i>
+               </button>
 
-                        <button id="btn-wizard-siguiente" class="btn btn-primary me-2 hide" type="button">
-                            <span class="kt-hidden-mobile font-weight-bold">Next</span>
-                            <i class="la la-arrow-right ms-2"></i>
-                        </button>
+                        <button id="btn-wizard-siguiente" class="btn btn-icon btn-primary me-2" type="button" title="Next" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-right"></i>
+               </button>
 
                         {% if permiso.agregar or permiso.editar %}
                             <button type="button" id="btn-wizard-finalizar"
-                                    class="btn btn-success me-2">
-                                <i class="la la-check"></i>
-                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                                    class="btn btn-icon btn-success me-2" title="Save" data-bs-toggle="tooltip">
+                                <i class="las la-save"></i>
+                               
                             </button>
                         {% endif %}
 
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-equation">
-                            <i class="la la-close"></i>
-                            <span class="kt-hidden-mobile font-weight-bold">Exit</span>
-                        </a>
+                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-equation" title="Exit" data-bs-toggle="tooltip">
+                  <i class="la la-close"></i>
+               </a>
                     </div>
                 </div>
 
@@ -394,7 +380,7 @@
                                 Pay Items
                             </h5>
 
-                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                                 <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                             </div>
 

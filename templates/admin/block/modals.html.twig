@@ -3,7 +3,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Delete</h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                     <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                 </div>
             </div>
@@ -25,7 +25,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Delete</h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                     <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                 </div>
             </div>
@@ -46,7 +46,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Confirmation</h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                     <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                 </div>
             </div>
@@ -65,49 +65,29 @@
     </div>
 </div>
 
-<!-- Modal Save Changes -->
-<div class="modal fade" id="modal-salvar-cambios" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<!-- Modal Exit: Save or discard changes -->
+<div class="modal fade" id="modal-salvar-cambios" tabindex="-1" role="dialog" aria-labelledby="modalExitLabel">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Save Changes</h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title" id="modalExitLabel">Close form</h5>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                     <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                 </div>
             </div>
             <div class="modal-body">
-
-                <!--begin::Alert-->
-                <div class="alert alert-danger d-flex align-items-center p-5">
-                    <!--begin::Icon-->
-                    <i class="ki-duotone ki-shield-tick fs-2hx text-danger me-4"><span class="path1"></span><span class="path2"></span></i>
-                    <!--end::Icon-->
-
-                    <!--begin::Wrapper-->
-                    <div class="d-flex flex-column">
-                        <!--begin::Title-->
-                        <h4 class="mb-1 text-danger">Warning</h4>
-                        <!--end::Title-->
-
-                        <!--begin::Content-->
-                        <span>Unsaved changes</span>
-                        <!--end::Content-->
-                    </div>
-                    <!--end::Wrapper-->
-                </div>
-                <!--end::Alert-->
-
-                <p>
-                    Changes have been generated in the information on the form.
-                </p>
-                <p>
-                    Are you sure you want to exit without saving changes?
+                <p class="mb-0">
+                    Do you want to save your changes before closing, or close and discard them?
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="btn-save-changes">Yes
+                <button type="button" class="btn btn-success" id="btn-exit-save-and-close" title="Save and close" data-bs-toggle="tooltip">
+                    Save and close
                 </button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-warning" id="btn-exit-discard-and-close" title="Discard and close" data-bs-toggle="tooltip">
+                    Discard and close
+                </button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip">Cancel</button>
             </div>
         </div>
     </div>
@@ -119,7 +99,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"></h5>
-                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                     <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
                 </div>
             </div>

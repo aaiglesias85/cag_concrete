@@ -102,10 +102,7 @@
                   <!--filter-->
                   <div>
                      <button type="button" class="btn btn-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                        <i class="ki-duotone ki-filter fs-2">
-                           <span class="path1"></span>
-                           <span class="path2"></span>
-                        </i>
+                        <i class="ki-duotone ki-filter fs-2"><span class="path1"></span><span class="path2"></span></i>
                         <span class="kt-hidden-mobile font-weight-bold">Filter</span>
                      </button>
                      <div id="filter-menu" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
@@ -276,26 +273,22 @@
                </h3>
             </div>
             <div class="card-toolbar">
-               <button id="btn-wizard-anterior" class="btn btn-warning me-2 hide" type="button">
-                  <i class="la la-arrow-left me-2"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
+               <button id="btn-wizard-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-left"></i>
                </button>
 
-               <button id="btn-wizard-siguiente" class="btn btn-primary me-2" type="button">
-                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
-                  <i class="la la-arrow-right ms-2"></i>
+               <button id="btn-wizard-siguiente" class="btn btn-icon btn-primary me-2" type="button" title="Next" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-right"></i>
                </button>
 
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-wizard-finalizar" class="btn btn-success me-2">
-                  <i class="la la-check"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Save</span>
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-icon btn-success me-2" title="Save" data-bs-toggle="tooltip">
+                  <i class="las la-save"></i>
                </button>
                {% endif %}
 
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking">
+               <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-data-tracking" title="Exit" data-bs-toggle="tooltip">
                   <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
                </a>
             </div>
          </div>
@@ -1024,17 +1017,16 @@
             <div class="card-toolbar">
                <button id="btn-wizard-anterior-detalle" class="btn btn-warning me-2 hide" type="button">
                   <i class="la la-arrow-left me-2"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Back</span>
+                 
                </button>
 
                <button id="btn-wizard-siguiente-detalle" class="btn btn-primary me-2" type="button">
-                  <span class="kt-hidden-mobile font-weight-bold">Next</span>
+                 
                   <i class="la la-arrow-right ms-2"></i>
                </button>
 
-               <a href="javascript:;" class="btn btn-secondary cerrar-form-data-tracking-detalle">
+               <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-data-tracking-detalle" title="Exit" data-bs-toggle="tooltip">
                   <i class="la la-close"></i>
-                  <span class="kt-hidden-mobile font-weight-bold">Exit</span>
                </a>
             </div>
          </div>
@@ -1682,7 +1674,7 @@
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title">Duplicate Measurement</h5>
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -1730,7 +1722,7 @@
                </span>
             </h5>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -1798,7 +1790,7 @@
          <div class="modal-header">
             <h5 class="modal-title">New Subcontract Item</h5>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -1879,7 +1871,7 @@
          <div class="modal-header">
             <h5 class="modal-title">New Employee</h5>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -1995,7 +1987,7 @@
          <div class="modal-header">
             <h5 class="modal-title">New Material</h5>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -2061,7 +2053,7 @@
          <div class="modal-header">
             <h5 class="modal-title">New Conc Vendor</h5>
 
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -2138,7 +2130,7 @@
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title">New Attachment</h5>
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
                <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
             </div>
          </div>
@@ -2205,7 +2197,7 @@
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title" id="myModalLabel">Change Order History</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip"></button>
          </div>
          <div class="modal-body">
             <div class="text-center">

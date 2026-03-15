@@ -81,12 +81,8 @@
                             {% if permiso.agregar %}
                                 <button
                                         type="button"
-                                        id="btn-nuevo-project-type"
-                                        class="btn btn-success me-2"
-                                >
-                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span
-                                                class="path2"></span><span
-                                                class="path3"></span><span class="path4"></span></i>
+                                        id="btn-nuevo-project-type" class="btn btn-success me-2">
+                     <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">New</span>
                                 </button>
                             {% endif %}
@@ -95,12 +91,8 @@
                             {% if permiso.eliminar %}
                                 <button
                                         type="button"
-                                        id="btn-eliminar-project-type"
-                                        class="btn btn-danger me-2 hide"
-                                >
-                                    <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span
-                                                class="path2"></span><span
-                                                class="path3"></span><span class="path4"></span></i>
+                                        id="btn-eliminar-project-type" class="btn btn-danger me-2 hide">
+                     <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                     <span class="kt-hidden-mobile font-weight-bold">Delete</span>
                                 </button>
                             {% endif %}
@@ -112,11 +104,9 @@
                                 <!--end::Export buttons-->
 
                                 <!--begin::Export dropdown-->
-                                <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click"
-                                        data-kt-menu-placement="bottom-end">
-                                    <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span
-                                                class="path2"></span></i>
-                                    <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                                <button type="button" class="btn btn-icon btn-light-primary" data-kt-menu-trigger="click"
+                                        data-kt-menu-placement="bottom-end" title="Export" data-bs-toggle="tooltip">
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
                                 </button>
 
                                 <!--begin::Menu-->
@@ -207,27 +197,22 @@
                     </div>
                     <div class="card-toolbar">
 
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-project-type me-2">
-
-                            <i class="ki-duotone ki-arrow-left fs-1">
-                                <span class="path1"></span>
-                                <span class="path2"></span>
-                            </i>
-
-                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
+                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-project-type me-2" title="Exit" data-bs-toggle="tooltip">
+                  <i class="ki-duotone ki-arrow-left fs-1"><span class="path1"></span><span class="path2"></span></i>
                         </a>
 
                         {% if permiso.agregar or permiso.editar %}
                             <button
                                     type="button"
                                     id="btn-salvar-project-type"
-                                    class="btn btn-success"
+                                    class="btn btn-icon btn-success"
+                                    title="Save" data-bs-toggle="tooltip"
                             >
                                 <i class="ki-duotone ki-double-check fs-1 me-2">
                                     <span class="path1"></span>
                                     <span class="path2"></span>
                                 </i>
-                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                               
                             </button>
                         {% endif %}
                     </div>

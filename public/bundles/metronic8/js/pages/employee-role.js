@@ -366,8 +366,16 @@ var EmployeeRole = (function () {
          event_change = true;
       });
 
-      $(document).off('click', '#btn-save-changes');
-      $(document).on('click', '#btn-save-changes', function (e) {
+      $(document).off('click', '#btn-exit-save-and-close');
+      $(document).on('click', '#btn-exit-save-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
+         $('#btn-salvar-employee-role').trigger('click');
+      });
+      $(document).off('click', '#btn-exit-discard-and-close');
+      $(document).on('click', '#btn-exit-discard-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
          cerrarFormsConfirmated();
       });
    };

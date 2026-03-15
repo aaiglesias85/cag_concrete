@@ -776,3 +776,10 @@ gmp-place-autocomplete:focus-within {
    border-left: none !important;
    border-radius: 0 0.475rem 0.475rem 0 !important;
 }
+
+/* Iconos más grandes en botones de formularios (toolbar del form y pies de modal) */
+.card .card-toolbar .btn-icon i,
+.card.card-sticky .card-toolbar .btn-icon i,
+.modal-footer .btn-icon i {
+   font-size: 1.5rem !important;
+}

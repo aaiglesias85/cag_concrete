@@ -574,7 +574,8 @@ var Payments = (function () {
             cerrarFormsConfirmated();
             return;
          }
-         btnClickSalvarForm(true);
+         e.preventDefault();
+         ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
       });
    };
 
@@ -594,8 +595,16 @@ var Payments = (function () {
       $(document).on('change', '.event-change', function (e) {
          event_change = true;
       });
-      $(document).off('click', '#btn-save-changes');
-      $(document).on('click', '#btn-save-changes', function (e) {
+      $(document).off('click', '#btn-exit-save-and-close');
+      $(document).on('click', '#btn-exit-save-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
+         btnClickSalvarForm(true);
+      });
+      $(document).off('click', '#btn-exit-discard-and-close');
+      $(document).on('click', '#btn-exit-discard-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) bsModal.hide(); }
          cerrarFormsConfirmated();
       });
    };
@@ -665,7 +674,7 @@ var Payments = (function () {
                $('#form-payment').find('input, select, textarea, button').prop('disabled', true);
 
                // 2. Ocultar solo botones de guardar y finalizar; Next/Back se muestran según tab en aplicarBotonesWizardReadOnly
-               $('#btn-salvar-invoice, #btn-save-changes, .btn-wizard-finalizar').addClass('hide');
+               $('#btn-salvar-invoice, .btn-wizard-finalizar').addClass('hide');
 
                // 3. Tab 1: Back oculto, Next visible y habilitado; Exit siempre visible
                aplicarBotonesWizardReadOnly();

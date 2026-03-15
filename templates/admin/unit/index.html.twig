@@ -195,27 +195,21 @@
                         <h3 class="card-label">New Unit:</h3>
                     </div>
                     <div class="card-toolbar">
-                        <a href="javascript:;" class="btn btn-secondary cerrar-form-unit me-2">
-
+                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-unit me-2" title="Exit" data-bs-toggle="tooltip">
                             <i class="ki-duotone ki-arrow-left fs-1">
                                 <span class="path1"></span>
                                 <span class="path2"></span>
                             </i>
-
-                            <span class="kt-hidden-mobile font-weight-bold">Back</span>
                         </a>
 
                         {% if permiso.agregar or permiso.editar %}
                             <button
                                     type="button"
                                     id="btn-salvar-unit"
-                                    class="btn btn-success"
+                                    class="btn btn-icon btn-success"
+                                    title="Save" data-bs-toggle="tooltip"
                             >
-                                <i class="ki-duotone ki-double-check fs-1 me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                                <span class="kt-hidden-mobile font-weight-bold">Save</span>
+                                <i class="las la-save"></i>
                             </button>
                         {% endif %}
                     </div>
