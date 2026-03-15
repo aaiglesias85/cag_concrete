@@ -92,7 +92,6 @@ var Estimates = (function () {
       exportButtons();
    };
 
-
    var getColumnsTable = function () {
       const columns = [];
 
@@ -101,75 +100,103 @@ var Estimates = (function () {
       }
 
       columns.push(
-         { data: 'name' },          
-         { data: 'proposal_number' }, 
-         { data: 'project_id' },      
+         { data: 'name' },
+         { data: 'proposal_number' },
+         { data: 'project_id' },
          { data: 'county' },
          { data: 'company' },
-         { data: 'bidDeadline' }, 
-         { data: 'estimators' }, 
-         { data: 'stage' }, 
-         { data: 'acciones' });
+         { data: 'bidDeadline' },
+         { data: 'estimators' },
+         { data: 'stage' },
+         { data: 'acciones' },
+      );
 
       return columns;
    };
    var getColumnsDefTable = function () {
-    let columnDefs = [
-        {
+      let columnDefs = [
+         {
             targets: 0,
             orderable: false,
             render: DatatableUtil.getRenderColumnCheck,
-        }
-    ];
-    if (!permiso.eliminar) columnDefs = [];
+         },
+      ];
+      if (!permiso.eliminar) columnDefs = [];
 
-    var i = permiso.eliminar ? 1 : 0;
+      var i = permiso.eliminar ? 1 : 0;
 
-    columnDefs.push(
-        // 1. Name
-        {
-            targets: i++, 
-            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); }
-        },
-        
-        // 2. Proposal
-        { targets: i++, visible: false, render: function(d){ return d;} }, 
-        // 3. Project
-        { targets: i++, visible: false, render: function(d){ return d;} },
-        // 4. County
-        { targets: i++, visible: false, render: function(d){ return d;} },        
-        {
-            targets: i++, 
-            render: function (data) { return DatatableUtil.getRenderColumnDiv(data,250); }
-        },
-        // 6. BidDeadline
-        {
-            targets: i++, 
-            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 120); }
-        },
-        // 7. Estimators
-        {
-            targets: i++, 
-            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 50); }
-        },
-        // 8. Stage
-        {
-            targets: i++, 
-            render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 100); }
-        },
-        // 9. Acciones 
-        {
+      columnDefs.push(
+         // 1. Name
+         {
+            targets: i++,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 250);
+            },
+         },
+
+         // 2. Proposal
+         {
+            targets: i++,
+            visible: false,
+            render: function (d) {
+               return d;
+            },
+         },
+         // 3. Project
+         {
+            targets: i++,
+            visible: false,
+            render: function (d) {
+               return d;
+            },
+         },
+         // 4. County
+         {
+            targets: i++,
+            visible: false,
+            render: function (d) {
+               return d;
+            },
+         },
+         {
+            targets: i++,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 250);
+            },
+         },
+         // 6. BidDeadline
+         {
+            targets: i++,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 120);
+            },
+         },
+         // 7. Estimators
+         {
+            targets: i++,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 50);
+            },
+         },
+         // 8. Stage
+         {
+            targets: i++,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 100);
+            },
+         },
+         // 9. Acciones
+         {
             targets: -1,
             orderable: false,
-            className: 'text-center', 
-            render: function (data, type, row) {                 
-                return row.acciones; 
-            }
-        }
-    );
-    return columnDefs;
+            className: 'text-center',
+            render: function (data, type, row) {
+               return row.acciones;
+            },
+         },
+      );
+      return columnDefs;
    };
-
 
    var handleSearchDatatable = function () {
       let debounceTimeout;
@@ -186,7 +213,6 @@ var Estimates = (function () {
          }, 300); // 300ms de debounce
       });
    };
-
 
    var exportButtons = () => {
       const documentTitle = 'Estimates';
@@ -1625,7 +1651,10 @@ var Estimates = (function () {
       oTableTemplateNotes = DatatableUtil.initSafeDataTable(table, {
          data: template_notes,
          displayLength: 30,
-         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: [[0, 'asc']],
          columns: columns,
          columnDefs: columnDefs,
@@ -1680,7 +1709,8 @@ var Estimates = (function () {
          formData.set('estimate_id', estimate_id);
          formData.set('estimate_note_item_id', estimate_note_item_id);
          BlockUtil.block('#modal-template-note .modal-content');
-         axios.post('estimate/agregarTemplateNote', formData, { responseType: 'json' })
+         axios
+            .post('estimate/agregarTemplateNote', formData, { responseType: 'json' })
             .then(function (res) {
                if ((res.status === 200 || res.status === 201) && res.data.success) {
                   template_notes.push({
@@ -1697,7 +1727,9 @@ var Estimates = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#modal-template-note .modal-content'); });
+            .then(function () {
+               BlockUtil.unblock('#modal-template-note .modal-content');
+            });
       });
 
       $(document).off('click', '#btn-add-template-note-new');
@@ -1720,7 +1752,8 @@ var Estimates = (function () {
          formData.set('description', desc.trim());
          formData.set('type', 'template');
          BlockUtil.block('#modal-new-template-note .modal-content');
-         axios.post('estimate-note-item/salvar', formData, { responseType: 'json' })
+         axios
+            .post('estimate-note-item/salvar', formData, { responseType: 'json' })
             .then(function (res) {
                if ((res.status === 200 || res.status === 201) && res.data.success) {
                   var newId = res.data.id;
@@ -1733,7 +1766,9 @@ var Estimates = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () { BlockUtil.unblock('#modal-new-template-note .modal-content'); });
+            .then(function () {
+               BlockUtil.unblock('#modal-new-template-note .modal-content');
+            });
       });
    };
    var initAccionesTemplateNotesDelete = function () {
@@ -1755,11 +1790,14 @@ var Estimates = (function () {
                   var formData = new URLSearchParams();
                   formData.set('id', template_notes[posicion].id);
                   BlockUtil.block('#lista-template-notes');
-                  axios.post('estimate/eliminarTemplateNote', formData, { responseType: 'json' })
+                  axios
+                     .post('estimate/eliminarTemplateNote', formData, { responseType: 'json' })
                      .then(function (res) {
-                        if (res.status === 200 || res.status === 201 && res.data.success) {
+                        if (res.status === 200 || (res.status === 201 && res.data.success)) {
                            template_notes.splice(posicion, 1);
-                           template_notes.forEach(function (tn, i) { tn.posicion = i; });
+                           template_notes.forEach(function (tn, i) {
+                              tn.posicion = i;
+                           });
                            actualizarTableListaTemplateNotes();
                            toastr.success(res.data.message || 'Removed.');
                         } else {
@@ -1767,7 +1805,9 @@ var Estimates = (function () {
                         }
                      })
                      .catch(MyUtil.catchErrorAxios)
-                     .then(function () { BlockUtil.unblock('#lista-template-notes'); });
+                     .then(function () {
+                        BlockUtil.unblock('#lista-template-notes');
+                     });
                }
             });
          }
@@ -2150,7 +2190,9 @@ var Estimates = (function () {
       var resultado = [];
       var orderCounter = 0;
       (quotesList || []).forEach(function (quote) {
-         var quoteItems = itemsList.filter(function (it) { return it.quote_id == quote.id; });
+         var quoteItems = itemsList.filter(function (it) {
+            return it.quote_id == quote.id;
+         });
          if (quoteItems.length === 0) return;
          resultado.push({
             isGroupHeader: true,
@@ -2197,14 +2239,13 @@ var Estimates = (function () {
                if (!row.notes || row.notes.length === 0) {
                   return itemName;
                }
-               var badges = row.notes.map(function (note) {
-                  var safe = (note || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-                  return '<span class="badge badge-light-primary fs-8 fw-normal me-1 mb-1">' + safe + '</span>';
-               }).join('');
-               return '<div class="d-flex flex-column">' +
-                  '<span class="fw-semibold">' + itemName + '</span>' +
-                  '<div class="mt-1 flex-wrap gap-1 d-flex">' + badges + '</div>' +
-                  '</div>';
+               var badges = row.notes
+                  .map(function (note) {
+                     var safe = (note || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+                     return '<span class="badge badge-light-primary fs-8 fw-normal me-1 mb-1">' + safe + '</span>';
+                  })
+                  .join('');
+               return '<div class="d-flex flex-column">' + '<span class="fw-semibold">' + itemName + '</span>' + '<div class="mt-1 flex-wrap gap-1 d-flex">' + badges + '</div>' + '</div>';
             },
          },
          {
@@ -2313,9 +2354,9 @@ var Estimates = (function () {
          quantity: {
             presence: { message: 'This field is required' },
          },
-         price: {
+         /*price: {
             presence: { message: 'This field is required' },
-         },
+         },*/
       };
 
       var errors = validate(form, constraints);
@@ -2353,7 +2394,7 @@ var Estimates = (function () {
             return;
          }
          $('#quote_id').val('');
-         $('#quote_name').val('Quote ' + ((quotes && quotes.length) ? quotes.length + 1 : 1));
+         $('#quote_name').val('Quote ' + (quotes && quotes.length ? quotes.length + 1 : 1));
          $('#modal-quote-title').text('New quote');
          new bootstrap.Modal(document.getElementById('modal-quote')).show();
       });
@@ -2403,7 +2444,7 @@ var Estimates = (function () {
             formData.set('equation_id', equation_id);
 
             var noteIds = $('#item_notes').val();
-            formData.set('note_ids', Array.isArray(noteIds) ? noteIds.join(',') : (noteIds || ''));
+            formData.set('note_ids', Array.isArray(noteIds) ? noteIds.join(',') : noteIds || '');
 
             BlockUtil.block('#modal-item .modal-content');
 
@@ -2424,14 +2465,16 @@ var Estimates = (function () {
                                  name: response.quote_created.name,
                                  items_count: 0,
                                  companies_count: 0,
-                                 companies: []
+                                 companies: [],
                               });
                               actualizarSelectQuoteEnModalItem();
                               renderQuotesSendTab();
                            }
                            item_new.posicion = items.length;
                            items.push(item_new);
-                           var q = quotes.find(function (x) { return x.id == item_new.quote_id; });
+                           var q = quotes.find(function (x) {
+                              return x.id == item_new.quote_id;
+                           });
                            if (q) q.items_count = (q.items_count || 0) + 1;
                         } else {
                            item_new.posicion = items[nEditingRowItem].posicion;
@@ -2713,7 +2756,9 @@ var Estimates = (function () {
       function deleteItem(posicion) {
          var removed = items[posicion];
          items.splice(posicion, 1);
-         var q = quotes.find(function (x) { return x.id == removed.quote_id; });
+         var q = quotes.find(function (x) {
+            return x.id == removed.quote_id;
+         });
          if (q && (q.items_count || 0) > 0) q.items_count--;
          for (var i = 0; i < items.length; i++) {
             items[i].posicion = i;
@@ -2728,7 +2773,11 @@ var Estimates = (function () {
       var current = sel.val();
       sel.empty().append('<option value="">Select quote</option>');
       (quotes || []).forEach(function (q) {
-         sel.append($('<option></option>').attr('value', q.id).text(q.name || 'Quote ' + q.id));
+         sel.append(
+            $('<option></option>')
+               .attr('value', q.id)
+               .text(q.name || 'Quote ' + q.id),
+         );
       });
       if (current) sel.val(current);
    };
@@ -3162,27 +3211,46 @@ var Estimates = (function () {
       }
 
       var dataRows = withCompanies.map(function (row) {
-         var itemsNames = (items || []).filter(function (it) { return it.quote_id == row.id; }).map(function (it) { return it.item || ''; });
+         var itemsNames = (items || [])
+            .filter(function (it) {
+               return it.quote_id == row.id;
+            })
+            .map(function (it) {
+               return it.item || '';
+            });
          var itemsText = itemsNames.length ? itemsNames.join(', ') : '—';
-         var companiesText = (row.companies && row.companies.length)
-            ? row.companies.map(function (c) {
-                 return typeof c === 'object' && c && c.company != null
-                    ? (c.company + (c.email ? ' (' + c.email + ')' : ''))
-                    : String(c);
-              }).join(', ')
-            : '—';
+         var companiesText =
+            row.companies && row.companies.length
+               ? row.companies
+                    .map(function (c) {
+                       return typeof c === 'object' && c && c.company != null ? c.company + (c.email ? ' (' + c.email + ')' : '') : String(c);
+                    })
+                    .join(', ')
+               : '—';
          var actions =
             '<div class="d-flex justify-content-center flex-shrink-0">' +
             (permiso.editar || permiso.agregar
-               ? '<a href="javascript:;" data-id="' + row.id + '" data-name="' + (row.name || '').replace(/"/g, '&quot;') + '" title="Edit" class="btn-edit-quote btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">' +
+               ? '<a href="javascript:;" data-id="' +
+                 row.id +
+                 '" data-name="' +
+                 (row.name || '').replace(/"/g, '&quot;') +
+                 '" title="Edit" class="btn-edit-quote btn btn-icon btn-light-success btn-sm me-1" data-bs-toggle="tooltip">' +
                  '<i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i></a>'
                : '') +
-            '<a href="javascript:;" data-id="' + row.id + '" title="Export PDF" class="btn-export-excel-quote btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">' +
+            '<a href="javascript:;" data-id="' +
+            row.id +
+            '" title="Export PDF" class="btn-export-excel-quote btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">' +
             '<i class="ki-duotone ki-file-down fs-3"><span class="path1"></span><span class="path2"></span></i></a>' +
-            '<a href="javascript:;" data-id="' + row.id + '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">' +
+            '<a href="javascript:;" data-id="' +
+            row.id +
+            '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">' +
             '<i class="ki-duotone ki-sms fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>' +
             (permiso.eliminar
-               ? '<a href="javascript:;" data-id="' + row.id + '" data-name="' + (row.name || '').replace(/"/g, '&quot;') + '" title="Delete" class="btn-delete-quote btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">' +
+               ? '<a href="javascript:;" data-id="' +
+                 row.id +
+                 '" data-name="' +
+                 (row.name || '').replace(/"/g, '&quot;') +
+                 '" title="Delete" class="btn-delete-quote btn btn-icon btn-light-danger btn-sm" data-bs-toggle="tooltip">' +
                  '<i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>'
                : '') +
             '</div>';
@@ -3191,16 +3259,41 @@ var Estimates = (function () {
 
       var columns = [{ data: 'name' }, { data: 'items_text' }, { data: 'companies_text' }, { data: 'acciones' }];
       var columnDefs = [
-         { targets: 0, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 200); } },
-         { targets: 1, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); } },
-         { targets: 2, render: function (data) { return DatatableUtil.getRenderColumnDiv(data, 250); } },
-         { targets: -1, orderable: false, className: 'text-center', render: function (data, type, row) { return row.acciones; } },
+         {
+            targets: 0,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 200);
+            },
+         },
+         {
+            targets: 1,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 250);
+            },
+         },
+         {
+            targets: 2,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data, 250);
+            },
+         },
+         {
+            targets: -1,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return row.acciones;
+            },
+         },
       ];
 
       oTableQuotesSend = DatatableUtil.initSafeDataTable(table, {
          data: dataRows,
          displayLength: 30,
-         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'Todos'],
+         ],
          order: [[0, 'asc']],
          columns: columns,
          columnDefs: columnDefs,
@@ -3226,7 +3319,7 @@ var Estimates = (function () {
             estimate_company_id: ec.id,
             company: ec.company || '',
             email: ec.email || '',
-            label: label
+            label: label,
          });
       });
       return list;
@@ -3239,7 +3332,11 @@ var Estimates = (function () {
 
       $quoteSelect.empty().append('<option value="">Select quote</option>');
       (quotes || []).forEach(function (q) {
-         $quoteSelect.append($('<option></option>').attr('value', q.id).text(q.name || 'Quote ' + q.id));
+         $quoteSelect.append(
+            $('<option></option>')
+               .attr('value', q.id)
+               .text(q.name || 'Quote ' + q.id),
+         );
       });
       var companiesList = getCompaniesFromEstimateCompanies();
       $companiesSelect.empty();
@@ -3248,16 +3345,21 @@ var Estimates = (function () {
       });
       var $hint = $('#quote-companies-empty-hint');
       if ($hint.length) {
-         if (companiesList.length === 0) $hint.removeClass('hide'); else $hint.addClass('hide');
+         if (companiesList.length === 0) $hint.removeClass('hide');
+         else $hint.addClass('hide');
       }
 
       if ($quoteSelect.hasClass('select2-hidden-accessible')) {
-         try { $quoteSelect.select2('destroy'); } catch (e) {}
+         try {
+            $quoteSelect.select2('destroy');
+         } catch (e) {}
       }
       $quoteSelect.select2({ dropdownParent: $modal, width: '100%' });
 
       if ($companiesSelect.hasClass('select2-hidden-accessible')) {
-         try { $companiesSelect.select2('destroy'); } catch (e) {}
+         try {
+            $companiesSelect.select2('destroy');
+         } catch (e) {}
       }
       $companiesSelect.select2({ dropdownParent: $modal, width: '100%' });
 
@@ -3270,7 +3372,9 @@ var Estimates = (function () {
             .post('estimate/cargarDatosQuote', formData, { responseType: 'json' })
             .then(function (response) {
                if (response.data.success && response.data.quote && response.data.quote.companies) {
-                  var ids = response.data.quote.companies.map(function (c) { return String(c.estimate_company_id); });
+                  var ids = response.data.quote.companies.map(function (c) {
+                     return String(c.estimate_company_id);
+                  });
                   $companiesSelect.val(ids).trigger('change');
                }
                new bootstrap.Modal(document.getElementById('modal-quote-companies')).show();
@@ -3355,14 +3459,20 @@ var Estimates = (function () {
             .then(function (response) {
                if (response.data.success) {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
-                  var q = quotes.find(function (x) { return x.id == quoteId; });
+                  var q = quotes.find(function (x) {
+                     return x.id == quoteId;
+                  });
                   if (q) {
                      q.companies_count = estimateCompanyIds.length;
                      var list = getCompaniesFromEstimateCompanies();
-                     q.companies = estimateCompanyIds.map(function (eid) {
-                        var c = list.find(function (x) { return String(x.estimate_company_id) === String(eid); });
-                        return c ? { company: c.company, email: c.email } : null;
-                     }).filter(Boolean);
+                     q.companies = estimateCompanyIds
+                        .map(function (eid) {
+                           var c = list.find(function (x) {
+                              return String(x.estimate_company_id) === String(eid);
+                           });
+                           return c ? { company: c.company, email: c.email } : null;
+                        })
+                        .filter(Boolean);
                   }
                   renderQuotesSendTab();
                   toastr.success(response.data.message || 'Saved.');
@@ -3390,20 +3500,27 @@ var Estimates = (function () {
             .then(function (response) {
                if (response.data.success) {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote-companies')).hide();
-                  var q = quotes.find(function (x) { return x.id == quoteId; });
+                  var q = quotes.find(function (x) {
+                     return x.id == quoteId;
+                  });
                   if (q) {
                      q.companies_count = estimateCompanyIds.length;
                      var list = getCompaniesFromEstimateCompanies();
-                     q.companies = estimateCompanyIds.map(function (eid) {
-                        var c = list.find(function (x) { return String(x.estimate_company_id) === String(eid); });
-                        return c ? { company: c.company, email: c.email } : null;
-                     }).filter(Boolean);
+                     q.companies = estimateCompanyIds
+                        .map(function (eid) {
+                           var c = list.find(function (x) {
+                              return String(x.estimate_company_id) === String(eid);
+                           });
+                           return c ? { company: c.company, email: c.email } : null;
+                        })
+                        .filter(Boolean);
                   }
                   renderQuotesSendTab();
                   toastr.success(response.data.message || 'Saved.');
                   var fd = new URLSearchParams();
                   fd.set('quote_ids', String(quoteId));
-                  axios.post('estimate/enviarQuotes', fd, { responseType: 'json' })
+                  axios
+                     .post('estimate/enviarQuotes', fd, { responseType: 'json' })
                      .then(function (r) {
                         if (r.data.success) {
                            toastr.success(r.data.message || 'Email sent.');
@@ -3509,7 +3626,9 @@ var Estimates = (function () {
                   .post('estimate/eliminarQuoteCompanies', formData, { responseType: 'json' })
                   .then(function (response) {
                      if (response.data.success) {
-                        var q = quotes.find(function (x) { return x.id == quoteId; });
+                        var q = quotes.find(function (x) {
+                           return x.id == quoteId;
+                        });
                         if (q) {
                            q.companies_count = 0;
                            q.companies = [];
