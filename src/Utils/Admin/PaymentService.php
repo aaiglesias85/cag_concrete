@@ -922,8 +922,10 @@ class PaymentService extends Base
       // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
       $updated_project_item_ids = [];
 
-      //items
-      $paid = false;
+      // Marcar invoice como paid solo cuando TODOS los ítems estén completamente pagados (unpaid_qty <= 0)
+      $allFullyPaid = !empty($payments);
+      $epsilon = 0.0001;
+
       foreach ($payments as $value) {
 
          /** @var InvoiceItemRepository $invoiceItemRepo */
@@ -940,14 +942,24 @@ class PaymentService extends Base
             $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
          }
 
-         // si se paga al menos 1 item, marcar el invoice como paid
-         if ($value->paid_qty > 0 || $value->paid_amount > 0 || $value->paid_amount_total > 0) {
-            $paid = true;
+         // Comprobar si este ítem está completamente pagado (unpaid_qty <= 0)
+         $unpaidQty = isset($value->unpaid_qty) && \is_numeric($value->unpaid_qty) ? (float) $value->unpaid_qty : null;
+         if ($unpaidQty !== null) {
+            if ($unpaidQty > $epsilon) {
+               $allFullyPaid = false;
+            }
+         } else {
+            // Fallback: comparar paid_qty con quantity (quantity_final)
+            $quantity = isset($value->quantity) && \is_numeric($value->quantity) ? (float) $value->quantity : 0;
+            $paidQty = isset($value->paid_qty) && \is_numeric($value->paid_qty) ? (float) $value->paid_qty : 0;
+            if ($paidQty < $quantity - $epsilon) {
+               $allFullyPaid = false;
+            }
          }
       }
 
-      // paid invoice - si se paga al menos un item, marcar como paid
-      if (!empty($payments) && $paid && !$entity->getPaid()) {
+      // paid invoice - solo si TODOS los ítems están completamente pagados
+      if ($allFullyPaid && !$entity->getPaid()) {
          $entity->setPaid(true);
       }
 
