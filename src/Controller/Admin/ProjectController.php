@@ -1165,6 +1165,25 @@ class ProjectController extends AbstractController
    }
 
    /**
+    * listarHistorialUnpaidQtyPorProjectItem Lista el historial de cambios de unpaid qty de un project_item (tab Completion).
+    */
+   public function listarHistorialUnpaidQtyPorProjectItem(Request $request)
+   {
+      $project_item_id = $request->get('project_item_id');
+
+      try {
+         $historial = $this->projectService->ListarHistorialUnpaidQtyPorProjectItem((int) $project_item_id);
+         $resultadoJson['success'] = true;
+         $resultadoJson['historial'] = $historial;
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto
     *
     */

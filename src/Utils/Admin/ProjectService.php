@@ -16,6 +16,7 @@ use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemUnpaidQtyHistory;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\Project;
@@ -1483,19 +1484,48 @@ class ProjectService extends Base
          $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
          $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
 
-         // Verificar si hay historial de cantidad y precio
+         // Ajuste por Override Unpaid Qty: el override reduce lo que "deben pagar", así que Diff Qty/Amt
+         // se ajustan sumando la cantidad/monto "perdonados": (quantity_final - paid_qty) - override_unpaid_qty
+         $total_qty_adjustment = 0.0;
+         $total_amt_adjustment = 0.0;
+         $is_bond_item = $value->getItem()->getBond();
+         if (!$is_bond_item) {
+            $invoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+            foreach ($invoiceItems as $invItem) {
+               $qtyFinal = (float) ($invItem->getQuantity() ?? 0) + (float) ($invItem->getQuantityBroughtForward() ?? 0);
+               $paidItem = (float) ($invItem->getPaidQty() ?? 0);
+               $notes = $this->ListarNotesDeItemInvoice($invItem->getId());
+               $override = null;
+               foreach ($notes as $n) {
+                  if (isset($n['override_unpaid_qty']) && $n['override_unpaid_qty'] !== null && $n['override_unpaid_qty'] !== '') {
+                     $override = (float) $n['override_unpaid_qty'];
+                     break;
+                  }
+               }
+               if ($override !== null) {
+                  $adjustment_qty = ($qtyFinal - $paidItem) - $override;
+                  $total_qty_adjustment += $adjustment_qty;
+                  $total_amt_adjustment += $adjustment_qty * (float) ($invItem->getPrice() ?? 0);
+               }
+            }
+         }
+
+         // Verificar si hay historial de cantidad, precio y unpaid qty
          /** @var ProjectItemHistoryRepository $historyRepo */
          $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
          $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
          $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+         /** @var \App\Repository\InvoiceItemUnpaidQtyHistoryRepository $unpaidHistoryRepo */
+         $unpaidHistoryRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
+         $has_unpaid_qty_history = $unpaidHistoryRepo->TieneHistorialPorProjectItem($project_item_id);
 
-         // Diff Qty = Paid qty - Inv qty; Diff Amt = Paid Amt - Inv Amt (igual que en el frontend admin)
+         // Diff Qty = Paid qty - Inv qty + ajuste por override; Diff Amt = Paid Amt - Inv Amt + ajuste
          $invQty = (float) $invoiced_qty;
          $invAmt = (float) $total_invoiced_amount;
          $paidQty = (float) $paid_qty;
          $paidAmt = (float) $total_paid_amount;
-         $diff_qty = $paidQty - $invQty;
-         $diff_amt = $paidAmt - $invAmt;
+         $diff_qty = ($paidQty - $invQty) + $total_qty_adjustment;
+         $diff_amt = ($paidAmt - $invAmt) + $total_amt_adjustment;
 
          $items[] = [
             'project_item_id' => $project_item_id,
@@ -1524,11 +1554,51 @@ class ProjectService extends Base
             "change_order_date" => $value->getChangeOrderDate() != null ? $value->getChangeOrderDate()->format('m/d/Y') : '',
             "has_quantity_history" => $has_quantity_history,
             "has_price_history" => $has_price_history,
+            "has_unpaid_qty_history" => $has_unpaid_qty_history,
             "posicion" => $key
          ];
       }
 
       return $items;
+   }
+
+   /**
+    * ListarHistorialUnpaidQtyPorProjectItem: Lista el historial de cambios de unpaid qty de todos los invoice items
+    * de un project_item (para el tab Completion). Incluye número de invoice en el mensaje cuando hay varios invoices.
+    *
+    * @param int $project_item_id
+    * @return array
+    */
+   public function ListarHistorialUnpaidQtyPorProjectItem(int $project_item_id): array
+   {
+      $historial = [];
+      /** @var \App\Repository\InvoiceItemUnpaidQtyHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
+      $lista = $historyRepo->ListarHistorialDeProjectItem($project_item_id);
+
+      foreach ($lista as $value) {
+         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+         $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
+         $old_value_raw = $value->getOldValue();
+         $new_value_raw = $value->getNewValue();
+         $old_value = $old_value_raw !== null && $old_value_raw !== '' ? number_format((float) $old_value_raw, 2, '.', ',') : $old_value_raw;
+         $new_value = $new_value_raw !== null && $new_value_raw !== '' ? number_format((float) $new_value_raw, 2, '.', ',') : $new_value_raw;
+         $invoice_number = '';
+         if ($value->getInvoiceItem() && $value->getInvoiceItem()->getInvoice()) {
+            $invoice_number = ' (Invoice #' . $value->getInvoiceItem()->getInvoice()->getNumber() . ')';
+         }
+         $mensaje = "{$fecha} Updated unpaid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"{$invoice_number}";
+
+         $historial[] = [
+            'id' => $value->getId(),
+            'mensaje' => $mensaje,
+            'fecha' => $value->getCreatedAt()->format('m/d/Y'),
+            'user_name' => $user_name,
+            'old_value' => $old_value,
+            'new_value' => $new_value,
+         ];
+      }
+      return $historial;
    }
 
    /**

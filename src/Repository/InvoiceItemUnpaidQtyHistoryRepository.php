@@ -47,4 +47,42 @@ class InvoiceItemUnpaidQtyHistoryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult() !== null;
     }
+
+    /**
+     * TieneHistorialPorProjectItem: Verifica si algún InvoiceItem del project_item tiene historial de unpaid qty
+     *
+     * @param int $project_item_id
+     * @return bool
+     */
+    public function TieneHistorialPorProjectItem(int $project_item_id): bool
+    {
+        return $this->createQueryBuilder('h')
+            ->leftJoin('h.invoiceItem', 'i_i')
+            ->leftJoin('i_i.projectItem', 'p_i')
+            ->where('p_i.id = :project_item_id')
+            ->setParameter('project_item_id', $project_item_id)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult() !== null;
+    }
+
+    /**
+     * ListarHistorialDeProjectItem: Lista el historial de cambios de unpaid qty de todos los invoice items de un project_item
+     *
+     * @param int $project_item_id
+     * @return InvoiceItemUnpaidQtyHistory[]
+     */
+    public function ListarHistorialDeProjectItem(int $project_item_id): array
+    {
+        return $this->createQueryBuilder('h')
+            ->leftJoin('h.invoiceItem', 'i_i')
+            ->leftJoin('i_i.projectItem', 'p_i')
+            ->leftJoin('i_i.invoice', 'i')
+            ->leftJoin('h.user', 'u')
+            ->where('p_i.id = :project_item_id')
+            ->setParameter('project_item_id', $project_item_id)
+            ->orderBy('h.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
