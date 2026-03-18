@@ -8,17 +8,129 @@ body, .app-default {
     background-color: #0F1014 !important;
 }
 
-/*[data-kt-app-layout=dark-sidebar] .app-sidebar {
-    background-color: #0e2536;
+[data-kt-app-layout=dark-sidebar] .app-sidebar {
+    background-color: #1B84FF !important;
 }
 
 [data-kt-app-layout=dark-sidebar] .app-sidebar .app-sidebar-logo {
-    border-bottom: 1px dashed #1a3a50;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.22);
 }
 
-[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active {
-    background-color: #16405b;
-}*/
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-content {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link {
+    border-radius: 0.65rem;
+    transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .menu-icon i,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .menu-arrow {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .menu-arrow::before,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .menu-arrow::after {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link .bullet {
+    background-color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    transform: translateX(2px);
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover .menu-icon i,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover .menu-arrow,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus .menu-icon i,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus .menu-arrow {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active .menu-icon i,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active .menu-arrow,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link .menu-icon i,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link .menu-arrow {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover .menu-arrow::before,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:hover .menu-arrow::after,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus .menu-arrow::before,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link:focus .menu-arrow::after,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active .menu-arrow::before,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active .menu-arrow::after,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link .menu-arrow::before,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link .menu-arrow::after {
+    background-color: #ffffff !important;
+    border-color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub {
+    background-color: rgba(15, 20, 31, 0.14) !important;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link:hover,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link.active {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link.active {
+    box-shadow: inset 3px 0 0 rgba(255, 255, 255, 0.85);
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-title,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-bullet,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-icon i {
+    color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link {
+    border-radius: 0.4rem;
+    margin: 0 0.35rem;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-content .menu-heading,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-heading.fs-7,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-heading.text-uppercase {
+    color: #ffffff !important;
+    opacity: 1;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link .bullet {
+    background-color: #ffffff !important;
+}
+
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-link.active,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item.here > .menu-link,
+[data-kt-app-layout=dark-sidebar] .app-sidebar .menu .menu-item .menu-sub .menu-link.active {
+    text-shadow: 0 1px 1px rgba(15, 20, 31, 0.18);
+}
 
 .btn-color-cat {
     background-color: #0e2536 !important;
