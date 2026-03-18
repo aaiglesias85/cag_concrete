@@ -847,6 +847,7 @@ class EstimateService extends Base
             $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
                ->find($stage_id);
             $entity->setStage($project_stage);
+            $this->AutoSetStageDate($entity, (int) $stage_id);
          }
 
          $em->flush();
@@ -1424,6 +1425,7 @@ class EstimateService extends Base
             $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
                ->find($stage_id);
             $entity->setStage($project_stage);
+           $this->AutoSetStageDate($entity, (int) $stage_id);
          }
 
          $entity->setProposalType(NULL);
@@ -1701,6 +1703,7 @@ class EstimateService extends Base
          $project_stage = $this->getDoctrine()->getRepository(ProjectStage::class)
             ->find($stage_id);
          $entity->setStage($project_stage);
+         $this->AutoSetStageDate($entity, (int) $stage_id);
       }
 
       if ($proposal_type_id != '') {
@@ -1794,6 +1797,29 @@ class EstimateService extends Base
       $resultado['estimate_id'] = $entity->getEstimateId();
 
       return $resultado;
+   }
+
+   /**
+    * AutoSetStageDate: asigna automáticamente la fecha según el stage
+    *
+    * @param Estimate $entity
+    * @param int $stage_id
+    */
+   private function AutoSetStageDate(Estimate $entity, int $stage_id): void
+   {
+      $now = new \DateTime();
+
+      if ($stage_id === 6) {
+         $entity->setSubmittedDate($now);
+      }
+
+      if ($stage_id === 7) {
+         $entity->setAwardedDate($now);
+      }
+
+      if ($stage_id === 8) {
+         $entity->setLostDate($now);
+      }
    }
 
    // salvar estimators

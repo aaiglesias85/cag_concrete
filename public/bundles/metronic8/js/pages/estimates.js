@@ -464,6 +464,52 @@ var Estimates = (function () {
       return result;
    };
 
+   var autoFillDateByStage = function (stageId) {
+      var now = moment().format('MM/DD/YYYY HH:mm');
+
+      if (String(stageId) === '6') {
+         FlatpickrUtil.setDate('datetimepicker-submittedDate', now);
+      }
+
+      if (String(stageId) === '7') {
+         FlatpickrUtil.setDate('datetimepicker-awardedDate', now);
+      }
+
+      if (String(stageId) === '8') {
+         FlatpickrUtil.setDate('datetimepicker-lostDate', now);
+      }
+   };
+
+   var promptMoveProjectToSubmitted = function (estimateId) {
+      Swal.fire({
+         text: "Would you like to move the project to the 'Submitted' stage?",
+         icon: 'question',
+         showCancelButton: true,
+         buttonsStyling: false,
+         confirmButtonText: 'Yes',
+         cancelButtonText: 'No',
+         customClass: {
+            confirmButton: 'btn fw-bold btn-success',
+            cancelButton: 'btn fw-bold btn-secondary',
+         },
+      }).then(function (result) {
+         if (result.value) {
+            var formData = new URLSearchParams();
+            formData.set('estimate_id', estimateId);
+            formData.set('stage_id', '6');
+            axios
+               .post('estimate/cambiarStage', formData, { responseType: 'json' })
+               .then(function (response) {
+                  if (response.data && response.data.success) {
+                     $('#project-stage').val('6').trigger('change');
+                     autoFillDateByStage('6');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios);
+         }
+      });
+   };
+
    //Wizard
    var activeTab = 1;
    var totalTabs = 1;
@@ -508,10 +554,10 @@ var Estimates = (function () {
             case 3:
                actualizarTableListaItems();
                break;
-            case 5:
+            case 4:
                actualizarTableListaTemplateNotes();
                break;
-            // case 4:
+            // case 5:
             //     actualizarTableListaProjectInformation();
             //    break;
          }
@@ -558,12 +604,11 @@ var Estimates = (function () {
                $('#tab-quotes').tab('show');
                actualizarTableListaItems();
                break;
-            // case 4:
-            //     $('#tab-project-information').tab('show');
-            //     actualizarTableListaProjectInformation();
-            //     break;
             case 4:
                $('#tab-bid-information').tab('show');
+               break;
+            case 5:
+               $('#tab-send-quotes').tab('show');
                break;
          }
       }, 0);
@@ -1211,6 +1256,11 @@ var Estimates = (function () {
 
             return $wrapper;
          },
+      });
+
+      $(document).off('change', '#project-stage');
+      $(document).on('change', '#project-stage', function () {
+         autoFillDateByStage($(this).val());
       });
 
       $('#estimator').select2({
@@ -3555,6 +3605,7 @@ var Estimates = (function () {
                      .then(function (r) {
                         if (r.data.success) {
                            toastr.success(r.data.message || 'Email sent.');
+                           promptMoveProjectToSubmitted($('#estimate_id').val());
                         } else {
                            toastr.error(r.data.error || r.data.errores || 'Error sending email.');
                         }
@@ -3622,6 +3673,7 @@ var Estimates = (function () {
                   .then(function (response) {
                      if (response.data.success) {
                         toastr.success(response.data.message || 'Sent.');
+                        promptMoveProjectToSubmitted($('#estimate_id').val());
                      } else {
                         toastr.error(response.data.message || response.data.error || 'Error sending.');
                      }
