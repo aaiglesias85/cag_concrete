@@ -323,7 +323,7 @@ var Payments = (function () {
       payments = [];
       $('#total_bonded_x').val('');
       $('#total_bonded_y').val('');
-      actualizarTableListaPayments();
+      actualizarTableListaPayments(true);
       archivos = [];
       actualizarTableListaArchivos();
       resetWizard();
@@ -380,7 +380,7 @@ var Payments = (function () {
          switch (activeTab) {
             case 1:
                $('#tab-payment').tab('show');
-               actualizarTableListaPayments();
+               actualizarTableListaPayments(true);
                break;
             case 2:
                $('#tab-archivo').tab('show');
@@ -451,7 +451,7 @@ var Payments = (function () {
          switch (activeTab) {
             case 1:
                $('#tab-payment').tab('show');
-               actualizarTableListaPayments();
+               actualizarTableListaPayments(true);
                break;
             case 3:
                $('#tab-notes').tab('show');
@@ -727,7 +727,7 @@ var Payments = (function () {
 
          calcularBondPaymentsEnTiempoReal();
 
-         actualizarTableListaPayments();
+         actualizarTableListaPayments(true);
          archivos = invoice.archivos;
          actualizarTableListaArchivos();
          event_change = false;
@@ -1313,9 +1313,32 @@ var Payments = (function () {
          });
    };
 
-   var actualizarTableListaPayments = function () {
-      if (oTablePayments) oTablePayments.destroy();
-      initTablePayments();
+   var actualizarTableListaPayments = function (forceReload) {
+      forceReload = forceReload === true;
+
+      if (forceReload) {
+         if (oTablePayments) oTablePayments.destroy();
+         initTablePayments();
+         return;
+      }
+
+      if (oTablePayments) {
+         oTablePayments.rows().invalidate('dom').draw(false);
+      }
+   };
+
+   var actualizarFilaPayment = function (posicion) {
+      if (!oTablePayments) return;
+
+      var $input = $('#payments-table-editable input[data-position="' + posicion + '"]').first();
+      if (!$input.length) return;
+
+      var row = $input.closest('tr');
+      if (!row.length) return;
+
+      if (typeof oTablePayments.row === 'function') {
+         oTablePayments.row(row).invalidate('dom');
+      }
    };
 
    var validateFormPayment = function () {
@@ -1395,8 +1418,7 @@ var Payments = (function () {
                }
 
                calcularBondPaymentsEnTiempoReal();
-               // 4. Redibujar la tabla para que las celdas se re-rendericen: cerrado = solo texto, abierto = inputs editables
-               actualizarTableListaPayments();
+               actualizarFilaPayment(posicion);
             }
             // Si cancela, no hacemos nada (el preventDefault ya lo dejó como estaba)
          });
@@ -1420,7 +1442,7 @@ var Payments = (function () {
                payments[posicion].unpaid_qty = Math.max(0, quantity - paid_qty);
             }
             calcularBondPaymentsEnTiempoReal();
-            actualizarTableListaPayments();
+            actualizarFilaPayment(posicion);
             resetFormPayment();
             ModalUtil.hide('modal-payment');
          }
@@ -1505,6 +1527,7 @@ var Payments = (function () {
             $row.find('span.paid_amount_text').text(MyApp.formatMoney(paid_amount));
             // Trigger cambio para recalcular retainage
             $row.find('input.paid_qty').trigger('change');
+            actualizarFilaPayment(posicion);
          }
       });
 
@@ -1518,7 +1541,7 @@ var Payments = (function () {
             payments[posicion].unpaid_qty = 0;
             payments[posicion].paid_amount = quantity * price;
             calcularBondPaymentsEnTiempoReal();
-            actualizarTableListaPayments();
+            actualizarFilaPayment(posicion);
          }
       });
 
@@ -1678,7 +1701,7 @@ var Payments = (function () {
                            }
                            if (seGuardoOverride) {
                               payments[nEditingRowPayment].has_unpaid_qty_history = true;
-                              actualizarTableListaPayments();
+                              actualizarFilaPayment(nEditingRowPayment);
                            }
                         }
                         $('#manual-unpaid-qty').val('');
