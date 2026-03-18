@@ -480,7 +480,11 @@ var Estimates = (function () {
       }
    };
 
-   var promptMoveProjectToSubmitted = function (estimateId) {
+   var promptMoveProjectToSubmitted = function (estimateId, currentStageId) {
+      if (String(currentStageId) === '6') {
+         return;
+      }
+
       Swal.fire({
          text: "Would you like to move the project to the 'Submitted' stage?",
          icon: 'question',
@@ -3605,7 +3609,7 @@ var Estimates = (function () {
                      .then(function (r) {
                         if (r.data.success) {
                            toastr.success(r.data.message || 'Email sent.');
-                           promptMoveProjectToSubmitted($('#estimate_id').val());
+                           promptMoveProjectToSubmitted($('#estimate_id').val(), $('#project-stage').val());
                         } else {
                            toastr.error(r.data.error || r.data.errores || 'Error sending email.');
                         }
@@ -3673,7 +3677,7 @@ var Estimates = (function () {
                   .then(function (response) {
                      if (response.data.success) {
                         toastr.success(response.data.message || 'Sent.');
-                        promptMoveProjectToSubmitted($('#estimate_id').val());
+                        promptMoveProjectToSubmitted($('#estimate_id').val(), $('#project-stage').val());
                      } else {
                         toastr.error(response.data.message || response.data.error || 'Error sending.');
                      }
