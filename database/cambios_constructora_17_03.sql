@@ -1,0 +1,1 @@
+ALTER TABLE `project_prevailing_role` DROP INDEX `unique_project_role`;
