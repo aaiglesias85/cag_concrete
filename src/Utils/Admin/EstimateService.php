@@ -331,6 +331,7 @@ class EstimateService extends Base
       $errores = [];
       $fromAddress = $this->getParameter('mailer_quotes_sender_address');
       $fromName = $this->getParameter('mailer_quotes_from_name') ?? '';
+      $copyAddress = $this->getParameter('mailer_quotes_copy_address') ?? '';
 
       foreach ($ids as $quote_id) {
          $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
@@ -368,6 +369,7 @@ class EstimateService extends Base
                $mensaje = (new TemplatedEmail())
                   ->from(new Address($fromAddress, $fromName))
                   ->to(new Address($email, $toName))
+                  ->bcc(...($copyAddress !== '' ? [new Address($copyAddress)] : []))
                   ->subject("Quote: $quoteName - $estimateName")
                   ->htmlTemplate('mailing/mail_quote.html.twig')
                   ->context([
