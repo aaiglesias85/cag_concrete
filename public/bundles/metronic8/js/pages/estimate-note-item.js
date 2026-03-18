@@ -19,7 +19,7 @@ var EstimateNoteItem = function () {
             order: order,
             stateSave: true,
             displayLength: 30,
-            lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+            lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'All']],
             stateSaveParams: DatatableUtil.stateSaveParams,
             select: {
                 info: false,

@@ -31,7 +31,7 @@ var Equations = function () {
             displayLength: 30,
             lengthMenu: [
                [10, 25, 30, 50, -1],
-               [10, 25, 30, 50, 'Todos'],
+               [10, 25, 30, 50, 'All'],
             ],
             stateSaveParams: DatatableUtil.stateSaveParams,
 
@@ -790,7 +790,7 @@ var Equations = function () {
             displayLength: 30,
             lengthMenu: [
                [10, 25, 30, 50, -1],
-               [10, 25, 30, 50, 'Todos'],
+               [10, 25, 30, 50, 'All'],
             ],
             order: order,
             columns: columns,
@@ -962,7 +962,7 @@ var Equations = function () {
             displayLength: 30,
             lengthMenu: [
                [10, 25, 30, 50, -1],
-               [10, 25, 30, 50, 'Todos'],
+               [10, 25, 30, 50, 'All'],
             ],
             order: order,
             columns: columns,

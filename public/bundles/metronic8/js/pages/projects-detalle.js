@@ -561,7 +561,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -796,7 +796,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
@@ -863,7 +863,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -914,7 +914,7 @@ var ProjectsDetalle = (function () {
       oTablePrevailingRolesDetalle = DatatableUtil.initSafeDataTable(table, {
          data: prevailing_roles_detalle,
          displayLength: 30,
-         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'Todos']],
+         lengthMenu: [[10, 25, 30, 50, -1], [10, 25, 30, 50, 'All']],
          order: order,
          columns: columns,
          columnDefs: columnDefs,
@@ -978,7 +978,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -1051,7 +1051,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -1246,7 +1246,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
          ajax: datasource,
@@ -1348,7 +1348,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -1415,7 +1415,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -1700,7 +1700,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -1983,7 +1983,7 @@ var ProjectsDetalle = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,

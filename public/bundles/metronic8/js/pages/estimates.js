@@ -48,7 +48,7 @@ var Estimates = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
 
@@ -1734,7 +1734,7 @@ var Estimates = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: [[0, 'asc']],
          columns: columns,
@@ -2187,7 +2187,7 @@ var Estimates = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -2390,7 +2390,7 @@ var Estimates = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: order,
          columns: columns,
@@ -3373,7 +3373,7 @@ var Estimates = (function () {
          displayLength: 30,
          lengthMenu: [
             [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'Todos'],
+            [10, 25, 30, 50, 'All'],
          ],
          order: [[0, 'asc']],
          columns: columns,
