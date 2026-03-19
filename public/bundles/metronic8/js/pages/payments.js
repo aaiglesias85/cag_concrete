@@ -1103,6 +1103,11 @@ var Payments = (function () {
                var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
                var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (item.unpaid_qty == null || parseFloat(item.unpaid_qty) <= 0));
 
+               // Para ordenar, usa un valor numérico estable (0=open, 1=closed).
+               if (type === 'sort') {
+                  return isClosed ? 1 : 0;
+               }
+
                if (isInvoicePaid) {
                   return '<span class="badge badge-light-success">C</span>';
                }
@@ -1327,17 +1332,27 @@ var Payments = (function () {
       }
    };
 
+   /**
+    * Redibuja una sola fila desde el array payments (misma referencia que el row data).
+    * No usar inputs para localizar la fila: si el ítem está "cerrado" no hay inputs.
+    * invalidate('dom') no sirve aquí: re-lee el DOM y no ejecuta render con is_closed_manual actualizado.
+    */
    var actualizarFilaPayment = function (posicion) {
-      if (!oTablePayments) return;
-
-      var $input = $('#payments-table-editable input[data-position="' + posicion + '"]').first();
-      if (!$input.length) return;
-
-      var row = $input.closest('tr');
-      if (!row.length) return;
-
-      if (typeof oTablePayments.row === 'function') {
-         oTablePayments.row(row).invalidate('dom');
+      if (!oTablePayments || posicion === undefined || posicion === null) return;
+      var posStr = String(posicion);
+      var found = false;
+      oTablePayments.rows().every(function () {
+         var d = this.data();
+         if (!d || d.isGroupHeader) return;
+         var p = d.posicion;
+         if (p == posicion || String(p) === posStr) {
+            this.invalidate('data');
+            found = true;
+            return false;
+         }
+      });
+      if (found) {
+         oTablePayments.draw(false);
       }
    };
 
@@ -1418,7 +1433,8 @@ var Payments = (function () {
                }
 
                calcularBondPaymentsEnTiempoReal();
-               actualizarFilaPayment(posicion);
+               // Rebuild completo para que DataTables recalcule render y re-ordene filas.
+               actualizarTableListaPayments(true);
             }
             // Si cancela, no hacemos nada (el preventDefault ya lo dejó como estaba)
          });
