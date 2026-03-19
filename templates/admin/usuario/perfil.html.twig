@@ -301,7 +301,7 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/js/pages/profile.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/js/pages/profile.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
         jQuery(document).ready(function () {
             Profile.init();

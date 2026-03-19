@@ -429,7 +429,7 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/js/pages/index.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/js/pages/index.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var chart_estados_data = {{ stats|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};

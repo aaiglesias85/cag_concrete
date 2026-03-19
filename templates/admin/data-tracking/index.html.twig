@@ -2222,8 +2222,8 @@
 <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
 
-<script src="{{ asset('bundles/metronic8/js/pages/data-tracking.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/js/pages/data-tracking-detalle.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/js/pages/data-tracking.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('bundles/metronic8/js/pages/data-tracking-detalle.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
 
    var permiso = {

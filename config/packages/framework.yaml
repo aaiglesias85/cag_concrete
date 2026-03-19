@@ -1,8 +1,11 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
+<<<<<<< HEAD
     assets:
         version: '%env(APP_VERSION)%'
+=======
+>>>>>>> parent of 30e2521ac (no borrar mas cache)
 
     # Note that the session will be started ONLY if you read or write from it.
     session: true

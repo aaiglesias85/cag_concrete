@@ -131,7 +131,7 @@
 
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/js/pages/login.js') }}"></script>
+    <script src="{{ asset('bundles/metronic8/js/pages/login.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
         jQuery(document).ready(function () {
             Login.init();
