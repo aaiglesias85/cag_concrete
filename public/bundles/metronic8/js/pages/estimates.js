@@ -521,65 +521,26 @@ var Estimates = (function () {
       $(document).off('click', '#form-estimate .wizard-tab');
       $(document).on('click', '#form-estimate .wizard-tab', function (e) {
          e.preventDefault();
-         var item = $(this).data('item');
+         var item = parseInt($(this).data('item'), 10);
 
-         // validar
-         if (item > activeTab && !validWizard()) {
-            mostrarTab();
+         if (item > activeTab) {
+            persistEstimateAndAdvance(item);
             return;
          }
 
-         activeTab = parseInt(item);
-
-         if (activeTab < totalTabs) {
-            // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
-         }
-         if (activeTab == 1) {
-            $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
-            $('#btn-wizard-siguiente').removeClass('hide');
-         }
-         if (activeTab > 1) {
-            $('#btn-wizard-anterior').removeClass('hide');
-            $('#btn-wizard-siguiente').removeClass('hide');
-         }
-         if (activeTab == totalTabs) {
-            // $('#btn-wizard-finalizar').removeClass('hide');
-            $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+         if (item < activeTab) {
+            advanceWizardToTab(item);
+            return;
          }
 
-         // marcar los pasos validos
-         marcarPasosValidosWizard();
-
-         //bug visual de la tabla que muestra las cols corridas
-         switch (activeTab) {
-            case 2:
-               actualizarTableListaBidDeadLines();
-               break;
-            case 3:
-               actualizarTableListaItems();
-               break;
-            case 4:
-               actualizarTableListaTemplateNotes();
-               break;
-            // case 5:
-            //     actualizarTableListaProjectInformation();
-            //    break;
-         }
+         mostrarTab();
       });
 
       //siguiente
       $(document).off('click', '#btn-wizard-siguiente');
       $(document).on('click', '#btn-wizard-siguiente', function (e) {
-         if (validWizard()) {
-            activeTab++;
-            $('#btn-wizard-anterior').removeClass('hide');
-            if (activeTab == totalTabs) {
-               $('#btn-wizard-finalizar').removeClass('hide');
-               $('#btn-wizard-siguiente').addClass('hide');
-            }
-
-            mostrarTab();
-         }
+         var nextTab = activeTab + 1;
+         persistEstimateAndAdvance(nextTab);
       });
       //anterior
       $(document).off('click', '#btn-wizard-anterior');
@@ -617,6 +578,41 @@ var Estimates = (function () {
          }
       }, 0);
    };
+
+   /** Avanza el stepper a newTab (actualiza botones, pestaña visible y tablas auxiliares). */
+   var advanceWizardToTab = function (newTab) {
+      activeTab = newTab;
+      if (activeTab == 1) {
+         $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
+         $('#btn-wizard-siguiente').removeClass('hide');
+      }
+      if (activeTab > 1) {
+         $('#btn-wizard-anterior').removeClass('hide');
+         $('#btn-wizard-siguiente').removeClass('hide');
+      }
+      if (activeTab == totalTabs) {
+         $('#btn-wizard-finalizar').removeClass('hide');
+         $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
+      } else {
+         $('#btn-wizard-finalizar').addClass('hide');
+      }
+      mostrarTab();
+      marcarPasosValidosWizard();
+      setTimeout(function () {
+         switch (activeTab) {
+            case 2:
+               actualizarTableListaBidDeadLines();
+               break;
+            case 3:
+               actualizarTableListaItems();
+               break;
+            case 4:
+               actualizarTableListaTemplateNotes();
+               break;
+         }
+      }, 0);
+   };
+
    var resetWizard = function () {
       activeTab = 1;
       totalTabs = 1;
@@ -631,29 +627,32 @@ var Estimates = (function () {
          KTUtil.removeClass(element, 'valid');
       });
    };
-   var validWizard = function () {
-      var result = true;
-      if (activeTab == 1) {
-         var stage_id = $('#project-stage').val();
-         var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
-         var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
+   /** Campos mínimos del estimate antes de guardar (cualquier Next o salto de pestaña hacia adelante). */
+   var validEstimateSalvar = function () {
+      var stage_id = $('#project-stage').val();
+      var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
+      var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
 
-         if (!validateForm() || stage_id == '' || projectStart == '' || projectEnd == '') {
-            result = false;
-
-            if (stage_id == '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
-            }
-            if (projectStart == '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
-            }
-            if (projectEnd == '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
-            }
+      if (!validateForm() || stage_id == '' || projectStart == '' || projectEnd == '') {
+         if (stage_id == '') {
+            MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
          }
+         if (projectStart == '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
+         }
+         if (projectEnd == '') {
+            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
+         }
+         return false;
       }
+      return true;
+   };
 
-      return result;
+   var validWizard = function () {
+      if (activeTab == 1) {
+         return validEstimateSalvar();
+      }
+      return true;
    };
 
    var marcarPasosValidosWizard = function () {
@@ -685,6 +684,13 @@ var Estimates = (function () {
          KTUtil.find(KTUtil.get('form-estimate'), '.card-label').innerHTML = 'New Project Estimate:';
 
          mostrarForm();
+
+         totalTabs = 5;
+         activeTab = 1;
+         $('#btn-wizard-anterior').addClass('hide');
+         $('#btn-wizard-siguiente').removeClass('hide');
+         $('#btn-wizard-finalizar').addClass('hide');
+         $('.nav-item-hide').removeClass('hide');
       }
    };
 
@@ -732,101 +738,55 @@ var Estimates = (function () {
       }
    };
 
-   var SalvarEstimate = function (closeForm) {
+   var collectEstimateSalvarFormData = function () {
       var formData = new URLSearchParams();
 
       var estimate_id = $('#estimate_id').val();
-      formData.set('estimate_id', estimate_id);
+      formData.set('estimate_id', estimate_id || '');
 
-      var name = $('#name').val();
-      formData.set('name', name);
-
-      var bidDeadline = FlatpickrUtil.getString('datetimepicker-bidDeadline');
-      formData.set('bidDeadline', bidDeadline);
+      formData.set('name', $('#name').val());
+      formData.set('bidDeadline', FlatpickrUtil.getString('datetimepicker-bidDeadline'));
 
       var estimators_id = $('#estimator').val();
-      formData.set('estimators_id', estimators_id.join(','));
+      formData.set('estimators_id', estimators_id ? estimators_id.join(',') : '');
 
-      var stage_id = $('#project-stage').val();
-      formData.set('stage_id', stage_id);
-
-      var county_id = $('#county').val();
-      formData.set('county_id', county_id);
+      formData.set('stage_id', $('#project-stage').val());
+      formData.set('county_id', $('#county').val());
 
       var project_types_id = $('#project-type').val();
-      formData.set('project_types_id', project_types_id.join(','));
+      formData.set('project_types_id', project_types_id ? project_types_id.join(',') : '');
 
-      var proposal_type_id = $('#proposal-type').val();
-      formData.set('proposal_type_id', proposal_type_id);
-
-      var status_id = $('#plan-status').val();
-      formData.set('status_id', status_id);
-
-      var district_id = $('#district').val();
-      formData.set('district_id', district_id);
-
-      var project_id = $('#project_id').val();
-      formData.set('project_id', project_id);
-
-      var priority = $('#priority').val();
-      formData.set('priority', priority);
-
-      var bidNo = $('#bidNo').val();
-      formData.set('bidNo', bidNo);
-
-      var workHour = $('#workHour').val();
-      formData.set('workHour', workHour);
-
-      var phone = $('#phone').val();
-      formData.set('phone', phone);
-
-      var email = $('#email').val();
-      formData.set('email', email);
-
-      var jobWalk = FlatpickrUtil.getString('datetimepicker-jobWalk');
-      formData.set('jobWalk', jobWalk);
-
-      var rfiDueDate = FlatpickrUtil.getString('datetimepicker-rfiDueDate');
-      formData.set('rfiDueDate', rfiDueDate);
-
-      var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
-      formData.set('projectStart', projectStart);
-
-      var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
-      formData.set('projectEnd', projectEnd);
-
-      var submittedDate = FlatpickrUtil.getString('datetimepicker-submittedDate');
-      formData.set('submittedDate', submittedDate);
-
-      var awardedDate = FlatpickrUtil.getString('datetimepicker-awardedDate');
-      formData.set('awardedDate', awardedDate);
-
-      var lostDate = FlatpickrUtil.getString('datetimepicker-lostDate');
-      formData.set('lostDate', lostDate);
-
-      var location = $('#location').val();
-      formData.set('location', location);
-
-      var sector = $('#sector').val();
-      formData.set('sector', sector);
-
-      var plan_downloading_id = $('#plan-downloading').val();
-      formData.set('plan_downloading_id', plan_downloading_id);
-
-      var bidDescription = $('#bidDescription').val();
-      formData.set('bidDescription', bidDescription);
-
-      var bidInstructions = $('#bidInstructions').val();
-      formData.set('bidInstructions', bidInstructions);
-
-      var planLink = $('#planLink').val();
-      formData.set('planLink', planLink);
-
-      var quoteReceived = $('#quoteReceived').prop('checked') ? 1 : 0;
-      formData.set('quoteReceived', quoteReceived);
-
+      formData.set('proposal_type_id', $('#proposal-type').val());
+      formData.set('status_id', $('#plan-status').val());
+      formData.set('district_id', $('#district').val());
+      formData.set('project_id', $('#project_id').val());
+      formData.set('priority', $('#priority').val());
+      formData.set('bidNo', $('#bidNo').val());
+      formData.set('workHour', $('#workHour').val());
+      formData.set('phone', $('#phone').val());
+      formData.set('email', $('#email').val());
+      formData.set('jobWalk', FlatpickrUtil.getString('datetimepicker-jobWalk'));
+      formData.set('rfiDueDate', FlatpickrUtil.getString('datetimepicker-rfiDueDate'));
+      formData.set('projectStart', FlatpickrUtil.getString('datetimepicker-projectStart'));
+      formData.set('projectEnd', FlatpickrUtil.getString('datetimepicker-projectEnd'));
+      formData.set('submittedDate', FlatpickrUtil.getString('datetimepicker-submittedDate'));
+      formData.set('awardedDate', FlatpickrUtil.getString('datetimepicker-awardedDate'));
+      formData.set('lostDate', FlatpickrUtil.getString('datetimepicker-lostDate'));
+      formData.set('location', $('#location').val());
+      formData.set('sector', $('#sector').val());
+      formData.set('plan_downloading_id', $('#plan-downloading').val());
+      formData.set('bidDescription', $('#bidDescription').val());
+      formData.set('bidInstructions', $('#bidInstructions').val());
+      formData.set('planLink', $('#planLink').val());
+      formData.set('quoteReceived', $('#quoteReceived').prop('checked') ? 1 : 0);
       formData.set('bid_deadlines', JSON.stringify(bid_deadlines));
       formData.set('companys', JSON.stringify(companys));
+
+      return formData;
+   };
+
+   var SalvarEstimate = function (closeForm) {
+      var formData = collectEstimateSalvarFormData();
 
       BlockUtil.block('#form-estimate');
 
@@ -927,33 +887,7 @@ var Estimates = (function () {
       });
    };
 
-   function editRow(estimate_id) {
-      var formData = new URLSearchParams();
-      formData.set('estimate_id', estimate_id);
-
-      BlockUtil.block('#form-estimate-body');
-
-      axios
-         .post('estimate/cargarDatos', formData, { responseType: 'json' })
-         .then(function (res) {
-            if (res.status === 200 || res.status === 201) {
-               var response = res.data;
-               if (response.success) {
-                  //cargar datos
-                  cargarDatos(response.estimate);
-               } else {
-                  toastr.error(response.error, '');
-               }
-            } else {
-               toastr.error('An internal error has occurred, please try again.', '');
-            }
-         })
-         .catch(MyUtil.catchErrorAxios)
-         .then(function () {
-            BlockUtil.unblock('#form-estimate-body');
-         });
-
-      function cargarDatos(estimate) {
+   function applyEstimateToForm(estimate) {
          KTUtil.find(KTUtil.get('form-estimate'), '.card-label').innerHTML = 'Update Project Estimate: ' + estimate.name;
 
          $('#name').val(estimate.name);
@@ -1082,7 +1016,74 @@ var Estimates = (function () {
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
+   }
+
+   function reloadEstimateFromBackend(estimateId, done) {
+      var formData = new URLSearchParams();
+      formData.set('estimate_id', estimateId);
+
+      BlockUtil.block('#form-estimate-body');
+
+      return axios
+         .post('estimate/cargarDatos', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  applyEstimateToForm(response.estimate);
+                  if (typeof done === 'function') {
+                     done();
+                  }
+               } else {
+                  toastr.error(response.error, '');
+               }
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .finally(function () {
+            BlockUtil.unblock('#form-estimate-body');
+         });
+   }
+
+   /** Guarda el estimate (salvar + cargarDatos) y avanza al paso newTab: cada Next y cada salto adelante en las pestañas. */
+   var persistEstimateAndAdvance = function (newTab) {
+      if (!validEstimateSalvar()) {
+         mostrarTab();
+         return;
       }
+
+      var formData = collectEstimateSalvarFormData();
+      BlockUtil.block('#form-estimate');
+
+      axios
+         .post('estimate/salvar', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status !== 200 && res.status !== 201) {
+               toastr.error('An internal error has occurred, please try again.', '');
+               return;
+            }
+            var response = res.data;
+            if (!response.success) {
+               toastr.error(response.error || '', '');
+               return;
+            }
+            toastr.success(response.message, '');
+            $('#estimate_id').val(response.estimate_id);
+            btnClickFiltrar();
+            return reloadEstimateFromBackend(response.estimate_id, function () {
+               advanceWizardToTab(newTab);
+            });
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .finally(function () {
+            BlockUtil.unblock('#form-estimate');
+         });
+   };
+
+   function editRow(estimate_id) {
+      reloadEstimateFromBackend(estimate_id);
    }
 
    //Eliminar
