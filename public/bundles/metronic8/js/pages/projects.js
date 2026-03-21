@@ -4954,6 +4954,13 @@ var Projects = (function () {
             [10, 25, 30, 50, 'All'],
          ],
          order: order,
+
+         fixedColumns: {
+            start: 1,
+         },
+         scrollCollapse: true,
+         scrollX: true,
+
          columns: columns,
          columnDefs: columnDefs,
          language: language,
