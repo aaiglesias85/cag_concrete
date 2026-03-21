@@ -423,7 +423,8 @@ class EstimateService extends Base
       $sheet = $spreadsheet->getActiveSheet();
 
       $bidDeadlineStr = $estimate->getBidDeadline() ? $estimate->getBidDeadline()->format('m/d/Y') : '';
-      $awardedDateStr = $estimate->getAwardedDate() ? $estimate->getAwardedDate()->format('m/d/Y') : '';
+      // COMPLETION DATE en el PDF/Excel: Project End del estimate (no awarded date)
+      $projectEndStr = $estimate->getProjectEnd() ? $estimate->getProjectEnd()->format('m/d/Y') : '';
 
       if ($templateName === 'bid_bids.xlsx') {
          $sheet->setCellValue('E3', $bidDeadlineStr);
@@ -431,14 +432,14 @@ class EstimateService extends Base
          $sheet->setCellValue('E5', $estimate->getBidNo() ?? '');
          $sheet->setCellValue('E6', $estimate->getName() ?? '');
          $sheet->setCellValue('E8', $estimate->getLocation() ?? '');
-         $sheet->setCellValue('E9', $awardedDateStr);
+         $sheet->setCellValue('E9', $projectEndStr);
       } else {
          $sheet->setCellValue('E3', $bidDeadlineStr);
          $sheet->setCellValue('E4', $estimate->getProjectId() ?? '');
          $sheet->setCellValue('E5', $estimate->getBidNo() ?? '');
          $sheet->setCellValue('E6', '');
          $sheet->setCellValue('E7', $estimate->getLocation() ?? '');
-         $sheet->setCellValue('E8', $awardedDateStr);
+         $sheet->setCellValue('E8', $projectEndStr);
       }
 
       // Reducir tamaño de fuente y dar más ancho a columna D (labels) para que se vean en una sola línea en el PDF
