@@ -525,6 +525,7 @@ class PaymentService extends Base
 
          // ... (asignación de datos básicos igual que antes) ...
          $arreglo_resultado['project_id'] = $project->getProjectId();
+         $arreglo_resultado['project_number'] = $project->getProjectNumber();
          $arreglo_resultado['company_id'] = $company_id;
          $arreglo_resultado['number'] = $entity->getNumber();
          $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');

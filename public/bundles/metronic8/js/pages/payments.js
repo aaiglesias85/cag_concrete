@@ -625,6 +625,19 @@ var Payments = (function () {
    };
 
    var invoice = null;
+
+   /** Mismo criterio que la columna Job No del listado (projectNumber). */
+   var getPaymentFormTitleJobPart = function (inv) {
+      if (!inv) {
+         return '';
+      }
+      var pn = inv.project_number;
+      if (pn !== undefined && pn !== null && String(pn).trim() !== '') {
+         return 'Job No: ' + String(pn).trim();
+      }
+      return '#' + (inv.number != null ? inv.number : '');
+   };
+
    var initAccionEditar = function () {
       // Acción EDITAR (Lápiz) - Comportamiento normal
       $(document).off('click', '#payment-table-editable a.edit');
@@ -693,7 +706,8 @@ var Payments = (function () {
                $('#payments-table-editable').find('a, input').addClass('disabled').prop('disabled', true).css('pointer-events', 'none');
 
                // Título visual para saber que es modo vista
-               KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'View Payment: #' + invoice.number + ' (Read Only)';
+               KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML =
+                  'View Payment: ' + getPaymentFormTitleJobPart(invoice) + ' (Read Only)';
             } else {
                paymentFormReadOnly = false;
                // Asegurar que los botones de guardar sean visibles si es edición normal
@@ -704,7 +718,7 @@ var Payments = (function () {
          });
 
       function cargarDatos(invoice) {
-         KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: #' + invoice.number;
+         KTUtil.find(KTUtil.get('form-payment'), '.card-label').innerHTML = 'Update Payments: ' + getPaymentFormTitleJobPart(invoice);
 
          var $retAmt = $('#total_retainage_amount');
          $retAmt.val(MyApp.formatMoney(invoice.total_retainage_amount, 2, '.', ','));
