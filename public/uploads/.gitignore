@@ -1,0 +1,5 @@
+# Ignorar archivos en la raíz de uploads
+*
+# Mantener subcarpetas para aplicar sus propios .gitignore
+!*/
+!.gitignore
