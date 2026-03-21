@@ -1,4 +1,12 @@
 var DataTracking = (function () {
+   /** Activar trazas: window.DEBUG_DT_ITEM_QTY = true */
+   var logDtItemQty = function (step, payload) {
+      if (typeof window === 'undefined' || window.DEBUG_DT_ITEM_QTY !== true) {
+         return;
+      }
+      console.log('[DT item qty]', step, payload !== undefined ? payload : '');
+   };
+
    var rowDelete = null;
    var items = [];
 
@@ -832,6 +840,16 @@ var DataTracking = (function () {
          formData.set('color_price', color_used);
 
          formData.set('items', JSON.stringify(items_data_tracking));
+         try {
+            logDtItemQty('SalvarDataTracking POST items (resumen)', {
+               itemsCount: items_data_tracking.length,
+               quantities: items_data_tracking.map(function (it, i) {
+                  return { i: i, item_id: it.item_id, quantity: it.quantity, data_tracking_item_id: it.data_tracking_item_id };
+               }),
+            });
+         } catch (e) {
+            console.warn('[DT item qty] SalvarDataTracking log error', e);
+         }
          formData.set('subcontracts', JSON.stringify(subcontracts));
          formData.set('labor', JSON.stringify(labor));
          formData.set('materials', JSON.stringify(materials));
@@ -844,6 +862,9 @@ var DataTracking = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
+                     logDtItemQty('SalvarDataTracking respuesta servidor OK', {
+                        data_tracking_id: response.data_tracking_id,
+                     });
                      toastr.success(response.message, '');
 
                      //actualizar lista
@@ -857,6 +878,7 @@ var DataTracking = (function () {
                         editRow(savedDataTrackingId);
                      }
                   } else {
+                     logDtItemQty('SalvarDataTracking respuesta error', { error: response.error });
                      toastr.error(response.error, '');
                   }
                } else {
@@ -1013,6 +1035,17 @@ var DataTracking = (function () {
 
          // items
          items_data_tracking = data_tracking.items;
+         try {
+            logDtItemQty('cargarDatos: items desde servidor (cargarDatos)', {
+               resumen:
+                  items_data_tracking &&
+                  items_data_tracking.map(function (it, i) {
+                     return { i: i, item_id: it.item_id, quantity: it.quantity, data_tracking_item_id: it.data_tracking_item_id };
+                  }),
+            });
+         } catch (e) {
+            console.warn('[DT item qty] log cargarDatos', e);
+         }
          actualizarTableListaItems();
 
          // project items
@@ -1933,7 +1966,8 @@ var DataTracking = (function () {
          quantity: {
             presence: { message: 'This field is required' },
             format: {
-               pattern: /^[+-]?\d+(\.\d+)?$/, // permite +12, -34, 56, etc.
+               // =-5, =12, -105.47, -10,441.53 (comas opcionales); sin NumberUtil en el input
+               pattern: /^=?\s*[+-]?[\d,.]+$/,
                message: 'The field is invalid',
             },
          },
@@ -2001,7 +2035,18 @@ var DataTracking = (function () {
                return;
             }
 
+            var rawQtyInput = $('#data-tracking-quantity').val();
             var quantity = DevolverCantidadItemDataTracking();
+            logDtItemQty('btn-salvar-item después de DevolverCantidadItemDataTracking', {
+               nEditingRowItem: nEditingRowItem,
+               rawInput: rawQtyInput,
+               normalizedPreview: normalizarSignoCantidadDataTracking(rawQtyInput),
+               quantityResultado: quantity,
+               filaAntes:
+                  nEditingRowItem != null && items_data_tracking[nEditingRowItem]
+                     ? JSON.parse(JSON.stringify(items_data_tracking[nEditingRowItem]))
+                     : null,
+            });
             var notes = $('#notes-item-data-tracking').val();
 
             var price = item.price;
@@ -2073,6 +2118,18 @@ var DataTracking = (function () {
             //actualizar lista
             actualizarTableListaItems();
 
+            if (nEditingRowItem != null && items_data_tracking[nEditingRowItem]) {
+               logDtItemQty('btn-salvar-item fila actualizada en memoria', {
+                  posicion: nEditingRowItem,
+                  quantityEnArray: items_data_tracking[nEditingRowItem].quantity,
+                  totalEnArray: items_data_tracking[nEditingRowItem].total,
+               });
+            } else if (nEditingRowItem == null) {
+               logDtItemQty('btn-salvar-item nueva fila (última)', {
+                  ultima: items_data_tracking[items_data_tracking.length - 1],
+               });
+            }
+
             if (nEditingRowItem != null) {
                ModalUtil.hide('modal-data-tracking-item');
             }
@@ -2101,6 +2158,12 @@ var DataTracking = (function () {
             $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
 
             $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
+
+            logDtItemQty('edit click: modal abierto con fila', {
+               posicion: posicion,
+               quantityEnFila: items_data_tracking[posicion].quantity,
+               valorPuestoEnInput: $('#data-tracking-quantity').val(),
+            });
 
             // obtener y mostrar la fecha
             var date = FlatpickrUtil.getString('datetimepicker-date');
@@ -2148,33 +2211,97 @@ var DataTracking = (function () {
             });
       });
 
+      /**
+       * Normaliza guion tipográfico (Unicode) a ASCII.
+       */
+      function normalizarSignoCantidadDataTracking(str) {
+         if (str == null) {
+            return '';
+         }
+         return String(str).trim().replace(/\u2212|\u2013/g, '-');
+      }
+
+      /**
+       * Parseo explícito para cantidad del ítem (sin NumberUtil): quita comas de miles y hace parseFloat.
+       * Evita interpretaciones erróneas con decimales / formato US.
+       */
+      function parseCantidadItemDataTrackingPlain(str) {
+         var s = normalizarSignoCantidadDataTracking(str);
+         if (s === '' || s === '-' || s === '+') {
+            return NaN;
+         }
+         s = s.replace(/,/g, '');
+         var n = parseFloat(s);
+         return isNaN(n) ? NaN : n;
+      }
+
       function DevolverCantidadItemDataTracking() {
-         var quantity = $('#data-tracking-quantity').val();
+         var rawDom = $('#data-tracking-quantity').val();
+         var quantity = normalizarSignoCantidadDataTracking(rawDom);
+
+         logDtItemQty('DevolverCantidadItemDataTracking entrada', {
+            rawDom: rawDom,
+            normalizado: quantity,
+            nEditingRowItem: nEditingRowItem,
+            parsePlain: rawDom !== '' && rawDom != null ? parseCantidadItemDataTrackingPlain(String(rawDom)) : NaN,
+         });
 
          if (nEditingRowItem == null) {
-            quantity = quantity.trim().replace(/^[-+]/, '');
-         } else {
-            var old_cant = items_data_tracking[nEditingRowItem].quantity > 0 ? parseFloat(items_data_tracking[nEditingRowItem].quantity) : 0;
-            var raw_quantity = quantity.trim(); // por si tiene espacios
-            var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
-            var number = parseFloat(raw_quantity.replace(/^[-+]/, '')); // quitamos signo y convertimos a número
-
-            // Por defecto, si no tiene signo, consideramos que es una asignación directa
-            var new_quantity = 0;
-
-            if (sign === '+') {
-               new_quantity = old_cant + number;
-            } else if (sign === '-') {
-               new_quantity = old_cant - number;
-            } else {
-               new_quantity = number; // caso sin signo, se reemplaza directamente
+            var qNuevo = quantity;
+            if (qNuevo.charAt(0) === '=') {
+               qNuevo = normalizarSignoCantidadDataTracking(qNuevo.slice(1));
             }
-
-            // Si el resultado es menor que cero, lo dejamos en cero
-            quantity = new_quantity < 0 ? 0 : new_quantity;
+            var parsedNuevo = qNuevo !== '' ? parseCantidadItemDataTrackingPlain(qNuevo) : NaN;
+            var out = isNaN(parsedNuevo) ? 0 : parsedNuevo;
+            logDtItemQty('DevolverCantidadItemDataTracking modo NUEVO ítem', { qNuevo: qNuevo, parsedNuevo: parsedNuevo, out: out });
+            return out;
          }
 
-         return quantity;
+         // Valor absoluto: =-5 o = 12 (evita confundir con resta relativa: -5 resta 5 a la cantidad actual)
+         if (quantity.charAt(0) === '=') {
+            var absolutoStr = normalizarSignoCantidadDataTracking(quantity.slice(1));
+            var parsedAbs = absolutoStr !== '' ? parseCantidadItemDataTrackingPlain(absolutoStr) : NaN;
+            var outAbs = isNaN(parsedAbs) ? 0 : parsedAbs;
+            logDtItemQty('DevolverCantidadItemDataTracking modo ABSOLUTO (=)', { absolutoStr: absolutoStr, parsedAbs: parsedAbs, out: outAbs });
+            return outAbs;
+         }
+
+         var prev = parseFloat(items_data_tracking[nEditingRowItem].quantity);
+         var old_cant = isNaN(prev) ? 0 : prev;
+         var raw_quantity = quantity;
+         var sign = raw_quantity.charAt(0);
+         var numStr = raw_quantity.replace(/^[-+]/, '');
+         var number = numStr !== '' ? parseCantidadItemDataTrackingPlain(numStr) : NaN;
+         if (isNaN(number)) {
+            number = 0;
+         }
+
+         var new_quantity = 0;
+
+         if (sign === '+') {
+            new_quantity = old_cant + number;
+         } else if (sign === '-') {
+            new_quantity = old_cant - number;
+            // Si cantidad previa > 0 y "-N" haría ~0 porque N ≈ old_cant, suele ser
+            // "pasar a negativo" (p. ej. -105.47 con stock 105.47), no "dejar en cero".
+            // Para poner exactamente 0 use =0.
+            var eps = 1e-4;
+            if (old_cant > 0 && Math.abs(new_quantity) < eps && Math.abs(number - old_cant) < eps) {
+               new_quantity = -number;
+            }
+         } else {
+            new_quantity = number;
+         }
+
+         logDtItemQty('DevolverCantidadItemDataTracking modo RELATIVO / reemplazo', {
+            old_cant: old_cant,
+            sign: sign,
+            number: number,
+            rama: sign === '+' ? 'suma' : sign === '-' ? 'resta' : 'reemplazo_directo',
+            new_quantity: new_quantity,
+         });
+
+         return new_quantity;
       }
 
       function ExisteItem(item_id) {
@@ -4227,6 +4354,7 @@ var DataTracking = (function () {
          initAccionNuevoInvoice();
          initAccionSalvar();
          initAccionCerrar();
+         initAccionChange();
 
          initAccionFiltrar();
 

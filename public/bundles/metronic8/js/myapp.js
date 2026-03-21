@@ -1121,11 +1121,24 @@ var MyApp = function () {
         try {
             // poner minuscula
             expression = expression.toLowerCase();
-            // Sustituye 'x' por el valor de la variable, asumiendo que 'x' es la variable
-            expression = expression.replace(/x/gi, variableValue);
+            // Normalizar cantidad a número (evita comas de miles y asegura tipo number)
+            var n = variableValue;
+            if (typeof n !== 'number' || !isFinite(n)) {
+                if (typeof NumberUtil !== 'undefined' && NumberUtil.unformatNumber) {
+                    n = NumberUtil.unformatNumber(String(variableValue));
+                } else {
+                    n = parseFloat(String(variableValue).replace(/,/g, ''));
+                }
+                if (!isFinite(n)) {
+                    n = 0;
+                }
+            }
+            var substitution = String(n);
+            // Sustituye 'x' por el valor entre paréntesis (cantidades negativas o decimales)
+            expression = expression.replace(/x/gi, '(' + substitution + ')');
 
-            // Verifica que la expresión solo contenga números, operadores permitidos y paréntesis
-            if (/^[0-9+\-*\/\s\(\)]+$/.test(expression)) {
+            // Números (incl. punto decimal), operadores permitidos y paréntesis
+            if (/^[0-9+\-*\/\s\(\).]+$/.test(expression)) {
                 let func = new Function('return ' + expression);
                 return func();
             } else {
