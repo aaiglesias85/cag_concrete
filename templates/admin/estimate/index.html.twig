@@ -812,6 +812,8 @@
                         <div id="lista-company"></div>
                      </div>
 
+                     {# Paso 3 (Phone / Email) oculto temporalmente #}
+                     {#
                      <div class="form-group ic-form-group">
                         <div class="row">
                            <div class="col-md-6">
@@ -830,6 +832,12 @@
                               <input type="text" class="form-control form-control-validate form-control-solid event-change" id="email" name="email" />
                            </div>
                         </div>
+                     </div>
+                     #}
+                     {# Mismos id que el bloque comentado: el JS (tagsInput, guardado) sigue encontrando #phone / #email #}
+                     <div class="d-none" aria-hidden="true">
+                        <input type="text" id="phone" name="phone" autocomplete="off" />
+                        <input type="text" id="email" name="email" autocomplete="off" />
                      </div>
                   </div>
                   <div class="tab-pane fade" id="tab-content-quotes" role="tabpanel">
