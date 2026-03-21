@@ -781,7 +781,8 @@ class PaymentService extends Base
             "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
             "has_quantity_history" => $has_quantity_history,
             "has_price_history" => $has_price_history,
-            "posicion" => $key
+            "posicion" => $key,
+            "is_closed_manual" => $value->getIsClosedManual() ? 1 : 0,
          ];
       }
       $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
@@ -935,11 +936,13 @@ class PaymentService extends Base
             // Guardar project_item_id para actualizar invoices siguientes
             $updated_project_item_ids[] = $value->project_item_id;
 
-            // payment (unpaid_qty puede venir sobrescrito desde Notas; persistir tal cual)
+            // Cantidades y montos vienen del cliente tal cual (abrir/cerrar ítem solo afecta is_closed_manual en UI).
+            // unpaid_qty puede venir sobrescrito desde Notas; persistir tal cual.
             $invoice_item_entity->setPaidQty((float)$value->paid_qty);
             $invoice_item_entity->setUnpaidQty(\is_numeric($value->unpaid_qty ?? null) ? (float)$value->unpaid_qty : $invoice_item_entity->getUnpaidQty());
             $invoice_item_entity->setPaidAmount($value->paid_amount);
             $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
+            $invoice_item_entity->setIsClosedManual((bool) $value->is_closed_manual);
          }
 
          // Comprobar si este ítem está completamente pagado (unpaid_qty <= 0)

@@ -525,6 +525,13 @@ var Payments = (function () {
       }
 
       if (isValid) {
+         if (Array.isArray(payments)) {
+            payments.forEach(function (p) {
+               if (p && !p.isGroupHeader) {
+                  p.is_closed_manual = normalizeIsClosedManualFlag(p.is_closed_manual);
+               }
+            });
+         }
          var formData = new URLSearchParams();
          var invoice_id = $('#invoice_id').val();
          formData.set('invoice_id', invoice_id);
@@ -719,6 +726,13 @@ var Payments = (function () {
          calcularTotalPaymentGlobal();
 
          payments = invoice.payments;
+         if (Array.isArray(payments)) {
+            payments.forEach(function (p) {
+               if (p && !p.isGroupHeader) {
+                  p.is_closed_manual = normalizeIsClosedManualFlag(p.is_closed_manual);
+               }
+            });
+         }
 
          // Bond en Payments: fórmula distinta a Invoice. Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
          var contractAmtBonded = parseFloat(invoice.contract_amount_bonded || 0);
@@ -870,6 +884,60 @@ var Payments = (function () {
    var payments = [];
    var nEditingRowPayment = null;
 
+   /** API puede enviar 0/1; unifica a booleano para render y guardado. */
+   var normalizeIsClosedManualFlag = function (v) {
+      if (v === undefined || v === null || v === '') return false;
+      if (v === true || v === 1 || v === '1') return true;
+      if (v === false || v === 0 || v === '0') return false;
+      var n = parseFloat(v);
+      return !isNaN(n) && n !== 0;
+   };
+
+   /**
+    * Abierto/cerrado en UI: solo is_closed_manual (y factura pagada = todo cerrado).
+    * No usar paid_qty/unpaid_qty para decidir; abrir/cerrar no debe alterar esas cantidades.
+    */
+   var isPaymentItemVisuallyClosed = function (item, isInvoicePaid) {
+      if (isInvoicePaid) return true;
+      if (!item || item.isGroupHeader) return false;
+      return normalizeIsClosedManualFlag(item.is_closed_manual);
+   };
+
+   /**
+    * Tras agrupar por Change Order: en cada bloque, ítems abiertos arriba y cerrados abajo (mantiene _groupOrder dentro de cada grupo).
+    */
+   var ordenarPorEstadoAbiertoArriba = function (datosAgrupados, isInvoicePaid) {
+      var resultado = [];
+      var segment = [];
+      var flush = function () {
+         if (!segment.length) {
+            return;
+         }
+         segment.sort(function (a, b) {
+            var ac = isPaymentItemVisuallyClosed(a, isInvoicePaid) ? 1 : 0;
+            var bc = isPaymentItemVisuallyClosed(b, isInvoicePaid) ? 1 : 0;
+            if (ac !== bc) {
+               return ac - bc;
+            }
+            return (a._groupOrder || 0) - (b._groupOrder || 0);
+         });
+         segment.forEach(function (r) {
+            resultado.push(r);
+         });
+         segment = [];
+      };
+      datosAgrupados.forEach(function (row) {
+         if (row.isGroupHeader) {
+            flush();
+            resultado.push(row);
+         } else {
+            segment.push(row);
+         }
+      });
+      flush();
+      return resultado;
+   };
+
    var agruparItemsPorChangeOrder = function (items) {
       var items_regulares = [];
       var items_change_order = [];
@@ -914,6 +982,8 @@ var Payments = (function () {
    var initTablePayments = function () {
       const table = '#payments-table-editable';
       var datosAgrupados = agruparItemsPorChangeOrder(payments);
+      var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
+      datosAgrupados = ordenarPorEstadoAbiertoArriba(datosAgrupados, isInvoicePaid);
 
       const columns = [
          { data: 'item' },
@@ -1029,7 +1099,7 @@ var Payments = (function () {
                var safeValue = data !== null && data !== undefined ? data : 0;
                var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
                var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
-               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (parseFloat(item.unpaid_qty) <= 0));
+               var isClosed = isPaymentItemVisuallyClosed(item, isInvoicePaid);
 
                if (isClosed) {
                   return `<div class="w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span></div>`;
@@ -1048,7 +1118,7 @@ var Payments = (function () {
                var safeValue = data !== null && data !== undefined ? data : 0;
                var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
                var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
-               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (parseFloat(item.unpaid_qty) <= 0));
+               var isClosed = isPaymentItemVisuallyClosed(item, isInvoicePaid);
 
                // Determinar si el ítem tiene notas para colorear el ícono
                var hasNotes =
@@ -1101,7 +1171,7 @@ var Payments = (function () {
                if (row.isGroupHeader) return '';
                var isInvoicePaid = invoice && (invoice.paid == 1 || invoice.paid === true);
                var item = typeof row.posicion !== 'undefined' && payments[row.posicion] ? payments[row.posicion] : row;
-               var isClosed = isInvoicePaid || (typeof item.is_closed_manual !== 'undefined' ? item.is_closed_manual : (item.unpaid_qty == null || parseFloat(item.unpaid_qty) <= 0));
+               var isClosed = isPaymentItemVisuallyClosed(item, isInvoicePaid);
 
                // Para ordenar, usa un valor numérico estable (0=open, 1=closed).
                if (type === 'sort') {
@@ -1132,7 +1202,6 @@ var Payments = (function () {
       ];
 
       const language = DatatableUtil.getDataTableLenguaje();
-      const order = [[10, 'asc']];
 
       oTablePayments = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
@@ -1141,7 +1210,8 @@ var Payments = (function () {
             [10, 25, 30, 50, -1],
             [10, 25, 30, 50, 'All'],
          ],
-         order: order,
+         ordering: false,
+         order: [],
          columns: columns,
          columnDefs: columnDefs,
          language: language,
@@ -1328,7 +1398,8 @@ var Payments = (function () {
       }
 
       if (oTablePayments) {
-         oTablePayments.rows().invalidate('dom').draw(false);
+         // 'data': redibuja desde payments[] (fuente de verdad). 'dom' re-lee HTML y pierde campos solo en memoria (p. ej. is_closed_manual).
+         oTablePayments.rows().invalidate('data').draw(false);
       }
    };
 
@@ -1379,16 +1450,27 @@ var Payments = (function () {
       $(document).off('click', '.item-status-toggle');
       $(document).on('click', '.item-status-toggle', function (e) {
          var $input = $(this);
-         var $row = $input.closest('tr');
-         var posicion = $input.data('posicion');
+         var posicionRaw = $input.attr('data-posicion');
+         var posicion = posicionRaw !== undefined && posicionRaw !== '' ? parseInt(posicionRaw, 10) : NaN;
 
-         // 1. Detectar el estado DESEADO (lo que el usuario clicó)
-         var desiredState = $input.prop('checked');
-
-         // 2. Bloquear el cambio visual inmediatamente para preguntar primero
          e.preventDefault();
 
-         // Determinamos texto según a dónde quiere ir
+         if (paymentFormReadOnly) {
+            return;
+         }
+         if (isNaN(posicion)) {
+            toastr.error('Could not identify the row.', '');
+            return;
+         }
+         var item = payments[posicion];
+         if (!item || item.isGroupHeader) {
+            toastr.error('Item not found.', '');
+            return;
+         }
+
+         // Fuente de verdad: is_closed_manual en payments[] (no el checkbox del DOM: puede desincronizarse).
+         var currentManual = normalizeIsClosedManualFlag(item.is_closed_manual);
+         var desiredState = !currentManual;
          var statusLabel = desiredState ? 'Closed' : 'Open';
 
          Swal.fire({
@@ -1400,44 +1482,35 @@ var Payments = (function () {
             cancelButtonColor: '#d33',
             confirmButtonText: 'Yes, change it!',
             cancelButtonText: 'No, cancel',
-         }).then((result) => {
-            if (result.isConfirmed) {
-               var item = payments[posicion];
-               if (item) {
-                  item.is_closed_manual = desiredState;
-                  var quantity = parseFloat(item.quantity) || 0;
-                  var price = parseFloat(item.price) || 0;
+         })
+            .then(function (result) {
+               var confirmado =
+                  (result && result.isConfirmed === true) ||
+                  (result && result.value === true);
 
-                  if (desiredState) {
-                     // Cerrando: guardar estado previo y marcar como pagado completo
-                     item._closed_previous_paid = parseFloat(item.paid_qty) || 0;
-                     item._closed_previous_unpaid = parseFloat(item.unpaid_qty) || 0;
-                     item.paid_qty = quantity;
-                     item.unpaid_qty = 0;
-                     item.paid_amount = quantity * price;
-                  } else {
-                     // Abriendo: restaurar paid_qty y unpaid_qty al estado anterior al cierre
-                     if (typeof item._closed_previous_paid === 'number' && typeof item._closed_previous_unpaid === 'number') {
-                        item.paid_qty = item._closed_previous_paid;
-                        item.unpaid_qty = item._closed_previous_unpaid;
-                        item.paid_amount = item.paid_qty * price;
-                     } else {
-                        // Sin estado guardado (ej. ya venía cerrado): proceso inverso = todo como no pagado
-                        item.paid_qty = 0;
-                        item.unpaid_qty = quantity;
-                        item.paid_amount = 0;
-                     }
-                     delete item._closed_previous_paid;
-                     delete item._closed_previous_unpaid;
-                  }
+               if (!confirmado) {
+                  return;
                }
 
-               calcularBondPaymentsEnTiempoReal();
-               // Rebuild completo para que DataTables recalcule render y re-ordene filas.
+               // Solo cambia el flag; paid/unpaid/montos se mantienen (snapshot tras redibujar por si otra lógica tocara la fila).
+               var snapQty = {
+                  paid_qty: item.paid_qty,
+                  unpaid_qty: item.unpaid_qty,
+                  paid_amount: item.paid_amount,
+                  paid_amount_total: item.paid_amount_total,
+               };
+
+               item.is_closed_manual = desiredState;
                actualizarTableListaPayments(true);
-            }
-            // Si cancela, no hacemos nada (el preventDefault ya lo dejó como estaba)
-         });
+               item.paid_qty = snapQty.paid_qty;
+               item.unpaid_qty = snapQty.unpaid_qty;
+               item.paid_amount = snapQty.paid_amount;
+               item.paid_amount_total = snapQty.paid_amount_total;
+               actualizarFilaPayment(posicion);
+            })
+            .catch(function (err) {
+               console.error('Swal item-status-toggle', err);
+            });
       });
 
       // --- Toggle Manual con Alerta end ---

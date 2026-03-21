@@ -35,6 +35,9 @@ class InvoiceItem
    #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: false)]
    private ?float $unpaidQty = 0.0;
 
+   #[ORM\Column(name: 'is_closed_manual', type: 'boolean', options: ['default' => false])]
+   private bool $isClosedManual = false;
+
    #[ORM\Column(name: 'quantity_brought_forward', type: 'float', nullable: true)]
    private ?float $quantityBroughtForward = null;
 
@@ -168,6 +171,16 @@ class InvoiceItem
    public function setUnpaidQty(?float $unpaidQty): void
    {
       $this->unpaidQty = $unpaidQty;
+   }
+
+   public function getIsClosedManual(): bool
+   {
+      return $this->isClosedManual;
+   }
+
+   public function setIsClosedManual(bool $isClosedManual): void
+   {
+      $this->isClosedManual = $isClosedManual;
    }
 
    public function getQuantityBroughtForward(): ?float

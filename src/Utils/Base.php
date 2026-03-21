@@ -1591,7 +1591,8 @@ class Base
             "has_price_history" => $has_price_history,
             "has_unpaid_qty_history" => $has_unpaid_qty_history,
             "notes" => $notes,
-            "posicion" => $key
+            "posicion" => $key,
+            "is_closed_manual" => $value->getIsClosedManual() ? 1 : 0,
          ];
       }
 

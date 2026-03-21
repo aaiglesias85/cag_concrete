@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 15-03-2026 a las 23:53:38
+-- Tiempo de generación: 21-03-2026 a las 13:22:34
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -765,6 +765,7 @@ CREATE TABLE `invoice_item` (
   `price` decimal(18,2) DEFAULT NULL,
   `paid_qty` decimal(18,6) DEFAULT NULL,
   `unpaid_qty` decimal(18,6) DEFAULT NULL,
+  `is_closed_manual` tinyint(1) NOT NULL DEFAULT '0' COMMENT '1 = ítem marcado cerrado en Payments (solo UI/estado)',
   `quantity_brought_forward` decimal(18,6) DEFAULT NULL,
   `paid_amount` decimal(18,6) DEFAULT NULL,
   `paid_amount_total` decimal(18,6) DEFAULT NULL,
@@ -777,22 +778,22 @@ CREATE TABLE `invoice_item` (
 -- Volcado de datos para la tabla `invoice_item`
 --
 
-INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previous`, `quantity`, `price`, `paid_qty`, `unpaid_qty`, `quantity_brought_forward`, `paid_amount`, `paid_amount_total`, `invoice_id`, `project_item_id`, `txn_id`) VALUES
-(37, 0.000000, 0.000000, 10.000000, 160.00, 4.000000, NULL, NULL, 640.000000, 640.000000, 9, 11, NULL),
-(38, 0.000000, 0.000000, 10.000000, 200.00, 4.000000, NULL, NULL, 800.000000, 800.000000, 9, 12, NULL),
-(39, 0.000000, 0.000000, 10.000000, 300.00, 4.000000, NULL, NULL, 1200.000000, 1200.000000, 9, 13, NULL),
-(40, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, NULL, NULL, 400.000000, 400.000000, 9, 16, NULL),
-(41, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, NULL, NULL, 400.000000, 400.000000, 9, 17, NULL),
-(52, 10.000000, 3.000000, 0.000000, 160.00, 1.000000, NULL, NULL, 160.000000, 800.000000, 12, 11, NULL),
-(53, 10.000000, 3.000000, 0.000000, 200.00, 1.000000, NULL, NULL, 200.000000, 1000.000000, 12, 12, NULL),
-(54, 10.000000, 3.000000, 0.000000, 300.00, 1.000000, NULL, NULL, 300.000000, 1500.000000, 12, 13, NULL),
-(55, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, NULL, NULL, 100.000000, 500.000000, 12, 16, NULL),
-(56, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, NULL, NULL, 100.000000, 500.000000, 12, 17, NULL),
-(57, 10.000000, 5.000000, 0.000000, 160.00, 5.000000, NULL, NULL, 800.000000, 1600.000000, 13, 11, NULL),
-(58, 10.000000, 5.000000, 0.000000, 200.00, 5.000000, NULL, NULL, 1000.000000, 2000.000000, 13, 12, NULL),
-(59, 10.000000, 5.000000, 0.000000, 300.00, 5.000000, NULL, NULL, 1500.000000, 3000.000000, 13, 13, NULL),
-(60, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, NULL, 500.000000, 1000.000000, 13, 16, NULL),
-(61, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, NULL, 500.000000, 1000.000000, 13, 17, NULL);
+INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previous`, `quantity`, `price`, `paid_qty`, `unpaid_qty`, `is_closed_manual`, `quantity_brought_forward`, `paid_amount`, `paid_amount_total`, `invoice_id`, `project_item_id`, `txn_id`) VALUES
+(37, 0.000000, 0.000000, 10.000000, 160.00, 4.000000, NULL, 0, NULL, 640.000000, 640.000000, 9, 11, NULL),
+(38, 0.000000, 0.000000, 10.000000, 200.00, 4.000000, NULL, 0, NULL, 800.000000, 800.000000, 9, 12, NULL),
+(39, 0.000000, 0.000000, 10.000000, 300.00, 4.000000, NULL, 0, NULL, 1200.000000, 1200.000000, 9, 13, NULL),
+(40, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, NULL, 0, NULL, 400.000000, 400.000000, 9, 16, NULL),
+(41, 0.000000, 0.000000, 10.000000, 100.00, 4.000000, NULL, 0, NULL, 400.000000, 400.000000, 9, 17, NULL),
+(52, 10.000000, 3.000000, 0.000000, 160.00, 1.000000, NULL, 0, NULL, 160.000000, 800.000000, 12, 11, NULL),
+(53, 10.000000, 3.000000, 0.000000, 200.00, 1.000000, NULL, 0, NULL, 200.000000, 1000.000000, 12, 12, NULL),
+(54, 10.000000, 3.000000, 0.000000, 300.00, 1.000000, NULL, 0, NULL, 300.000000, 1500.000000, 12, 13, NULL),
+(55, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, NULL, 0, NULL, 100.000000, 500.000000, 12, 16, NULL),
+(56, 10.000000, 3.000000, 0.000000, 100.00, 1.000000, NULL, 0, NULL, 100.000000, 500.000000, 12, 17, NULL),
+(57, 10.000000, 5.000000, 0.000000, 160.00, 5.000000, NULL, 0, NULL, 800.000000, 1600.000000, 13, 11, NULL),
+(58, 10.000000, 5.000000, 0.000000, 200.00, 5.000000, NULL, 0, NULL, 1000.000000, 2000.000000, 13, 12, NULL),
+(59, 10.000000, 5.000000, 0.000000, 300.00, 5.000000, NULL, 0, NULL, 1500.000000, 3000.000000, 13, 13, NULL),
+(60, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, 0, NULL, 500.000000, 1000.000000, 13, 16, NULL),
+(61, 10.000000, 5.000000, 0.000000, 100.00, 5.000000, NULL, 0, NULL, 500.000000, 1000.000000, 13, 17, NULL);
 
 -- --------------------------------------------------------
 
@@ -2549,7 +2550,6 @@ ALTER TABLE `project_notes`
 --
 ALTER TABLE `project_prevailing_role`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `unique_project_role` (`project_id`,`role_id`),
   ADD KEY `idx_project_id` (`project_id`),
   ADD KEY `idx_role_id` (`role_id`),
   ADD KEY `fk_project_prevailing_role_county` (`county_id`);
