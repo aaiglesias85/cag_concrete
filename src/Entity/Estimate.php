@@ -58,8 +58,8 @@ class Estimate
     #[ORM\Column(name: 'rfi_due_date', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $rfiDueDate;
 
-    #[ORM\Column(name: 'project_start', type: 'datetime', nullable: false)]
-    private ?\DateTimeInterface $projectStart;
+    #[ORM\Column(name: 'project_start', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $projectStart = null;
 
     #[ORM\Column(name: 'project_end', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $projectEnd;

@@ -1742,11 +1742,13 @@ class EstimateService extends Base
          $entity->setRfiDueDate($rfiDueDate);
       }
 
+      $entity->setProjectStart(null);
       if ($projectStart != '') {
          $projectStart = \DateTime::createFromFormat('m/d/Y H:i', $projectStart);
          $entity->setProjectStart($projectStart);
       }
 
+      $entity->setProjectEnd(null);
       if ($projectEnd != '') {
          $projectEnd = \DateTime::createFromFormat('m/d/Y H:i', $projectEnd);
          $entity->setProjectEnd($projectEnd);

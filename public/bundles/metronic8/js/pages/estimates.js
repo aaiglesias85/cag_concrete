@@ -630,15 +630,11 @@ var Estimates = (function () {
    /** Campos mínimos del estimate antes de guardar (cualquier Next o salto de pestaña hacia adelante). */
    var validEstimateSalvar = function () {
       var stage_id = $('#project-stage').val();
-      var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
       var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
 
-      if (!validateForm() || stage_id == '' || projectStart == '' || projectEnd == '') {
+      if (!validateForm() || stage_id == '' || projectEnd == '') {
          if (stage_id == '') {
             MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
-         }
-         if (projectStart == '') {
-            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
          }
          if (projectEnd == '') {
             MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
@@ -713,10 +709,9 @@ var Estimates = (function () {
       event_change = false;
 
       var stage_id = $('#project-stage').val();
-      var projectStart = FlatpickrUtil.getString('datetimepicker-projectStart');
       var projectEnd = FlatpickrUtil.getString('datetimepicker-projectEnd');
 
-      var isValid = validateForm() && stage_id !== '' && projectStart !== '' && projectEnd !== '';
+      var isValid = validateForm() && stage_id !== '' && projectEnd !== '';
 
       if (closeForm && !isValid) {
          cerrarFormsConfirmated();
@@ -728,9 +723,6 @@ var Estimates = (function () {
       } else {
          if (stage_id === '') {
             MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project-stage'), 'This field is required');
-         }
-         if (projectStart === '') {
-            MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectStart'), 'This field is required');
          }
          if (projectEnd === '') {
             MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-projectEnd'), 'This field is required');
