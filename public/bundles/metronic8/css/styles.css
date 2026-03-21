@@ -9,6 +9,10 @@ body,
    background-color: #0f1014 !important;
 }
 
+/* ---------------------------------------------------------------------------
+   Personalización sidebar / menú (colores Metronic dark-sidebar)
+   Descomentar el bloque siguiente si quieres volver a usar estos estilos.
+   ---------------------------------------------------------------------------
 [data-kt-app-layout='dark-sidebar'] .app-sidebar {
    background-color: #056ee9 !important;
 }
@@ -135,12 +139,14 @@ body,
 [data-kt-app-layout='dark-sidebar'] .app-sidebar .menu .menu-item .menu-sub .menu-link.active {
    text-shadow: 0 1px 1px rgba(15, 20, 31, 0.18);
 }
+--------------------------------------------------------------------------- */
 
 .btn-color-cat {
    background-color: #0e2536 !important;
    border: 1px solid #1c3b4d !important;
 }
 
+/* Toggle del sidebar (colores / estilo junto al menú) — descomentar si reactivas la personalización del menú
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-duotone,
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-outline,
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-solid {
@@ -164,6 +170,7 @@ body,
    border-radius: 50%;
    box-shadow: none !important;
 }
+*/
 
 .bg-cencosud {
    background-color: #fd5b00 !important;
@@ -1266,6 +1273,7 @@ span.is-invalid {
    margin-left: 0px !important;
 }
 
+/* Duplicado: toggle sidebar (mismo bloque que arriba; descomentar junto con la personalización del menú)
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-duotone,
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-outline,
 #kt_app_sidebar_toggle.btn.btn-active-color-primary:hover .ki-solid {
@@ -1289,6 +1297,7 @@ span.is-invalid {
    border-radius: 50%;
    box-shadow: none !important;
 }
+*/
 
 .menu-action-link {
    cursor: pointer;
