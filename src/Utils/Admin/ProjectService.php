@@ -16,6 +16,8 @@ use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemOverridePayment;
+use App\Entity\InvoiceItemOverridePaymentHistory;
 use App\Entity\InvoiceItemUnpaidQtyHistory;
 use App\Entity\Item;
 use App\Entity\Notification;
@@ -42,6 +44,8 @@ use App\Repository\DataTrackingLaborRepository;
 use App\Repository\DataTrackingMaterialRepository;
 use App\Repository\DataTrackingRepository;
 use App\Repository\DataTrackingSubcontractRepository;
+use App\Repository\InvoiceItemOverridePaymentHistoryRepository;
+use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\NotificationRepository;
@@ -745,6 +749,20 @@ class ProjectService extends Base
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $invoice_item) {
          $em->remove($invoice_item);
+      }
+
+      // override payment (paid qty) e historial
+      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      $override_items = $overrideRepo->ListarPorProjectItem((int) $project_item_id);
+      /** @var InvoiceItemOverridePaymentHistoryRepository $histRepo */
+      $histRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
+      foreach ($override_items as $override_item) {
+         $historial_override = $histRepo->ListarHistorialDeOverride((int) $override_item->getId());
+         foreach ($historial_override as $historial_override_row) {
+            $em->remove($historial_override_row);
+         }
+         $em->remove($override_item);
       }
 
       // project item history
