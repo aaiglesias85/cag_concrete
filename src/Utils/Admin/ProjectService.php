@@ -79,7 +79,8 @@ class ProjectService extends Base
       ContainerBagInterface $containerBag,
       Security $security,
       LoggerInterface $logger,
-      InvoiceService $invoiceService
+      InvoiceService $invoiceService,
+      private InvoicePaidQtyOverrideResolver $paidQtyOverrideResolver
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->invoiceService = $invoiceService;
@@ -1197,7 +1198,7 @@ class ProjectService extends Base
       /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItem::class);
       $bon_quantity_used_before = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $fecha_inicial);
-      $bond_paid_qty_before = (float) $invoiceItemRepo->SumBondPaidQtyForInvoicesBeforeOrOnDate($project_id, $fecha_inicial);
+      $bond_paid_qty_before = $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForProjectBeforeOrOnDate((int) $project_id, $fecha_inicial);
       $consumed_real = $bon_quantity_used_before - $bond_paid_qty_before;
       $bon_quantity_available = max(0.0, 1.0 - $consumed_real);
 
@@ -1244,7 +1245,9 @@ class ProjectService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
       foreach ($invoice_items as $value) {
-         $total += $value->getPaidAmount();
+         $effPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
+         $price = (float) ($value->getPrice() ?? 0);
+         $total += $effPaid * $price;
       }
 
       return $total;
@@ -1286,9 +1289,8 @@ class ProjectService extends Base
          $quantity = $invoice_item->getQuantity();
          $quantity = ($quantity === null) ? 0.0 : (float)$quantity;
 
-         // Sumar lo pagado
-         $paid_quantity = $invoice_item->getPaidQty();
-         $paid_quantity = ($paid_quantity === null) ? 0.0 : (float)$paid_quantity;
+         // Sumar lo pagado (efectivo: override si aplica al período del invoice)
+         $paid_quantity = $this->paidQtyOverrideResolver->getEffectivePaidQty($invoice_item);
 
          // ACUMULAR
          // IMPORTANTE: No sumamos quantity_brought_forward aquí.

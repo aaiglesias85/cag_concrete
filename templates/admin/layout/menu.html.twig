@@ -358,7 +358,7 @@
                {% endif %} {% endif %}
 
                <!-- menu invoice -->
-               {% if menu.menuInvoice or menu.menuPayment %}
+               {% if menu.menuInvoice or menu.menuPayment or menu.menuOverridePayment %}
                <div class="menu-item pt-5">
                   <div class="menu-content">
                      <span class="menu-heading fw-bold text-uppercase fs-7">Accounting</span>
@@ -387,6 +387,18 @@
                         </i>
                      </span>
                      <span class="menu-title">Payments</span>
+                  </a>
+               </div>
+               {% endif %} {% if menu.menuOverridePayment %}
+               <div class="menu-item">
+                  <a class="menu-link {{ activeRoute == 'override_payment' ? 'active' }}" href="{{ url('override_payment') }}">
+                     <span class="menu-icon">
+                        <i class="ki-duotone ki-dollar fs-2">
+                           <span class="path1"></span>
+                           <span class="path2"></span>
+                        </i>
+                     </span>
+                     <span class="menu-title">Override Payment</span>
                   </a>
                </div>
                {% endif %} {% endif %}

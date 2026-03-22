@@ -1,0 +1,324 @@
+<?php
+
+namespace App\Utils\Admin;
+
+use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemOverridePayment;
+use App\Entity\InvoiceItemOverridePaymentHistory;
+use App\Entity\Project;
+use App\Entity\ProjectItem;
+use App\Entity\ProjectItemHistory;
+use App\Repository\InvoiceItemOverridePaymentHistoryRepository;
+use App\Repository\InvoiceItemOverridePaymentRepository;
+use App\Repository\InvoiceItemRepository;
+use App\Repository\ProjectItemHistoryRepository;
+use App\Repository\ProjectItemRepository;
+use App\Utils\Base;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+
+class OverridePaymentService extends Base
+{
+   public function __construct(
+      ContainerInterface $container,
+      MailerInterface $mailer,
+      ContainerBagInterface $containerBag,
+      Security $security,
+      LoggerInterface $logger
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+   }
+
+   /**
+    * Lista datos para Override Payment: el repositorio agrupa por project_item_id (sumas en SQL);
+    * aquí solo se aplican override de paid qty, historiales y formato para DataTables.
+    *
+    * @return array{data: array<int, array<string, mixed>>, total: int}
+    */
+   public function Listar(
+      int $start,
+      int $length,
+      string $search,
+      string $orderField,
+      string $orderDir,
+      ?string $company_id,
+      ?string $project_id,
+      ?string $fecha_inicial,
+      ?string $fecha_fin
+   ): array {
+      $startDate = $this->parseDateMDY($fecha_inicial);
+      $endDate = $this->parseDateMDY($fecha_fin);
+
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $result = $invoiceItemRepo->ListarParaOverridePaymentConTotal(
+         $start,
+         $length,
+         $search,
+         $orderField,
+         $orderDir,
+         (string) ($company_id ?? ''),
+         (string) ($project_id ?? ''),
+         $fecha_inicial ?? '',
+         $fecha_fin ?? ''
+      );
+
+      $raw = $result['data'];
+      if ($raw === []) {
+         return ['data' => [], 'total' => $result['total']];
+      }
+
+      $piIds = array_map(static fn(array $r) => $r['project_item_id'], $raw);
+
+      /** @var ProjectItem[] $projectItems */
+      $projectItems = $projectItemRepo->findBy(['id' => $piIds]);
+      $piById = [];
+      foreach ($projectItems as $pi) {
+         $piById[$pi->getId()] = $pi;
+      }
+
+      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      /** @var InvoiceItemOverridePaymentHistoryRepository $overrideHistRepo */
+      $overrideHistRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
+      /** @var ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+
+      $mapOverrideId = $overrideRepo->MapIdsPorProjectItemsYFechas($piIds, $startDate, $endDate);
+      $overrideIds = array_values(array_filter($mapOverrideId, static fn($id) => $id !== null));
+      $overrideConHist = array_fill_keys($overrideHistRepo->IdsConHistorial($overrideIds), true);
+
+      $paidQtyByPi = [];
+      if ($overrideIds !== []) {
+         /** @var InvoiceItemOverridePayment[] $overrides */
+         $overrides = $overrideRepo->findBy(['id' => $overrideIds]);
+         foreach ($overrides as $ov) {
+            $opi = $ov->getProjectItem();
+            if ($opi !== null) {
+               $paidQtyByPi[$opi->getId()] = (float) $ov->getPaidQty();
+            }
+         }
+      }
+
+      $histQtyCache = [];
+      $histPriceCache = [];
+
+      $rows = [];
+      foreach ($raw as $r) {
+         $r = array_change_key_case((array) $r, CASE_LOWER);
+         $pid = (int) ($r['project_item_id'] ?? 0);
+         $pi = $piById[$pid] ?? null;
+         if ($pi === null) {
+            continue;
+         }
+
+         $itemEntity = $pi->getItem();
+         if ($itemEntity === null) {
+            continue;
+         }
+
+         if (!isset($histQtyCache[$pid])) {
+            $histQtyCache[$pid] = $historyRepo->TieneHistorialCantidad($pid);
+         }
+         if (!isset($histPriceCache[$pid])) {
+            $histPriceCache[$pid] = $historyRepo->TieneHistorialPrecio($pid);
+         }
+
+         $sumPaidLines = (float) ($r['sum_paid_lines'] ?? 0);
+         $paidQtyDisplay = array_key_exists($pid, $paidQtyByPi) ? $paidQtyByPi[$pid] : $sumPaidLines;
+         $sumQtyFinal = (float) ($r['sum_qty_final'] ?? 0);
+         $contractQty = (float) ($pi->getQuantity() ?? 0);
+         $priceContract = (float) ($pi->getPrice() ?? 0);
+
+         $unpaidQty = max(0.0, $sumQtyFinal - $paidQtyDisplay);
+         $paidAmount = $paidQtyDisplay * $priceContract;
+
+         $overrideId = $mapOverrideId[$pid] ?? null;
+         $hasOverrideHist = $overrideId !== null && isset($overrideConHist[$overrideId]);
+
+         $codStr = $pi->getChangeOrderDate() !== null
+            ? $pi->getChangeOrderDate()->format('m/d/Y')
+            : '';
+
+         $rows[] = [
+            'project_item_id' => $pid,
+            'item_id' => (int) ($itemEntity->getItemId() ?? 0),
+            'invoice_item_override_payment_id' => $overrideId,
+            'apply_retainage' => $pi->getApplyRetainage() ? 1 : 0,
+            'bonded' => $pi->getBonded() ? 1 : 0,
+            'bond' => $itemEntity->getBond() ? 1 : 0,
+            'item' => $itemEntity->getName() ?? '',
+            'unit' => $itemEntity->getUnit() ? $itemEntity->getUnit()->getDescription() : '',
+            'contract_qty' => $contractQty,
+            'price' => $priceContract,
+            'contract_amount' => $contractQty * $priceContract,
+            'quantity' => $sumQtyFinal,
+            'quantity_completed' => (float) ($r['sum_qty_completed'] ?? 0),
+            'amount' => (float) ($r['sum_amount'] ?? 0),
+            'total_amount' => (float) ($r['sum_total_amount'] ?? 0),
+            'paid_qty' => $paidQtyDisplay,
+            'unpaid_qty' => $unpaidQty,
+            'paid_amount' => $paidAmount,
+            'paid_amount_total' => $paidAmount,
+            'principal' => $pi->getPrincipal() ? 1 : 0,
+            'change_order' => $pi->getChangeOrder() ? 1 : 0,
+            'change_order_date' => $codStr,
+            'has_quantity_history' => $histQtyCache[$pid],
+            'has_price_history' => $histPriceCache[$pid],
+            'has_override_payment_history' => $hasOverrideHist,
+         ];
+      }
+
+      return ['data' => $rows, 'total' => $result['total']];
+   }
+
+   /**
+    * @param array<int, array<string, mixed>> $itemsDecoded
+    */
+   public function SalvarOverridePayment(
+      string $project_id,
+      string $fecha_inicial,
+      string $fecha_fin,
+      array $itemsDecoded
+   ): array {
+      $project = null;
+      $projectIdTrim = trim($project_id);
+      if ($projectIdTrim !== '') {
+         $project = $this->getDoctrine()->getRepository(Project::class)->find((int) $projectIdTrim);
+         if ($project === null) {
+            return ['success' => false, 'error' => 'Project not found'];
+         }
+      }
+
+      $startDate = $this->parseDateMDY($fecha_inicial);
+      $endDate = $this->parseDateMDY($fecha_fin);
+
+      $em = $this->getDoctrine()->getManager();
+      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      $user = $this->getUser();
+
+      foreach ($itemsDecoded as $data) {
+         if (!is_array($data)) {
+            continue;
+         }
+         $projectItemId = isset($data['project_item_id']) ? (int) $data['project_item_id'] : 0;
+         $paidQtyNew = isset($data['paid_qty']) ? (float) $data['paid_qty'] : 0.0;
+
+         if ($projectItemId <= 0) {
+            continue;
+         }
+
+         $pi = $this->getDoctrine()->getRepository(ProjectItem::class)->find($projectItemId);
+         if ($pi === null) {
+            continue;
+         }
+         if ($project !== null && $pi->getProject()->getProjectId() !== $project->getProjectId()) {
+            continue;
+         }
+
+         $entity = $overrideRepo->findOneBy([
+            'projectItem' => $pi,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+         ], ['id' => 'ASC']);
+
+         $oldPaid = null;
+         if ($entity === null) {
+            $entity = new InvoiceItemOverridePayment();
+            $entity->setProjectItem($pi);
+            $entity->setStartDate($startDate);
+            $entity->setEndDate($endDate);
+            $entity->setPaidQty($paidQtyNew);
+            $em->persist($entity);
+
+            $hist = new InvoiceItemOverridePaymentHistory();
+            $hist->setInvoiceItemOverridePayment($entity);
+            $hist->setOldValue(null);
+            $hist->setNewValue((string) $paidQtyNew);
+            $hist->setCreatedAt(new \DateTime());
+            if ($user instanceof \App\Entity\Usuario) {
+               $hist->setUser($user);
+            }
+            $em->persist($hist);
+         } else {
+            $oldPaid = (float) $entity->getPaidQty();
+            if (abs($oldPaid - $paidQtyNew) > 0.000001) {
+               $entity->setPaidQty($paidQtyNew);
+               $entity->setUpdatedAt(new \DateTime());
+
+               $hist = new InvoiceItemOverridePaymentHistory();
+               $hist->setInvoiceItemOverridePayment($entity);
+               $hist->setOldValue((string) $oldPaid);
+               $hist->setNewValue((string) $paidQtyNew);
+               $hist->setCreatedAt(new \DateTime());
+               if ($user instanceof \App\Entity\Usuario) {
+                  $hist->setUser($user);
+               }
+               $em->persist($hist);
+            }
+         }
+      }
+
+      $em->flush();
+
+      $logMsg = $project !== null
+         ? 'Override payment quantities saved for project #' . $project->getProjectNumber()
+         : 'Override payment quantities saved (multiple projects)';
+      $this->SalvarLog('Update', 'Override Payment', $logMsg);
+
+      return ['success' => true];
+   }
+
+   /**
+    * @return array<int, array{id:int, mensaje:string, fecha:string, user_name:string, old_value:string, new_value:string}>
+    */
+   public function ListarHistorialOverridePayment(int $invoice_item_override_payment_id): array
+   {
+      /** @var InvoiceItemOverridePaymentHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
+      $lista = $historyRepo->ListarHistorialDeOverride($invoice_item_override_payment_id);
+
+      $historial = [];
+      foreach ($lista as $value) {
+         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+         $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
+         $old_value_raw = $value->getOldValue();
+         $new_value_raw = $value->getNewValue();
+         $old_value = $old_value_raw !== null && $old_value_raw !== '' ? number_format((float) $old_value_raw, 2, '.', ',') : '—';
+         $new_value = $new_value_raw !== null && $new_value_raw !== '' ? number_format((float) $new_value_raw, 2, '.', ',') : '—';
+         $mensaje = "{$fecha} Updated paid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+
+         $historial[] = [
+            'id' => $value->getId(),
+            'mensaje' => $mensaje,
+            'fecha' => $value->getCreatedAt()->format('m/d/Y'),
+            'user_name' => $user_name,
+            'old_value' => $old_value,
+            'new_value' => $new_value,
+         ];
+      }
+
+      return $historial;
+   }
+
+   private function parseDateMDY(?string $s): ?\DateTimeInterface
+   {
+      if ($s === null || trim($s) === '') {
+         return null;
+      }
+      $d = \DateTime::createFromFormat('m/d/Y', trim($s));
+      if ($d === false) {
+         return null;
+      }
+      $d->setTime(0, 0, 0);
+
+      return $d;
+   }
+}

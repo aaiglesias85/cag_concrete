@@ -1,0 +1,15 @@
+override_payment:
+   path: /override-payment
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::index }
+
+listarOverridePaymentAdmin:
+   path: /override-payment/listar
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::listar, _format: json }
+
+salvarOverridePaymentAdmin:
+   path: /override-payment/salvar
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::salvar, _format: json }
+
+listarHistorialOverridePaymentAdmin:
+   path: /override-payment/listarHistorial
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorial, _format: json }

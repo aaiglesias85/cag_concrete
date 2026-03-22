@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 21-03-2026 a las 13:23:00
+-- Tiempo de generación: 22-03-2026 a las 17:10:48
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -3217,7 +3217,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (2523, '2025-10-02', '', 'Empleado_Prueba_2523', NULL, 'Empleado_Prueba_2523', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:28:45', '2025-10-17 16:08:35', 28, NULL, 1),
 (2524, '2025-10-03', '', 'Empleado_Prueba_2524', NULL, 'Empleado_Prueba_2524', '', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 0, '2025-10-16 16:29:50', '2026-01-06 17:17:36', 28, NULL, NULL),
 (2525, '2025-10-07', '', 'Empleado_Prueba_2525', NULL, 'Empleado_Prueba_2525', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:30:51', '2025-11-04 13:08:42', 28, NULL, 1),
-(2526, '2026-01-21', '', 'Empleado_Prueba_2526', NULL, 'Empleado_Prueba_2526', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:31:49', '2026-01-20 23:08:09', 28, NULL, 1),
+(2526, '2026-01-21', '', 'Empleado_Prueba_2526', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:31:49', '2026-03-21 15:03:39', 28, NULL, 1),
 (2527, '2025-10-01', '', 'Empleado_Prueba_2527', NULL, 'Empleado_Prueba_2527', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:37:41', '2025-11-11 16:55:21', 21, NULL, 1),
 (2528, '2025-10-02', '', 'Empleado_Prueba_2528', NULL, 'Empleado_Prueba_2528', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-10-16 16:38:46', '2025-11-11 16:54:58', 21, NULL, 1),
 (2529, '2025-10-01', '', 'Empleado_Prueba_2529', NULL, 'Empleado_Prueba_2529', '', '', NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 1, '2025-10-16 16:40:15', NULL, 488, NULL, NULL),
@@ -10117,7 +10117,7 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_trac
 (3802, 61.930000, 87.00, '', 2523, 147),
 (3804, 66.000000, 36.00, '', 2525, 2941),
 (3805, 156.780000, 58.00, '', 2525, 148),
-(3806, 105.470000, 58.00, '\n', 2526, 148),
+(3806, -105.470000, 58.00, '\n', 2526, 148),
 (3807, 83.000000, 33.00, '', 2527, 2939),
 (3808, 5.000000, 33.00, '', 2528, 2939),
 (3809, 0.000000, 47.00, '', 2529, 2756),
@@ -27258,7 +27258,7 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (1016, 234, 25),
 (1020, 241, 36),
 (1021, 62, 43),
-(1049, 43, 41);
+(1056, 43, 41);
 
 -- --------------------------------------------------------
 
@@ -28101,7 +28101,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (35, 'employee_rrhh', 'Employees'),
 (36, 'concrete_class', 'Concrete Class'),
 (37, 'employee_role', 'Employee Role'),
-(38, 'note_estimate_item', 'Items Notes');
+(38, 'note_estimate_item', 'Items Notes'),
+(39, 'override_payment', 'Override Payment');
 
 -- --------------------------------------------------------
 
@@ -28327,7 +28328,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (360, '3', '2025-11-01', '2025-11-30', '', 0, '2026-01-25 21:14:10', '2026-02-06 02:37:48', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (361, '4', '2025-12-01', '2025-12-31', '', 1, '2026-01-25 21:14:32', '2026-02-02 02:24:33', 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3600.00, 360.00),
 (362, '5', '2026-01-01', '2026-01-31', '', 0, '2026-02-06 02:10:27', NULL, 513, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 3636.00, 363.60),
-(372, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-24 01:03:14', '2026-03-20 00:18:33', 28, NULL, NULL, NULL, 1.000000, -1823.75, 0, 0.00, NULL, 254514.54, 12725.73),
+(372, '1', '2025-09-01', '2025-09-30', '', 0, '2026-02-24 01:03:14', '2026-03-21 14:25:32', 28, NULL, NULL, NULL, 1.000000, -1823.75, 0, 0.00, NULL, 254514.54, 12725.73),
 (373, '2', '2025-10-01', '2025-10-31', '', 0, '2026-02-24 01:03:54', '2026-03-14 00:12:36', 28, NULL, NULL, NULL, 0.051450, -93.83, 0, 0.00, NULL, 56130.04, 2806.50);
 
 -- --------------------------------------------------------
@@ -29103,6 +29104,77 @@ INSERT INTO `invoice_item_notes` (`id`, `notes`, `date`, `invoice_item_id`, `ove
 (71, '<p>test</p>', '2026-03-13', 3456, 50.000000),
 (72, '<p>test</p>', '2026-03-14', 3461, 50.000000),
 (73, '<p>500</p>', '2026-03-16', 3441, 500.000000);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_item_override_payment`
+--
+
+CREATE TABLE `invoice_item_override_payment` (
+  `id` int(11) NOT NULL,
+  `project_item_id` int(11) NOT NULL,
+  `paid_qty` decimal(18,6) NOT NULL COMMENT 'Cantidad pagada sobreescrita (agregado)',
+  `start_date` date DEFAULT NULL COMMENT 'Inicio de vigencia del override (NULL = sin fecha desde)',
+  `end_date` date DEFAULT NULL COMMENT 'Fin de vigencia del override (NULL = sin fecha hasta)',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Override de paid qty agregado por project_item y rango de fechas';
+
+--
+-- Volcado de datos para la tabla `invoice_item_override_payment`
+--
+
+INSERT INTO `invoice_item_override_payment` (`id`, `project_item_id`, `paid_qty`, `start_date`, `end_date`, `created_at`, `updated_at`) VALUES
+(1, 2941, 50.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(2, 148, 150.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(3, 3081, 0.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(4, 147, 25.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(5, 3089, 20.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(6, 151, 0.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(7, 152, 0.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(8, 3092, 0.000000, NULL, NULL, '2026-03-22 17:09:10', NULL),
+(9, 153, 0.000000, NULL, NULL, '2026-03-22 17:09:11', NULL),
+(10, 3090, 5.000000, NULL, NULL, '2026-03-22 17:09:11', NULL),
+(11, 3086, 0.000000, NULL, NULL, '2026-03-22 17:09:11', NULL),
+(12, 3087, 0.000000, NULL, NULL, '2026-03-22 17:09:11', NULL),
+(13, 3088, 0.000000, NULL, NULL, '2026-03-22 17:09:11', NULL),
+(14, 3091, 0.000000, NULL, NULL, '2026-03-22 17:09:11', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_item_override_payment_history`
+--
+
+CREATE TABLE `invoice_item_override_payment_history` (
+  `id` int(11) NOT NULL,
+  `invoice_item_override_payment_id` int(11) NOT NULL,
+  `old_value` decimal(18,6) DEFAULT NULL,
+  `new_value` decimal(18,6) DEFAULT NULL,
+  `created_at` datetime NOT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Historial de cambios de paid_qty en invoice_item_override_payment';
+
+--
+-- Volcado de datos para la tabla `invoice_item_override_payment_history`
+--
+
+INSERT INTO `invoice_item_override_payment_history` (`id`, `invoice_item_override_payment_id`, `old_value`, `new_value`, `created_at`, `user_id`) VALUES
+(1, 1, NULL, 50.000000, '2026-03-22 17:09:10', 27),
+(2, 2, NULL, 150.000000, '2026-03-22 17:09:10', 27),
+(3, 3, NULL, 0.000000, '2026-03-22 17:09:10', 27),
+(4, 4, NULL, 25.000000, '2026-03-22 17:09:10', 27),
+(5, 5, NULL, 20.000000, '2026-03-22 17:09:10', 27),
+(6, 6, NULL, 0.000000, '2026-03-22 17:09:10', 27),
+(7, 7, NULL, 0.000000, '2026-03-22 17:09:10', 27),
+(8, 8, NULL, 0.000000, '2026-03-22 17:09:10', 27),
+(9, 9, NULL, 0.000000, '2026-03-22 17:09:11', 27),
+(10, 10, NULL, 5.000000, '2026-03-22 17:09:11', 27),
+(11, 11, NULL, 0.000000, '2026-03-22 17:09:11', 27),
+(12, 12, NULL, 0.000000, '2026-03-22 17:09:11', 27),
+(13, 13, NULL, 0.000000, '2026-03-22 17:09:11', 27),
+(14, 14, NULL, 0.000000, '2026-03-22 17:09:11', 27);
 
 -- --------------------------------------------------------
 
@@ -30487,7 +30559,20 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (477, 'Delete', 'Estimate', 'The estimate is deleted: Test', '::1', '2026-03-20 00:17:06', 27),
 (478, 'Update', 'Invoice Status', 'Invoice #1 status changed to Closed', '::1', '2026-03-20 00:18:18', 27),
 (479, 'Update', 'Invoice Status', 'Invoice #1 status changed to Open', '::1', '2026-03-20 00:18:21', 27),
-(480, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-20 00:18:33', 27);
+(480, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-20 00:18:33', 27),
+(481, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-21 13:44:15', 27),
+(482, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-21 14:15:50', 27),
+(483, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-21 14:16:10', 27),
+(484, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:21:10', 27),
+(485, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:23:03', 27),
+(486, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:23:05', 27),
+(487, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:23:26', 27),
+(488, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:23:34', 27),
+(489, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 14:23:39', 27),
+(490, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-03-21 14:25:32', 27),
+(491, 'Update', 'Data Tracking', 'The data tracking is modified, Project: ERS05071 - Lakeview Road Bridge, Date: 01/21/2026', '::1', '2026-03-21 15:03:39', 27),
+(492, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-03-21 15:07:11', 27),
+(493, 'Update', 'Override Payment', 'Override payment quantities saved (multiple projects)', '::1', '2026-03-22 17:09:11', 27);
 
 -- --------------------------------------------------------
 
@@ -37455,7 +37540,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (488, 1, 1, 1, 1, 1, 35),
 (489, 1, 1, 1, 1, 1, 36),
 (490, 1, 1, 1, 1, 1, 37),
-(491, 1, 1, 1, 1, 1, 38);
+(491, 1, 1, 1, 1, 1, 38),
+(492, 1, 1, 1, 1, 1, 39);
 
 -- --------------------------------------------------------
 
@@ -42285,7 +42371,9 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (4013, 1, 1, 1, 1, 1, 36),
 (4014, 1, 1, 1, 1, 1, 37),
 (4015, 1, 1, 1, 1, 1, 38),
-(4016, 1, 1, 1, 1, 27, 38);
+(4016, 1, 1, 1, 1, 27, 38),
+(4017, 1, 1, 1, 1, 1, 39),
+(4018, 1, 1, 1, 1, 27, 39);
 
 -- --------------------------------------------------------
 
@@ -42573,6 +42661,22 @@ ALTER TABLE `invoice_item`
 ALTER TABLE `invoice_item_notes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Refinvoice_item_notes1` (`invoice_item_id`);
+
+--
+-- Indices de la tabla `invoice_item_override_payment`
+--
+ALTER TABLE `invoice_item_override_payment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_invoice_item_override_payment_project_item` (`project_item_id`),
+  ADD KEY `idx_invoice_item_override_payment_dates` (`start_date`,`end_date`);
+
+--
+-- Indices de la tabla `invoice_item_override_payment_history`
+--
+ALTER TABLE `invoice_item_override_payment_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_invoice_item_override_payment_history_parent` (`invoice_item_override_payment_id`),
+  ADD KEY `fk_invoice_item_override_payment_history_user` (`user_id`);
 
 --
 -- Indices de la tabla `invoice_item_unpaid_qty_history`
@@ -43031,7 +43135,7 @@ ALTER TABLE `estimate_note_item`
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1050;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1057;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -43067,7 +43171,7 @@ ALTER TABLE `estimate_template_note`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -43106,6 +43210,18 @@ ALTER TABLE `invoice_item_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
+-- AUTO_INCREMENT de la tabla `invoice_item_override_payment`
+--
+ALTER TABLE `invoice_item_override_payment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
+-- AUTO_INCREMENT de la tabla `invoice_item_override_payment_history`
+--
+ALTER TABLE `invoice_item_override_payment_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+
+--
 -- AUTO_INCREMENT de la tabla `invoice_item_unpaid_qty_history`
 --
 ALTER TABLE `invoice_item_unpaid_qty_history`
@@ -43127,7 +43243,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=481;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=494;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -43283,7 +43399,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=492;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=493;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -43349,7 +43465,7 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4017;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4019;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -43527,6 +43643,19 @@ ALTER TABLE `invoice_attachment`
 --
 ALTER TABLE `invoice_item_notes`
   ADD CONSTRAINT `Refinvoice_item_notes1` FOREIGN KEY (`invoice_item_id`) REFERENCES `invoice_item` (`id`);
+
+--
+-- Filtros para la tabla `invoice_item_override_payment`
+--
+ALTER TABLE `invoice_item_override_payment`
+  ADD CONSTRAINT `fk_invoice_item_override_payment_project_item` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Filtros para la tabla `invoice_item_override_payment_history`
+--
+ALTER TABLE `invoice_item_override_payment_history`
+  ADD CONSTRAINT `fk_invoice_item_override_payment_history_parent` FOREIGN KEY (`invoice_item_override_payment_id`) REFERENCES `invoice_item_override_payment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_invoice_item_override_payment_history_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `invoice_item_unpaid_qty_history`

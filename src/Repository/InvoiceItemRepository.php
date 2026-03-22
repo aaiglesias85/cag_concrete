@@ -563,4 +563,143 @@ class InvoiceItemRepository extends ServiceEntityRepository
       $result = $qb->getQuery()->getSingleScalarResult();
       return (float) ($result ?? 0);
    }
+
+   /**
+    * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id en rango de fechas del invoice
+    * (como ListarInvoicesRangoFecha / Payments). Devuelve solo project_item_id y sumatorias; el resto va en el service.
+    *
+    * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
+    */
+   public function ListarParaOverridePaymentConTotal(
+      int $start,
+      int $limit,
+      ?string $sSearch,
+      string $sortField,
+      string $sortDir,
+      string $company_id,
+      string $project_id,
+      string $fecha_inicial,
+      string $fecha_fin
+   ): array {
+      $fechaIniYmd = '';
+      $fechaFinYmd = '';
+      if (!empty($fecha_inicial)) {
+         $d = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+         if ($d !== false) {
+            $fechaIniYmd = $d->format('Y-m-d');
+         }
+      }
+      if (!empty($fecha_fin)) {
+         $d = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+         if ($d !== false) {
+            $fechaFinYmd = $d->format('Y-m-d');
+         }
+      }
+      $sortable = [
+         'item' => 'MAX(it.name)',
+         'unit' => 'MAX(u.description)',
+         'contract_qty' => 'MAX(pi.quantity)',
+         'price' => 'MAX(pi.price)',
+         'quantity' => 'sum_qty_final',
+         'paid_qty' => 'sum_paid_lines',
+         'unpaid_qty' => 'unpaid_sort',
+      ];
+      $orderCol = $sortable[$sortField] ?? 'MAX(it.name)';
+      $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+
+      $conn = $this->getEntityManager()->getConnection();
+
+      $searchTrim = $sSearch !== null ? trim($sSearch) : '';
+      $searchClause = '';
+      $params = [];
+      if ($searchTrim !== '') {
+         // Mismo criterio amplio que ListarInvoicesParaPaymentsConTotal (invoice + proyecto + company) + catálogo ítem/unidad.
+         $searchClause = ' AND (
+            it.name LIKE :search_like OR it.description LIKE :search_like OR u.description LIKE :search_like
+            OR i.number LIKE :search_like OR i.notes LIKE :search_like
+            OR p.invoice_contact LIKE :search_like OR p.owner LIKE :search_like OR p.manager LIKE :search_like
+            OR p.county LIKE :search_like OR p.project_number LIKE :search_like OR p.name LIKE :search_like OR p.description LIKE :search_like
+            OR p.po_number LIKE :search_like OR p.po_cg LIKE :search_like
+            OR c.name LIKE :search_like
+         ) ';
+         $params['search_like'] = '%' . $searchTrim . '%';
+      }
+
+      $dateClause = '';
+      if ($fechaIniYmd !== '') {
+         $dateClause .= ' AND i.start_date >= :fecha_inicial';
+         $params['fecha_inicial'] = $fechaIniYmd;
+      }
+      if ($fechaFinYmd !== '') {
+         $dateClause .= ' AND i.end_date <= :fecha_final';
+         $params['fecha_final'] = $fechaFinYmd;
+      }
+
+      $companyClause = '';
+      if ($company_id !== '') {
+         $companyClause = ' AND p.company_id = :company_id';
+         $params['company_id'] = (int) $company_id;
+      }
+
+      $projectClause = '';
+      if ($project_id !== '') {
+         $projectClause = ' AND i.project_id = :project_id';
+         $params['project_id'] = (int) $project_id;
+      }
+
+      $fromWhere = "
+         FROM invoice_item ii
+         INNER JOIN invoice i ON ii.invoice_id = i.invoice_id
+         INNER JOIN project p ON i.project_id = p.project_id
+         LEFT JOIN company c ON p.company_id = c.company_id
+         INNER JOIN project_item pi ON ii.project_item_id = pi.id
+         INNER JOIN item it ON pi.item_id = it.item_id
+         LEFT JOIN unit u ON u.unit_id = it.unit_id
+         WHERE (it.bond IS NULL OR it.bond = 0)
+           $companyClause
+           $projectClause
+           $dateClause
+           $searchClause
+      ";
+
+      $selectAgg = "
+         pi.id AS project_item_id,
+         SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) AS sum_qty_final,
+         SUM(ii.paid_qty) AS sum_paid_lines,
+         SUM(ii.quantity + COALESCE(ii.unpaid_from_previous, 0) + COALESCE(ii.quantity_from_previous, 0)) AS sum_qty_completed,
+         SUM((ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) * ii.price) AS sum_amount,
+         SUM((ii.quantity + COALESCE(ii.unpaid_from_previous, 0) + COALESCE(ii.quantity_from_previous, 0)) * ii.price) AS sum_total_amount,
+         GREATEST(0,
+           SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) - SUM(ii.paid_qty)
+         ) AS unpaid_sort
+      ";
+
+      $sqlCount = "SELECT COUNT(*) AS cnt FROM (SELECT pi.id AS pid $fromWhere GROUP BY pi.id) t";
+      $total = (int) $conn->executeQuery($sqlCount, $params)->fetchOne();
+
+      $sqlData = "SELECT $selectAgg $fromWhere GROUP BY pi.id ORDER BY $orderCol $dir, pi.id ASC";
+      if ($limit > 0 && $limit < PHP_INT_MAX) {
+         $sqlData .= ' LIMIT ' . (int) $limit . ' OFFSET ' . (int) $start;
+      }
+
+      $rows = $conn->executeQuery($sqlData, $params)->fetchAllAssociative();
+
+      $data = [];
+      foreach ($rows as $r) {
+         $r = array_change_key_case((array) $r, CASE_LOWER);
+         $data[] = [
+            'project_item_id' => (int) ($r['project_item_id'] ?? 0),
+            'sum_qty_final' => (float) ($r['sum_qty_final'] ?? 0),
+            'sum_paid_lines' => (float) ($r['sum_paid_lines'] ?? 0),
+            'sum_qty_completed' => (float) ($r['sum_qty_completed'] ?? 0),
+            'sum_amount' => (float) ($r['sum_amount'] ?? 0),
+            'sum_total_amount' => (float) ($r['sum_total_amount'] ?? 0),
+         ];
+      }
+
+      return [
+         'data' => $data,
+         'total' => $total,
+      ];
+   }
 }

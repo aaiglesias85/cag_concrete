@@ -82,4 +82,64 @@ class ProjectItemHistoryRepository extends ServiceEntityRepository
 
       return count($consulta->getQuery()->getResult()) > 0;
    }
+
+   /**
+    * TieneHistorialCantidadPorProyectoYItemId: Algún project_item del proyecto con ese item (catálogo) tiene historial de cantidad.
+    */
+   public function TieneHistorialCantidadPorProyectoYItemId(int $project_id, int $item_id): bool
+   {
+      $consulta = $this->createQueryBuilder('h')
+         ->leftJoin('h.projectItem', 'p_i')
+         ->leftJoin('p_i.project', 'p')
+         ->leftJoin('p_i.item', 'it')
+         ->where('p.projectId = :project_id')
+         ->andWhere('it.itemId = :item_id')
+         ->andWhere('h.actionType = :action_type')
+         ->setParameter('project_id', $project_id)
+         ->setParameter('item_id', $item_id)
+         ->setParameter('action_type', 'update_quantity')
+         ->setMaxResults(1);
+
+      return count($consulta->getQuery()->getResult()) > 0;
+   }
+
+   /**
+    * TieneHistorialPrecioPorProyectoYItemId: Algún project_item del proyecto con ese item tiene historial de precio.
+    */
+   public function TieneHistorialPrecioPorProyectoYItemId(int $project_id, int $item_id): bool
+   {
+      $consulta = $this->createQueryBuilder('h')
+         ->leftJoin('h.projectItem', 'p_i')
+         ->leftJoin('p_i.project', 'p')
+         ->leftJoin('p_i.item', 'it')
+         ->where('p.projectId = :project_id')
+         ->andWhere('it.itemId = :item_id')
+         ->andWhere('h.actionType = :action_type')
+         ->setParameter('project_id', $project_id)
+         ->setParameter('item_id', $item_id)
+         ->setParameter('action_type', 'update_price')
+         ->setMaxResults(1);
+
+      return count($consulta->getQuery()->getResult()) > 0;
+   }
+
+   /**
+    * TieneHistorialChangeOrderPorProyectoYItemId: Historial de alta de change order para ese item en el proyecto.
+    */
+   public function TieneHistorialChangeOrderPorProyectoYItemId(int $project_id, int $item_id): bool
+   {
+      $consulta = $this->createQueryBuilder('h')
+         ->leftJoin('h.projectItem', 'p_i')
+         ->leftJoin('p_i.project', 'p')
+         ->leftJoin('p_i.item', 'it')
+         ->where('p.projectId = :project_id')
+         ->andWhere('it.itemId = :item_id')
+         ->andWhere('h.actionType = :action_type')
+         ->setParameter('project_id', $project_id)
+         ->setParameter('item_id', $item_id)
+         ->setParameter('action_type', 'add')
+         ->setMaxResults(1);
+
+      return count($consulta->getQuery()->getResult()) > 0;
+   }
 }

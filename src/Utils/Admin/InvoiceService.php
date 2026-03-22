@@ -41,7 +41,8 @@ class InvoiceService extends Base
       ContainerBagInterface $containerBag,
       Security              $security,
       LoggerInterface       $logger,
-      TwigEnvironment       $twig
+      TwigEnvironment       $twig,
+      private InvoicePaidQtyOverrideResolver $paidQtyOverrideResolver,
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->twig = $twig;
@@ -113,7 +114,7 @@ class InvoiceService extends Base
             $invoice->setBonAmount(0.0);
             $em->persist($invoice);
             // Sigue sumando paid_qty de este invoice para el siguiente
-            $totalBondPaidQtyPrevious += (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice->getInvoiceId());
+            $totalBondPaidQtyPrevious += $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice((int) $invoice->getInvoiceId());
             continue;
          }
 
@@ -140,7 +141,7 @@ class InvoiceService extends Base
          $em->persist($invoice);
 
          $totalBonQuantityPrevious += $applied;
-         $totalBondPaidQtyPrevious += (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice->getInvoiceId());
+         $totalBondPaidQtyPrevious += $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice((int) $invoice->getInvoiceId());
       }
 
       $em->flush();
@@ -201,7 +202,9 @@ class InvoiceService extends Base
          $item = $invoiceItemMap[$invoiceId] ?? null;
 
          $qty = (float) (($item?->getQuantity()) ?? 0);
-         $paid = (float) (($item?->getPaidQty()) ?? 0);
+         $paid = $item !== null
+            ? $this->paidQtyOverrideResolver->getEffectivePaidQty($item)
+            : 0.0;
          $qbfValue = (float) (($item?->getQuantityBroughtForward()) ?? 0);
 
          if ($overrideInvoiceId !== null && $invoiceId === (int) $overrideInvoiceId) {
@@ -1077,7 +1080,7 @@ class InvoiceService extends Base
             foreach ($invoiceItemRepo->ListarItems($inv->getInvoiceId()) as $prevItem) {
                if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
                   $sum_qty_prev += (float) $prevItem->getQuantity();
-                  $sum_paid_prev += (float) ($prevItem->getPaidQty() ?? 0);
+                  $sum_paid_prev += $this->paidQtyOverrideResolver->getEffectivePaidQty($prevItem);
                   break;
                }
             }
@@ -1094,7 +1097,7 @@ class InvoiceService extends Base
          }
       } else {
          $quantity_final = $qty + ($value->getQuantityBroughtForward() ?? 0.0);
-         $paid_qty = $value->getPaidQty() !== null ? (float) $value->getPaidQty() : 0.0;
+         $paid_qty = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
          $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
          $pending_balance_btd = $pending_qty_btd * $price;
       }
@@ -1392,10 +1395,10 @@ class InvoiceService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
       $bon_used_before_or_on = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $start_date_str);
-      $bond_paid_before_or_on = (float) $invoiceItemRepo->SumBondPaidQtyForInvoicesBeforeOrOnDate($project_id, $start_date_str);
+      $bond_paid_before_or_on = $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForProjectBeforeOrOnDate((int) $project_id, $start_date_str);
 
       $this_bon_qty = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : 0.0;
-      $this_bond_paid = (float) $invoiceItemRepo->SumBondPaidQtyForInvoice($invoice_id);
+      $this_bond_paid = $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice($invoice_id);
 
       $used_before_this = $bon_used_before_or_on - $this_bon_qty;
       $paid_before_this = $bond_paid_before_or_on - $this_bond_paid;
@@ -1701,7 +1704,7 @@ class InvoiceService extends Base
 
             $currentQbf = ($invItem) ? (float)$invItem->getQuantityBroughtForward() : 0.0;
             $iQty = ($invItem) ? (float)$invItem->getQuantity() : 0.0;
-            $iPaid = ($invItem) ? (float)$invItem->getPaidQty() : 0.0;
+            $iPaid = ($invItem) ? $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem) : 0.0;
 
             // Calcular Unpaid en este punto del tiempo
             $tempUnpaid = $this->calculateInvoiceUnpaidQty(
@@ -1763,7 +1766,7 @@ class InvoiceService extends Base
             $amount_from_previous = 0.0;
          }
 
-         $paid_qty = $value->getPaidQty();
+         $paid_qty = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
          $unpaid_amount = $unpaid_qty * $price;
          $unpaid_from_previous = $unpaidPrevSpecific;
 
@@ -2437,7 +2440,7 @@ class InvoiceService extends Base
                   : (float)$invItem->getQuantityBroughtForward();
 
                $iQty = (float)$invItem->getQuantity();
-               $iPaid = (float)$invItem->getPaidQty();
+               $iPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem);
             }
 
             // 1. Calcular: (SumQtyPrev - SumPaidPrev) - QBF Actual
@@ -2574,7 +2577,7 @@ class InvoiceService extends Base
 
             $currentQbf = $invItem ? (float) $invItem->getQuantityBroughtForward() : 0.0;
             $iQty = $invItem ? (float) $invItem->getQuantity() : 0.0;
-            $iPaid = $invItem ? (float) $invItem->getPaidQty() : 0.0;
+            $iPaid = $invItem ? $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem) : 0.0;
 
             $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
 
