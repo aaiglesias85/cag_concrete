@@ -1,98 +1,150 @@
-# Columna **Diff Qty** (y **Diff Amt**) en el tab **Completion** del proyecto
+# Diff Qty y Diff Amt (tab **Completion** del proyecto)
 
-Este documento explica **de dónde sale el valor**, **cómo se calcula** y **qué relación tiene** con otras partes del sistema. La implementación vive en `ProjectService::ListarItemsCompletion` y en la tabla del frontend `items-completion-table-editable` (`projects.js` / `projects-detalle.js`).
+Documentación de la columna **Diff Qty** y **Diff Amt** en la pestaña **Completion** (vista de proyecto admin): origen de datos, reglas de negocio, fórmulas, integración con Payments/notas y cambios respecto a versiones anteriores del cálculo.
 
-Documentación relacionada: [README_INVOICES_PAYMENTS.md](./README_INVOICES_PAYMENTS.md) (campo `override_unpaid_qty` en notas de ítem de factura).
+**Implementación principal:** `App\Utils\Admin\ProjectService::ListarItemsCompletion`  
+**UI:** tabla `#items-completion-table-editable` en `public/bundles/metronic8/js/pages/projects.js` y `projects-detalle.js`.
 
----
-
-## 1. Dónde se muestra y de dónde vienen los datos
-
-- **Pantalla:** proyecto (vista admin) → pestaña **Completion** → tabla de ítems.
-- **Origen del JSON:** el backend arma `items_completion` con un elemento por **`project_item`**, incluyendo las claves `diff_qty` y `diff_amt`.
-- **Código servidor:** `App\Utils\Admin\ProjectService::ListarItemsCompletion($project_id, $fecha_inicial, $fecha_fin)`.
-- **Código cliente:** la columna **Diff Qty** lee `row.diff_qty`; si ese valor no es un número válido, hace un **respaldo** calculando solo `paid_qty - invoiced_qty` en el navegador (**sin** sumar overrides; el valor completo debe venir del servidor).
+**Relacionado:** [README_INVOICES_PAYMENTS.md](./README_INVOICES_PAYMENTS.md) (`override_unpaid_qty` en notas).  
+**Independiente de:** [README_OVERRIDE_PAID_QTY.md](./README_OVERRIDE_PAID_QTY.md) (override de `paid_qty` vía `invoice_item_override_payment` — **no** interviene en Diff Qty del Completion).
 
 ---
 
-## 2. Regla de negocio (override desde Payments)
+## 1. Alcance
 
-- Los overrides se detectan por **`override_unpaid_qty`** en **`invoice_item_notes`** (flujo Payments / notas del ítem de factura).
-- **Por cada par invoice + ítem de línea** (`invoice_item`) puede haber varias notas con valores distintos en el tiempo.
-- Solo cuenta el **último valor vigente** de unpaid sobreescrito: la **primera nota** al listar por **fecha de nota `DESC`** (más reciente primero) que tenga `override_unpaid_qty` informado.
-- **No** se suman valores históricos de la misma línea (p. ej. 5 + 8 + 10); solo el **10** si ese es el último override reflejado en la nota más reciente que define el campo.
-- Entre **varias** facturas / líneas del mismo `project_item`, **sí** se **suman** esos últimos valores (uno por línea que tenga override). Ej.: línea factura A → último O = 10, línea factura B → último O = 12 → **22** de ajuste en cantidad.
-
-> **No confundir** con [README_OVERRIDE_PAID_QTY.md](./README_OVERRIDE_PAID_QTY.md): ese documento describe el override de **`paid_qty`** vía tabla `invoice_item_override_payment`. La columna Diff Qty del Completion **no** usa esa tabla; usa sumas de `invoice_item` y **`override_unpaid_qty`** en notas.
+| Incluye | No incluye |
+|--------|------------|
+| Cálculo de `diff_qty` y `diff_amt` por `project_item` | Retainage, Bond aplicado en otras pantallas |
+| Overrides de **unpaid** vía `invoice_item_notes.override_unpaid_qty` | Override de **paid** (`invoice_item_override_payment`) |
+| Cómo se elige el **último** override por línea de factura | Lógica de generación de PDF/Excel de invoice |
 
 ---
 
-## 3. Entradas: totales base por `project_item`
+## 2. Dónde se muestra y cómo llegan los datos
 
-Para cada `project_item`, el repositorio `InvoiceItemRepository` suma **todas** las líneas `invoice_item` ligadas a ese ítem:
+- **Pantalla:** proyecto (admin) → pestaña **Completion** → tabla de ítems.
+- **Carga inicial:** al cargar el proyecto, `items_completion` viene en el payload del proyecto (p. ej. `cargarDatos` / datos completos del proyecto) generado por `ProjectService` (incluye `ListarItemsCompletion` sin filtro de fechas si el método se invoca así en ese flujo).
+- **Recarga:** acción `listarItemsCompletion` en `Admin\ProjectController` (`project_id`, `fechaInicial`, `fechaFin` opcionales) devuelve `items` con el mismo shape; el JS reemplaza `items_completion` y refresca la DataTable.
 
-| Campo en la respuesta | Significado | Cálculo en BD (resumen) |
-|----------------------|-------------|-------------------------|
-| `invoiced_qty` | Total facturado en cantidad | `SUM(invoice_item.quantity)` |
-| `total_invoiced_amount` | Total facturado en $ | `SUM(invoice_item.quantity * invoice_item.price)` |
-| `paid_qty` | Total pagado en cantidad | `SUM(invoice_item.paidQty)` |
-| `total_paid_amount` | Total pagado en $ | `SUM(invoice_item.paidAmount)` |
+Campos relevantes por fila (entre otros):
 
----
-
-## 4. Fórmula base (antes de sumar overrides)
-
-- **Diff Qty (base)** = `paid_qty` − `invoiced_qty`
-- **Diff Amt (base)** = `total_paid_amount` − `total_invoiced_amount`
+| Campo | Uso en Diff |
+|-------|-------------|
+| `invoiced_qty`, `paid_qty` | Base cantidad |
+| `total_invoiced_amount`, `total_paid_amount` | Base importes |
+| `diff_qty`, `diff_amt` | Valores finales mostrados |
+| `has_unpaid_qty_history` | Solo UI: ícono de historial (no cambia el número) |
+| `project_item_id` | Ícono historial / modal |
 
 ---
 
-## 5. Suma de últimos overrides por línea (no Bond)
+## 3. Totales base (por `project_item`)
 
-- Se recorre cada **`invoice_item`** del `project_item` (`ListarInvoicesDeItem`).
-- **Ítems Bond** (`item.bond`): **no** participan; no se suma ningún override para ese ítem de proyecto.
-- Para cada línea no Bond, si existe un último **O** = `override_unpaid_qty` según el criterio de la sección 2:
-  - Se suma **O** a `total_qty_adjustment`.
-  - Se suma **O × precio de esa línea** (`invoice_item.price`) a `total_amt_adjustment`.
+`InvoiceItemRepository` agrega **todas** las filas `invoice_item` del ítem:
+
+| Respuesta API | Significado en BD |
+|---------------|-------------------|
+| `invoiced_qty` | `SUM(invoice_item.quantity)` |
+| `total_invoiced_amount` | `SUM(quantity × price)` |
+| `paid_qty` | `SUM(invoice_item.paidQty)` |
+| `total_paid_amount` | `SUM(invoice_item.paidAmount)` |
+
+**Base cantidad:** `paid_qty − invoiced_qty`  
+**Base importes:** `total_paid_amount − total_invoiced_amount`
 
 ---
 
-## 6. Fórmula final (lo que devuelve el backend)
+## 4. Overrides desde Payments (notas)
+
+- **Detección:** campo **`override_unpaid_qty`** en **`invoice_item_notes`**, ligado a cada **`invoice_item`**.
+- **Listado de notas:** `Base::ListarNotesDeItemInvoice` → `InvoiceItemNotesRepository::ListarNotesDeItemInvoice` con **`orderBy('i_i_n.date', 'DESC')`** por defecto (más reciente primero).
+- **Valor vigente por línea:** se recorre la lista en ese orden y se usa **la primera nota** que tenga `override_unpaid_qty` no vacío/null (`break` tras asignar).  
+  Eso equivale al override de la nota **con fecha más reciente entre las que definen** el campo (no se suman 5 + 8 + 10 de la misma línea; solo el valor de la nota elegida, p. ej. **10**).
+- **Varias líneas / facturas:** para cada `invoice_item` no Bond, si hay override vigente **Oᵢ**, se acumula **Oᵢ** en cantidad y **Oᵢ × priceᵢ** en monto (precio de esa línea).
+
+**Ítems Bond** (`item.bond` = true en el ítem del catálogo): **no** se recorren overrides; `total_qty_adjustment` y `total_amt_adjustment` quedan en 0 para ese `project_item`.
+
+---
+
+## 5. Fórmulas finales (implementación actual)
 
 ```
+total_qty_adjustment  = Σ Oᵢ    (solo líneas no Bond con override vigente)
+total_amt_adjustment = Σ (Oᵢ × priceᵢ)
+
 diff_qty  = (paid_qty - invoiced_qty) + total_qty_adjustment
 diff_amt  = (total_paid_amount - total_invoiced_amount) + total_amt_adjustment
 ```
 
-donde `total_qty_adjustment` = **Σ Oᵢ** y `total_amt_adjustment` = **Σ (Oᵢ × priceᵢ)** solo sobre líneas no Bond con override vigente.
+**Ejemplo cantidades:** base `(paid_qty − invoiced_qty) = 100`; línea factura 1 último O = 10, línea factura 2 último O = 12 → **diff_qty = 100 + 10 + 12 = 122**.
 
-**Ejemplo (cantidades):** si la base `(paid_qty - invoiced_qty)` es 100 y los últimos overrides de dos líneas son 10 y 12, entonces **diff_qty = 100 + 10 + 12 = 122**.
-
----
-
-## 7. Actualización al cambiar unpaid en Payments
-
-Al guardar un nuevo override desde Payments (nueva nota o actualización que deje reflejado el último `override_unpaid_qty`), el siguiente cálculo de Completion toma el **nuevo** valor vigente por la regla de la nota más reciente; no se acumulan overrides antiguos en el total.
+**Ejemplo importes (ilustrativo):** misma línea con O = 10 y `price = 5` → aporte al ajuste en $ = 50; se suma a la base `(paid − invoiced)` en dinero.
 
 ---
 
-## 8. Historial en la UI (ícono junto al número)
+## 6. Cambio respecto a la lógica anterior
 
-Si el `project_item` tiene registros en `InvoiceItemUnpaidQtyHistory`, el backend envía `has_unpaid_qty_history` y el frontend muestra un ícono para el detalle. Eso **no** altera el número de Diff Qty; solo indica historial de cambios.
+Antes de alinear con el requerimiento “**base + suma de los últimos overrides por invoice/ítem**”, el ajuste por línea era:
+
+- `adjustment_qty = (quantity + QBF − paid_qty_línea) − O`  
+  y se sumaba ese ajuste al diff global (enfoque “corregir la diferencia entre unpaid teórico y unpaid acordado”).
+
+**Ahora** el ajuste por línea es **solo O** (y en dinero **O × price**), y el diff es explícitamente:
+
+**base + Σ últimos overrides** (sin mezclar con `(qtyFinal − paid) − O`).
+
+Cualquier informe o comparación histórica con números antiguos debe tener en cuenta este cambio de definición.
 
 ---
 
-## 9. Resumen de archivos útiles
+## 7. UI (tabla Completion)
 
-| Qué | Dónde |
-|-----|--------|
+- **Columna Diff Qty (índice 12):** muestra `row.diff_qty`; si no es un número válido, el JS usa **respaldo** `paid_qty − invoiced_qty` **sin** sumar overrides (solo emergencia; el valor correcto debe venir del servidor).
+- **Columna Diff Amt (índice 13):** análogo con `diff_amt` y respaldo `total_paid_amount − total_invoiced_amount`.
+- Valores **negativos** se muestran en **rojo** (`text-danger`).
+- Si `has_unpaid_qty_history`, se muestra un ícono que abre el historial (`listarHistorialUnpaidQtyPorProjectItem`); **no** modifica el cálculo.
+- Comentarios en código JS: `Diff Qty = (Paid - Inv) + suma últimos override_unpaid_qty por línea`.
+
+---
+
+## 8. Endpoints y servicios relacionados
+
+| Acción | Controlador | Servicio |
+|--------|-------------|----------|
+| Lista ítems Completion | `ProjectController::listarItemsCompletion` | `ProjectService::ListarItemsCompletion` |
+| Historial unpaid qty (modal) | `ProjectController::listarHistorialUnpaidQtyPorProjectItem` | `ProjectService::ListarHistorialUnpaidQtyPorProjectItem` |
+
+---
+
+## 9. Archivos clave
+
+| Rol | Archivo |
+|-----|---------|
 | Cálculo `diff_qty` / `diff_amt` | `src/Utils/Admin/ProjectService.php` → `ListarItemsCompletion` |
-| Sumas `SUM(quantity)`, `SUM(paidQty)`, etc. | `src/Repository/InvoiceItemRepository.php` |
-| Notas y `override_unpaid_qty` | `src/Utils/Base.php` → `ListarNotesDeItemInvoice`; entidad `InvoiceItemNotes` |
-| Tabla Completion (columna 12) | `public/bundles/metronic8/js/pages/projects.js`, `projects-detalle.js` → `initTableItemsCompletion` |
+| Agregaciones `SUM(...)` | `src/Repository/InvoiceItemRepository.php` |
+| Notas por `invoice_item` | `src/Repository/InvoiceItemNotesRepository.php`; `src/Utils/Base.php` → `ListarNotesDeItemInvoice` |
+| Líneas por `project_item` | `InvoiceItemRepository::ListarInvoicesDeItem` |
+| Tab Completion | `public/bundles/metronic8/js/pages/projects.js`, `projects-detalle.js` (`initTableItemsCompletion`) |
 
 ---
 
-## 10. Frase final
+## 10. Criterios de aceptación (resumen)
 
-**Diff Qty** = **(total pagado − total facturado en cantidad)** + **suma del último `override_unpaid_qty` por cada línea de factura no Bond**; **Diff Amt** = **(total pagado $ − total facturado $)** + **suma de (ese último override × precio de la línea)** para las mismas líneas.
+- Por cada **invoice_item** (línea no Bond) solo interviene **un** valor de override: el de la nota **más reciente (por fecha de nota)** que defina `override_unpaid_qty`.
+- No se **suman** todos los valores históricos de overrides de la misma línea.
+- Entre líneas distintas, sí se **suman** los últimos **Oᵢ** al **base** de cantidad (y **Oᵢ × priceᵢ** al base de importes).
+- Al guardar un nuevo override desde Payments, el siguiente cálculo usa el valor vigente según las notas en BD.
+- Bond: sin ajuste por notas en este cálculo.
+
+---
+
+## 11. Limitaciones y matices
+
+- El orden usa la **fecha de la nota** (`invoice_item_notes.date`), no necesariamente la hora de creación del registro en BD. Si una nota nueva lleva fecha antigua, puede afectar cuál nota se considera “la última”.
+- Si la nota con **fecha más reciente** no tiene `override_unpaid_qty` pero una **más antigua sí**, el algoritmo toma la **primera** en orden DESC **con** el campo definido → es la nota más reciente **entre las que tienen** override. Si el producto exige “solo la última nota de cualquier tipo”, habría que cambiar reglas (no implementado aquí).
+
+---
+
+## 12. Frase final
+
+**Diff Qty** = **(Σ paid − Σ invoiced en cantidad)** + **suma del último `override_unpaid_qty` por cada línea de factura no Bond**; **Diff Amt** = **(Σ paid $ − Σ invoiced $)** + **suma de (ese último override × precio de la línea)** para esas mismas líneas.
