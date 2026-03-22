@@ -4902,7 +4902,7 @@ var Projects = (function () {
             },
          },
          {
-            targets: 12, // Diff Qty = Paid Qty - Inv Qty + ajuste override (+ ícono historial unpaid qty)
+            targets: 12, // Diff Qty = (Paid - Inv) + suma últimos override_unpaid_qty por línea (+ ícono historial unpaid qty)
             className: 'text-end',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';

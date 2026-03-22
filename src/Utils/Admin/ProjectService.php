@@ -1486,16 +1486,15 @@ class ProjectService extends Base
          $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
          $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
 
-         // Ajuste por Override Unpaid Qty: el override reduce lo que "deben pagar", así que Diff Qty/Amt
-         // se ajustan sumando la cantidad/monto "perdonados": (quantity_final - paid_qty) - override_unpaid_qty
+         // Override de unpaid desde Payments (notas): Diff Qty/Amt = base + suma de los últimos override_unpaid_qty
+         // por invoice_item (notas ordenadas por fecha DESC; primera nota con valor = estado final vigente).
+         // No se acumulan overrides históricos de la misma línea; solo el último valor por factura/ítem.
          $total_qty_adjustment = 0.0;
          $total_amt_adjustment = 0.0;
          $is_bond_item = $value->getItem()->getBond();
          if (!$is_bond_item) {
             $invoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
             foreach ($invoiceItems as $invItem) {
-               $qtyFinal = (float) ($invItem->getQuantity() ?? 0) + (float) ($invItem->getQuantityBroughtForward() ?? 0);
-               $paidItem = (float) ($invItem->getPaidQty() ?? 0);
                $notes = $this->ListarNotesDeItemInvoice($invItem->getId());
                $override = null;
                foreach ($notes as $n) {
@@ -1505,9 +1504,9 @@ class ProjectService extends Base
                   }
                }
                if ($override !== null) {
-                  $adjustment_qty = ($qtyFinal - $paidItem) - $override;
-                  $total_qty_adjustment += $adjustment_qty;
-                  $total_amt_adjustment += $adjustment_qty * (float) ($invItem->getPrice() ?? 0);
+                  $priceLine = (float) ($invItem->getPrice() ?? 0);
+                  $total_qty_adjustment += $override;
+                  $total_amt_adjustment += $override * $priceLine;
                }
             }
          }
@@ -1521,7 +1520,7 @@ class ProjectService extends Base
          $unpaidHistoryRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
          $has_unpaid_qty_history = $unpaidHistoryRepo->TieneHistorialPorProjectItem($project_item_id);
 
-         // Diff Qty = Paid qty - Inv qty + ajuste por override; Diff Amt = Paid Amt - Inv Amt + ajuste
+         // Diff Qty = (Paid qty - Inv qty) + suma últimos overrides qty; Diff Amt = (Paid Amt - Inv Amt) + suma (override × price línea)
          $invQty = (float) $invoiced_qty;
          $invAmt = (float) $total_invoiced_amount;
          $paidQty = (float) $paid_qty;
