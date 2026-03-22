@@ -196,6 +196,7 @@ class InvoiceService extends Base
       $prefixPaid = [0.0];
       $prefixQbf = [0.0];
 
+      $seenOverrideIdsForSeries = [];
       foreach ($allInvoices as $idx => $invoice) {
          /** @var Invoice $invoice */
          $invoiceId = (int) $invoice->getInvoiceId();
@@ -203,7 +204,7 @@ class InvoiceService extends Base
 
          $qty = (float) (($item?->getQuantity()) ?? 0);
          $paid = $item !== null
-            ? $this->paidQtyOverrideResolver->getEffectivePaidQty($item)
+            ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($item, $seenOverrideIdsForSeries)
             : 0.0;
          $qbfValue = (float) (($item?->getQuantityBroughtForward()) ?? 0);
 
@@ -1075,12 +1076,13 @@ class InvoiceService extends Base
       if (!$value->getProjectItem()->getItem()->getBond()) {
          $sum_qty_prev = 0.0;
          $sum_paid_prev = 0.0;
+         $seenOverrideIdsExcel = [];
          foreach ($allInvoicesHistory as $inv) {
             if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
             foreach ($invoiceItemRepo->ListarItems($inv->getInvoiceId()) as $prevItem) {
                if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
                   $sum_qty_prev += (float) $prevItem->getQuantity();
-                  $sum_paid_prev += $this->paidQtyOverrideResolver->getEffectivePaidQty($prevItem);
+                  $sum_paid_prev += $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($prevItem, $seenOverrideIdsExcel);
                   break;
                }
             }
@@ -1695,6 +1697,7 @@ class InvoiceService extends Base
          $lastLoopUnpaid = 0.0;
          $foundSpecific = false;
 
+         $seenOverrideIdsTimeline = [];
          // 2. Recorrer línea de tiempo
          foreach ($allInvoices as $inv) {
             $loopInvId = (int)$inv->getInvoiceId();
@@ -1704,7 +1707,9 @@ class InvoiceService extends Base
 
             $currentQbf = ($invItem) ? (float)$invItem->getQuantityBroughtForward() : 0.0;
             $iQty = ($invItem) ? (float)$invItem->getQuantity() : 0.0;
-            $iPaid = ($invItem) ? $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem) : 0.0;
+            $iPaid = ($invItem)
+               ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsTimeline)
+               : 0.0;
 
             // Calcular Unpaid en este punto del tiempo
             $tempUnpaid = $this->calculateInvoiceUnpaidQty(
@@ -2423,6 +2428,7 @@ class InvoiceService extends Base
 
          $historialQty = 0.0;
          $historialPaid = 0.0;
+         $seenOverrideIdsQbf = [];
 
          for ($i = 0; $i < count($allInvoices); $i++) {
             $invId = (int)$allInvoices[$i]->getInvoiceId();
@@ -2440,7 +2446,7 @@ class InvoiceService extends Base
                   : (float)$invItem->getQuantityBroughtForward();
 
                $iQty = (float)$invItem->getQuantity();
-               $iPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem);
+               $iPaid = $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsQbf);
             }
 
             // 1. Calcular: (SumQtyPrev - SumPaidPrev) - QBF Actual
@@ -2566,6 +2572,7 @@ class InvoiceService extends Base
 
          $historialQty = 0.0;
          $historialPaid = 0.0;
+         $seenOverrideIdsRecalc = [];
 
          for ($i = 0; $i < count($allInvoices); $i++) {
             $invId = (int) $allInvoices[$i]->getInvoiceId();
@@ -2577,7 +2584,9 @@ class InvoiceService extends Base
 
             $currentQbf = $invItem ? (float) $invItem->getQuantityBroughtForward() : 0.0;
             $iQty = $invItem ? (float) $invItem->getQuantity() : 0.0;
-            $iPaid = $invItem ? $this->paidQtyOverrideResolver->getEffectivePaidQty($invItem) : 0.0;
+            $iPaid = $invItem
+               ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsRecalc)
+               : 0.0;
 
             $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
 

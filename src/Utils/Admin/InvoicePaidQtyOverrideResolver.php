@@ -27,26 +27,112 @@ class InvoicePaidQtyOverrideResolver
 
    public function getEffectivePaidQty(InvoiceItem $invoiceItem): float
    {
+      return $this->resolvePaidQtyDetails($invoiceItem)['effective'];
+   }
+
+   /**
+    * Misma lógica que getEffectivePaidQty, con metadatos para trazas y depuración.
+    *
+    * @return array{
+    *   effective: float,
+    *   base: float,
+    *   override_id: int|null,
+    *   invoice_item_id: int|null,
+    *   invoice_id: int|null,
+    *   project_item_id: int|null,
+    *   invoice_period: string|null
+    * }
+    */
+   public function resolvePaidQtyDetails(InvoiceItem $invoiceItem): array
+   {
       $base = (float) ($invoiceItem->getPaidQty() ?? 0);
       $invoice = $invoiceItem->getInvoice();
       $pi = $invoiceItem->getProjectItem();
+      $invoiceItemId = $invoiceItem->getId();
+      $invoiceId = $invoice !== null ? (int) $invoice->getInvoiceId() : null;
+      $projectItemId = $pi !== null ? (int) $pi->getId() : null;
+
       if ($invoice === null || $pi === null) {
-         return $base;
+         return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
       $invStart = $invoice->getStartDate();
       $invEnd = $invoice->getEndDate();
       if ($invStart === null || $invEnd === null) {
-         return $base;
+         return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
 
       $overrides = $this->overrideRepo->ListarPorProjectItem($pi->getId());
       if ($overrides === []) {
-         return $base;
+         return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
       }
 
       $match = $this->selectBestOverrideForInvoice($invStart, $invEnd, $overrides);
+      $effective = $match !== null ? (float) $match->getPaidQty() : $base;
+      $overrideId = null;
+      if ($match !== null && $match->getId() !== null) {
+         $overrideId = (int) $match->getId();
+      }
 
-      return $match !== null ? (float) $match->getPaidQty() : $base;
+      return $this->paidQtyDetailsRow(
+         $effective,
+         $base,
+         $overrideId,
+         $invoiceItemId,
+         $invoiceId,
+         $projectItemId,
+         $this->formatInvoicePeriod($invStart, $invEnd)
+      );
+   }
+
+   /**
+    * @return array{effective: float, base: float, override_id: int|null, invoice_item_id: int|null, invoice_id: int|null, project_item_id: int|null, invoice_period: string|null}
+    */
+   private function paidQtyDetailsRow(
+      float $effective,
+      float $base,
+      ?int $overrideId,
+      ?int $invoiceItemId,
+      ?int $invoiceId,
+      ?int $projectItemId,
+      ?string $invoicePeriod
+   ): array {
+      return [
+         'effective' => $effective,
+         'base' => $base,
+         'override_id' => $overrideId,
+         'invoice_item_id' => $invoiceItemId,
+         'invoice_id' => $invoiceId,
+         'project_item_id' => $projectItemId,
+         'invoice_period' => $invoicePeriod,
+      ];
+   }
+
+   private function formatInvoicePeriod(\DateTimeInterface $invStart, \DateTimeInterface $invEnd): string
+   {
+      return $invStart->format('Y-m-d') . '..' . $invEnd->format('Y-m-d');
+   }
+
+   /**
+    * Incremento de paid acumulado en timeline (misma regla que ProjectService::computePreviousInvoiceTotalsForProjectItem):
+    * cada `invoice_item_override_payment` (override_id) cuenta una sola vez; no se multiplica por número de facturas.
+    * Líneas sin override: suma el paid_qty almacenado en la línea.
+    *
+    * @param array<int, true> $seenOverrideIds Modificado por referencia; reiniciar por cada project_item.
+    */
+   public function paidIncrementForHistorialTimeline(InvoiceItem $invItem, array &$seenOverrideIds): float
+   {
+      $details = $this->resolvePaidQtyDetails($invItem);
+      $oid = $details['override_id'];
+      if ($oid !== null) {
+         if (isset($seenOverrideIds[$oid])) {
+            return 0.0;
+         }
+         $seenOverrideIds[$oid] = true;
+
+         return (float) $details['effective'];
+      }
+
+      return (float) $details['base'];
    }
 
    /**

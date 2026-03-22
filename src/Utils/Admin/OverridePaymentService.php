@@ -199,6 +199,10 @@ class OverridePaymentService extends Base
       $startDate = $this->parseDateMDY($fecha_inicial);
       $endDate = $this->parseDateMDY($fecha_fin);
 
+      if ($itemsDecoded === []) {
+         return ['success' => true, 'message' => 'No changes to save'];
+      }
+
       $em = $this->getDoctrine()->getManager();
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);

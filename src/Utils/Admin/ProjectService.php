@@ -70,6 +70,12 @@ use Symfony\Component\Mailer\MailerInterface;
 
 class ProjectService extends Base
 {
+   /**
+    * Logs detallados de `listarItemsParaInvoice` / agregado de facturas previas solo para este project_item.
+    * Poner en 0 para no escribir logs de depuración.
+    */
+   private const INVOICE_LISTING_DEBUG_PROJECT_ITEM_ID = 147;
+
    /** @var InvoiceService */
    private $invoiceService;
 
@@ -84,6 +90,20 @@ class ProjectService extends Base
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->invoiceService = $invoiceService;
+   }
+
+   /**
+    * Caché por request: CalcularUnpaidQuantityFromPreviusInvoice y CalculaPaidAmountTotalFromPreviusInvoice
+    * comparten el mismo agregado (evita doble bucle y logs duplicados).
+    *
+    * @var array<int, array<string, mixed>>
+    */
+   private array $previousInvoiceTotalsByProjectItem = [];
+
+   private function shouldLogInvoiceListingDebug(int $projectItemId): bool
+   {
+      return self::INVOICE_LISTING_DEBUG_PROJECT_ITEM_ID !== 0
+         && $projectItemId === self::INVOICE_LISTING_DEBUG_PROJECT_ITEM_ID;
    }
 
    /**
@@ -1088,6 +1108,8 @@ class ProjectService extends Base
     */
    public function ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin)
    {
+      $this->previousInvoiceTotalsByProjectItem = [];
+
       $items = [];
 
       // listar items de project
@@ -1131,6 +1153,10 @@ class ProjectService extends Base
 
          $paid_amount_total = $this->CalculaPaidAmountTotalFromPreviusInvoice($project_item_id);
 
+         $aggPrev = $this->previousInvoiceTotalsByProjectItem[$project_item_id] ?? null;
+         $paid_qty_total_effective = $aggPrev !== null ? (float) $aggPrev['total_paid_effective'] : 0.0;
+         $prev_invoice_line_count = $aggPrev !== null ? (int) $aggPrev['line_count'] : 0;
+
 
          $quantity_brought_forward = 0;
          // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
@@ -1168,6 +1194,8 @@ class ProjectService extends Base
             "amount" => $amount,
             "total_amount" => $total_amount,
             "paid_amount_total" => $paid_amount_total,
+            "paid_qty_total_effective" => $paid_qty_total_effective,
+            "prev_invoice_line_count" => $prev_invoice_line_count,
             "amount_from_previous" => $amount_from_previous,
             "amount_completed" => $amount_completed,
 
@@ -1181,6 +1209,24 @@ class ProjectService extends Base
             "has_quantity_history" => $has_quantity_history,
             "has_price_history" => $has_price_history,
          ];
+
+         if ($this->shouldLogInvoiceListingDebug((int) $project_item_id)) {
+            $this->logger->info('invoice_listing.listar_item_row', [
+               'project_item_id' => $project_item_id,
+               'project_id' => (int) $project_id,
+               'fecha_inicial' => $fecha_inicial,
+               'fecha_fin' => $fecha_fin,
+               'quantity_period' => $quantity ?? 0,
+               'quantity_from_previous' => $quantity_from_previous ?? 0,
+               'quantity_completed' => $quantity_completed,
+               'unpaid_qty' => $unpaid_qty,
+               'formula_unpaid' => 'total_quantity_prev_invoices - paid_qty_total_effective',
+               'paid_qty_total_effective' => $paid_qty_total_effective,
+               'prev_invoice_line_count' => $prev_invoice_line_count,
+               'paid_amount_total' => $paid_amount_total,
+               'unpaid_amount' => $amount_unpaid,
+            ]);
+         }
 
          $items[] = $item_data;
       }
@@ -1233,24 +1279,127 @@ class ProjectService extends Base
    }
 
    /**
+    * Agregado de líneas de factura previas para un project_item (un solo bucle, caché por request).
+    *
+    * Override de paid: el mismo registro (`override_id`) cuenta **una sola vez** hacia el total pagado,
+    * aunque haya varias líneas o facturas en el rango; no se multiplica por número de invoices.
+    * Líneas sin override: se suma el `paid_qty` almacenado por línea.
+    * Logs solo si {@see self::INVOICE_LISTING_DEBUG_PROJECT_ITEM_ID} coincide.
+    *
+    * @return array{
+    *   total_quantity: float,
+    *   total_paid_effective: float,
+    *   paid_amount_total: float,
+    *   line_count: int
+    * }
+    */
+   private function computePreviousInvoiceTotalsForProjectItem(int $project_item_id): array
+   {
+      if (isset($this->previousInvoiceTotalsByProjectItem[$project_item_id])) {
+         return $this->previousInvoiceTotalsByProjectItem[$project_item_id];
+      }
+
+      $total_quantity = 0.0;
+      /** @var array<int, float> paid_qty del override, una entrada por override_id */
+      $paidQtyByOverrideId = [];
+      /** @var array<int, float> precio proyecto para importe del override (primera línea que ve el id) */
+      $priceForOverrideId = [];
+      $sumStoredPaidNoOverride = 0.0;
+      $sumStoredPaidAmountNoOverride = 0.0;
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+      $lineIndex = 0;
+      $trace = $this->shouldLogInvoiceListingDebug($project_item_id);
+
+      foreach ($invoice_items as $invoice_item) {
+         $quantity = $invoice_item->getQuantity();
+         $quantity = ($quantity === null) ? 0.0 : (float) $quantity;
+         $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
+         $price = (float) ($invoice_item->getPrice() ?? 0);
+         $total_quantity += $quantity;
+
+         $oid = $details['override_id'];
+         $isFirstLineForThisOverrideId = false;
+         if ($oid !== null) {
+            $isFirstLineForThisOverrideId = !isset($paidQtyByOverrideId[$oid]);
+            if (!isset($paidQtyByOverrideId[$oid])) {
+               $paidQtyByOverrideId[$oid] = (float) $details['effective'];
+               $pi = $invoice_item->getProjectItem();
+               $priceForOverrideId[$oid] = (float) (($pi !== null && $pi->getPrice() !== null)
+                  ? $pi->getPrice()
+                  : $price);
+            }
+         } else {
+            $sumStoredPaidNoOverride += (float) $details['base'];
+            $sumStoredPaidAmountNoOverride += (float) $details['base'] * $price;
+         }
+
+         if ($trace) {
+            $this->logger->info('invoice_listing.prev_invoice_line', [
+               'project_item_id' => $project_item_id,
+               'line_index' => $lineIndex,
+               'invoice_item_id' => $details['invoice_item_id'],
+               'invoice_id' => $details['invoice_id'],
+               'invoice_period' => $details['invoice_period'],
+               'quantity_this_period' => $quantity,
+               'price_line' => $price,
+               'paid_qty_stored' => $details['base'],
+               'paid_qty_effective_line' => $details['effective'],
+               'override_id' => $oid,
+               'override_first_line_for_this_override_id' => $oid !== null ? $isFirstLineForThisOverrideId : null,
+            ]);
+         }
+         $lineIndex++;
+      }
+
+      $totalPaidFromOverrides = 0.0;
+      $paidAmountFromOverrides = 0.0;
+      foreach ($paidQtyByOverrideId as $ovId => $pq) {
+         $totalPaidFromOverrides += $pq;
+         $paidAmountFromOverrides += $pq * ($priceForOverrideId[$ovId] ?? 0.0);
+      }
+
+      $total_paid = $totalPaidFromOverrides + $sumStoredPaidNoOverride;
+      $paid_amount_total = $paidAmountFromOverrides + $sumStoredPaidAmountNoOverride;
+
+      $unpaid_raw = $total_quantity - $total_paid;
+      $result = [
+         'total_quantity' => $total_quantity,
+         'total_paid_effective' => $total_paid,
+         'paid_amount_total' => $paid_amount_total,
+         'line_count' => $lineIndex,
+      ];
+      $this->previousInvoiceTotalsByProjectItem[$project_item_id] = $result;
+
+      if ($trace) {
+         $this->logger->info('invoice_listing.prev_invoice_totals', [
+            'project_item_id' => $project_item_id,
+            'total_quantity' => $total_quantity,
+            'total_paid_effective' => $total_paid,
+            'paid_amount_total' => $paid_amount_total,
+            'unpaid_qty_raw' => $unpaid_raw,
+            'line_count' => $lineIndex,
+            'paid_qty_by_override_id_once' => $paidQtyByOverrideId,
+            'sum_stored_paid_lines_without_override' => $sumStoredPaidNoOverride,
+            'nota' => 'total_paid = sum(paid_qty por override_id una vez) + sum(paid_qty almacenado en líneas sin override)',
+         ]);
+      }
+
+      return $result;
+   }
+
+   /**
     * CalculaPaidAmountTotalFromPreviusInvoice
     * @param $project_item_id
     * @return float|int
     */
    public function CalculaPaidAmountTotalFromPreviusInvoice($project_item_id)
    {
-      $total = 0;
+      $agg = $this->computePreviousInvoiceTotalsForProjectItem((int) $project_item_id);
 
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-      foreach ($invoice_items as $value) {
-         $effPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
-         $price = (float) ($value->getPrice() ?? 0);
-         $total += $effPaid * $price;
-      }
-
-      return $total;
+      return $agg['paid_amount_total'];
    }
 
    /**
@@ -1259,49 +1408,20 @@ class ProjectService extends Base
     * IMPORTANTE: NO usa el campo unpaid_qty almacenado en BD, sino que recorre
     * todos los invoices previos y aplica la fórmula: unpaid_qty = quantity_final - paid_qty
     * donde quantity_final = quantity + quantity_brought_forward
-    * 
-    * @param $project_item_id
-    * @return float|int
-    */
-   /**
+    *
     * CalcularUnpaidQuantityFromPreviusInvoice
     * Suma los unpaid_qty de todos los invoices anteriores.
     * CORRECCIÓN: Se basa estrictamente en (Total Cantidad - Total Pagado).
     * Se IGNORA el quantity_brought_forward (QBF) para la deuda histórica,
     * ya que el QBF es un ajuste temporal de ese invoice y no debe aumentar la deuda futura.
-    * * @param $project_item_id
+    * @param $project_item_id
     * @return float|int
     */
    public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id)
    {
-      $total_quantity = 0.0;
-      $total_paid = 0.0;
+      $agg = $this->computePreviousInvoiceTotalsForProjectItem((int) $project_item_id);
 
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-
-      // Obtener TODOS los invoice items anteriores de este project_item
-      $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-
-      // Recorrer TODOS los invoices previos
-      foreach ($invoice_items as $invoice_item) {
-         // Sumar solo la cantidad real facturada (Qty This Period)
-         $quantity = $invoice_item->getQuantity();
-         $quantity = ($quantity === null) ? 0.0 : (float)$quantity;
-
-         // Sumar lo pagado (efectivo: override si aplica al período del invoice)
-         $paid_quantity = $this->paidQtyOverrideResolver->getEffectivePaidQty($invoice_item);
-
-         // ACUMULAR
-         // IMPORTANTE: No sumamos quantity_brought_forward aquí.
-         $total_quantity += $quantity;
-         $total_paid += $paid_quantity;
-      }
-
-      // La deuda total es simplemente lo facturado menos lo pagado
-      $unpaid_quantity = $total_quantity - $total_paid;
-
-      return max(0.0, $unpaid_quantity);
+      return max(0.0, $agg['total_quantity'] - $agg['total_paid_effective']);
    }
 
    /**

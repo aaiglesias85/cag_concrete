@@ -119,7 +119,7 @@ class OverridePaymentController extends AbstractController
          if (!empty($resultado['success'])) {
             return $this->json([
                'success' => true,
-               'message' => 'The operation was successful',
+               'message' => $resultado['message'] ?? 'The operation was successful',
             ]);
          }
 

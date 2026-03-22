@@ -329,6 +329,12 @@ var OverridePayment = (function () {
                if (data.hasOwnProperty('principal') && !data.principal) {
                   $(row).addClass('row-secondary');
                }
+               // Valor de paid_qty al cargar (para salvar solo filas que cambiaron)
+               var initPaid = data.paid_qty !== null && data.paid_qty !== undefined ? parseFloat(data.paid_qty) : 0;
+               if (isNaN(initPaid)) {
+                  initPaid = 0;
+               }
+               $(row).attr('data-initial-op-paid', String(initPaid));
             }
          },
          drawCallback: function () {
@@ -430,15 +436,35 @@ var OverridePayment = (function () {
             return;
          }
          var items = [];
+         var eps = 1e-6;
          $('#override-payment-items-table tbody tr').each(function () {
-            var $inp = $(this).find('input.override-paid-qty');
-            if ($inp.length) {
-               var pid = $inp.data('project-item-id');
-               var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
-               if (isNaN(pq)) pq = 0;
-               items.push({ project_item_id: pid, paid_qty: pq });
+            var $tr = $(this);
+            if ($tr.hasClass('row-group-header')) {
+               return;
             }
+            var $inp = $tr.find('input.override-paid-qty');
+            if (!$inp.length) {
+               return;
+            }
+            var pid = $inp.data('project-item-id');
+            var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
+            if (isNaN(pq)) {
+               pq = 0;
+            }
+            var initialStr = $tr.attr('data-initial-op-paid');
+            var initial = initialStr !== undefined && initialStr !== '' ? parseFloat(initialStr) : 0;
+            if (isNaN(initial)) {
+               initial = 0;
+            }
+            if (Math.abs(pq - initial) < eps) {
+               return;
+            }
+            items.push({ project_item_id: pid, paid_qty: pq });
          });
+         if (items.length === 0) {
+            toastr.info('No changes to save.', '');
+            return;
+         }
          var formData = new URLSearchParams();
          formData.set('project_id', $('#filtro-project-op').val());
          formData.set('fechaInicial', FlatpickrUtil.getString('op-datetimepicker-desde'));
