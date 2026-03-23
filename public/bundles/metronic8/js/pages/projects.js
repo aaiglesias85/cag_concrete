@@ -462,6 +462,10 @@ var Projects = (function () {
       invoices = [];
       actualizarTableListaInvoices();
 
+      // invoice_item_override_payment_history
+      invoice_item_override_payment_history = [];
+      actualizarTableListaInvoiceItemOverridePayments();
+
       //ajustes precio
       ajustes_precio = [];
       actualizarTableListaAjustesPrecio();
@@ -533,7 +537,7 @@ var Projects = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 12;
+   var totalTabs = 13;
    var initWizard = function () {
       $(document).off('click', '#form-project .wizard-tab');
       $(document).on('click', '#form-project .wizard-tab', function (e) {
@@ -606,6 +610,9 @@ var Projects = (function () {
                break;
             case 12:
                btnClickFiltrarNotes();
+               break;
+            case 13:
+               actualizarTableListaInvoiceItemOverridePayments();
                break;
          }
       });
@@ -700,6 +707,10 @@ var Projects = (function () {
                actualizarTableListaInvoices();
                break;
             case 12:
+               $('#tab-override-payments').tab('show');
+               actualizarTableListaInvoiceItemOverridePayments();
+               break;
+            case 13:
                $('#tab-notes').tab('show');
                btnClickFiltrarNotes();
                break;
@@ -708,7 +719,7 @@ var Projects = (function () {
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 12;
+      totalTabs = 13;
       mostrarTab();
       // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
@@ -1208,6 +1219,10 @@ var Projects = (function () {
          invoices = project.invoices;
          actualizarTableListaInvoices();
 
+         // invoice_item_override_payment_history
+         invoice_item_override_payment_history = project.invoice_item_override_payment_history || [];
+         actualizarTableListaInvoiceItemOverridePayments();
+
          // ajustes precio
          ajustes_precio = project.ajustes_precio;
          actualizarTableListaAjustesPrecio();
@@ -1241,7 +1256,7 @@ var Projects = (function () {
          actualizarTableListaPrevailingRoles();
 
          // habilitar tab
-         totalTabs = 12;
+         totalTabs = 13;
          $('.nav-item-hide').removeClass('hide');
 
          event_change = false;
@@ -3652,6 +3667,8 @@ var Projects = (function () {
    // invoices
    var oTableInvoices;
    var invoices = [];
+   var oTableInvoiceItemOverridePayments;
+   var invoice_item_override_payment_history = [];
    var initTableInvoices = function () {
       const table = '#invoices-table-editable';
 
@@ -3758,6 +3775,65 @@ var Projects = (function () {
             window.location.href = url_invoice;
          }
       });
+   };
+
+   // invoice_item_override_payment_history (tab Paid qty overrides)
+   var initTableInvoiceItemOverridePayments = function () {
+      const table = '#invoice-item-override-payments-table-editable';
+
+      const columns = [
+         { data: 'item_description' },
+         { data: 'old_qty' },
+         { data: 'new_qty' },
+         { data: 'user_name' },
+         { data: 'created_at' },
+      ];
+
+      const columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 220);
+            },
+         },
+         {
+            targets: 3,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 160);
+            },
+         },
+      ];
+
+      const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[4, 'desc']];
+
+      oTableInvoiceItemOverridePayments = DatatableUtil.initSafeDataTable(table, {
+         data: invoice_item_override_payment_history,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'All'],
+         ],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableInvoiceItemOverridePayments();
+   };
+   var handleSearchDatatableInvoiceItemOverridePayments = function () {
+      $(document).off('keyup', '#lista-invoice-item-override-payments [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-invoice-item-override-payments [data-table-filter="search"]', function (e) {
+         oTableInvoiceItemOverridePayments.search(e.target.value).draw();
+      });
+   };
+   var actualizarTableListaInvoiceItemOverridePayments = function () {
+      if (oTableInvoiceItemOverridePayments) {
+         oTableInvoiceItemOverridePayments.destroy();
+      }
+
+      initTableInvoiceItemOverridePayments();
    };
 
    // datatracking
@@ -5843,6 +5919,8 @@ var Projects = (function () {
          // invoices
          initTableInvoices();
          initAccionesInvoices();
+
+         initTableInvoiceItemOverridePayments();
 
          // data tracking
          initTableDataTracking();

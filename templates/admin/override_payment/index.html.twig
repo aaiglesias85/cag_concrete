@@ -66,20 +66,14 @@
                               </select>
                            </div>
                            <div class="mb-3">
-                              <div class="input-group input-group-solid date-picker-filter" id="op-datetimepicker-desde" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                 <input type="text" class="form-control filter-date" placeholder="From" data-td-target="#op-datetimepicker-desde" autocomplete="off" />
-                                 <span class="input-group-text" data-td-target="#op-datetimepicker-desde" data-td-toggle="datetimepicker">
+                              <label class="form-label fs-7 text-gray-600 mb-1">Invoice end date</label>
+                              <div class="input-group input-group-solid date-picker-filter" id="op-datetimepicker-fecha-fin" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                 <input type="text" class="form-control filter-date" placeholder="m/d/Y" data-td-target="#op-datetimepicker-fecha-fin" autocomplete="off" />
+                                 <span class="input-group-text" data-td-target="#op-datetimepicker-fecha-fin" data-td-toggle="datetimepicker">
                                     <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
                                  </span>
                               </div>
-                           </div>
-                           <div class="mb-3">
-                              <div class="input-group input-group-solid date-picker-filter" id="op-datetimepicker-hasta" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                 <input type="text" class="form-control filter-date" placeholder="To" data-td-target="#op-datetimepicker-hasta" autocomplete="off" />
-                                 <span class="input-group-text" data-td-target="#op-datetimepicker-hasta" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                                 </span>
-                              </div>
+                              <div class="form-text">Totals include invoices with end date on or before this date.</div>
                            </div>
                            <div class="d-flex justify-content-end mt-10">
                               <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" id="btn-reset-filtrar-op">Reset filters</button>
@@ -97,7 +91,7 @@
                   <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
                </i>
                <p class="text-gray-700 fw-semibold fs-4 mb-2">Apply a filter to view items</p>
-               <p class="text-gray-500 fs-6 mb-0">Select <strong>Company</strong> and <strong>Project</strong> (required). Optionally set <strong>From</strong> and/or <strong>To</strong> to limit invoices by date. Then click <strong>Apply</strong>. Use <strong>Save</strong> to persist paid qty overrides for the same filter.</p>
+               <p class="text-gray-500 fs-6 mb-0">Select <strong>Company</strong> and <strong>Project</strong> (required). Optionally set <strong>Invoice end date</strong> so totals use invoices ending on or before that date. Then click <strong>Apply</strong>. Use <strong>Save</strong> to persist paid qty overrides for the same filter.</p>
             </div>
             <div id="override-payment-table-wrapper" class="hide">
                <table id="override-payment-items-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">

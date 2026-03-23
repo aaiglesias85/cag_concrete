@@ -95,4 +95,24 @@ class InvoiceItemOverridePaymentHistoryRepository extends ServiceEntityRepositor
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * ListarPorProject: historial de cambios de paid_qty de todos los overrides de ítems del proyecto.
+     *
+     * @return InvoiceItemOverridePaymentHistory[]
+     */
+    public function ListarPorProject(int $projectId): array
+    {
+        return $this->createQueryBuilder('h')
+            ->join('h.invoiceItemOverridePayment', 'o')
+            ->join('o.projectItem', 'pi')
+            ->join('pi.project', 'pr')
+            ->leftJoin('h.user', 'u')
+            ->where('pr.projectId = :pid')
+            ->setParameter('pid', $projectId)
+            ->orderBy('h.createdAt', 'DESC')
+            ->addOrderBy('h.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

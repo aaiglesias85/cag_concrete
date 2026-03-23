@@ -33,6 +33,24 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
    }
 
    /**
+    * ListarPorProject: todos los overrides de paid qty de ítems del proyecto.
+    *
+    * @return InvoiceItemOverridePayment[]
+    */
+   public function ListarPorProject(int $projectId): array
+   {
+      return $this->createQueryBuilder('o')
+         ->join('o.projectItem', 'pi')
+         ->join('pi.project', 'pr')
+         ->where('pr.projectId = :pid')
+         ->setParameter('pid', $projectId)
+         ->orderBy('o.endDate', 'DESC')
+         ->addOrderBy('o.id', 'DESC')
+         ->getQuery()
+         ->getResult();
+   }
+
+   /**
     * Busca overrides del proyecto cuyo rango de vigencia coincide exactamente con start/end.
     *
     * @return InvoiceItemOverridePayment[] indexados por project_item_id

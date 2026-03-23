@@ -46,10 +46,8 @@ class OverridePaymentService extends Base
       string $orderDir,
       ?string $company_id,
       ?string $project_id,
-      ?string $fecha_inicial,
       ?string $fecha_fin
    ): array {
-      $startDate = $this->parseDateMDY($fecha_inicial);
       $endDate = $this->parseDateMDY($fecha_fin);
 
       /** @var ProjectItemRepository $projectItemRepo */
@@ -65,7 +63,6 @@ class OverridePaymentService extends Base
          $orderDir,
          (string) ($company_id ?? ''),
          (string) ($project_id ?? ''),
-         $fecha_inicial ?? '',
          $fecha_fin ?? ''
       );
 
@@ -90,7 +87,17 @@ class OverridePaymentService extends Base
       /** @var ProjectItemHistoryRepository $historyRepo */
       $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
 
-      $mapOverrideId = $overrideRepo->MapIdsPorProjectItemsYFechas($piIds, $startDate, $endDate);
+      $mapOverrideId = [];
+      foreach ($piIds as $pid) {
+         $oid = null;
+         if ($endDate !== null) {
+            $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
+         }
+         if ($oid === null) {
+            $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
+         }
+         $mapOverrideId[$pid] = $oid;
+      }
       $overrideIds = array_values(array_filter($mapOverrideId, static fn($id) => $id !== null));
       $overrideConHist = array_fill_keys($overrideHistRepo->IdsConHistorial($overrideIds), true);
 
@@ -183,7 +190,6 @@ class OverridePaymentService extends Base
     */
    public function SalvarOverridePayment(
       string $project_id,
-      string $fecha_inicial,
       string $fecha_fin,
       array $itemsDecoded
    ): array {
@@ -196,8 +202,10 @@ class OverridePaymentService extends Base
          }
       }
 
-      $startDate = $this->parseDateMDY($fecha_inicial);
       $endDate = $this->parseDateMDY($fecha_fin);
+      if ($endDate === null) {
+         return ['success' => false, 'error' => 'Select invoice end date'];
+      }
 
       if ($itemsDecoded === []) {
          return ['success' => true, 'message' => 'No changes to save'];
@@ -229,7 +237,7 @@ class OverridePaymentService extends Base
 
          $entity = $overrideRepo->findOneBy([
             'projectItem' => $pi,
-            'startDate' => $startDate,
+            'startDate' => null,
             'endDate' => $endDate,
          ], ['id' => 'ASC']);
 
@@ -237,7 +245,7 @@ class OverridePaymentService extends Base
          if ($entity === null) {
             $entity = new InvoiceItemOverridePayment();
             $entity->setProjectItem($pi);
-            $entity->setStartDate($startDate);
+            $entity->setStartDate(null);
             $entity->setEndDate($endDate);
             $entity->setPaidQty($paidQtyNew);
             $em->persist($entity);

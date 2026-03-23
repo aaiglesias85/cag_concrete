@@ -53,7 +53,6 @@ class OverridePaymentController extends AbstractController
 
          $company_id = $request->get('company_id');
          $project_id = $request->get('project_id');
-         $fecha_inicial = $request->get('fechaInicial');
          $fecha_fin = $request->get('fechaFin');
 
          $result = $this->overridePaymentService->Listar(
@@ -64,7 +63,6 @@ class OverridePaymentController extends AbstractController
             $dt['orderDir'],
             $company_id,
             $project_id,
-            $fecha_inicial,
             $fecha_fin
          );
 
@@ -96,7 +94,6 @@ class OverridePaymentController extends AbstractController
         }
 
         $project_id = (string) $request->get('project_id', '');
-        $fecha_inicial = (string) $request->get('fechaInicial', '');
         $fecha_fin = (string) $request->get('fechaFin', '');
       $itemsRaw = $request->get('items');
       if (is_string($itemsRaw)) {
@@ -111,7 +108,6 @@ class OverridePaymentController extends AbstractController
       try {
          $resultado = $this->overridePaymentService->SalvarOverridePayment(
             $project_id,
-            $fecha_inicial,
             $fecha_fin,
             $itemsDecoded
          );

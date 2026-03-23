@@ -565,8 +565,8 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id en rango de fechas del invoice
-    * (como ListarInvoicesRangoFecha / Payments). Devuelve solo project_item_id y sumatorias; el resto va en el service.
+    * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id.
+    * Filtro opcional por fecha: solo invoice.end_date <= fecha_fin (inclusive), en m/d/Y.
     *
     * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
     */
@@ -578,17 +578,9 @@ class InvoiceItemRepository extends ServiceEntityRepository
       string $sortDir,
       string $company_id,
       string $project_id,
-      string $fecha_inicial,
       string $fecha_fin
    ): array {
-      $fechaIniYmd = '';
       $fechaFinYmd = '';
-      if (!empty($fecha_inicial)) {
-         $d = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
-         if ($d !== false) {
-            $fechaIniYmd = $d->format('Y-m-d');
-         }
-      }
       if (!empty($fecha_fin)) {
          $d = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
          if ($d !== false) {
@@ -626,10 +618,6 @@ class InvoiceItemRepository extends ServiceEntityRepository
       }
 
       $dateClause = '';
-      if ($fechaIniYmd !== '') {
-         $dateClause .= ' AND i.start_date >= :fecha_inicial';
-         $params['fecha_inicial'] = $fechaIniYmd;
-      }
       if ($fechaFinYmd !== '') {
          $dateClause .= ' AND i.end_date <= :fecha_final';
          $params['fecha_final'] = $fechaFinYmd;

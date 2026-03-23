@@ -671,6 +671,43 @@
                               <div class="wizard-title">Notes</div>
                               <div class="wizard-desc">List of notes</div>
                            </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item hide nav-item-hide">
+                     <a class="nav-link wizard-tab" data-item="13" data-bs-toggle="tab" href="#tab-content-override-payments" id="tab-override-payments">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">13</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Paid qty overrides</div>
+                              <div class="wizard-desc">Paid qty override history</div>
+                           </div>
                         </div>
                      </a>
                   </li>
@@ -1363,6 +1400,30 @@
                               <tbody class="text-gray-600 fw-semibold"></tbody>
                            </table>
                            <!--end::Datatable-->
+                        </div>
+                     </div>
+                  </div>
+                  <div class="tab-pane fade" id="tab-content-override-payments" role="tabpanel">
+                     <div class="row" id="lista-invoice-item-override-payments">
+                        <div class="col-md-12">
+                           <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
+                              <div class="d-flex align-items-center position-relative my-1">
+                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
+                                 <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                              </div>
+                           </div>
+                           <table id="invoice-item-override-payments-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Item</th>
+                                    <th>Previous qty</th>
+                                    <th>New qty</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
                         </div>
                      </div>
                   </div>
@@ -2073,6 +2134,43 @@
                               <div class="wizard-title">Notes</div>
                               <div class="wizard-desc">List of notes</div>
                            </div>
+                           <span class="svg-icon ps-6">
+                              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1">
+                                 <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <polygon points="0 0 24 0 24 24 0 24"></polygon>
+                                    <rect
+                                       fill="#000000"
+                                       opacity="0.3"
+                                       transform="translate(8.500000, 12.000000) rotate(-90.000000) translate(-8.500000, -12.000000)"
+                                       x="7.5"
+                                       y="7.5"
+                                       width="2"
+                                       height="9"
+                                       rx="1"
+                                    ></rect>
+                                    <path
+                                       d="M9.70710318,15.7071045 C9.31657888,16.0976288 8.68341391,16.0976288 8.29288961,15.7071045 C7.90236532,15.3165802 7.90236532,14.6834152 8.29288961,14.2928909 L14.2928896,8.29289093 C14.6714686,7.914312 15.281055,7.90106637 15.675721,8.26284357 L21.675721,13.7628436 C22.08284,14.136036 22.1103429,14.7686034 21.7371505,15.1757223 C21.3639581,15.5828413 20.7313908,15.6103443 20.3242718,15.2371519 L15.0300721,10.3841355 L9.70710318,15.7071045 Z"
+                                       fill="#000000"
+                                       fill-rule="nonzero"
+                                       transform="translate(14.999999, 11.999997) scale(1, -1) rotate(90.000000) translate(-14.999999, -11.999997)"
+                                    ></path>
+                                 </g>
+                              </svg>
+                           </span>
+                        </div>
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="13" data-bs-toggle="tab" href="#tab-content-override-payments-detalle" id="tab-override-payments-detalle">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">13</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Paid qty overrides</div>
+                              <div class="wizard-desc">Paid qty override history</div>
+                           </div>
                         </div>
                      </a>
                   </li>
@@ -2626,6 +2724,30 @@
                               <tbody class="text-gray-600 fw-semibold"></tbody>
                            </table>
                            <!--end::Datatable-->
+                        </div>
+                     </div>
+                  </div>
+                  <div class="tab-pane fade" id="tab-content-override-payments-detalle" role="tabpanel">
+                     <div class="row" id="lista-invoice-item-override-payments-detalle">
+                        <div class="col-md-12">
+                           <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
+                              <div class="d-flex align-items-center position-relative my-1">
+                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
+                                 <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                              </div>
+                           </div>
+                           <table id="invoice-item-override-payments-table-editable-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Item</th>
+                                    <th>Previous qty</th>
+                                    <th>New qty</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
                         </div>
                      </div>
                   </div>

@@ -20,9 +20,8 @@ var OverridePayment = (function () {
       if (company != null && String(company).trim() !== '') return true;
       var project = $('#filtro-project-op').val();
       if (project != null && String(project).trim() !== '') return true;
-      var fi = FlatpickrUtil.getString('op-datetimepicker-desde') || '';
-      var ff = FlatpickrUtil.getString('op-datetimepicker-hasta') || '';
-      if (String(fi).trim() !== '' || String(ff).trim() !== '') return true;
+      var ff = FlatpickrUtil.getString('op-datetimepicker-fecha-fin') || '';
+      if (String(ff).trim() !== '') return true;
       return false;
    };
 
@@ -208,20 +207,6 @@ var OverridePayment = (function () {
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var v = data !== null && data !== undefined ? data : 0;
-               return (
-                  '<input type="number" class="form-control form-control-sm override-paid-qty" value="' +
-                  v +
-                  '" data-project-item-id="' +
-                  row.project_item_id +
-                  '" style="width:80px;min-width:72px;" />'
-               );
-            },
-         },
-         {
-            targets: 8,
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               var v = data !== null && data !== undefined ? data : 0;
                var histOverride = '';
                if (row.has_override_payment_history && row.invoice_item_override_payment_id) {
                   histOverride =
@@ -231,13 +216,27 @@ var OverridePayment = (function () {
                }
                return (
                   '<div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:150px;">' +
-                  '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
+                  '<input type="number" class="form-control form-control-sm override-paid-qty" value="' +
                   v +
                   '" data-project-item-id="' +
                   row.project_item_id +
                   '" style="width:80px;min-width:72px;" />' +
                   histOverride +
                   '</div>'
+               );
+            },
+         },
+         {
+            targets: 8,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var v = data !== null && data !== undefined ? data : 0;
+               return (
+                  '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
+                  v +
+                  '" data-project-item-id="' +
+                  row.project_item_id +
+                  '" style="width:80px;min-width:72px;" />'
                );
             },
          },
@@ -295,8 +294,7 @@ var OverridePayment = (function () {
                return $.extend({}, d, {
                   company_id: $('#filtro-company-op').val(),
                   project_id: $('#filtro-project-op').val(),
-                  fechaInicial: FlatpickrUtil.getString('op-datetimepicker-desde'),
-                  fechaFin: FlatpickrUtil.getString('op-datetimepicker-hasta'),
+                  fechaFin: FlatpickrUtil.getString('op-datetimepicker-fecha-fin'),
                });
             },
             dataSrc: function (json) {
@@ -364,8 +362,7 @@ var OverridePayment = (function () {
          $('#lista-override-payment [data-table-filter="search"]').val('');
          $('#filtro-company-op').val('').trigger('change');
          MyUtil.limpiarSelect('#filtro-project-op');
-         FlatpickrUtil.clear('op-datetimepicker-desde');
-         FlatpickrUtil.clear('op-datetimepicker-hasta');
+         FlatpickrUtil.clear('op-datetimepicker-fecha-fin');
          resetToInitialState();
       });
    };
@@ -467,8 +464,7 @@ var OverridePayment = (function () {
          }
          var formData = new URLSearchParams();
          formData.set('project_id', $('#filtro-project-op').val());
-         formData.set('fechaInicial', FlatpickrUtil.getString('op-datetimepicker-desde'));
-         formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-hasta'));
+         formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
          formData.set('items', JSON.stringify(items));
          BlockUtil.block('#lista-override-payment .card-body');
          axios
@@ -647,13 +643,9 @@ var OverridePayment = (function () {
    };
 
    var initFlatpickr = function () {
-      var desde = document.getElementById('op-datetimepicker-desde');
-      var hasta = document.getElementById('op-datetimepicker-hasta');
-      if (desde && typeof FlatpickrUtil !== 'undefined') {
-         FlatpickrUtil.initDate('op-datetimepicker-desde', { allowInput: true });
-      }
-      if (hasta && typeof FlatpickrUtil !== 'undefined') {
-         FlatpickrUtil.initDate('op-datetimepicker-hasta', { allowInput: true });
+      var el = document.getElementById('op-datetimepicker-fecha-fin');
+      if (el && typeof FlatpickrUtil !== 'undefined') {
+         FlatpickrUtil.initDate('op-datetimepicker-fecha-fin', { allowInput: true });
       }
    };
 

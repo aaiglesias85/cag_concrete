@@ -1563,6 +1563,9 @@ class ProjectService extends Base
          $invoices = $this->ListarInvoicesDeProject($project_id);
          $arreglo_resultado['invoices'] = $invoices;
 
+         // Historial de cambios de paid_qty (invoice_item_override_payment_history) del proyecto
+         $arreglo_resultado['invoice_item_override_payment_history'] = $this->ListarInvoiceItemOverridePaymentHistoryDeProject($project_id);
+
          // archivos
          $archivos = $this->ListarArchivosDeProject($project_id);
          $arreglo_resultado['archivos'] = $archivos;
@@ -1916,6 +1919,44 @@ class ProjectService extends Base
       }
 
       return $invoices;
+   }
+
+   /**
+    * ListarInvoiceItemOverridePaymentHistoryDeProject: historial de paid_qty (invoice_item_override_payment_history) de ítems del proyecto.
+    *
+    * @param int|string $project_id
+    *
+    * @return array<int, array<string, mixed>>
+    */
+   public function ListarInvoiceItemOverridePaymentHistoryDeProject($project_id): array
+   {
+      $out = [];
+      /** @var InvoiceItemOverridePaymentHistoryRepository $histRepo */
+      $histRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
+      $rows = $histRepo->ListarPorProject((int) $project_id);
+      foreach ($rows as $key => $h) {
+         $override = $h->getInvoiceItemOverridePayment();
+         $pi = $override !== null ? $override->getProjectItem() : null;
+         $item = $pi !== null ? $pi->getItem() : null;
+         $user = $h->getUser();
+         $userName = $user !== null ? $user->getNombreCompleto() : 'Unknown';
+         $oldRaw = $h->getOldValue();
+         $newRaw = $h->getNewValue();
+         $oldQty = $oldRaw !== null && $oldRaw !== '' ? number_format((float) $oldRaw, 2, '.', ',') : '—';
+         $newQty = $newRaw !== null && $newRaw !== '' ? number_format((float) $newRaw, 2, '.', ',') : '—';
+         $created = $h->getCreatedAt();
+         $out[] = [
+            'id' => $h->getId(),
+            'item_description' => $item !== null ? (string) ($item->getDescription() ?? '') : '',
+            'old_qty' => $oldQty,
+            'new_qty' => $newQty,
+            'user_name' => $userName,
+            'created_at' => $created !== null ? $created->format('m/d/Y H:i') : '',
+            'posicion' => $key,
+         ];
+      }
+
+      return $out;
    }
 
    /**
