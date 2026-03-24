@@ -226,20 +226,30 @@ var OverridePayment = (function () {
                );
             },
          },
-         {
-            targets: 8,
-            render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
-               var v = data !== null && data !== undefined ? data : 0;
-               return (
-                  '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
-                  v +
-                  '" data-project-item-id="' +
-                  row.project_item_id +
-                  '" style="width:80px;min-width:72px;" />'
-               );
-            },
-         },
+          {
+             targets: 8,
+             render: function (data, type, row) {
+                if (row.isGroupHeader) return '';
+                var v = data !== null && data !== undefined ? data : 0;
+                var histOverride = '';
+                if (row.has_override_unpaid_qty_history && row.invoice_item_override_unpaid_qty_id) {
+                   histOverride =
+                      '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer override-unpaid-qty-history-icon flex-shrink-0" style="cursor:pointer;display:inline-block;" data-invoice-item-override-unpaid-qty-id="' +
+                      row.invoice_item_override_unpaid_qty_id +
+                      '" title="Unpaid Override history"></i>';
+                }
+                return (
+                   '<div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:150px;">' +
+                   '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
+                   v +
+                   '" data-project-item-id="' +
+                   row.project_item_id +
+                   '" style="width:80px;min-width:72px;" />' +
+                   histOverride +
+                   '</div>'
+                );
+             },
+          },
          {
             targets: 9,
             render: function (data, type, row) {
@@ -250,23 +260,21 @@ var OverridePayment = (function () {
       ];
    };
 
-   var recalcRow = function ($row) {
-      if (!oTable) return;
-      var rowData = oTable.row($row).data();
-      if (!rowData || rowData.isGroupHeader) return;
-      var qf = parseFloat(rowData.quantity) || 0;
-      var price = parseFloat(rowData.price) || 0;
-      var $inpPaid = $row.find('input.override-paid-qty');
-      var $inpUnpaid = $row.find('input.override-unpaid-qty');
-      var pq = parseFloat(String($inpPaid.val() || '').replace(/,/g, ''));
-      if (isNaN(pq)) pq = 0;
-      pq = Math.max(0, pq);
-      var unpaid = Math.max(0, qf - pq);
-      if ($inpUnpaid.length) {
-         $inpUnpaid.val(unpaid);
-      }
-      $row.find('span.override-paid-amount-display').text(MyApp.formatMoney(pq * price));
-   };
+    var recalcRow = function ($row) {
+       if (!oTable) return;
+       var rowData = oTable.row($row).data();
+       if (!rowData || rowData.isGroupHeader) return;
+       var price = parseFloat(rowData.price) || 0;
+       var $inpPaid = $row.find('input.override-paid-qty');
+       var $inpUnpaid = $row.find('input.override-unpaid-qty');
+       var pq = parseFloat(String($inpPaid.val() || '').replace(/,/g, ''));
+       if (isNaN(pq)) pq = 0;
+       pq = Math.max(0, pq);
+       var uq = parseFloat(String($inpUnpaid.val() || '').replace(/,/g, ''));
+       if (isNaN(uq)) uq = 0;
+       $row.find('span.override-paid-amount-display').text(MyApp.formatMoney(pq * price));
+       $row.find('span.override-unpaid-amount-display').text(MyApp.formatMoney(uq * price));
+    };
 
    var initTable = function () {
       if (oTable) {
@@ -328,13 +336,20 @@ var OverridePayment = (function () {
                   $(row).addClass('row-secondary');
                }
                // Valor de paid_qty al cargar (para salvar solo filas que cambiaron)
-               var initPaid = data.paid_qty !== null && data.paid_qty !== undefined ? parseFloat(data.paid_qty) : 0;
-               if (isNaN(initPaid)) {
-                  initPaid = 0;
-               }
-               $(row).attr('data-initial-op-paid', String(initPaid));
-            }
-         },
+                var initPaid = data.paid_qty !== null && data.paid_qty !== undefined ? parseFloat(data.paid_qty) : 0;
+                if (isNaN(initPaid)) {
+                   initPaid = 0;
+                }
+                $(row).attr('data-initial-op-paid', String(initPaid));
+
+                // Valor de unpaid_qty al cargar (para salvar solo filas que cambiaron)
+                var initUnpaid = data.unpaid_qty !== null && data.unpaid_qty !== undefined ? parseFloat(data.unpaid_qty) : 0;
+                if (isNaN(initUnpaid)) {
+                   initUnpaid = 0;
+                }
+                $(row).attr('data-initial-op-unpaid', String(initUnpaid));
+             }
+          },
          drawCallback: function () {
             $('#override-payment-items-table tbody tr').each(function () {
                recalcRow($(this));
@@ -408,22 +423,13 @@ var OverridePayment = (function () {
       });
    };
 
-   var initAccionUnpaidQtyChange = function () {
-      $(document).off('change', '#override-payment-items-table input.override-unpaid-qty');
-      $(document).on('change', '#override-payment-items-table input.override-unpaid-qty', function () {
-         var $row = $(this).closest('tr');
-         if (!oTable) return;
-         var rowData = oTable.row($row).data();
-         if (!rowData || rowData.isGroupHeader) return;
-         var qf = parseFloat(rowData.quantity) || 0;
-         var uv = parseFloat(String($(this).val() || '').replace(/,/g, ''));
-         if (isNaN(uv)) uv = 0;
-         uv = Math.max(0, Math.min(uv, qf));
-         var paid = Math.max(0, qf - uv);
-         $row.find('input.override-paid-qty').val(paid);
-         recalcRow($row);
-      });
-   };
+    var initAccionUnpaidQtyChange = function () {
+       $(document).off('change', '#override-payment-items-table input.override-unpaid-qty');
+       $(document).on('change', '#override-payment-items-table input.override-unpaid-qty', function () {
+          var $row = $(this).closest('tr');
+          recalcRow($row);
+       });
+    };
 
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-override-payment');
@@ -432,32 +438,56 @@ var OverridePayment = (function () {
             toastr.warning('No permission to save.', '');
             return;
          }
-         var items = [];
-         var eps = 1e-6;
-         $('#override-payment-items-table tbody tr').each(function () {
-            var $tr = $(this);
-            if ($tr.hasClass('row-group-header')) {
-               return;
-            }
-            var $inp = $tr.find('input.override-paid-qty');
-            if (!$inp.length) {
-               return;
-            }
-            var pid = $inp.data('project-item-id');
-            var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
-            if (isNaN(pq)) {
-               pq = 0;
-            }
-            var initialStr = $tr.attr('data-initial-op-paid');
-            var initial = initialStr !== undefined && initialStr !== '' ? parseFloat(initialStr) : 0;
-            if (isNaN(initial)) {
-               initial = 0;
-            }
-            if (Math.abs(pq - initial) < eps) {
-               return;
-            }
-            items.push({ project_item_id: pid, paid_qty: pq });
-         });
+          var items = [];
+          var eps = 1e-6;
+          $('#override-payment-items-table tbody tr').each(function () {
+             var $tr = $(this);
+             if ($tr.hasClass('row-group-header')) {
+                return;
+             }
+             var $inp = $tr.find('input.override-paid-qty');
+             if (!$inp.length) {
+                return;
+             }
+             var pid = $inp.data('project-item-id');
+             var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
+             if (isNaN(pq)) {
+                pq = 0;
+             }
+             var initialStr = $tr.attr('data-initial-op-paid');
+             var initial = initialStr !== undefined && initialStr !== '' ? parseFloat(initialStr) : 0;
+             if (isNaN(initial)) {
+                initial = 0;
+             }
+             
+             var $inpUnpaid = $tr.find('input.override-unpaid-qty');
+             var initialUnpaidStr = $tr.attr('data-initial-op-unpaid');
+             var initialUnpaid = initialUnpaidStr !== undefined && initialUnpaidStr !== '' ? parseFloat(initialUnpaidStr) : 0;
+             if (isNaN(initialUnpaid)) {
+                initialUnpaid = 0;
+             }
+             var uq = parseFloat(String($inpUnpaid.val() || '').replace(/,/g, ''));
+             if (isNaN(uq)) {
+                uq = 0;
+             }
+             
+             // Solo guardar si hubo cambio en paid O en unpaid
+             var paidChanged = Math.abs(pq - initial) >= eps;
+             var unpaidChanged = Math.abs(uq - initialUnpaid) >= eps;
+             
+             if (!paidChanged && !unpaidChanged) {
+                return;
+             }
+             
+             var item = { project_item_id: pid };
+             if (paidChanged) {
+                item.paid_qty = pq;
+             }
+             if (unpaidChanged) {
+                item.unpaid_qty = uq;
+             }
+             items.push(item);
+          });
          if (items.length === 0) {
             toastr.info('No changes to save.', '');
             return;
@@ -602,12 +632,51 @@ var OverridePayment = (function () {
          .catch(function () {
             toastr.error('Error loading history', '');
          })
-         .finally(function () {
-            BlockUtil.unblock('#modal-change-order-history .modal-content');
-         });
-   };
+          .finally(function () {
+             BlockUtil.unblock('#modal-change-order-history .modal-content');
+          });
+    };
 
-   var initAccionHistorial = function () {
+    var cargarHistorialOverrideUnpaidQty = function (overrideId) {
+       BlockUtil.block('#modal-change-order-history .modal-content');
+       axios
+          .get('override-payment/listarHistorialUnpaid', {
+             params: { invoice_item_override_unpaid_qty_id: overrideId },
+             responseType: 'json',
+          })
+          .then(function (res) {
+             var response = res.data;
+             if (response.success) {
+                var historial = response.historial || [];
+                var html = '';
+                if (historial.length === 0) {
+                   html = '<div class="alert alert-info">No history for this override.</div>';
+                 } else {
+                    html = '<ul class="list-unstyled">';
+                    historial.forEach(function (item) {
+                       html +=
+                          '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' +
+                          item.mensaje +
+                          '</li>';
+                    });
+                    html += '</ul>';
+                 }
+                $('#modalOverrideHistoryLabel').text('Unpaid qty override history');
+                $('#modal-change-order-history .modal-body').html(html);
+                ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+             } else {
+                toastr.error(response.error || 'Error', '');
+             }
+          })
+          .catch(function () {
+             toastr.error('Error loading history', '');
+          })
+          .finally(function () {
+             BlockUtil.unblock('#modal-change-order-history .modal-content');
+          });
+    };
+
+    var initAccionHistorial = function () {
       $(document).off('click', '.override-paid-qty-history-icon');
       $(document).on('click', '.override-paid-qty-history-icon', function (e) {
          e.preventDefault();
@@ -633,14 +702,21 @@ var OverridePayment = (function () {
          cargarHistorialProjectItem(project_item_id, 'update_quantity');
       });
 
-      $(document).off('click', '#override-payment-items-table .price-history-icon');
-      $(document).on('click', '#override-payment-items-table .price-history-icon', function (e) {
-         e.preventDefault();
-         var project_item_id = $(this).data('project-item-id');
-         if (!project_item_id) return;
-         cargarHistorialProjectItem(project_item_id, 'update_price');
-      });
-   };
+       $(document).off('click', '#override-payment-items-table .price-history-icon');
+       $(document).on('click', '#override-payment-items-table .price-history-icon', function (e) {
+          e.preventDefault();
+          var project_item_id = $(this).data('project-item-id');
+          if (!project_item_id) return;
+          cargarHistorialProjectItem(project_item_id, 'update_price');
+       });
+
+       $(document).off('click', '.override-unpaid-qty-history-icon');
+       $(document).on('click', '.override-unpaid-qty-history-icon', function (e) {
+          e.preventDefault();
+          var id = $(this).data('invoice-item-override-unpaid-qty-id');
+          if (id) cargarHistorialOverrideUnpaidQty(id);
+       });
+    };
 
    var initFlatpickr = function () {
       var el = document.getElementById('op-datetimepicker-fecha-fin');

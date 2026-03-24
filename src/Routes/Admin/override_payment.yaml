@@ -13,3 +13,7 @@ salvarOverridePaymentAdmin:
 listarHistorialOverridePaymentAdmin:
    path: /override-payment/listarHistorial
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorial, _format: json }
+
+listarHistorialUnpaidOverridePaymentAdmin:
+   path: /override-payment/listarHistorialUnpaid
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorialUnpaid, _format: json }

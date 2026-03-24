@@ -43,6 +43,7 @@ class InvoiceService extends Base
       LoggerInterface       $logger,
       TwigEnvironment       $twig,
       private InvoicePaidQtyOverrideResolver $paidQtyOverrideResolver,
+      private InvoiceUnpaidQtyOverrideResolver $unpaidQtyOverrideResolver,
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->twig = $twig;
@@ -1085,19 +1086,26 @@ class InvoiceService extends Base
                   $sum_paid_prev += $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($prevItem, $seenOverrideIdsExcel);
                   break;
                }
-            }
-         }
-         $pending_qty_btd = max(0.0, $sum_qty_prev - $sum_paid_prev);
-         $pending_balance_btd = $pending_qty_btd * $price;
-         $notes = $this->ListarNotesDeItemInvoice($value->getId());
-         foreach ($notes as $note) {
-            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
-               $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
-               $pending_balance_btd = $pending_qty_btd * $price;
-               break;
-            }
-         }
-      } else {
+             }
+          }
+          $notes = $this->ListarNotesDeItemInvoice($value->getId());
+          $hasNoteOverride = false;
+          foreach ($notes as $note) {
+             if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+                $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
+                $pending_balance_btd = $pending_qty_btd * $price;
+                $hasNoteOverride = true;
+                break;
+             }
+          }
+          if (!$hasNoteOverride) {
+             $unpaidOverride = $this->unpaidQtyOverrideResolver->getEffectiveUnpaidQty($value);
+             if ($unpaidOverride > 0) {
+                $pending_qty_btd = max(0.0, $unpaidOverride);
+                $pending_balance_btd = $pending_qty_btd * $price;
+             }
+          }
+       } else {
          $quantity_final = $qty + ($value->getQuantityBroughtForward() ?? 0.0);
          $paid_qty = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
          $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);

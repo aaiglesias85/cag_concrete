@@ -80,65 +80,69 @@ class OverridePaymentService extends Base
          $piById[$pi->getId()] = $pi;
       }
 
-       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
-       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
-       /** @var InvoiceItemOverridePaymentHistoryRepository $overrideHistRepo */
-       $overrideHistRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
-       /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyRepository $unpaidOverrideRepo */
-       $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
-       /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyHistoryRepository $unpaidOverrideHistRepo */
-       $unpaidOverrideHistRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQtyHistory::class);
-       /** @var ProjectItemHistoryRepository $historyRepo */
-       $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      /** @var InvoiceItemOverridePaymentHistoryRepository $overrideHistRepo */
+      $overrideHistRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
+      /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyRepository $unpaidOverrideRepo */
+      $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+      /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyHistoryRepository $unpaidOverrideHistRepo */
+      $unpaidOverrideHistRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQtyHistory::class);
+      /** @var ProjectItemHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
 
-       $mapOverrideId = [];
-       $mapUnpaidOverrideId = [];
-       foreach ($piIds as $pid) {
-          $oid = null;
-          if ($endDate !== null) {
-             $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
-          }
-          if ($oid === null) {
-             $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
-          }
-          $mapOverrideId[$pid] = $oid;
+      $mapOverrideId = [];
+      foreach ($piIds as $pid) {
+         $oid = null;
+         if ($endDate !== null) {
+            $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
+         }
+         if ($oid === null) {
+            $oid = $overrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
+         }
+         $mapOverrideId[$pid] = $oid;
+      }
+      $overrideIds = array_values(array_filter($mapOverrideId, static fn($id) => $id !== null));
+      $overrideConHist = array_fill_keys($overrideHistRepo->IdsConHistorial($overrideIds), true);
 
-          $uoid = null;
-          if ($endDate !== null) {
-             $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
-          }
-          if ($uoid === null) {
-             $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
-          }
-          $mapUnpaidOverrideId[$pid] = $uoid;
-       }
-       $overrideIds = array_values(array_filter($mapOverrideId, static fn($id) => $id !== null));
-       $overrideConHist = array_fill_keys($overrideHistRepo->IdsConHistorial($overrideIds), true);
-       $unpaidOverrideIds = array_values(array_filter($mapUnpaidOverrideId, static fn($id) => $id !== null));
-       $unpaidOverrideConHist = array_fill_keys($unpaidOverrideHistRepo->IdsConHistorial($unpaidOverrideIds), true);
+      $paidQtyByPi = [];
+      $unpaidQtyByPi = [];
+      if ($overrideIds !== []) {
+         /** @var InvoiceItemOverridePayment[] $overrides */
+         $overrides = $overrideRepo->findBy(['id' => $overrideIds]);
+         foreach ($overrides as $ov) {
+            $opi = $ov->getProjectItem();
+            if ($opi !== null) {
+               $paidQtyByPi[$opi->getId()] = (float) $ov->getPaidQty();
+            }
+         }
+      }
 
-       $paidQtyByPi = [];
-       $unpaidQtyByPi = [];
-       if ($overrideIds !== []) {
-          /** @var InvoiceItemOverridePayment[] $overrides */
-          $overrides = $overrideRepo->findBy(['id' => $overrideIds]);
-          foreach ($overrides as $ov) {
-             $opi = $ov->getProjectItem();
-             if ($opi !== null) {
-                $paidQtyByPi[$opi->getId()] = (float) $ov->getPaidQty();
-             }
-          }
-       }
-       if ($unpaidOverrideIds !== []) {
-          /** @var \App\Entity\InvoiceItemOverrideUnpaidQty[] $unpaidOverrides */
-          $unpaidOverrides = $unpaidOverrideRepo->findBy(['id' => $unpaidOverrideIds]);
-          foreach ($unpaidOverrides as $uov) {
-             $upi = $uov->getProjectItem();
-             if ($upi !== null) {
-                $unpaidQtyByPi[$upi->getId()] = (float) $uov->getUnpaidQty();
-             }
-          }
-       }
+      // Obtener overrides de unpaid qty
+      $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+      $mapUnpaidOverrideId = [];
+      foreach ($piIds as $pid) {
+         $uoid = null;
+         if ($endDate !== null) {
+            $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
+         }
+         if ($uoid === null) {
+            $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
+         }
+         $mapUnpaidOverrideId[$pid] = $uoid;
+      }
+      $unpaidOverrideIds = array_values(array_filter($mapUnpaidOverrideId, static fn($id) => $id !== null));
+      $unpaidOverrideConHist = array_fill_keys($unpaidOverrideHistRepo->IdsConHistorial($unpaidOverrideIds), true);
+      if ($unpaidOverrideIds !== []) {
+         /** @var \App\Entity\InvoiceItemOverrideUnpaidQty[] $unpaidOverrides */
+         $unpaidOverrides = $unpaidOverrideRepo->findBy(['id' => $unpaidOverrideIds]);
+         foreach ($unpaidOverrides as $uov) {
+            $upi = $uov->getProjectItem();
+            if ($upi !== null) {
+               $unpaidQtyByPi[$upi->getId()] = (float) $uov->getUnpaidQty();
+            }
+         }
+      }
 
       $histQtyCache = [];
       $histPriceCache = [];
@@ -161,37 +165,39 @@ class OverridePaymentService extends Base
             $histQtyCache[$pid] = $historyRepo->TieneHistorialCantidad($pid);
          }
          if (!isset($histPriceCache[$pid])) {
-            $histPriceCache[$pid] = $historyRepo->TieneHistorialPrecio($pid);
-         }
+             $histPriceCache[$pid] = $historyRepo->TieneHistorialPrecio($pid);
+          }
 
-         $sumPaidLines = (float) ($r['sum_paid_lines'] ?? 0);
-         $paidQtyDisplay = array_key_exists($pid, $paidQtyByPi) ? $paidQtyByPi[$pid] : $sumPaidLines;
-         $sumQtyFinal = (float) ($r['sum_qty_final'] ?? 0);
-         $contractQty = (float) ($pi->getQuantity() ?? 0);
-         $priceContract = (float) ($pi->getPrice() ?? 0);
+          $sumPaidLines = (float) ($r['sum_paid_lines'] ?? 0);
+          $paidQtyDisplay = array_key_exists($pid, $paidQtyByPi) ? $paidQtyByPi[$pid] : $sumPaidLines;
+          $sumQtyFinal = (float) ($r['sum_qty_final'] ?? 0);
+          $contractQty = (float) ($pi->getQuantity() ?? 0);
+          $priceContract = (float) ($pi->getPrice() ?? 0);
 
-         $unpaidOverrideId = $mapUnpaidOverrideId[$pid] ?? null;
-         if ($unpaidOverrideId !== null && isset($unpaidQtyByPi[$pid])) {
-            $unpaidQty = $unpaidQtyByPi[$pid];
-         } else {
-            $unpaidQty = max(0.0, $sumQtyFinal - $paidQtyDisplay);
-         }
-         $paidAmount = $paidQtyDisplay * $priceContract;
+          // Si hay override de unpaid qty, usarlo; si no, calcularlo
+          $unpaidOverrideId = $mapUnpaidOverrideId[$pid] ?? null;
+          if ($unpaidOverrideId !== null && isset($unpaidQtyByPi[$pid])) {
+             $unpaidQty = $unpaidQtyByPi[$pid];
+          } else {
+             $unpaidQty = max(0.0, $sumQtyFinal - $paidQtyDisplay);
+          }
+          $paidAmount = $paidQtyDisplay * $priceContract;
 
-         $overrideId = $mapOverrideId[$pid] ?? null;
-         $hasOverrideHist = $overrideId !== null && isset($overrideConHist[$overrideId]);
-         $hasUnpaidOverrideHist = $unpaidOverrideId !== null && isset($unpaidOverrideConHist[$unpaidOverrideId]);
+          $overrideId = $mapOverrideId[$pid] ?? null;
+          $hasOverrideHist = $overrideId !== null && isset($overrideConHist[$overrideId]);
+          $hasUnpaidOverrideHist = $unpaidOverrideId !== null && isset($unpaidOverrideConHist[$unpaidOverrideId]);
 
-         $codStr = $pi->getChangeOrderDate() !== null
-            ? $pi->getChangeOrderDate()->format('m/d/Y')
-            : '';
+          $codStr = $pi->getChangeOrderDate() !== null
+             ? $pi->getChangeOrderDate()->format('m/d/Y')
+             : '';
 
-         $rows[] = [
-            'project_item_id' => $pid,
-            'item_id' => (int) ($itemEntity->getItemId() ?? 0),
-            'invoice_item_override_payment_id' => $overrideId,
-            'apply_retainage' => $pi->getApplyRetainage() ? 1 : 0,
-            'bonded' => $pi->getBonded() ? 1 : 0,
+          $rows[] = [
+             'project_item_id' => $pid,
+             'item_id' => (int) ($itemEntity->getItemId() ?? 0),
+             'invoice_item_override_payment_id' => $overrideId,
+             'invoice_item_override_unpaid_qty_id' => $unpaidOverrideId,
+             'apply_retainage' => $pi->getApplyRetainage() ? 1 : 0,
+             'bonded' => $pi->getBonded() ? 1 : 0,
              'bond' => $itemEntity->getBond() ? 1 : 0,
              'item' => $itemEntity->getName() ?? '',
              'unit' => $itemEntity->getUnit() ? $itemEntity->getUnit()->getDescription() : '',
@@ -212,10 +218,9 @@ class OverridePaymentService extends Base
              'has_quantity_history' => $histQtyCache[$pid],
              'has_price_history' => $histPriceCache[$pid],
              'has_override_payment_history' => $hasOverrideHist,
-             'invoice_item_override_unpaid_qty_id' => $unpaidOverrideId,
              'has_override_unpaid_qty_history' => $hasUnpaidOverrideHist,
           ];
-       }
+      }
 
       return ['data' => $rows, 'total' => $result['total']];
    }
@@ -246,118 +251,120 @@ class OverridePaymentService extends Base
          return ['success' => true, 'message' => 'No changes to save'];
       }
 
-      $em = $this->getDoctrine()->getManager();
-      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
-      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
-      $user = $this->getUser();
+       $em = $this->getDoctrine()->getManager();
+       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+       $user = $this->getUser();
 
-      foreach ($itemsDecoded as $data) {
-         if (!is_array($data)) {
-            continue;
-         }
-         $projectItemId = isset($data['project_item_id']) ? (int) $data['project_item_id'] : 0;
-         $hasPaidQty = isset($data['paid_qty']);
-         $hasUnpaidQty = isset($data['unpaid_qty']);
-         $paidQtyNew = $hasPaidQty ? (float) $data['paid_qty'] : 0.0;
-         $unpaidQtyNew = $hasUnpaidQty ? (float) $data['unpaid_qty'] : 0.0;
+       foreach ($itemsDecoded as $data) {
+          if (!is_array($data)) {
+             continue;
+          }
+          $projectItemId = isset($data['project_item_id']) ? (int) $data['project_item_id'] : 0;
+          $hasPaidQty = isset($data['paid_qty']);
+          $hasUnpaidQty = isset($data['unpaid_qty']);
+          $paidQtyNew = $hasPaidQty ? (float) $data['paid_qty'] : 0.0;
+          $unpaidQtyNew = $hasUnpaidQty ? (float) $data['unpaid_qty'] : 0.0;
 
-         if ($projectItemId <= 0) {
-            continue;
-         }
+          if ($projectItemId <= 0) {
+             continue;
+          }
 
-         $pi = $this->getDoctrine()->getRepository(ProjectItem::class)->find($projectItemId);
-         if ($pi === null) {
-            continue;
-         }
-         if ($project !== null && $pi->getProject()->getProjectId() !== $project->getProjectId()) {
-            continue;
-         }
+          $pi = $this->getDoctrine()->getRepository(ProjectItem::class)->find($projectItemId);
+          if ($pi === null) {
+             continue;
+          }
+          if ($project !== null && $pi->getProject()->getProjectId() !== $project->getProjectId()) {
+             continue;
+          }
 
-         $entity = $overrideRepo->findOneBy([
+          // Guardar override de Paid Qty solo si se envió
+          if ($hasPaidQty) {
+             $entity = $overrideRepo->findOneBy([
+                'projectItem' => $pi,
+                'startDate' => null,
+                'endDate' => $endDate,
+             ], ['id' => 'ASC']);
+
+             $oldPaid = null;
+             if ($entity === null) {
+                $entity = new InvoiceItemOverridePayment();
+                $entity->setProjectItem($pi);
+                $entity->setStartDate(null);
+                $entity->setEndDate($endDate);
+                $entity->setPaidQty($paidQtyNew);
+                $em->persist($entity);
+
+                $hist = new InvoiceItemOverridePaymentHistory();
+                $hist->setInvoiceItemOverridePayment($entity);
+                $hist->setOldValue(null);
+                $hist->setNewValue((string) $paidQtyNew);
+                $hist->setCreatedAt(new \DateTime());
+                if ($user instanceof \App\Entity\Usuario) {
+                   $hist->setUser($user);
+                }
+                $em->persist($hist);
+             } else {
+                $oldPaid = (float) $entity->getPaidQty();
+                if (abs($oldPaid - $paidQtyNew) > 0.000001) {
+                   $entity->setPaidQty($paidQtyNew);
+                   $entity->setUpdatedAt(new \DateTime());
+
+                   $hist = new InvoiceItemOverridePaymentHistory();
+                   $hist->setInvoiceItemOverridePayment($entity);
+                   $hist->setOldValue((string) $oldPaid);
+                   $hist->setNewValue((string) $paidQtyNew);
+                   $hist->setCreatedAt(new \DateTime());
+                   if ($user instanceof \App\Entity\Usuario) {
+                      $hist->setUser($user);
+                   }
+                   $em->persist($hist);
+                }
+             }
+          }
+
+          // Guardar override de Unpaid Qty solo si se envió
+          if ($hasUnpaidQty) {
+             $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+             $unpaidEntity = $unpaidOverrideRepo->findOneBy([
             'projectItem' => $pi,
             'startDate' => null,
             'endDate' => $endDate,
          ], ['id' => 'ASC']);
 
-         $oldPaid = null;
-         if ($entity === null) {
-            $entity = new InvoiceItemOverridePayment();
-            $entity->setProjectItem($pi);
-            $entity->setStartDate(null);
-            $entity->setEndDate($endDate);
-            $entity->setPaidQty($paidQtyNew);
-            $em->persist($entity);
+         $oldUnpaid = null;
+         if ($unpaidEntity === null) {
+            $unpaidEntity = new \App\Entity\InvoiceItemOverrideUnpaidQty();
+            $unpaidEntity->setProjectItem($pi);
+            $unpaidEntity->setStartDate(null);
+            $unpaidEntity->setEndDate($endDate);
+            $unpaidEntity->setUnpaidQty($unpaidQtyNew);
+            $em->persist($unpaidEntity);
 
-            $hist = new InvoiceItemOverridePaymentHistory();
-            $hist->setInvoiceItemOverridePayment($entity);
-            $hist->setOldValue(null);
-            $hist->setNewValue((string) $paidQtyNew);
-            $hist->setCreatedAt(new \DateTime());
+            $unpaidHist = new \App\Entity\InvoiceItemOverrideUnpaidQtyHistory();
+            $unpaidHist->setInvoiceItemOverrideUnpaidQty($unpaidEntity);
+            $unpaidHist->setOldValue(null);
+            $unpaidHist->setNewValue((string) $unpaidQtyNew);
+            $unpaidHist->setCreatedAt(new \DateTime());
             if ($user instanceof \App\Entity\Usuario) {
-               $hist->setUser($user);
+               $unpaidHist->setUser($user);
             }
-            $em->persist($hist);
+            $em->persist($unpaidHist);
          } else {
-            $oldPaid = (float) $entity->getPaidQty();
-            if (abs($oldPaid - $paidQtyNew) > 0.000001) {
-               $entity->setPaidQty($paidQtyNew);
-               $entity->setUpdatedAt(new \DateTime());
-
-               $hist = new InvoiceItemOverridePaymentHistory();
-               $hist->setInvoiceItemOverridePayment($entity);
-               $hist->setOldValue((string) $oldPaid);
-               $hist->setNewValue((string) $paidQtyNew);
-               $hist->setCreatedAt(new \DateTime());
-               if ($user instanceof \App\Entity\Usuario) {
-                  $hist->setUser($user);
-               }
-               $em->persist($hist);
-            }
-         }
-
-         // Guardar override de Unpaid Qty solo si se envió
-         if ($hasUnpaidQty) {
-            $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
-            $unpaidEntity = $unpaidOverrideRepo->findOneBy([
-               'projectItem' => $pi,
-               'startDate' => null,
-               'endDate' => $endDate,
-            ], ['id' => 'ASC']);
-
-            $oldUnpaid = null;
-            if ($unpaidEntity === null) {
-               $unpaidEntity = new \App\Entity\InvoiceItemOverrideUnpaidQty();
-               $unpaidEntity->setProjectItem($pi);
-               $unpaidEntity->setStartDate(null);
-               $unpaidEntity->setEndDate($endDate);
+            $oldUnpaid = (float) $unpaidEntity->getUnpaidQty();
+            if (abs($oldUnpaid - $unpaidQtyNew) > 0.000001) {
                $unpaidEntity->setUnpaidQty($unpaidQtyNew);
-               $em->persist($unpaidEntity);
+               $unpaidEntity->setUpdatedAt(new \DateTime());
 
                $unpaidHist = new \App\Entity\InvoiceItemOverrideUnpaidQtyHistory();
                $unpaidHist->setInvoiceItemOverrideUnpaidQty($unpaidEntity);
-               $unpaidHist->setOldValue(null);
+               $unpaidHist->setOldValue((string) $oldUnpaid);
                $unpaidHist->setNewValue((string) $unpaidQtyNew);
                $unpaidHist->setCreatedAt(new \DateTime());
                if ($user instanceof \App\Entity\Usuario) {
                   $unpaidHist->setUser($user);
                }
                $em->persist($unpaidHist);
-            } else {
-               $oldUnpaid = (float) $unpaidEntity->getUnpaidQty();
-               if (abs($oldUnpaid - $unpaidQtyNew) > 0.000001) {
-                  $unpaidEntity->setUnpaidQty($unpaidQtyNew);
-                  $unpaidEntity->setUpdatedAt(new \DateTime());
-
-                  $unpaidHist = new \App\Entity\InvoiceItemOverrideUnpaidQtyHistory();
-                  $unpaidHist->setInvoiceItemOverrideUnpaidQty($unpaidEntity);
-                  $unpaidHist->setOldValue((string) $oldUnpaid);
-                  $unpaidHist->setNewValue((string) $unpaidQtyNew);
-                  $unpaidHist->setCreatedAt(new \DateTime());
-                  if ($user instanceof \App\Entity\Usuario) {
-                     $unpaidHist->setUser($user);
-                  }
-                  $em->persist($unpaidHist);
-               }
             }
          }
       }
@@ -372,12 +379,8 @@ class OverridePaymentService extends Base
       return ['success' => true];
    }
 
-   /**
-    * @return array<int, array{id:int, mensaje:string, fecha:string, user_name:string, old_value:string, new_value:string}>
-    */
    public function ListarHistorialOverridePayment(int $invoice_item_override_payment_id): array
    {
-      /** @var InvoiceItemOverridePaymentHistoryRepository $historyRepo */
       $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentHistory::class);
       $lista = $historyRepo->ListarHistorialDeOverride($invoice_item_override_payment_id);
 

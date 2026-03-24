@@ -1,0 +1,15 @@
+override_unpaid_qty:
+   path: /override-unpaid-qty
+   defaults: { _controller: App\Controller\Admin\OverrideUnpaidQtyController::index }
+
+listarOverrideUnpaidQtyAdmin:
+   path: /override-unpaid-qty/listar
+   defaults: { _controller: App\Controller\Admin\OverrideUnpaidQtyController::listar, _format: json }
+
+salvarOverrideUnpaidQtyAdmin:
+   path: /override-unpaid-qty/salvar
+   defaults: { _controller: App\Controller\Admin\OverrideUnpaidQtyController::salvar, _format: json }
+
+listarHistorialOverrideUnpaidQtyAdmin:
+   path: /override-unpaid-qty/listarHistorial
+   defaults: { _controller: App\Controller\Admin\OverrideUnpaidQtyController::listarHistorial, _format: json }

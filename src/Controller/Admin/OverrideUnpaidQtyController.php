@@ -5,34 +5,34 @@ namespace App\Controller\Admin;
 use App\Entity\Company;
 use App\Entity\Usuario;
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\OverridePaymentService;
+use App\Utils\Admin\OverrideUnpaidQtyService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class OverridePaymentController extends AbstractController
+class OverrideUnpaidQtyController extends AbstractController
 {
-   private $overridePaymentService;
+   private $overrideUnpaidQtyService;
 
-   public function __construct(OverridePaymentService $overridePaymentService)
+   public function __construct(OverrideUnpaidQtyService $overrideUnpaidQtyService)
    {
-      $this->overridePaymentService = $overridePaymentService;
+      $this->overrideUnpaidQtyService = $overrideUnpaidQtyService;
    }
 
-    public function index(): Response
-    {
-        /** @var Usuario $usuario */
-        $usuario = $this->getUser();
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+   public function index(): Response
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overrideUnpaidQtyService->BuscarPermiso($usuario->getUsuarioId(), 39);
       if (count($permiso) > 0) {
          if ($permiso[0]['ver']) {
-            $companies = $this->overridePaymentService->getDoctrine()->getRepository(Company::class)
+            $companies = $this->overrideUnpaidQtyService->getDoctrine()->getRepository(Company::class)
                ->ListarOrdenados();
 
-            return $this->render('admin/override_payment/index.html.twig', [
+            return $this->render('admin/override_unpaid_qty/index.html.twig', [
                'permiso' => $permiso[0],
                'companies' => $companies,
-               'direccion_url' => $this->overridePaymentService->ObtenerURL(),
+               'direccion_url' => $this->overrideUnpaidQtyService->ObtenerURL(),
             ]);
          }
       }
@@ -55,7 +55,7 @@ class OverridePaymentController extends AbstractController
          $project_id = $request->get('project_id');
          $fecha_fin = $request->get('fechaFin');
 
-         $result = $this->overridePaymentService->Listar(
+         $result = $this->overrideUnpaidQtyService->Listar(
             $dt['start'],
             $dt['length'],
             $dt['search'],
@@ -84,17 +84,17 @@ class OverridePaymentController extends AbstractController
       }
    }
 
-    public function salvar(Request $request)
-    {
-        /** @var Usuario $usuario */
-        $usuario = $this->getUser();
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
-        if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
-        }
+   public function salvar(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overrideUnpaidQtyService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
 
-        $project_id = (string) $request->get('project_id', '');
-        $fecha_fin = (string) $request->get('fechaFin', '');
+      $project_id = (string) $request->get('project_id', '');
+      $fecha_fin = (string) $request->get('fechaFin', '');
       $itemsRaw = $request->get('items');
       if (is_string($itemsRaw)) {
          $itemsDecoded = json_decode($itemsRaw, true);
@@ -106,7 +106,7 @@ class OverridePaymentController extends AbstractController
       }
 
       try {
-         $resultado = $this->overridePaymentService->SalvarOverridePayment(
+         $resultado = $this->overrideUnpaidQtyService->SalvarOverrideUnpaidQty(
             $project_id,
             $fecha_fin,
             $itemsDecoded
@@ -131,41 +131,22 @@ class OverridePaymentController extends AbstractController
       }
    }
 
-    public function listarHistorial(Request $request)
-    {
-       $invoice_item_override_payment_id = $request->get('invoice_item_override_payment_id');
+   public function listarHistorial(Request $request)
+   {
+      $invoice_item_override_unpaid_qty_id = $request->get('invoice_item_override_unpaid_qty_id');
 
-       try {
-          $historial = $this->overridePaymentService->ListarHistorialOverridePayment((int) $invoice_item_override_payment_id);
+      try {
+         $historial = $this->overrideUnpaidQtyService->ListarHistorialOverrideUnpaidQty((int) $invoice_item_override_unpaid_qty_id);
 
-          return $this->json([
-             'success' => true,
-             'historial' => $historial,
-          ]);
-       } catch (\Exception $e) {
-          return $this->json([
-             'success' => false,
-             'error' => $e->getMessage(),
-          ]);
-       }
-    }
-
-    public function listarHistorialUnpaid(Request $request)
-    {
-       $invoice_item_override_unpaid_qty_id = $request->get('invoice_item_override_unpaid_qty_id');
-
-       try {
-          $historial = $this->overridePaymentService->ListarHistorialOverrideUnpaidQty((int) $invoice_item_override_unpaid_qty_id);
-
-          return $this->json([
-             'success' => true,
-             'historial' => $historial,
-          ]);
-       } catch (\Exception $e) {
-          return $this->json([
-             'success' => false,
-             'error' => $e->getMessage(),
-          ]);
-       }
-    }
+         return $this->json([
+            'success' => true,
+            'historial' => $historial,
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+         ]);
+      }
+   }
 }
