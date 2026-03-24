@@ -1437,6 +1437,34 @@ class ProjectService extends Base
     */
    public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id)
    {
+      // Verificar si hay override de unpaid qty
+      $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+      $unpaidOverrides = $unpaidOverrideRepo->ListarPorProjectItem($project_item_id);
+      
+      if (!empty($unpaidOverrides)) {
+         // Encontrar el override más reciente
+         $latestOverride = null;
+         $latestStartDate = null;
+         foreach ($unpaidOverrides as $override) {
+            $oStart = $override->getStartDate();
+            if ($oStart === null) {
+               $latestOverride = $override;
+               $latestStartDate = null;
+               break;
+            }
+            if ($latestStartDate === null || $oStart > $latestStartDate) {
+               $latestOverride = $override;
+               $latestStartDate = $oStart;
+            }
+         }
+         
+         if ($latestOverride !== null) {
+            // Retornar el valor del override más reciente
+            return (float) $latestOverride->getUnpaidQty();
+         }
+      }
+      
+      // Si no hay override, calcular normalmente
       $agg = $this->computePreviousInvoiceTotalsForProjectItem((int) $project_item_id);
 
       return max(0.0, $agg['total_quantity'] - $agg['total_paid_effective']);

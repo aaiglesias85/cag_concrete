@@ -156,28 +156,38 @@ class InvoiceUnpaidQtyOverrideResolver
       \DateTimeInterface $invEnd,
       array $overrides
    ): ?InvoiceItemOverrideUnpaidQty {
-      $specificMatches = [];
-      $globalMatches = [];
+      // Ordenar overrides por fecha descending (el más reciente primero)
+      usort($overrides, static function (InvoiceItemOverrideUnpaidQty $a, InvoiceItemOverrideUnpaidQty $b) {
+         $aStart = $a->getStartDate();
+         $bStart = $b->getStartDate();
+         $aEnd = $a->getEndDate();
+         $bEnd = $b->getEndDate();
+         
+         // Global overrides (sin fechas) van al final
+         if ($aStart === null && $aEnd === null) return 1;
+         if ($bStart === null && $bEnd === null) return -1;
+         
+         // Comparar por endDate descending (el más reciente primero)
+         if ($aEnd && $bEnd) {
+            return $bEnd <=> $aEnd;
+         }
+         if ($aEnd) return -1;
+         if ($bEnd) return 1;
+         
+         return ($b->getId() ?? 0) <=> ($a->getId() ?? 0);
+      });
 
+      // Tomar el override más reciente que sea aplicable:
+      // - Global override (sin fechas), O
+      // - Override cuya endDate sea <= fecha de inicio del invoice (desde esa fecha hacia adelante)
       foreach ($overrides as $o) {
          if ($this->isGlobalOverride($o)) {
-            $globalMatches[] = $o;
-            continue;
+            return $o;
          }
-         if ($this->invoiceOverlapsOverrideRange($invStart, $invEnd, $o)) {
-            $specificMatches[] = $o;
+         $oe = $o->getEndDate();
+         if ($oe !== null && $oe <= $invStart) {
+            return $o;
          }
-      }
-
-      if ($specificMatches !== []) {
-         usort($specificMatches, static fn (InvoiceItemOverrideUnpaidQty $a, InvoiceItemOverrideUnpaidQty $b) => ($b->getId() ?? 0) <=> ($a->getId() ?? 0));
-
-         return $specificMatches[0];
-      }
-      if ($globalMatches !== []) {
-         usort($globalMatches, static fn (InvoiceItemOverrideUnpaidQty $a, InvoiceItemOverrideUnpaidQty $b) => ($b->getId() ?? 0) <=> ($a->getId() ?? 0));
-
-         return $globalMatches[0];
       }
 
       return null;

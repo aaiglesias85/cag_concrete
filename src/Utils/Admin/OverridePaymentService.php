@@ -103,14 +103,14 @@ class OverridePaymentService extends Base
           }
           $mapOverrideId[$pid] = $oid;
 
-          $uoid = null;
-          if ($endDate !== null) {
-             $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, $endDate);
-          }
-          if ($uoid === null) {
-             $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
-          }
-          $mapUnpaidOverrideId[$pid] = $uoid;
+        $uoid = null;
+       if ($endDate !== null) {
+          $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, $endDate, null);
+       }
+       if ($uoid === null) {
+          $uoid = $unpaidOverrideRepo->BuscarIdPorProjectItemYFechas($pid, null, null);
+       }
+       $mapUnpaidOverrideId[$pid] = $uoid;
        }
        $overrideIds = array_values(array_filter($mapOverrideId, static fn($id) => $id !== null));
        $overrideConHist = array_fill_keys($overrideHistRepo->IdsConHistorial($overrideIds), true);
@@ -318,18 +318,19 @@ class OverridePaymentService extends Base
          // Guardar override de Unpaid Qty solo si se envió
          if ($hasUnpaidQty) {
             $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+            
+            // Buscar override existente o crear nuevo
             $unpaidEntity = $unpaidOverrideRepo->findOneBy([
                'projectItem' => $pi,
-               'startDate' => null,
-               'endDate' => $endDate,
+               'startDate' => $endDate,  // El override aplica DESDE esta fecha
             ], ['id' => 'ASC']);
 
             $oldUnpaid = null;
             if ($unpaidEntity === null) {
                $unpaidEntity = new \App\Entity\InvoiceItemOverrideUnpaidQty();
                $unpaidEntity->setProjectItem($pi);
-               $unpaidEntity->setStartDate(null);
-               $unpaidEntity->setEndDate($endDate);
+               $unpaidEntity->setStartDate($endDate);  // Aplica DESDE esta fecha
+               $unpaidEntity->setEndDate(null);       // Sin límite - hacia adelante
                $unpaidEntity->setUnpaidQty($unpaidQtyNew);
                $em->persist($unpaidEntity);
 

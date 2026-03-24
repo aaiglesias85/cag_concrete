@@ -1699,35 +1699,84 @@ class InvoiceService extends Base
          $historialQty = 0.0;
          $historialPaid = 0.0;
 
-         // Valor por defecto (si es un invoice nuevo, asumimos que es el último acumulado)
+         // Obtener overrides de unpaid para este project_item
+         $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
+         $unpaidOverrides = $unpaidOverrideRepo->ListarPorProjectItem($project_item_id);
+         
+         // Encontrar el override más reciente
+         $latestOverride = null;
+         $latestStartDate = null;
+         foreach ($unpaidOverrides as $override) {
+            $oStart = $override->getStartDate();
+            if ($oStart === null) {
+               $latestOverride = $override;
+               $latestStartDate = null;
+               break;
+            }
+            if ($latestStartDate === null || $oStart > $latestStartDate) {
+               $latestOverride = $override;
+               $latestStartDate = $oStart;
+            }
+         }
+         
+         $overrideStartDate = null;
+         if ($latestOverride !== null) {
+            $overrideStartDate = $latestOverride->getStartDate();
+         }
+
+         // Valor por defecto
          $unpaidQtySpecific = 0.0;
-         $unpaidPrevSpecific = 0.0;    // Para el Unpaid Anterior
+         $unpaidPrevSpecific = 0.0;
          $lastLoopUnpaid = 0.0;
+         $lastUnpaidOverrideValue = null;
          $foundSpecific = false;
 
          $seenOverrideIdsTimeline = [];
+         
          // 2. Recorrer línea de tiempo
          foreach ($allInvoices as $inv) {
             $loopInvId = (int)$inv->getInvoiceId();
+            $invStart = $inv->getStartDate();
 
             // Buscar datos del item en este punto de la historia
             $invItem = $invoiceItemMap[$loopInvId] ?? null;
 
+            // Para invoices ANTERIORES al override, usar el valor guardado en BD
+            $isAfterOverride = ($overrideStartDate === null) || ($invStart !== null && $invStart >= $overrideStartDate);
+            
             $currentQbf = ($invItem) ? (float)$invItem->getQuantityBroughtForward() : 0.0;
             $iQty = ($invItem) ? (float)$invItem->getQuantity() : 0.0;
             $iPaid = ($invItem)
                ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsTimeline)
                : 0.0;
 
-            // Calcular Unpaid en este punto del tiempo
-            $tempUnpaid = $this->calculateInvoiceUnpaidQty(
-               $historialQty,
-               $historialPaid,
-               $currentQbf
-            );
+            $tempUnpaid = 0.0;
+            
+            if (!$isAfterOverride) {
+               // Invoice anterior al override: usar valor guardado en BD
+               $tempUnpaid = ($invItem) ? (float)$invItem->getUnpaidQty() : 0.0;
+            } elseif ($latestOverride !== null) {
+               // Desde el override en adelante: usar override como base
+               $overrideBase = (float) $latestOverride->getUnpaidQty();
+               
+               // Calcular: override_base + qty_actual - paid_actual - qbf_actual
+               $tempUnpaid = $overrideBase + $iQty - $iPaid - $currentQbf;
+               $tempUnpaid = max(0.0, $tempUnpaid); // No puede ser negativo
+               $lastUnpaidOverrideValue = $tempUnpaid;
+            } elseif ($lastUnpaidOverrideValue !== null) {
+               // Propagar valor anterior
+               $tempUnpaid = $lastUnpaidOverrideValue + $iQty - $iPaid - $currentQbf;
+               $tempUnpaid = max(0.0, $tempUnpaid);
+            } else {
+               // Calcular normalmente
+               $tempUnpaid = $this->calculateInvoiceUnpaidQty(
+                  $historialQty,
+                  $historialPaid,
+                  $currentQbf
+               );
+            }
 
-            // CORRECCIÓN CRÍTICA: 
-            // Si el invoice del bucle es el que estamos mirando, CAPTURAMOS ese valor y no lo soltamos.
+            // Si el invoice del bucle es el que estamos mirando, CAPTURAMOS ese valor
             if ($loopInvId === $currentInvoiceId) {
                $unpaidQtySpecific = $tempUnpaid;
                $unpaidPrevSpecific = $lastLoopUnpaid;
@@ -1736,17 +1785,35 @@ class InvoiceService extends Base
 
             $lastLoopUnpaid = $tempUnpaid;
 
-            // ACUMULAR PARA EL FUTURO: Solo sumamos la cantidad real.
+            // ACUMULAR PARA EL FUTURO
             $historialQty += $iQty;
             $historialPaid += $iPaid;
          }
 
-         // Si por alguna razón el invoice actual no estaba en la lista (caso raro), usamos el último valor calculado
-         if (!$foundSpecific) {
-            // Lógica para nuevos invoices que aún no están en $allInvoices
-            $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $value->getQuantityBroughtForward());
-            $unpaidPrevSpecific = $lastLoopUnpaid;
-         }
+          // Si por alguna razón el invoice actual no estaba en la lista (caso raro), usamos el override si aplica
+          if (!$foundSpecific) {
+             $currentInv = $this->getDoctrine()->getRepository(Invoice::class)->find($currentInvoiceId);
+             $currentInvStart = ($currentInv) ? $currentInv->getStartDate() : null;
+             
+             // Si el invoice actual es posterior al override, usar el override
+             $isAfterOverride = ($overrideStartDate === null) || ($currentInvStart !== null && $currentInvStart >= $overrideStartDate);
+             
+             if ($isAfterOverride && $latestOverride !== null) {
+                // Usar el override como base
+                $overrideBase = (float) $latestOverride->getUnpaidQty();
+                $currentQbf = (float)$value->getQuantityBroughtForward();
+                $currentQty = (float)$value->getQuantity();
+                $currentPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
+                
+                $unpaidQtySpecific = $overrideBase + $currentQty - $currentPaid - $currentQbf;
+                $unpaidQtySpecific = max(0.0, $unpaidQtySpecific);
+                $unpaidPrevSpecific = $lastLoopUnpaid;
+             } else {
+                // Calcular normalmente
+                $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $value->getQuantityBroughtForward());
+                $unpaidPrevSpecific = $lastLoopUnpaid;
+             }
+          }
 
          $unpaid_qty = $unpaidQtySpecific;
          // -------------------------------------
@@ -2410,6 +2477,8 @@ class InvoiceService extends Base
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyRepository $unpaidOverrideRepo */
+      $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
 
       // Obtener todos los invoices del proyecto ordenados por fecha
       $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
@@ -2428,6 +2497,38 @@ class InvoiceService extends Base
          if ($project_item_id === null || $project_item_id === '') {
             continue;
          }
+
+         $projectItem = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class)->find($project_item_id);
+         if ($projectItem === null) {
+            continue;
+         }
+
+         // Obtener overrides de unpaid para este project_item
+         $unpaidOverrides = $unpaidOverrideRepo->ListarPorProjectItem($project_item_id);
+         
+         // Encontrar el override más reciente (para propagar hacia adelante)
+         $latestOverride = null;
+         $latestStartDate = null;
+         foreach ($unpaidOverrides as $override) {
+            $oStart = $override->getStartDate();
+            if ($oStart === null) {
+               // Global override - es el más reciente posible
+               $latestOverride = $override;
+               $latestStartDate = null;
+               break;
+            }
+            if ($latestStartDate === null || $oStart > $latestStartDate) {
+               $latestOverride = $override;
+               $latestStartDate = $oStart;
+            }
+         }
+         
+         // Determinar la fecha de inicio del override más reciente
+         $overrideStartDate = null;
+         if ($latestOverride !== null) {
+            $overrideStartDate = $latestOverride->getStartDate();
+         }
+         
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
          $invoiceItemMap = [];
          foreach ($allInvoiceItems as $ii) {
@@ -2437,10 +2538,28 @@ class InvoiceService extends Base
          $historialQty = 0.0;
          $historialPaid = 0.0;
          $seenOverrideIdsQbf = [];
+         $lastUnpaidOverrideValue = null;
 
          for ($i = 0; $i < count($allInvoices); $i++) {
-            $invId = (int)$allInvoices[$i]->getInvoiceId();
+            $inv = $allInvoices[$i];
+            $invId = (int)$inv->getInvoiceId();
             $invItem = $invoiceItemMap[$invId] ?? null;
+            $invStart = $inv->getStartDate();
+
+            // Solo procesar invoices desde el override hacia adelante
+            $isAfterOverride = ($overrideStartDate === null) || ($invStart !== null && $invStart >= $overrideStartDate);
+            
+            // Si el invoice es anterior al override, NO modificar su unpaid
+            if (!$isAfterOverride && $invItem) {
+               // Solo sumar al historial para los siguientes invoices
+               $currentQbf = (float)$invItem->getQuantityBroughtForward();
+               $iQty = (float)$invItem->getQuantity();
+               $iPaid = $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsQbf);
+               
+               $historialQty += $iQty;
+               $historialPaid += $iPaid;
+               continue;
+            }
 
             // Datos actuales
             $currentQbf = 0.0;
@@ -2448,7 +2567,6 @@ class InvoiceService extends Base
             $iPaid = 0.0;
 
             if ($invItem) {
-               // Usamos el override si es el invoice actual del formulario
                $currentQbf = ($invId === (int)$current_invoice_id)
                   ? (isset($itemData->quantity_brought_forward) ? (float)$itemData->quantity_brought_forward : 0.0)
                   : (float)$invItem->getQuantityBroughtForward();
@@ -2457,10 +2575,20 @@ class InvoiceService extends Base
                $iPaid = $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsQbf);
             }
 
-            // 1. Calcular: (SumQtyPrev - SumPaidPrev) - QBF Actual
-            $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+            // Determinar el unpaid: primero revisar override
+            $nuevoUnpaid = null;
+            if ($latestOverride !== null) {
+               $nuevoUnpaid = (float) $latestOverride->getUnpaidQty();
+               $lastUnpaidOverrideValue = $nuevoUnpaid;
+            } elseif ($lastUnpaidOverrideValue !== null) {
+               // Propagar override previo
+               $nuevoUnpaid = $lastUnpaidOverrideValue;
+            } else {
+               // Calcular normalmente
+               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+            }
 
-            // 2. Guardar en BD (Si existe el item)
+            // Guardar en BD (Si existe el item)
             if ($invItem) {
                $invItem->setUnpaidQty($nuevoUnpaid);
                $invItem->setUnpaidFromPrevious($nuevoUnpaid);
