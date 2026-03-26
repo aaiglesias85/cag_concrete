@@ -107,6 +107,44 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
    }
 
    /**
+    * start_date NULL y end_date = fin del período cubierto en Override Payment.
+    * Vale para todo invoice cuyo inicio de período es estrictamente posterior a ese end_date (Y-m-d).
+    * Si hay varias filas, usa la de end_date más reciente entre las aplicables.
+    */
+   public function findLatestNullStartForInvoicePeriodAfterEndDate(int $project_item_id, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
+   {
+      $invStartYmd = $invStart->format('Y-m-d');
+      $best = null;
+      $bestEndYmd = null;
+      $bestId = 0;
+
+      foreach ($this->ListarPorProjectItem($project_item_id) as $o) {
+         if (!$o instanceof InvoiceItemOverridePayment) {
+            continue;
+         }
+         if ($o->getStartDate() !== null) {
+            continue;
+         }
+         $ed = $o->getEndDate();
+         if ($ed === null) {
+            continue;
+         }
+         $edYmd = $ed->format('Y-m-d');
+         if ($invStartYmd <= $edYmd) {
+            continue;
+         }
+         $oid = (int) ($o->getId() ?? 0);
+         if ($best === null || $bestEndYmd === null || $edYmd > $bestEndYmd || ($edYmd === $bestEndYmd && $oid > $bestId)) {
+            $best = $o;
+            $bestEndYmd = $edYmd;
+            $bestId = $oid;
+         }
+      }
+
+      return $best;
+   }
+
+   /**
     * MapIdsPorProjectItemsYFechas: IDs de override por project_item para el mismo criterio de vigencia que el filtro.
     *
     * @param int[] $project_item_ids

@@ -20,6 +20,10 @@ class InvoiceItemOverridePayment
    #[ORM\Column(name: 'paid_qty', type: 'float', nullable: false)]
    private ?float $paidQty = 0.0;
 
+   /** NULL = unpaid no sobreescrito (usar cantidad derivada); valor = último unpaid del historial de notas */
+   #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: true)]
+   private ?float $unpaidQty = null;
+
    #[ORM\Column(name: 'start_date', type: 'date', nullable: true)]
    private ?\DateTimeInterface $startDate = null;
 
@@ -60,6 +64,16 @@ class InvoiceItemOverridePayment
    public function setPaidQty(?float $paidQty): void
    {
       $this->paidQty = $paidQty;
+   }
+
+   public function getUnpaidQty(): ?float
+   {
+      return $this->unpaidQty;
+   }
+
+   public function setUnpaidQty(?float $unpaidQty): void
+   {
+      $this->unpaidQty = $unpaidQty;
    }
 
    public function getStartDate(): ?\DateTimeInterface

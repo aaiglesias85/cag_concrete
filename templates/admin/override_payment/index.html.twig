@@ -4,6 +4,7 @@
 <link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
    .dtfc-fixed-start, .dtfc-fixed-end { background: #fff !important; }
+   #form-override-payment .row-secondary > td { background: #e6f2ff !important; }
 </style>
 {% endblock %}
 
@@ -23,95 +24,196 @@
 
 <div id="kt_app_content" class="app-content flex-column-fluid">
    <div id="kt_app_content_container" class="app-container container-fluid">
-      <div id="lista-override-payment" class="card card-sticky">
-         <div class="card-header border-0 pt-6">
+      <div id="form-override-payment" class="card card-sticky">
+         <div
+            class="card-header border-0 pt-6"
+            data-kt-sticky="true"
+            data-kt-sticky-name="form-override-payment"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
             <div class="card-title">
-               <div class="d-flex align-items-center position-relative my-1">
-                  <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
-                     <span class="path1"></span><span class="path2"></span>
-                  </i>
-                  <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" placeholder="Search..." />
-               </div>
+               <h3 class="card-label mb-0">Override Payment</h3>
             </div>
             <div class="card-toolbar">
-               <div class="d-flex flex-wrap justify-content-end gap-2">
-                  {% if permiso.agregar or permiso.editar %}
-                  <button type="button" class="btn btn-success hide" id="btn-salvar-override-payment" title="Save paid qty overrides">
-                     <i class="ki-duotone ki-save-2 fs-2"><span class="path1"></span><span class="path2"></span></i>
-                     <span class="d-none d-md-inline ms-1">Save</span>
-                  </button>
-                  {% endif %}
-                  <div>
-                     <button type="button" class="btn btn-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
-                        <i class="ki-duotone ki-filter fs-2"><span class="path1"></span><span class="path2"></span></i>
-                        <span class="d-none d-md-inline">Filter</span>
-                     </button>
-                     <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
-                        <div class="px-7 py-5">
-                           <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+               <button id="btn-op-wizard-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-left"></i>
+               </button>
+               <button id="btn-op-wizard-siguiente" class="btn btn-icon btn-primary me-2" type="button" title="Next" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-right"></i>
+               </button>
+               {% if permiso.agregar or permiso.editar %}
+               <button type="button" id="btn-salvar-override-payment" class="btn btn-icon btn-success btn-op-wizard-save me-2 hide" title="Save" data-bs-toggle="tooltip">
+                  <i class="las la-save"></i>
+               </button>
+               {% endif %}
+            </div>
+         </div>
+
+         <div class="card-body" id="form-override-payment-body">
+            <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
+               <li class="nav-item">
+                  <a class="nav-link active wizard-tab-op" data-item="1" data-bs-toggle="tab" href="#tab-content-op-general" id="tab-op-general">
+                     <div class="wizard-wrapper">
+                        <span class="wizard-number">
+                           <i class="wizard-check ki-duotone ki-check"></i>
+                           <span class="number">1</span>
+                        </span>
+                        <div class="wizard-label">
+                           <div class="wizard-title">General</div>
+                           <div class="wizard-desc">Company, project & date</div>
                         </div>
-                        <div class="separator border-gray-200"></div>
-                        <div class="px-7 py-5">
-                           <div class="mb-3">
-                              <select id="filtro-company-op" class="form-select form-select2 form-select-solid fw-bold">
-                                 <option value="">Company</option>
-                                 {% for item in companies %}
-                                 <option value="{{ item.companyId }}">{{ item.name }}</option>
-                                 {% endfor %}
-                              </select>
-                           </div>
-                           <div class="mb-3" id="select-filtro-project-op">
-                              <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-project-op">
-                                 <option value="">Project</option>
-                              </select>
-                           </div>
-                           <div class="mb-3">
-                              <label class="form-label fs-7 text-gray-600 mb-1">Invoice end date</label>
-                              <div class="input-group input-group-solid date-picker-filter" id="op-datetimepicker-fecha-fin" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                                 <input type="text" class="form-control filter-date" placeholder="m/d/Y" data-td-target="#op-datetimepicker-fecha-fin" autocomplete="off" />
-                                 <span class="input-group-text" data-td-target="#op-datetimepicker-fecha-fin" data-td-toggle="datetimepicker">
-                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                                 </span>
-                              </div>
-                              <div class="form-text">Totals include invoices with end date on or before this date.</div>
-                           </div>
-                           <div class="d-flex justify-content-end mt-10">
-                              <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" id="btn-reset-filtrar-op">Reset filters</button>
-                              <button type="button" class="btn btn-primary fw-semibold px-6" data-kt-menu-dismiss="true" id="btn-filtrar-op">Apply</button>
+                     </div>
+                  </a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link wizard-tab-op" data-item="2" data-bs-toggle="tab" href="#tab-content-op-items" id="tab-op-items">
+                     <div class="wizard-wrapper">
+                        <span class="wizard-number">
+                           <i class="wizard-check ki-duotone ki-check"></i>
+                           <span class="number">2</span>
+                        </span>
+                        <div class="wizard-label">
+                           <div class="wizard-title">Items</div>
+                           <div class="wizard-desc">Paid / unpaid overrides</div>
+                        </div>
+                     </div>
+                  </a>
+               </li>
+               <li class="nav-item">
+                  <a class="nav-link wizard-tab-op" data-item="3" data-bs-toggle="tab" href="#tab-content-op-history" id="tab-op-history">
+                     <div class="wizard-wrapper">
+                        <span class="wizard-number">
+                           <i class="wizard-check ki-duotone ki-check"></i>
+                           <span class="number">3</span>
+                        </span>
+                        <div class="wizard-label">
+                           <div class="wizard-title">History</div>
+                           <div class="wizard-desc">Paid qty change log</div>
+                        </div>
+                     </div>
+                  </a>
+               </li>
+            </ul>
+
+            <div class="tab-content">
+               <div class="tab-pane fade show active" id="tab-content-op-general" role="tabpanel">
+                  <div class="form-group ic-form-group">
+                     <div class="row">
+                        <div class="col-md-4" id="select-filtro-company-op-wrap">
+                           <label class="form-label required">
+                              <span class="ic-step-number">1</span>
+                              Company
+                           </label>
+                           <select id="filtro-company-op" class="form-control form-select form-select2 form-select-solid fw-bold">
+                              <option value="">Select</option>
+                              {% for item in companies %}
+                              <option value="{{ item.companyId }}">{{ item.name }}</option>
+                              {% endfor %}
+                           </select>
+                        </div>
+                        <div class="col-md-8" id="select-filtro-project-op">
+                           <label class="form-label required"> Project </label>
+                           <select class="form-control form-select form-select2 form-select-solid fw-bold" id="filtro-project-op">
+                              <option value="">Select</option>
+                           </select>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="form-group ic-form-group">
+                     <div class="row">
+                        <div class="col-md-2">
+                           <label class="form-label required">
+                              <span class="ic-step-number">2</span>
+                              Invoice end date
+                           </label>
+                           <div class="input-group input-group-solid date-picker-filter" id="op-datetimepicker-fecha-fin" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                              <input
+                                 type="text"
+                                 class="form-control filter-date"
+                                 placeholder="Select a date"
+                                 data-td-target="#op-datetimepicker-fecha-fin"
+                                 autocomplete="off"
+                                 readonly
+                              />
+                              <span class="input-group-text" data-td-target="#op-datetimepicker-fecha-fin" data-td-toggle="datetimepicker">
+                                 <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                              </span>
                            </div>
                         </div>
                      </div>
                   </div>
                </div>
-            </div>
-         </div>
-         <div class="card-body">
-            <div id="override-payment-list-placeholder" class="text-center py-15 px-5">
-               <i class="ki-duotone ki-filter-search text-primary fs-3x mb-5">
-                  <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
-               </i>
-               <p class="text-gray-700 fw-semibold fs-4 mb-2">Apply a filter to view items</p>
-               <p class="text-gray-500 fs-6 mb-0">Select <strong>Company</strong> and <strong>Project</strong> (required). Optionally set <strong>Invoice end date</strong> so totals use invoices ending on or before that date. Then click <strong>Apply</strong>. Use <strong>Save</strong> to persist paid qty overrides for the same filter.</p>
-            </div>
-            <div id="override-payment-table-wrapper" class="hide">
-               <table id="override-payment-items-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">
-                  <thead>
-                     <tr class="fw-bold fs-6 text-gray-800 px-7">
-                        <th>Item</th>
-                        <th>Unit</th>
-                        <th>Contract QTY</th>
-                        <th>Unit Price</th>
-                        <th>Contract Amount</th>
-                        <th>Invoiced Qty</th>
-                        <th>Invoiced Amount $</th>
-                        <th>Paid Qty</th>
-                        <th>Unpaid Qty</th>
-                        <th>Paid Amount</th>
-                        <th class="d-none"></th>
-                     </tr>
-                  </thead>
-                  <tbody class="text-gray-600 fw-semibold"></tbody>
-               </table>
+
+               <div class="tab-pane fade" id="tab-content-op-items" role="tabpanel">
+                  <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-5">
+                     <div class="d-flex align-items-center position-relative my-1">
+                        <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                           <span class="path1"></span><span class="path2"></span>
+                        </i>
+                        <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" id="op-items-search" placeholder="Search..." />
+                     </div>
+                  </div>
+                  <div id="override-payment-list-placeholder" class="text-center py-15 px-5">
+                     <i class="ki-duotone ki-filter-search text-primary fs-3x mb-5">
+                        <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span>
+                     </i>
+                     <p class="text-gray-700 fw-semibold fs-4 mb-2">No items to show</p>
+                     <p class="text-gray-500 fs-6 mb-0">In <strong>General</strong>, choose company, project and invoice end date, then open this tab again.</p>
+                  </div>
+                  <div id="override-payment-table-wrapper" class="hide">
+                     <table id="override-payment-items-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">
+                        <thead>
+                           <tr class="fw-bold fs-6 text-gray-800 px-7">
+                              <th>Item</th>
+                              <th>Unit</th>
+                              <th>Contract QTY</th>
+                              <th>Unit Price</th>
+                              <th>Contract Amount</th>
+                              <th>Invoiced Qty</th>
+                              <th>Invoiced Amount $</th>
+                              <th>Paid Qty</th>
+                              <th>Unpaid Qty</th>
+                              <th>Paid Amount</th>
+                              <th class="d-none"></th>
+                           </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                     </table>
+                  </div>
+               </div>
+
+               <div class="tab-pane fade" id="tab-content-op-history" role="tabpanel">
+                  <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-5">
+                     <div class="d-flex align-items-center position-relative my-1">
+                        <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                           <span class="path1"></span><span class="path2"></span>
+                        </i>
+                        <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" id="op-history-search" placeholder="Search..." />
+                     </div>
+                  </div>
+                  <div id="op-history-placeholder" class="text-center py-15 px-5">
+                     <p class="text-gray-500 fs-6 mb-0">Select a project in <strong>General</strong>, then open this tab to load paid qty override history.</p>
+                  </div>
+                  <div id="op-history-table-wrapper" class="hide">
+                     <table id="op-override-payment-history-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">
+                        <thead>
+                           <tr class="fw-bold fs-6 text-gray-800 px-7">
+                              <th>Item</th>
+                              <th>Previous qty</th>
+                              <th>New qty</th>
+                              <th>User</th>
+                              <th>Date</th>
+                           </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                     </table>
+                  </div>
+               </div>
             </div>
          </div>
       </div>
@@ -132,6 +234,63 @@
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+<!-- Notas de override unpaid qty (N filas en invoice_item_override_unpaid_qty_history, tabla como Payments) -->
+<div class="modal fade" id="modal-op-unpaid-note" tabindex="-1" role="dialog" aria-labelledby="modalOpUnpaidNoteLabel">
+   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h5 class="modal-title" id="modalOpUnpaidNoteLabel">Unpaid qty override notes</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            <form class="m-form" id="op-unpaid-notes-form" action="#" method="post">
+               <input type="hidden" id="op-unpaid-note-project-item-id" value="" />
+               <input type="hidden" id="op-unpaid-history-note-id" value="" />
+               <div class="row mb-3">
+                  <div class="col-md-6">
+                     <label class="form-label fw-bold">Override Unpaid Qty</label>
+                     <input type="number" id="op-manual-unpaid-qty-override" class="form-control form-control-solid" placeholder="0.00" step="any" />
+                  </div>
+               </div>
+               <div class="row mb-2">
+                  <div class="col-md-12">
+                     <label class="form-label fw-bold">Note</label>
+                     <div id="op-unpaid-note-quill" class="h-100px"></div>
+                  </div>
+               </div>
+               <button type="button" class="btn btn-success mb-6" id="btn-salvar-op-unpaid-note">Save note</button>
+            </form>
+            <div class="form-group ic-form-group" id="lista-op-unpaid-notes">
+               <div class="row">
+                  <div class="col-md-12">
+                     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
+                        <div class="d-flex flex-wrap gap-3"></div>
+                        <div class="d-flex flex-wrap align-items-center gap-3">
+                           <div class="position-relative w-250px">
+                              <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute top-50 translate-middle-y ms-3"><span class="path1"></span><span class="path2"></span></i>
+                              <input type="text" data-table-filter="search" class="form-control form-control-solid ps-13" placeholder="Search..." />
+                           </div>
+                        </div>
+                     </div>
+                     <table id="op-unpaid-notes-item-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                        <thead>
+                           <tr class="fw-bold fs-6 text-gray-800 px-7">
+                              <th>Notes</th>
+                              <th>Date</th>
+                              <th>Override Unpaid Qty</th>
+                              <th>Actions</th>
+                           </tr>
+                        </thead>
+                        <tbody class="text-gray-600 fw-semibold"></tbody>
+                     </table>
+                  </div>
+               </div>
+            </div>
          </div>
       </div>
    </div>

@@ -133,10 +133,13 @@ class OverrideUnpaidQtyController extends AbstractController
 
    public function listarHistorial(Request $request)
    {
-      $invoice_item_override_unpaid_qty_id = $request->get('invoice_item_override_unpaid_qty_id');
+      $pid = $request->get('invoice_item_override_payment_id');
+      if ($pid === null || $pid === '') {
+         $pid = $request->get('invoice_item_override_unpaid_qty_id');
+      }
 
       try {
-         $historial = $this->overrideUnpaidQtyService->ListarHistorialOverrideUnpaidQty((int) $invoice_item_override_unpaid_qty_id);
+         $historial = $this->overrideUnpaidQtyService->ListarHistorialOverrideUnpaidQty((int) $pid);
 
          return $this->json([
             'success' => true,

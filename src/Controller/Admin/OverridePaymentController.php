@@ -4,7 +4,6 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\Usuario;
-use App\Http\DataTablesHelper;
 use App\Utils\Admin\OverridePaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,46 +39,32 @@ class OverridePaymentController extends AbstractController
       return $this->redirectToRoute('denegado');
    }
 
+   /**
+    * Lista todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
+    * Respuesta alineada con project/listarItemsParaInvoice: { success, items }.
+    */
    public function listar(Request $request)
    {
-      $draw = (int) $request->get('draw');
+      $company_id = $request->get('company_id');
+      $project_id = $request->get('project_id');
+      $fecha_fin = $request->get('fechaFin');
+
       try {
-         $dt = DataTablesHelper::parse(
-            $request,
-            allowedOrderFields: ['item', 'unit', 'contract_qty', 'price', 'quantity', 'paid_qty', 'unpaid_qty'],
-            defaultOrderField: 'item'
-         );
-         $draw = $dt['draw'];
-
-         $company_id = $request->get('company_id');
-         $project_id = $request->get('project_id');
-         $fecha_fin = $request->get('fechaFin');
-
-         $result = $this->overridePaymentService->Listar(
-            $dt['start'],
-            $dt['length'],
-            $dt['search'],
-            $dt['orderField'],
-            $dt['orderDir'],
-            $company_id,
-            $project_id,
-            $fecha_fin
+         $result = $this->overridePaymentService->ListarItemsParaOverridePayment(
+            $company_id !== null ? (string) $company_id : null,
+            $project_id !== null ? (string) $project_id : null,
+            $fecha_fin !== null ? (string) $fecha_fin : null
          );
 
          return $this->json([
-            'draw' => $draw,
-            'data' => $result['data'],
-            'recordsTotal' => (int) $result['total'],
-            'recordsFiltered' => (int) $result['total'],
+            'success' => true,
+            'items' => $result['items'],
          ]);
       } catch (\Exception $e) {
          return $this->json([
-            'draw' => $draw,
-            'data' => [],
-            'recordsTotal' => 0,
-            'recordsFiltered' => 0,
             'success' => false,
             'error' => $e->getMessage(),
+            'items' => [],
          ]);
       }
    }
@@ -131,6 +116,135 @@ class OverridePaymentController extends AbstractController
       }
    }
 
+   public function salvarNotaOverrideUnpaid(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
+
+      $project_id = (string) $request->get('project_id', '');
+      $fecha_fin = (string) $request->get('fechaFin', '');
+      $project_item_id = (int) $request->get('project_item_id', 0);
+      $notes = $request->get('notes');
+      $override_unpaid_qty = $request->get('override_unpaid_qty');
+      $history_id_raw = $request->get('history_id');
+      $history_id = is_numeric($history_id_raw) ? (int) $history_id_raw : null;
+      if ($history_id !== null && $history_id <= 0) {
+         $history_id = null;
+      }
+
+      if (!is_string($notes)) {
+         $notes = '';
+      }
+
+      try {
+         $resultado = $this->overridePaymentService->SalvarNotaOverrideUnpaidQty(
+            $project_id,
+            $fecha_fin,
+            $project_item_id,
+            $notes,
+            $override_unpaid_qty !== null && $override_unpaid_qty !== '' ? (string) $override_unpaid_qty : null,
+            $history_id
+         );
+
+         if (!empty($resultado['success'])) {
+            return $this->json([
+               'success' => true,
+               'message' => $resultado['message'] ?? 'The operation was successful',
+               'invoice_item_override_payment_id' => $resultado['invoice_item_override_payment_id'] ?? null,
+               'note' => $resultado['note'] ?? null,
+            ]);
+         }
+
+         return $this->json([
+            'success' => false,
+            'error' => $resultado['error'] ?? 'Unknown error',
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+         ]);
+      }
+   }
+
+   public function listarNotasOverrideUnpaid(Request $request)
+   {
+      $project_id = (string) $request->get('project_id', '');
+      $fecha_fin = (string) $request->get('fechaFin', '');
+      $project_item_id = (int) $request->get('project_item_id', 0);
+
+      try {
+         $resultado = $this->overridePaymentService->ListarNotasOverrideUnpaidQty(
+            $project_id,
+            $fecha_fin,
+            $project_item_id
+         );
+
+         if (!empty($resultado['success'])) {
+            return $this->json([
+               'success' => true,
+               'notes' => $resultado['notes'] ?? [],
+               'invoice_item_override_payment_id' => $resultado['invoice_item_override_payment_id'] ?? null,
+            ]);
+         }
+
+         return $this->json([
+            'success' => false,
+            'error' => $resultado['error'] ?? 'Unknown error',
+            'notes' => [],
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'notes' => [],
+         ]);
+      }
+   }
+
+   public function eliminarNotaOverrideUnpaid(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
+
+      $project_id = (string) $request->get('project_id', '');
+      $project_item_id = (int) $request->get('project_item_id', 0);
+      $history_id = (int) $request->get('history_id', 0);
+
+      try {
+         $resultado = $this->overridePaymentService->EliminarNotaOverrideUnpaidQty(
+            $project_id,
+            $project_item_id,
+            $history_id
+         );
+
+         if (!empty($resultado['success'])) {
+            return $this->json([
+               'success' => true,
+               'message' => $resultado['message'] ?? 'The operation was successful',
+            ]);
+         }
+
+         return $this->json([
+            'success' => false,
+            'error' => $resultado['error'] ?? 'Unknown error',
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+         ]);
+      }
+   }
+
     public function listarHistorial(Request $request)
     {
        $invoice_item_override_payment_id = $request->get('invoice_item_override_payment_id');
@@ -152,10 +266,13 @@ class OverridePaymentController extends AbstractController
 
     public function listarHistorialUnpaid(Request $request)
     {
-       $invoice_item_override_unpaid_qty_id = $request->get('invoice_item_override_unpaid_qty_id');
+       $pid = $request->get('invoice_item_override_payment_id');
+       if ($pid === null || $pid === '') {
+          $pid = $request->get('invoice_item_override_unpaid_qty_id');
+       }
 
        try {
-          $historial = $this->overridePaymentService->ListarHistorialOverrideUnpaidQty((int) $invoice_item_override_unpaid_qty_id);
+          $historial = $this->overridePaymentService->ListarHistorialOverrideUnpaidQty((int) $pid);
 
           return $this->json([
              'success' => true,
@@ -167,5 +284,28 @@ class OverridePaymentController extends AbstractController
              'error' => $e->getMessage(),
           ]);
        }
+    }
+
+    /**
+     * Historial agregado de paid_qty (mismo dataset que el tab Override Payment del proyecto).
+     */
+    public function listarHistorialProyecto(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $rows = $this->overridePaymentService->ListarHistorialOverridePaymentProyecto((int) $project_id);
+
+            return $this->json([
+                'success' => true,
+                'data' => $rows,
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'data' => [],
+            ]);
+        }
     }
 }

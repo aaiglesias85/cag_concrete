@@ -1699,26 +1699,21 @@ class InvoiceService extends Base
          $historialQty = 0.0;
          $historialPaid = 0.0;
 
-         // Obtener overrides de unpaid para este project_item
-         $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
-         $unpaidOverrides = $unpaidOverrideRepo->ListarPorProjectItem($project_item_id);
-         
-         // Encontrar el override más reciente
+         // Misma fila override que paid para el período de este invoice; unpaid solo si la columna unpaid_qty está definida
+         $invPeriodStart = $currentInvoice->getStartDate();
+         $invPeriodEnd = $currentInvoice->getEndDate();
          $latestOverride = null;
-         $latestStartDate = null;
-         foreach ($unpaidOverrides as $override) {
-            $oStart = $override->getStartDate();
-            if ($oStart === null) {
-               $latestOverride = $override;
-               $latestStartDate = null;
-               break;
-            }
-            if ($latestStartDate === null || $oStart > $latestStartDate) {
-               $latestOverride = $override;
-               $latestStartDate = $oStart;
+         if ($invPeriodStart !== null && $invPeriodEnd !== null) {
+            $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
+               (int) $project_item_id,
+               $invPeriodStart,
+               $invPeriodEnd
+            );
+            if ($match !== null && $match->getUnpaidQty() !== null) {
+               $latestOverride = $match;
             }
          }
-         
+
          $overrideStartDate = null;
          if ($latestOverride !== null) {
             $overrideStartDate = $latestOverride->getStartDate();
@@ -2477,8 +2472,6 @@ class InvoiceService extends Base
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      /** @var \App\Repository\InvoiceItemOverrideUnpaidQtyRepository $unpaidOverrideRepo */
-      $unpaidOverrideRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItemOverrideUnpaidQty::class);
 
       // Obtener todos los invoices del proyecto ordenados por fecha
       $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
@@ -2503,32 +2496,25 @@ class InvoiceService extends Base
             continue;
          }
 
-         // Obtener overrides de unpaid para este project_item
-         $unpaidOverrides = $unpaidOverrideRepo->ListarPorProjectItem($project_item_id);
-         
-         // Encontrar el override más reciente (para propagar hacia adelante)
+         $invPeriodStart = $currentInvoice->getStartDate();
+         $invPeriodEnd = $currentInvoice->getEndDate();
          $latestOverride = null;
-         $latestStartDate = null;
-         foreach ($unpaidOverrides as $override) {
-            $oStart = $override->getStartDate();
-            if ($oStart === null) {
-               // Global override - es el más reciente posible
-               $latestOverride = $override;
-               $latestStartDate = null;
-               break;
-            }
-            if ($latestStartDate === null || $oStart > $latestStartDate) {
-               $latestOverride = $override;
-               $latestStartDate = $oStart;
+         if ($invPeriodStart !== null && $invPeriodEnd !== null) {
+            $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
+               (int) $project_item_id,
+               $invPeriodStart,
+               $invPeriodEnd
+            );
+            if ($match !== null && $match->getUnpaidQty() !== null) {
+               $latestOverride = $match;
             }
          }
-         
-         // Determinar la fecha de inicio del override más reciente
+
          $overrideStartDate = null;
          if ($latestOverride !== null) {
             $overrideStartDate = $latestOverride->getStartDate();
          }
-         
+
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
          $invoiceItemMap = [];
          foreach ($allInvoiceItems as $ii) {

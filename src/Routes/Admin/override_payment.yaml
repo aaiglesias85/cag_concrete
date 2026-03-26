@@ -10,6 +10,18 @@ salvarOverridePaymentAdmin:
    path: /override-payment/salvar
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::salvar, _format: json }
 
+salvarNotaOverrideUnpaidAdmin:
+   path: /override-payment/salvarNotaOverrideUnpaid
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::salvarNotaOverrideUnpaid, _format: json }
+
+listarNotasOverrideUnpaidAdmin:
+   path: /override-payment/listarNotasOverrideUnpaid
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarNotasOverrideUnpaid, _format: json }
+
+eliminarNotaOverrideUnpaidAdmin:
+   path: /override-payment/eliminarNotaOverrideUnpaid
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::eliminarNotaOverrideUnpaid, _format: json }
+
 listarHistorialOverridePaymentAdmin:
    path: /override-payment/listarHistorial
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorial, _format: json }
@@ -17,3 +29,7 @@ listarHistorialOverridePaymentAdmin:
 listarHistorialUnpaidOverridePaymentAdmin:
    path: /override-payment/listarHistorialUnpaid
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorialUnpaid, _format: json }
+
+listarHistorialProyectoOverridePaymentAdmin:
+   path: /override-payment/listarHistorialProyecto
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarHistorialProyecto, _format: json }

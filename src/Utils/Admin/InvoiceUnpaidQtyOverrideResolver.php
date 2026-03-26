@@ -2,26 +2,22 @@
 
 namespace App\Utils\Admin;
 
-use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
-use App\Entity\InvoiceItemOverrideUnpaidQty;
-use App\Repository\InvoiceItemOverrideUnpaidQtyRepository;
+use App\Entity\InvoiceItemOverridePayment;
 use App\Repository\InvoiceItemRepository;
-use App\Repository\InvoiceRepository;
 
 /**
- * Unpaid qty efectivo para cálculos: si existe un {@see InvoiceItemOverrideUnpaidQty} aplicable
- * al período del invoice (reglas similares a Paid Override), se usa su unpaid_qty;
- * si no, el valor persistido en invoice_item.
+ * Unpaid qty efectivo: misma fila que {@see InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod}
+ * (período posterior a end_date con start_date NULL, luego solape y global). Si esa fila tiene unpaid_qty no null, se usa;
+ * si no, el valor en invoice_item.
  *
  * No modifica registros en BD.
  */
 class InvoiceUnpaidQtyOverrideResolver
 {
    public function __construct(
-      private InvoiceItemOverrideUnpaidQtyRepository $overrideRepo,
       private InvoiceItemRepository $invoiceItemRepo,
-      private InvoiceRepository $invoiceRepo
+      private InvoicePaidQtyOverrideResolver $paidPeriodResolver,
    ) {
    }
 
@@ -31,8 +27,6 @@ class InvoiceUnpaidQtyOverrideResolver
    }
 
    /**
-    * Misma lógica que getEffectiveUnpaidQty, con metadatos para trazas y depuración.
-    *
     * @return array{
     *   effective: float,
     *   base: float,
@@ -61,27 +55,23 @@ class InvoiceUnpaidQtyOverrideResolver
          return $this->unpaidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
 
-      $overrides = $this->overrideRepo->ListarPorProjectItem($pi->getId());
-      if ($overrides === []) {
-         return $this->unpaidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
+      $match = $this->paidPeriodResolver->selectOverrideRowForInvoicePeriod($pi->getId(), $invStart, $invEnd);
+      if ($match !== null && $match->getUnpaidQty() !== null) {
+         $effective = (float) $match->getUnpaidQty();
+         $overrideId = $match->getId() !== null ? (int) $match->getId() : null;
+
+         return $this->unpaidQtyDetailsRow(
+            $effective,
+            $base,
+            $overrideId,
+            $invoiceItemId,
+            $invoiceId,
+            $projectItemId,
+            $this->formatInvoicePeriod($invStart, $invEnd)
+         );
       }
 
-      $match = $this->selectBestOverrideForInvoice($invStart, $invEnd, $overrides);
-      $effective = $match !== null ? (float) $match->getUnpaidQty() : $base;
-      $overrideId = null;
-      if ($match !== null && $match->getId() !== null) {
-         $overrideId = (int) $match->getId();
-      }
-
-      return $this->unpaidQtyDetailsRow(
-         $effective,
-         $base,
-         $overrideId,
-         $invoiceItemId,
-         $invoiceId,
-         $projectItemId,
-         $this->formatInvoicePeriod($invStart, $invEnd)
-      );
+      return $this->unpaidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
    }
 
    /**
@@ -113,10 +103,7 @@ class InvoiceUnpaidQtyOverrideResolver
    }
 
    /**
-    * Incremento de unpaid acumulado en timeline (misma regla que getEffectiveUnpaidQty):
-    * cada override_id cuenta una sola vez.
-    *
-    * @param array<int, true> $seenOverrideIds Modificado por referencia; reiniciar por cada project_item.
+    * @param array<int, true> $seenOverrideIds
     */
    public function unpaidIncrementForHistorialTimeline(InvoiceItem $invItem, array &$seenOverrideIds): float
    {
@@ -134,9 +121,6 @@ class InvoiceUnpaidQtyOverrideResolver
       return (float) $details['base'];
    }
 
-   /**
-    * Suma de unpaid_qty efectivos de líneas en un invoice.
-    */
    public function sumEffectiveUnpaidQtyForInvoice(int $invoiceId): float
    {
       $items = $this->invoiceItemRepo->ListarItems($invoiceId);
@@ -146,74 +130,5 @@ class InvoiceUnpaidQtyOverrideResolver
       }
 
       return $sum;
-   }
-
-   /**
-    * @param InvoiceItemOverrideUnpaidQty[] $overrides
-    */
-   private function selectBestOverrideForInvoice(
-      \DateTimeInterface $invStart,
-      \DateTimeInterface $invEnd,
-      array $overrides
-   ): ?InvoiceItemOverrideUnpaidQty {
-      // Ordenar overrides por fecha descending (el más reciente primero)
-      usort($overrides, static function (InvoiceItemOverrideUnpaidQty $a, InvoiceItemOverrideUnpaidQty $b) {
-         $aStart = $a->getStartDate();
-         $bStart = $b->getStartDate();
-         $aEnd = $a->getEndDate();
-         $bEnd = $b->getEndDate();
-         
-         // Global overrides (sin fechas) van al final
-         if ($aStart === null && $aEnd === null) return 1;
-         if ($bStart === null && $bEnd === null) return -1;
-         
-         // Comparar por endDate descending (el más reciente primero)
-         if ($aEnd && $bEnd) {
-            return $bEnd <=> $aEnd;
-         }
-         if ($aEnd) return -1;
-         if ($bEnd) return 1;
-         
-         return ($b->getId() ?? 0) <=> ($a->getId() ?? 0);
-      });
-
-      // Tomar el override más reciente que sea aplicable:
-      // - Global override (sin fechas), O
-      // - Override cuya endDate sea <= fecha de inicio del invoice (desde esa fecha hacia adelante)
-      foreach ($overrides as $o) {
-         if ($this->isGlobalOverride($o)) {
-            return $o;
-         }
-         $oe = $o->getEndDate();
-         if ($oe !== null && $oe <= $invStart) {
-            return $o;
-         }
-      }
-
-      return null;
-   }
-
-   private function isGlobalOverride(InvoiceItemOverrideUnpaidQty $o): bool
-   {
-      return $o->getStartDate() === null && $o->getEndDate() === null;
-   }
-
-   private function invoiceOverlapsOverrideRange(
-      \DateTimeInterface $invStart,
-      \DateTimeInterface $invEnd,
-      InvoiceItemOverrideUnpaidQty $o
-   ): bool {
-      $os = $o->getStartDate();
-      $oe = $o->getEndDate();
-      if ($os === null && $oe === null) {
-         return false;
-      }
-
-      $is = $invStart->format('Y-m-d');
-      $ie = $invEnd->format('Y-m-d');
-      $rangeStart = $os !== null ? $os->format('Y-m-d') : '0000-01-01';
-      $rangeEnd = $oe !== null ? $oe->format('Y-m-d') : '9999-12-31';
-
-      return $is <= $rangeEnd && $ie >= $rangeStart;
    }
 }

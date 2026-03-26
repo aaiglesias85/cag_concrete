@@ -183,10 +183,10 @@ var OverrideUnpaidQty = (function () {
                if (row.isGroupHeader) return '';
                var v = data !== null && data !== undefined ? data : 0;
                var histOverride = '';
-               if (row.has_override_unpaid_qty_history && row.invoice_item_override_unpaid_qty_id) {
+               if (row.has_override_unpaid_qty_history && row.invoice_item_override_payment_id) {
                   histOverride =
-                     '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer override-unpaid-qty-history-icon flex-shrink-0" style="cursor:pointer;display:inline-block;" data-invoice-item-override-unpaid-qty-id="' +
-                     row.invoice_item_override_unpaid_qty_id +
+                     '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer override-unpaid-qty-history-icon flex-shrink-0" style="cursor:pointer;display:inline-block;" data-invoice-item-override-payment-id="' +
+                     row.invoice_item_override_payment_id +
                      '" title="Override history"></i>';
                }
                return (
@@ -385,10 +385,6 @@ var OverrideUnpaidQty = (function () {
             }
             items.push({ project_item_id: pid, unpaid_qty: uq });
          });
-         if (items.length === 0) {
-            toastr.info('No changes to save.', '');
-            return;
-         }
          var formData = new URLSearchParams();
          formData.set('project_id', $('#filtro-project-op').val());
          formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
@@ -416,7 +412,7 @@ var OverrideUnpaidQty = (function () {
       BlockUtil.block('#modal-override-unpaid-qty-history .modal-content');
       axios
          .get('override-unpaid-qty/listarHistorial', {
-            params: { invoice_item_override_unpaid_qty_id: overrideId },
+            params: { invoice_item_override_payment_id: overrideId },
             responseType: 'json',
          })
          .then(function (res) {
@@ -455,7 +451,7 @@ var OverrideUnpaidQty = (function () {
       $(document).off('click', '.override-unpaid-qty-history-icon');
       $(document).on('click', '.override-unpaid-qty-history-icon', function (e) {
          e.preventDefault();
-         var id = $(this).data('invoice-item-override-unpaid-qty-id');
+         var id = $(this).data('invoice-item-override-payment-id') || $(this).data('invoice-item-override-unpaid-qty-id');
          if (id) cargarHistorialOverrideUnpaidQty(id);
       });
    };

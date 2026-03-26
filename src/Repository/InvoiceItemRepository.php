@@ -57,6 +57,22 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Número de líneas invoice_item del project_item (todas las facturas).
+    */
+   public function CountInvoiceLinesForProjectItem(int $project_item_id): int
+   {
+      $n = $this->createQueryBuilder('i_i')
+         ->select('COUNT(i_i.id)')
+         ->join('i_i.projectItem', 'p_i')
+         ->andWhere('p_i.id = :project_item_id')
+         ->setParameter('project_item_id', $project_item_id)
+         ->getQuery()
+         ->getSingleScalarResult();
+
+      return (int) $n;
+   }
+
+   /**
     * TotalPreviousQuantity: Obtiene el total de cantidad de items.
     *
     * @param int $project_item_id El ID del item de proyecto

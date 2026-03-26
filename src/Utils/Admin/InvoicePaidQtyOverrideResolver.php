@@ -31,6 +31,27 @@ class InvoicePaidQtyOverrideResolver
    }
 
    /**
+    * Fila aplicable al invoice: primero overrides con start_date NULL y end_date = fin del período
+    * guardado en Override Payment — aplican a todo invoice cuyo inicio es estrictamente posterior
+    * a ese end_date (la más reciente entre las candidatas). Si no, solape con rango del override o global.
+    * Misma regla que {@see resolvePaidQtyDetails}.
+    */
+   public function selectOverrideRowForInvoicePeriod(int $projectItemId, \DateTimeInterface $invStart, \DateTimeInterface $invEnd): ?InvoiceItemOverridePayment
+   {
+      $afterEnd = $this->overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart);
+      if ($afterEnd !== null) {
+         return $afterEnd;
+      }
+
+      $overrides = $this->overrideRepo->ListarPorProjectItem($projectItemId);
+      if ($overrides === []) {
+         return null;
+      }
+
+      return $this->selectBestOverrideForInvoice($invStart, $invEnd, $overrides);
+   }
+
+   /**
     * Misma lógica que getEffectivePaidQty, con metadatos para trazas y depuración.
     *
     * @return array{
@@ -66,7 +87,7 @@ class InvoicePaidQtyOverrideResolver
          return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
       }
 
-      $match = $this->selectBestOverrideForInvoice($invStart, $invEnd, $overrides);
+      $match = $this->selectOverrideRowForInvoicePeriod((int) $pi->getId(), $invStart, $invEnd);
       $effective = $match !== null ? (float) $match->getPaidQty() : $base;
       $overrideId = null;
       if ($match !== null && $match->getId() !== null) {
