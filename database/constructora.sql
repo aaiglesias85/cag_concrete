@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 26-03-2026 a las 01:01:13
+-- Tiempo de generación: 28-03-2026 a las 01:45:25
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -818,10 +818,10 @@ CREATE TABLE `invoice_item_notes` (
 
 CREATE TABLE `invoice_item_override_payment` (
   `id` int(11) NOT NULL,
+  `invoice_override_payment_id` int(11) NOT NULL COMMENT 'FK a invoice_override_payment (cabecera)',
   `project_item_id` int(11) NOT NULL,
   `paid_qty` decimal(18,6) NOT NULL COMMENT 'Cantidad pagada sobreescrita (agregado)',
-  `start_date` date DEFAULT NULL COMMENT 'Inicio de vigencia del override (NULL = sin fecha desde)',
-  `end_date` date DEFAULT NULL COMMENT 'Fin de vigencia del override (NULL = sin fecha hasta)',
+  `unpaid_qty` decimal(18,6) DEFAULT NULL COMMENT 'Override unpaid qty; NULL = no aplica, usar derivado (qty - paid)',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Override de paid qty agregado por project_item y rango de fechas';
@@ -829,10 +829,10 @@ CREATE TABLE `invoice_item_override_payment` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `invoice_item_override_payment_history`
+-- Estructura de tabla para la tabla `invoice_item_override_payment_paid_qty_history`
 --
 
-CREATE TABLE `invoice_item_override_payment_history` (
+CREATE TABLE `invoice_item_override_payment_paid_qty_history` (
   `id` int(11) NOT NULL,
   `invoice_item_override_payment_id` int(11) NOT NULL,
   `old_value` decimal(18,6) DEFAULT NULL,
@@ -844,31 +844,15 @@ CREATE TABLE `invoice_item_override_payment_history` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `invoice_item_override_unpaid_qty`
+-- Estructura de tabla para la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
 
-CREATE TABLE `invoice_item_override_unpaid_qty` (
+CREATE TABLE `invoice_item_override_payment_unpaid_qty_history` (
   `id` int(11) NOT NULL,
-  `project_item_id` int(11) NOT NULL,
-  `unpaid_qty` decimal(18,6) NOT NULL COMMENT 'Cantidad no pagada sobreescrita (agregado)',
-  `note` longtext COMMENT 'Nota (HTML) asociada al override; se persiste al guardar desde el modal de notas',
-  `start_date` date DEFAULT NULL COMMENT 'Inicio de vigencia del override (opcional; NULL = sin filtro de fechas)',
-  `end_date` date DEFAULT NULL COMMENT 'Fin de vigencia del override (opcional; NULL = sin filtro de fechas)',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Override de unpaid qty agregado por project_item y rango de fechas';
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `invoice_item_override_unpaid_qty_history`
---
-
-CREATE TABLE `invoice_item_override_unpaid_qty_history` (
-  `id` int(11) NOT NULL,
-  `invoice_item_override_unpaid_qty_id` int(11) NOT NULL,
+  `invoice_item_override_payment_id` int(11) NOT NULL COMMENT 'FK a invoice_item_override_payment',
   `old_value` decimal(18,6) DEFAULT NULL,
   `new_value` decimal(18,6) DEFAULT NULL,
+  `note` longtext COMMENT 'Nota (HTML) por entrada',
   `created_at` datetime NOT NULL,
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Historial de cambios de unpaid_qty en invoice_item_override_unpaid_qty';
@@ -900,6 +884,18 @@ CREATE TABLE `invoice_notes` (
   `date` date DEFAULT NULL,
   `invoice_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `invoice_override_payment`
+--
+
+CREATE TABLE `invoice_override_payment` (
+  `invoice_override_payment_id` int(11) NOT NULL,
+  `project_id` int(11) NOT NULL COMMENT 'FK project.project_id (tab General)',
+  `date` date DEFAULT NULL COMMENT 'Fecha de período (tab General; alineada a end_date de líneas)'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Cabecera de override payment por proyecto y fecha de período';
 
 -- --------------------------------------------------------
 
@@ -2469,30 +2465,22 @@ ALTER TABLE `invoice_item_notes`
 ALTER TABLE `invoice_item_override_payment`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_invoice_item_override_payment_project_item` (`project_item_id`),
-  ADD KEY `idx_invoice_item_override_payment_dates` (`start_date`,`end_date`);
+  ADD KEY `idx_invoice_item_override_payment_header` (`invoice_override_payment_id`);
 
 --
--- Indices de la tabla `invoice_item_override_payment_history`
+-- Indices de la tabla `invoice_item_override_payment_paid_qty_history`
 --
-ALTER TABLE `invoice_item_override_payment_history`
+ALTER TABLE `invoice_item_override_payment_paid_qty_history`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_invoice_item_override_payment_history_parent` (`invoice_item_override_payment_id`),
   ADD KEY `fk_invoice_item_override_payment_history_user` (`user_id`);
 
 --
--- Indices de la tabla `invoice_item_override_unpaid_qty`
+-- Indices de la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
-ALTER TABLE `invoice_item_override_unpaid_qty`
+ALTER TABLE `invoice_item_override_payment_unpaid_qty_history`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_invoice_item_override_unpaid_qty_project_item` (`project_item_id`),
-  ADD KEY `idx_invoice_item_override_unpaid_qty_dates` (`start_date`,`end_date`);
-
---
--- Indices de la tabla `invoice_item_override_unpaid_qty_history`
---
-ALTER TABLE `invoice_item_override_unpaid_qty_history`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_invoice_item_override_unpaid_qty_history_parent` (`invoice_item_override_unpaid_qty_id`),
+  ADD KEY `idx_invoice_item_override_unpaid_qty_history_parent` (`invoice_item_override_payment_id`),
   ADD KEY `fk_invoice_item_override_unpaid_qty_history_user` (`user_id`);
 
 --
@@ -2509,6 +2497,14 @@ ALTER TABLE `invoice_item_unpaid_qty_history`
 ALTER TABLE `invoice_notes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Refinvoice_notes1` (`invoice_id`);
+
+--
+-- Indices de la tabla `invoice_override_payment`
+--
+ALTER TABLE `invoice_override_payment`
+  ADD PRIMARY KEY (`invoice_override_payment_id`),
+  ADD UNIQUE KEY `uk_invoice_override_payment_project_date` (`project_id`,`date`),
+  ADD KEY `idx_invoice_override_payment_project` (`project_id`);
 
 --
 -- Indices de la tabla `item`
@@ -3026,21 +3022,15 @@ ALTER TABLE `invoice_item_override_payment`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `invoice_item_override_payment_history`
+-- AUTO_INCREMENT de la tabla `invoice_item_override_payment_paid_qty_history`
 --
-ALTER TABLE `invoice_item_override_payment_history`
+ALTER TABLE `invoice_item_override_payment_paid_qty_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `invoice_item_override_unpaid_qty`
+-- AUTO_INCREMENT de la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
-ALTER TABLE `invoice_item_override_unpaid_qty`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `invoice_item_override_unpaid_qty_history`
---
-ALTER TABLE `invoice_item_override_unpaid_qty_history`
+ALTER TABLE `invoice_item_override_payment_unpaid_qty_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -3054,6 +3044,12 @@ ALTER TABLE `invoice_item_unpaid_qty_history`
 --
 ALTER TABLE `invoice_notes`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `invoice_override_payment`
+--
+ALTER TABLE `invoice_override_payment`
+  MODIFY `invoice_override_payment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `item`
@@ -3477,26 +3473,21 @@ ALTER TABLE `invoice_item_notes`
 -- Filtros para la tabla `invoice_item_override_payment`
 --
 ALTER TABLE `invoice_item_override_payment`
+  ADD CONSTRAINT `fk_invoice_item_override_payment_header` FOREIGN KEY (`invoice_override_payment_id`) REFERENCES `invoice_override_payment` (`invoice_override_payment_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_invoice_item_override_payment_project_item` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `invoice_item_override_payment_history`
+-- Filtros para la tabla `invoice_item_override_payment_paid_qty_history`
 --
-ALTER TABLE `invoice_item_override_payment_history`
+ALTER TABLE `invoice_item_override_payment_paid_qty_history`
   ADD CONSTRAINT `fk_invoice_item_override_payment_history_parent` FOREIGN KEY (`invoice_item_override_payment_id`) REFERENCES `invoice_item_override_payment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_invoice_item_override_payment_history_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `invoice_item_override_unpaid_qty`
+-- Filtros para la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
-ALTER TABLE `invoice_item_override_unpaid_qty`
-  ADD CONSTRAINT `fk_invoice_item_override_unpaid_qty_project_item` FOREIGN KEY (`project_item_id`) REFERENCES `project_item` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Filtros para la tabla `invoice_item_override_unpaid_qty_history`
---
-ALTER TABLE `invoice_item_override_unpaid_qty_history`
-  ADD CONSTRAINT `fk_invoice_item_override_unpaid_qty_history_parent` FOREIGN KEY (`invoice_item_override_unpaid_qty_id`) REFERENCES `invoice_item_override_unpaid_qty` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+ALTER TABLE `invoice_item_override_payment_unpaid_qty_history`
+  ADD CONSTRAINT `fk_inv_ovr_pay_unpaid_hist_payment` FOREIGN KEY (`invoice_item_override_payment_id`) REFERENCES `invoice_item_override_payment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_invoice_item_override_unpaid_qty_history_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
@@ -3511,6 +3502,12 @@ ALTER TABLE `invoice_item_unpaid_qty_history`
 --
 ALTER TABLE `invoice_notes`
   ADD CONSTRAINT `Refinvoice_notes1` FOREIGN KEY (`invoice_id`) REFERENCES `invoice` (`invoice_id`);
+
+--
+-- Filtros para la tabla `invoice_override_payment`
+--
+ALTER TABLE `invoice_override_payment`
+  ADD CONSTRAINT `fk_invoice_override_payment_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `item`
