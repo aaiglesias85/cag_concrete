@@ -1825,8 +1825,10 @@ class ProjectService extends Base
          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
          $invoiced_qty = $invoiceItemRepo->TotalInvoiceQuantityByProjectItem($project_item_id);
          $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
-         $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
-         $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
+         // Paid acumulado con override (misma regla que invoice / agregados): no solo SUM(paid_qty) en BD
+         $aggPaidCompletion = $this->computePreviousInvoiceTotalsForProjectItem($project_item_id, null);
+         $paid_qty = (float) ($aggPaidCompletion['total_paid_effective'] ?? 0);
+         $total_paid_amount = (float) ($aggPaidCompletion['paid_amount_total'] ?? 0);
 
          // Override de unpaid desde Payments (notas): Diff Qty/Amt = base + suma de los últimos override_unpaid_qty
          // por invoice_item (notas ordenadas por fecha DESC; primera nota con valor = estado final vigente).
@@ -2227,8 +2229,9 @@ class ProjectService extends Base
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $invoiced_qty = $invoiceItemRepo->TotalInvoiceQuantityByProjectItem($project_item_id);
       $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
-      $paid_qty = $invoiceItemRepo->TotalInvoicePaidQtyByProjectItem($project_item_id);
-      $total_paid_amount = $invoiceItemRepo->TotalInvoicePaidAmountByProjectItem($project_item_id);
+      $aggPaidItem = $this->computePreviousInvoiceTotalsForProjectItem($project_item_id, null);
+      $paid_qty = (float) ($aggPaidItem['total_paid_effective'] ?? 0);
+      $total_paid_amount = (float) ($aggPaidItem['paid_amount_total'] ?? 0);
 
       // Verificar si hay historial de cantidad y precio
       /** @var ProjectItemHistoryRepository $historyRepo */
