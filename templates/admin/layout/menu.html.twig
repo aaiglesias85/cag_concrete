@@ -377,9 +377,15 @@
                      <span class="menu-title">Invoices</span>
                   </a>
                </div>
-               {% endif %} {% if menu.menuPayment %}
-               <div class="menu-item">
-                  <a class="menu-link {{ activeRoute == 'payment' ? 'active' }}" href="{{ url('payment') }}">
+               {% endif %} {% if menu.menuPayment or menu.menuOverridePayment %}
+               <!--begin:Menu item Payments (Payments + Override)-->
+               <div
+                  data-kt-menu-trigger="click"
+                  class="menu-item menu-accordion
+                            {{ activeRoute == 'payment' or activeRoute == 'override_payment' ? 'here show' }}
+                        "
+               >
+                  <span class="menu-link">
                      <span class="menu-icon">
                         <i class="ki-duotone ki-dollar fs-2">
                            <span class="path1"></span>
@@ -387,20 +393,32 @@
                         </i>
                      </span>
                      <span class="menu-title">Payments</span>
-                  </a>
+                     <span class="menu-arrow"></span>
+                  </span>
+                  <div class="menu-sub menu-sub-accordion">
+                     {% if menu.menuPayment %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'payment' ? 'active' }}" href="{{ url('payment') }}">
+                           <span class="menu-bullet">
+                              <span class="bullet bullet-dot"></span>
+                           </span>
+                           <span class="menu-title">Payments</span>
+                        </a>
+                     </div>
+                     {% endif %}
+                     {% if menu.menuOverridePayment %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'override_payment' ? 'active' }}" href="{{ url('override_payment') }}">
+                           <span class="menu-bullet">
+                              <span class="bullet bullet-dot"></span>
+                           </span>
+                           <span class="menu-title">Override</span>
+                        </a>
+                     </div>
+                     {% endif %}
+                  </div>
                </div>
-               {% endif %} {% if menu.menuOverridePayment %}
-               <div class="menu-item">
-                  <a class="menu-link {{ activeRoute == 'override_payment' ? 'active' }}" href="{{ url('override_payment') }}">
-                     <span class="menu-icon">
-                        <i class="ki-duotone ki-dollar fs-2">
-                           <span class="path1"></span>
-                           <span class="path2"></span>
-                        </i>
-                     </span>
-                     <span class="menu-title">Override Payment</span>
-                  </a>
-               </div>
+               <!--end:Menu item Payments-->
                {% endif %} {% endif %}
 
                <!-- menu reportes -->

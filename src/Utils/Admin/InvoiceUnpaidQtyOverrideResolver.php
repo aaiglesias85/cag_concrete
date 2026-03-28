@@ -8,8 +8,8 @@ use App\Repository\InvoiceItemRepository;
 
 /**
  * Unpaid qty efectivo: misma fila que {@see InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod}
- * (período posterior a end_date con start_date NULL, luego solape y global). Si esa fila tiene unpaid_qty no null, se usa;
- * si no, el valor en invoice_item.
+ * (fecha en {@see InvoiceOverridePayment}, solape con período del invoice, cabecera “global” sin fecha).
+ * Si esa fila tiene unpaid_qty no null, se usa; si no, el valor en invoice_item.
  *
  * No modifica registros en BD.
  */

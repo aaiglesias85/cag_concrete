@@ -94,7 +94,7 @@ class ProjectService extends Base
    /**
     * Caché por request: CalcularUnpaidQuantityFromPreviusInvoice y CalculaPaidAmountTotalFromPreviusInvoice
     * comparten el mismo agregado (evita doble bucle).
-    * Clave: id de project_item, o id~Y-m-d si el agregado es solo invoices con start_date > end_date del override.
+    * Clave: id de project_item, o id~Y-m-d si el agregado es solo invoices con start_date > fecha de cabecera del override.
     *
     * @var array<string, array<string, mixed>>
     */
@@ -108,8 +108,8 @@ class ProjectService extends Base
    }
 
    /**
-    * Override con start_date NULL y end_date = cierre del período: si el invoice nuevo empieza después de esa fecha,
-    * devuelve esa fila; si no aplica, null.
+    * Override cuya cabecera tiene fecha de período: si el invoice nuevo empieza después de esa fecha,
+    * devuelve esa fila de detalle; si no aplica, null.
     */
    private function findPostOverrideRowForInvoicePeriod(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): ?InvoiceItemOverridePayment
    {
@@ -169,13 +169,13 @@ class ProjectService extends Base
    }
 
    /**
-    * unpaid_qty del snapshot (override) y luego, por cada invoice guardado después del end_date:
+    * unpaid_qty del snapshot (override) y luego, por cada invoice guardado después de la fecha de cabecera:
     * u = max(0, u + quantity − paid_line − QBF). paid_line alineado al agregado de paid: primera línea con un
     * override_id usa effective del resolver; líneas siguientes con el mismo id solo paid_qty persistido (base).
     */
    private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId): float
    {
-      $ed = $rowAfter->getEndDate();
+      $ed = $rowAfter->getOverridePeriodDate();
       if ($ed === null || $rowAfter->getUnpaidQty() === null) {
          return 0.0;
       }
@@ -233,17 +233,17 @@ class ProjectService extends Base
    }
 
    /**
-    * Agregado de facturas previas alineado al período del invoice nuevo: si hay override "posterior a end_date",
-    * solo cuentan líneas con invoice.start_date > end_date del override; si aún no hay ninguna, paid/importe
-    * parten del snapshot del override.
+    * Agregado de facturas previas alineado al período del invoice nuevo: si hay override con cabecera anterior
+    * al período del invoice nuevo, solo cuentan líneas con invoice.start_date > fecha de esa cabecera;
+    * si aún no hay ninguna, paid/importe parten del snapshot del override.
     *
     * @return array<string, mixed>
     */
    private function previousInvoiceTotalsMergedForPeriod(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): array
    {
       $rowAfter = $this->findPostOverrideRowForInvoicePeriod($projectItemId, $fecha_inicial, $fecha_fin);
-      $cutoffYmd = $rowAfter !== null && $rowAfter->getEndDate() !== null
-         ? $rowAfter->getEndDate()->format('Y-m-d')
+      $cutoffYmd = $rowAfter !== null && $rowAfter->getOverridePeriodDate() !== null
+         ? $rowAfter->getOverridePeriodDate()->format('Y-m-d')
          : null;
       $agg = $this->computePreviousInvoiceTotalsForProjectItem($projectItemId, $cutoffYmd);
       if ($rowAfter !== null) {
@@ -1433,7 +1433,7 @@ class ProjectService extends Base
     * Líneas sin override: se suma el `paid_qty` almacenado por línea.
     *
     * Si $invoiceStartAfterYmd (Y-m-d) no es null, solo se consideran líneas cuyo invoice tiene start_date > ese día
-    * (períodos posteriores al end_date del override con start_date NULL).
+    * (períodos posteriores a la fecha de cabecera del override aplicable).
     *
     * @return array{
     *   total_quantity: float,

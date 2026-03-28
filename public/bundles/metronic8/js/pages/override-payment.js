@@ -1,26 +1,322 @@
 var OverridePayment = (function () {
+
+   // Estado (tablas DataTable y wizard)
+
+   var oTableItems = null;
    var oTable = null;
    var oTableHistory = null;
    var activeTab = 1;
+   /** Id pendiente para confirmar borrado vía #modal-eliminar (misma convención que invoice). */
+   var overridePaymentDeleteId = null;
+
+   // Vista: listado principal vs formulario wizard
+
+   var showListView = function () {
+      $('#lista-override-payment').removeClass('hide');
+      $('#form-override-payment').addClass('hide');
+   };
+   var showFormView = function () {
+      $('#lista-override-payment').addClass('hide');
+      $('#form-override-payment').removeClass('hide');
+   };
 
    /** Muestra la tabla de ítems (oculta el placeholder). El botón Save lo controla el wizard (tab Items). */
+   var showHeadersTableContent = function () {
+      $('#op-headers-list-placeholder').addClass('hide');
+      $('#op-headers-table-wrapper').removeClass('hide');
+   };
+
+   // Listado cabeceras: DataTable server-side, export y filtros de lista
+
+   var getHeadersColumnsTable = function () {
+      return [
+         { data: 'company', name: 'company' },
+         { data: 'project', name: 'project' },
+         { data: 'date', name: 'date' },
+         { data: 'overridePaidQty', name: 'overridePaidQty' },
+         { data: 'overridePaidAmount', name: 'overridePaidAmount' },
+         { data: 'overrideUnpaidQty', name: 'overrideUnpaidQty' },
+         { data: 'overrideUnpaidAmount', name: 'overrideUnpaidAmount' },
+         { data: null, name: 'id', orderable: false },
+      ];
+   };
+   var getHeadersColumnsDefTable = function () {
+      var fmtQty = function (v) {
+         var n = v !== null && v !== undefined ? Number(v) : 0;
+         if (isNaN(n)) {
+            n = 0;
+         }
+         return MyApp.formatearNumero(n, 2, '.', ',');
+      };
+      var fmtMoney = function (v) {
+         var n = v !== null && v !== undefined ? Number(v) : 0;
+         if (isNaN(n)) {
+            n = 0;
+         }
+         return MyApp.formatMoney(n);
+      };
+      return [
+         {
+            targets: 0,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 200);
+            },
+         },
+         {
+            targets: 1,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 280);
+            },
+         },
+         {
+            targets: 2,
+            render: function (data) {
+               return DatatableUtil.getRenderColumnDiv(data != null ? String(data) : '', 120);
+            },
+         },
+         {
+            targets: 3,
+            className: 'text-end op-col-total',
+            orderable: true,
+            render: function (data, type, row) {
+               return '<span class="text-nowrap">' + fmtQty(row.overridePaidQty) + '</span>';
+            },
+         },
+         {
+            targets: 4,
+            className: 'text-end op-col-total',
+            orderable: true,
+            render: function (data, type, row) {
+               return '<span class="text-nowrap">' + fmtMoney(row.overridePaidAmount) + '</span>';
+            },
+         },
+         {
+            targets: 5,
+            className: 'text-end op-col-total',
+            orderable: true,
+            render: function (data, type, row) {
+               return '<span class="text-nowrap">' + fmtQty(row.overrideUnpaidQty) + '</span>';
+            },
+         },
+         {
+            targets: 6,
+            className: 'text-end op-col-total',
+            orderable: true,
+            render: function (data, type, row) {
+               return '<span class="text-nowrap">' + fmtMoney(row.overrideUnpaidAmount) + '</span>';
+            },
+         },
+         {
+            targets: 7,
+            data: null,
+            orderable: false,
+            className: 'text-end',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+            },
+         },
+      ];
+   };
+   var exportHeadersButtons = function () {
+      var table = document.querySelector('#override-payment-headers-table');
+      if (!table || !$.fn.dataTable || !$.fn.dataTable.Buttons) {
+         return;
+      }
+      var documentTitle = 'Override payments';
+      var exclude_columns = ':not(:last-child)';
+      new $.fn.dataTable.Buttons(table, {
+         buttons: [
+            {
+               extend: 'copyHtml5',
+               title: documentTitle,
+               exportOptions: { columns: exclude_columns },
+            },
+            {
+               extend: 'excelHtml5',
+               title: documentTitle,
+               exportOptions: { columns: exclude_columns },
+            },
+            {
+               extend: 'csvHtml5',
+               title: documentTitle,
+               exportOptions: { columns: exclude_columns },
+            },
+            {
+               extend: 'pdfHtml5',
+               title: documentTitle,
+               exportOptions: { columns: exclude_columns },
+            },
+         ],
+      })
+         .container()
+         .appendTo($('#op-headers-table-buttons'));
+      var exportBtns = document.querySelectorAll('#op-headers_export_menu [data-kt-export]');
+      exportBtns.forEach(function (exportButton) {
+         exportButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            var exportValue = exportButton.getAttribute('data-kt-export');
+            var target = document.querySelector('#op-headers-table-buttons .dt-buttons .buttons-' + exportValue);
+            if (target) {
+               target.click();
+            }
+         });
+      });
+   };
+   var btnClickFiltrarHeaders = function () {
+      if (!oTable) {
+         return;
+      }
+      var search = $('#lista-override-payment [data-table-filter="search"]').val();
+      oTable.search(search || '').draw();
+   };
+   var btnClickResetFiltersHeaders = function () {
+      $('#lista-override-payment [data-table-filter="search"]').val('');
+      $('#filtro-op-list-company').val('');
+      $('#filtro-op-list-company').trigger('change');
+      MyUtil.limpiarSelect('#filtro-op-list-project');
+      FlatpickrUtil.clear('datetimepicker-op-list-desde');
+      FlatpickrUtil.clear('datetimepicker-op-list-hasta');
+      if (oTable) {
+         oTable.search('').draw();
+      }
+      $('#op-headers-table-wrapper').addClass('hide');
+      $('#op-headers-list-placeholder').removeClass('hide');
+   };
+
+   //Inicializar table
+   var initHeadersTable = function () {
+      var table = '#override-payment-headers-table';
+
+      // datasource
+      var datasource = {
+         url: 'override-payment/listar',
+         data: function (d) {
+            return $.extend({}, d, {
+               company_id: $('#filtro-op-list-company').val(),
+               project_id: $('#filtro-op-list-project').val(),
+               fechaInicial: FlatpickrUtil.getString('datetimepicker-op-list-desde'),
+               fechaFin: FlatpickrUtil.getString('datetimepicker-op-list-hasta'),
+            });
+         },
+         method: 'post',
+         dataType: 'json',
+         error: DatatableUtil.errorDataTable,
+      };
+
+      // columns / column defs / language (getHeadersColumnsTable, getHeadersColumnsDefTable)
+      oTable = $(table).DataTable({
+         searchDelay: 500,
+         processing: true,
+         serverSide: true,
+         order: [[2, 'desc']],
+         stateSave: true,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'All'],
+         ],
+         stateSaveParams: DatatableUtil.stateSaveParams,
+         scrollX: true,
+         scrollCollapse: true,
+         ajax: datasource,
+         columns: getHeadersColumnsTable(),
+         columnDefs: getHeadersColumnsDefTable(),
+         language: DatatableUtil.getDataTableLenguaje(),
+      });
+
+      oTable.on('draw', function () {
+         if (typeof KTMenu !== 'undefined' && KTMenu.createInstances) {
+            KTMenu.createInstances();
+         }
+      });
+
+      exportHeadersButtons();
+   };
+   var handleSearchHeadersDatatable = function () {
+      var debounceTimeout;
+      $(document).off('keyup', '#lista-override-payment [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-override-payment [data-table-filter="search"]', function (e) {
+         clearTimeout(debounceTimeout);
+         var searchTerm = e.target.value.trim();
+         debounceTimeout = setTimeout(function () {
+            if (!oTable) {
+               return;
+            }
+            if (searchTerm.length >= 3) {
+               showHeadersTableContent();
+               oTable.search(searchTerm).draw();
+            } else if (searchTerm === '') {
+               oTable.search('').draw();
+               $('#op-headers-table-wrapper').addClass('hide');
+               $('#op-headers-list-placeholder').removeClass('hide');
+            }
+         }, 300);
+      });
+   };
+   var initAccionFiltrarHeaders = function () {
+      $(document).off('click', '#btn-op-list-filtrar');
+      $(document).on('click', '#btn-op-list-filtrar', function () {
+         showHeadersTableContent();
+         btnClickFiltrarHeaders();
+      });
+
+      $(document).off('click', '#btn-op-list-reset-filtrar');
+      $(document).on('click', '#btn-op-list-reset-filtrar', function () {
+         btnClickResetFiltersHeaders();
+      });
+   };
+   var changeFiltroCompanyList = function () {
+      var company_id = $('#filtro-op-list-company').val();
+      MyUtil.limpiarSelect('#filtro-op-list-project');
+      if (company_id === '' || company_id == null) {
+         $('#filtro-op-list-project').select2();
+         return;
+      }
+      BlockUtil.block('#select-filtro-op-list-project');
+      var formData = new URLSearchParams();
+      formData.set('company_id', company_id);
+      axios
+         .post('project/listarOrdenados', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var projects = response.projects;
+                  for (var i = 0; i < projects.length; i++) {
+                     var descripcion = projects[i].number + ' - ' + projects[i].description;
+                     $('#filtro-op-list-project').append(new Option(descripcion, projects[i].project_id, false, false));
+                  }
+                  $('#filtro-op-list-project').select2();
+               }
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#select-filtro-op-list-project');
+         });
+   };
+   var refreshHeadersList = function () {
+      if (oTable) {
+         oTable.ajax.reload(null, false);
+      }
+   };
+
+   // Formulario wizard: pestañas General, Items e History
+
    var showTableContent = function () {
       $('#override-payment-list-placeholder').addClass('hide');
       $('#override-payment-table-wrapper').removeClass('hide');
    };
-
    var hideTableContent = function () {
       $('#override-payment-table-wrapper').addClass('hide');
       $('#override-payment-list-placeholder').removeClass('hide');
    };
-
    var destroyHistoryTable = function () {
       if (oTableHistory) {
          oTableHistory.destroy();
          oTableHistory = null;
       }
    };
-
    var updateWizardButtons = function () {
       if (activeTab === 1) {
          $('#btn-op-wizard-anterior').addClass('hide');
@@ -41,7 +337,6 @@ var OverridePayment = (function () {
          }
       }
    };
-
    var validGeneralTab = function () {
       var company = $('#filtro-company-op').val();
       var project = $('#filtro-project-op').val();
@@ -74,13 +369,7 @@ var OverridePayment = (function () {
             destroyHistoryTable();
             $('#op-history-placeholder').addClass('hide');
             $('#op-history-table-wrapper').removeClass('hide');
-            var columns = [
-               { data: 'item_description' },
-               { data: 'old_qty' },
-               { data: 'new_qty' },
-               { data: 'user_name' },
-               { data: 'created_at' },
-            ];
+            var columns = [{ data: 'item_description' }, { data: 'old_qty' }, { data: 'new_qty' }, { data: 'user_name' }, { data: 'created_at' }];
             var columnDefs = [
                {
                   targets: 0,
@@ -117,16 +406,15 @@ var OverridePayment = (function () {
    /** Al mostrar el tab Items: lista desde el servidor si General está completo. */
    var loadItemsTabData = function () {
       if (!validGeneralTab()) {
-         if (oTable) {
-            oTable.destroy();
-            oTable = null;
+         if (oTableItems) {
+            oTableItems.destroy();
+            oTableItems = null;
          }
          hideTableContent();
          return;
       }
       aplicarFiltroOverridePayment();
    };
-
    var initWizard = function () {
       updateWizardButtons();
       $(document).off('click', '#btn-op-wizard-siguiente');
@@ -156,8 +444,8 @@ var OverridePayment = (function () {
          if (activeTab === 2) {
             loadItemsTabData();
             setTimeout(function () {
-               if (oTable) {
-                  oTable.columns.adjust().draw(false);
+               if (oTableItems) {
+                  oTableItems.columns.adjust().draw(false);
                }
             }, 100);
          } else if (activeTab === 3) {
@@ -170,7 +458,6 @@ var OverridePayment = (function () {
          }
       });
    };
-
    var initHistorySearch = function () {
       $(document).off('keyup', '#op-history-search');
       $(document).on('keyup', '#op-history-search', function (e) {
@@ -184,6 +471,9 @@ var OverridePayment = (function () {
     * Misma lógica que payments.js: ítems con change_order + change_order_date van al bloque Change Order;
     * si hay regulares y CO, se inserta fila de cabecera.
     */
+
+   // Pestaña Items: columnas, agrupación Change Order y tabla local
+
    var agruparItemsPorChangeOrder = function (items) {
       if (!items || !items.length) {
          return items || [];
@@ -227,18 +517,16 @@ var OverridePayment = (function () {
       });
       return resultado;
    };
-
    var resetToInitialState = function () {
-      if (oTable) {
-         oTable.destroy();
-         oTable = null;
+      if (oTableItems) {
+         oTableItems.destroy();
+         oTableItems = null;
       }
       destroyHistoryTable();
       hideTableContent();
       $('#op-history-placeholder').removeClass('hide');
       $('#op-history-table-wrapper').addClass('hide');
    };
-
    var getColumns = function () {
       return [
          { data: 'item' },
@@ -254,7 +542,6 @@ var OverridePayment = (function () {
          { data: '_groupOrder', visible: false },
       ];
    };
-
    var getColumnDefs = function () {
       return [
          {
@@ -270,13 +557,11 @@ var OverridePayment = (function () {
                }
                var badgeBond = '';
                if (row.bond == 1 || row.bond === true) {
-                  badgeBond =
-                     '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8 flex-shrink-0" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8 flex-shrink-0" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
                var badgeBonded = '';
                if (row.bonded == 1 || row.bonded === true) {
-                  badgeBonded =
-                     '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8 flex-shrink-0" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
+                  badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8 flex-shrink-0" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
@@ -311,17 +596,9 @@ var OverridePayment = (function () {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_quantity_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="' +
-                     row.project_item_id +
-                     '"></i>';
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer quantity-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
-               return (
-                  '<span>' +
-                  MyApp.formatearNumero(data, 2, '.', ',') +
-                  '</span>' +
-                  icono
-               );
+               return '<span>' + MyApp.formatearNumero(data, 2, '.', ',') + '</span>' + icono;
             },
          },
          {
@@ -330,10 +607,7 @@ var OverridePayment = (function () {
                if (row.isGroupHeader) return '';
                var icono = '';
                if (row.has_price_history && !row.isGroupHeader) {
-                  icono =
-                     '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="' +
-                     row.project_item_id +
-                     '"></i>';
+                  icono = '<i class="fas fa-plus-circle text-primary ms-2 cursor-pointer price-history-icon" data-project-item-id="' + row.project_item_id + '"></i>';
                }
                return '<span>' + MyApp.formatMoney(data) + '</span>' + icono;
             },
@@ -384,44 +658,44 @@ var OverridePayment = (function () {
                );
             },
          },
-          {
-             targets: 8,
-             render: function (data, type, row) {
-                if (row.isGroupHeader) return '';
-                var v = data !== null && data !== undefined ? data : 0;
-                var unpaidReadonly = !!row.unpaid_qty_readonly;
-                var noteColorClass = unpaidReadonly ? 'text-danger' : 'text-primary';
-                var histOverride = '';
-                if (row.has_override_unpaid_qty_history && row.invoice_item_override_payment_id) {
-                   histOverride =
-                      '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer override-unpaid-qty-history-icon flex-shrink-0" style="cursor:pointer;display:inline-block;" data-invoice-item-override-payment-id="' +
-                      row.invoice_item_override_payment_id +
-                      '" title="Unpaid Override history"></i>';
-                }
-                var readonlyAttr = unpaidReadonly ? ' readonly' : '';
-                return (
-                   '<div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:150px;">' +
-                   '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
-                   v +
-                   '" data-project-item-id="' +
-                   row.project_item_id +
-                   '" style="width:80px;min-width:72px;"' +
-                   readonlyAttr +
-                   ' />' +
-                   histOverride +
-                   '<a href="javascript:void(0)" class="' +
-                   noteColorClass +
-                   ' op-add-unpaid-note-btn flex-shrink-0" title="Notes" data-project-item-id="' +
-                   row.project_item_id +
-                   '">' +
-                   '<i class="ki-outline ki-message-text fs-2 ' +
-                   noteColorClass +
-                   '"></i>' +
-                   '</a>' +
-                   '</div>'
-                );
-             },
-          },
+         {
+            targets: 8,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var v = data !== null && data !== undefined ? data : 0;
+               var unpaidReadonly = !!row.unpaid_qty_readonly;
+               var noteColorClass = unpaidReadonly ? 'text-danger' : 'text-primary';
+               var histOverride = '';
+               if (row.has_override_unpaid_qty_history && row.invoice_item_override_payment_id) {
+                  histOverride =
+                     '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer override-unpaid-qty-history-icon flex-shrink-0" style="cursor:pointer;display:inline-block;" data-invoice-item-override-payment-id="' +
+                     row.invoice_item_override_payment_id +
+                     '" title="Unpaid Override history"></i>';
+               }
+               var readonlyAttr = unpaidReadonly ? ' readonly' : '';
+               return (
+                  '<div class="d-flex align-items-center gap-2 flex-wrap" style="min-width:150px;">' +
+                  '<input type="number" class="form-control form-control-sm override-unpaid-qty" value="' +
+                  v +
+                  '" data-project-item-id="' +
+                  row.project_item_id +
+                  '" style="width:80px;min-width:72px;"' +
+                  readonlyAttr +
+                  ' />' +
+                  histOverride +
+                  '<a href="javascript:void(0)" class="' +
+                  noteColorClass +
+                  ' op-add-unpaid-note-btn flex-shrink-0" title="Notes" data-project-item-id="' +
+                  row.project_item_id +
+                  '">' +
+                  '<i class="ki-outline ki-message-text fs-2 ' +
+                  noteColorClass +
+                  '"></i>' +
+                  '</a>' +
+                  '</div>'
+               );
+            },
+         },
          {
             targets: 9,
             render: function (data, type, row) {
@@ -431,33 +705,32 @@ var OverridePayment = (function () {
          },
       ];
    };
-
-    var recalcRow = function ($row) {
-       if (!oTable) return;
-       var rowData = oTable.row($row).data();
-       if (!rowData || rowData.isGroupHeader) return;
-       var price = parseFloat(rowData.price) || 0;
-       var $inpPaid = $row.find('input.override-paid-qty');
-       var $inpUnpaid = $row.find('input.override-unpaid-qty');
-       var pq = parseFloat(String($inpPaid.val() || '').replace(/,/g, ''));
-       if (isNaN(pq)) pq = 0;
-       pq = Math.max(0, pq);
-       var uq = parseFloat(String($inpUnpaid.val() || '').replace(/,/g, ''));
-       if (isNaN(uq)) uq = 0;
-       $row.find('span.override-paid-amount-display').text(MyApp.formatMoney(pq * price));
-       $row.find('span.override-unpaid-amount-display').text(MyApp.formatMoney(uq * price));
-    };
+   var recalcRow = function ($row) {
+      if (!oTableItems) return;
+      var rowData = oTableItems.row($row).data();
+      if (!rowData || rowData.isGroupHeader) return;
+      var price = parseFloat(rowData.price) || 0;
+      var $inpPaid = $row.find('input.override-paid-qty');
+      var $inpUnpaid = $row.find('input.override-unpaid-qty');
+      var pq = parseFloat(String($inpPaid.val() || '').replace(/,/g, ''));
+      if (isNaN(pq)) pq = 0;
+      pq = Math.max(0, pq);
+      var uq = parseFloat(String($inpUnpaid.val() || '').replace(/,/g, ''));
+      if (isNaN(uq)) uq = 0;
+      $row.find('span.override-paid-amount-display').text(MyApp.formatMoney(pq * price));
+      $row.find('span.override-unpaid-amount-display').text(MyApp.formatMoney(uq * price));
+   };
 
    /** DataSource local (como invoice items): el servidor devuelve todos los ítems; búsqueda y paginación en cliente. */
    var montarTablaItemsLocal = function (datos) {
-      if (oTable) {
-         oTable.destroy();
-         oTable = null;
+      if (oTableItems) {
+         oTableItems.destroy();
+         oTableItems = null;
       }
       $('#op-items-search').val('');
       var table = '#override-payment-items-table';
       var columns = getColumns();
-      oTable = $(table).DataTable({
+      oTableItems = $(table).DataTable({
          data: datos,
          processing: false,
          serverSide: false,
@@ -485,11 +758,7 @@ var OverridePayment = (function () {
                $(row).attr('data-project-item-id', data.project_item_id);
                $(row).attr(
                   'data-unpaid-override-id',
-                  data.unpaid_qty_readonly &&
-                     data.invoice_item_override_payment_id != null &&
-                     data.invoice_item_override_payment_id !== ''
-                     ? String(data.invoice_item_override_payment_id)
-                     : ''
+                  data.unpaid_qty_readonly && data.invoice_item_override_payment_id != null && data.invoice_item_override_payment_id !== '' ? String(data.invoice_item_override_payment_id) : '',
                );
                if (data.quantity != null && data.quantity !== '') {
                   $(row).attr('data-quantity-final', data.quantity);
@@ -514,12 +783,11 @@ var OverridePayment = (function () {
          },
       });
    };
-
    var fetchItemsYMontarTabla = function () {
       if (!validGeneralTab()) {
-         if (oTable) {
-            oTable.destroy();
-            oTable = null;
+         if (oTableItems) {
+            oTableItems.destroy();
+            oTableItems = null;
          }
          hideTableContent();
          return;
@@ -531,7 +799,7 @@ var OverridePayment = (function () {
       formData.set('project_id', $('#filtro-project-op').val() || '');
       formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin') || '');
       axios
-         .post('override-payment/listar', formData, { responseType: 'json' })
+         .post('override-payment/listarItems', formData, { responseType: 'json' })
          .then(function (res) {
             var response = res.data;
             if (!response.success) {
@@ -547,22 +815,23 @@ var OverridePayment = (function () {
             BlockUtil.unblock('#tab-content-op-items');
          });
    };
-
    var aplicarFiltroOverridePayment = function () {
       fetchItemsYMontarTabla();
    };
+
+   // Pestaña Items: búsqueda, sync paid/unpaid y cambios en inputs
 
    var initAccionBuscar = function () {
       var debounceTimeout;
       $(document).off('input', '#op-items-search');
       $(document).on('input', '#op-items-search', function (e) {
-         if (!oTable) {
+         if (!oTableItems) {
             return;
          }
          clearTimeout(debounceTimeout);
          var searchTerm = e.target.value;
          debounceTimeout = setTimeout(function () {
-            oTable.search(searchTerm).draw();
+            oTableItems.search(searchTerm).draw();
          }, 400);
       });
    };
@@ -583,7 +852,6 @@ var OverridePayment = (function () {
       var uq = Math.max(0, qty - pq);
       $unpaid.val(uq);
    };
-
    var syncPaidFromUnpaid = function ($row) {
       if ($row.hasClass('row-group-header')) return;
       var overrideId = $row.attr('data-unpaid-override-id');
@@ -599,7 +867,6 @@ var OverridePayment = (function () {
       var pq = Math.max(0, qty - uq);
       $paid.val(pq);
    };
-
    var initAccionPaidQtyChange = function () {
       $(document).off('change', '#override-payment-items-table input.override-paid-qty');
       $(document).on('change', '#override-payment-items-table input.override-paid-qty', function () {
@@ -608,7 +875,6 @@ var OverridePayment = (function () {
          recalcRow($row);
       });
    };
-
    var initAccionUnpaidQtyChange = function () {
       $(document).off('change', '#override-payment-items-table input.override-unpaid-qty');
       $(document).on('change', '#override-payment-items-table input.override-unpaid-qty', function () {
@@ -618,11 +884,12 @@ var OverridePayment = (function () {
       });
    };
 
+   // Modal notas override unpaid
+
    var opUnpaidNoteQuillInited = false;
    var op_unpaid_notes_item = [];
    var oTableOpUnpaidNotes = null;
    var nOpUnpaidEditingNoteRow = null;
-
    var resetFormOpUnpaidNotes = function () {
       $('#op-unpaid-history-note-id').val('');
       if (typeof QuillUtil !== 'undefined') {
@@ -631,7 +898,6 @@ var OverridePayment = (function () {
       $('#op-manual-unpaid-qty-override').val('');
       nOpUnpaidEditingNoteRow = null;
    };
-
    var cargarListaNotasOpUnpaidDesdeServidor = function (cb) {
       var projectItemId = parseInt($('#op-unpaid-note-project-item-id').val(), 10);
       if (!projectItemId) {
@@ -664,7 +930,6 @@ var OverridePayment = (function () {
             }
          });
    };
-
    var actualizarTableListaOpUnpaidNotes = function () {
       if (oTableOpUnpaidNotes) {
          oTableOpUnpaidNotes.destroy();
@@ -721,7 +986,6 @@ var OverridePayment = (function () {
          }
       });
    };
-
    var initAccionNotaOverrideUnpaid = function () {
       $('#modal-op-unpaid-note').on('shown.bs.modal', function () {
          if (typeof QuillUtil === 'undefined') {
@@ -740,14 +1004,13 @@ var OverridePayment = (function () {
             toastr.warning('Complete General (company, project, invoice end date) first.', '');
             return;
          }
-         if (!oTable) return;
+         if (!oTableItems) return;
          var $tr = $(this).closest('tr');
-         var rowData = oTable.row($tr).data();
+         var rowData = oTableItems.row($tr).data();
          if (!rowData || rowData.isGroupHeader) return;
          $('#op-unpaid-note-project-item-id').val(rowData.project_item_id);
          resetFormOpUnpaidNotes();
-         var uq =
-            rowData.unpaid_qty !== null && rowData.unpaid_qty !== undefined ? parseFloat(rowData.unpaid_qty) : 0;
+         var uq = rowData.unpaid_qty !== null && rowData.unpaid_qty !== undefined ? parseFloat(rowData.unpaid_qty) : 0;
          if (isNaN(uq)) uq = 0;
          $('#op-manual-unpaid-qty-override').val(uq);
          BlockUtil.block('#modal-op-unpaid-note .modal-content');
@@ -832,9 +1095,7 @@ var OverridePayment = (function () {
                QuillUtil.setHtml('#op-unpaid-note-quill', op_unpaid_notes_item[posicion].notes || '');
             }
             var overrideVal = op_unpaid_notes_item[posicion].override_unpaid_qty;
-            $('#op-manual-unpaid-qty-override').val(
-               overrideVal !== null && overrideVal !== undefined && overrideVal !== '' ? overrideVal : ''
-            );
+            $('#op-manual-unpaid-qty-override').val(overrideVal !== null && overrideVal !== undefined && overrideVal !== '' ? overrideVal : '');
          }
       });
 
@@ -902,64 +1163,135 @@ var OverridePayment = (function () {
       }
    };
 
+   // Guardar override, modal cerrar formulario y eliminar cabecera
+
+   /**
+    * @param {boolean} closeOnSuccess Si true, tras guardar correctamente cierra el form y vuelve al listado.
+    */
+   var ejecutarSalvarOverridePayment = function (closeOnSuccess) {
+      if (!permiso.editar && !permiso.agregar) {
+         toastr.warning('No permission to save.', '');
+         return;
+      }
+      var items = [];
+      var eps = 1e-6;
+      $('#override-payment-items-table tbody tr').each(function () {
+         var $tr = $(this);
+         if ($tr.hasClass('row-group-header')) {
+            return;
+         }
+         var $inp = $tr.find('input.override-paid-qty');
+         if (!$inp.length) {
+            return;
+         }
+         var pid = $inp.data('project-item-id');
+         var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
+         if (isNaN(pq)) {
+            pq = 0;
+         }
+         var initialStr = $tr.attr('data-initial-op-paid');
+         var initial = initialStr !== undefined && initialStr !== '' ? parseFloat(initialStr) : 0;
+         if (isNaN(initial)) {
+            initial = 0;
+         }
+
+         var paidChanged = Math.abs(pq - initial) >= eps;
+         if (!paidChanged) {
+            return;
+         }
+         items.push({ project_item_id: pid, paid_qty: pq });
+      });
+      var formData = new URLSearchParams();
+      formData.set('project_id', $('#filtro-project-op').val());
+      formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
+      formData.set('items', JSON.stringify(items));
+      BlockUtil.block('#form-override-payment-body');
+      axios
+         .post('override-payment/salvar', formData, { responseType: 'json' })
+         .then(function (res) {
+            var response = res.data;
+            if (response.success) {
+               toastr.success(response.message || 'Saved.', '');
+               aplicarFiltroOverridePayment();
+               refreshHistoryTable();
+               refreshHeadersList();
+               if (closeOnSuccess) {
+                  cerrarFormOverrideDescartar();
+               }
+            } else {
+               toastr.error(response.error || 'Error', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .finally(function () {
+            BlockUtil.unblock('#form-override-payment-body');
+         });
+   };
    var initAccionSalvar = function () {
       $(document).off('click', '#btn-salvar-override-payment');
       $(document).on('click', '#btn-salvar-override-payment', function () {
-         if (!permiso.editar && !permiso.agregar) {
-            toastr.warning('No permission to save.', '');
+         ejecutarSalvarOverridePayment(false);
+      });
+   };
+
+   /** Misma convención que invoice: modal-salvar-cambios + btn-exit-save-and-close / btn-exit-discard-and-close */
+   var initAccionModalCerrarOverridePayment = function () {
+      $(document).off('click', '#btn-exit-save-and-close');
+      $(document).on('click', '#btn-exit-save-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) {
+            var bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+               bsModal.hide();
+            }
+         }
+         ejecutarSalvarOverridePayment(true);
+      });
+
+      $(document).off('click', '#btn-exit-discard-and-close');
+      $(document).on('click', '#btn-exit-discard-and-close', function (e) {
+         var modal = document.getElementById('modal-salvar-cambios');
+         if (modal && window.bootstrap) {
+            var bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+               bsModal.hide();
+            }
+         }
+         cerrarFormOverrideDescartar();
+      });
+   };
+
+   /** Confirmación de borrado con #modal-eliminar y #btn-delete (como invoice). */
+   var initAccionModalEliminarOverride = function () {
+      $(document).off('click', '#btn-delete');
+      $(document).on('click', '#btn-delete', function (e) {
+         if (overridePaymentDeleteId === null || overridePaymentDeleteId === undefined) {
             return;
          }
-          var items = [];
-          var eps = 1e-6;
-          $('#override-payment-items-table tbody tr').each(function () {
-             var $tr = $(this);
-             if ($tr.hasClass('row-group-header')) {
-                return;
-             }
-             var $inp = $tr.find('input.override-paid-qty');
-             if (!$inp.length) {
-                return;
-             }
-             var pid = $inp.data('project-item-id');
-             var pq = parseFloat(String($inp.val() || '').replace(/,/g, ''));
-             if (isNaN(pq)) {
-                pq = 0;
-             }
-             var initialStr = $tr.attr('data-initial-op-paid');
-             var initial = initialStr !== undefined && initialStr !== '' ? parseFloat(initialStr) : 0;
-             if (isNaN(initial)) {
-                initial = 0;
-             }
-             
-             var paidChanged = Math.abs(pq - initial) >= eps;
-             if (!paidChanged) {
-                return;
-             }
-             items.push({ project_item_id: pid, paid_qty: pq });
-          });
+         var id = overridePaymentDeleteId;
+         overridePaymentDeleteId = null;
          var formData = new URLSearchParams();
-         formData.set('project_id', $('#filtro-project-op').val());
-         formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
-         formData.set('items', JSON.stringify(items));
-         BlockUtil.block('#form-override-payment-body');
+         formData.set('id', String(id));
+         BlockUtil.block('#lista-override-payment');
          axios
-            .post('override-payment/salvar', formData, { responseType: 'json' })
+            .post('override-payment/eliminar', formData, { responseType: 'json' })
             .then(function (res) {
                var response = res.data;
                if (response.success) {
-                  toastr.success(response.message || 'Saved.', '');
-                  aplicarFiltroOverridePayment();
-                  refreshHistoryTable();
+                  toastr.success(response.message || 'Deleted.', '');
+                  refreshHeadersList();
                } else {
                   toastr.error(response.error || 'Error', '');
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-override-payment-body');
+            .finally(function () {
+               BlockUtil.unblock('#lista-override-payment');
             });
       });
    };
+
+   // Modales historial (override, ítem, change order)
 
    var cargarHistorialOverridePaidQty = function (overrideId) {
       BlockUtil.block('#modal-change-order-history .modal-content');
@@ -978,10 +1310,7 @@ var OverridePayment = (function () {
                } else {
                   html = '<ul class="list-unstyled">';
                   historial.forEach(function (item) {
-                     html +=
-                        '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' +
-                        item.mensaje +
-                        '</li>';
+                     html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' + item.mensaje + '</li>';
                   });
                   html += '</ul>';
                }
@@ -1021,10 +1350,7 @@ var OverridePayment = (function () {
                   } else {
                      html = '<ul class="list-unstyled">';
                      historial.forEach(function (item) {
-                        html +=
-                           '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' +
-                           item.mensaje +
-                           '</li>';
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' + item.mensaje + '</li>';
                      });
                      html += '</ul>';
                   }
@@ -1043,7 +1369,6 @@ var OverridePayment = (function () {
             BlockUtil.unblock('#modal-change-order-history .modal-content');
          });
    };
-
    var cargarHistorialProjectItem = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
       axios
@@ -1063,10 +1388,7 @@ var OverridePayment = (function () {
                } else {
                   html = '<ul class="list-unstyled">';
                   historial.forEach(function (item) {
-                     html +=
-                        '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' +
-                        item.mensaje +
-                        '</li>';
+                     html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' + item.mensaje + '</li>';
                   });
                   html += '</ul>';
                }
@@ -1078,51 +1400,46 @@ var OverridePayment = (function () {
          .catch(function () {
             toastr.error('Error loading history', '');
          })
-          .finally(function () {
-             BlockUtil.unblock('#modal-change-order-history .modal-content');
-          });
-    };
-
-    var cargarHistorialOverrideUnpaidQty = function (overrideId) {
-       BlockUtil.block('#modal-change-order-history .modal-content');
-       axios
-          .get('override-payment/listarHistorialUnpaid', {
-             params: { invoice_item_override_payment_id: overrideId },
-             responseType: 'json',
-          })
-          .then(function (res) {
-             var response = res.data;
-             if (response.success) {
-                var historial = response.historial || [];
-                var html = '';
-                if (historial.length === 0) {
-                   html = '<div class="alert alert-info">No history for this override.</div>';
-                 } else {
-                    html = '<ul class="list-unstyled">';
-                    historial.forEach(function (item) {
-                       html +=
-                          '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' +
-                          item.mensaje +
-                          '</li>';
-                    });
-                    html += '</ul>';
-                 }
-                $('#modalOverrideHistoryLabel').text('Unpaid qty override history');
-                $('#modal-change-order-history .modal-body').html(html);
-                ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
-             } else {
-                toastr.error(response.error || 'Error', '');
-             }
-          })
-          .catch(function () {
-             toastr.error('Error loading history', '');
-          })
-          .finally(function () {
-             BlockUtil.unblock('#modal-change-order-history .modal-content');
-          });
-    };
-
-    var initAccionHistorial = function () {
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
+   };
+   var cargarHistorialOverrideUnpaidQty = function (overrideId) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      axios
+         .get('override-payment/listarHistorialUnpaid', {
+            params: { invoice_item_override_payment_id: overrideId },
+            responseType: 'json',
+         })
+         .then(function (res) {
+            var response = res.data;
+            if (response.success) {
+               var historial = response.historial || [];
+               var html = '';
+               if (historial.length === 0) {
+                  html = '<div class="alert alert-info">No history for this override.</div>';
+               } else {
+                  html = '<ul class="list-unstyled">';
+                  historial.forEach(function (item) {
+                     html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size:8px;"></i>' + item.mensaje + '</li>';
+                  });
+                  html += '</ul>';
+               }
+               $('#modalOverrideHistoryLabel').text('Unpaid qty override history');
+               $('#modal-change-order-history .modal-body').html(html);
+               ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+            } else {
+               toastr.error(response.error || 'Error', '');
+            }
+         })
+         .catch(function () {
+            toastr.error('Error loading history', '');
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
+   };
+   var initAccionHistorial = function () {
       $(document).off('click', '.override-paid-qty-history-icon');
       $(document).on('click', '.override-paid-qty-history-icon', function (e) {
          e.preventDefault();
@@ -1148,34 +1465,158 @@ var OverridePayment = (function () {
          cargarHistorialProjectItem(project_item_id, 'update_quantity');
       });
 
-       $(document).off('click', '#override-payment-items-table .price-history-icon');
-       $(document).on('click', '#override-payment-items-table .price-history-icon', function (e) {
-          e.preventDefault();
-          var project_item_id = $(this).data('project-item-id');
-          if (!project_item_id) return;
-          cargarHistorialProjectItem(project_item_id, 'update_price');
-       });
+      $(document).off('click', '#override-payment-items-table .price-history-icon');
+      $(document).on('click', '#override-payment-items-table .price-history-icon', function (e) {
+         e.preventDefault();
+         var project_item_id = $(this).data('project-item-id');
+         if (!project_item_id) return;
+         cargarHistorialProjectItem(project_item_id, 'update_price');
+      });
 
-       $(document).off('click', '.override-unpaid-qty-history-icon');
-       $(document).on('click', '.override-unpaid-qty-history-icon', function (e) {
-          e.preventDefault();
-          var id = $(this).data('invoice-item-override-payment-id') || $(this).data('invoice-item-override-unpaid-qty-id');
-          if (id) cargarHistorialOverrideUnpaidQty(id);
-       });
-    };
+      $(document).off('click', '.override-unpaid-qty-history-icon');
+      $(document).on('click', '.override-unpaid-qty-history-icon', function (e) {
+         e.preventDefault();
+         var id = $(this).data('invoice-item-override-payment-id') || $(this).data('invoice-item-override-unpaid-qty-id');
+         if (id) cargarHistorialOverrideUnpaidQty(id);
+      });
+   };
+
+   // Formulario: nuevo, editar desde fila y cerrar
+
+   var resetFormOverrideForNew = function () {
+      $('#invoice-override-payment-id').val('');
+      $('#op-form-card-title').text('New Override Payment');
+      $('#filtro-company-op').val('').trigger('change');
+      MyUtil.limpiarSelect('#filtro-project-op');
+      FlatpickrUtil.clear('op-datetimepicker-fecha-fin');
+      resetToInitialState();
+      activeTab = 1;
+      $('#tab-op-general').tab('show');
+      updateWizardButtons();
+   };
+   var applyPendingFormProject = function () {
+      var pending = $('#form-override-payment').data('pending-op-project-id');
+      if (pending === undefined || pending === null || pending === '') {
+         return;
+      }
+      $('#filtro-project-op').val(String(pending)).trigger('change');
+      $('#form-override-payment').removeData('pending-op-project-id');
+   };
+   var openFormEditFromRow = function (row) {
+      if (!row || !row.id) {
+         return;
+      }
+      $('#invoice-override-payment-id').val(String(row.id));
+      $('#op-form-card-title').text('Edit Override Payment');
+      var cid = row.company_id != null ? parseInt(row.company_id, 10) : 0;
+      $('#filtro-company-op')
+         .val(cid > 0 ? String(cid) : '')
+         .trigger('change');
+      var pid = row.project_id != null ? parseInt(row.project_id, 10) : 0;
+      if (pid > 0) {
+         $('#form-override-payment').data('pending-op-project-id', pid);
+      }
+      if (row.date) {
+         FlatpickrUtil.setString('op-datetimepicker-fecha-fin', row.date);
+      } else {
+         FlatpickrUtil.clear('op-datetimepicker-fecha-fin');
+      }
+      resetToInitialState();
+      activeTab = 1;
+      $('#tab-op-general').tab('show');
+      updateWizardButtons();
+      showFormView();
+   };
+
+   /** Cierra el formulario, vuelve al listado y refresca (descartar cambios o tras guardar). */
+   var cerrarFormOverrideDescartar = function () {
+      resetFormOverrideForNew();
+      showListView();
+      refreshHeadersList();
+   };
+
+   // Listado cabeceras: acciones (nuevo, editar, borrar, pedir confirmación al cerrar)
+
+   var initAccionHeadersList = function () {
+      $(document).off('click', '#btn-op-nuevo-override');
+      $(document).on('click', '#btn-op-nuevo-override', function () {
+         resetFormOverrideForNew();
+         showFormView();
+      });
+
+      $(document).off('click', '.cerrar-form-override-payment');
+      $(document).on('click', '.cerrar-form-override-payment', function (e) {
+         e.preventDefault();
+         ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#override-payment-headers-table a.edit');
+      $(document).on('click', '#override-payment-headers-table a.edit', function (e) {
+         e.preventDefault();
+         var tr = $(this).closest('tr');
+         if (!oTable) {
+            return;
+         }
+         var row = oTable.row(tr).data();
+         if (!row) {
+            return;
+         }
+         openFormEditFromRow(row);
+      });
+
+      $(document).off('click', '#override-payment-headers-table a.delete');
+      $(document).on('click', '#override-payment-headers-table a.delete', function (e) {
+         e.preventDefault();
+         if (!permiso.eliminar) {
+            return;
+         }
+         var id = $(this).data('id');
+         if (!id) {
+            return;
+         }
+         overridePaymentDeleteId = id;
+         ModalUtil.show('modal-eliminar', { backdrop: 'static', keyboard: true });
+      });
+   };
+
+   // Widgets: Flatpickr y filtros company/project
 
    var initFlatpickr = function () {
       var el = document.getElementById('op-datetimepicker-fecha-fin');
       if (el && typeof FlatpickrUtil !== 'undefined') {
          FlatpickrUtil.initDate('op-datetimepicker-fecha-fin', { allowInput: true });
       }
+      var listDesde = document.querySelector('#datetimepicker-op-list-desde input.filter-date');
+      var listDesdeGroup = listDesde ? listDesde.closest('.input-group') : null;
+      if (listDesde && listDesdeGroup && typeof FlatpickrUtil !== 'undefined') {
+         FlatpickrUtil.initDate('datetimepicker-op-list-desde', {
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: listDesdeGroup,
+            positionElement: listDesde,
+            static: true,
+            position: 'above',
+            allowInput: true,
+         });
+      }
+      var listHasta = document.querySelector('#datetimepicker-op-list-hasta input.filter-date');
+      var listHastaGroup = listHasta ? listHasta.closest('.input-group') : null;
+      if (listHasta && listHastaGroup && typeof FlatpickrUtil !== 'undefined') {
+         FlatpickrUtil.initDate('datetimepicker-op-list-hasta', {
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: listHastaGroup,
+            positionElement: listHasta,
+            static: true,
+            position: 'above',
+            allowInput: true,
+         });
+      }
    };
-
    var changeFiltroCompany = function () {
       var company_id = $('#filtro-company-op').val();
       MyUtil.limpiarSelect('#filtro-project-op');
       if (company_id === '' || company_id == null) {
          $('#filtro-project-op').select2();
+         $('#form-override-payment').removeData('pending-op-project-id');
          return;
       }
       BlockUtil.block('#select-filtro-project-op');
@@ -1193,6 +1634,7 @@ var OverridePayment = (function () {
                      $('#filtro-project-op').append(new Option(descripcion, projects[i].project_id, false, false));
                   }
                   $('#filtro-project-op').select2();
+                  applyPendingFormProject();
                }
             }
          })
@@ -1201,22 +1643,28 @@ var OverridePayment = (function () {
             BlockUtil.unblock('#select-filtro-project-op');
          });
    };
-
    var initWidgets = function () {
       MyApp.initWidgets();
       initFlatpickr();
       $('#filtro-company-op').change(changeFiltroCompany);
+      $('#filtro-op-list-company').change(changeFiltroCompanyList);
    };
 
    return {
       init: function () {
          initWidgets();
+         initHeadersTable();
+         handleSearchHeadersDatatable();
+         initAccionFiltrarHeaders();
+         initAccionHeadersList();
+         initAccionModalEliminarOverride();
          initWizard();
          initAccionBuscar();
          initHistorySearch();
          initAccionPaidQtyChange();
          initAccionUnpaidQtyChange();
          initAccionSalvar();
+         initAccionModalCerrarOverridePayment();
          initAccionNotaOverrideUnpaid();
          initAccionHistorial();
       },

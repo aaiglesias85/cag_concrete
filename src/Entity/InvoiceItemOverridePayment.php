@@ -13,6 +13,10 @@ class InvoiceItemOverridePayment
    #[ORM\Column(name: 'id', type: 'integer')]
    private ?int $id = null;
 
+   #[ORM\ManyToOne(targetEntity: InvoiceOverridePayment::class, inversedBy: 'itemOverrides')]
+   #[ORM\JoinColumn(name: 'invoice_override_payment_id', referencedColumnName: 'invoice_override_payment_id', nullable: false, onDelete: 'CASCADE')]
+   private ?InvoiceOverridePayment $invoiceOverridePayment = null;
+
    #[ORM\ManyToOne(targetEntity: ProjectItem::class)]
    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
    private ?ProjectItem $projectItem = null;
@@ -23,12 +27,6 @@ class InvoiceItemOverridePayment
    /** NULL = unpaid no sobreescrito (usar cantidad derivada); valor = último unpaid del historial de notas */
    #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: true)]
    private ?float $unpaidQty = null;
-
-   #[ORM\Column(name: 'start_date', type: 'date', nullable: true)]
-   private ?\DateTimeInterface $startDate = null;
-
-   #[ORM\Column(name: 'end_date', type: 'date', nullable: true)]
-   private ?\DateTimeInterface $endDate = null;
 
    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
    private ?\DateTimeInterface $createdAt;
@@ -44,6 +42,22 @@ class InvoiceItemOverridePayment
    public function getId(): ?int
    {
       return $this->id;
+   }
+
+   public function getInvoiceOverridePayment(): ?InvoiceOverridePayment
+   {
+      return $this->invoiceOverridePayment;
+   }
+
+   public function setInvoiceOverridePayment(?InvoiceOverridePayment $invoiceOverridePayment): void
+   {
+      $this->invoiceOverridePayment = $invoiceOverridePayment;
+   }
+
+   /** Fecha de período (cabecera); antes start_date/end_date en la línea */
+   public function getOverridePeriodDate(): ?\DateTimeInterface
+   {
+      return $this->invoiceOverridePayment?->getDate();
    }
 
    public function getProjectItem(): ?ProjectItem
@@ -74,26 +88,6 @@ class InvoiceItemOverridePayment
    public function setUnpaidQty(?float $unpaidQty): void
    {
       $this->unpaidQty = $unpaidQty;
-   }
-
-   public function getStartDate(): ?\DateTimeInterface
-   {
-      return $this->startDate;
-   }
-
-   public function setStartDate(?\DateTimeInterface $startDate): void
-   {
-      $this->startDate = $startDate;
-   }
-
-   public function getEndDate(): ?\DateTimeInterface
-   {
-      return $this->endDate;
-   }
-
-   public function setEndDate(?\DateTimeInterface $endDate): void
-   {
-      $this->endDate = $endDate;
    }
 
    public function getCreatedAt(): ?\DateTimeInterface

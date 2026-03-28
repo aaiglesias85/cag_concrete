@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Company;
 use App\Entity\Usuario;
+use App\Http\DataTablesHelper;
 use App\Utils\Admin\OverridePaymentService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,10 +41,95 @@ class OverridePaymentController extends AbstractController
    }
 
    /**
+    * Listado server-side invoice_override_payment (DataTables).
+    */
+   public function listar(Request $request)
+   {
+      try {
+         $dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: [
+               'id',
+               'company',
+               'project',
+               'projectNumber',
+               'date',
+               'overridePaidQty',
+               'overridePaidAmount',
+               'overrideUnpaidQty',
+               'overrideUnpaidAmount',
+            ],
+            defaultOrderField: 'date'
+         );
+
+         $company_id = $request->get('company_id');
+         $project_id = $request->get('project_id');
+         $fecha_inicial = $request->get('fechaInicial');
+         $fecha_fin = $request->get('fechaFin');
+
+         $result = $this->overridePaymentService->ListarCabecerasInvoiceOverridePayment(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $company_id !== null ? (string) $company_id : '',
+            $project_id !== null ? (string) $project_id : '',
+            $fecha_inicial !== null ? (string) $fecha_inicial : '',
+            $fecha_fin !== null ? (string) $fecha_fin : ''
+         );
+
+         return $this->json([
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'recordsTotal' => (int) $result['total'],
+            'recordsFiltered' => (int) $result['total'],
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'draw' => (int) $request->get('draw', 0),
+            'data' => [],
+            'recordsTotal' => 0,
+            'recordsFiltered' => 0,
+            'error' => $e->getMessage(),
+         ]);
+      }
+   }
+
+   /**
+    * Elimina un registro override (cabecera y líneas asociadas en cascada).
+    */
+   public function eliminar(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || empty($permiso[0]['eliminar'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
+
+      $id = (int) $request->get('id', 0);
+      if ($id <= 0) {
+         return $this->json(['success' => false, 'error' => 'Invalid id']);
+      }
+
+      try {
+         $r = $this->overridePaymentService->EliminarCabeceraInvoiceOverridePayment($id);
+         if (!empty($r['success'])) {
+            return $this->json(['success' => true]);
+         }
+
+         return $this->json(['success' => false, 'error' => $r['error'] ?? 'Unknown error']);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
     * Lista todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
     * Respuesta alineada con project/listarItemsParaInvoice: { success, items }.
     */
-   public function listar(Request $request)
+   public function listarItems(Request $request)
    {
       $company_id = $request->get('company_id');
       $project_id = $request->get('project_id');

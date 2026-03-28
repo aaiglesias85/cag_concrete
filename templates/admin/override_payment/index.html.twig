@@ -5,6 +5,11 @@
 <style>
    .dtfc-fixed-start, .dtfc-fixed-end { background: #fff !important; }
    #form-override-payment .row-secondary > td { background: #e6f2ff !important; }
+   #override-payment-headers-table th.op-col-total,
+   #override-payment-headers-table td.op-col-total {
+      min-width: 150px;
+      white-space: nowrap;
+   }
 </style>
 {% endblock %}
 
@@ -24,7 +29,149 @@
 
 <div id="kt_app_content" class="app-content flex-column-fluid">
    <div id="kt_app_content_container" class="app-container container-fluid">
-      <div id="form-override-payment" class="card card-sticky">
+      <!-- Listado cabeceras (como Invoices) -->
+      <div id="lista-override-payment" class="card card-sticky">
+         <div
+            class="card-header border-0 pt-6"
+            data-kt-sticky="true"
+            data-kt-sticky-name="lista-override-payment"
+            data-kt-sticky-offset="{default: '50px', xl: '70px'}"
+            data-kt-sticky-width="{default: '95%', sm: '100%', md: '100%', lg: '70%', xl: '82%'}"
+            data-kt-sticky-left="auto"
+            data-kt-sticky-top="{default: '0px', sm: '0px', md: '0px', lg: '45px', xl: '45px'}"
+            data-kt-sticky-animation="false"
+            data-kt-sticky-zindex="95"
+         >
+            <div class="card-title">
+               <div class="d-flex align-items-center position-relative my-1">
+                  <i class="ki-duotone ki-magnifier text-primary fs-3 position-absolute ms-5">
+                     <span class="path1"></span>
+                     <span class="path2"></span>
+                  </i>
+                  <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-13" placeholder="Search..." />
+               </div>
+            </div>
+            <div class="card-toolbar">
+               <div class="d-flex justify-content-end">
+                  <!--filter-->
+                  <div>
+                     <button type="button" class="btn btn-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-filter fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        <span class="kt-hidden-mobile font-weight-bold">Filter</span>
+                     </button>
+                     <div id="filter-menu-op-headers" class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true">
+                        <div class="px-7 py-5">
+                           <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+                        </div>
+                        <div class="separator border-gray-200"></div>
+                        <div class="px-7 py-5">
+                           <div class="mb-3">
+                              <select id="filtro-op-list-company" class="form-select form-select2 form-select-solid fw-bold">
+                                 <option value="">Company</option>
+                                 {% for item in companies %}
+                                 <option value="{{ item.companyId }}">{{ item.name }}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="mb-3" id="select-filtro-op-list-project">
+                              <select class="form-select form-select2 form-select-solid fw-bold" id="filtro-op-list-project">
+                                 <option value="">Project</option>
+                              </select>
+                           </div>
+                           <div class="mb-3">
+                              <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-op-list-desde" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                 <input type="text" class="form-control filter-date" placeholder="From" data-td-target="#datetimepicker-op-list-desde" autocomplete="off" />
+                                 <span class="input-group-text" data-td-target="#datetimepicker-op-list-desde" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="mb-3">
+                              <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-op-list-hasta" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                 <input type="text" class="form-control filter-date" placeholder="To" data-td-target="#datetimepicker-op-list-hasta" autocomplete="off" />
+                                 <span class="input-group-text" data-td-target="#datetimepicker-op-list-hasta" data-td-toggle="datetimepicker">
+                                    <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                 </span>
+                              </div>
+                           </div>
+                           <div class="d-flex justify-content-end mt-10">
+                              <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" id="btn-op-list-reset-filtrar">Reset filters</button>
+                              <button type="submit" class="btn btn-primary fw-semibold px-6" data-kt-menu-dismiss="true" id="btn-op-list-filtrar">Apply</button>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- new -->
+                  {% if permiso.agregar %}
+                  <button type="button" id="btn-op-nuevo-override" class="btn btn-success me-2">
+                     <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">New</span>
+                  </button>
+                  {% endif %}
+
+                  <!-- export -->
+                  <div>
+                     <div id="op-headers-table-export" class="d-none"></div>
+                     <button type="button" class="btn btn-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                        <i class="ki-duotone ki-exit-down fs-2"><span class="path1"></span><span class="path2"></span></i>
+                        <span class="kt-hidden-mobile font-weight-bold">Export</span>
+                     </button>
+                     <div
+                        id="op-headers_export_menu"
+                        class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold fs-7 w-200px py-4"
+                        data-kt-menu="true"
+                     >
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="copy"> Copy to clipboard </a>
+                        </div>
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="excel"> Export to Excel </a>
+                        </div>
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="csv"> Export CSV </a>
+                        </div>
+                        <div class="menu-item px-3">
+                           <a href="#" class="menu-link px-3" data-kt-export="pdf"> Export to PDF </a>
+                        </div>
+                     </div>
+                     <div id="op-headers-table-buttons" class="d-none"></div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="card-body">
+            <div id="op-headers-list-placeholder" class="text-center py-15 px-5">
+               <i class="ki-duotone ki-filter-search text-primary fs-3x mb-5">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                  <span class="path3"></span>
+                  <span class="path4"></span>
+               </i>
+               <p class="text-gray-700 fw-semibold fs-4 mb-2">Apply a filter to view override payments</p>
+               <p class="text-gray-500 fs-6 mb-0">Use the <strong>Filter</strong> button to select Company, Project, or date range (From / To), or search (min. 3 characters).</p>
+            </div>
+            <div id="op-headers-table-wrapper" class="hide">
+               <table id="override-payment-headers-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">
+                  <thead>
+                     <tr class="fw-bold fs-6 text-gray-800 px-7">
+                        <th>Company</th>
+                        <th>Project</th>
+                        <th class="min-w-125px">Date</th>
+                        <th class="text-end op-col-total">Paid Qty Override</th>
+                        <th class="text-end op-col-total">Paid Amount Override</th>
+                        <th class="text-end op-col-total">Unpaid Qty Override</th>
+                        <th class="text-end op-col-total">Unpaid Amount Override</th>
+                        <th class="text-end min-w-100px">Actions</th>
+                     </tr>
+                  </thead>
+                  <tbody class="text-gray-600 fw-semibold"></tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+
+      <div id="form-override-payment" class="card card-sticky hide">
          <div
             class="card-header border-0 pt-6"
             data-kt-sticky="true"
@@ -37,7 +184,7 @@
             data-kt-sticky-zindex="95"
          >
             <div class="card-title">
-               <h3 class="card-label mb-0">Override Payment</h3>
+               <h3 class="card-label mb-0" id="op-form-card-title">New Override Payment</h3>
             </div>
             <div class="card-toolbar">
                <button id="btn-op-wizard-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
@@ -51,10 +198,14 @@
                   <i class="las la-save"></i>
                </button>
                {% endif %}
+               <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-override-payment" title="Exit" data-bs-toggle="tooltip">
+                  <i class="la la-close"></i>
+               </a>
             </div>
          </div>
 
          <div class="card-body" id="form-override-payment-body">
+            <input type="hidden" id="invoice-override-payment-id" value="" />
             <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
                <li class="nav-item">
                   <a class="nav-link active wizard-tab-op" data-item="1" data-bs-toggle="tab" href="#tab-content-op-general" id="tab-op-general">

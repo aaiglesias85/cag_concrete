@@ -6,12 +6,14 @@ use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemOverridePayment;
 use App\Entity\InvoiceItemOverridePaymentPaidQtyHistory;
 use App\Entity\InvoiceItemOverridePaymentUnpaidQtyHistory;
+use App\Entity\InvoiceOverridePayment;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
 use App\Repository\InvoiceItemOverridePaymentPaidQtyHistoryRepository;
 use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemOverridePaymentUnpaidQtyHistoryRepository;
+use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
@@ -32,6 +34,102 @@ class OverridePaymentService extends Base
       LoggerInterface $logger
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
+   }
+
+   /**
+    * Listado DataTables de cabeceras invoice_override_payment.
+    *
+    * @return array{data: array<int, array<string, mixed>>, total: int}
+    */
+   public function ListarCabecerasInvoiceOverridePayment(
+      int $start,
+      int $limit,
+      string $search,
+      string $orderField,
+      string $orderDir,
+      ?string $company_id,
+      ?string $project_id,
+      ?string $fecha_inicial,
+      ?string $fecha_fin
+   ): array {
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+      $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
+      /** @var InvoiceItemOverridePaymentRepository $itemRepo */
+      $itemRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+
+      $result = $headerRepo->listarConTotal(
+         $start,
+         $limit,
+         $search,
+         $orderField,
+         $orderDir,
+         (string) ($company_id ?? ''),
+         (string) ($project_id ?? ''),
+         (string) ($fecha_inicial ?? ''),
+         (string) ($fecha_fin ?? '')
+      );
+
+      $ids = [];
+      foreach ($result['data'] as $h) {
+         if ($h->getInvoiceOverridePaymentId() !== null) {
+            $ids[] = (int) $h->getInvoiceOverridePaymentId();
+         }
+      }
+      $totals = $itemRepo->aggregateTotalsByHeaderIds($ids);
+
+      $data = [];
+      foreach ($result['data'] as $h) {
+         $hid = (int) $h->getInvoiceOverridePaymentId();
+         $p = $h->getProject();
+         $co = $p !== null ? $p->getCompany() : null;
+         $t = $totals[$hid] ?? [
+            'paidQty' => 0.0,
+            'paidAmount' => 0.0,
+            'unpaidQty' => 0.0,
+            'unpaidAmount' => 0.0,
+         ];
+         $dateStr = '';
+         if ($h->getDate() !== null) {
+            $dateStr = $h->getDate()->format('m/d/Y');
+         }
+         $data[] = [
+            'id' => $hid,
+            'company' => $co !== null ? (string) ($co->getName() ?? '') : '',
+            'project' => $p !== null ? (string) ($p->getDescription() ?? $p->getName() ?? '') : '',
+            'projectNumber' => $p !== null ? (string) ($p->getProjectNumber() ?? '') : '',
+            'project_id' => $p !== null ? (int) $p->getProjectId() : 0,
+            'company_id' => $co !== null ? (int) $co->getCompanyId() : 0,
+            'date' => $dateStr,
+            'overridePaidQty' => $t['paidQty'],
+            'overridePaidAmount' => $t['paidAmount'],
+            'overrideUnpaidQty' => $t['unpaidQty'],
+            'overrideUnpaidAmount' => $t['unpaidAmount'],
+         ];
+      }
+
+      return [
+         'data' => $data,
+         'total' => $result['total'],
+      ];
+   }
+
+   /**
+    * Elimina la cabecera (cascade a líneas e historiales vía FK / entidades).
+    *
+    * @return array{success: bool, error?: string}
+    */
+   public function EliminarCabeceraInvoiceOverridePayment(int $invoiceOverridePaymentId): array
+   {
+      $em = $this->getDoctrine()->getManager();
+      $header = $em->getRepository(InvoiceOverridePayment::class)->find($invoiceOverridePaymentId);
+      if ($header === null) {
+         return ['success' => false, 'error' => 'Record not found'];
+      }
+      $em->remove($header);
+      $em->flush();
+      $this->SalvarLog('Delete', 'Override Payment', 'Override payment header #' . $invoiceOverridePaymentId . ' deleted');
+
+      return ['success' => true];
    }
 
    /**
@@ -234,6 +332,8 @@ class OverridePaymentService extends Base
       $em = $this->getDoctrine()->getManager();
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+      $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
       $user = $this->getUser();
 
       foreach ($itemsDecoded as $data) {
@@ -256,18 +356,25 @@ class OverridePaymentService extends Base
             continue;
          }
 
-         $entity = $overrideRepo->findOneBy([
-            'projectItem' => $pi,
-            'startDate' => null,
-            'endDate' => $endDate,
-         ], ['id' => 'ASC']);
+         $projEntity = $pi->getProject();
+         $header = $headerRepo->findOneByProjectAndDate((int) $projEntity->getProjectId(), $endDate);
+         if ($header === null) {
+            $header = new InvoiceOverridePayment();
+            $header->setProject($projEntity);
+            $header->setDate($endDate);
+            $em->persist($header);
+         }
+
+         $entity = $overrideRepo->findOneBy(
+            ['projectItem' => $pi, 'invoiceOverridePayment' => $header],
+            ['id' => 'ASC']
+         );
 
          $oldPaid = null;
          if ($entity === null) {
             $entity = new InvoiceItemOverridePayment();
             $entity->setProjectItem($pi);
-            $entity->setStartDate(null);
-            $entity->setEndDate($endDate);
+            $entity->setInvoiceOverridePayment($header);
             $entity->setPaidQty($paidQtyNew);
             $entity->setUnpaidQty(null);
             $em->persist($entity);
@@ -448,10 +555,19 @@ class OverridePaymentService extends Base
 
       $parent = $this->findPaymentOverrideForProjectItemEndDate($pi, $endDate);
       if ($parent === null) {
+         /** @var InvoiceOverridePaymentRepository $headerRepo */
+         $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
+         $projEntity = $pi->getProject();
+         $header = $headerRepo->findOneByProjectAndDate((int) $projEntity->getProjectId(), $endDate);
+         if ($header === null) {
+            $header = new InvoiceOverridePayment();
+            $header->setProject($projEntity);
+            $header->setDate($endDate);
+            $em->persist($header);
+         }
          $parent = new InvoiceItemOverridePayment();
          $parent->setProjectItem($pi);
-         $parent->setStartDate(null);
-         $parent->setEndDate($endDate);
+         $parent->setInvoiceOverridePayment($header);
          $parent->setPaidQty(0.0);
          $parent->setUnpaidQty(null);
          $em->persist($parent);
@@ -654,22 +770,18 @@ class OverridePaymentService extends Base
       ProjectItem $pi,
       \DateTimeInterface $endDate
    ): ?InvoiceItemOverridePayment {
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+      $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
       /** @var InvoiceItemOverridePaymentRepository $repo */
       $repo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
-      foreach (
-         [
-            ['sd' => $endDate, 'ed' => $endDate],
-            ['sd' => $endDate, 'ed' => null],
-            ['sd' => null, 'ed' => $endDate],
-            ['sd' => null, 'ed' => null],
-         ] as $c
-      ) {
+      $projectId = (int) $pi->getProject()->getProjectId();
+      foreach ([$endDate, null] as $d) {
+         $header = $headerRepo->findOneByProjectAndDate($projectId, $d);
+         if ($header === null) {
+            continue;
+         }
          $e = $repo->findOneBy(
-            [
-               'projectItem' => $pi,
-               'startDate' => $c['sd'],
-               'endDate' => $c['ed'],
-            ],
+            ['projectItem' => $pi, 'invoiceOverridePayment' => $header],
             ['id' => 'ASC']
          );
          if ($e instanceof InvoiceItemOverridePayment) {

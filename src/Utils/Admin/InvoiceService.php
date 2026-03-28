@@ -1716,7 +1716,7 @@ class InvoiceService extends Base
 
          $overrideStartDate = null;
          if ($latestOverride !== null) {
-            $overrideStartDate = $latestOverride->getStartDate();
+            $overrideStartDate = $latestOverride->getOverridePeriodDate();
          }
 
          // Valor por defecto
@@ -2512,7 +2512,7 @@ class InvoiceService extends Base
 
          $overrideStartDate = null;
          if ($latestOverride !== null) {
-            $overrideStartDate = $latestOverride->getStartDate();
+            $overrideStartDate = $latestOverride->getOverridePeriodDate();
          }
 
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);

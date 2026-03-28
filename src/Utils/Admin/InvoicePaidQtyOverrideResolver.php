@@ -11,8 +11,12 @@ use App\Repository\InvoiceRepository;
 
 /**
  * Paid qty efectivo para cálculos: si existe un {@see InvoiceItemOverridePayment} aplicable
- * al período del invoice (reglas README_OVERRIDE_PAID_QTY.md), se usa su paid_qty;
- * si no, el valor persistido en invoice_item.
+ * al período del invoice, se usa su paid_qty; si no, el valor persistido en invoice_item.
+ *
+ * Modelo de datos: la fecha de período vive en la cabecera {@see InvoiceOverridePayment} (`date`);
+ * cada línea `invoice_item_override_payment` enlaza a esa cabecera (`invoice_override_payment_id`).
+ * La coincidencia con el invoice usa esa fecha de cabecera (y el caso “global” = cabecera sin fecha),
+ * no columnas de rango en el detalle (eliminadas a favor de cabecera + ítems).
  *
  * No modifica registros en BD.
  */
@@ -31,9 +35,9 @@ class InvoicePaidQtyOverrideResolver
    }
 
    /**
-    * Fila aplicable al invoice: primero overrides con start_date NULL y end_date = fin del período
-    * guardado en Override Payment — aplican a todo invoice cuyo inicio es estrictamente posterior
-    * a ese end_date (la más reciente entre las candidatas). Si no, solape con rango del override o global.
+    * Fila aplicable al invoice: primero overrides cuya cabecera tiene fecha anterior al inicio del invoice
+    * (inicio estrictamente posterior a esa fecha: la cabecera más reciente entre las candidatas).
+    * Si no, solape del período del invoice con la fecha de cabecera o override global (cabecera sin fecha).
     * Misma regla que {@see resolvePaidQtyDetails}.
     */
    public function selectOverrideRowForInvoicePeriod(int $projectItemId, \DateTimeInterface $invStart, \DateTimeInterface $invEnd): ?InvoiceItemOverridePayment
@@ -240,7 +244,7 @@ class InvoicePaidQtyOverrideResolver
 
    private function isGlobalOverride(InvoiceItemOverridePayment $o): bool
    {
-      return $o->getStartDate() === null && $o->getEndDate() === null;
+      return $o->getInvoiceOverridePayment()?->getDate() === null;
    }
 
    private function invoiceOverlapsOverrideRange(
@@ -248,17 +252,15 @@ class InvoicePaidQtyOverrideResolver
       \DateTimeInterface $invEnd,
       InvoiceItemOverridePayment $o
    ): bool {
-      $os = $o->getStartDate();
-      $oe = $o->getEndDate();
-      if ($os === null && $oe === null) {
+      $hd = $o->getInvoiceOverridePayment()?->getDate();
+      if ($hd === null) {
          return false;
       }
 
+      $d = $hd->format('Y-m-d');
       $is = $invStart->format('Y-m-d');
       $ie = $invEnd->format('Y-m-d');
-      $rangeStart = $os !== null ? $os->format('Y-m-d') : '0000-01-01';
-      $rangeEnd = $oe !== null ? $oe->format('Y-m-d') : '9999-12-31';
 
-      return $is <= $rangeEnd && $ie >= $rangeStart;
+      return $is <= $d && $d <= $ie;
    }
 }

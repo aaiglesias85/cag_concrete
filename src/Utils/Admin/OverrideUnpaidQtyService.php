@@ -5,10 +5,12 @@ namespace App\Utils\Admin;
 use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemOverridePayment;
 use App\Entity\InvoiceItemOverridePaymentUnpaidQtyHistory;
+use App\Entity\InvoiceOverridePayment;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
 use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemOverridePaymentUnpaidQtyHistoryRepository;
+use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\ProjectItemRepository;
 use App\Utils\Base;
@@ -156,6 +158,8 @@ class OverrideUnpaidQtyService extends Base
       $em = $this->getDoctrine()->getManager();
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+      $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
       $user = $this->getUser();
 
       foreach ($itemsDecoded as $data) {
@@ -177,18 +181,25 @@ class OverrideUnpaidQtyService extends Base
             continue;
          }
 
-         $entity = $overrideRepo->findOneBy([
-            'projectItem' => $pi,
-            'startDate' => null,
-            'endDate' => $endDate,
-         ], ['id' => 'ASC']);
+         $projEntity = $pi->getProject();
+         $header = $headerRepo->findOneByProjectAndDate((int) $projEntity->getProjectId(), $endDate);
+         if ($header === null) {
+            $header = new InvoiceOverridePayment();
+            $header->setProject($projEntity);
+            $header->setDate($endDate);
+            $em->persist($header);
+         }
+
+         $entity = $overrideRepo->findOneBy(
+            ['projectItem' => $pi, 'invoiceOverridePayment' => $header],
+            ['id' => 'ASC']
+         );
 
          $oldUnpaid = null;
          if ($entity === null) {
             $entity = new InvoiceItemOverridePayment();
             $entity->setProjectItem($pi);
-            $entity->setStartDate(null);
-            $entity->setEndDate($endDate);
+            $entity->setInvoiceOverridePayment($header);
             $entity->setPaidQty(0.0);
             $entity->setUnpaidQty($unpaidQtyNew);
             $em->persist($entity);
