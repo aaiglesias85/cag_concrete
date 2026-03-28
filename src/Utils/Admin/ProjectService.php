@@ -67,6 +67,7 @@ use App\Entity\EmployeeRole;
 
 use App\Utils\Admin\InvoiceService;
 use App\Utils\Base;
+// use App\Utils\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -108,25 +109,35 @@ class ProjectService extends Base
    }
 
    /**
-    * Override cuya cabecera tiene fecha de período: si el invoice nuevo empieza después de esa fecha,
-    * devuelve esa fila de detalle; si no aplica, null.
+    * Fila de override aplicable al período del borrador (misma regla que el resolver):
+    * cabecera con fecha ≤ inicio del invoice; la más reciente entre esas.
     */
    private function findPostOverrideRowForInvoicePeriod(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): ?InvoiceItemOverridePayment
    {
       $fi = $fecha_inicial !== null ? trim((string) $fecha_inicial) : '';
       $ff = $fecha_fin !== null ? trim((string) $fecha_fin) : '';
       if ($fi === '' || $ff === '') {
+         // OverridePaymentWritelog::writelog('[findPostOverrideRowForInvoicePeriod] projectItemId=' . $projectItemId . ' fechas vacías -> null');
+
          return null;
       }
       $invStart = $this->parseInvoiceDateFlexible($fi);
       $invEnd = $this->parseInvoiceDateFlexible($ff);
       if ($invStart === null || $invEnd === null) {
+         // OverridePaymentWritelog::writelog('[findPostOverrideRowForInvoicePeriod] projectItemId=' . $projectItemId . ' parse fecha falló fi=' . $fi . ' ff=' . $ff);
+
          return null;
       }
+      // OverridePaymentWritelog::writelog(
+      //    '[findPostOverrideRowForInvoicePeriod] projectItemId=' . $projectItemId . ' invStart=' . $invStart->format('Y-m-d') . ' invEnd=' . $invEnd->format('Y-m-d')      );
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
 
-      return $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart);
+      $row = $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart);
+      // OverridePaymentWritelog::writelog(
+      //    '[findPostOverrideRowForInvoicePeriod] resultado=' . ($row !== null ? 'override_id=' . (int) ($row->getId() ?? 0) : 'null')      );
+
+      return $row;
    }
 
    /**
@@ -245,7 +256,13 @@ class ProjectService extends Base
       $cutoffYmd = $rowAfter !== null && $rowAfter->getOverridePeriodDate() !== null
          ? $rowAfter->getOverridePeriodDate()->format('Y-m-d')
          : null;
+      // OverridePaymentWritelog::writelog(
+      //    '[previousInvoiceTotalsMergedForPeriod] projectItemId=' . $projectItemId . ' cutoffYmd=' . ($cutoffYmd ?? 'null')      );
       $agg = $this->computePreviousInvoiceTotalsForProjectItem($projectItemId, $cutoffYmd);
+      // OverridePaymentWritelog::writelog(
+      //    '[previousInvoiceTotalsMergedForPeriod] agg total_paid_effective=' . ($agg['total_paid_effective'] ?? '')
+      //    . ' paid_amount_total=' . ($agg['paid_amount_total'] ?? '')
+      //    . ' line_count=' . ($agg['line_count'] ?? '')      );
       if ($rowAfter !== null) {
          $pi = $this->getDoctrine()->getRepository(ProjectItem::class)->find($projectItemId);
          $pr = $pi !== null && $pi->getPrice() !== null ? (float) $pi->getPrice() : 0.0;
@@ -1277,6 +1294,8 @@ class ProjectService extends Base
     */
    public function ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin)
    {
+      // OverridePaymentWritelog::writelog(
+      //    '[ListarItemsParaInvoice] START project_id=' . $project_id . ' fecha_inicial=' . (string) $fecha_inicial . ' fecha_fin=' . (string) $fecha_fin      );
       $this->previousInvoiceTotalsByProjectItem = [];
 
       $items = [];
@@ -1315,6 +1334,15 @@ class ProjectService extends Base
 
          // unpaid_qty: override unpaid mismo criterio de período que paid, si aplica; si no, deuda según agregado (misma clave de caché que arriba)
          $unpaid_qty = $this->CalcularUnpaidQuantityFromPreviusInvoice($project_item_id, $fecha_inicial, $fecha_fin);
+
+         // OverridePaymentWritelog::writelog(
+         //    '[ListarItemsParaInvoice] project_item_id=' . $project_item_id
+         //    . ' paid_qty_total_effective=' . $paid_qty_total_effective
+         //    . ' paid_amount_total=' . $paid_amount_total
+         //    . ' unpaid_qty=' . $unpaid_qty
+         //    . ' agg_prev_line_count=' . ($aggPrev['line_count'] ?? ''),
+         //    'override_payment_debug.log'
+         // );
 
          $quantity_completed = $quantity + $quantity_from_previous;
 
@@ -1553,25 +1581,38 @@ class ProjectService extends Base
       $fi = $fecha_inicial !== null ? trim((string) $fecha_inicial) : '';
       $ff = $fecha_fin !== null ? trim((string) $fecha_fin) : '';
 
+      // OverridePaymentWritelog::writelog(
+      //    '[CalcularUnpaidQuantityFromPreviusInvoice] piId=' . $piId . ' fi=' . $fi . ' ff=' . $ff      );
+
       if ($fi !== '' && $ff !== '') {
          $invStart = $this->parseInvoiceDateFlexible($fi);
          $invEnd = $this->parseInvoiceDateFlexible($ff);
          if ($invStart !== null && $invEnd !== null) {
             $rowAfter = $this->findPostOverrideRowForInvoicePeriod($piId, $fecha_inicial, $fecha_fin);
             if ($rowAfter !== null && $rowAfter->getUnpaidQty() !== null) {
-               return $this->computeUnpaidChainingAfterOverride($rowAfter, $piId);
+               $u = $this->computeUnpaidChainingAfterOverride($rowAfter, $piId);
+               // OverridePaymentWritelog::writelog('[CalcularUnpaidQuantityFromPreviusInvoice] rama computeUnpaidChainingAfterOverride unpaid=' . $u);
+
+               return $u;
             }
 
             $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod($piId, $invStart, $invEnd);
             if ($match !== null && $match->getUnpaidQty() !== null) {
-               return (float) $match->getUnpaidQty();
+               $u = (float) $match->getUnpaidQty();
+               // OverridePaymentWritelog::writelog('[CalcularUnpaidQuantityFromPreviusInvoice] rama match directo unpaid=' . $u);
+
+               return $u;
             }
          }
       }
 
       $agg = $this->previousInvoiceTotalsMergedForPeriod($piId, $fi !== '' ? $fecha_inicial : null, $ff !== '' ? $fecha_fin : null);
+      $u = max(0.0, $agg['total_quantity'] - $agg['total_paid_effective']);
+      // OverridePaymentWritelog::writelog(
+      //    '[CalcularUnpaidQuantityFromPreviusInvoice] rama total_qty - total_paid_effective unpaid=' . $u
+      //    . ' total_quantity=' . ($agg['total_quantity'] ?? '') . ' total_paid_effective=' . ($agg['total_paid_effective'] ?? '')      );
 
-      return max(0.0, $agg['total_quantity'] - $agg['total_paid_effective']);
+      return $u;
    }
 
    /**

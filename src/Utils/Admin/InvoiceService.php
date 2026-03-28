@@ -17,6 +17,7 @@ use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
+// use App\Utils\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -1577,6 +1578,7 @@ class InvoiceService extends Base
     */
    public function CargarDatosInvoice($invoice_id)
    {
+      // OverridePaymentWritelog::writelog('[CargarDatosInvoice] START invoice_id=' . (string) $invoice_id);
       $resultado = array();
       $arreglo_resultado = array();
 
@@ -1665,10 +1667,19 @@ class InvoiceService extends Base
 
       $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
       if (!$currentInvoice) {
+         // OverridePaymentWritelog::writelog('[ListarItemsDeInvoice] ABORT invoice no encontrado invoice_id=' . (string) $invoice_id);
+
          return $items;
       }
       $currentInvoiceId = (int)$currentInvoice->getInvoiceId();
       $project_id = $currentInvoice->getProject()->getProjectId();
+      $invSd = $currentInvoice->getStartDate();
+      $invEd = $currentInvoice->getEndDate();
+      // OverridePaymentWritelog::writelog(
+      //    '[ListarItemsDeInvoice] invoice_id=' . $currentInvoiceId . ' project_id=' . $project_id
+      //    . ' start=' . ($invSd !== null ? $invSd->format('Y-m-d') : 'null')
+      //    . ' end=' . ($invEd !== null ? $invEd->format('Y-m-d') : 'null')
+      // );
 
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
@@ -1703,14 +1714,15 @@ class InvoiceService extends Base
          $invPeriodStart = $currentInvoice->getStartDate();
          $invPeriodEnd = $currentInvoice->getEndDate();
          $latestOverride = null;
+         $periodOverrideRow = null;
          if ($invPeriodStart !== null && $invPeriodEnd !== null) {
-            $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
+            $periodOverrideRow = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
                (int) $project_item_id,
                $invPeriodStart,
                $invPeriodEnd
             );
-            if ($match !== null && $match->getUnpaidQty() !== null) {
-               $latestOverride = $match;
+            if ($periodOverrideRow !== null && $periodOverrideRow->getUnpaidQty() !== null) {
+               $latestOverride = $periodOverrideRow;
             }
          }
 
@@ -1841,7 +1853,24 @@ class InvoiceService extends Base
             $amount_from_previous = 0.0;
          }
 
-         $paid_qty = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
+         $pd = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($value);
+         $paid_qty = (float) ($pd['effective'] ?? 0);
+         // OverridePaymentWritelog::writelog(
+         //    '[ListarItemsDeInvoice] invoice_item_id=' . $value->getId() . ' project_item_id=' . $project_item_id
+         //    . ' paid_qty_efectivo=' . $paid_qty . ' paid_base_BD=' . ($pd['base'] ?? '')
+         //    . ' override_id=' . ($pd['override_id'] ?? 'null')
+         // );
+         // Si la fila override define paid pero unpaid_qty=NULL en BD, derivar unpaid = quantity_completed - paid (véase InvoiceItemOverridePayment::unpaidQty)
+         if (($pd['override_id'] ?? null) !== null
+            && $periodOverrideRow !== null
+            && $periodOverrideRow->getUnpaidQty() === null
+         ) {
+            $unpaid_qty = max(0.0, (float) $quantity_completed - $paid_qty);
+            // OverridePaymentWritelog::writelog(
+            //    '[ListarItemsDeInvoice] unpaid derivado de completed-paid: quantity_completed=' . $quantity_completed
+            //    . ' paid_qty=' . $paid_qty . ' unpaid_qty=' . $unpaid_qty
+            // );
+         }
          $unpaid_amount = $unpaid_qty * $price;
          $unpaid_from_previous = $unpaidPrevSpecific;
 
