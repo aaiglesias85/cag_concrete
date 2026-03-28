@@ -1340,8 +1340,7 @@ class ProjectService extends Base
          //    . ' paid_qty_total_effective=' . $paid_qty_total_effective
          //    . ' paid_amount_total=' . $paid_amount_total
          //    . ' unpaid_qty=' . $unpaid_qty
-         //    . ' agg_prev_line_count=' . ($aggPrev['line_count'] ?? ''),
-         //    'override_payment_debug.log'
+         //    . ' agg_prev_line_count=' . ($aggPrev['line_count'] ?? '')
          // );
 
          $quantity_completed = $quantity + $quantity_from_previous;
@@ -1606,11 +1605,16 @@ class ProjectService extends Base
          }
       }
 
-      $agg = $this->previousInvoiceTotalsMergedForPeriod($piId, $fi !== '' ? $fecha_inicial : null, $ff !== '' ? $fecha_fin : null);
-      $u = max(0.0, $agg['total_quantity'] - $agg['total_paid_effective']);
+      // Deuda = Σ qty facturada − paid efectivo en todo el historial. No usar el agregado con cutoff:
+      // con override post-cabecera, el cutoff excluye la factura del mismo mes que la cabecera (p. ej. Oct 1),
+      // deja total_quantity=0 y mergeOverridePaidAfterCutoffIfNoLines pone paid=150 → unpaid=0 por error.
+      $aggDebt = $this->computePreviousInvoiceTotalsForProjectItem($piId, null);
+      $u = max(0.0, (float) ($aggDebt['total_quantity'] ?? 0) - (float) ($aggDebt['total_paid_effective'] ?? 0));
       // OverridePaymentWritelog::writelog(
-      //    '[CalcularUnpaidQuantityFromPreviusInvoice] rama total_qty - total_paid_effective unpaid=' . $u
-      //    . ' total_quantity=' . ($agg['total_quantity'] ?? '') . ' total_paid_effective=' . ($agg['total_paid_effective'] ?? '')      );
+      //    '[CalcularUnpaidQuantityFromPreviusInvoice] rama total_qty - total_paid_effective (agregado SIN cutoff) unpaid=' . $u
+      //    . ' total_quantity=' . ($aggDebt['total_quantity'] ?? '')
+      //    . ' total_paid_effective=' . ($aggDebt['total_paid_effective'] ?? '')
+      // );
 
       return $u;
    }
