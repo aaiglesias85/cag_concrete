@@ -819,7 +819,7 @@ var OverridePayment = (function () {
       fetchItemsYMontarTabla();
    };
 
-   // Pestaña Items: búsqueda, sync paid/unpaid y cambios en inputs
+   // Pestaña Items: búsqueda; al cambiar paid se recalcula unpaid (salvo override por nota); editar unpaid no modifica paid
 
    var initAccionBuscar = function () {
       var debounceTimeout;
@@ -836,7 +836,7 @@ var OverridePayment = (function () {
       });
    };
 
-   /** Sin override de unpaid por nota: unpaid = qty − paid; si cambia unpaid, paid = qty − unpaid. Con override, no se recalcula al cambiar paid. */
+   /** Si no hay override de unpaid por nota: al cambiar paid, unpaid = qty − paid. Con override por nota no se toca unpaid desde paid. */
    var syncUnpaidFromPaid = function ($row) {
       if ($row.hasClass('row-group-header')) return;
       var overrideId = $row.attr('data-unpaid-override-id');
@@ -852,21 +852,6 @@ var OverridePayment = (function () {
       var uq = Math.max(0, qty - pq);
       $unpaid.val(uq);
    };
-   var syncPaidFromUnpaid = function ($row) {
-      if ($row.hasClass('row-group-header')) return;
-      var overrideId = $row.attr('data-unpaid-override-id');
-      if (overrideId !== undefined && overrideId !== '') {
-         return;
-      }
-      var qty = parseFloat($row.attr('data-quantity-final')) || 0;
-      var $paid = $row.find('input.override-paid-qty');
-      var $unpaid = $row.find('input.override-unpaid-qty');
-      var uq = parseFloat(String($unpaid.val() || '').replace(/,/g, ''));
-      if (isNaN(uq)) uq = 0;
-      uq = Math.max(0, uq);
-      var pq = Math.max(0, qty - uq);
-      $paid.val(pq);
-   };
    var initAccionPaidQtyChange = function () {
       $(document).off('change', '#override-payment-items-table input.override-paid-qty');
       $(document).on('change', '#override-payment-items-table input.override-paid-qty', function () {
@@ -879,7 +864,6 @@ var OverridePayment = (function () {
       $(document).off('change', '#override-payment-items-table input.override-unpaid-qty');
       $(document).on('change', '#override-payment-items-table input.override-unpaid-qty', function () {
          var $row = $(this).closest('tr');
-         syncPaidFromUnpaid($row);
          recalcRow($row);
       });
    };
