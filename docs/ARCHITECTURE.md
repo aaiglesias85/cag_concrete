@@ -122,9 +122,11 @@ Patrón habitual en el código: repositorios con métodos de negocio de listado;
 
 ### Fase A — Reducir complejidad sin cambiar el despliegue (alto ROI)
 
+Guía operativa detallada (alcance, convenciones, orden de trabajo, checklist): **[PHASE_A_REDUCIR_COMPLEJIDAD.md](PHASE_A_REDUCIR_COMPLEJIDAD.md)**.
+
 1. **Acotar capas:** reglas de negocio reutilizables en servicios dedicados; repositorios principalmente persistencia y consultas; controladores delgados.
 2. **Módulos lógicos:** agrupar por dominio (facturación, estimación, proyecto, integraciones) con namespaces o subcarpetas explícitas y dependencias “hacia dentro” (p. ej. el módulo de informes no importa detalles internos de QBWC).
-3. **Messenger:** mover trabajo pesado (PDF masivos, envíos, sincronizaciones) a **mensajes y handlers** con retry y cola failed ya existente.
+3. **Messenger (opcional):** mover trabajo pesado a mensajes y handlers solo si el equipo lo prioriza; no forma parte de la guía Fase A acordada en el repositorio.
 4. **Migraciones:** nuevos cambios de esquema vía **Doctrine Migrations**; ir archivando o consolidando scripts legacy.
 5. **Tests:** pruebas de integración en servicios críticos (facturación, pagos, overrides) para permitir refactor.
 

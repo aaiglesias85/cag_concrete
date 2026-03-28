@@ -13,6 +13,7 @@ Aplicación empresarial para gestión de proyectos de construcción: estimacione
 | Documento | Contenido |
 |-----------|-------------|
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura actual, trade-offs (monolito vs microservicios, etc.), complejidad y líneas de evolución recomendadas |
+| [docs/PHASE_A_REDUCIR_COMPLEJIDAD.md](docs/PHASE_A_REDUCIR_COMPLEJIDAD.md) | Guía de implementación de la Fase A: capas, módulos, migraciones y tests (sin Messenger) |
 
 Otros README temáticos en la raíz del repositorio documentan funcionalidades concretas (facturación, Firebase, etc.).
 
