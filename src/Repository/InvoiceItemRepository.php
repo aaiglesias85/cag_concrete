@@ -482,6 +482,33 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Suma de cantidades y paid de líneas de factura para un project_item, excluyendo ítems bond.
+    * Misma base que {@see ListarParaOverridePaymentConTotal} sin filtro de fecha.
+    *
+    * @return array{sum_qty_final: float, sum_paid_lines: float}
+    */
+   public function aggregateNonBondInvoiceQtyPaidForProjectItem(int $projectItemId): array
+   {
+      $conn = $this->getEntityManager()->getConnection();
+      $sql = '
+         SELECT
+            COALESCE(SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)), 0) AS sum_qty_final,
+            COALESCE(SUM(ii.paid_qty), 0) AS sum_paid_lines
+         FROM invoice_item ii
+         INNER JOIN project_item pi ON ii.project_item_id = pi.id
+         INNER JOIN item it ON pi.item_id = it.item_id
+         WHERE pi.id = :pid
+           AND (it.bond IS NULL OR it.bond = 0)
+      ';
+      $row = $conn->executeQuery($sql, ['pid' => $projectItemId])->fetchAssociative() ?: [];
+
+      return [
+         'sum_qty_final' => (float) ($row['sum_qty_final'] ?? 0),
+         'sum_paid_lines' => (float) ($row['sum_paid_lines'] ?? 0),
+      ];
+   }
+
+   /**
     * TotalInvoicePaidAmountByProjectItem: Obtiene la suma de paid_amount de los invoice items de un project_item
     *
     * @param int $project_item_id El ID del item de proyecto

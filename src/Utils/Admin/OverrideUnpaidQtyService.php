@@ -202,9 +202,17 @@ class OverrideUnpaidQtyService extends Base
             $entity->setUnpaidQty($unpaidQtyNew);
             $em->persist($entity);
 
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $agg = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem($projectItemId);
+            $baselineUnpaid = max(
+               0.0,
+               (float) ($agg['sum_qty_final'] ?? 0) - (float) ($agg['sum_paid_lines'] ?? 0)
+            );
+
             $hist = new InvoiceItemOverridePaymentUnpaidQtyHistory();
             $hist->setInvoiceItemOverridePayment($entity);
-            $hist->setOldValue(null);
+            $hist->setOldValue((string) $baselineUnpaid);
             $hist->setNewValue((string) $unpaidQtyNew);
             $hist->setNote(null);
             $hist->setCreatedAt(new \DateTime());

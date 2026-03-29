@@ -385,7 +385,7 @@ class OverridePaymentService extends Base
 
             $hist = new InvoiceItemOverridePaymentPaidQtyHistory();
             $hist->setInvoiceItemOverridePayment($entity);
-            $hist->setOldValue(null);
+            $hist->setOldValue((string) $this->baselinePaidFromInvoiceLinesNonBond($pi));
             $hist->setNewValue((string) $paidQtyNew);
             $hist->setCreatedAt(new \DateTime());
             if ($user instanceof \App\Entity\Usuario) {
@@ -594,9 +594,10 @@ class OverridePaymentService extends Base
          $em->persist($parent);
       }
 
-      $oldStr = null;
       if ($parent->getUnpaidQty() !== null) {
          $oldStr = (string) $parent->getUnpaidQty();
+      } else {
+         $oldStr = (string) $this->baselineUnpaidFromInvoiceLinesNonBond($pi, $parent);
       }
 
       $unpaidHist = new InvoiceItemOverridePaymentUnpaidQtyHistory();
@@ -884,6 +885,38 @@ class OverridePaymentService extends Base
       $nv = $latest->getNewValue();
       $payment->setUnpaidQty($nv !== null && $nv !== '' ? (float) $nv : null);
       $payment->setUpdatedAt(new \DateTime());
+   }
+
+   /**
+    * Paid “de sistema” antes del override: suma de paid_qty en líneas de factura (sin ítems bond),
+    * misma base que el listado Override Payment.
+    */
+   private function baselinePaidFromInvoiceLinesNonBond(ProjectItem $pi): float
+   {
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $a = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem((int) $pi->getId());
+
+      return (float) ($a['sum_paid_lines'] ?? 0);
+   }
+
+   /**
+    * Unpaid calculado antes de override explícito: max(0, invoice qty final − paid efectivo).
+    * Si ya hay paid en la fila de override, sustituye a la suma de líneas (como en la grilla).
+    */
+   private function baselineUnpaidFromInvoiceLinesNonBond(ProjectItem $pi, ?InvoiceItemOverridePayment $row): float
+   {
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $a = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem((int) $pi->getId());
+      $sumQtyFinal = (float) ($a['sum_qty_final'] ?? 0);
+      $sumPaidLines = (float) ($a['sum_paid_lines'] ?? 0);
+      $paidDisplay = $sumPaidLines;
+      if ($row !== null && $row->getPaidQty() !== null) {
+         $paidDisplay = (float) $row->getPaidQty();
+      }
+
+      return max(0.0, $sumQtyFinal - $paidDisplay);
    }
 
    private function parseDateMDY(?string $s): ?\DateTimeInterface
