@@ -144,8 +144,10 @@ class ProjectService extends Base
    }
 
    /**
-    * Fila de override aplicable al período del borrador (misma regla que el resolver):
+    * Fila de override aplicable al período del borrador (misma regla que el resolver de paid):
     * mes(invoice) ≤ mes(cabecera del override); entre candidatas, cabecera más reciente.
+    *
+    * Usada para cortes de agregado de paid ({@see previousInvoiceTotalsMergedForPeriod}), no para la cadena de unpaid.
     */
    private function findPostOverrideRowForInvoicePeriod(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): ?InvoiceItemOverridePayment
    {
@@ -163,16 +165,58 @@ class ProjectService extends Base
 
          return null;
       }
-      // OverridePaymentWritelog::writelog(
-      //    '[findPostOverrideRowForInvoicePeriod] projectItemId=' . $projectItemId . ' invStart=' . $invStart->format('Y-m-d') . ' invEnd=' . $invEnd->format('Y-m-d')      );
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
 
-      $row = $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart, $invEnd);
-      // OverridePaymentWritelog::writelog(
-      //    '[findPostOverrideRowForInvoicePeriod] resultado=' . ($row !== null ? 'override_id=' . (int) ($row->getId() ?? 0) : 'null')      );
+      return $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart, $invEnd);
+   }
 
-      return $row;
+   /**
+    * Fila de override como ancla de unpaid en facturas posteriores al mes de la cabecera.
+    *
+    * @see InvoiceItemOverridePaymentRepository::findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth
+    */
+   private function findOverrideRowForUnpaidChaining(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): ?InvoiceItemOverridePayment
+   {
+      $fi = $fecha_inicial !== null ? trim((string) $fecha_inicial) : '';
+      $ff = $fecha_fin !== null ? trim((string) $fecha_fin) : '';
+      if ($fi === '' || $ff === '') {
+         return null;
+      }
+      $invStart = $this->parseInvoiceDateFlexible($fi);
+      if ($invStart === null) {
+         return null;
+      }
+      /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
+      $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+
+      return $overrideRepo->findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth($projectItemId, $invStart);
+   }
+
+   /**
+    * unpaid_qty persistido o, si es null, último valor en historial de notas (misma fuente que sync en BD).
+    */
+   private function resolveEffectiveUnpaidQtyForOverrideRow(InvoiceItemOverridePayment $row): ?float
+   {
+      if ($row->getUnpaidQty() !== null) {
+         return (float) $row->getUnpaidQty();
+      }
+      $id = $row->getId();
+      if ($id === null) {
+         return null;
+      }
+      /** @var InvoiceItemOverridePaymentUnpaidQtyHistoryRepository $histRepo */
+      $histRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentUnpaidQtyHistory::class);
+      $latest = $histRepo->findLatestByOverrideId((int) $id);
+      if ($latest === null) {
+         return null;
+      }
+      $nv = $latest->getNewValue();
+      if ($nv === null || $nv === '') {
+         return null;
+      }
+
+      return (float) $nv;
    }
 
    /**
@@ -242,18 +286,20 @@ class ProjectService extends Base
    private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId): float
    {
       $ed = $rowAfter->getOverridePeriodDate();
-      if ($ed === null || $rowAfter->getUnpaidQty() === null) {
+      $snapshotUnpaidOpt = $this->resolveEffectiveUnpaidQtyForOverrideRow($rowAfter);
+      if ($ed === null || $snapshotUnpaidOpt === null) {
          $this->logUnpaidQtyCalc('chain_abort_missing_period_date_or_unpaid', [
             'project_item_id' => $projectItemId,
             'override_row_id' => $rowAfter->getId(),
             'has_override_period_date' => $ed !== null,
             'has_unpaid_qty' => $rowAfter->getUnpaidQty() !== null,
+            'has_effective_unpaid' => $snapshotUnpaidOpt !== null,
          ]);
 
          return 0.0;
       }
       $cutoffYmd = $ed->format('Y-m-d');
-      $snapshotUnpaid = (float) $rowAfter->getUnpaidQty();
+      $snapshotUnpaid = $snapshotUnpaidOpt;
       $this->logUnpaidQtyCalc('chain_start', [
          'project_item_id' => $projectItemId,
          'override_row_id' => $rowAfter->getId(),
@@ -1796,17 +1842,21 @@ class ProjectService extends Base
             'inv_end' => $invEnd !== null ? $invEnd->format('Y-m-d') : null,
          ]);
          if ($invStart !== null && $invEnd !== null) {
-            $rowAfter = $this->findPostOverrideRowForInvoicePeriod($piId, $fecha_inicial, $fecha_fin);
+            $rowUnpaidAnchor = $this->findOverrideRowForUnpaidChaining($piId, $fecha_inicial, $fecha_fin);
+            $effUnpaidAnchor = $rowUnpaidAnchor !== null
+               ? $this->resolveEffectiveUnpaidQtyForOverrideRow($rowUnpaidAnchor)
+               : null;
             $this->logUnpaidQtyCalc('calc_row_after_lookup', [
                'project_item_id' => $piId,
-               'row_after_id' => $rowAfter !== null ? $rowAfter->getId() : null,
-               'row_after_override_period_date' => $rowAfter !== null && $rowAfter->getOverridePeriodDate() !== null
-                  ? $rowAfter->getOverridePeriodDate()->format('Y-m-d')
+               'row_after_id' => $rowUnpaidAnchor !== null ? $rowUnpaidAnchor->getId() : null,
+               'row_after_override_period_date' => $rowUnpaidAnchor !== null && $rowUnpaidAnchor->getOverridePeriodDate() !== null
+                  ? $rowUnpaidAnchor->getOverridePeriodDate()->format('Y-m-d')
                   : null,
-               'row_after_unpaid_qty' => $rowAfter !== null ? $rowAfter->getUnpaidQty() : null,
+               'row_after_unpaid_qty' => $rowUnpaidAnchor !== null ? $rowUnpaidAnchor->getUnpaidQty() : null,
+               'row_after_effective_unpaid_qty' => $effUnpaidAnchor,
             ]);
-            if ($rowAfter !== null && $rowAfter->getUnpaidQty() !== null) {
-               $u = $this->computeUnpaidChainingAfterOverride($rowAfter, $piId);
+            if ($rowUnpaidAnchor !== null && $effUnpaidAnchor !== null) {
+               $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId);
                $this->logUnpaidQtyCalc('calc_return_chain_after_override', [
                   'project_item_id' => $piId,
                   'result_unpaid_qty' => $u,
@@ -1816,13 +1866,15 @@ class ProjectService extends Base
             }
 
             $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod($piId, $invStart, $invEnd);
+            $effUnpaidMatch = $match !== null ? $this->resolveEffectiveUnpaidQtyForOverrideRow($match) : null;
             $this->logUnpaidQtyCalc('calc_override_match_row', [
                'project_item_id' => $piId,
                'match_id' => $match !== null ? $match->getId() : null,
                'match_unpaid_qty' => $match !== null ? $match->getUnpaidQty() : null,
+               'match_effective_unpaid_qty' => $effUnpaidMatch,
             ]);
-            if ($match !== null && $match->getUnpaidQty() !== null) {
-               $u = (float) $match->getUnpaidQty();
+            if ($match !== null && $effUnpaidMatch !== null) {
+               $u = $effUnpaidMatch;
                $this->logUnpaidQtyCalc('calc_return_static_override_unpaid', [
                   'project_item_id' => $piId,
                   'result_unpaid_qty' => $u,

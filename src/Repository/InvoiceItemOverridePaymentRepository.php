@@ -138,6 +138,28 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
    }
 
    /**
+    * Fila de override que sigue aplicando en facturas **posteriores** al mes de la cabecera (cadena de unpaid).
+    *
+    * Entre las cabeceras con mes ≤ mes del invoice, toma la **más reciente**. Así un override guardado en
+    * octubre sigue siendo la ancla para noviembre, diciembre, etc. (a diferencia de
+    * {@see findLatestNullStartForInvoicePeriodAfterEndDate}, pensada para paid con invoice_mes ≤ cabecera_mes).
+    */
+   public function findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth(int $project_item_id, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
+   {
+      $rows = $this->ListarPorProjectItem($project_item_id);
+      $invMonth = \DateTimeImmutable::createFromInterface($invStart)->modify('first day of this month')->setTime(0, 0, 0);
+
+      return $this->pickBestInvoiceItemOverrideByHeaderRule(
+         $rows,
+         static function (string $hdYmd) use ($invMonth): bool {
+            $hdMonth = (new \DateTimeImmutable($hdYmd))->modify('first day of this month')->setTime(0, 0, 0);
+
+            return $hdMonth <= $invMonth;
+         }
+      );
+   }
+
+   /**
     * @param InvoiceItemOverridePayment[] $rows
     * @param callable(string $headerYmd): bool $includeHeaderYmd
     */
