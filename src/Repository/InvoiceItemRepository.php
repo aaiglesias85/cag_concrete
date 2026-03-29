@@ -483,24 +483,35 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
    /**
     * Suma de cantidades y paid de líneas de factura para un project_item, excluyendo ítems bond.
-    * Misma base que {@see ListarParaOverridePaymentConTotal} sin filtro de fecha.
+    * Misma base que {@see ListarParaOverridePaymentConTotal}.
+    *
+    * Si `$invoiceStartBeforeYmd` no es null: solo líneas cuyo invoice tiene start_date **estrictamente anterior**
+    * a esa fecha (mismo criterio que “Starting Override Date”: no incluye el primer invoice del período del override).
     *
     * @return array{sum_qty_final: float, sum_paid_lines: float}
     */
-   public function aggregateNonBondInvoiceQtyPaidForProjectItem(int $projectItemId): array
+   public function aggregateNonBondInvoiceQtyPaidForProjectItem(int $projectItemId, ?string $invoiceStartBeforeYmd = null): array
    {
       $conn = $this->getEntityManager()->getConnection();
-      $sql = '
+      $params = ['pid' => $projectItemId];
+      $startClause = '';
+      if ($invoiceStartBeforeYmd !== null && $invoiceStartBeforeYmd !== '') {
+         $startClause = ' AND i.start_date < :start_override';
+         $params['start_override'] = $invoiceStartBeforeYmd;
+      }
+      $sql = "
          SELECT
             COALESCE(SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)), 0) AS sum_qty_final,
             COALESCE(SUM(ii.paid_qty), 0) AS sum_paid_lines
          FROM invoice_item ii
+         INNER JOIN invoice i ON ii.invoice_id = i.invoice_id
          INNER JOIN project_item pi ON ii.project_item_id = pi.id
          INNER JOIN item it ON pi.item_id = it.item_id
          WHERE pi.id = :pid
            AND (it.bond IS NULL OR it.bond = 0)
-      ';
-      $row = $conn->executeQuery($sql, ['pid' => $projectItemId])->fetchAssociative() ?: [];
+           $startClause
+      ";
+      $row = $conn->executeQuery($sql, $params)->fetchAssociative() ?: [];
 
       return [
          'sum_qty_final' => (float) ($row['sum_qty_final'] ?? 0),
@@ -609,8 +620,10 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
    /**
     * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id.
-    * Filtro opcional por fecha (solo si `fecha_fin` no está vacío): invoice.end_date <= fecha_fin (inclusive), m/d/Y.
-    * Cadena vacía = todos los invoices del proyecto en los agregados (p. ej. listado Override Payment).
+    *
+    * `fecha_fin` (m/d/Y) es la **Starting Override Date** de la UI: solo se suman líneas de invoices con
+    * `start_date` **estrictamente anterior** a esa fecha (no incluye el invoice que empieza en esa fecha).
+    * Cadena vacía = todos los invoices del proyecto.
     *
     * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
     */
@@ -624,11 +637,11 @@ class InvoiceItemRepository extends ServiceEntityRepository
       string $project_id,
       string $fecha_fin
    ): array {
-      $fechaFinYmd = '';
+      $startOverrideYmd = '';
       if (!empty($fecha_fin)) {
          $d = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
          if ($d !== false) {
-            $fechaFinYmd = $d->format('Y-m-d');
+            $startOverrideYmd = $d->format('Y-m-d');
          }
       }
       $sortable = [
@@ -662,9 +675,9 @@ class InvoiceItemRepository extends ServiceEntityRepository
       }
 
       $dateClause = '';
-      if ($fechaFinYmd !== '') {
-         $dateClause .= ' AND i.end_date <= :fecha_final';
-         $params['fecha_final'] = $fechaFinYmd;
+      if ($startOverrideYmd !== '') {
+         $dateClause .= ' AND i.start_date < :start_override';
+         $params['start_override'] = $startOverrideYmd;
       }
 
       $companyClause = '';
