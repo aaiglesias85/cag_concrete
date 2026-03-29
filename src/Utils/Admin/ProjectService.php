@@ -352,19 +352,19 @@ class ProjectService extends Base
           ]);
 
           // Incluir el invoice del override en el cálculo
+          // NOTA: El paid del override NO afecta el unpaid base - son independientes
           $overrideInvoiceItem = $this->findInvoiceItemByProjectItemAndDate($projectItemId, $ed);
           if ($overrideInvoiceItem !== null) {
              $overrideQty = (float) ($overrideInvoiceItem->getQuantity() ?? 0);
              $overrideQbf = (float) ($overrideInvoiceItem->getQuantityBroughtForward() ?? 0);
-             $overridePaid = (float) ($rowAfter->getPaidQty() ?? 0);
-             $u = max(0.0, $snapshotUnpaid + $overrideQty - $overridePaid - $overrideQbf);
+             // No restamos el paid del override - unpaid base es independiente del paid
+             $u = max(0.0, $snapshotUnpaid + $overrideQty - $overrideQbf);
              $this->logUnpaidQtyCalc('chain_no_post_lines_include_override_invoice', [
                 'project_item_id' => $projectItemId,
                 'cutoff_ymd' => $cutoffYmd,
                 'override_invoice_id' => $overrideInvoiceItem->getInvoice()?->getInvoiceId(),
                 'override_invoice_qty' => $overrideQty,
                 'override_invoice_qbf' => $overrideQbf,
-                'override_invoice_paid' => $overridePaid,
                 'result_unpaid_qty' => $u,
              ]);
 
@@ -392,6 +392,11 @@ class ProjectService extends Base
          $inv = $invItem->getInvoice();
          $qty = (float) ($invItem->getQuantity() ?? 0);
          $qbf = (float) ($invItem->getQuantityBroughtForward() ?? 0);
+         
+         // Si el invoice está en el mismo mes que la cabecera del override, no restar paid
+         // porque el unpaid base es independiente del paid
+         $isSameMonthAsOverride = $inv !== null && $inv->getStartDate() !== null && $this->isSameCalendarMonth($inv->getStartDate(), $ed);
+         
          $detailsPaid = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invItem);
          $oid = $detailsPaid['override_id'];
          $paidStored = (float) $detailsPaid['base'];
@@ -410,7 +415,9 @@ class ProjectService extends Base
             $paidSource = 'stored_no_override';
          }
          $uBefore = $u;
-         $u = max(0.0, $u + $qty - $paidLine - $qbf);
+         // Si es el invoice del override (mismo mes), no restar paid - unpaid es independiente
+         $paidToSubtract = $isSameMonthAsOverride ? 0.0 : $paidLine;
+         $u = max(0.0, $u + $qty - $paidToSubtract - $qbf);
          ++$stepIndex;
          $this->logUnpaidQtyCalc('chain_step', [
             'project_item_id' => $projectItemId,
@@ -1932,14 +1939,13 @@ class ProjectService extends Base
                 if ($matchInvoiceItem !== null) {
                    $matchQty = (float) ($matchInvoiceItem->getQuantity() ?? 0);
                    $matchQbf = (float) ($matchInvoiceItem->getQuantityBroughtForward() ?? 0);
-                   $matchPaid = (float) ($match->getPaidQty() ?? 0);
-                   $u = max(0.0, $effUnpaidMatch + $matchQty - $matchPaid - $matchQbf);
+                   // No restamos el paid del override - unpaid base es independiente del paid
+                   $u = max(0.0, $effUnpaidMatch + $matchQty - $matchQbf);
                    $this->logUnpaidQtyCalc('calc_return_override_with_invoice_qty', [
                       'project_item_id' => $piId,
                       'match_id' => $match->getId(),
                       'invoice_qty' => $matchQty,
                       'invoice_qbf' => $matchQbf,
-                      'invoice_paid' => $matchPaid,
                       'result_unpaid_qty' => $u,
                    ]);
 
