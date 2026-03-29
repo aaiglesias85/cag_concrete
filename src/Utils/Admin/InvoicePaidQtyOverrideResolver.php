@@ -113,7 +113,8 @@ class InvoicePaidQtyOverrideResolver
       $this->logOverrideRowsVsInvoiceStart($invoiceItemId, $invoiceId, $invStartYmd, $overrides);
 
       $match = $this->selectOverrideRowForInvoicePeriod((int) $pi->getId(), $invStart, $invEnd);
-      $effective = $match !== null ? (float) $match->getPaidQty() : $base;
+      $ovPaid = $match !== null ? $match->getPaidQty() : null;
+      $effective = $match !== null && $ovPaid !== null ? (float) $ovPaid : $base;
       $overrideId = null;
       if ($match !== null && $match->getId() !== null) {
          $overrideId = (int) $match->getId();

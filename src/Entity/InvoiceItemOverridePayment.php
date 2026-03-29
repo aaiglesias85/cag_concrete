@@ -21,8 +21,9 @@ class InvoiceItemOverridePayment
    #[ORM\JoinColumn(name: 'project_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
    private ?ProjectItem $projectItem = null;
 
-   #[ORM\Column(name: 'paid_qty', type: 'float', nullable: false)]
-   private ?float $paidQty = 0.0;
+   /** NULL = no override de paid (usar paid agregado en factura / invoice_item); valor = paid forzado por override */
+   #[ORM\Column(name: 'paid_qty', type: 'float', nullable: true)]
+   private ?float $paidQty = null;
 
    /** NULL = unpaid no sobreescrito (usar cantidad derivada); valor = último unpaid del historial de notas */
    #[ORM\Column(name: 'unpaid_qty', type: 'float', nullable: true)]

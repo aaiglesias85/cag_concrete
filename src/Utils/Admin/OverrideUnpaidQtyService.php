@@ -14,6 +14,8 @@ use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\ProjectItemRepository;
 use App\Utils\Base;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -161,6 +163,8 @@ class OverrideUnpaidQtyService extends Base
       /** @var InvoiceOverridePaymentRepository $headerRepo */
       $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
       $user = $this->getUser();
+      /** @var array<string, InvoiceOverridePayment> */
+      $invoiceOverrideHeaderCache = [];
 
       foreach ($itemsDecoded as $data) {
          if (!is_array($data)) {
@@ -182,13 +186,7 @@ class OverrideUnpaidQtyService extends Base
          }
 
          $projEntity = $pi->getProject();
-         $header = $headerRepo->findOneByProjectAndDate((int) $projEntity->getProjectId(), $endDate);
-         if ($header === null) {
-            $header = new InvoiceOverridePayment();
-            $header->setProject($projEntity);
-            $header->setDate($endDate);
-            $em->persist($header);
-         }
+         $header = $this->resolveInvoiceOverridePaymentHeaderForUnpaid($em, $headerRepo, $projEntity, $endDate, $invoiceOverrideHeaderCache);
 
          $entity = $overrideRepo->findOneBy(
             ['projectItem' => $pi, 'invoiceOverridePayment' => $header],
@@ -200,7 +198,7 @@ class OverrideUnpaidQtyService extends Base
             $entity = new InvoiceItemOverridePayment();
             $entity->setProjectItem($pi);
             $entity->setInvoiceOverridePayment($header);
-            $entity->setPaidQty(0.0);
+            $entity->setPaidQty(null);
             $entity->setUnpaidQty($unpaidQtyNew);
             $em->persist($entity);
 
@@ -235,7 +233,18 @@ class OverrideUnpaidQtyService extends Base
          }
       }
 
-      $em->flush();
+      try {
+         $em->flush();
+      } catch (\Throwable $e) {
+         if (!$this->isUniqueConstraintViolationForUnpaid($e)) {
+            throw $e;
+         }
+
+         return [
+            'success' => false,
+            'error' => 'Ya existe un override de pago para este proyecto y fecha.',
+         ];
+      }
 
       if ($itemsDecoded !== []) {
          $logMsg = $project !== null
@@ -245,6 +254,45 @@ class OverrideUnpaidQtyService extends Base
       }
 
       return ['success' => true];
+   }
+
+   /**
+    * @param array<string, InvoiceOverridePayment> $headerCache
+    */
+   private function resolveInvoiceOverridePaymentHeaderForUnpaid(
+      EntityManagerInterface $em,
+      InvoiceOverridePaymentRepository $headerRepo,
+      Project $projEntity,
+      \DateTimeInterface $endDate,
+      array &$headerCache
+   ): InvoiceOverridePayment {
+      $key = (string) $projEntity->getProjectId() . '|' . $endDate->format('Y-m-d');
+      if (isset($headerCache[$key])) {
+         return $headerCache[$key];
+      }
+      $header = $headerRepo->findOneByProjectAndDate((int) $projEntity->getProjectId(), $endDate);
+      if ($header === null) {
+         $header = new InvoiceOverridePayment();
+         $header->setProject($projEntity);
+         $header->setDate($endDate);
+         $em->persist($header);
+      }
+      $headerCache[$key] = $header;
+
+      return $header;
+   }
+
+   private function isUniqueConstraintViolationForUnpaid(\Throwable $e): bool
+   {
+      $cur = $e;
+      for ($i = 0; $i < 6 && $cur !== null; $i++) {
+         if ($cur instanceof UniqueConstraintViolationException) {
+            return true;
+         }
+         $cur = $cur->getPrevious();
+      }
+
+      return false;
    }
 
    /**

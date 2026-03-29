@@ -236,7 +236,11 @@ class ProjectService extends Base
       if ((int) ($agg['line_count'] ?? 0) !== 0) {
          return $agg;
       }
-      $pq = (float) $row->getPaidQty();
+      $pqRaw = $row->getPaidQty();
+      if ($pqRaw === null) {
+         return $agg;
+      }
+      $pq = (float) $pqRaw;
       $agg['total_paid_effective'] = $pq;
       $agg['paid_amount_total'] = $pq * $projectItemPrice;
 
