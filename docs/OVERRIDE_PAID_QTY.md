@@ -2,7 +2,7 @@
 
 Este documento resume **qué se entiende por el negocio**, las **reglas acordadas** y un **plan de trabajo técnico** para que, al calcular facturas nuevas y cualquier flujo que dependa de los `paid_qty` de facturas **anteriores**, se use el valor de la tabla de **override** cuando corresponda, **sin modificar** los `invoice_item.paid_qty` ya persistidos.
 
-Documentación relacionada: [README_INVOICES_PAYMENTS.md](./README_INVOICES_PAYMENTS.md).
+Documentación relacionada: [README_INVOICES_PAYMENTS.md](./README_INVOICES_PAYMENTS.md). **Flujo y fechas (fuente canónica):** [OVERRIDE_PAYMENT_FECHAS_INVOICE.md](./OVERRIDE_PAYMENT_FECHAS_INVOICE.md).
 
 ---
 
@@ -23,17 +23,18 @@ En algunos casos el negocio **perdió la cuenta** de los valores reales de `paid
 
 ## 3. Reglas de coincidencia override ↔ invoice (implementación actual)
 
-La lógica vive en **`InvoicePaidQtyOverrideResolver`** (y unpaid alineado en **`InvoiceUnpaidQtyOverrideResolver`**). Resumen:
+La selección de **qué cabecera** aplica vive en **`InvoiceItemOverridePaymentRepository`** (`pickBestInvoiceItemOverrideByHeaderRule`), consumida por **`InvoicePaidQtyOverrideResolver`** (paid) y por consultas usadas desde **`InvoiceUnpaidQtyOverrideResolver`** y **`ProjectService`** (unpaid y borradores). Detalle paso a paso: [OVERRIDE_PAYMENT_FECHAS_INVOICE.md §0](./OVERRIDE_PAYMENT_FECHAS_INVOICE.md#0-implementación-aplicada-código).
 
 | Situación | Significado |
 |-----------|-------------|
-| **Cabecera sin fecha** (`invoice_override_payment.date` nula) | Se trata como override “global” para ese `project_item`: puede aplicar en la selección de fila según el orden de prioridad del código. |
-| **Cabecera con fecha** | Se compara la **fecha de la cabecera** con el **período del invoice** (`invoice.start_date` … `invoice.end_date`): si esa fecha cae **dentro** del período del invoice, la línea de detalle enlazada a esa cabecera puede usarse como `paid_qty` efectivo para ese período. |
-| **Varias cabeceras / líneas** por ítem | `ListarPorProjectItem` devuelve todas las líneas; el resolver elige la fila que corresponde al invoice (incl. regla “post‑corte” vía `findLatestNullStartForInvoicePeriodAfterEndDate` para agregados de facturas previas en `ProjectService`). |
+| **Cabecera sin fecha** (`invoice_override_payment.date` nula) | En el picker actual **no entra** en la competición (se ignora). En negocio se asume `date` informada. |
+| **Cabecera con fecha** | Se compara por **mes calendario**: solo cabeceras con **mes(cabecera) ≤ mes(invoice.start)**; entre ellas, la cabecera de **`date` más reciente**. No se usa “¿la fecha de cabecera cae entre start y end del invoice?”; el criterio es el **mes del inicio** del invoice. |
+| **Varias cabeceras / líneas** por ítem | `ListarPorProjectItem` carga líneas; el repositorio elige una fila por las reglas anteriores. **Paid:** `paid_qty` de esa fila (o persistido si no hay match / null). **Unpaid:** `unpaid_qty` o historial de notas; además hay **cadenas** de facturas en `ProjectService` / `InvoiceService` que combinan esa ancla con el histórico. |
+| **Timelines / series de facturas** | Para paid acumulado, `paidIncrementForHistorialTimeline` cuenta cada **`override_id` una sola vez** en la serie (no repite el snapshot en cada factura posterior). |
 
-La pantalla Override guarda **una cabecera por (proyecto, fecha de período)** y líneas bajo ella; al **crear un invoice**, los cálculos que necesitan “paid efectivo” o unpaid con override **no leen** columnas de rango en el detalle: usan la FK a cabecera y la fecha de cabecera.
+La pantalla Override guarda **una cabecera por (proyecto, fecha de período)** y líneas bajo ella; el detalle **no** tiene `start_date` / `end_date` propios: todo cuelga de la fecha de la cabecera.
 
-*(Detalle: mantener alineado con `OverridePaymentService::SalvarOverridePayment`, que crea o reutiliza la cabecera por `project` + fecha fin de período.)*
+*(Alineado con `OverridePaymentService::SalvarOverridePayment`, que crea o reutiliza la cabecera por `project` + fecha de período.)*
 
 ---
 
@@ -49,10 +50,9 @@ En otras palabras: el override es una **capa lógica** sobre los datos históric
 
 ## 5. Histórico y pantallas de facturas ya guardadas
 
-- **Valores ya guardados** en `invoice_item` **no se tocan** al introducir o cambiar overrides.
-- La decisión explícita: **no** es obligatorio “al abrir un invoice viejo” recalcular y mostrar números distintos solo por haber definido un override, salvo que el producto pida coherencia visual en una segunda fase. El alcance acordado aquí es **cálculos hacia adelante** (nuevos invoices y cadenas que dependen de paid de anteriores), no una migración de datos ni reescritura de histórico en BD.
-
-Si en el futuro se quisiera que la pantalla de un invoice antiguo muestre el mismo “paid efectivo”, habría que definirlo aparte (solo lectura con resolver).
+- **Valores ya guardados** en `invoice_item` **no se tocan** al introducir o cambiar overrides (no hay migración que reescriba `paid_qty` / `unpaid_qty` en filas antiguas).
+- **Pantalla y export del invoice guardado:** `InvoiceService::CargarDatosInvoice` → `ListarItemsDeInvoice` calcula **paid y unpaid efectivos** con los resolvers según la **fecha del invoice**; lo que ve el usuario puede diferir del literal en BD en períodos donde aplica override.
+- Los reportes o SQL que lean solo columnas de `invoice_item` pueden seguir mostrando **persistido**, no efectivo, salvo que pasen por la misma lógica.
 
 ---
 
@@ -64,44 +64,39 @@ Si en el futuro se quisiera que la pantalla de un invoice antiguo muestre el mis
 
 ## 7. Relación con “unpaid” y mensajes del negocio
 
-El negocio puede expresar el override en términos de **unpaid** esperado (“para este item en este rango, el unpaid es X”). En la implementación, lo que está modelado en BD es **`paid_qty` en override**; los unpaid derivados deben ser **consistentes** con la fórmula del sistema (`quantity_final`, reglas de QBF, etc.) usando el **paid efectivo** (override o `invoice_item`) según corresponda.
+El negocio puede expresar el override en términos de **unpaid** esperado. En BD hay **`paid_qty` y `unpaid_qty`** en `invoice_item_override_payment`; el unpaid efectivo puede salir de la **columna**, del **historial de notas** (cuando la columna es null) y de **cadenas** entre facturas del mismo ítem. Debe mantenerse coherencia con `quantity_final`, QBF y el **paid efectivo** resuelto por `InvoicePaidQtyOverrideResolver`.
 
 ---
 
-## 8. Plan de trabajo técnico (qué habría que hacer)
+## 8. Plan de trabajo técnico (estado respecto al código actual)
 
 ### 8.1 Inventario
 
-- Localizar **todos** los puntos que lean `InvoiceItem::getPaidQty()`, `SUM(i_i.paidQty)`, `TotalInvoicePaidQtyByProjectItem`, o armen **series de facturas** con prefijos de paid (p. ej. `InvoiceService::buildInvoiceItemSeriesForInvoices`, `calculateInvoiceUnpaidQty`, `ProjectService::CalcularUnpaidQuantityFromPreviusInvoice`, flujos Bond, `PaymentService` al propagar unpaid a siguientes, repositorios con agregaciones).
-- Revisar **frontend** que asuma que el único paid viene de API sin resolver overrides en servidor.
+- Sigue siendo útil un inventario periódico de lecturas de `getPaidQty()` / agregados SQL **sin** resolver override en reporting o jobs batch.
 
-### 8.2 Resolver central (“paid efectivo”)
+### 8.2 Resolver central (“paid efectivo”) — **hecho**
 
-- Introducir una función o servicio reutilizable, por ejemplo: dado `project_item_id` + **invoice** (o su par de fechas), devolver si para **ese** invoice/ítem aplica override y cuál es el **`paid_qty` efectivo** a usar en cálculos (si no aplica → valor de `invoice_item.paid_qty`).
-- Opcionalmente: método batch para N líneas/invoices del mismo proyecto para evitar N+1 consultas.
+- Existe **`InvoicePaidQtyOverrideResolver`** (`getEffectivePaidQty`, `resolvePaidQtyDetails`, `paidIncrementForHistorialTimeline`, Bond, etc.). Opcional: batch/caché por request para reducir trabajo repetido.
 
-### 8.3 Integración en cálculos de invoice / unpaid
+### 8.3 Integración en cálculos de invoice / unpaid — **parcialmente hecho**
 
-- Sustituir o envolver usos de `getPaidQty()` en **cadenas de invoices anteriores** cuando el código construya sumas acumuladas, unpaid, o “paid local” para el invoice actual.
-- Asegurar que **creación de líneas nuevas** de invoice y **recálculos** (p. ej. al cambiar QBF) usen el mismo resolver al mirar facturas previas.
+- Integrado en **`InvoiceService::ListarItemsDeInvoice`**, **`ProjectService::ListarItemsParaInvoice`** y rutas relacionadas; conviene revisar cada nuevo flujo que sume paid “en crudo”.
 
 ### 8.4 Integración en payments y propagación
 
-- `PaymentService` (guardar pagos, marcar pagado, actualizar siguientes): revisar si los valores que **leen** de facturas anteriores deben pasar por el resolver; **no** cambiar filas antiguas por override, pero **sí** la lógica que **calcula** deuda/siguientes a partir de histórico.
-- Definir comportamiento cuando el usuario **guarda** un payment: el cliente puede seguir enviando paid_qty; el servidor debe seguir siendo fuente de verdad según reglas de negocio (puede requerir alinear mensajes si el UI muestra números ya “efectivos”).
+- `PaymentService`: revisar lecturas desde facturas anteriores cuando afecte deuda o propagación; **no** reescribir histórico por override.
 
 ### 8.5 Repositorio y SQL
 
-- Métodos como `TotalInvoicePaidQtyByProjectItem` que hacen `SUM(paid_qty)` crudo: o bien se reemplazan por lógica en PHP que por cada línea aplique override, o se documenta una estrategia híbrida (más compleja en SQL).
-- Cualquier listado agregado para reporting debe documentarse si debe reflejar **BD cruda** o **efectivo**.
+- Agregados tipo `SUM(paid_qty)` sin resolver override: documentar si el reporte debe ser **BD cruda** o **efectivo**.
 
 ### 8.6 Override Payment (admin)
 
-- Alinear la pantalla y `OverridePaymentService` para que los mismos criterios de fechas y “paid efectivo” coincidan con el resolver global (evitar dos definiciones distintas de “coincide rango”).
+- Criterio de fechas alineado al resolver por **mes** y cabecera; mantener una sola definición (ver doc de fechas).
 
 ### 8.7 Pruebas
 
-- Casos: sin override; override sin fechas; override solo enero; invoice nuevo en marzo leyendo enero/febrero; varios overrides; ítem Bond; conflicto de rangos (definir prioridad si hay solapamiento — **pendiente de decisión** si no está cubierto).
+- Matrices invoice × cabecera: ver [OVERRIDE_PAYMENT_FECHAS_INVOICE.md §5](./OVERRIDE_PAYMENT_FECHAS_INVOICE.md#5-plan-de-pruebas-manuales-validación-end-to-end). Casos: sin override, varias cabeceras, Bond, payments.
 
 ---
 
@@ -115,4 +110,4 @@ El negocio puede expresar el override en términos de **unpaid** esperado (“pa
 
 ## 10. Resumen en una frase
 
-**Los `paid_qty` guardados en facturas antiguas no se modifican; al calcular cualquier cosa nueva que dependa de esos pagos acumulados por período, si existe una línea `invoice_item_override_payment` aplicable según la fecha de su cabecera `invoice_override_payment` (o reglas de prioridad/global), se usa el `paid_qty` de esa línea en lugar del valor en `invoice_item` para ese contexto — incluidos los ítems Bond — con una única lógica alineada con la pantalla Override (cabecera + ítems) y la creación de invoices.**
+**Los `paid_qty` / `unpaid_qty` guardados en facturas antiguas no se reescriben por el override; al calcular totales, borradores o pantallas que muestran cantidades efectivas, el sistema elige una línea `invoice_item_override_payment` según el mes de `invoice.start_date` frente al mes de la cabecera `invoice_override_payment.date` (cabecera más reciente que cumpla la ventana), lee `paid_qty` y/o `unpaid_qty` (más historial de notas para unpaid), y encadena con el resto de facturas del ítem donde el código lo define — alineado con la pantalla Override y con `README.md` / `OVERRIDE_PAYMENT_FECHAS_INVOICE.md`.**

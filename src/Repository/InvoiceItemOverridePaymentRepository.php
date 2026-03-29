@@ -111,11 +111,10 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
    /**
     * Fila de override aplicable al invoice (misma regla que facturas / Completion).
     *
-    * El mes del invoice (según `invStart`) debe ser **igual o anterior** al mes de la cabecera del override
-    * (`invoice_override_payment.date`). Así el override cubre ese mes y todos los anteriores respecto al
-    * período de la cabecera; el `paid_qty` del override es el acumulado vigente (no se suma con meses
-    * anteriores en agregados: cada `override_id` cuenta una vez). Si hay varias filas, la de cabecera con
-    * fecha **más reciente** entre las que cumplen.
+    * El mes del invoice (según `invStart`) debe ser **igual o posterior** al mes de la cabecera del override
+    * (`invoice_override_payment.date`). Así un override de octubre **no** aplica a facturas de agosto o
+    * septiembre, pero sí a octubre y meses siguientes. Si hay varias cabeceras candidatas, la de fecha
+    * **más reciente** entre las que cumplen (p. ej. factura de diciembre con cabeceras oct y nov → noviembre).
     *
     * En negocio `date` en cabecera no es nula; si faltara, la fila se omite (defensa).
     *
@@ -132,7 +131,7 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
          static function (string $hdYmd) use ($invMonth): bool {
             $hdMonth = (new \DateTimeImmutable($hdYmd))->modify('first day of this month')->setTime(0, 0, 0);
 
-            return $invMonth <= $hdMonth;
+            return $invMonth >= $hdMonth;
          }
       );
    }
@@ -142,7 +141,7 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
     *
     * Entre las cabeceras con mes ≤ mes del invoice, toma la **más reciente**. Así un override guardado en
     * octubre sigue siendo la ancla para noviembre, diciembre, etc. (a diferencia de
-    * {@see findLatestNullStartForInvoicePeriodAfterEndDate}, pensada para paid con invoice_mes ≤ cabecera_mes).
+    * {@see findLatestNullStartForInvoicePeriodAfterEndDate}, pensada para paid con mes(invoice) ≥ mes(cabecera)).
     */
    public function findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth(int $project_item_id, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
    {

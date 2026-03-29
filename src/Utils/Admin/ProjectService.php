@@ -145,7 +145,7 @@ class ProjectService extends Base
 
    /**
     * Fila de override aplicable al período del borrador (misma regla que el resolver de paid):
-    * mes(invoice) ≤ mes(cabecera del override); entre candidatas, cabecera más reciente.
+    * mes(invoice.start) ≥ mes(cabecera); entre candidatas, cabecera más reciente.
     *
     * Usada para cortes de agregado de paid ({@see previousInvoiceTotalsMergedForPeriod}), no para la cadena de unpaid.
     */
@@ -236,7 +236,10 @@ class ProjectService extends Base
             continue;
          }
          $startYmd = $inv->getStartDate()->format('Y-m-d');
-         if ($startYmd <= $cutoffYmd) {
+         // Incluir el primer mes del override (start_date == cabecera), alineado a InvoiceService
+         // (invStart >= partition). Con <= se excluía octubre 1 cuando el corte es 2025-10-01 y el unpaid
+         // encadenado para noviembre quedaba solo en el snapshot sin sumar la qty de octubre.
+         if ($startYmd < $cutoffYmd) {
             $excluded[] = [
                'invoice_item_id' => $invItem->getId(),
                'invoice_id' => $inv->getInvoiceId(),
@@ -253,7 +256,7 @@ class ProjectService extends Base
          'included_count' => \count($out),
          'excluded_not_after_cutoff' => $excluded,
          'skipped_null_invoice_or_date' => $skippedNull,
-         'rule' => 'invoice.start_date must be strictly after cutoff (Y-m-d)',
+         'rule' => 'invoice.start_date Y-m-d >= cutoff (cabecera inclusive)',
       ]);
 
       usort(
@@ -277,11 +280,11 @@ class ProjectService extends Base
    }
 
    /**
-    * unpaid_qty del snapshot (override) y luego, por cada invoice guardado después de la fecha de cabecera:
-    * u = max(0, u + quantity − paid_line − QBF). paid_line alineado al agregado de paid: primera línea con un
-    * override_id usa effective del resolver; líneas siguientes con el mismo id solo paid_qty persistido (base).
-    * Si el invoice de la línea cae en el mismo mes calendario que la fecha de cabecera del override, no aplica
-    * el paso de cadena (u queda igual al snapshot hasta el mes siguiente).
+    * unpaid_qty del snapshot (override) y luego, por cada línea con invoice.start_date >= fecha cabecera:
+    * u = max(0, u + quantity − paid_line − QBF). paid_line: primera línea con override_id usa effective;
+    * siguientes con el mismo id usan paid persistido (base).
+    * Incluye el mes de la cabecera: el arrastre hacia el mes siguiente debe sumar qty−paid de ese invoice
+    * (misma idea que lastUnpaidOverrideValue en InvoiceService), no dejar u congelada en el snapshot.
     */
    private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId): float
    {
@@ -336,9 +339,6 @@ class ProjectService extends Base
       $seenOverrideIdsInChain = [];
       foreach ($postLines as $invItem) {
          $inv = $invItem->getInvoice();
-         if ($inv !== null && $inv->getStartDate() !== null && $this->isSameCalendarMonth($inv->getStartDate(), $ed)) {
-            continue;
-         }
          $qty = (float) ($invItem->getQuantity() ?? 0);
          $qbf = (float) ($invItem->getQuantityBroughtForward() ?? 0);
          $detailsPaid = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invItem);
@@ -414,7 +414,7 @@ class ProjectService extends Base
 
    /**
     * Agregado de facturas previas alineado al período del invoice nuevo: si hay override con cabecera anterior
-    * al período del invoice nuevo, solo cuentan líneas con invoice.start_date > fecha de esa cabecera;
+    * al período del invoice nuevo, cuentan líneas con invoice.start_date >= fecha de esa cabecera (cabecera inclusive);
     * si aún no hay ninguna, paid/importe parten del snapshot del override.
     *
     * @return array<string, mixed>
@@ -1710,7 +1710,7 @@ class ProjectService extends Base
             if ($invoice === null || $invoice->getStartDate() === null) {
                continue;
             }
-            if ($invoice->getStartDate()->format('Y-m-d') <= $invoiceStartAfterYmd) {
+            if ($invoice->getStartDate()->format('Y-m-d') < $invoiceStartAfterYmd) {
                continue;
             }
          }
@@ -1885,9 +1885,7 @@ class ProjectService extends Base
          }
       }
 
-      // Deuda = Σ qty facturada − paid efectivo en todo el historial. No usar el agregado con cutoff:
-      // con override post-cabecera, el cutoff excluye la factura del mismo mes que la cabecera (p. ej. Oct 1),
-      // deja total_quantity=0 y mergeOverridePaidAfterCutoffIfNoLines pone paid=150 → unpaid=0 por error.
+      // Deuda = Σ qty facturada − paid efectivo en todo el historial (sin cutoff). Fallback cuando no hay período.
       $aggDebt = $this->computePreviousInvoiceTotalsForProjectItem($piId, null);
       $u = max(0.0, (float) ($aggDebt['total_quantity'] ?? 0) - (float) ($aggDebt['total_paid_effective'] ?? 0));
       $this->logUnpaidQtyCalc('calc_return_aggregate_debt_no_cutoff', [

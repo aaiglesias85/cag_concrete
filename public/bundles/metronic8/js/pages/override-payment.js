@@ -813,6 +813,8 @@ var OverridePayment = (function () {
       var formData = new URLSearchParams();
       formData.set('company_id', $('#filtro-company-op').val() || '');
       formData.set('project_id', pid);
+      // Misma fecha que salvar / notas: sin esto el backend no enlaza líneas por cabecera (h.date) y la grilla queda desactualizada tras salvarNotaOverrideUnpaid.
+      formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin') || '');
       formData.set('invoice_override_payment_id', $('#invoice-override-payment-id').val() || '');
       axios
          .post('override-payment/listarItems', formData, { responseType: 'json' })

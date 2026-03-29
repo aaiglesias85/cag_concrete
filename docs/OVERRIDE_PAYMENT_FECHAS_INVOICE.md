@@ -1,18 +1,66 @@
-# Override Payment (paid / unpaid) y fecha del invoice — Plan de verificación e implementación
+# Override Payment (paid / unpaid) y fecha del invoice — Flujo actual y verificación
+
+Documento de referencia para el comportamiento **implementado** (alineado con `README.md` → sección Override Payment).
 
 ## 0. Implementación aplicada (código)
 
-- **Regla:** Para un `invoice` con `start_date`, se elige la fila `invoice_item_override_payment` cuya cabecera `invoice_override_payment.date` cumple **`date ≤ invoice.start_date`** (mismo día incluido) y, si hay varias, la de **fecha de cabecera más reciente**. Los overrides con fecha **posterior** al inicio del invoice **no** aplican (evita efecto retroactivo en facturas ya emitidas).
-- **Cabecera:** en negocio **`date` siempre viene informada** (no nula).
-- **Archivos tocados:** `InvoiceItemOverridePaymentRepository::findLatestNullStartForInvoicePeriodAfterEndDate`, `InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod`, documentación en `InvoiceUnpaidQtyOverrideResolver`.
+### 0.1 Elegir cabecera / fila de override (por `project_item` y mes del invoice)
 
-Todo lo que ya delegaba en `selectOverrideRowForInvoicePeriod` o en el repositorio queda alineado: `ListarItemsParaInvoice`, `CalcularUnpaidQuantityFromPreviusInvoice`, `CargarDatosInvoice` / export, timeline de unpaid en `InvoiceService`, etc.
+Para cabeceras con **`invoice_override_payment.date` informada** (las nulas se ignoran en el picker):
 
-### Depuración: log de override
+1. Se normaliza **mes del invoice** = primer día del mes de `invoice.start_date`.
+2. **Candidatas:** cabeceras cuyo mes cumple **`mes(cabecera) ≤ mes(invoice)`** (equivalente a **`mes(invoice) ≥ mes(cabecera)`**). Ej.: cabecera octubre → aplica a facturas de octubre en adelante; **no** a agosto/septiembre.
+3. Entre candidatas, la fila ganadora es la de **fecha de cabecera más reciente** (desempate por id de línea si hiciera falta): `InvoiceItemOverridePaymentRepository::pickBestInvoiceItemOverrideByHeaderRule`.
 
-- Archivo: **`var/log/override_payment_debug.log`** (o `$path_logs` + nombre de archivo si el global `path_logs` está definido en el bootstrap).
-- **Importante:** `Base::writelog()` sin `path_logs` escribe en el **directorio de trabajo** del PHP (a menudo **`public/override_payment_debug.log`**), no en `var/log/`. Por eso el trazado de override usa **`OverridePaymentWritelog::writelog()`** en `InvoiceService`, `ProjectService`, repositorio y resolvers — siempre el mismo destino predecible.
-- **`CargarDatosInvoice`** registra una línea `[CargarDatosInvoice] START` al entrar; luego **`ListarItemsDeInvoice`** escribe el detalle por invoice / ítem.
+Ese predicado de mes es **el mismo** en:
+
+- `findLatestNullStartForInvoicePeriodAfterEndDate` (nombre histórico; admite `$invEnd` por firma; el filtro usa `invStart`).
+- `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth`.
+
+La **diferencia** no está en “qué cabecera gana” para un mismo `invStart`, sino en **qué campo se lee después** y **en qué flujo** se encadena:
+
+| Camino | Repositorio / entrada | Campo efectivo | Uso principal |
+|--------|------------------------|----------------|---------------|
+| **Paid** | `InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod` → `findLatestNullStart…` | `paid_qty` de la línea; si null, cae en `invoice_item.paid_qty` | `getEffectivePaidQty`, agregados, Bond, `paidIncrementForHistorialTimeline` (cada `override_id` una sola vez en la serie) |
+| **Unpaid (ancla)** | `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth` | `unpaid_qty` o último valor en `InvoiceItemOverridePaymentUnpaidQtyHistory` | `InvoiceUnpaidQtyOverrideResolver`, `ProjectService::findOverrideRowForUnpaidChaining`, cadena post-override |
+
+### 0.2 Archivos y coherencia
+
+- **Paid:** `InvoicePaidQtyOverrideResolver`, `ProjectService::findPostOverrideRowForInvoicePeriod` (misma consulta que el resolver para el borrador).
+- **Listado nuevo invoice:** `ProjectService::ListarItemsParaInvoice` + `computeUnpaidChainingAfterOverride` / totales previos con `paidQtyOverrideResolver->resolvePaidQtyDetails`.
+- **Invoice guardado y export:** `InvoiceService::CargarDatosInvoice` → `ListarItemsDeInvoice` (paid vía resolver; unpaid con orden de facturas del ítem, `findEarliestUnpaidOverrideHeaderDate` y ancla alineada al resolver de unpaid).
+
+Todo lo que delega en `selectOverrideRowForInvoicePeriod` o en `findLatestNullStartForInvoicePeriodAfterEndDate` queda alineado: listar ítems para invoice, cargar datos, export, etc.
+
+### 0.3 Flujo en diagrama (alto nivel)
+
+```mermaid
+flowchart TD
+  subgraph draft [Borrador nuevo invoice]
+    A[Modal fechas fecha_inicial / fecha_fin] --> B[POST listarItemsParaInvoice]
+    B --> C[ProjectService::ListarItemsParaInvoice]
+    C --> D[Paid: findPostOverrideRow + resolvePaidQtyDetails por líneas previas]
+    C --> E[Unpaid: findOverrideRowForUnpaidChaining + cadena / override estático]
+  end
+  subgraph saved [Invoice persistido]
+    F[cargarDatos / export] --> G[InvoiceService::ListarItemsDeInvoice]
+    G --> H[Paid: InvoicePaidQtyOverrideResolver]
+    G --> I[Unpaid: timeline + unpaidQtyOverrideResolver / partición por fecha mínima de ancla]
+  end
+```
+
+<a id="depuración-trazas"></a>
+### Depuración (trazas)
+
+**Estado por defecto: desactivado.** No se escribe en log salvo que se descomenten cuerpos o llamadas.
+
+| Mecanismo | Destino típico | Cómo activar |
+|-----------|----------------|--------------|
+| `InvoiceService::logOverrideInvoice` | `public/weblog.txt` vía `Base::writelogPublic` | Descomentar el cuerpo del método en `InvoiceService.php` |
+| `ProjectService::logUnpaidQtyCalc`, `logCompletionPaidTrace` | `public/weblog.txt` | Descomentar el cuerpo de cada método (y la constante de completion si aplica) |
+| `OverridePaymentWritelog::writelog` | `weblog.txt` relativo a CWD o `$path_logs` + archivo | Descomentar `use` y llamadas en `ProjectService`, repositorio, etc. |
+
+`OverridePaymentWritelog` **no** usa `kernel.project_dir`; si `$path_logs` está vacío, el archivo puede acabar en el **directorio de trabajo** del PHP. Para rutas estables, preferir `writelogPublic` → **`public/weblog.txt`**.
 
 ---
 
@@ -29,9 +77,9 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 1. Obtener **cabeceras de override** del proyecto / ítem (`invoice_override_payment` + `invoice_item_override_payment`).
 2. **Comparar la fecha del invoice** (normalmente `start_date`, o el criterio que defina el producto) **con la fecha de cabecera del override** (`header.date`).
 3. **Si** el invoice es **anterior** al período de aplicación del override → **no** usar filas de override; `effective paid` = `invoice_item.paid_qty` (y `unpaid` según cadena histórica **sin** forzar override).
-4. **Si** el invoice es **igual o posterior** (según definición exacta) → aplicar la resolución actual (`InvoicePaidQtyOverrideResolver` / `InvoiceUnpaidQtyOverrideResolver`).
+4. **Si** el invoice es **igual o posterior al mes de la cabecera** (para **paid** / fila de período) → aplicar `InvoicePaidQtyOverrideResolver` con la regla de meses.
 
-> **Definición aplicada:** `override.header.date ≤ invoice.start_date` (mismo día incluido); entre varias cabeceras elegibles, la de **fecha más reciente**.
+> **Definición aplicada (paid / fila por invoice):** `mes(invoice.start) ≥ mes(header.date)`; entre varias cabeceras que cumplen, la de **fecha más reciente**. Así una cabecera de **octubre** no se usa como fila de override para facturas de **agosto o septiembre** (el criterio es el mes del período, no un mix confuso día a día frente a la cabecera).
 
 ## 3. Estado actual del código (puntos críticos)
 
@@ -40,14 +88,14 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 | Archivo | Responsabilidad |
 |--------|------------------|
 | `src/Utils/Admin/InvoicePaidQtyOverrideResolver.php` | `resolvePaidQtyDetails()`, `selectOverrideRowForInvoicePeriod()`, `getEffectivePaidQty()`. |
-| `src/Repository/InvoiceItemOverridePaymentRepository.php` | `findLatestNullStartForInvoicePeriodAfterEndDate()` — cabeceras con `h.date ≤ invStart`; entre ellas, la fecha de cabecera **más reciente**. |
+| `src/Repository/InvoiceItemOverridePaymentRepository.php` | `findLatestNullStartForInvoicePeriodAfterEndDate()` — cabeceras con **`mes(invoice) ≥ mes(h.date)`**; entre ellas, la fecha de cabecera **más reciente**. `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth()` — unpaid/ancla: **`mes(h.date) ≤ mes(invoice)`**. |
 
 ### 3.2 Unpaid efectivo
 
 | Archivo | Responsabilidad |
 |--------|------------------|
-| `src/Utils/Admin/InvoiceUnpaidQtyOverrideResolver.php` | Alineado a la misma fila que el paid por período. |
-| `src/Utils/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findPostOverrideRowForInvoicePeriod()`, `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. |
+| `src/Utils/Admin/InvoiceUnpaidQtyOverrideResolver.php` | Ancla por `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth`; valor desde columna `unpaid_qty` o historial de notas; `findEarliestUnpaidOverrideHeaderDate` para particionar la línea de tiempo en `ListarItemsDeInvoice`. **No** es la misma semántica que “solo paid”: mismo **criterio de mes** para elegir cabecera, distinto **campo** y encadenado con otras facturas del ítem. |
+| `src/Utils/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findOverrideRowForUnpaidChaining()`, `findPostOverrideRowForInvoicePeriod()` (este último solo paid / cortes de agregado), `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. |
 
 ### 3.3 Listado de ítems para nuevo invoice (borrador)
 
@@ -76,31 +124,26 @@ Cualquier pantalla que muestre **paid/unpaid** con “effective” debe respetar
 | `InvoicePaidQtyOverrideResolver::sumEffectiveBondPaidQtyForProjectBeforeOrOnDate` | Bond acumulado hasta fecha — revisar coherencia con el corte por override. |
 | `PaymentService` | Persistencia de `paid_qty`/`unpaid_qty` y notas; no siempre pasa por el resolver; validar que no se **sobrescriban** facturas viejas al guardar pagos. |
 
-## 4. Qué revisar o modificar (checklist)
+## 4. Mejoras futuras y checklist
 
-### 4.1 Unificar criterio de “¿aplica override?”
+### 4.1 Criterio “¿aplica override?”
 
-- [ ] Centralizar en **un solo** método (p. ej. en `InvoicePaidQtyOverrideResolver` o helper compartido) algo como:
-  - `shouldApplyOverrideForInvoice(Invoice $invoice, InvoiceOverridePayment $header): bool`
-  - basado en `invoice.start_date` (y `end_date` si aplica) vs `header.date`.
-- [ ] Revisar **tres** caminos actuales que pueden divergir:
-  1. `findLatestNullStartForInvoicePeriodAfterEndDate` (comparación `invStart` vs `hd`).
-  2. `invoiceOverlapsOverrideRange` (cabecera dentro del rango del invoice).
-  3. Overrides globales (`date === null`).
+- El criterio por **mes** está centralizado en el repositorio (`pickBestInvoiceItemOverrideByHeaderRule`). Opcional: exponer un helper de dominio explícito (`shouldHeaderApplyToInvoiceMonth`) para documentación y tests.
+- Revisar otros puntos del código que aún usen reglas distintas (p. ej. solapamiento de rangos, `invoiceOverlapsOverrideRange`) y alinearlos o documentar la excepción.
 
 ### 4.2 Casos borde
 
-- [ ] Invoice cuyo **rango** cruza la fecha del override (p. ej. inicio Septiembre, fin Octubre) — definir si el override aplica a la línea o no.
-- [ ] **Varias** cabeceras de override en el mismo proyecto — orden y prioridad.
-- [ ] **Mismo día** que la cabecera: aplica (inclusive).
+- [ ] Invoice cuyo **rango** cruza meses (p. ej. inicio septiembre, fin octubre): la selección usa **`start_date`** del invoice para el mes; validar expectativa de negocio si el rango es atípico.
+- [ ] **Varias** cabeceras: prioridad = cabecera **más reciente** entre las que cumplen el mes.
+- [ ] **Mismo mes** que la cabecera: aplica (inclusive).
 
 ### 4.3 Datos
 
-- La cabecera de override lleva **`date` obligatorio** en negocio.
+- En negocio, la cabecera lleva **`date` informada**; cabeceras sin fecha no entran en el picker actual.
 
 ### 4.4 Frontend
 
-- [ ] Solo validación de UX: el backend debe ser la fuente de verdad; el JS no debe “recalcular” paid/unpaid con override sin las mismas fechas.
+- El backend es la fuente de verdad; el JS debe enviar **`fecha_inicial` / `fecha_fin`** coherentes con el período del invoice (p. ej. `public/bundles/metronic8/js/pages/invoices.js`, `modal-invoice.js`).
 
 ## 5. Plan de pruebas manuales (validación end-to-end)
 

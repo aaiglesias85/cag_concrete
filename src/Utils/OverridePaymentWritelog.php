@@ -10,7 +10,6 @@ final class OverridePaymentWritelog
 {
    public static function writelog(string $txt, string $filename = 'weblog.txt'): void
    {
-      return;
       global $path_logs;
 
       $datetime = date('Y-m-d H:i:s', time());

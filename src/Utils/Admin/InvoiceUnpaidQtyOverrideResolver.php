@@ -7,8 +7,6 @@ use App\Entity\InvoiceItemOverridePayment;
 use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemOverridePaymentUnpaidQtyHistoryRepository;
 use App\Repository\InvoiceItemRepository;
-use App\Utils\OverridePaymentWritelog;
-
 /**
  * Unpaid qty efectivo: fila con cabecera más reciente tal que mes(cabecera) ≤ mes(invoice)
  * ({@see InvoiceItemOverridePaymentRepository::findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth}),
@@ -34,9 +32,9 @@ class InvoiceUnpaidQtyOverrideResolver
 
    /**
     * Fecha de cabecera más antigua donde este ítem tiene unpaid efectivo (columna o historial).
-    * Sirve para particionar la línea de tiempo: facturas con start estrictamente anteriores a esa fecha
-    * no deben verse afectadas por la lógica de override de unpaid (usan valor persistido), aunque el
-    * invoice que se está viendo no tenga ancla (mes anterior al override).
+    * Particiona la línea de tiempo en InvoiceService: facturas con start estrictamente anteriores usan
+    * unpaid calculado por cadena qty/paid (sin snapshot de override); desde esa fecha en adelante aplica
+    * ancla/encadenado de override de unpaid.
     */
    public function findEarliestUnpaidOverrideHeaderDate(int $projectItemId): ?\DateTimeInterface
    {
@@ -103,22 +101,14 @@ class InvoiceUnpaidQtyOverrideResolver
       $invStart = $invoice->getStartDate();
       $invEnd = $invoice->getEndDate();
       if ($invStart === null || $invEnd === null) {
-         OverridePaymentWritelog::writelog("[resolveUnpaidQtyDetails] invoice_item_id={$invoiceItemId} sin fechas invoice -> base unpaid={$base}");
          return $this->unpaidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
-
-      OverridePaymentWritelog::writelog(
-         "[resolveUnpaidQtyDetails] START invoice_item_id={$invoiceItemId} invoice_id={$invoiceId} project_item_id={$projectItemId} base(unpaid persistido)={$base} period=" . $this->formatInvoicePeriod($invStart, $invEnd)
-      );
 
       $match = $this->overrideRepo->findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth($pi->getId(), $invStart);
       $effectiveOpt = $match !== null ? $this->effectiveUnpaidFromOverrideRow($match) : null;
       if ($match !== null && $effectiveOpt !== null) {
          $effective = $effectiveOpt;
          $overrideId = $match->getId() !== null ? (int) $match->getId() : null;
-         OverridePaymentWritelog::writelog(
-            "[resolveUnpaidQtyDetails] END effective(unpaid override)={$effective} override_id={$overrideId}"
-         );
 
          return $this->unpaidQtyDetailsRow(
             $effective,
@@ -130,9 +120,6 @@ class InvoiceUnpaidQtyOverrideResolver
             $this->formatInvoicePeriod($invStart, $invEnd)
          );
       }
-
-      $reason = $match === null ? 'match=null' : 'sin unpaid efectivo (columna ni historial)';
-      OverridePaymentWritelog::writelog("[resolveUnpaidQtyDetails] END effective=base ({$reason}) base={$base}");
 
       return $this->unpaidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
    }
