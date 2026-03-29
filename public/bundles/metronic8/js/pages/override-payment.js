@@ -795,7 +795,7 @@ var OverridePayment = (function () {
       });
    };
    /**
-    * @param {boolean} forceReload Si true, siempre pide ítems al servidor. Si false y ya hay tabla con el mismo project_id, no recarga (solo cambió fecha u otro dato de General).
+    * @param {boolean} forceReload Si true, siempre pide ítems al servidor. Si false y la firma (proyecto+fecha+cabecera) coincide, no recarga.
     */
    var fetchItemsYMontarTabla = function (forceReload) {
       if (forceReload === undefined) {
@@ -817,6 +817,7 @@ var OverridePayment = (function () {
       }
       showTableContent();
       BlockUtil.block('#tab-content-op-items');
+      var pid = $('#filtro-project-op').val() || '';
       var formData = new URLSearchParams();
       formData.set('company_id', $('#filtro-company-op').val() || '');
       formData.set('project_id', pid);
