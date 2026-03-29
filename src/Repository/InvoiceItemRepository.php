@@ -582,7 +582,8 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
    /**
     * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id.
-    * Filtro opcional por fecha: solo invoice.end_date <= fecha_fin (inclusive), en m/d/Y.
+    * Filtro opcional por fecha (solo si `fecha_fin` no está vacío): invoice.end_date <= fecha_fin (inclusive), m/d/Y.
+    * Cadena vacía = todos los invoices del proyecto en los agregados (p. ej. listado Override Payment).
     *
     * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
     */

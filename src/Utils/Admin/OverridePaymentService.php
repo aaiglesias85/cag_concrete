@@ -138,6 +138,10 @@ class OverridePaymentService extends Base
     * Todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
     * El frontend usa DataTables con datasource local; la búsqueda es en cliente.
     *
+    * La fecha de cabecera (`fecha_fin`) no filtra los agregados de facturación: Invoice QTY y demás
+    * sumas incluyen todos los invoice_item del proyecto. Esa fecha solo enlaza la fila de override
+    * existente y se persiste al guardar ({@see SalvarOverridePayment}).
+    *
     * @return array{items: array<int, array<string, mixed>>}
     */
    public function ListarItemsParaOverridePayment(
@@ -155,7 +159,7 @@ class OverridePaymentService extends Base
          'asc',
          (string) ($company_id ?? ''),
          (string) ($project_id ?? ''),
-         $fecha_fin ?? ''
+         ''
       );
 
       $raw = $result['data'];
