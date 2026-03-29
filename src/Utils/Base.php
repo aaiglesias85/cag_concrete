@@ -144,6 +144,34 @@ class Base
       $this->logger->info($txt);
    }
 
+   /**
+    * Escribe siempre en public/{filename} (ruta absoluta vía kernel.project_dir).
+    * Útil cuando el CWD del PHP no es public/ y weblog.txt quedaría en otro sitio.
+    */
+   public function writelogPublic(string $txt, string $filename = 'weblog.txt'): void
+   {
+      $dir = rtrim((string) $this->getParameter('kernel.project_dir'), '/\\') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR;
+      $fullPath = $dir . $filename;
+      $datetime = date('Y-m-d H:i:s', time());
+      $line = $datetime . "\t---\t" . $txt . "\n";
+      $fp = @fopen($fullPath, 'a');
+      if ($fp) {
+         fputs($fp, $line, strlen($line));
+         fclose($fp);
+      } else {
+         $this->logger->warning('writelogPublic: no se pudo escribir ' . $fullPath);
+      }
+      $this->logger->info($line);
+   }
+
+   /**
+    * Mismo año-mes calendario (Y-m), para reglas de override por período.
+    */
+   protected function isSameCalendarMonth(\DateTimeInterface $invoiceStart, \DateTimeInterface $overridePeriodDate): bool
+   {
+      return $invoiceStart->format('Y-m') === $overridePeriodDate->format('Y-m');
+   }
+
    // http://www.the-art-of-web.com/php/truncate/
    function truncate($string, $limit, $break = ".", $pad = "...")
    {

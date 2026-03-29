@@ -109,6 +109,22 @@ class ProjectService extends Base
    }
 
    /**
+    * Depuración: unpaid_qty / cadena post-override → public/weblog.txt (writelogPublic).
+    *
+    * @param array<string, mixed> $context
+    */
+   private function logUnpaidQtyCalc(string $step, array $context = []): void
+   {
+      // Descomentar para escribir trazas en public/weblog.txt
+      /*
+      $line = $context === []
+         ? $step
+         : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+      $this->writelogPublic('[unpaid_qty_calc] ' . $line, 'weblog.txt');
+      */
+   }
+
+   /**
     * Fila de override aplicable al período del borrador (misma regla que el resolver):
     * cabecera con fecha ≤ inicio del invoice; la más reciente entre esas.
     */
@@ -148,16 +164,34 @@ class ProjectService extends Base
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $out = [];
+      $excluded = [];
+      $skippedNull = [];
       foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invItem) {
          $inv = $invItem->getInvoice();
          if ($inv === null || $inv->getStartDate() === null) {
+            $skippedNull[] = ['invoice_item_id' => $invItem->getId()];
             continue;
          }
-         if ($inv->getStartDate()->format('Y-m-d') <= $cutoffYmd) {
+         $startYmd = $inv->getStartDate()->format('Y-m-d');
+         if ($startYmd <= $cutoffYmd) {
+            $excluded[] = [
+               'invoice_item_id' => $invItem->getId(),
+               'invoice_id' => $inv->getInvoiceId(),
+               'invoice_start_ymd' => $startYmd,
+            ];
             continue;
          }
          $out[] = $invItem;
       }
+
+      $this->logUnpaidQtyCalc('post_override_lines_scan', [
+         'project_item_id' => $projectItemId,
+         'cutoff_ymd' => $cutoffYmd,
+         'included_count' => \count($out),
+         'excluded_not_after_cutoff' => $excluded,
+         'skipped_null_invoice_or_date' => $skippedNull,
+         'rule' => 'invoice.start_date must be strictly after cutoff (Y-m-d)',
+      ]);
 
       usort(
          $out,
@@ -183,26 +217,63 @@ class ProjectService extends Base
     * unpaid_qty del snapshot (override) y luego, por cada invoice guardado después de la fecha de cabecera:
     * u = max(0, u + quantity − paid_line − QBF). paid_line alineado al agregado de paid: primera línea con un
     * override_id usa effective del resolver; líneas siguientes con el mismo id solo paid_qty persistido (base).
+    * Si el invoice de la línea cae en el mismo mes calendario que la fecha de cabecera del override, no aplica
+    * el paso de cadena (u queda igual al snapshot hasta el mes siguiente).
     */
    private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId): float
    {
       $ed = $rowAfter->getOverridePeriodDate();
       if ($ed === null || $rowAfter->getUnpaidQty() === null) {
+         $this->logUnpaidQtyCalc('chain_abort_missing_period_date_or_unpaid', [
+            'project_item_id' => $projectItemId,
+            'override_row_id' => $rowAfter->getId(),
+            'has_override_period_date' => $ed !== null,
+            'has_unpaid_qty' => $rowAfter->getUnpaidQty() !== null,
+         ]);
+
          return 0.0;
       }
       $cutoffYmd = $ed->format('Y-m-d');
       $snapshotUnpaid = (float) $rowAfter->getUnpaidQty();
+      $this->logUnpaidQtyCalc('chain_start', [
+         'project_item_id' => $projectItemId,
+         'override_row_id' => $rowAfter->getId(),
+         'override_period_date_ymd' => $cutoffYmd,
+         'snapshot_unpaid_qty' => $snapshotUnpaid,
+         'snapshot_paid_qty' => $rowAfter->getPaidQty(),
+      ]);
 
       $postLines = $this->listInvoiceItemsForProjectItemStrictlyAfterDateYmd($projectItemId, $cutoffYmd);
 
       if ($postLines === []) {
+         $this->logUnpaidQtyCalc('chain_no_post_lines_return_snapshot', [
+            'project_item_id' => $projectItemId,
+            'cutoff_ymd' => $cutoffYmd,
+            'result_unpaid_qty' => $snapshotUnpaid,
+         ]);
+
          return $snapshotUnpaid;
       }
 
+      $this->logUnpaidQtyCalc('chain_post_lines_selected', [
+         'project_item_id' => $projectItemId,
+         'cutoff_ymd' => $cutoffYmd,
+         'count' => \count($postLines),
+         'invoice_item_ids' => array_map(
+            static fn (InvoiceItem $ii) => $ii->getId(),
+            $postLines
+         ),
+      ]);
+
       $u = $snapshotUnpaid;
+      $stepIndex = 0;
       /** @var array<int, true> */
       $seenOverrideIdsInChain = [];
       foreach ($postLines as $invItem) {
+         $inv = $invItem->getInvoice();
+         if ($inv !== null && $inv->getStartDate() !== null && $this->isSameCalendarMonth($inv->getStartDate(), $ed)) {
+            continue;
+         }
          $qty = (float) ($invItem->getQuantity() ?? 0);
          $qbf = (float) ($invItem->getQuantityBroughtForward() ?? 0);
          $detailsPaid = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invItem);
@@ -213,14 +284,43 @@ class ProjectService extends Base
             if (!isset($seenOverrideIdsInChain[$oid])) {
                $paidLine = $paidEffective;
                $seenOverrideIdsInChain[$oid] = true;
+               $paidSource = 'override_effective_first_line';
             } else {
                $paidLine = $paidStored;
+               $paidSource = 'stored_after_override_already_counted';
             }
          } else {
             $paidLine = $paidStored;
+            $paidSource = 'stored_no_override';
          }
+         $uBefore = $u;
          $u = max(0.0, $u + $qty - $paidLine - $qbf);
+         ++$stepIndex;
+         $this->logUnpaidQtyCalc('chain_step', [
+            'project_item_id' => $projectItemId,
+            'step' => $stepIndex,
+            'invoice_item_id' => $invItem->getId(),
+            'invoice_id' => $inv !== null ? $inv->getInvoiceId() : null,
+            'invoice_start_ymd' => $inv !== null && $inv->getStartDate() !== null
+               ? $inv->getStartDate()->format('Y-m-d')
+               : null,
+            'quantity' => $qty,
+            'quantity_brought_forward' => $qbf,
+            'paid_qty_stored' => $paidStored,
+            'paid_qty_effective_resolver' => $paidEffective,
+            'override_id' => $oid,
+            'paid_line_used' => $paidLine,
+            'paid_source' => $paidSource,
+            'u_before' => $uBefore,
+            'u_after' => $u,
+            'formula' => 'max(0, u + qty - paid_line - qbf)',
+         ]);
       }
+
+      $this->logUnpaidQtyCalc('chain_end', [
+         'project_item_id' => $projectItemId,
+         'result_unpaid_qty' => $u,
+      ]);
 
       return $u;
    }
@@ -1584,25 +1684,54 @@ class ProjectService extends Base
       $fi = $fecha_inicial !== null ? trim((string) $fecha_inicial) : '';
       $ff = $fecha_fin !== null ? trim((string) $fecha_fin) : '';
 
-      // OverridePaymentWritelog::writelog(
-      //    '[CalcularUnpaidQuantityFromPreviusInvoice] piId=' . $piId . ' fi=' . $fi . ' ff=' . $ff      );
+      $this->logUnpaidQtyCalc('calc_enter', [
+         'project_item_id' => $piId,
+         'fecha_inicial_raw' => $fecha_inicial,
+         'fecha_fin_raw' => $fecha_fin,
+         'fi_trimmed' => $fi,
+         'ff_trimmed' => $ff,
+      ]);
 
       if ($fi !== '' && $ff !== '') {
          $invStart = $this->parseInvoiceDateFlexible($fi);
          $invEnd = $this->parseInvoiceDateFlexible($ff);
+         $this->logUnpaidQtyCalc('calc_parsed_invoice_period', [
+            'project_item_id' => $piId,
+            'inv_start' => $invStart !== null ? $invStart->format('Y-m-d') : null,
+            'inv_end' => $invEnd !== null ? $invEnd->format('Y-m-d') : null,
+         ]);
          if ($invStart !== null && $invEnd !== null) {
             $rowAfter = $this->findPostOverrideRowForInvoicePeriod($piId, $fecha_inicial, $fecha_fin);
+            $this->logUnpaidQtyCalc('calc_row_after_lookup', [
+               'project_item_id' => $piId,
+               'row_after_id' => $rowAfter !== null ? $rowAfter->getId() : null,
+               'row_after_override_period_date' => $rowAfter !== null && $rowAfter->getOverridePeriodDate() !== null
+                  ? $rowAfter->getOverridePeriodDate()->format('Y-m-d')
+                  : null,
+               'row_after_unpaid_qty' => $rowAfter !== null ? $rowAfter->getUnpaidQty() : null,
+            ]);
             if ($rowAfter !== null && $rowAfter->getUnpaidQty() !== null) {
                $u = $this->computeUnpaidChainingAfterOverride($rowAfter, $piId);
-               // OverridePaymentWritelog::writelog('[CalcularUnpaidQuantityFromPreviusInvoice] rama computeUnpaidChainingAfterOverride unpaid=' . $u);
+               $this->logUnpaidQtyCalc('calc_return_chain_after_override', [
+                  'project_item_id' => $piId,
+                  'result_unpaid_qty' => $u,
+               ]);
 
                return $u;
             }
 
             $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod($piId, $invStart, $invEnd);
+            $this->logUnpaidQtyCalc('calc_override_match_row', [
+               'project_item_id' => $piId,
+               'match_id' => $match !== null ? $match->getId() : null,
+               'match_unpaid_qty' => $match !== null ? $match->getUnpaidQty() : null,
+            ]);
             if ($match !== null && $match->getUnpaidQty() !== null) {
                $u = (float) $match->getUnpaidQty();
-               // OverridePaymentWritelog::writelog('[CalcularUnpaidQuantityFromPreviusInvoice] rama match directo unpaid=' . $u);
+               $this->logUnpaidQtyCalc('calc_return_static_override_unpaid', [
+                  'project_item_id' => $piId,
+                  'result_unpaid_qty' => $u,
+               ]);
 
                return $u;
             }
@@ -1614,11 +1743,13 @@ class ProjectService extends Base
       // deja total_quantity=0 y mergeOverridePaidAfterCutoffIfNoLines pone paid=150 → unpaid=0 por error.
       $aggDebt = $this->computePreviousInvoiceTotalsForProjectItem($piId, null);
       $u = max(0.0, (float) ($aggDebt['total_quantity'] ?? 0) - (float) ($aggDebt['total_paid_effective'] ?? 0));
-      // OverridePaymentWritelog::writelog(
-      //    '[CalcularUnpaidQuantityFromPreviusInvoice] rama total_qty - total_paid_effective (agregado SIN cutoff) unpaid=' . $u
-      //    . ' total_quantity=' . ($aggDebt['total_quantity'] ?? '')
-      //    . ' total_paid_effective=' . ($aggDebt['total_paid_effective'] ?? '')
-      // );
+      $this->logUnpaidQtyCalc('calc_return_aggregate_debt_no_cutoff', [
+         'project_item_id' => $piId,
+         'agg_total_quantity' => $aggDebt['total_quantity'] ?? null,
+         'agg_total_paid_effective' => $aggDebt['total_paid_effective'] ?? null,
+         'agg_line_count' => $aggDebt['line_count'] ?? null,
+         'result_unpaid_qty' => $u,
+      ]);
 
       return $u;
    }
