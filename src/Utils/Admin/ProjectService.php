@@ -272,11 +272,42 @@ class ProjectService extends Base
                return $cmp;
             }
 
-            return ((int) $ia->getInvoiceId()) <=> ((int) $ib->getInvoiceId());
+             return ((int) $ia->getInvoiceId()) <=> ((int) $ib->getInvoiceId());
          }
       );
 
       return $out;
+   }
+
+   private function findInvoiceItemByProjectItemAndDate(int $projectItemId, \DateTimeInterface $date): ?\App\Entity\InvoiceItem
+   {
+      /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItem::class);
+      $this->logUnpaidQtyCalc('find_invoice_item_search', [
+         'project_item_id' => $projectItemId,
+         'search_date' => $date->format('Y-m-d'),
+      ]);
+      foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invItem) {
+         $inv = $invItem->getInvoice();
+         if ($inv === null || $inv->getStartDate() === null) {
+            continue;
+         }
+         $invStart = $inv->getStartDate()->format('Y-m-d');
+         $searchDate = $date->format('Y-m-d');
+         $isSameMonth = $this->isSameCalendarMonth($inv->getStartDate(), $date);
+         $this->logUnpaidQtyCalc('find_invoice_item_check', [
+            'invoice_id' => $inv->getInvoiceId(),
+            'invoice_start' => $invStart,
+            'search_date' => $searchDate,
+            'is_same_month' => $isSameMonth,
+            'quantity' => $invItem->getQuantity(),
+         ]);
+         if ($isSameMonth) {
+            return $invItem;
+         }
+      }
+
+      return null;
    }
 
    /**
@@ -316,14 +347,34 @@ class ProjectService extends Base
       if ($postLines === []) {
          $this->logUnpaidQtyCalc('chain_no_post_lines_return_snapshot', [
             'project_item_id' => $projectItemId,
-            'cutoff_ymd' => $cutoffYmd,
-            'result_unpaid_qty' => $snapshotUnpaid,
-         ]);
+             'cutoff_ymd' => $cutoffYmd,
+             'result_unpaid_qty' => $snapshotUnpaid,
+          ]);
 
-         return $snapshotUnpaid;
-      }
+          // Incluir el invoice del override en el cálculo
+          $overrideInvoiceItem = $this->findInvoiceItemByProjectItemAndDate($projectItemId, $ed);
+          if ($overrideInvoiceItem !== null) {
+             $overrideQty = (float) ($overrideInvoiceItem->getQuantity() ?? 0);
+             $overrideQbf = (float) ($overrideInvoiceItem->getQuantityBroughtForward() ?? 0);
+             $overridePaid = (float) ($rowAfter->getPaidQty() ?? 0);
+             $u = max(0.0, $snapshotUnpaid + $overrideQty - $overridePaid - $overrideQbf);
+             $this->logUnpaidQtyCalc('chain_no_post_lines_include_override_invoice', [
+                'project_item_id' => $projectItemId,
+                'cutoff_ymd' => $cutoffYmd,
+                'override_invoice_id' => $overrideInvoiceItem->getInvoice()?->getInvoiceId(),
+                'override_invoice_qty' => $overrideQty,
+                'override_invoice_qbf' => $overrideQbf,
+                'override_invoice_paid' => $overridePaid,
+                'result_unpaid_qty' => $u,
+             ]);
 
-      $this->logUnpaidQtyCalc('chain_post_lines_selected', [
+             return $u;
+          }
+
+          return $snapshotUnpaid;
+       }
+
+       $this->logUnpaidQtyCalc('chain_post_lines_selected', [
          'project_item_id' => $projectItemId,
          'cutoff_ymd' => $cutoffYmd,
          'count' => \count($postLines),
@@ -1874,14 +1925,34 @@ class ProjectService extends Base
                'match_effective_unpaid_qty' => $effUnpaidMatch,
             ]);
             if ($match !== null && $effUnpaidMatch !== null) {
-               $u = $effUnpaidMatch;
-               $this->logUnpaidQtyCalc('calc_return_static_override_unpaid', [
-                  'project_item_id' => $piId,
-                  'result_unpaid_qty' => $u,
-               ]);
+                $matchPeriodDate = $match->getOverridePeriodDate();
+                $matchInvoiceItem = $matchPeriodDate !== null 
+                   ? $this->findInvoiceItemByProjectItemAndDate($piId, $matchPeriodDate)
+                   : null;
+                if ($matchInvoiceItem !== null) {
+                   $matchQty = (float) ($matchInvoiceItem->getQuantity() ?? 0);
+                   $matchQbf = (float) ($matchInvoiceItem->getQuantityBroughtForward() ?? 0);
+                   $matchPaid = (float) ($match->getPaidQty() ?? 0);
+                   $u = max(0.0, $effUnpaidMatch + $matchQty - $matchPaid - $matchQbf);
+                   $this->logUnpaidQtyCalc('calc_return_override_with_invoice_qty', [
+                      'project_item_id' => $piId,
+                      'match_id' => $match->getId(),
+                      'invoice_qty' => $matchQty,
+                      'invoice_qbf' => $matchQbf,
+                      'invoice_paid' => $matchPaid,
+                      'result_unpaid_qty' => $u,
+                   ]);
 
-               return $u;
-            }
+                   return $u;
+                }
+                $u = $effUnpaidMatch;
+                $this->logUnpaidQtyCalc('calc_return_static_override_unpaid', [
+                   'project_item_id' => $piId,
+                   'result_unpaid_qty' => $u,
+                ]);
+
+                return $u;
+             }
          }
       }
 
