@@ -6,6 +6,7 @@ use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
+use App\Entity\InvoiceItemOverridePayment;
 
 use App\Entity\ProjectItem;
 use App\Entity\ProjectItemHistory;
@@ -1733,10 +1734,12 @@ class InvoiceService extends Base
          $historialQty = 0.0;
          $historialPaid = 0.0;
 
-         // Misma fila override que paid para el período de este invoice; unpaid solo si la columna unpaid_qty está definida
+         // Paid: fila del período del invoice. Unpaid ancla: cabecera ≤ mes invoice (puede ser otra fila que la de paid).
          $invPeriodStart = $currentInvoice->getStartDate();
          $invPeriodEnd = $currentInvoice->getEndDate();
+         /** @var ?InvoiceItemOverridePayment $latestOverride */
          $latestOverride = null;
+         $anchorUnpaidEffective = null;
          $periodOverrideRow = null;
          if ($invPeriodStart !== null && $invPeriodEnd !== null) {
             $periodOverrideRow = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
@@ -1744,8 +1747,18 @@ class InvoiceService extends Base
                $invPeriodStart,
                $invPeriodEnd
             );
-            if ($periodOverrideRow !== null && $periodOverrideRow->getUnpaidQty() !== null) {
-               $latestOverride = $periodOverrideRow;
+         }
+         if ($invPeriodStart !== null) {
+            $anchorRow = $this->unpaidQtyOverrideResolver->findUnpaidAnchorOverrideRow(
+               (int) $project_item_id,
+               $invPeriodStart
+            );
+            if ($anchorRow !== null) {
+               $effUnpaid = $this->unpaidQtyOverrideResolver->getEffectiveUnpaidFromOverrideRow($anchorRow);
+               if ($effUnpaid !== null) {
+                  $latestOverride = $anchorRow;
+                  $anchorUnpaidEffective = $effUnpaid;
+               }
             }
          }
 
@@ -1759,8 +1772,9 @@ class InvoiceService extends Base
             'period_override_row_id' => $periodOverrideRow !== null ? $periodOverrideRow->getId() : null,
             'latest_override_id' => $latestOverride !== null ? $latestOverride->getId() : null,
             'override_period_date_ymd' => $overrideStartDate !== null ? $overrideStartDate->format('Y-m-d') : null,
-            'override_snapshot_unpaid' => $latestOverride !== null ? $latestOverride->getUnpaidQty() : null,
-            'override_snapshot_paid' => $latestOverride !== null ? $latestOverride->getPaidQty() : null,
+            'override_snapshot_unpaid_column' => $latestOverride !== null ? $latestOverride->getUnpaidQty() : null,
+            'anchor_unpaid_effective' => $anchorUnpaidEffective,
+            'override_snapshot_paid' => $periodOverrideRow !== null ? $periodOverrideRow->getPaidQty() : ($latestOverride !== null ? $latestOverride->getPaidQty() : null),
          ]);
 
          // Valor por defecto
@@ -1794,9 +1808,9 @@ class InvoiceService extends Base
             if (!$isAfterOverride) {
                // Invoice anterior al override: usar valor guardado en BD
                $tempUnpaid = ($invItem) ? (float)$invItem->getUnpaidQty() : 0.0;
-            } elseif ($latestOverride !== null) {
-               // Desde el override en adelante: usar override como base
-               $overrideBase = (float) $latestOverride->getUnpaidQty();
+            } elseif ($latestOverride !== null && $anchorUnpaidEffective !== null) {
+               // Desde el override en adelante: base = unpaid efectivo de la ancla (columna o historial)
+               $overrideBase = (float) $anchorUnpaidEffective;
                if ($invStart !== null && $overrideStartDate !== null
                   && $this->isSameCalendarMonth($invStart, $overrideStartDate)
                ) {
@@ -1865,9 +1879,9 @@ class InvoiceService extends Base
              // Si el invoice actual es posterior al override, usar el override
              $isAfterOverride = ($overrideStartDate === null) || ($currentInvStart !== null && $currentInvStart >= $overrideStartDate);
              
-             if ($isAfterOverride && $latestOverride !== null) {
+             if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
                 // Usar el override como base
-                $overrideBase = (float) $latestOverride->getUnpaidQty();
+                $overrideBase = (float) $anchorUnpaidEffective;
                 $currentQbf = (float)$value->getQuantityBroughtForward();
                 $currentQty = (float)$value->getQuantity();
                 $currentPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
@@ -2627,16 +2641,20 @@ class InvoiceService extends Base
          }
 
          $invPeriodStart = $currentInvoice->getStartDate();
-         $invPeriodEnd = $currentInvoice->getEndDate();
+         /** @var ?InvoiceItemOverridePayment $latestOverride ancla unpaid (cabecera ≤ mes invoice), no la misma fila que paid por período */
          $latestOverride = null;
-         if ($invPeriodStart !== null && $invPeriodEnd !== null) {
-            $match = $this->paidQtyOverrideResolver->selectOverrideRowForInvoicePeriod(
+         $anchorUnpaidEffective = null;
+         if ($invPeriodStart !== null) {
+            $anchorRow = $this->unpaidQtyOverrideResolver->findUnpaidAnchorOverrideRow(
                (int) $project_item_id,
-               $invPeriodStart,
-               $invPeriodEnd
+               $invPeriodStart
             );
-            if ($match !== null && $match->getUnpaidQty() !== null) {
-               $latestOverride = $match;
+            if ($anchorRow !== null) {
+               $effUnpaid = $this->unpaidQtyOverrideResolver->getEffectiveUnpaidFromOverrideRow($anchorRow);
+               if ($effUnpaid !== null) {
+                  $latestOverride = $anchorRow;
+                  $anchorUnpaidEffective = $effUnpaid;
+               }
             }
          }
 
@@ -2691,14 +2709,22 @@ class InvoiceService extends Base
                $iPaid = $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsQbf);
             }
 
-            // Determinar el unpaid: primero revisar override
+            // Determinar el unpaid: misma regla que ListarItemsDeInvoice (ancla unpaid + mismo mes vs base+qty-paid-qbf)
             $nuevoUnpaid = null;
-            if ($latestOverride !== null) {
-               $nuevoUnpaid = (float) $latestOverride->getUnpaidQty();
+            if ($latestOverride !== null && $anchorUnpaidEffective !== null) {
+               $overrideBase = (float) $anchorUnpaidEffective;
+               if ($invStart !== null && $overrideStartDate !== null
+                  && $this->isSameCalendarMonth($invStart, $overrideStartDate)
+               ) {
+                  $nuevoUnpaid = $overrideBase;
+               } else {
+                  $nuevoUnpaid = $overrideBase + $iQty - $iPaid - $currentQbf;
+               }
+               $nuevoUnpaid = max(0.0, $nuevoUnpaid);
                $lastUnpaidOverrideValue = $nuevoUnpaid;
             } elseif ($lastUnpaidOverrideValue !== null) {
-               // Propagar override previo
-               $nuevoUnpaid = $lastUnpaidOverrideValue;
+               $nuevoUnpaid = $lastUnpaidOverrideValue + $iQty - $iPaid - $currentQbf;
+               $nuevoUnpaid = max(0.0, $nuevoUnpaid);
             } else {
                // Calcular normalmente
                $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
@@ -2827,8 +2853,10 @@ class InvoiceService extends Base
          $seenOverrideIdsRecalc = [];
 
          for ($i = 0; $i < count($allInvoices); $i++) {
-            $invId = (int) $allInvoices[$i]->getInvoiceId();
+            $inv = $allInvoices[$i];
+            $invId = (int) $inv->getInvoiceId();
             $invItem = $invoiceItemMap[$invId] ?? null;
+            $invStart = $inv->getStartDate();
 
             if ($invItem) {
                $invItem->setQuantityFromPrevious($historialQty);
@@ -2840,7 +2868,36 @@ class InvoiceService extends Base
                ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($invItem, $seenOverrideIdsRecalc)
                : 0.0;
 
-            $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+            /** @var ?InvoiceItemOverridePayment $recalcAnchor */
+            $recalcAnchor = null;
+            $recalcAnchorUnpaidEffective = null;
+            if ($invStart !== null) {
+               $recalcAnchor = $this->unpaidQtyOverrideResolver->findUnpaidAnchorOverrideRow(
+                  (int) $project_item_id,
+                  $invStart
+               );
+               if ($recalcAnchor !== null) {
+                  $eff = $this->unpaidQtyOverrideResolver->getEffectiveUnpaidFromOverrideRow($recalcAnchor);
+                  if ($eff !== null) {
+                     $recalcAnchorUnpaidEffective = $eff;
+                  }
+               }
+            }
+            $recalcOverrideStart = $recalcAnchor !== null ? $recalcAnchor->getOverridePeriodDate() : null;
+
+            if ($recalcAnchor !== null && $recalcAnchorUnpaidEffective !== null) {
+               $overrideBase = (float) $recalcAnchorUnpaidEffective;
+               if ($invStart !== null && $recalcOverrideStart !== null
+                  && $this->isSameCalendarMonth($invStart, $recalcOverrideStart)
+               ) {
+                  $nuevoUnpaid = $overrideBase;
+               } else {
+                  $nuevoUnpaid = $overrideBase + $iQty - $iPaid - $currentQbf;
+               }
+               $nuevoUnpaid = max(0.0, $nuevoUnpaid);
+            } else {
+               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+            }
 
             if ($invItem) {
                $invItem->setUnpaidQty($nuevoUnpaid);

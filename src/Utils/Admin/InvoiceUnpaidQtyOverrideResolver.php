@@ -33,6 +33,22 @@ class InvoiceUnpaidQtyOverrideResolver
    }
 
    /**
+    * Fila de override como ancla de unpaid (misma regla que ProjectService / listado invoice).
+    */
+   public function findUnpaidAnchorOverrideRow(int $projectItemId, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
+   {
+      return $this->overrideRepo->findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth($projectItemId, $invStart);
+   }
+
+   /**
+    * unpaid_qty en BD o último valor en historial de notas.
+    */
+   public function getEffectiveUnpaidFromOverrideRow(InvoiceItemOverridePayment $row): ?float
+   {
+      return $this->effectiveUnpaidFromOverrideRow($row);
+   }
+
+   /**
     * @return array{
     *   effective: float,
     *   base: float,
