@@ -6,6 +6,10 @@ listarOverridePaymentAdmin:
    path: /override-payment/listar
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::listar, _format: json }
 
+cargarDatosOverridePaymentAdmin:
+   path: /override-payment/cargarDatos
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::cargarDatos, _format: json }
+
 eliminarOverridePaymentAdmin:
    path: /override-payment/eliminar
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::eliminar, _format: json }

@@ -6,6 +6,8 @@ var OverridePayment = (function () {
    var oTable = null;
    var oTableHistory = null;
    var activeTab = 1;
+   /** Id de proyecto con el que se cargó la tabla de ítems (evita recargar al cambiar solo la fecha). */
+   var lastItemsLoadProjectId = null;
    /** Id pendiente para confirmar borrado vía #modal-eliminar (misma convención que invoice). */
    var overridePaymentDeleteId = null;
 
@@ -410,10 +412,11 @@ var OverridePayment = (function () {
             oTableItems.destroy();
             oTableItems = null;
          }
+         lastItemsLoadProjectId = null;
          hideTableContent();
          return;
       }
-      aplicarFiltroOverridePayment();
+      fetchItemsYMontarTabla(false);
    };
    var initWizard = function () {
       updateWizardButtons();
@@ -522,6 +525,7 @@ var OverridePayment = (function () {
          oTableItems.destroy();
          oTableItems = null;
       }
+      lastItemsLoadProjectId = null;
       destroyHistoryTable();
       hideTableContent();
       $('#op-history-placeholder').removeClass('hide');
@@ -783,21 +787,33 @@ var OverridePayment = (function () {
          },
       });
    };
-   var fetchItemsYMontarTabla = function () {
+   /**
+    * @param {boolean} forceReload Si true, siempre pide ítems al servidor. Si false y ya hay tabla con el mismo project_id, no recarga (solo cambió fecha u otro dato de General).
+    */
+   var fetchItemsYMontarTabla = function (forceReload) {
+      if (forceReload === undefined) {
+         forceReload = false;
+      }
       if (!validGeneralTab()) {
          if (oTableItems) {
             oTableItems.destroy();
             oTableItems = null;
          }
+         lastItemsLoadProjectId = null;
          hideTableContent();
+         return;
+      }
+      var pid = $('#filtro-project-op').val() || '';
+      if (!forceReload && oTableItems && lastItemsLoadProjectId === pid) {
+         showTableContent();
          return;
       }
       showTableContent();
       BlockUtil.block('#tab-content-op-items');
       var formData = new URLSearchParams();
       formData.set('company_id', $('#filtro-company-op').val() || '');
-      formData.set('project_id', $('#filtro-project-op').val() || '');
-      formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin') || '');
+      formData.set('project_id', pid);
+      formData.set('invoice_override_payment_id', $('#invoice-override-payment-id').val() || '');
       axios
          .post('override-payment/listarItems', formData, { responseType: 'json' })
          .then(function (res) {
@@ -809,6 +825,7 @@ var OverridePayment = (function () {
             var items = response.items || [];
             var datos = agruparItemsPorChangeOrder(items);
             montarTablaItemsLocal(datos);
+            lastItemsLoadProjectId = pid;
          })
          .catch(MyUtil.catchErrorAxios)
          .finally(function () {
@@ -816,7 +833,7 @@ var OverridePayment = (function () {
          });
    };
    var aplicarFiltroOverridePayment = function () {
-      fetchItemsYMontarTabla();
+      fetchItemsYMontarTabla(true);
    };
 
    // Pestaña Items: búsqueda; al cambiar paid se recalcula unpaid (salvo override por nota); editar unpaid no modifica paid
@@ -1188,6 +1205,7 @@ var OverridePayment = (function () {
       var formData = new URLSearchParams();
       formData.set('project_id', $('#filtro-project-op').val());
       formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
+      formData.set('invoice_override_payment_id', $('#invoice-override-payment-id').val() || '');
       formData.set('items', JSON.stringify(items));
       BlockUtil.block('#form-override-payment-body');
       axios
@@ -1542,10 +1560,26 @@ var OverridePayment = (function () {
             return;
          }
          var row = oTable.row(tr).data();
-         if (!row) {
+         if (!row || row.id == null || row.id === '') {
             return;
          }
-         openFormEditFromRow(row);
+         BlockUtil.block('#lista-override-payment');
+         var formData = new URLSearchParams();
+         formData.set('id', String(row.id));
+         axios
+            .post('override-payment/cargarDatos', formData, { responseType: 'json' })
+            .then(function (res) {
+               var response = res.data;
+               if (response.success && response.override) {
+                  openFormEditFromRow(response.override);
+               } else {
+                  toastr.error(response.error || 'Error', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .finally(function () {
+               BlockUtil.unblock('#lista-override-payment');
+            });
       });
 
       $(document).off('click', '#override-payment-headers-table a.delete');
@@ -1595,7 +1629,18 @@ var OverridePayment = (function () {
          });
       }
    };
+   /** Al cambiar solo el proyecto (misma company), la tabla de ítems debe recargarse al volver al tab Items. */
+   var changeFiltroProject = function () {
+      lastItemsLoadProjectId = null;
+      if (oTableItems) {
+         oTableItems.destroy();
+         oTableItems = null;
+      }
+      hideTableContent();
+   };
+
    var changeFiltroCompany = function () {
+      changeFiltroProject();
       var company_id = $('#filtro-company-op').val();
       MyUtil.limpiarSelect('#filtro-project-op');
       if (company_id === '' || company_id == null) {
@@ -1631,6 +1676,8 @@ var OverridePayment = (function () {
       MyApp.initWidgets();
       initFlatpickr();
       $('#filtro-company-op').change(changeFiltroCompany);
+      $(document).off('change', '#filtro-project-op');
+      $(document).on('change', '#filtro-project-op', changeFiltroProject);
       $('#filtro-op-list-company').change(changeFiltroCompanyList);
    };
 

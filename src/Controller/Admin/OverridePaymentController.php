@@ -126,6 +126,41 @@ class OverridePaymentController extends AbstractController
    }
 
    /**
+    * Carga cabecera por id para editar (misma convención que payment/cargarDatos, project/cargarDatos).
+    */
+   public function cargarDatos(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || empty($permiso[0]['ver'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
+
+      $id = (int) $request->get('id', 0);
+
+      try {
+         $resultado = $this->overridePaymentService->CargarDatosInvoiceOverridePayment($id);
+         if (!empty($resultado['success'])) {
+            return $this->json([
+               'success' => true,
+               'override' => $resultado['override'] ?? null,
+            ]);
+         }
+
+         return $this->json([
+            'success' => false,
+            'error' => $resultado['error'] ?? 'Unknown error',
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+         ]);
+      }
+   }
+
+   /**
     * Lista todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
     * Respuesta alineada con project/listarItemsParaInvoice: { success, items }.
     */
@@ -134,12 +169,21 @@ class OverridePaymentController extends AbstractController
       $company_id = $request->get('company_id');
       $project_id = $request->get('project_id');
       $fecha_fin = $request->get('fechaFin');
+      $iopHeaderRaw = $request->get('invoice_override_payment_id');
+      $invoice_override_payment_id = null;
+      if ($iopHeaderRaw !== null && $iopHeaderRaw !== '') {
+         $iopHeaderId = (int) $iopHeaderRaw;
+         if ($iopHeaderId > 0) {
+            $invoice_override_payment_id = $iopHeaderId;
+         }
+      }
 
       try {
          $result = $this->overridePaymentService->ListarItemsParaOverridePayment(
             $company_id !== null ? (string) $company_id : null,
             $project_id !== null ? (string) $project_id : null,
-            $fecha_fin !== null ? (string) $fecha_fin : null
+            $fecha_fin !== null ? (string) $fecha_fin : null,
+            $invoice_override_payment_id
          );
 
          return $this->json([
@@ -175,12 +219,21 @@ class OverridePaymentController extends AbstractController
       if (!is_array($itemsDecoded)) {
          $itemsDecoded = [];
       }
+      $iopHeaderRaw = $request->get('invoice_override_payment_id');
+      $invoice_override_payment_id = null;
+      if ($iopHeaderRaw !== null && $iopHeaderRaw !== '') {
+         $hid = (int) $iopHeaderRaw;
+         if ($hid > 0) {
+            $invoice_override_payment_id = $hid;
+         }
+      }
 
       try {
          $resultado = $this->overridePaymentService->SalvarOverridePayment(
             $project_id,
             $fecha_fin,
-            $itemsDecoded
+            $itemsDecoded,
+            $invoice_override_payment_id
          );
 
          if (!empty($resultado['success'])) {

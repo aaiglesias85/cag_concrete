@@ -8,7 +8,7 @@ use App\Entity\InvoiceItemOverridePayment;
 use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceRepository;
-// use App\Utils\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
+use App\Utils\OverridePaymentWritelog;
 
 /**
  * Paid qty efectivo para cálculos: si existe un {@see InvoiceItemOverridePayment} aplicable
@@ -44,16 +44,16 @@ class InvoicePaidQtyOverrideResolver
    {
       $is = $invStart->format('Y-m-d');
       $ie = $invEnd->format('Y-m-d');
-      // OverridePaymentWritelog::writelog(
-      //    "[selectOverrideRowForInvoicePeriod] projectItemId={$projectItemId} invStart={$is} invEnd={$ie}"
-      // );
+      OverridePaymentWritelog::writelog(
+         "[selectOverrideRowForInvoicePeriod] projectItemId={$projectItemId} invStart={$is} invEnd={$ie}"
+      );
       $row = $this->overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart, $invEnd);
-      // if ($row !== null) {
-      //    $rid = (int) ($row->getId() ?? 0);
-      //    OverridePaymentWritelog::writelog("[selectOverrideRowForInvoicePeriod] fila id={$rid} paid_qty=" . ($row->getPaidQty() ?? 'null'));
-      // } else {
-      //    OverridePaymentWritelog::writelog('[selectOverrideRowForInvoicePeriod] fila=null');
-      // }
+      if ($row !== null) {
+         $rid = (int) ($row->getId() ?? 0);
+         OverridePaymentWritelog::writelog("[selectOverrideRowForInvoicePeriod] fila id={$rid} paid_qty=" . ($row->getPaidQty() ?? 'null'));
+      } else {
+         OverridePaymentWritelog::writelog('[selectOverrideRowForInvoicePeriod] fila=null');
+      }
 
       return $row;
    }
@@ -80,33 +80,33 @@ class InvoicePaidQtyOverrideResolver
       $invoiceId = $invoice !== null ? (int) $invoice->getInvoiceId() : null;
       $projectItemId = $pi !== null ? (int) $pi->getId() : null;
 
-      // OverridePaymentWritelog::writelog(
-      //    "[resolvePaidQtyDetails] START invoice_item_id={$invoiceItemId} invoice_id={$invoiceId} project_item_id={$projectItemId} base(persistido)={$base}"
-      // );
+      OverridePaymentWritelog::writelog(
+         "[resolvePaidQtyDetails] START invoice_item_id={$invoiceItemId} invoice_id={$invoiceId} project_item_id={$projectItemId} base(persistido)={$base}"
+      );
 
       if ($invoice === null || $pi === null) {
-         // OverridePaymentWritelog::writelog('[resolvePaidQtyDetails] sin invoice o projectItem -> effective=base');
+         OverridePaymentWritelog::writelog('[resolvePaidQtyDetails] sin invoice o projectItem -> effective=base');
          return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
       $invStart = $invoice->getStartDate();
       $invEnd = $invoice->getEndDate();
       if ($invStart === null || $invEnd === null) {
-         // OverridePaymentWritelog::writelog('[resolvePaidQtyDetails] invoice sin start/end date -> effective=base');
+         OverridePaymentWritelog::writelog('[resolvePaidQtyDetails] invoice sin start/end date -> effective=base');
          return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, null);
       }
 
       $invStartYmd = $invStart->format('Y-m-d');
       $invEndYmd = $invEnd->format('Y-m-d');
-      // OverridePaymentWritelog::writelog(
-      //    "[resolvePaidQtyDetails] invoice_id={$invoiceId} invStartYmd={$invStartYmd} invEndYmd={$invEndYmd} "
-      //    . 'REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.'
-      // );
+      OverridePaymentWritelog::writelog(
+         "[resolvePaidQtyDetails] invoice_id={$invoiceId} invStartYmd={$invStartYmd} invEndYmd={$invEndYmd} "
+         . 'REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.'
+      );
 
       $overrides = $this->overrideRepo->ListarPorProjectItem($pi->getId());
       if ($overrides === []) {
-         // OverridePaymentWritelog::writelog(
-         //    "[resolvePaidQtyDetails] project_item_id={$projectItemId} sin filas en invoice_item_override_payment -> effective=base (paid persistido)"
-         // );
+         OverridePaymentWritelog::writelog(
+            "[resolvePaidQtyDetails] project_item_id={$projectItemId} sin filas en invoice_item_override_payment -> effective=base (paid persistido)"
+         );
          return $this->paidQtyDetailsRow($base, $base, null, $invoiceItemId, $invoiceId, $projectItemId, $this->formatInvoicePeriod($invStart, $invEnd));
       }
 
@@ -125,10 +125,10 @@ class InvoicePaidQtyOverrideResolver
          $winnerHeaderYmd = $wh !== null ? $wh->format('Y-m-d') : 'null';
       }
 
-      // OverridePaymentWritelog::writelog(
-      //    "[resolvePaidQtyDetails] END invoice_id={$invoiceId} project_item_id={$projectItemId} effective={$effective} base={$base} "
-      //    . 'override_line_id=' . ($overrideId ?? 'null') . " winner_headerYmd={$winnerHeaderYmd} invStartYmd={$invStartYmd} period=" . $this->formatInvoicePeriod($invStart, $invEnd)
-      // );
+      OverridePaymentWritelog::writelog(
+         "[resolvePaidQtyDetails] END invoice_id={$invoiceId} project_item_id={$projectItemId} effective={$effective} base={$base} "
+         . 'override_line_id=' . ($overrideId ?? 'null') . " winner_headerYmd={$winnerHeaderYmd} invStartYmd={$invStartYmd} period=" . $this->formatInvoicePeriod($invStart, $invEnd)
+      );
 
       return $this->paidQtyDetailsRow(
          $effective,
@@ -185,24 +185,24 @@ class InvoicePaidQtyOverrideResolver
          $hd = $o->getInvoiceOverridePayment()?->getDate();
          $headerId = $o->getInvoiceOverridePayment()?->getInvoiceOverridePaymentId();
          if ($hd === null) {
-            // OverridePaymentWritelog::writelog(
-            //    "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
-            //    . "cabecera_id=" . ($headerId ?? 'null') . " headerDate=NULL -> EXCLUIDA (sin fecha en cabecera)"
-            // );
+            OverridePaymentWritelog::writelog(
+               "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
+               . "cabecera_id=" . ($headerId ?? 'null') . " headerDate=NULL -> EXCLUIDA (sin fecha en cabecera)"
+            );
             continue;
          }
          $hdYmd = $hd->format('Y-m-d');
          if ($hdYmd > $invStartYmd) {
-            // OverridePaymentWritelog::writelog(
-            //    "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
-            //    . "cabecera_id={$headerId} headerYmd={$hdYmd} paid_qty={$pq} -> NO_APLICA (headerYmd > invStartYmd {$invStartYmd}; override posterior al inicio del invoice)"
-            // );
+            OverridePaymentWritelog::writelog(
+               "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
+               . "cabecera_id={$headerId} headerYmd={$hdYmd} paid_qty={$pq} -> NO_APLICA (headerYmd > invStartYmd {$invStartYmd}; override posterior al inicio del invoice)"
+            );
             continue;
          }
-         // OverridePaymentWritelog::writelog(
-         //    "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
-         //    . "cabecera_id={$headerId} headerYmd={$hdYmd} paid_qty={$pq} -> CANDIDATA (headerYmd<=invStartYmd); el repositorio elige la cabecera más reciente entre candidatas"
-         // );
+         OverridePaymentWritelog::writelog(
+            "[overrideVsInvoice] invoice_id={$invoiceId} project_item_id={$projectItemId} line_override_id={$oid} "
+            . "cabecera_id={$headerId} headerYmd={$hdYmd} paid_qty={$pq} -> CANDIDATA (headerYmd<=invStartYmd); el repositorio elige la cabecera más reciente entre candidatas"
+         );
       }
    }
 

@@ -1,0 +1,612 @@
+2026-03-29 18:45:45	---	[override_invoice] cargar_datos_invoice	{"invoice_id":345}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3256 invoice_id=351 project_item_id=3129 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] listar_items_start	{"invoice_id":345,"project_id":513,"invoice_period_start":"2025-09-01","invoice_period_end":"2025-09-30","invoice_lines_in_request":10}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3187,"project_item_id":3026,"period_override_row_id":23,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3177 invoice_id=344 project_item_id=3026 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=344 project_item_id=3177 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3026 effective=0 base=0 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":150,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3187 invoice_id=345 project_item_id=3026 base(persistido)=50
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=345 project_item_id=3187 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3026 effective=50 base=50 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":50,"i_qty":100,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":150}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3187,"project_item_id":3026,"loop_invoice_id":345,"temp_unpaid":50,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":100,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3247 invoice_id=351 project_item_id=3026 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=351 project_item_id=3247 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> CANDIDATA (headerYmd<=invStartYmd); el repositorio elige la cabecera más reciente entre candidatas
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-10-01 invEnd=2025-10-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=351 project_item_id=3026 effective=0 base=0 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-10-01 period=2025-10-01..2025-10-30
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":250,"i_qty":100,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":250}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3187 invoice_id=345 project_item_id=3026 base(persistido)=50
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=345 project_item_id=3187 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3026 effective=50 base=50 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3187,"project_item_id":3026,"paid_effective":50,"paid_base_stored":50,"override_id":23,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3187,"project_item_id":3026,"unpaid_qty":50,"unpaid_from_previous":0,"unpaid_amount":1834,"quantity_completed":250}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3188,"project_item_id":3027,"period_override_row_id":22,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":150}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3178 invoice_id=344 project_item_id=3027 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=344 project_item_id=3178 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":300,"i_paid_timeline":150,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3188 invoice_id=345 project_item_id=3027 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=345 project_item_id=3188 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":10,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":300}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3188,"project_item_id":3027,"loop_invoice_id":345,"temp_unpaid":10,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3248 invoice_id=351 project_item_id=3027 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=351 project_item_id=3248 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> CANDIDATA (headerYmd<=invStartYmd); el repositorio elige la cabecera más reciente entre candidatas
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-10-01 invEnd=2025-10-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=351 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-10-01 period=2025-10-01..2025-10-30
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":150,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":300}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3188 invoice_id=345 project_item_id=3027 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[overrideVsInvoice] invoice_id=345 project_item_id=3188 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3188,"project_item_id":3027,"paid_effective":150,"paid_base_stored":0,"override_id":22,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3188,"project_item_id":3027,"unpaid_qty":10,"unpaid_from_previous":0,"unpaid_amount":20.4,"quantity_completed":300}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3028 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3189,"project_item_id":3028,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3179 invoice_id=344 project_item_id=3028 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3189 invoice_id=345 project_item_id=3028 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3189,"project_item_id":3028,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3249 invoice_id=351 project_item_id=3028 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3189 invoice_id=345 project_item_id=3028 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3189,"project_item_id":3028,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3189,"project_item_id":3028,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3029 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3190,"project_item_id":3029,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3180 invoice_id=344 project_item_id=3029 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3190 invoice_id=345 project_item_id=3029 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":52,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3190,"project_item_id":3029,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":52,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3250 invoice_id=351 project_item_id=3029 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":52,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":52}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3190 invoice_id=345 project_item_id=3029 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3190,"project_item_id":3029,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3190,"project_item_id":3029,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":52}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3059 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3191,"project_item_id":3059,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3181 invoice_id=344 project_item_id=3059 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3191 invoice_id=345 project_item_id=3059 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3191,"project_item_id":3059,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3251 invoice_id=351 project_item_id=3059 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3191 invoice_id=345 project_item_id=3059 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3191,"project_item_id":3059,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3191,"project_item_id":3059,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3065 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3192,"project_item_id":3065,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3182 invoice_id=344 project_item_id=3065 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3192 invoice_id=345 project_item_id=3065 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3192,"project_item_id":3065,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3252 invoice_id=351 project_item_id=3065 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3192 invoice_id=345 project_item_id=3065 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3192,"project_item_id":3065,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3192,"project_item_id":3065,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3069 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3193,"project_item_id":3069,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3183 invoice_id=344 project_item_id=3069 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3193 invoice_id=345 project_item_id=3069 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3193,"project_item_id":3069,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3253 invoice_id=351 project_item_id=3069 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3193 invoice_id=345 project_item_id=3069 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3193,"project_item_id":3069,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3193,"project_item_id":3069,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3070 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3194,"project_item_id":3070,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3184 invoice_id=344 project_item_id=3070 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3194 invoice_id=345 project_item_id=3070 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3194,"project_item_id":3070,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3254 invoice_id=351 project_item_id=3070 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3194 invoice_id=345 project_item_id=3070 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3194,"project_item_id":3070,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3194,"project_item_id":3070,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] projectItemId=3128 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:45:45	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:45:45	---	[override_invoice] item_override_row	{"invoice_item_id":3195,"project_item_id":3128,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3185 invoice_id=344 project_item_id=3128 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3195 invoice_id=345 project_item_id=3128 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3195,"project_item_id":3128,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3255 invoice_id=351 project_item_id=3128 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=351 invStartYmd=2025-10-01 invEndYmd=2025-10-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":345,"loop_invoice_id":351,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3195 invoice_id=345 project_item_id=3128 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3195,"project_item_id":3128,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:45:45	---	[override_invoice] item_line_summary	{"invoice_item_id":3195,"project_item_id":3128,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:45:45	---	[override_invoice] listar_items_done	{"invoice_id":345,"project_id":513,"items_returned":9}
+2026-03-29 18:45:45	---	[override_invoice] cargar_datos_invoice_items_loaded	{"invoice_id":345,"project_id":513,"items_count":9}
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:45:45	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] cargar_datos_invoice	{"invoice_id":344}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] listar_items_start	{"invoice_id":344,"project_id":513,"invoice_period_start":"2025-08-01","invoice_period_end":"2025-08-31","invoice_lines_in_request":10}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3177,"project_item_id":3026,"period_override_row_id":23,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3177 invoice_id=344 project_item_id=3026 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=344 project_item_id=3177 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3026 effective=0 base=0 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":150,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3177,"project_item_id":3026,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":150,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3187 invoice_id=345 project_item_id=3026 base(persistido)=50
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=345 project_item_id=3187 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3026 effective=50 base=50 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":50,"i_qty":100,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":150}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3177 invoice_id=344 project_item_id=3026 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=344 project_item_id=3177 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3026 effective=0 base=0 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3177,"project_item_id":3026,"paid_effective":0,"paid_base_stored":0,"override_id":23,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3177,"project_item_id":3026,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":150}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3178,"project_item_id":3027,"period_override_row_id":22,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":150}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3178 invoice_id=344 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=344 project_item_id=3178 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":300,"i_paid_timeline":150,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3178,"project_item_id":3027,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":300,"i_paid_timeline":150,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3188 invoice_id=345 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=345 project_item_id=3188 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":10,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":300}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3178 invoice_id=344 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[overrideVsInvoice] invoice_id=344 project_item_id=3178 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3178,"project_item_id":3027,"paid_effective":150,"paid_base_stored":0,"override_id":22,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3178,"project_item_id":3027,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":300}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3028 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3179,"project_item_id":3028,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3179 invoice_id=344 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3179,"project_item_id":3028,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3189 invoice_id=345 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3179 invoice_id=344 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3179,"project_item_id":3028,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3179,"project_item_id":3028,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3029 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3180,"project_item_id":3029,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3180 invoice_id=344 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3180,"project_item_id":3029,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3190 invoice_id=345 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":52,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3180 invoice_id=344 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3180,"project_item_id":3029,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3180,"project_item_id":3029,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3059 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3181,"project_item_id":3059,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3181 invoice_id=344 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3181,"project_item_id":3059,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3191 invoice_id=345 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3181 invoice_id=344 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3181,"project_item_id":3059,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3181,"project_item_id":3059,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3065 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3182,"project_item_id":3065,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3182 invoice_id=344 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3182,"project_item_id":3065,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3192 invoice_id=345 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3182 invoice_id=344 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3182,"project_item_id":3065,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3182,"project_item_id":3065,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3069 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3183,"project_item_id":3069,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3183 invoice_id=344 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3183,"project_item_id":3069,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3193 invoice_id=345 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3183 invoice_id=344 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3183,"project_item_id":3069,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3183,"project_item_id":3069,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3070 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3184,"project_item_id":3070,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3184 invoice_id=344 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3184,"project_item_id":3070,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3194 invoice_id=345 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3184 invoice_id=344 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3184,"project_item_id":3070,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3184,"project_item_id":3070,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] projectItemId=3128 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:06	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:06	---	[override_invoice] item_override_row	{"invoice_item_id":3185,"project_item_id":3128,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3185 invoice_id=344 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":344,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3185,"project_item_id":3128,"loop_invoice_id":344,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3195 invoice_id=345 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":344,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3185 invoice_id=344 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3185,"project_item_id":3128,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-08-01..2025-08-31"}
+2026-03-29 18:47:06	---	[override_invoice] item_line_summary	{"invoice_item_id":3185,"project_item_id":3128,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:06	---	[override_invoice] listar_items_done	{"invoice_id":344,"project_id":513,"items_returned":9}
+2026-03-29 18:47:06	---	[override_invoice] cargar_datos_invoice_items_loaded	{"invoice_id":344,"project_id":513,"items_count":9}
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:06	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] cargar_datos_invoice	{"invoice_id":345}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] listar_items_start	{"invoice_id":345,"project_id":513,"invoice_period_start":"2025-09-01","invoice_period_end":"2025-09-30","invoice_lines_in_request":10}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3187,"project_item_id":3026,"period_override_row_id":23,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3177 invoice_id=344 project_item_id=3026 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=344 project_item_id=3177 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3026 effective=0 base=0 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":150,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3187 invoice_id=345 project_item_id=3026 base(persistido)=50
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=345 project_item_id=3187 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3026 effective=50 base=50 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3026,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":50,"i_qty":100,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":150}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3187,"project_item_id":3026,"loop_invoice_id":345,"temp_unpaid":50,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":100,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3187 invoice_id=345 project_item_id=3026 base(persistido)=50
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=345 project_item_id=3187 line_override_id=23 cabecera_id=3 headerYmd=2025-10-01 paid_qty= -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3026 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=23 paid_qty=null
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3026 effective=50 base=50 override_line_id=23 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3187,"project_item_id":3026,"paid_effective":50,"paid_base_stored":50,"override_id":23,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3187,"project_item_id":3026,"unpaid_qty":50,"unpaid_from_previous":0,"unpaid_amount":1834,"quantity_completed":250}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3188,"project_item_id":3027,"period_override_row_id":22,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":"2025-10-01","override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":150}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3178 invoice_id=344 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=344 project_item_id=3178 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-08-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-08-01 invEnd=2025-08-31
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=344 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-08-01 period=2025-08-01..2025-08-31
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":0,"i_qty":300,"i_paid_timeline":150,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3188 invoice_id=345 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=345 project_item_id=3188 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3027,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":false,"branch":"use_stored_bd","temp_unpaid":10,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":300}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3188,"project_item_id":3027,"loop_invoice_id":345,"temp_unpaid":10,"last_loop_unpaid":0,"is_after_override":false,"branch":"use_stored_bd","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3188 invoice_id=345 project_item_id=3027 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[overrideVsInvoice] invoice_id=345 project_item_id=3188 line_override_id=22 cabecera_id=3 headerYmd=2025-10-01 paid_qty=150 -> NO_APLICA (headerYmd > invStartYmd 2025-09-01; override posterior al inicio del invoice)
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3027 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila id=22 paid_qty=150
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] END invoice_id=345 project_item_id=3027 effective=150 base=0 override_line_id=22 winner_headerYmd=2025-10-01 invStartYmd=2025-09-01 period=2025-09-01..2025-09-30
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3188,"project_item_id":3027,"paid_effective":150,"paid_base_stored":0,"override_id":22,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3188,"project_item_id":3027,"unpaid_qty":10,"unpaid_from_previous":0,"unpaid_amount":20.4,"quantity_completed":300}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3028 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3189,"project_item_id":3028,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3179 invoice_id=344 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3189 invoice_id=345 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3028,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3189,"project_item_id":3028,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3189 invoice_id=345 project_item_id=3028 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3028 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3189,"project_item_id":3028,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3189,"project_item_id":3028,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3029 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3190,"project_item_id":3029,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3180 invoice_id=344 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3190 invoice_id=345 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3029,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":52,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3190,"project_item_id":3029,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":52,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3190 invoice_id=345 project_item_id=3029 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3029 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3190,"project_item_id":3029,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3190,"project_item_id":3029,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":52}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3059 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3191,"project_item_id":3059,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3181 invoice_id=344 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3191 invoice_id=345 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3059,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3191,"project_item_id":3059,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3191 invoice_id=345 project_item_id=3059 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3059 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3191,"project_item_id":3059,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3191,"project_item_id":3059,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3065 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3192,"project_item_id":3065,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3182 invoice_id=344 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3192 invoice_id=345 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3065,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3192,"project_item_id":3065,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3192 invoice_id=345 project_item_id=3065 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3065 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3192,"project_item_id":3065,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3192,"project_item_id":3065,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3069 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3193,"project_item_id":3069,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3183 invoice_id=344 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3193 invoice_id=345 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3069,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3193,"project_item_id":3069,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3193 invoice_id=345 project_item_id=3069 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3069 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3193,"project_item_id":3069,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3193,"project_item_id":3069,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3070 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3194,"project_item_id":3070,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3184 invoice_id=344 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3194 invoice_id=345 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3070,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3194,"project_item_id":3070,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3194 invoice_id=345 project_item_id=3070 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3070 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3194,"project_item_id":3070,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3194,"project_item_id":3070,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] projectItemId=3128 invStart=2025-09-01 invEnd=2025-09-30
+2026-03-29 18:47:15	---	[selectOverrideRowForInvoicePeriod] fila=null
+2026-03-29 18:47:15	---	[override_invoice] item_override_row	{"invoice_item_id":3195,"project_item_id":3128,"period_override_row_id":null,"latest_override_id":null,"override_period_date_ymd":null,"override_partition_date_ymd":null,"override_snapshot_unpaid_column":null,"anchor_unpaid_effective":null,"override_snapshot_paid":null}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3185 invoice_id=344 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":345,"loop_invoice_id":344,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3195 invoice_id=345 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] timeline_iteration	{"project_item_id":3128,"current_invoice_id":345,"loop_invoice_id":345,"carry_at_loop_start":null,"last_unpaid_carry_end":null,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","temp_unpaid":0,"i_qty":0,"i_paid_timeline":0,"current_qbf":0,"historial_qty_before":0}
+2026-03-29 18:47:15	---	[override_invoice] timeline_at_current_invoice	{"invoice_item_id":3195,"project_item_id":3128,"loop_invoice_id":345,"temp_unpaid":0,"last_loop_unpaid":0,"is_after_override":true,"branch":"calculate_invoice_unpaid_qty","i_qty":0,"i_paid_timeline":0,"current_qbf":0}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3195 invoice_id=345 project_item_id=3128 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3128 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[override_invoice] item_paid_resolved	{"invoice_item_id":3195,"project_item_id":3128,"paid_effective":0,"paid_base_stored":0,"override_id":null,"invoice_period":"2025-09-01..2025-09-30"}
+2026-03-29 18:47:15	---	[override_invoice] item_line_summary	{"invoice_item_id":3195,"project_item_id":3128,"unpaid_qty":0,"unpaid_from_previous":0,"unpaid_amount":0,"quantity_completed":0}
+2026-03-29 18:47:15	---	[override_invoice] listar_items_done	{"invoice_id":345,"project_id":513,"items_returned":9}
+2026-03-29 18:47:15	---	[override_invoice] cargar_datos_invoice_items_loaded	{"invoice_id":345,"project_id":513,"items_count":9}
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3186 invoice_id=344 project_item_id=3129 base(persistido)=0
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=344 invStartYmd=2025-08-01 invEndYmd=2025-08-31 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] START invoice_item_id=3196 invoice_id=345 project_item_id=3129 base(persistido)=0.018
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] invoice_id=345 invStartYmd=2025-09-01 invEndYmd=2025-09-30 REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.
+2026-03-29 18:47:15	---	[resolvePaidQtyDetails] project_item_id=3129 sin filas en invoice_item_override_payment -> effective=base (paid persistido)
