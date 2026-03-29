@@ -189,13 +189,14 @@ class OverridePaymentService extends Base
     * Todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
     * El frontend usa DataTables con datasource local; la búsqueda es en cliente.
     *
-    * Los agregados (qty facturada, paid en líneas, etc.) incluyen **todas** las facturas del proyecto; la
-    * fecha de cabecera (`fecha_fin`) no recorta ese listado (evita que al cambiar solo la fecha en el
-    * formulario cambien cantidades e ítems).
+    * Los agregados (qty facturada, paid en líneas, importes, etc.) vienen de facturas con
+    * `invoice.start_date` **estrictamente anterior** a la fecha del override (`fecha_fin` en m/d/Y),
+    * misma regla que {@see InvoiceItemRepository::ListarParaOverridePaymentConTotal} y el baseline al guardar.
+    * Si `fecha_fin` falta o no parsea, se suman todas las facturas del proyecto (comportamiento previo).
     *
     * Para enlazar la fila `invoice_item_override_payment` correcta:
-    * - En edición: preferir `invoice_override_payment_id` (cabecera); no depende de la fecha del formulario.
-    * - Si no hay id de cabecera: se usa `fecha_fin` (opcional) con {@see InvoiceItemOverridePaymentRepository::BuscarIdPorProjectItemYFechas}
+    * - En edición: preferir `invoice_override_payment_id` (cabecera).
+    * - Si no hay id de cabecera: `fecha_fin` con {@see InvoiceItemOverridePaymentRepository::BuscarIdPorProjectItemYFechas}
     *   y, si hace falta, búsqueda sin fecha.
     *
     * @return array{items: array<int, array<string, mixed>>}
@@ -208,6 +209,11 @@ class OverridePaymentService extends Base
    ): array {
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $fechaFinAgg = '';
+      $parsedFin = $this->parseDateMDY($fecha_fin);
+      if ($parsedFin !== null) {
+         $fechaFinAgg = $parsedFin->format('m/d/Y');
+      }
       $result = $invoiceItemRepo->ListarParaOverridePaymentConTotal(
          0,
          \PHP_INT_MAX,
@@ -216,7 +222,7 @@ class OverridePaymentService extends Base
          'asc',
          (string) ($company_id ?? ''),
          (string) ($project_id ?? ''),
-         ''
+         $fechaFinAgg
       );
 
       $raw = $result['data'];

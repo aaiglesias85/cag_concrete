@@ -6,8 +6,15 @@ var OverridePayment = (function () {
    var oTable = null;
    var oTableHistory = null;
    var activeTab = 1;
-   /** Id de proyecto con el que se cargó la tabla de ítems (evita recargar al cambiar solo la fecha). */
-   var lastItemsLoadProjectId = null;
+   /** Firma proyecto + fecha override + cabecera; si coincide, no se repite listarItems. */
+   var lastItemsLoadSignature = null;
+
+   var computeItemsLoadSignature = function () {
+      var pid = $('#filtro-project-op').val() || '';
+      var ff = FlatpickrUtil.getString('op-datetimepicker-fecha-fin') || '';
+      var hid = $('#invoice-override-payment-id').val() || '';
+      return pid + '\x1e' + String(ff).trim() + '\x1e' + String(hid).trim();
+   };
    /** Id pendiente para confirmar borrado vía #modal-eliminar (misma convención que invoice). */
    var overridePaymentDeleteId = null;
 
@@ -412,7 +419,7 @@ var OverridePayment = (function () {
             oTableItems.destroy();
             oTableItems = null;
          }
-         lastItemsLoadProjectId = null;
+         lastItemsLoadSignature = null;
          hideTableContent();
          return;
       }
@@ -525,7 +532,7 @@ var OverridePayment = (function () {
          oTableItems.destroy();
          oTableItems = null;
       }
-      lastItemsLoadProjectId = null;
+      lastItemsLoadSignature = null;
       destroyHistoryTable();
       hideTableContent();
       $('#op-history-placeholder').removeClass('hide');
@@ -799,12 +806,12 @@ var OverridePayment = (function () {
             oTableItems.destroy();
             oTableItems = null;
          }
-         lastItemsLoadProjectId = null;
+         lastItemsLoadSignature = null;
          hideTableContent();
          return;
       }
-      var pid = $('#filtro-project-op').val() || '';
-      if (!forceReload && oTableItems && lastItemsLoadProjectId === pid) {
+      var sig = computeItemsLoadSignature();
+      if (!forceReload && oTableItems && lastItemsLoadSignature === sig) {
          showTableContent();
          return;
       }
@@ -827,7 +834,7 @@ var OverridePayment = (function () {
             var items = response.items || [];
             var datos = agruparItemsPorChangeOrder(items);
             montarTablaItemsLocal(datos);
-            lastItemsLoadProjectId = pid;
+            lastItemsLoadSignature = computeItemsLoadSignature();
          })
          .catch(MyUtil.catchErrorAxios)
          .finally(function () {
@@ -1631,9 +1638,9 @@ var OverridePayment = (function () {
          });
       }
    };
-   /** Al cambiar solo el proyecto (misma company), la tabla de ítems debe recargarse al volver al tab Items. */
+   /** Al cambiar proyecto, la tabla de ítems debe recargarse (firma incluye también fecha y cabecera). */
    var changeFiltroProject = function () {
-      lastItemsLoadProjectId = null;
+      lastItemsLoadSignature = null;
       if (oTableItems) {
          oTableItems.destroy();
          oTableItems = null;

@@ -32,6 +32,10 @@ La selección de **qué cabecera** aplica vive en **`InvoiceItemOverridePaymentR
 | **Varias cabeceras / líneas** por ítem | `ListarPorProjectItem` carga líneas; el repositorio elige una fila por las reglas anteriores. **Paid:** `paid_qty` de esa fila (o persistido si no hay match / null). **Unpaid:** `unpaid_qty` o historial de notas; además hay **cadenas** de facturas en `ProjectService` / `InvoiceService` que combinan esa ancla con el histórico. |
 | **Timelines / series de facturas** | Para paid acumulado, `paidIncrementForHistorialTimeline` cuenta cada **`override_id` una sola vez** en la serie (no repite el snapshot en cada factura posterior). |
 
+### 3.1 Cadena de unpaid con override (mes de cabecera vs posteriores)
+
+Además de elegir cabecera por mes, el **unpaid** en serie se calcula distinto según si el invoice cae en el **mismo mes calendario** que la fecha de cabecera del override o en **meses posteriores**. En el mes del override, el snapshot de unpaid **no** se ajusta restando el paid de ese mismo período (carry: `snapshot + quantity − QBF`); en meses siguientes vuelve la fórmula con **paid efectivo**. Detalle, tabla y puntos de código: [OVERRIDE_PAYMENT_FECHAS_INVOICE.md §0.4](./OVERRIDE_PAYMENT_FECHAS_INVOICE.md#unpaid-cadena-mes-cabecera).
+
 La pantalla Override guarda **una cabecera por (proyecto, fecha de período)** y líneas bajo ella; el detalle **no** tiene `start_date` / `end_date` propios: todo cuelga de la fecha de la cabecera.
 
 *(Alineado con `OverridePaymentService::SalvarOverridePayment`, que crea o reutiliza la cabecera por `project` + fecha de período.)*
@@ -65,6 +69,8 @@ En otras palabras: el override es una **capa lógica** sobre los datos históric
 ## 7. Relación con “unpaid” y mensajes del negocio
 
 El negocio puede expresar el override en términos de **unpaid** esperado. En BD hay **`paid_qty` y `unpaid_qty`** en `invoice_item_override_payment`; el unpaid efectivo puede salir de la **columna**, del **historial de notas** (cuando la columna es null) y de **cadenas** entre facturas del mismo ítem. Debe mantenerse coherencia con `quantity_final`, QBF y el **paid efectivo** resuelto por `InvoicePaidQtyOverrideResolver`.
+
+En la **cadena** tras un override, el código distingue el **mes de la cabecera** del override de los **meses posteriores**: en el mes de cabecera el unpaid mostrado sigue el **snapshot** y el carry no resta paid de ese período; después se encadena con paid efectivo. Ver [§0.4](./OVERRIDE_PAYMENT_FECHAS_INVOICE.md#unpaid-cadena-mes-cabecera).
 
 ---
 
@@ -110,4 +116,4 @@ El negocio puede expresar el override en términos de **unpaid** esperado. En BD
 
 ## 10. Resumen en una frase
 
-**Los `paid_qty` / `unpaid_qty` guardados en facturas antiguas no se reescriben por el override; al calcular totales, borradores o pantallas que muestran cantidades efectivas, el sistema elige una línea `invoice_item_override_payment` según el mes de `invoice.start_date` frente al mes de la cabecera `invoice_override_payment.date` (cabecera más reciente que cumpla la ventana), lee `paid_qty` y/o `unpaid_qty` (más historial de notas para unpaid), y encadena con el resto de facturas del ítem donde el código lo define — alineado con la pantalla Override y con `README.md` / `OVERRIDE_PAYMENT_FECHAS_INVOICE.md`.**
+**Los `paid_qty` / `unpaid_qty` guardados en facturas antiguas no se reescriben por el override; al calcular totales, borradores o pantallas que muestran cantidades efectivas, el sistema elige una línea `invoice_item_override_payment` según el mes de `invoice.start_date` frente al mes de la cabecera `invoice_override_payment.date` (cabecera más reciente que cumpla la ventana), lee `paid_qty` y/o `unpaid_qty` (más historial de notas para unpaid), y encadena unpaid con distinción **mes de cabecera vs meses posteriores** (sin restar paid al snapshot en el mes del override; sí en la cadena posterior) — alineado con la pantalla Override, `README.md` y `OVERRIDE_PAYMENT_FECHAS_INVOICE.md` §0.4.**

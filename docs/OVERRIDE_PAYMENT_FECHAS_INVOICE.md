@@ -49,6 +49,25 @@ flowchart TD
   end
 ```
 
+<a id="unpaid-cadena-mes-cabecera"></a>
+### 0.4 Unpaid encadenado: mes de la cabecera vs meses posteriores
+
+Regla **implementada** en `InvoiceService::ListarItemsDeInvoice` (timeline, fallback y coherencia con recálculos QBF) y en `ProjectService::computeUnpaidChainingAfterOverride` / `calcularUnpaidQuantityFromPreviusInvoice` (borrador y cadena). Idea de negocio: en el **mes del override**, el **unpaid del snapshot** no se “corrige” restando el **paid** de ese mismo período (se tratan como conceptos independientes para ese mes); en **meses siguientes** la cadena vuelve a usar la fórmula habitual con **paid efectivo**.
+
+| Caso | Criterio (`isSameCalendarMonth(invoice.start, fecha cabecera override)`) | Comportamiento (resumen) |
+|------|--------------------------------------------------------------------------|---------------------------|
+| **Mes de la cabecera** | Sí | Unpaid **mostrado** en ese invoice = **snapshot** (`anchorUnpaidEffective`). El **carry** hacia el siguiente período: `max(0, snapshot + quantity − QBF)` **sin** restar `paid`. |
+| **Primer invoice en mes estrictamente posterior** | No (y aún no hay carry previo en la cadena de override) | `unpaid = snapshot + quantity − QBF` **sin** restar paid (transición desde el mes de cabecera). |
+| **Meses posteriores** (ya hay carry) | No | `unpaid = unpaid_anterior + quantity − paid_efectivo − QBF` (sí resta paid vía resolver / línea usada en cadena). |
+
+**`ProjectService`** (nuevo invoice / cadena):
+
+- `findInvoiceItemByProjectItemAndDate($projectItemId, $fechaCabecera)` localiza la línea `InvoiceItem` cuyo invoice cae en el **mismo mes** que la cabecera (para sumar `quantity`/`QBF` del invoice de ese mes al snapshot sin mezclar paid del override en ese tramo).
+- Si no hay facturas “posteriores” a la cabecera pero sí invoice en el mes del override: `u = max(0, snapshotUnpaid + qty_invoice_mes − QBF)` sin restar paid de la fila override.
+- En el bucle de facturas con `start_date` ≥ cabecera: si el invoice es del **mismo mes** que la cabecera del override, **`paidToSubtract = 0`**; si no, se usa la lógica habitual de `paid_line` (efectivo o almacenado según override_id).
+
+Referencia de commits en el repo: *new invoice unpaid qty correcta*, *Invoices meses posteriores*.
+
 <a id="depuración-trazas"></a>
 ### Depuración (trazas)
 
@@ -78,6 +97,7 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 2. **Comparar la fecha del invoice** (normalmente `start_date`, o el criterio que defina el producto) **con la fecha de cabecera del override** (`header.date`).
 3. **Si** el invoice es **anterior** al período de aplicación del override → **no** usar filas de override; `effective paid` = `invoice_item.paid_qty` (y `unpaid` según cadena histórica **sin** forzar override).
 4. **Si** el invoice es **igual o posterior al mes de la cabecera** (para **paid** / fila de período) → aplicar `InvoicePaidQtyOverrideResolver` con la regla de meses.
+5. Para **unpaid** en cadena con override, además aplicar la distinción **mes de cabecera vs meses posteriores** (§0.4): en el mes del override no se resta paid al snapshot de ese tramo; después sí se encadena con paid efectivo.
 
 > **Definición aplicada (paid / fila por invoice):** `mes(invoice.start) ≥ mes(header.date)`; entre varias cabeceras que cumplen, la de **fecha más reciente**. Así una cabecera de **octubre** no se usa como fila de override para facturas de **agosto o septiembre** (el criterio es el mes del período, no un mix confuso día a día frente a la cabecera).
 
@@ -95,7 +115,7 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 | Archivo | Responsabilidad |
 |--------|------------------|
 | `src/Utils/Admin/InvoiceUnpaidQtyOverrideResolver.php` | Ancla por `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth`; valor desde columna `unpaid_qty` o historial de notas; `findEarliestUnpaidOverrideHeaderDate` para particionar la línea de tiempo en `ListarItemsDeInvoice`. **No** es la misma semántica que “solo paid”: mismo **criterio de mes** para elegir cabecera, distinto **campo** y encadenado con otras facturas del ítem. |
-| `src/Utils/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findOverrideRowForUnpaidChaining()`, `findPostOverrideRowForInvoicePeriod()` (este último solo paid / cortes de agregado), `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. |
+| `src/Utils/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findInvoiceItemByProjectItemAndDate()`, `findOverrideRowForUnpaidChaining()`, `findPostOverrideRowForInvoicePeriod()` (este último solo paid / cortes de agregado), `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. Cadena unpaid: §0.4 (`paidToSubtract = 0` en mes de cabecera). |
 
 ### 3.3 Listado de ítems para nuevo invoice (borrador)
 
@@ -111,7 +131,7 @@ Debe cumplirse: los agregados con override usan **las fechas del borrador** (`fe
 | Método | Uso |
 |--------|-----|
 | `InvoiceController::cargarDatos` | `InvoiceService::CargarDatosInvoice($invoice_id)`. |
-| `InvoiceService::ListarItemsDeInvoice` / construcción de ítems | Usa `paidQtyOverrideResolver->getEffectivePaidQty($invoiceItem)` y lógica de unpaid encadenada (incluye comparaciones con `overrideStartDate` en tramos del loop). |
+| `InvoiceService::ListarItemsDeInvoice` / construcción de ítems | Usa `paidQtyOverrideResolver->getEffectivePaidQty($invoiceItem)` y lógica de unpaid encadenada con `overrideStartDate` y **mismo mes vs posteriores** (§0.4); recálculos QBF alineados. |
 | `InvoiceService` (export Excel/PDF) | Misma fuente de datos que vista cuando usa `ObtenerDatosExportacionInvoice` / `getEffectivePaidQty` donde aplique. |
 
 Cualquier pantalla que muestre **paid/unpaid** con “effective” debe respetar la **fecha del invoice guardado**, no la fecha “hoy” ni solo el proyecto.
@@ -174,6 +194,12 @@ Preparar un proyecto con:
 
 1. Registrar un pago que toque `invoice_item` y **no** alterar facturas anteriores al override.
 
+### 5.6 Unpaid: mes de cabecera vs mes siguiente (§0.4)
+
+1. Con override en **octubre** y snapshot de unpaid conocido: abrir invoice de **octubre** → el unpaid mostrado debe ser el **snapshot**; el arrastre interno hacia noviembre debe reflejar `snapshot + qty_oct − QBF` **sin** restar paid de octubre en ese tramo.
+2. Abrir invoice de **noviembre** (y siguientes) → unpaid debe encadenar con **`+ qty − paid_efectivo − QBF`** respecto al carry anterior.
+3. Repetir **listarItemsParaInvoice** para un borrador en noviembre y comprobar coherencia con `computeUnpaidChainingAfterOverride` (mismo mes que cabecera → no restar paid en ese paso de cadena).
+
 ## 6. Seguimiento recomendado
 
 1. Tests unitarios o de integración sobre `resolvePaidQtyDetails` con matrices invoice vs cabecera (opcional).
@@ -186,4 +212,4 @@ Preparar un proyecto con:
 
 ---
 
-*Documento generado para alinear validación de “override solo hacia adelante desde la fecha definida” en creación de invoice, visualización, export y procesos que lean `paid_qty` / `unpaid_qty` efectivos.*
+*Documento de referencia: override hacia adelante por mes, cadena de **unpaid** con distinción **mes de cabecera / meses posteriores** (§0.4), creación de invoice, visualización, export y lecturas efectivas de `paid_qty` / `unpaid_qty`.*

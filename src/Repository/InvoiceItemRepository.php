@@ -623,8 +623,7 @@ class InvoiceItemRepository extends ServiceEntityRepository
     *
     * `fecha_fin` (m/d/Y), si no está vacío: solo se suman líneas de invoices con `start_date` **estrictamente
     * anterior** a esa fecha. Cadena vacía = todos los invoices del proyecto.
-    * Override Payment usa cadena vacía para listar ítems (todos los invoices); la fecha de cabecera solo
-    * enlaza filas guardadas en {@see OverridePaymentService::buildOverridePaymentRowsFromAggregates}.
+    * Override Payment pasa la fecha de cabecera del formulario para alinear cantidades con el baseline al guardar.
     *
     * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
     */
