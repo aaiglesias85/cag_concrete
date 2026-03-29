@@ -1822,8 +1822,9 @@ class InvoiceService extends Base
                   // sin sumar cantidad ni restar paid/QBF de esta factura.
                   $tempUnpaid = $overrideBase;
                } else {
-                  // Calcular: override_base + qty_actual - paid_actual - qbf_actual
-                  $tempUnpaid = $overrideBase + $iQty - $iPaid - $currentQbf;
+                   // Calcular: unpaid_invoice_anterior + qty_actual - paid_actual - qbf_actual
+                   // $lastLoopUnpaid contiene el unpaid del invoice anterior (puede ser el overrideBase si es el primer invoice después del override)
+                   $tempUnpaid = $lastLoopUnpaid + $iQty - $iPaid - $currentQbf;
                }
                $tempUnpaid = max(0.0, $tempUnpaid); // No puede ser negativo
                $lastUnpaidOverrideValue = $tempUnpaid;
@@ -1883,20 +1884,22 @@ class InvoiceService extends Base
              // Si el invoice actual es posterior a la partición unpaid, usar override / cálculo
              $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
              
-             if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
-                // Usar el override como base
-                $overrideBase = (float) $anchorUnpaidEffective;
-                $currentQbf = (float)$value->getQuantityBroughtForward();
-                $currentQty = (float)$value->getQuantity();
-                $currentPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
-                if ($currentInvStart !== null && $overrideStartDate !== null
-                   && $this->isSameCalendarMonth($currentInvStart, $overrideStartDate)
-                ) {
-                   $unpaidQtySpecific = $overrideBase;
-                } else {
-                   $unpaidQtySpecific = $overrideBase + $currentQty - $currentPaid - $currentQbf;
-                }
-                $unpaidQtySpecific = max(0.0, $unpaidQtySpecific);
+              if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
+                 // Usar el override como base (o el unpaid del último invoice procesado si existe)
+                 $overrideBase = (float) $anchorUnpaidEffective;
+                 $currentQbf = (float)$value->getQuantityBroughtForward();
+                 $currentQty = (float)$value->getQuantity();
+                 $currentPaid = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
+                 if ($currentInvStart !== null && $overrideStartDate !== null
+                    && $this->isSameCalendarMonth($currentInvStart, $overrideStartDate)
+                 ) {
+                    $unpaidQtySpecific = $overrideBase;
+                 } else {
+                    // Usar lastLoopUnpaid si existe (del último invoice procesado), sino usar overrideBase
+                    $unpaidBase = $lastLoopUnpaid > 0 || $lastLoopUnpaid === 0.0 ? $lastLoopUnpaid : $overrideBase;
+                    $unpaidQtySpecific = $unpaidBase + $currentQty - $currentPaid - $currentQbf;
+                 }
+                 $unpaidQtySpecific = max(0.0, $unpaidQtySpecific);
                 $unpaidPrevSpecific = $lastLoopUnpaid;
                 $this->logOverrideInvoice('fallback_override_base', [
                    'invoice_item_id' => $value->getId(),
