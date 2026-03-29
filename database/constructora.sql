@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 28-03-2026 a las 01:45:25
+-- Tiempo de generación: 29-03-2026 a las 01:26:39
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -820,7 +820,7 @@ CREATE TABLE `invoice_item_override_payment` (
   `id` int(11) NOT NULL,
   `invoice_override_payment_id` int(11) NOT NULL COMMENT 'FK a invoice_override_payment (cabecera)',
   `project_item_id` int(11) NOT NULL,
-  `paid_qty` decimal(18,6) NOT NULL COMMENT 'Cantidad pagada sobreescrita (agregado)',
+  `paid_qty` decimal(18,6) DEFAULT NULL COMMENT 'Override paid qty; NULL = no override de paid',
   `unpaid_qty` decimal(18,6) DEFAULT NULL COMMENT 'Override unpaid qty; NULL = no aplica, usar derivado (qty - paid)',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP

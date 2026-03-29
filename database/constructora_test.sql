@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 28-03-2026 a las 01:45:40
+-- Tiempo de generación: 29-03-2026 a las 01:27:04
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -29128,7 +29128,7 @@ CREATE TABLE `invoice_item_override_payment` (
   `id` int(11) NOT NULL,
   `invoice_override_payment_id` int(11) NOT NULL COMMENT 'FK a invoice_override_payment (cabecera)',
   `project_item_id` int(11) NOT NULL,
-  `paid_qty` decimal(18,6) NOT NULL COMMENT 'Cantidad pagada sobreescrita (agregado)',
+  `paid_qty` decimal(18,6) DEFAULT NULL COMMENT 'Override paid qty; NULL = no override de paid',
   `unpaid_qty` decimal(18,6) DEFAULT NULL COMMENT 'Override unpaid qty; NULL = no aplica, usar derivado (qty - paid)',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
@@ -29139,7 +29139,7 @@ CREATE TABLE `invoice_item_override_payment` (
 --
 
 INSERT INTO `invoice_item_override_payment` (`id`, `invoice_override_payment_id`, `project_item_id`, `paid_qty`, `unpaid_qty`, `created_at`, `updated_at`) VALUES
-(5, 3, 147, 10.000000, 70.000000, '2026-03-28 01:36:57', '2026-03-28 01:37:22');
+(5, 3, 147, 10.000000, 60.000000, '2026-03-28 01:36:57', '2026-03-28 01:52:14');
 
 -- --------------------------------------------------------
 
@@ -29184,7 +29184,8 @@ CREATE TABLE `invoice_item_override_payment_unpaid_qty_history` (
 --
 
 INSERT INTO `invoice_item_override_payment_unpaid_qty_history` (`id`, `invoice_item_override_payment_id`, `old_value`, `new_value`, `note`, `created_at`, `user_id`) VALUES
-(5, 5, NULL, 70.000000, '<p>test</p>', '2026-03-28 01:37:22', 27);
+(5, 5, NULL, 70.000000, '<p>test</p>', '2026-03-28 01:37:22', 27),
+(6, 5, 70.000000, 60.000000, '<p>test</p>', '2026-03-28 01:52:14', 27);
 
 -- --------------------------------------------------------
 
@@ -30639,7 +30640,8 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (530, 'Update', 'Override Payment', 'Override payment quantities saved for project #ERS05071', '::1', '2026-03-28 01:32:24', 27),
 (531, 'Delete', 'Override Payment', 'Override payment header #2 deleted', '::1', '2026-03-28 01:36:16', 27),
 (532, 'Update', 'Override Payment', 'Override payment quantities saved for project #ERS05071', '::1', '2026-03-28 01:36:57', 27),
-(533, 'Update', 'Override Payment', 'Unpaid qty override note saved for project #ERS05071', '::1', '2026-03-28 01:37:22', 27);
+(533, 'Update', 'Override Payment', 'Unpaid qty override note saved for project #ERS05071', '::1', '2026-03-28 01:37:22', 27),
+(534, 'Update', 'Override Payment', 'Unpaid qty override note saved for project #ERS05071', '::1', '2026-03-28 01:52:14', 27);
 
 -- --------------------------------------------------------
 
@@ -43309,7 +43311,7 @@ ALTER TABLE `invoice_item_override_payment_paid_qty_history`
 -- AUTO_INCREMENT de la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
 ALTER TABLE `invoice_item_override_payment_unpaid_qty_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_unpaid_qty_history`
@@ -43339,7 +43341,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=534;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=535;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
