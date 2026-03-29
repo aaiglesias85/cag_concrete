@@ -280,16 +280,16 @@ var ProjectsDetalle = (function () {
                actualizarTableListaItemsCompletion();
                break;
             case 10:
-               btnClickFiltrarDataTracking();
+               actualizarTableListaInvoiceItemOverridePayments();
                break;
             case 11:
-               actualizarTableListaInvoices();
+               btnClickFiltrarDataTracking();
                break;
             case 12:
-               btnClickFiltrarNotes();
+               actualizarTableListaInvoices();
                break;
             case 13:
-               actualizarTableListaInvoiceItemOverridePayments();
+               btnClickFiltrarNotes();
                break;
          }
       });
@@ -359,20 +359,20 @@ var ProjectsDetalle = (function () {
                actualizarTableListaItemsCompletion();
                break;
             case 10:
+               $('#tab-override-payments-detalle').tab('show');
+               actualizarTableListaInvoiceItemOverridePayments();
+               break;
+            case 11:
                $('#tab-data-tracking-detalle').tab('show');
                btnClickFiltrarDataTracking();
                break;
-            case 11:
+            case 12:
                $('#tab-invoices-detalle').tab('show');
                actualizarTableListaInvoices();
                break;
-            case 12:
+            case 13:
                $('#tab-notes-detalle').tab('show');
                btnClickFiltrarNotes();
-               break;
-            case 13:
-               $('#tab-override-payments-detalle').tab('show');
-               actualizarTableListaInvoiceItemOverridePayments();
                break;
          }
       }, 0);
