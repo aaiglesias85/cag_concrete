@@ -109,60 +109,63 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
    }
 
    /**
-    * Fila de override aplicable al inicio del invoice: cabecera con fecha ≤ inicio del invoice (mismo día cuenta).
-    * Si hay varias, la de cabecera con fecha más reciente (la última ya “vigente” en esa fecha).
+    * Fila de override aplicable al invoice (misma regla que facturas / Completion).
+    *
+    * El mes del invoice (según `invStart`) debe ser **igual o anterior** al mes de la cabecera del override
+    * (`invoice_override_payment.date`). Así el override cubre ese mes y todos los anteriores respecto al
+    * período de la cabecera; el `paid_qty` del override es el acumulado vigente (no se suma con meses
+    * anteriores en agregados: cada `override_id` cuenta una vez). Si hay varias filas, la de cabecera con
+    * fecha **más reciente** entre las que cumplen.
+    *
     * En negocio `date` en cabecera no es nula; si faltara, la fila se omite (defensa).
     *
-    * Usado por {@see \App\Utils\Admin\InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod}
-    * y agregados en {@see \App\Utils\Admin\ProjectService::findPostOverrideRowForInvoicePeriod}.
+    * @see \App\Utils\Admin\InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod
+    * @see \App\Utils\Admin\ProjectService::findPostOverrideRowForInvoicePeriod
     */
-   public function findLatestNullStartForInvoicePeriodAfterEndDate(int $project_item_id, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
+   public function findLatestNullStartForInvoicePeriodAfterEndDate(int $project_item_id, \DateTimeInterface $invStart, ?\DateTimeInterface $invEnd = null): ?InvoiceItemOverridePayment
    {
-      $invStartYmd = $invStart->format('Y-m-d');
-      // OverridePaymentWritelog::writelog(
-      //    "[findLatestNullStart] project_item_id={$project_item_id} invStartYmd={$invStartYmd}"
-      // );
+      $rows = $this->ListarPorProjectItem($project_item_id);
+      $invMonth = \DateTimeImmutable::createFromInterface($invStart)->modify('first day of this month')->setTime(0, 0, 0);
+
+      return $this->pickBestInvoiceItemOverrideByHeaderRule(
+         $rows,
+         static function (string $hdYmd) use ($invMonth): bool {
+            $hdMonth = (new \DateTimeImmutable($hdYmd))->modify('first day of this month')->setTime(0, 0, 0);
+
+            return $invMonth <= $hdMonth;
+         }
+      );
+   }
+
+   /**
+    * @param InvoiceItemOverridePayment[] $rows
+    * @param callable(string $headerYmd): bool $includeHeaderYmd
+    */
+   private function pickBestInvoiceItemOverrideByHeaderRule(array $rows, callable $includeHeaderYmd): ?InvoiceItemOverridePayment
+   {
       $best = null;
       $bestHeaderDateYmd = null;
       $bestId = 0;
-
-      $rows = $this->ListarPorProjectItem($project_item_id);
-      // OverridePaymentWritelog::writelog('[findLatestNullStart] filas ListarPorProjectItem count=' . count($rows));
 
       foreach ($rows as $o) {
          if (!$o instanceof InvoiceItemOverridePayment) {
             continue;
          }
-         $oidRow = (int) ($o->getId() ?? 0);
          $hd = $o->getInvoiceOverridePayment()?->getDate();
          if ($hd === null) {
-            // OverridePaymentWritelog::writelog("[findLatestNullStart] override_id={$oidRow} SKIP cabecera date=null");
             continue;
          }
          $hdYmd = $hd->format('Y-m-d');
-         // Override futuro respecto al invoice: no aplica (evita efecto retroactivo en facturas anteriores).
-         if ($hdYmd > $invStartYmd) {
-            // OverridePaymentWritelog::writelog("[findLatestNullStart] override_id={$oidRow} headerYmd={$hdYmd} SKIP futuro (hd>invStart)");
+         if (!$includeHeaderYmd($hdYmd)) {
             continue;
          }
          $oid = (int) ($o->getId() ?? 0);
          if ($best === null || $bestHeaderDateYmd === null || $hdYmd > $bestHeaderDateYmd || ($hdYmd === $bestHeaderDateYmd && $oid > $bestId)) {
-            $pq = $o->getPaidQty();
-            // OverridePaymentWritelog::writelog(
-            //    "[findLatestNullStart] override_id={$oidRow} headerYmd={$hdYmd} CANDIDATO paid_qty={$pq} (mejor hasta ahora)"
-            // );
             $best = $o;
             $bestHeaderDateYmd = $hdYmd;
             $bestId = $oid;
          }
       }
-
-      // if ($best !== null) {
-      //    $bid = (int) ($best->getId() ?? 0);
-      //    OverridePaymentWritelog::writelog("[findLatestNullStart] RESULTADO best_override_id={$bid} bestHeaderYmd={$bestHeaderDateYmd}");
-      // } else {
-      //    OverridePaymentWritelog::writelog('[findLatestNullStart] RESULTADO best=null');
-      // }
 
       return $best;
    }

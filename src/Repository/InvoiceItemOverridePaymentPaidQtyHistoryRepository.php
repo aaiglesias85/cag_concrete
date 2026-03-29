@@ -71,6 +71,20 @@ class InvoiceItemOverridePaymentPaidQtyHistoryRepository extends ServiceEntityRe
         return array_map('intval', array_keys($seen));
     }
 
+    public function TieneHistorialPorProjectItem(int $project_item_id): bool
+    {
+        $count = (int) $this->createQueryBuilder('h')
+            ->select('COUNT(h.id)')
+            ->join('h.invoiceItemOverridePayment', 'o')
+            ->join('o.projectItem', 'p')
+            ->where('p.id = :project_item_id')
+            ->setParameter('project_item_id', $project_item_id)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count > 0;
+    }
+
     /**
      * @return InvoiceItemOverridePaymentPaidQtyHistory[]
      */

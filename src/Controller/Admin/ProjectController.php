@@ -1184,6 +1184,27 @@ class ProjectController extends AbstractController
    }
 
    /**
+    * Historial de cambios de paid_qty en invoice_item_override_payment (tab Completion, columna Paid Qty).
+    */
+   public function listarHistorialPaidQtyOverridePorProjectItem(Request $request)
+   {
+      $project_item_id = $request->get('project_item_id');
+
+      try {
+         $historial = $this->projectService->ListarHistorialPaidQtyOverridePorProjectItem((int) $project_item_id);
+         $resultadoJson['success'] = true;
+         $resultadoJson['historial'] = $historial;
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto
     *
     */

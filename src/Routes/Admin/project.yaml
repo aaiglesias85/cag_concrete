@@ -132,6 +132,10 @@ listarHistorialUnpaidQtyPorProjectItemProjectAdmin:
    path: /project/listarHistorialUnpaidQtyPorProjectItem
    defaults: { _controller: App\Controller\Admin\ProjectController::listarHistorialUnpaidQtyPorProjectItem, _format: json }
 
+listarHistorialPaidQtyOverridePorProjectItemProjectAdmin:
+   path: /project/listarHistorialPaidQtyOverridePorProjectItem
+   defaults: { _controller: App\Controller\Admin\ProjectController::listarHistorialPaidQtyOverridePorProjectItem, _format: json }
+
 project_bulk_retainage_update:
   path: /project/bulk-retainage-update
   defaults: { _controller: App\Controller\Admin\ProjectController::bulkRetainageUpdate, _format: json }

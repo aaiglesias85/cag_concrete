@@ -9,7 +9,7 @@ use App\Repository\InvoiceItemRepository;
 
 /**
  * Unpaid qty efectivo: misma fila que {@see InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod}
- * (cabecera con fecha ≤ inicio del invoice; la más reciente entre esas).
+ * (mes del invoice ≤ mes de la cabecera del override; la cabecera más reciente que cumpla).
  * Si esa fila tiene unpaid_qty no null, se usa; si no, el valor en invoice_item.
  *
  * No modifica registros en BD.

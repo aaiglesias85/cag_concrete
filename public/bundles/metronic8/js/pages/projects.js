@@ -1983,6 +1983,7 @@ var Projects = (function () {
 
    var cargarHistorialUnpaidQtyCompletion = function (project_item_id) {
       BlockUtil.block('#modal-change-order-history .modal-content');
+      $('#modal-change-order-history .modal-title').text('Unpaid qty history');
       axios
          .get('project/listarHistorialUnpaidQtyPorProjectItem', { params: { project_item_id: project_item_id }, responseType: 'json' })
          .then(function (res) {
@@ -2015,8 +2016,63 @@ var Projects = (function () {
          });
    };
 
+   var handlePaidQtyOverrideHistoryCompletion = function () {
+      $(document).off(
+         'click',
+         '#lista-items-completion .paid-qty-override-history-icon-completion, #lista-items-completion-detalle .paid-qty-override-history-icon-completion'
+      );
+      $(document).on(
+         'click',
+         '#lista-items-completion .paid-qty-override-history-icon-completion, #lista-items-completion-detalle .paid-qty-override-history-icon-completion',
+         function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var project_item_id = $(this).data('project-item-id');
+            if (project_item_id) {
+               cargarHistorialPaidQtyOverrideCompletion(project_item_id);
+            }
+         }
+      );
+   };
+
+   var cargarHistorialPaidQtyOverrideCompletion = function (project_item_id) {
+      BlockUtil.block('#modal-change-order-history .modal-content');
+      $('#modal-change-order-history .modal-title').text('Paid qty override history');
+      axios
+         .get('project/listarHistorialPaidQtyOverridePorProjectItem', { params: { project_item_id: project_item_id }, responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  var historial = response.historial || [];
+                  var html = '';
+                  if (historial.length === 0) {
+                     html = '<div class="alert alert-info">No paid qty override history for this item.</div>';
+                  } else {
+                     html = '<ul class="list-unstyled">';
+                     historial.forEach(function (item) {
+                        html += '<li class="mb-2"><i class="fas fa-circle text-primary me-2" style="font-size: 8px;"></i>' + item.mensaje + '</li>';
+                     });
+                     html += '</ul>';
+                  }
+                  $('#modal-change-order-history .modal-body').html(html);
+                  ModalUtil.show('modal-change-order-history', { backdrop: 'static', keyboard: true });
+               } else {
+                  toastr.error(response.error || 'Error loading history', '');
+               }
+            }
+         })
+         .catch(function (error) {
+            toastr.error('Error loading history', '');
+         })
+         .finally(function () {
+            BlockUtil.unblock('#modal-change-order-history .modal-content');
+         });
+   };
+
    var cargarHistorialChangeOrder = function (project_item_id, filterType) {
       BlockUtil.block('#modal-change-order-history .modal-content');
+      $('#modal-change-order-history .modal-title').text('Change Order History');
       axios
          .get('project/listarHistorialItem', {
             params: { project_item_id: project_item_id },
@@ -4875,6 +4931,7 @@ var Projects = (function () {
             total_paid_amount: null,
             diff_qty: null,
             diff_amt: null,
+            has_paid_qty_override_history: false,
          });
       }
 
@@ -4963,8 +5020,8 @@ var Projects = (function () {
             },
          },
          {
-            // Columnas de Cantidad (Qty, Qty Completed, Invoiced Qty, Paid Qty)
-            targets: [2, 5, 8, 10],
+            // Columnas de Cantidad (Qty, Qty Completed, Invoiced Qty) — Paid Qty (10) tiene render propio con historial override
+            targets: [2, 5, 8],
             className: 'text-end',
             render: function (data, type, row) {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '').display(data) : '0.00';
@@ -4975,6 +5032,24 @@ var Projects = (function () {
             className: 'text-end',
             render: function (data, type, row) {
                return data ? $.fn.dataTable.render.number(',', '.', 2, '', '%').display(data) : '0.00%';
+            },
+         },
+         {
+            targets: 10, // Paid Qty (agregado con override) + historial invoice_item_override_payment_paid_qty_history
+            className: 'text-end',
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               var numHtml = data !== null && data !== undefined && data !== ''
+                  ? $.fn.dataTable.render.number(',', '.', 2, '').display(data)
+                  : '0.00';
+               if (type === 'display' && row.has_paid_qty_override_history && row.project_item_id) {
+                  var icon =
+                     '<i class="fas fa-plus-circle text-primary ms-1 cursor-pointer paid-qty-override-history-icon-completion" style="cursor: pointer; display: inline-block;" data-project-item-id="' +
+                     row.project_item_id +
+                     '" title="Paid qty override history"></i>';
+                  return '<div class="d-flex align-items-center justify-content-end gap-1">' + numHtml + icon + '</div>';
+               }
+               return numHtml;
             },
          },
          {
@@ -5067,6 +5142,7 @@ var Projects = (function () {
       handleQuantityHistory();
       handlePriceHistory();
       handleUnpaidQtyHistoryCompletion();
+      handlePaidQtyOverrideHistoryCompletion();
 
       // totals
       $('#total_count_items_completion').val(items_completion.length);

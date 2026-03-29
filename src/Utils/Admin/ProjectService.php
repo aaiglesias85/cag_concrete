@@ -101,11 +101,30 @@ class ProjectService extends Base
     */
    private array $previousInvoiceTotalsByProjectItem = [];
 
+   /**
+    * Trazas de paid/override para el tab Completion → {@see self::logCompletionPaidTrace} escribe en public/weblog.txt.
+    * Descomentar la constante, el cuerpo de logCompletionPaidTrace y los bloques marcados para depurar.
+    */
+   // private const DEBUG_COMPLETION_PAID_TRACE = true;
+
    private function keyPreviousInvoiceTotals(int $projectItemId, ?string $invoiceStartAfterYmd): string
    {
       return $invoiceStartAfterYmd !== null
          ? $projectItemId . '~' . $invoiceStartAfterYmd
          : (string) $projectItemId;
+   }
+
+   /**
+    * Depuración Completion: paid efectivo vs override (InvoicePaidQtyOverrideResolver) en public/weblog.txt.
+    */
+   private function logCompletionPaidTrace(string $line): void
+   {
+      /*
+      if (!self::DEBUG_COMPLETION_PAID_TRACE) {
+         return;
+      }
+      $this->writelogPublic('[completion_paid] ' . $line, 'weblog.txt');
+      */
    }
 
    /**
@@ -126,7 +145,7 @@ class ProjectService extends Base
 
    /**
     * Fila de override aplicable al período del borrador (misma regla que el resolver):
-    * cabecera con fecha ≤ inicio del invoice; la más reciente entre esas.
+    * mes(invoice) ≤ mes(cabecera del override); entre candidatas, cabecera más reciente.
     */
    private function findPostOverrideRowForInvoicePeriod(int $projectItemId, ?string $fecha_inicial, ?string $fecha_fin): ?InvoiceItemOverridePayment
    {
@@ -149,7 +168,7 @@ class ProjectService extends Base
       /** @var InvoiceItemOverridePaymentRepository $overrideRepo */
       $overrideRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
 
-      $row = $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart);
+      $row = $overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart, $invEnd);
       // OverridePaymentWritelog::writelog(
       //    '[findPostOverrideRowForInvoicePeriod] resultado=' . ($row !== null ? 'override_id=' . (int) ($row->getId() ?? 0) : 'null')      );
 
@@ -1578,8 +1597,52 @@ class ProjectService extends Base
    {
       $cacheKey = $this->keyPreviousInvoiceTotals($project_item_id, $invoiceStartAfterYmd);
       if (isset($this->previousInvoiceTotalsByProjectItem[$cacheKey])) {
+         /*
+         if (self::DEBUG_COMPLETION_PAID_TRACE) {
+            $cached = $this->previousInvoiceTotalsByProjectItem[$cacheKey];
+            $this->logCompletionPaidTrace(
+               'computePreviousInvoiceTotals CACHE_HIT project_item_id=' . $project_item_id
+               . ' invoiceStartAfterYmd=' . ($invoiceStartAfterYmd ?? 'null')
+               . ' cached=' . json_encode($cached, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
+            );
+         }
+         */
+
          return $this->previousInvoiceTotalsByProjectItem[$cacheKey];
       }
+
+      /*
+      $this->logCompletionPaidTrace(
+         'computePreviousInvoiceTotals START project_item_id=' . $project_item_id
+         . ' invoiceStartAfterYmd=' . ($invoiceStartAfterYmd ?? 'null')
+         . ' cacheKey=' . $cacheKey
+      );
+
+      if (self::DEBUG_COMPLETION_PAID_TRACE) {
+         // @var InvoiceItemOverridePaymentRepository $ovRepo
+         $ovRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+         $ovRows = $ovRepo->ListarPorProjectItem($project_item_id);
+         $this->logCompletionPaidTrace(
+            'override_rows_en_BD project_item_id=' . $project_item_id . ' count=' . count($ovRows)
+         );
+         foreach ($ovRows as $ovRow) {
+            if (!$ovRow instanceof InvoiceItemOverridePayment) {
+               continue;
+            }
+            $ovId = (int) ($ovRow->getId() ?? 0);
+            $pq = $ovRow->getPaidQty();
+            $hd = $ovRow->getInvoiceOverridePayment()?->getDate();
+            $hid = $ovRow->getInvoiceOverridePayment()?->getInvoiceOverridePaymentId();
+            $this->logCompletionPaidTrace(
+               'override_row project_item_id=' . $project_item_id
+               . ' invoice_item_override_payment_id=' . $ovId
+               . ' invoice_override_payment_id=' . ($hid ?? 'null')
+               . ' paid_qty=' . ($pq !== null ? (string) $pq : 'null')
+               . ' header_date=' . ($hd !== null ? $hd->format('Y-m-d') : 'null')
+            );
+         }
+      }
+      */
 
       $total_quantity = 0.0;
       $total_invoiced_amount_from_lines = 0.0;
@@ -1610,6 +1673,25 @@ class ProjectService extends Base
          $quantity = ($quantity === null) ? 0.0 : (float) $quantity;
          $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
          $price = (float) ($invoice_item->getPrice() ?? 0);
+         /*
+         if (self::DEBUG_COMPLETION_PAID_TRACE) {
+            $iid = $invoice !== null ? (int) $invoice->getInvoiceId() : 0;
+            $sd = $invoice !== null && $invoice->getStartDate() !== null ? $invoice->getStartDate()->format('Y-m-d') : 'null';
+            $ed = $invoice !== null && $invoice->getEndDate() !== null ? $invoice->getEndDate()->format('Y-m-d') : 'null';
+            $this->logCompletionPaidTrace(
+               'invoice_line project_item_id=' . $project_item_id
+               . ' invoice_item_id=' . ($invoice_item->getId() ?? 'null')
+               . ' invoice_id=' . $iid
+               . ' inv_start=' . $sd . ' inv_end=' . $ed
+               . ' qty_line=' . $quantity
+               . ' price_line=' . $price
+               . ' base_persistido=' . $details['base']
+               . ' effective=' . $details['effective']
+               . ' override_id=' . ($details['override_id'] !== null ? (string) $details['override_id'] : 'null')
+               . ' period=' . ($details['invoice_period'] ?? 'null')
+            );
+         }
+         */
          $total_quantity += $quantity;
          $total_invoiced_amount_from_lines += $quantity * $price;
 
@@ -1648,6 +1730,19 @@ class ProjectService extends Base
          'total_invoiced_amount_from_lines' => $total_invoiced_amount_from_lines,
       ];
       $this->previousInvoiceTotalsByProjectItem[$cacheKey] = $result;
+
+      /*
+      $this->logCompletionPaidTrace(
+         'computePreviousInvoiceTotals RESULT project_item_id=' . $project_item_id
+         . ' total_paid_effective=' . $total_paid
+         . ' paid_amount_total=' . $paid_amount_total
+         . ' total_quantity=' . $total_quantity
+         . ' line_count=' . $lineIndex
+         . ' paidQtyByOverrideId=' . json_encode($paidQtyByOverrideId, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
+         . ' sumStoredPaidNoOverride=' . $sumStoredPaidNoOverride
+         . ' sumStoredPaidAmountNoOverride=' . $sumStoredPaidAmountNoOverride
+      );
+      */
 
       return $result;
    }
@@ -1939,6 +2034,14 @@ class ProjectService extends Base
     */
    public function ListarItemsCompletion($project_id, $fecha_inicial = "", $fecha_fin = "")
    {
+      /*
+      $this->logCompletionPaidTrace(
+         'ListarItemsCompletion START project_id=' . $project_id
+         . ' fecha_inicial=' . $fecha_inicial
+         . ' fecha_fin=' . $fecha_fin
+      );
+      */
+
       $items = [];
 
       /** @var ProjectItemRepository $projectItemRepo */
@@ -2002,6 +2105,9 @@ class ProjectService extends Base
          /** @var \App\Repository\InvoiceItemUnpaidQtyHistoryRepository $unpaidHistoryRepo */
          $unpaidHistoryRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
          $has_unpaid_qty_history = $unpaidHistoryRepo->TieneHistorialPorProjectItem($project_item_id);
+         /** @var InvoiceItemOverridePaymentPaidQtyHistoryRepository $paidOverrideHistRepo */
+         $paidOverrideHistRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentPaidQtyHistory::class);
+         $has_paid_qty_override_history = $paidOverrideHistRepo->TieneHistorialPorProjectItem($project_item_id);
 
          // Diff Qty = (Paid qty - Inv qty) + suma últimos overrides qty; Diff Amt = (Paid Amt - Inv Amt) + suma (override × price línea)
          $invQty = (float) $invoiced_qty;
@@ -2010,6 +2116,19 @@ class ProjectService extends Base
          $paidAmt = (float) $total_paid_amount;
          $diff_qty = ($paidQty - $invQty) + $total_qty_adjustment;
          $diff_amt = ($paidAmt - $invAmt) + $total_amt_adjustment;
+
+         /*
+         $this->logCompletionPaidTrace(
+            'completion_fila project_id=' . $project_id
+            . ' project_item_id=' . $project_item_id
+            . ' item=' . ($value->getItem()->getName() ?? '')
+            . ' paid_qty=' . $paid_qty
+            . ' total_paid_amount=' . $total_paid_amount
+            . ' invoiced_qty=' . $invoiced_qty
+            . ' diff_qty=' . $diff_qty
+            . ' has_paid_qty_override_history=' . ($has_paid_qty_override_history ? '1' : '0')
+         );
+         */
 
          $items[] = [
             'project_item_id' => $project_item_id,
@@ -2039,11 +2158,50 @@ class ProjectService extends Base
             "has_quantity_history" => $has_quantity_history,
             "has_price_history" => $has_price_history,
             "has_unpaid_qty_history" => $has_unpaid_qty_history,
+            "has_paid_qty_override_history" => $has_paid_qty_override_history,
             "posicion" => $key
          ];
       }
 
+      /*
+      $this->logCompletionPaidTrace('ListarItemsCompletion END project_id=' . $project_id . ' items_count=' . count($items));
+      */
+
       return $items;
+   }
+
+   /**
+    * Historial de paid_qty en invoice_item_override_payment (tab Completion, columna Paid Qty).
+    *
+    * @return array<int, array{id:int, mensaje:string, fecha:string, user_name:string, old_value:string, new_value:string}>
+    */
+   public function ListarHistorialPaidQtyOverridePorProjectItem(int $project_item_id): array
+   {
+      /** @var InvoiceItemOverridePaymentPaidQtyHistoryRepository $historyRepo */
+      $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentPaidQtyHistory::class);
+      $lista = $historyRepo->ListarHistorialDeProjectItem($project_item_id);
+
+      $historial = [];
+      foreach ($lista as $value) {
+         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+         $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
+         $old_value_raw = $value->getOldValue();
+         $new_value_raw = $value->getNewValue();
+         $old_value = $old_value_raw !== null && $old_value_raw !== '' ? number_format((float) $old_value_raw, 2, '.', ',') : '—';
+         $new_value = $new_value_raw !== null && $new_value_raw !== '' ? number_format((float) $new_value_raw, 2, '.', ',') : '—';
+         $mensaje = "{$fecha} Updated paid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+
+         $historial[] = [
+            'id' => $value->getId(),
+            'mensaje' => $mensaje,
+            'fecha' => $value->getCreatedAt()->format('m/d/Y'),
+            'user_name' => $user_name,
+            'old_value' => $old_value,
+            'new_value' => $new_value,
+         ];
+      }
+
+      return $historial;
    }
 
    /**

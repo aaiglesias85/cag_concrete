@@ -12,12 +12,13 @@ use App\Repository\InvoiceRepository;
 
 /**
  * Paid qty efectivo para cálculos: si existe un {@see InvoiceItemOverridePayment} aplicable
- * al período del invoice, se usa su paid_qty; si no, el valor persistido en invoice_item.
+ * al invoice, se usa su paid_qty; si no, el valor persistido en invoice_item.
  *
  * Modelo de datos: la fecha de período vive en la cabecera {@see InvoiceOverridePayment} (`date`);
  * cada línea `invoice_item_override_payment` enlaza a esa cabecera (`invoice_override_payment_id`).
- * La coincidencia con el invoice: cabecera con fecha ≤ inicio del invoice; la más reciente entre esas.
- * En negocio la cabecera siempre tiene `date` informada.
+ * Coincidencia: el mes del invoice (start) debe ser ≤ al mes de la cabecera del override; entre varias,
+ * la cabecera más reciente que cumpla (override cubre ese mes y los anteriores; paid_qty = acumulado).
+ * En negocio la cabecera suele tener `date` informada.
  *
  * No modifica registros en BD.
  */
@@ -36,9 +37,8 @@ class InvoicePaidQtyOverrideResolver
    }
 
    /**
-    * Fila aplicable al período del invoice: misma regla que el repositorio
+    * Fila aplicable al invoice: mes(invoice.start) ≤ mes(cabecera); entre candidatas, cabecera más reciente
     * ({@see InvoiceItemOverridePaymentRepository::findLatestNullStartForInvoicePeriodAfterEndDate}).
-    * $invEnd se conserva en la firma por compatibilidad; el criterio usa solo el inicio del invoice.
     */
    public function selectOverrideRowForInvoicePeriod(int $projectItemId, \DateTimeInterface $invStart, \DateTimeInterface $invEnd): ?InvoiceItemOverridePayment
    {
@@ -47,7 +47,7 @@ class InvoicePaidQtyOverrideResolver
       // OverridePaymentWritelog::writelog(
       //    "[selectOverrideRowForInvoicePeriod] projectItemId={$projectItemId} invStart={$is} invEnd={$ie}"
       // );
-      $row = $this->overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart);
+      $row = $this->overrideRepo->findLatestNullStartForInvoicePeriodAfterEndDate($projectItemId, $invStart, $invEnd);
       // if ($row !== null) {
       //    $rid = (int) ($row->getId() ?? 0);
       //    OverridePaymentWritelog::writelog("[selectOverrideRowForInvoicePeriod] fila id={$rid} paid_qty=" . ($row->getPaidQty() ?? 'null'));
@@ -99,7 +99,7 @@ class InvoicePaidQtyOverrideResolver
       $invEndYmd = $invEnd->format('Y-m-d');
       // OverridePaymentWritelog::writelog(
       //    "[resolvePaidQtyDetails] invoice_id={$invoiceId} invStartYmd={$invStartYmd} invEndYmd={$invEndYmd} "
-      //    . "REGLA: solo cabeceras con headerDate<=invStartYmd; si hay varias, la headerDate más reciente."
+      //    . 'REGLA: mes(invoice) <= mes(cabecera); si hay varias, cabecera más reciente.'
       // );
 
       $overrides = $this->overrideRepo->ListarPorProjectItem($pi->getId());
