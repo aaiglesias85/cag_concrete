@@ -1762,6 +1762,9 @@ class InvoiceService extends Base
             }
          }
 
+         /** Cabecera más antigua con unpaid efectivo: partición timeline (facturas anteriores = valor BD) */
+         $overridePartitionDate = $this->unpaidQtyOverrideResolver->findEarliestUnpaidOverrideHeaderDate((int) $project_item_id);
+
          $overrideStartDate = null;
          if ($latestOverride !== null) {
             $overrideStartDate = $latestOverride->getOverridePeriodDate();
@@ -1772,6 +1775,7 @@ class InvoiceService extends Base
             'period_override_row_id' => $periodOverrideRow !== null ? $periodOverrideRow->getId() : null,
             'latest_override_id' => $latestOverride !== null ? $latestOverride->getId() : null,
             'override_period_date_ymd' => $overrideStartDate !== null ? $overrideStartDate->format('Y-m-d') : null,
+            'override_partition_date_ymd' => $overridePartitionDate !== null ? $overridePartitionDate->format('Y-m-d') : null,
             'override_snapshot_unpaid_column' => $latestOverride !== null ? $latestOverride->getUnpaidQty() : null,
             'anchor_unpaid_effective' => $anchorUnpaidEffective,
             'override_snapshot_paid' => $periodOverrideRow !== null ? $periodOverrideRow->getPaidQty() : ($latestOverride !== null ? $latestOverride->getPaidQty() : null),
@@ -1794,8 +1798,8 @@ class InvoiceService extends Base
             // Buscar datos del item en este punto de la historia
             $invItem = $invoiceItemMap[$loopInvId] ?? null;
 
-            // Para invoices ANTERIORES al override, usar el valor guardado en BD
-            $isAfterOverride = ($overrideStartDate === null) || ($invStart !== null && $invStart >= $overrideStartDate);
+            // Antes de la primera cabecera con unpaid efectivo: valor persistido (no recalcular sin override)
+            $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
             
             $currentQbf = ($invItem) ? (float)$invItem->getQuantityBroughtForward() : 0.0;
             $iQty = ($invItem) ? (float)$invItem->getQuantity() : 0.0;
@@ -1876,8 +1880,8 @@ class InvoiceService extends Base
              $currentInv = $this->getDoctrine()->getRepository(Invoice::class)->find($currentInvoiceId);
              $currentInvStart = ($currentInv) ? $currentInv->getStartDate() : null;
              
-             // Si el invoice actual es posterior al override, usar el override
-             $isAfterOverride = ($overrideStartDate === null) || ($currentInvStart !== null && $currentInvStart >= $overrideStartDate);
+             // Si el invoice actual es posterior a la partición unpaid, usar override / cálculo
+             $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
              
              if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
                 // Usar el override como base
@@ -2663,6 +2667,8 @@ class InvoiceService extends Base
             $overrideStartDate = $latestOverride->getOverridePeriodDate();
          }
 
+         $overridePartitionDate = $this->unpaidQtyOverrideResolver->findEarliestUnpaidOverrideHeaderDate((int) $project_item_id);
+
          $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
          $invoiceItemMap = [];
          foreach ($allInvoiceItems as $ii) {
@@ -2680,8 +2686,8 @@ class InvoiceService extends Base
             $invItem = $invoiceItemMap[$invId] ?? null;
             $invStart = $inv->getStartDate();
 
-            // Solo procesar invoices desde el override hacia adelante
-            $isAfterOverride = ($overrideStartDate === null) || ($invStart !== null && $invStart >= $overrideStartDate);
+            // Solo tocar unpaid desde la primera cabecera con unpaid efectivo (misma partición que ListarItemsDeInvoice)
+            $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
             
             // Si el invoice es anterior al override, NO modificar su unpaid
             if (!$isAfterOverride && $invItem) {

@@ -33,6 +33,35 @@ class InvoiceUnpaidQtyOverrideResolver
    }
 
    /**
+    * Fecha de cabecera más antigua donde este ítem tiene unpaid efectivo (columna o historial).
+    * Sirve para particionar la línea de tiempo: facturas con start estrictamente anteriores a esa fecha
+    * no deben verse afectadas por la lógica de override de unpaid (usan valor persistido), aunque el
+    * invoice que se está viendo no tenga ancla (mes anterior al override).
+    */
+   public function findEarliestUnpaidOverrideHeaderDate(int $projectItemId): ?\DateTimeInterface
+   {
+      $rows = $this->overrideRepo->ListarPorProjectItem($projectItemId);
+      $best = null;
+      foreach ($rows as $o) {
+         if (!$o instanceof InvoiceItemOverridePayment) {
+            continue;
+         }
+         if ($this->getEffectiveUnpaidFromOverrideRow($o) === null) {
+            continue;
+         }
+         $hd = $o->getInvoiceOverridePayment()?->getDate();
+         if ($hd === null) {
+            continue;
+         }
+         if ($best === null || $hd < $best) {
+            $best = $hd;
+         }
+      }
+
+      return $best;
+   }
+
+   /**
     * Fila de override como ancla de unpaid (misma regla que ProjectService / listado invoice).
     */
    public function findUnpaidAnchorOverrideRow(int $projectItemId, \DateTimeInterface $invStart): ?InvoiceItemOverridePayment
