@@ -2045,13 +2045,18 @@ class InvoiceService extends Base
                $invPeriodEnd->format('m/d/Y'),
                $currentInvoiceId
             );
-            $unpaidQtySpecific = $alignedUnpaid;
+            // Con exclude_invoice_id la cadena no procesa la línea actual: aligned ≈ deuda antes de QBF de esta
+            // línea (como unpaidBeforeQbfForRow en el timeline). Igual que allí: unpaid mostrado = max(0, aligned − QBF).
+            $qbfRow = (float) ($value->getQuantityBroughtForward() ?? 0);
+            $unpaidQtySpecific = max(0.0, $alignedUnpaid - $qbfRow);
             $unpaidPrevSpecific = $alignedUnpaid;
             $this->logOverrideInvoice('listar_aligned_calcular_unpaid', [
                'invoice_item_id' => $value->getId(),
                'project_item_id' => $project_item_id,
                'exclude_invoice_id' => $currentInvoiceId,
-               'aligned_unpaid_qty' => $alignedUnpaid,
+               'aligned_unpaid_before_qbf' => $alignedUnpaid,
+               'quantity_brought_forward' => $qbfRow,
+               'aligned_unpaid_qty' => $unpaidQtySpecific,
             ]);
          }
 
