@@ -19,6 +19,7 @@ use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -45,39 +46,39 @@ class InvoiceService extends Base
       TwigEnvironment       $twig,
       private InvoicePaidQtyOverrideResolver $paidQtyOverrideResolver,
       private InvoiceUnpaidQtyOverrideResolver $unpaidQtyOverrideResolver,
+      #[Autowire(lazy: true)]
+      private ProjectService $projectService,
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
       $this->twig = $twig;
    }
 
    /**
-    * Trazas override payment / unpaid (desactivadas). Descomentar el cuerpo para escribir en public/weblog.txt.
+    * Trazas override payment / unpaid → public/weblog.txt (prefijo [override_invoice]).
     *
     * @param array<string, mixed> $context
     */
    private function logOverrideInvoice(string $step, array $context = []): void
    {
-      /*
-      $line = $context === []
-         ? $step
-         : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-      $this->writelogPublic('[override_invoice] ' . $line, 'weblog.txt');
-      */
+      // Trazas desactivadas (weblog.txt). Descomentar para depurar.
+      // $line = $context === []
+      //    ? $step
+      //    : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+      // $this->writelogPublic('[override_invoice] ' . $line, 'weblog.txt');
    }
 
    /**
-    * Depuración QBF / unpaid (desactivada). Descomentar el cuerpo para escribir en public/weblog.txt.
+    * Depuración QBF / unpaid → public/weblog.txt (prefijo [qbf]).
     *
     * @param array<string, mixed> $context
     */
    private function logQbf(string $step, array $context = []): void
    {
-      /*
-      $line = $context === []
-         ? $step
-         : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-      $this->writelogPublic('[qbf] ' . $line, 'weblog.txt');
-      */
+      // Trazas desactivadas (weblog.txt). Descomentar para depurar.
+      // $line = $context === []
+      //    ? $step
+      //    : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+      // $this->writelogPublic('[qbf] ' . $line, 'weblog.txt');
    }
 
    /**
@@ -2027,6 +2028,26 @@ class InvoiceService extends Base
                 ]);
              }
           }
+
+         // Misma fuente que ListarItemsParaInvoice: el timeline de unpaid aquí arriba usa partición
+         // (primera cabecera con unpaid) y carry mes a mes; CalcularUnpaid usa findOverrideRowForUnpaidChaining
+         // + cutoff en la cabecera del período del invoice (p. ej. noviembre excluye octubre del post-chain).
+         if ($invPeriodStart !== null && $invPeriodEnd !== null) {
+            $alignedUnpaid = (float) $this->projectService->CalcularUnpaidQuantityFromPreviusInvoice(
+               (int) $project_item_id,
+               $invPeriodStart->format('m/d/Y'),
+               $invPeriodEnd->format('m/d/Y'),
+               $currentInvoiceId
+            );
+            $unpaidQtySpecific = $alignedUnpaid;
+            $unpaidPrevSpecific = $alignedUnpaid;
+            $this->logOverrideInvoice('listar_aligned_calcular_unpaid', [
+               'invoice_item_id' => $value->getId(),
+               'project_item_id' => $project_item_id,
+               'exclude_invoice_id' => $currentInvoiceId,
+               'aligned_unpaid_qty' => $alignedUnpaid,
+            ]);
+         }
 
          $unpaid_qty = $unpaidQtySpecific;
          // -------------------------------------

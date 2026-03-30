@@ -102,11 +102,7 @@ class ProjectService extends Base
     */
    private array $previousInvoiceTotalsByProjectItem = [];
 
-   /**
-    * Trazas de paid/override para el tab Completion → {@see self::logCompletionPaidTrace} escribe en public/weblog.txt.
-    * Descomentar la constante, el cuerpo de logCompletionPaidTrace y los bloques marcados para depurar.
-    */
-   // private const DEBUG_COMPLETION_PAID_TRACE = true;
+   private const DEBUG_COMPLETION_PAID_TRACE = false;
 
    private function keyPreviousInvoiceTotals(int $projectItemId, ?string $invoiceStartAfterYmd): string
    {
@@ -116,32 +112,27 @@ class ProjectService extends Base
    }
 
    /**
-    * Depuración Completion: paid efectivo vs override (InvoicePaidQtyOverrideResolver) en public/weblog.txt.
+    * Depuración Completion: paid efectivo vs override → public/weblog.txt ([completion_paid]).
+    * Control: {@see self::DEBUG_COMPLETION_PAID_TRACE}.
     */
    private function logCompletionPaidTrace(string $line): void
    {
-      /*
-      if (!self::DEBUG_COMPLETION_PAID_TRACE) {
-         return;
-      }
-      $this->writelogPublic('[completion_paid] ' . $line, 'weblog.txt');
-      */
+      // Trazas desactivadas (weblog.txt). Activar también {@see self::DEBUG_COMPLETION_PAID_TRACE}.
+      // $this->writelogPublic('[completion_paid] ' . $line, 'weblog.txt');
    }
 
    /**
-    * Depuración: unpaid_qty / cadena post-override → public/weblog.txt (writelogPublic).
+    * Depuración: unpaid_qty / cadena post-override → public/weblog.txt (prefijo [unpaid_qty_calc]).
     *
     * @param array<string, mixed> $context
     */
    private function logUnpaidQtyCalc(string $step, array $context = []): void
    {
-      // Descomentar para escribir trazas en public/weblog.txt
-      /*
-      $line = $context === []
-         ? $step
-         : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-      $this->writelogPublic('[unpaid_qty_calc] ' . $line, 'weblog.txt');
-      */
+      // Trazas desactivadas (weblog.txt). Descomentar para depurar.
+      // $line = $context === []
+      //    ? $step
+      //    : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+      // $this->writelogPublic('[unpaid_qty_calc] ' . $line, 'weblog.txt');
    }
 
    /**
@@ -223,7 +214,7 @@ class ProjectService extends Base
    /**
     * @return InvoiceItem[]
     */
-   private function listInvoiceItemsForProjectItemStrictlyAfterDateYmd(int $projectItemId, string $cutoffYmd): array
+   private function listInvoiceItemsForProjectItemStrictlyAfterDateYmd(int $projectItemId, string $cutoffYmd, ?int $excludeInvoiceId = null): array
    {
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
@@ -234,6 +225,9 @@ class ProjectService extends Base
          $inv = $invItem->getInvoice();
          if ($inv === null || $inv->getStartDate() === null) {
             $skippedNull[] = ['invoice_item_id' => $invItem->getId()];
+            continue;
+         }
+         if ($excludeInvoiceId !== null && (int) $inv->getInvoiceId() === $excludeInvoiceId) {
             continue;
          }
          $startYmd = $inv->getStartDate()->format('Y-m-d');
@@ -254,6 +248,7 @@ class ProjectService extends Base
       $this->logUnpaidQtyCalc('post_override_lines_scan', [
          'project_item_id' => $projectItemId,
          'cutoff_ymd' => $cutoffYmd,
+         'exclude_invoice_id' => $excludeInvoiceId,
          'included_count' => \count($out),
          'excluded_not_after_cutoff' => $excluded,
          'skipped_null_invoice_or_date' => $skippedNull,
@@ -280,17 +275,21 @@ class ProjectService extends Base
       return $out;
    }
 
-   private function findInvoiceItemByProjectItemAndDate(int $projectItemId, \DateTimeInterface $date): ?\App\Entity\InvoiceItem
+   private function findInvoiceItemByProjectItemAndDate(int $projectItemId, \DateTimeInterface $date, ?int $excludeInvoiceId = null): ?\App\Entity\InvoiceItem
    {
       /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(\App\Entity\InvoiceItem::class);
       $this->logUnpaidQtyCalc('find_invoice_item_search', [
          'project_item_id' => $projectItemId,
          'search_date' => $date->format('Y-m-d'),
+         'exclude_invoice_id' => $excludeInvoiceId,
       ]);
       foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invItem) {
          $inv = $invItem->getInvoice();
          if ($inv === null || $inv->getStartDate() === null) {
+            continue;
+         }
+         if ($excludeInvoiceId !== null && (int) $inv->getInvoiceId() === $excludeInvoiceId) {
             continue;
          }
          $invStart = $inv->getStartDate()->format('Y-m-d');
@@ -318,7 +317,7 @@ class ProjectService extends Base
     * Incluye el mes de la cabecera: el arrastre hacia el mes siguiente debe sumar qty−paid de ese invoice
     * (misma idea que lastUnpaidOverrideValue en InvoiceService), no dejar u congelada en el snapshot.
     */
-   private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId): float
+   private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId, ?int $excludeInvoiceId = null): float
    {
       $ed = $rowAfter->getOverridePeriodDate();
       $snapshotUnpaidOpt = $this->resolveEffectiveUnpaidQtyForOverrideRow($rowAfter);
@@ -343,7 +342,7 @@ class ProjectService extends Base
          'snapshot_paid_qty' => $rowAfter->getPaidQty(),
       ]);
 
-      $postLines = $this->listInvoiceItemsForProjectItemStrictlyAfterDateYmd($projectItemId, $cutoffYmd);
+      $postLines = $this->listInvoiceItemsForProjectItemStrictlyAfterDateYmd($projectItemId, $cutoffYmd, $excludeInvoiceId);
 
       if ($postLines === []) {
          $this->logUnpaidQtyCalc('chain_no_post_lines_return_snapshot', [
@@ -354,7 +353,7 @@ class ProjectService extends Base
 
           // Incluir el invoice del override en el cálculo
           // NOTA: El paid del override NO afecta el unpaid base - son independientes
-          $overrideInvoiceItem = $this->findInvoiceItemByProjectItemAndDate($projectItemId, $ed);
+          $overrideInvoiceItem = $this->findInvoiceItemByProjectItemAndDate($projectItemId, $ed, $excludeInvoiceId);
           if ($overrideInvoiceItem !== null) {
              $overrideQty = (float) ($overrideInvoiceItem->getQuantity() ?? 0);
              $overrideQbf = (float) ($overrideInvoiceItem->getQuantityBroughtForward() ?? 0);
@@ -1702,7 +1701,6 @@ class ProjectService extends Base
    {
       $cacheKey = $this->keyPreviousInvoiceTotals($project_item_id, $invoiceStartAfterYmd);
       if (isset($this->previousInvoiceTotalsByProjectItem[$cacheKey])) {
-         /*
          if (self::DEBUG_COMPLETION_PAID_TRACE) {
             $cached = $this->previousInvoiceTotalsByProjectItem[$cacheKey];
             $this->logCompletionPaidTrace(
@@ -1711,12 +1709,10 @@ class ProjectService extends Base
                . ' cached=' . json_encode($cached, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
             );
          }
-         */
 
          return $this->previousInvoiceTotalsByProjectItem[$cacheKey];
       }
 
-      /*
       $this->logCompletionPaidTrace(
          'computePreviousInvoiceTotals START project_item_id=' . $project_item_id
          . ' invoiceStartAfterYmd=' . ($invoiceStartAfterYmd ?? 'null')
@@ -1724,7 +1720,7 @@ class ProjectService extends Base
       );
 
       if (self::DEBUG_COMPLETION_PAID_TRACE) {
-         // @var InvoiceItemOverridePaymentRepository $ovRepo
+         /** @var \App\Repository\InvoiceItemOverridePaymentRepository $ovRepo */
          $ovRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
          $ovRows = $ovRepo->ListarPorProjectItem($project_item_id);
          $this->logCompletionPaidTrace(
@@ -1747,7 +1743,6 @@ class ProjectService extends Base
             );
          }
       }
-      */
 
       $total_quantity = 0.0;
       $total_invoiced_amount_from_lines = 0.0;
@@ -1778,7 +1773,6 @@ class ProjectService extends Base
          $quantity = ($quantity === null) ? 0.0 : (float) $quantity;
          $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
          $price = (float) ($invoice_item->getPrice() ?? 0);
-         /*
          if (self::DEBUG_COMPLETION_PAID_TRACE) {
             $iid = $invoice !== null ? (int) $invoice->getInvoiceId() : 0;
             $sd = $invoice !== null && $invoice->getStartDate() !== null ? $invoice->getStartDate()->format('Y-m-d') : 'null';
@@ -1796,7 +1790,6 @@ class ProjectService extends Base
                . ' period=' . ($details['invoice_period'] ?? 'null')
             );
          }
-         */
          $total_quantity += $quantity;
          $total_invoiced_amount_from_lines += $quantity * $price;
 
@@ -1836,7 +1829,6 @@ class ProjectService extends Base
       ];
       $this->previousInvoiceTotalsByProjectItem[$cacheKey] = $result;
 
-      /*
       $this->logCompletionPaidTrace(
          'computePreviousInvoiceTotals RESULT project_item_id=' . $project_item_id
          . ' total_paid_effective=' . $total_paid
@@ -1847,7 +1839,6 @@ class ProjectService extends Base
          . ' sumStoredPaidNoOverride=' . $sumStoredPaidNoOverride
          . ' sumStoredPaidAmountNoOverride=' . $sumStoredPaidAmountNoOverride
       );
-      */
 
       return $result;
    }
@@ -1876,9 +1867,12 @@ class ProjectService extends Base
     * @param int|string $project_item_id
     * @param string|null $fecha_inicial m/d/Y del período del invoice en edición
     * @param string|null $fecha_fin m/d/Y
+    * @param int|null $exclude_invoice_id Si se pasa (p. ej. invoice guardado en ListarItemsDeInvoice), no incluye
+    *                                     líneas de ese invoice en la cadena post-override — mismo efecto que el borrador
+    *                                     donde la qty del período aún no está persistida.
     * @return float|int
     */
-   public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id, $fecha_inicial = null, $fecha_fin = null)
+   public function CalcularUnpaidQuantityFromPreviusInvoice($project_item_id, $fecha_inicial = null, $fecha_fin = null, ?int $exclude_invoice_id = null)
    {
       $piId = (int) $project_item_id;
       $fi = $fecha_inicial !== null ? trim((string) $fecha_inicial) : '';
@@ -1890,6 +1884,7 @@ class ProjectService extends Base
          'fecha_fin_raw' => $fecha_fin,
          'fi_trimmed' => $fi,
          'ff_trimmed' => $ff,
+         'exclude_invoice_id' => $exclude_invoice_id,
       ]);
 
       if ($fi !== '' && $ff !== '') {
@@ -1915,7 +1910,7 @@ class ProjectService extends Base
                'row_after_effective_unpaid_qty' => $effUnpaidAnchor,
             ]);
             if ($rowUnpaidAnchor !== null && $effUnpaidAnchor !== null) {
-               $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId);
+               $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId, $exclude_invoice_id);
                $this->logUnpaidQtyCalc('calc_return_chain_after_override', [
                   'project_item_id' => $piId,
                   'result_unpaid_qty' => $u,
@@ -1935,7 +1930,7 @@ class ProjectService extends Base
             if ($match !== null && $effUnpaidMatch !== null) {
                 $matchPeriodDate = $match->getOverridePeriodDate();
                 $matchInvoiceItem = $matchPeriodDate !== null 
-                   ? $this->findInvoiceItemByProjectItemAndDate($piId, $matchPeriodDate)
+                   ? $this->findInvoiceItemByProjectItemAndDate($piId, $matchPeriodDate, $exclude_invoice_id)
                    : null;
                 if ($matchInvoiceItem !== null) {
                    $matchQty = (float) ($matchInvoiceItem->getQuantity() ?? 0);
@@ -2162,13 +2157,11 @@ class ProjectService extends Base
     */
    public function ListarItemsCompletion($project_id, $fecha_inicial = "", $fecha_fin = "")
    {
-      /*
       $this->logCompletionPaidTrace(
          'ListarItemsCompletion START project_id=' . $project_id
          . ' fecha_inicial=' . $fecha_inicial
          . ' fecha_fin=' . $fecha_fin
       );
-      */
 
       $items = [];
 
@@ -2245,7 +2238,6 @@ class ProjectService extends Base
          $diff_qty = ($paidQty - $invQty) + $total_qty_adjustment;
          $diff_amt = ($paidAmt - $invAmt) + $total_amt_adjustment;
 
-         /*
          $this->logCompletionPaidTrace(
             'completion_fila project_id=' . $project_id
             . ' project_item_id=' . $project_item_id
@@ -2256,7 +2248,6 @@ class ProjectService extends Base
             . ' diff_qty=' . $diff_qty
             . ' has_paid_qty_override_history=' . ($has_paid_qty_override_history ? '1' : '0')
          );
-         */
 
          $items[] = [
             'project_item_id' => $project_item_id,
@@ -2291,9 +2282,7 @@ class ProjectService extends Base
          ];
       }
 
-      /*
       $this->logCompletionPaidTrace('ListarItemsCompletion END project_id=' . $project_id . ' items_count=' . count($items));
-      */
 
       return $items;
    }
