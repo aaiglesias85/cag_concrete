@@ -66,6 +66,21 @@ class InvoiceService extends Base
    }
 
    /**
+    * Depuración QBF / unpaid (desactivada). Descomentar el cuerpo para escribir en public/weblog.txt.
+    *
+    * @param array<string, mixed> $context
+    */
+   private function logQbf(string $step, array $context = []): void
+   {
+      /*
+      $line = $context === []
+         ? $step
+         : $step . "\t" . json_encode($context, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+      $this->writelogPublic('[qbf] ' . $line, 'weblog.txt');
+      */
+   }
+
+   /**
     * Orden determinístico de invoices (fecha inicio, luego ID).
     *
     * @param Invoice[] $invoices
@@ -265,8 +280,18 @@ class InvoiceService extends Base
       // (100 del inv1) - (70 del inv1) = 30.
       // 30 - 0 (QBF) = 30.
       $deudaNetaPrev = $sumPrevQty - $sumPrevPaid;
+      $out = max(0.0, $deudaNetaPrev - $currentQbf);
+      if (abs($currentQbf) > 1e-12) {
+         $this->logQbf('calculateInvoiceUnpaidQty', [
+            'sum_prev_qty' => $sumPrevQty,
+            'sum_prev_paid' => $sumPrevPaid,
+            'current_qbf' => $currentQbf,
+            'deuda_neta_prev' => $deudaNetaPrev,
+            'unpaid_out' => $out,
+         ]);
+      }
 
-      return max(0, $deudaNetaPrev - $currentQbf);
+      return $out;
    }
 
    /**
@@ -1875,13 +1900,39 @@ class InvoiceService extends Base
             // Si el invoice del bucle es el que estamos mirando, CAPTURAMOS ese valor
             if ($loopInvId === $currentInvoiceId) {
                $carryIntoCurrentForFallback = $carryAtLoopStart;
-               // ListarItemsParaInvoice (borrador): unpaid = cadena solo hasta facturas guardadas previas → deuda al
-               // *inicio* de este período (carry), sin sumar aún la qty de esta línea en meses posteriores a la cabecera.
-               // tempUnpaid aquí incluye +iQty (p. ej. nov 150+100=250); unpaid_qty mostrada debe coincidir con Listar (150).
-               $unpaidOpeningForDisplay = $tempUnpaid;
-               if ($latestOverride !== null && $anchorUnpaidEffective !== null && $isAfterOverride && $carryAtLoopStart !== null) {
-                  $unpaidOpeningForDisplay = (float) $carryAtLoopStart;
+               // QBF: siempre se resta del unpaid mostrado (una sola vez). Primero la deuda “antes de aplicar QBF
+               // de esta línea”; luego max(0, esa − QBF). No depende del mes del override.
+               if (!$isAfterOverride) {
+                  $unpaidBeforeQbfForRow = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, 0.0);
+               } elseif ($latestOverride !== null && $anchorUnpaidEffective !== null && $isAfterOverride) {
+                  if ($invStart !== null && $overrideStartDate !== null
+                     && $this->isSameCalendarMonth($invStart, $overrideStartDate)
+                  ) {
+                     $unpaidBeforeQbfForRow = $carryAtLoopStart !== null
+                        ? (float) $carryAtLoopStart
+                        : (float) $anchorUnpaidEffective;
+                  } elseif ($carryAtLoopStart !== null) {
+                     $unpaidBeforeQbfForRow = (float) $carryAtLoopStart;
+                  } else {
+                     $unpaidBeforeQbfForRow = (float) $anchorUnpaidEffective;
+                  }
+               } else {
+                  $unpaidBeforeQbfForRow = max(0.0, $tempUnpaid + $currentQbf);
                }
+               $unpaidOpeningForDisplay = max(0.0, $unpaidBeforeQbfForRow - $currentQbf);
+               $this->logQbf('listar_timeline_current_invoice', [
+                  'invoice_item_id' => $value->getId(),
+                  'project_item_id' => $project_item_id,
+                  'loop_invoice_id' => $loopInvId,
+                  'current_qbf' => $currentQbf,
+                  'override_base' => $anchorUnpaidEffective,
+                  'carry_at_loop_start' => $carryAtLoopStart,
+                  'temp_unpaid' => $tempUnpaid,
+                  'unpaid_before_qbf' => $unpaidBeforeQbfForRow,
+                  'unpaid_opening_for_display' => $unpaidOpeningForDisplay,
+                  'same_month_as_override_header' => $invStart !== null && $overrideStartDate !== null
+                     && $this->isSameCalendarMonth($invStart, $overrideStartDate),
+               ]);
                $this->logOverrideInvoice('timeline_at_current_invoice', [
                   'invoice_item_id' => $value->getId(),
                   'project_item_id' => $project_item_id,
@@ -1928,7 +1979,7 @@ class InvoiceService extends Base
              $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
              
               if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
-                 // Usar el override como base
+                 // Usar el override como base; QBF siempre: unpaid = max(0, deuda_antes_qbf − QBF)
                  $overrideBase = (float) $anchorUnpaidEffective;
                  $currentQbf = (float)$value->getQuantityBroughtForward();
                  $currentQty = (float)$value->getQuantity();
@@ -1936,15 +1987,24 @@ class InvoiceService extends Base
                  if ($currentInvStart !== null && $overrideStartDate !== null
                     && $this->isSameCalendarMonth($currentInvStart, $overrideStartDate)
                  ) {
-                    // Mismo mes que override: unpaid = snapshot (sin restar paid)
-                    $unpaidQtySpecific = $overrideBase;
+                    $unpaidBeforeQbf = $carryIntoCurrentForFallback !== null
+                       ? (float) $carryIntoCurrentForFallback
+                       : $overrideBase;
+                 } elseif ($carryIntoCurrentForFallback !== null) {
+                    $unpaidBeforeQbf = (float) $carryIntoCurrentForFallback;
                  } else {
-                    // Meses posteriores: unpaid = base + qty - paid (sí restar paid)
-                    $baseChain = $carryIntoCurrentForFallback !== null ? $carryIntoCurrentForFallback : $overrideBase;
-                    $unpaidQtySpecific = $baseChain + $currentQty - $currentPaid - $currentQbf;
+                    $unpaidBeforeQbf = $overrideBase;
                  }
-                 $unpaidQtySpecific = max(0.0, $unpaidQtySpecific);
+                 $unpaidQtySpecific = max(0.0, $unpaidBeforeQbf - $currentQbf);
                 $unpaidPrevSpecific = $lastLoopUnpaid;
+                $this->logQbf('listar_fallback_override', [
+                   'invoice_item_id' => $value->getId(),
+                   'project_item_id' => $project_item_id,
+                   'override_base' => $overrideBase,
+                   'current_qbf' => $currentQbf,
+                   'unpaid_before_qbf' => $unpaidBeforeQbf,
+                   'unpaid_qty_specific' => $unpaidQtySpecific,
+                ]);
                 $this->logOverrideInvoice('fallback_override_base', [
                    'invoice_item_id' => $value->getId(),
                    'project_item_id' => $project_item_id,
@@ -2014,7 +2074,15 @@ class InvoiceService extends Base
             && $periodOverrideRow !== null
             && $periodOverrideRow->getUnpaidQty() === null
          ) {
-            $unpaid_qty = max(0.0, (float) $quantity_completed - $paid_qty);
+            $qbfRow = (float) ($value->getQuantityBroughtForward() ?? 0);
+            $unpaid_qty = max(0.0, (float) $quantity_completed - $paid_qty - $qbfRow);
+            $this->logQbf('listar_unpaid_derived_completed_minus_paid_minus_qbf', [
+               'invoice_item_id' => $value->getId(),
+               'quantity_completed' => $quantity_completed,
+               'paid_qty' => $paid_qty,
+               'qbf' => $qbfRow,
+               'unpaid_qty' => $unpaid_qty,
+            ]);
             $this->logOverrideInvoice('item_unpaid_derived_completed_minus_paid', [
                'invoice_item_id' => $value->getId(),
                'project_item_id' => $project_item_id,
@@ -2663,6 +2731,20 @@ class InvoiceService extends Base
       $project_id = $currentInvoice->getProject()->getProjectId();
       $current_invoice_id = $currentInvoice->getInvoiceId();
 
+      $qbfPayload = [];
+      foreach ($items as $row) {
+         $qbfPayload[] = [
+            'project_item_id' => $row->project_item_id ?? null,
+            'invoice_item_id' => $row->invoice_item_id ?? null,
+            'quantity_brought_forward' => $row->quantity_brought_forward ?? null,
+         ];
+      }
+      $this->logQbf('actualizar_unpaid_qbf_start', [
+         'current_invoice_id' => (int) $current_invoice_id,
+         'project_id' => (int) $project_id,
+         'items_qbf' => $qbfPayload,
+      ]);
+
       $this->logOverrideInvoice('actualizar_unpaid_qbf_start', [
          'current_invoice_id' => (int) $current_invoice_id,
          'project_id' => (int) $project_id,
@@ -2787,27 +2869,39 @@ class InvoiceService extends Base
                 if ($invStart !== null && $overrideStartDate !== null
                    && $this->isSameCalendarMonth($invStart, $overrideStartDate)
                 ) {
-                   // Mismo mes que override: unpaid = snapshot + qty (sin restar paid)
-                   $nuevoUnpaid = $overrideBase;
+                   // Mismo mes que override: persistir unpaid = snapshot − QBF; carry sigue con qty − QBF
+                   $nuevoUnpaid = max(0.0, $overrideBase - $currentQbf);
                    $lastUnpaidOverrideValue = max(0.0, $overrideBase + $iQty - $currentQbf);
                 } else {
                    if ($lastUnpaidOverrideValue !== null) {
-                      $nuevoUnpaid = $lastUnpaidOverrideValue + $iQty - $iPaid - $currentQbf;
+                      $carryIn = (float) $lastUnpaidOverrideValue;
+                      $nuevoUnpaid = max(0.0, $carryIn - $currentQbf);
+                      $lastUnpaidOverrideValue = max(0.0, $carryIn + $iQty - $iPaid - $currentQbf);
                    } else {
-                      // Primer invoice después del override: unpaid = overrideBase + qty (sin restar paid)
-                      $nuevoUnpaid = $overrideBase + $iQty - $currentQbf;
+                      // Primer invoice después del mes de cabecera: unpaid = snapshot − QBF; carry con qty y paid
+                      $nuevoUnpaid = max(0.0, $overrideBase - $currentQbf);
+                      $lastUnpaidOverrideValue = max(0.0, $overrideBase + $iQty - $iPaid - $currentQbf);
                    }
-                   $nuevoUnpaid = max(0.0, $nuevoUnpaid);
-                   $lastUnpaidOverrideValue = $nuevoUnpaid;
                }
             } elseif ($lastUnpaidOverrideValue !== null) {
-               $nuevoUnpaid = $lastUnpaidOverrideValue + $iQty - $iPaid - $currentQbf;
-               $nuevoUnpaid = max(0.0, $nuevoUnpaid);
+               $carryIn = (float) $lastUnpaidOverrideValue;
+               $nuevoUnpaid = max(0.0, $carryIn - $currentQbf);
+               $lastUnpaidOverrideValue = max(0.0, $carryIn + $iQty - $iPaid - $currentQbf);
             } else {
                // Calcular normalmente
                $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
             }
 
+            if (abs($currentQbf) > 1e-12 || $invId === (int) $current_invoice_id) {
+               $this->logQbf('actualizar_unpaid_qbf_invoice', [
+                  'project_item_id' => (int) $project_item_id,
+                  'current_invoice_id_being_saved' => (int) $current_invoice_id,
+                  'loop_invoice_id' => $invId,
+                  'current_qbf' => $currentQbf,
+                  'nuevo_unpaid' => $nuevoUnpaid,
+                  'last_unpaid_carry' => $lastUnpaidOverrideValue,
+               ]);
+            }
             $this->logOverrideInvoice('actualizar_unpaid_qbf_invoice', [
                'project_item_id' => (int) $project_item_id,
                'current_invoice_id_being_saved' => (int) $current_invoice_id,
@@ -2981,18 +3075,17 @@ class InvoiceService extends Base
                if ($invStart !== null && $recalcOverrideStart !== null
                   && $this->isSameCalendarMonth($invStart, $recalcOverrideStart)
                ) {
-                  // Mismo mes que override: unpaid = snapshot + qty (sin restar paid)
-                  $nuevoUnpaid = $overrideBase;
+                  $nuevoUnpaid = max(0.0, $overrideBase - $currentQbf);
                   $lastUnpaidOverrideCarry = max(0.0, $overrideBase + $iQty - $currentQbf);
                } else {
                   if ($lastUnpaidOverrideCarry !== null) {
-                     $nuevoUnpaid = $lastUnpaidOverrideCarry + $iQty - $iPaid - $currentQbf;
+                     $carryIn = (float) $lastUnpaidOverrideCarry;
+                     $nuevoUnpaid = max(0.0, $carryIn - $currentQbf);
+                     $lastUnpaidOverrideCarry = max(0.0, $carryIn + $iQty - $iPaid - $currentQbf);
                   } else {
-                     // Primer invoice después del override: unpaid = overrideBase + qty (sin restar paid)
-                     $nuevoUnpaid = $overrideBase + $iQty - $currentQbf;
+                     $nuevoUnpaid = max(0.0, $overrideBase - $currentQbf);
+                     $lastUnpaidOverrideCarry = max(0.0, $overrideBase + $iQty - $iPaid - $currentQbf);
                   }
-                  $nuevoUnpaid = max(0.0, $nuevoUnpaid);
-                  $lastUnpaidOverrideCarry = $nuevoUnpaid;
                }
             } else {
                $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
