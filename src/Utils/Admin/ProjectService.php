@@ -1680,11 +1680,48 @@ class ProjectService extends Base
    }
 
    /**
+    * Último snapshot de paid por project_item: fila con `paid_qty` no null y cabecera con fecha;
+    * gana la cabecera de fecha **más reciente** (mismo criterio que varios overrides en el tiempo).
+    */
+   private function findLatestPaidQtyOverrideSnapshotForProjectItem(int $project_item_id): ?InvoiceItemOverridePayment
+   {
+      /** @var InvoiceItemOverridePaymentRepository $ovRepo */
+      $ovRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
+      $rows = $ovRepo->ListarPorProjectItem($project_item_id);
+      $best = null;
+      $bestHeaderYmd = null;
+      $bestId = 0;
+
+      foreach ($rows as $o) {
+         if (!$o instanceof InvoiceItemOverridePayment || $o->getPaidQty() === null) {
+            continue;
+         }
+         $hd = $o->getInvoiceOverridePayment()?->getDate();
+         if ($hd === null) {
+            continue;
+         }
+         $ymd = $hd->format('Y-m-d');
+         $oid = (int) ($o->getId() ?? 0);
+         if ($best === null || $ymd > $bestHeaderYmd || ($ymd === $bestHeaderYmd && $oid > $bestId)) {
+            $best = $o;
+            $bestHeaderYmd = $ymd;
+            $bestId = $oid;
+         }
+      }
+
+      return $best;
+   }
+
+   /**
     * Agregado de líneas de factura previas para un project_item (un solo bucle, caché por request).
     *
-    * Override de paid: el mismo registro (`override_id`) cuenta **una sola vez** hacia el total pagado,
-    * aunque haya varias líneas o facturas en el rango; no se multiplica por número de invoices.
-    * Líneas sin override: se suma el `paid_qty` almacenado por línea.
+    * Sin filtro de fecha ($invoiceStartAfterYmd === null), p. ej. tab **Completion**: si existe override con
+    * `paid_qty`, ese valor es el **acumulado pagado hasta el mes de la cabecera** (inclusive). No se suman los
+    * `invoice_item.paid_qty` de facturas con mes ≤ mes cabecera (aunque Payments cambie meses anteriores).
+    * Después de ese mes, el total suma el `paid_qty` **persistido** en cada línea (sin aplicar ese snapshot).
+    *
+    * Con $invoiceStartAfterYmd (recorte para borrador de factura): se mantiene la lógica por línea con
+    * {@see InvoicePaidQtyOverrideResolver} (mes invoice ≥ mes cabecera, override una sola vez por id).
     *
     * Si $invoiceStartAfterYmd (Y-m-d) no es null, solo se consideran líneas cuyo invoice tiene start_date > ese día
     * (períodos posteriores a la fecha de cabecera del override aplicable).
@@ -1753,6 +1790,36 @@ class ProjectService extends Base
       $sumStoredPaidNoOverride = 0.0;
       $sumStoredPaidAmountNoOverride = 0.0;
 
+      $snapshotRow = null;
+      $snapshotCutoffMonth = null;
+      if ($invoiceStartAfterYmd === null) {
+         $snapshotRow = $this->findLatestPaidQtyOverrideSnapshotForProjectItem($project_item_id);
+         if ($snapshotRow !== null) {
+            $snapHd = $snapshotRow->getInvoiceOverridePayment()?->getDate();
+            if ($snapHd === null) {
+               $snapshotRow = null;
+            } else {
+               $snapshotCutoffMonth = \DateTimeImmutable::createFromInterface($snapHd)
+                  ->modify('first day of this month')
+                  ->setTime(0, 0, 0);
+            }
+         }
+         if (self::DEBUG_COMPLETION_PAID_TRACE && $snapshotRow !== null) {
+            $this->logCompletionPaidTrace(
+               'compute_snapshot_paid_mode project_item_id=' . $project_item_id
+               . ' invoice_item_override_payment_id=' . (string) ($snapshotRow->getId() ?? '')
+               . ' snapshot_paid_qty=' . (string) $snapshotRow->getPaidQty()
+               . ' cutoff_month=' . $snapshotCutoffMonth->format('Y-m-d')
+            );
+         }
+      }
+
+      /** @var ProjectItem|null $projectItemEntity */
+      $projectItemEntity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($project_item_id);
+      $projectItemPrice = ($projectItemEntity !== null && $projectItemEntity->getPrice() !== null)
+         ? (float) $projectItemEntity->getPrice()
+         : 0.0;
+
       /** @var InvoiceItemRepository $invoiceItemRepo */
       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $invoice_items = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
@@ -1771,54 +1838,97 @@ class ProjectService extends Base
 
          $quantity = $invoice_item->getQuantity();
          $quantity = ($quantity === null) ? 0.0 : (float) $quantity;
-         $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
          $price = (float) ($invoice_item->getPrice() ?? 0);
-         if (self::DEBUG_COMPLETION_PAID_TRACE) {
-            $iid = $invoice !== null ? (int) $invoice->getInvoiceId() : 0;
-            $sd = $invoice !== null && $invoice->getStartDate() !== null ? $invoice->getStartDate()->format('Y-m-d') : 'null';
-            $ed = $invoice !== null && $invoice->getEndDate() !== null ? $invoice->getEndDate()->format('Y-m-d') : 'null';
-            $this->logCompletionPaidTrace(
-               'invoice_line project_item_id=' . $project_item_id
-               . ' invoice_item_id=' . ($invoice_item->getId() ?? 'null')
-               . ' invoice_id=' . $iid
-               . ' inv_start=' . $sd . ' inv_end=' . $ed
-               . ' qty_line=' . $quantity
-               . ' price_line=' . $price
-               . ' base_persistido=' . $details['base']
-               . ' effective=' . $details['effective']
-               . ' override_id=' . ($details['override_id'] !== null ? (string) $details['override_id'] : 'null')
-               . ' period=' . ($details['invoice_period'] ?? 'null')
-            );
+
+         if ($snapshotRow !== null && $snapshotCutoffMonth !== null) {
+            $invStart = $invoice !== null ? $invoice->getStartDate() : null;
+            if (self::DEBUG_COMPLETION_PAID_TRACE) {
+               $iid = $invoice !== null ? (int) $invoice->getInvoiceId() : 0;
+               $sd = $invStart !== null ? $invStart->format('Y-m-d') : 'null';
+               $ed = $invoice !== null && $invoice->getEndDate() !== null ? $invoice->getEndDate()->format('Y-m-d') : 'null';
+               $this->logCompletionPaidTrace(
+                  'invoice_line_snapshot project_item_id=' . $project_item_id
+                  . ' invoice_item_id=' . ($invoice_item->getId() ?? 'null')
+                  . ' invoice_id=' . $iid
+                  . ' inv_start=' . $sd . ' inv_end=' . $ed
+               );
+            }
+         } else {
+            $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
+            if (self::DEBUG_COMPLETION_PAID_TRACE) {
+               $iid = $invoice !== null ? (int) $invoice->getInvoiceId() : 0;
+               $sd = $invoice !== null && $invoice->getStartDate() !== null ? $invoice->getStartDate()->format('Y-m-d') : 'null';
+               $ed = $invoice !== null && $invoice->getEndDate() !== null ? $invoice->getEndDate()->format('Y-m-d') : 'null';
+               $this->logCompletionPaidTrace(
+                  'invoice_line project_item_id=' . $project_item_id
+                  . ' invoice_item_id=' . ($invoice_item->getId() ?? 'null')
+                  . ' invoice_id=' . $iid
+                  . ' inv_start=' . $sd . ' inv_end=' . $ed
+                  . ' qty_line=' . $quantity
+                  . ' price_line=' . $price
+                  . ' base_persistido=' . $details['base']
+                  . ' effective=' . $details['effective']
+                  . ' override_id=' . ($details['override_id'] !== null ? (string) $details['override_id'] : 'null')
+                  . ' period=' . ($details['invoice_period'] ?? 'null')
+               );
+            }
          }
          $total_quantity += $quantity;
          $total_invoiced_amount_from_lines += $quantity * $price;
 
-         $oid = $details['override_id'];
-         if ($oid !== null) {
-            if (!isset($paidQtyByOverrideId[$oid])) {
-               $paidQtyByOverrideId[$oid] = (float) $details['effective'];
-               $pi = $invoice_item->getProjectItem();
-               $priceForOverrideId[$oid] = (float) (($pi !== null && $pi->getPrice() !== null)
-                  ? $pi->getPrice()
-                  : $price);
+         if ($snapshotRow !== null && $snapshotCutoffMonth !== null) {
+            $invStart = $invoice !== null ? $invoice->getStartDate() : null;
+            if ($invStart !== null) {
+               $lineMonth = \DateTimeImmutable::createFromInterface($invStart)
+                  ->modify('first day of this month')
+                  ->setTime(0, 0, 0);
+               if ($lineMonth > $snapshotCutoffMonth) {
+                  $baseLine = (float) ($invoice_item->getPaidQty() ?? 0);
+                  $sumStoredPaidNoOverride += $baseLine;
+                  $sumStoredPaidAmountNoOverride += $baseLine * $price;
+               }
+            } else {
+               $baseLine = (float) ($invoice_item->getPaidQty() ?? 0);
+               $sumStoredPaidNoOverride += $baseLine;
+               $sumStoredPaidAmountNoOverride += $baseLine * $price;
             }
          } else {
-            $sumStoredPaidNoOverride += (float) $details['base'];
-            $sumStoredPaidAmountNoOverride += (float) $details['base'] * $price;
+            $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
+            $oid = $details['override_id'];
+            if ($oid !== null) {
+               if (!isset($paidQtyByOverrideId[$oid])) {
+                  $paidQtyByOverrideId[$oid] = (float) $details['effective'];
+                  $pi = $invoice_item->getProjectItem();
+                  $priceForOverrideId[$oid] = (float) (($pi !== null && $pi->getPrice() !== null)
+                     ? $pi->getPrice()
+                     : $price);
+               }
+            } else {
+               $sumStoredPaidNoOverride += (float) $details['base'];
+               $sumStoredPaidAmountNoOverride += (float) $details['base'] * $price;
+            }
          }
 
          $lineIndex++;
       }
 
-      $totalPaidFromOverrides = 0.0;
-      $paidAmountFromOverrides = 0.0;
-      foreach ($paidQtyByOverrideId as $ovId => $pq) {
-         $totalPaidFromOverrides += $pq;
-         $paidAmountFromOverrides += $pq * ($priceForOverrideId[$ovId] ?? 0.0);
-      }
+      if ($snapshotRow !== null && $snapshotCutoffMonth !== null) {
+         $snapshotPaid = (float) $snapshotRow->getPaidQty();
+         $total_paid = $snapshotPaid + $sumStoredPaidNoOverride;
+         $paid_amount_total = $snapshotPaid * $projectItemPrice + $sumStoredPaidAmountNoOverride;
+         $totalPaidFromOverrides = $snapshotPaid;
+         $paidAmountFromOverrides = $snapshotPaid * $projectItemPrice;
+      } else {
+         $totalPaidFromOverrides = 0.0;
+         $paidAmountFromOverrides = 0.0;
+         foreach ($paidQtyByOverrideId as $ovId => $pq) {
+            $totalPaidFromOverrides += $pq;
+            $paidAmountFromOverrides += $pq * ($priceForOverrideId[$ovId] ?? 0.0);
+         }
 
-      $total_paid = $totalPaidFromOverrides + $sumStoredPaidNoOverride;
-      $paid_amount_total = $paidAmountFromOverrides + $sumStoredPaidAmountNoOverride;
+         $total_paid = $totalPaidFromOverrides + $sumStoredPaidNoOverride;
+         $paid_amount_total = $paidAmountFromOverrides + $sumStoredPaidAmountNoOverride;
+      }
 
       $result = [
          'total_quantity' => $total_quantity,
