@@ -126,6 +126,42 @@ class OverridePaymentController extends AbstractController
    }
 
    /**
+    * Elimina varias cabeceras override (ids separados por coma).
+    */
+   public function eliminarVarios(Request $request)
+   {
+      /** @var Usuario $usuario */
+      $usuario = $this->getUser();
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      if (count($permiso) === 0 || empty($permiso[0]['eliminar'])) {
+         return $this->json(['success' => false, 'error' => 'Access denied']);
+      }
+
+      $ids = $request->get('ids', '');
+      if ($ids === null || trim((string) $ids) === '') {
+         return $this->json(['success' => false, 'error' => 'No records selected']);
+      }
+
+      try {
+         $r = $this->overridePaymentService->EliminarCabecerasInvoiceOverridePayment((string) $ids);
+         if (!empty($r['success'])) {
+            return $this->json([
+               'success' => true,
+               'message' => 'The operation was successful',
+               'deleted' => (int) ($r['deleted'] ?? 0),
+            ]);
+         }
+
+         return $this->json([
+            'success' => false,
+            'error' => $r['error'] ?? 'Unknown error',
+         ]);
+      } catch (\Exception $e) {
+         return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
     * Carga cabecera por id para editar (misma convención que payment/cargarDatos, project/cargarDatos).
     */
    public function cargarDatos(Request $request)

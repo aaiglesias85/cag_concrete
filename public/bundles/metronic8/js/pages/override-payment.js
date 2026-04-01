@@ -17,6 +17,8 @@ var OverridePayment = (function () {
    };
    /** Id pendiente para confirmar borrado vía #modal-eliminar (misma convención que invoice). */
    var overridePaymentDeleteId = null;
+   /** Select all en cabeceras (listado principal). */
+   var tableSelectAllOpHeaders = false;
 
    // Vista: listado principal vs formulario wizard
 
@@ -38,7 +40,11 @@ var OverridePayment = (function () {
    // Listado cabeceras: DataTable server-side, export y filtros de lista
 
    var getHeadersColumnsTable = function () {
-      return [
+      var cols = [];
+      if (permiso.eliminar) {
+         cols.push({ data: 'id', name: 'id' });
+      }
+      cols.push(
          { data: 'company', name: 'company' },
          { data: 'project', name: 'project' },
          { data: 'date', name: 'date' },
@@ -46,8 +52,9 @@ var OverridePayment = (function () {
          { data: 'overridePaidAmount', name: 'overridePaidAmount' },
          { data: 'overrideUnpaidQty', name: 'overrideUnpaidQty' },
          { data: 'overrideUnpaidAmount', name: 'overrideUnpaidAmount' },
-         { data: null, name: 'id', orderable: false },
-      ];
+         { data: null, name: 'actions', orderable: false },
+      );
+      return cols;
    };
    var getHeadersColumnsDefTable = function () {
       var fmtQty = function (v) {
@@ -64,27 +71,37 @@ var OverridePayment = (function () {
          }
          return MyApp.formatMoney(n);
       };
-      return [
+      var defs = [];
+      var i = 0;
+      if (permiso.eliminar) {
+         defs.push({
+            targets: i++,
+            orderable: false,
+            className: 'text-center',
+            render: DatatableUtil.getRenderColumnCheck,
+         });
+      }
+      defs.push(
          {
-            targets: 0,
+            targets: i++,
             render: function (data) {
                return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 200);
             },
          },
          {
-            targets: 1,
+            targets: i++,
             render: function (data) {
                return DatatableUtil.getRenderColumnDiv(DatatableUtil.escapeHtml(data != null ? String(data) : ''), 280);
             },
          },
          {
-            targets: 2,
+            targets: i++,
             render: function (data) {
                return DatatableUtil.getRenderColumnDiv(data != null ? String(data) : '', 120);
             },
          },
          {
-            targets: 3,
+            targets: i++,
             className: 'text-end op-col-total',
             orderable: true,
             render: function (data, type, row) {
@@ -92,7 +109,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 4,
+            targets: i++,
             className: 'text-end op-col-total',
             orderable: true,
             render: function (data, type, row) {
@@ -100,7 +117,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 5,
+            targets: i++,
             className: 'text-end op-col-total',
             orderable: true,
             render: function (data, type, row) {
@@ -108,7 +125,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 6,
+            targets: i++,
             className: 'text-end op-col-total',
             orderable: true,
             render: function (data, type, row) {
@@ -116,7 +133,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 7,
+            targets: i++,
             data: null,
             orderable: false,
             className: 'text-end',
@@ -124,7 +141,8 @@ var OverridePayment = (function () {
                return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
             },
          },
-      ];
+      );
+      return defs;
    };
    var exportHeadersButtons = function () {
       var table = document.querySelector('#override-payment-headers-table');
@@ -132,7 +150,7 @@ var OverridePayment = (function () {
          return;
       }
       var documentTitle = 'Override payments';
-      var exclude_columns = ':not(:last-child)';
+      var exclude_columns = permiso.eliminar ? ':not(:first-child):not(:last-child)' : ':not(:last-child)';
       new $.fn.dataTable.Buttons(table, {
          buttons: [
             {
@@ -213,11 +231,12 @@ var OverridePayment = (function () {
       };
 
       // columns / column defs / language (getHeadersColumnsTable, getHeadersColumnsDefTable)
-      oTable = $(table).DataTable({
+      var orderCol = permiso.eliminar ? [[3, 'desc']] : [[2, 'desc']];
+      var dtOpts = {
          searchDelay: 500,
          processing: true,
          serverSide: true,
-         order: [[2, 'desc']],
+         order: orderCol,
          stateSave: true,
          displayLength: 30,
          lengthMenu: [
@@ -231,15 +250,103 @@ var OverridePayment = (function () {
          columns: getHeadersColumnsTable(),
          columnDefs: getHeadersColumnsDefTable(),
          language: DatatableUtil.getDataTableLenguaje(),
-      });
+      };
+      if (permiso.eliminar) {
+         dtOpts.select = {
+            info: false,
+            style: 'multi',
+            selector: 'td:first-child input[type="checkbox"]',
+            className: 'row-selected',
+         };
+      }
+      oTable = $(table).DataTable(dtOpts);
 
       oTable.on('draw', function () {
          if (typeof KTMenu !== 'undefined' && KTMenu.createInstances) {
             KTMenu.createInstances();
          }
+         if (permiso.eliminar) {
+            resetSelectOpHeadersRecords();
+         }
       });
 
+      if (permiso.eliminar) {
+         handleSelectOpHeadersRecords(table);
+      }
+
       exportHeadersButtons();
+   };
+
+   var getOpHeadersSelectedIds = function () {
+      var ids = [];
+      if (oTable && typeof oTable.rows === 'function') {
+         try {
+            var rows = oTable.rows({ selected: true }).data().toArray();
+            for (var r = 0; r < rows.length; r++) {
+               var d = rows[r];
+               if (d && d.id != null && d.id !== '') {
+                  ids.push(String(d.id));
+               }
+            }
+         } catch (err) {
+            /* Select extension */
+         }
+      }
+      if (ids.length === 0) {
+         ids = DatatableUtil.getTableSelectedRowKeys('#override-payment-headers-table');
+      }
+      return ids;
+   };
+
+   var actualizarOpHeadersSeleccionados = function () {
+      if (!permiso.eliminar) {
+         return;
+      }
+      var n = getOpHeadersSelectedIds().length;
+      if (n > 0) {
+         $('#btn-op-eliminar-override-headers').removeClass('hide');
+      } else {
+         $('#btn-op-eliminar-override-headers').addClass('hide');
+      }
+   };
+
+   var resetSelectOpHeadersRecords = function () {
+      tableSelectAllOpHeaders = false;
+      $('#lista-override-payment .chk-op-headers-select-all').prop('checked', false);
+      actualizarOpHeadersSeleccionados();
+   };
+
+   var handleSelectOpHeadersRecords = function (tableSelector) {
+      if (!permiso.eliminar || !oTable) {
+         return;
+      }
+      oTable.on('select', function (e, dt, type) {
+         if (type === 'row') {
+            actualizarOpHeadersSeleccionados();
+         }
+      });
+      oTable.on('deselect', function (e, dt, type) {
+         if (type === 'row') {
+            actualizarOpHeadersSeleccionados();
+         }
+      });
+      $(document).off('click', '#lista-override-payment .chk-op-headers-select-all');
+      $(document).on('click', '#lista-override-payment .chk-op-headers-select-all', function () {
+         if (!oTable) {
+            return;
+         }
+         if (!tableSelectAllOpHeaders) {
+            oTable.rows({ search: 'applied' }).select();
+         } else {
+            oTable.rows().deselect();
+         }
+         tableSelectAllOpHeaders = !tableSelectAllOpHeaders;
+      });
+
+      $(document).off('change', '#override-payment-headers-table tbody input[type="checkbox"]');
+      $(document).on('change', '#override-payment-headers-table tbody input[type="checkbox"]', function () {
+         actualizarOpHeadersSeleccionados();
+      });
    };
    var handleSearchHeadersDatatable = function () {
       var debounceTimeout;
@@ -1273,7 +1380,7 @@ var OverridePayment = (function () {
       });
    };
 
-   /** Confirmación de borrado con #modal-eliminar y #btn-delete (como invoice). */
+   /** Confirmación de borrado con #modal-eliminar y #btn-delete (como invoice); varios con #modal-eliminar-seleccion. */
    var initAccionModalEliminarOverride = function () {
       $(document).off('click', '#btn-delete');
       $(document).on('click', '#btn-delete', function (e) {
@@ -1291,6 +1398,56 @@ var OverridePayment = (function () {
                var response = res.data;
                if (response.success) {
                   toastr.success(response.message || 'Deleted.', '');
+                  refreshHeadersList();
+               } else {
+                  toastr.error(response.error || 'Error', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .finally(function () {
+               BlockUtil.unblock('#lista-override-payment');
+            });
+      });
+
+      if (!permiso.eliminar) {
+         return;
+      }
+
+      $(document).off('click', '#btn-op-eliminar-override-headers');
+      $(document).on('click', '#btn-op-eliminar-override-headers', function () {
+         var ids = getOpHeadersSelectedIds();
+         if (ids.length === 0) {
+            toastr.warning('Select one or more override payments to delete (use the checkboxes).', '');
+            return;
+         }
+         ModalUtil.show('modal-eliminar-seleccion', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-delete-selection');
+      $(document).on('click', '#btn-delete-selection', function (e) {
+         var ids = getOpHeadersSelectedIds().join(',');
+         if (!ids) {
+            return;
+         }
+         var formData = new URLSearchParams();
+         formData.set('ids', ids);
+         BlockUtil.block('#lista-override-payment');
+         axios
+            .post('override-payment/eliminarVarios', formData, { responseType: 'json' })
+            .then(function (res) {
+               var response = res.data;
+               if (response.success) {
+                  toastr.success(response.message || 'The operation was successful', '');
+                  tableSelectAllOpHeaders = false;
+                  $('#lista-override-payment .chk-op-headers-select-all').prop('checked', false);
+                  if (oTable && typeof oTable.rows === 'function') {
+                     try {
+                        oTable.rows().deselect();
+                     } catch (err) {
+                        /* ignore */
+                     }
+                  }
+                  actualizarOpHeadersSeleccionados();
                   refreshHeadersList();
                } else {
                   toastr.error(response.error || 'Error', '');

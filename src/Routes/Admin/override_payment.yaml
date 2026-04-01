@@ -14,6 +14,10 @@ eliminarOverridePaymentAdmin:
    path: /override-payment/eliminar
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::eliminar, _format: json }
 
+eliminarVariosOverridePaymentAdmin:
+   path: /override-payment/eliminarVarios
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::eliminarVarios, _format: json }
+
 listarItemsOverridePaymentAdmin:
    path: /override-payment/listarItems
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::listarItems, _format: json }

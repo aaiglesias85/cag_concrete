@@ -17,6 +17,8 @@ use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
+use App\Utils\Admin\InvoiceService;
+use App\Utils\Admin\ProjectService;
 use App\Utils\Base;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,7 +35,9 @@ class OverridePaymentService extends Base
       MailerInterface $mailer,
       ContainerBagInterface $containerBag,
       Security $security,
-      LoggerInterface $logger
+      LoggerInterface $logger,
+      private ProjectService $projectService,
+      private InvoiceService $invoiceService
    ) {
       parent::__construct($container, $mailer, $containerBag, $security, $logger);
    }
@@ -183,6 +187,34 @@ class OverridePaymentService extends Base
       $this->SalvarLog('Delete', 'Override Payment', 'Override payment header #' . $invoiceOverridePaymentId . ' deleted');
 
       return ['success' => true];
+   }
+
+   /**
+    * Elimina varias cabeceras `invoice_override_payment` por id (CSV o lista).
+    *
+    * @return array{success: bool, deleted?: int, requested?: int, error?: string}
+    */
+   public function EliminarCabecerasInvoiceOverridePayment(string $idsCsv): array
+   {
+      $parts = array_filter(array_map('intval', explode(',', (string) $idsCsv)));
+      if ($parts === []) {
+         return ['success' => false, 'error' => 'No valid IDs'];
+      }
+      $deleted = 0;
+      foreach ($parts as $id) {
+         if ($id <= 0) {
+            continue;
+         }
+         $r = $this->EliminarCabeceraInvoiceOverridePayment($id);
+         if (!empty($r['success'])) {
+            $deleted++;
+         }
+      }
+      if ($deleted === 0) {
+         return ['success' => false, 'error' => 'Could not delete the selected records'];
+      }
+
+      return ['success' => true, 'deleted' => $deleted, 'requested' => count($parts)];
    }
 
    /**
@@ -353,19 +385,30 @@ class OverridePaymentService extends Base
             $histPriceCache[$pid] = $historyRepo->TieneHistorialPrecio($pid);
          }
 
-         $sumPaidLines = (float) ($r['sum_paid_lines'] ?? 0);
-         $paidQtyDisplay = array_key_exists($pid, $paidQtyByPi) ? $paidQtyByPi[$pid] : $sumPaidLines;
          $sumQtyFinal = (float) ($r['sum_qty_final'] ?? 0);
          $contractQty = (float) ($pi->getQuantity() ?? 0);
          $priceContract = (float) ($pi->getPrice() ?? 0);
+
+         $cutoffYmd = null;
+         if ($endDate !== null) {
+            $cutoffYmd = $endDate->format('Y-m-d');
+         }
+
+         if (array_key_exists($pid, $paidQtyByPi)) {
+            $paidQtyDisplay = $paidQtyByPi[$pid];
+            $paidAmount = $paidQtyDisplay * $priceContract;
+         } else {
+            $aggPaid = $this->projectService->computeInvoiceStyleCumulativePaidBeforeCutoffExclusive($pid, $cutoffYmd);
+            $paidQtyDisplay = $aggPaid['total_paid_effective'];
+            $paidAmount = $aggPaid['paid_amount_total'];
+         }
 
          $overrideId = $mapOverrideId[$pid] ?? null;
          if ($overrideId !== null && array_key_exists($pid, $unpaidExplicitByPi)) {
             $unpaidQty = $unpaidExplicitByPi[$pid];
          } else {
-            $unpaidQty = max(0.0, $sumQtyFinal - $paidQtyDisplay);
+            $unpaidQty = $this->invoiceService->getUnpaidQtyMatchingInvoiceListarForLastLineBeforeCutoff($pid, $cutoffYmd);
          }
-         $paidAmount = $paidQtyDisplay * $priceContract;
 
          $hasPaidOverrideHist = $overrideId !== null && isset($overrideConHist[$overrideId]);
          $hasUnpaidOverrideHist = $overrideId !== null && isset($unpaidOverrideConHist[$overrideId]);

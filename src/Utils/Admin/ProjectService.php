@@ -1954,6 +1954,70 @@ class ProjectService extends Base
    }
 
    /**
+    * Paid acumulado efectivo (resolver por línea, deduplicación por override_id), misma base que en pantalla Invoice.
+    * No aplica el snapshot de Completion. Solo líneas no bond con invoice.start_date &lt; $invoiceStartStrictlyBeforeYmd (Y-m-d);
+    * si el cutoff es null, considera todas las facturas del ítem.
+    *
+    * @return array{total_paid_effective: float, paid_amount_total: float}
+    */
+   public function computeInvoiceStyleCumulativePaidBeforeCutoffExclusive(int $projectItemId, ?string $invoiceStartStrictlyBeforeYmd): array
+   {
+      $paidQtyByOverrideId = [];
+      $priceForOverrideId = [];
+      $sumStoredPaidNoOverride = 0.0;
+      $sumStoredPaidAmountNoOverride = 0.0;
+
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invoice_item) {
+         $invoice = $invoice_item->getInvoice();
+         $pi = $invoice_item->getProjectItem();
+         $itemEntity = $pi?->getItem();
+         if ($itemEntity !== null && $itemEntity->getBond()) {
+            continue;
+         }
+         if ($invoice === null || $invoice->getStartDate() === null) {
+            continue;
+         }
+         if ($invoiceStartStrictlyBeforeYmd !== null && $invoiceStartStrictlyBeforeYmd !== '') {
+            if ($invoice->getStartDate()->format('Y-m-d') >= $invoiceStartStrictlyBeforeYmd) {
+               continue;
+            }
+         }
+
+         $price = (float) ($invoice_item->getPrice() ?? 0);
+         $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
+         $oid = $details['override_id'];
+         if ($oid !== null) {
+            if (!isset($paidQtyByOverrideId[$oid])) {
+               $paidQtyByOverrideId[$oid] = (float) $details['effective'];
+               $priceForOverrideId[$oid] = (float) (($pi !== null && $pi->getPrice() !== null)
+                  ? $pi->getPrice()
+                  : $price);
+            }
+         } else {
+            $sumStoredPaidNoOverride += (float) $details['base'];
+            $sumStoredPaidAmountNoOverride += (float) $details['base'] * $price;
+         }
+      }
+
+      $totalPaidFromOverrides = 0.0;
+      $paidAmountFromOverrides = 0.0;
+      foreach ($paidQtyByOverrideId as $ovId => $pq) {
+         $totalPaidFromOverrides += $pq;
+         $paidAmountFromOverrides += $pq * ($priceForOverrideId[$ovId] ?? 0.0);
+      }
+
+      $total_paid = $totalPaidFromOverrides + $sumStoredPaidNoOverride;
+      $paid_amount_total = $paidAmountFromOverrides + $sumStoredPaidAmountNoOverride;
+
+      return [
+         'total_paid_effective' => $total_paid,
+         'paid_amount_total' => $paid_amount_total,
+      ];
+   }
+
+   /**
     * CalculaPaidAmountTotalFromPreviusInvoice
     * @param $project_item_id
     * @return float|int

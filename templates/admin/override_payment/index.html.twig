@@ -110,6 +110,13 @@
                   </button>
                   {% endif %}
 
+                  {% if permiso.eliminar %}
+                  <button type="button" id="btn-op-eliminar-override-headers" class="btn btn-danger me-2 hide">
+                     <i class="ki-duotone ki-trash fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">Delete</span>
+                  </button>
+                  {% endif %}
+
                   <!-- export -->
                   <div>
                      <div id="op-headers-table-export" class="d-none"></div>
@@ -155,6 +162,20 @@
                <table id="override-payment-headers-table" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5" style="width:100%">
                   <thead>
                      <tr class="fw-bold fs-6 text-gray-800 px-7">
+                        {% if permiso.eliminar %}
+                        <th class="w-10px pe-2">
+                           <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
+                              <input
+                                 class="form-check-input chk-op-headers-select-all"
+                                 type="checkbox"
+                                 data-kt-check="true"
+                                 data-kt-check-target="#override-payment-headers-table .form-check-input"
+                                 value="1"
+                                 title="Select all"
+                              />
+                           </div>
+                        </th>
+                        {% endif %}
                         <th>Company</th>
                         <th>Project</th>
                         <th class="min-w-125px">Date</th>

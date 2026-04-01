@@ -2201,6 +2201,47 @@ class InvoiceService extends Base
    }
 
    /**
+    * Unpaid qty como en {@see ListarItemsDeInvoice} para la última línea no bond del ítem cuyo invoice tiene
+    * start_date estrictamente anterior a $invoiceStartStrictlyBeforeYmd (Y-m-d). Si el cutoff es null, usa el
+    * último invoice del ítem. Sirve para Override Payment cuando aún no hay paid/unpaid explícitos en BD.
+    */
+   public function getUnpaidQtyMatchingInvoiceListarForLastLineBeforeCutoff(int $projectItemId, ?string $invoiceStartStrictlyBeforeYmd): float
+   {
+      /** @var InvoiceItemRepository $invoiceItemRepo */
+      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+      $lines = $invoiceItemRepo->ListarInvoicesDeItem($projectItemId);
+      $lastEligible = null;
+      foreach ($lines as $ii) {
+         $inv = $ii->getInvoice();
+         $item = $ii->getProjectItem()?->getItem();
+         if ($item !== null && $item->getBond()) {
+            continue;
+         }
+         if ($inv === null || $inv->getStartDate() === null) {
+            continue;
+         }
+         if ($invoiceStartStrictlyBeforeYmd !== null && $invoiceStartStrictlyBeforeYmd !== '') {
+            if ($inv->getStartDate()->format('Y-m-d') >= $invoiceStartStrictlyBeforeYmd) {
+               continue;
+            }
+         }
+         $lastEligible = $ii;
+      }
+      if ($lastEligible === null) {
+         return 0.0;
+      }
+      $invoiceId = (int) $lastEligible->getInvoice()->getInvoiceId();
+      $rows = $this->ListarItemsDeInvoice($invoiceId);
+      foreach ($rows as $row) {
+         if ((int) ($row['project_item_id'] ?? 0) === $projectItemId) {
+            return (float) ($row['unpaid_qty'] ?? 0);
+         }
+      }
+
+      return 0.0;
+   }
+
+   /**
     * ListarProjectsDeCompany
     * @param $company_id
     * @return array
