@@ -626,17 +626,27 @@ var Payments = (function () {
 
    var invoice = null;
 
-   /** Mismo criterio que la columna Job No del listado (projectNumber). */
-   var getPaymentFormTitleJobPart = function (inv) {
-      if (!inv) {
-         return '';
-      }
-      var pn = inv.project_number;
-      if (pn !== undefined && pn !== null && String(pn).trim() !== '') {
-         return 'Job No: ' + String(pn).trim();
-      }
-      return '#' + (inv.number != null ? inv.number : '');
-   };
+    /** Mismo criterio que la columna Job No del listado (projectNumber). */
+    var getPaymentFormTitleJobPart = function (inv) {
+       if (!inv) {
+          return '';
+       }
+       var result = '';
+       var pn = inv.project_number;
+       if (pn !== undefined && pn !== null && String(pn).trim() !== '') {
+          result += 'Job No: ' + String(pn).trim();
+       }
+       if (inv.number !== undefined && inv.number !== null) {
+          result += (result ? ' - ' : '') + 'Invoice #' + inv.number;
+       }
+       if (inv.start_date !== undefined && inv.start_date !== null) {
+          result += (result ? ' | ' : '') + inv.start_date;
+          if (inv.end_date !== undefined && inv.end_date !== null) {
+             result += ' - ' + inv.end_date;
+          }
+       }
+       return result;
+    };
 
    var initAccionEditar = function () {
       // Acción EDITAR (Lápiz) - Comportamiento normal
