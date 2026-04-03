@@ -221,8 +221,8 @@ class OverridePaymentService extends Base
     * Todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
     * El frontend usa DataTables con datasource local; la búsqueda es en cliente.
     *
-    * Los agregados (qty facturada, paid en líneas, importes, etc.) vienen de facturas con
-    * `invoice.start_date` **estrictamente anterior** a la fecha del override (`fecha_fin` en m/d/Y),
+    * Los agregados (qty facturada sin QBF en la columna Invoice Qty, paid en líneas, importes, etc.) vienen de
+    * facturas con `invoice.start_date` **estrictamente anterior** a la fecha del override (`fecha_fin` en m/d/Y),
     * misma regla que {@see InvoiceItemRepository::ListarParaOverridePaymentConTotal} y el baseline al guardar.
     * Si `fecha_fin` falta o no parsea, se suman todas las facturas del proyecto (comportamiento previo).
     *

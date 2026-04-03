@@ -483,7 +483,8 @@ class InvoiceItemRepository extends ServiceEntityRepository
 
    /**
     * Suma de cantidades y paid de líneas de factura para un project_item, excluyendo ítems bond.
-    * Misma base que {@see ListarParaOverridePaymentConTotal}.
+    * `sum_qty_final` incluye QBF (`quantity + quantity_brought_forward`); la grilla Override Payment usa
+    * {@see ListarParaOverridePaymentConTotal}, donde la qty mostrada **excluye** QBF.
     *
     * Si `$invoiceStartBeforeYmd` no es null: solo líneas cuyo invoice tiene start_date **estrictamente anterior**
     * a esa fecha (mismo criterio que “Starting Override Date”: no incluye el primer invoice del período del override).
@@ -619,11 +620,14 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
-    * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id.
+    * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id (solo pantalla Override Payment).
     *
     * `fecha_fin` (m/d/Y), si no está vacío: solo se suman líneas de invoices con `start_date` **estrictamente
     * anterior** a esa fecha. Cadena vacía = todos los invoices del proyecto.
     * Override Payment pasa la fecha de cabecera del formulario para alinear cantidades con el baseline al guardar.
+    *
+    * **QBF:** en esta pantalla, "Total Invoice Qty" / importe del período **no** incluye `quantity_brought_forward`
+    * (el QBF sigue aplicando en invoice/unpaid vía otras rutas; aquí solo se muestra lo facturado del período).
     *
     * @return array{data: array<int, array{project_item_id: int, sum_qty_final: float, sum_paid_lines: float, sum_qty_completed: float, sum_amount: float, sum_total_amount: float}>, total: int}
     */
@@ -707,12 +711,13 @@ class InvoiceItemRepository extends ServiceEntityRepository
            $searchClause
       ";
 
+      /* sum_qty_final / sum_amount: solo ii.quantity (sin QBF) para la grilla Override Payment */
       $selectAgg = "
          pi.id AS project_item_id,
-         SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) AS sum_qty_final,
+         SUM(ii.quantity) AS sum_qty_final,
          SUM(ii.paid_qty) AS sum_paid_lines,
          SUM(ii.quantity + COALESCE(ii.unpaid_from_previous, 0) + COALESCE(ii.quantity_from_previous, 0)) AS sum_qty_completed,
-         SUM((ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) * ii.price) AS sum_amount,
+         SUM(ii.quantity * ii.price) AS sum_amount,
          SUM((ii.quantity + COALESCE(ii.unpaid_from_previous, 0) + COALESCE(ii.quantity_from_previous, 0)) * ii.price) AS sum_total_amount,
          GREATEST(0,
            SUM(ii.quantity + COALESCE(ii.quantity_brought_forward, 0)) - SUM(ii.paid_qty)
