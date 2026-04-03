@@ -214,27 +214,38 @@ class ProjectService extends Base
    /**
     * @return InvoiceItem[]
     */
-   private function listInvoiceItemsForProjectItemStrictlyAfterDateYmd(int $projectItemId, string $cutoffYmd, ?int $excludeInvoiceId = null): array
-   {
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      $out = [];
-      $excluded = [];
-      $skippedNull = [];
-      foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invItem) {
-         $inv = $invItem->getInvoice();
-         if ($inv === null || $inv->getStartDate() === null) {
-            $skippedNull[] = ['invoice_item_id' => $invItem->getId()];
-            continue;
-         }
-         if ($excludeInvoiceId !== null && (int) $inv->getInvoiceId() === $excludeInvoiceId) {
-            continue;
-         }
-         $startYmd = $inv->getStartDate()->format('Y-m-d');
-         // Incluir el primer mes del override (start_date == cabecera), alineado a InvoiceService
-         // (invStart >= partition). Con <= se excluía octubre 1 cuando el corte es 2025-10-01 y el unpaid
-         // encadenado para noviembre quedaba solo en el snapshot sin sumar la qty de octubre.
-         if ($startYmd < $cutoffYmd) {
+    private function listInvoiceItemsForProjectItemStrictlyAfterDateYmd(int $projectItemId, string $cutoffYmd, ?int $excludeInvoiceId = null, ?string $limitToEndDateYmd = null): array
+    {
+       /** @var InvoiceItemRepository $invoiceItemRepo */
+       $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+       $out = [];
+       $excluded = [];
+       $skippedNull = [];
+       foreach ($invoiceItemRepo->ListarInvoicesDeItem($projectItemId) as $invItem) {
+          $inv = $invItem->getInvoice();
+          if ($inv === null || $inv->getStartDate() === null) {
+             $skippedNull[] = ['invoice_item_id' => $invItem->getId()];
+             continue;
+          }
+          if ($excludeInvoiceId !== null && (int) $inv->getInvoiceId() === $excludeInvoiceId) {
+             continue;
+          }
+          $startYmd = $inv->getStartDate()->format('Y-m-d');
+          // Usar end_date para filtrar, igual que en InvoiceService
+          $endYmd = $inv->getEndDate() !== null ? $inv->getEndDate()->format('Y-m-d') : $startYmd;
+          
+          // Si hay límite de end_date, no incluir invoices que terminen después
+          if ($limitToEndDateYmd !== null && $endYmd > $limitToEndDateYmd) {
+             $excluded[] = [
+                'invoice_item_id' => $invItem->getId(),
+                'invoice_id' => $inv->getInvoiceId(),
+                'invoice_end_ymd' => $endYmd,
+                'reason' => 'exceeds_limit_date',
+             ];
+             continue;
+          }
+          
+          if ($endYmd < $cutoffYmd) {
             $excluded[] = [
                'invoice_item_id' => $invItem->getId(),
                'invoice_id' => $inv->getInvoiceId(),
@@ -311,14 +322,15 @@ class ProjectService extends Base
    }
 
    /**
-    * unpaid_qty del snapshot (override) y luego, por cada línea con invoice.start_date >= fecha cabecera:
-    * u = max(0, u + quantity − paid_line − QBF). paid_line: primera línea con override_id usa effective;
-    * siguientes con el mismo id usan paid persistido (base).
-    * Incluye el mes de la cabecera: el arrastre hacia el mes siguiente debe sumar qty−paid de ese invoice
-    * (misma idea que lastUnpaidOverrideValue en InvoiceService), no dejar u congelada en el snapshot.
-    */
-   private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId, ?int $excludeInvoiceId = null): float
-   {
+     * unpaid_qty del snapshot (override) y luego, por cada línea con invoice.start_date >= fecha cabecera:
+     * u = max(0, u + quantity − paid_line − QBF). paid_line: primera línea con override_id usa effective;
+     * siguientes con el mismo id usan paid persistido (base).
+     * Incluye el mes de la cabecera: el arrastre hacia el mes siguiente debe sumar qty−paid de ese invoice
+     * (misma idea que lastUnpaidOverrideValue en InvoiceService), no dejar u congelada en el snapshot.
+     * @param string|null $limitToEndDateYmd Si se provee, solo incluye invoices hasta esta fecha (end_date)
+     */
+    private function computeUnpaidChainingAfterOverride(InvoiceItemOverridePayment $rowAfter, int $projectItemId, ?int $excludeInvoiceId = null, ?string $limitToEndDateYmd = null): float
+    {
       $ed = $rowAfter->getOverridePeriodDate();
       $snapshotUnpaidOpt = $this->resolveEffectiveUnpaidQtyForOverrideRow($rowAfter);
       if ($ed === null || $snapshotUnpaidOpt === null) {
@@ -342,7 +354,7 @@ class ProjectService extends Base
          'snapshot_paid_qty' => $rowAfter->getPaidQty(),
       ]);
 
-      $postLines = $this->listInvoiceItemsForProjectItemStrictlyAfterDateYmd($projectItemId, $cutoffYmd, $excludeInvoiceId);
+       $postLines = $this->listInvoiceItemsForProjectItemStrictlyAfterDateYmd($projectItemId, $cutoffYmd, $excludeInvoiceId, $limitToEndDateYmd);
 
       if ($postLines === []) {
          $this->logUnpaidQtyCalc('chain_no_post_lines_return_snapshot', [
@@ -2138,8 +2150,9 @@ class ProjectService extends Base
                'row_after_unpaid_qty' => $rowUnpaidAnchor !== null ? $rowUnpaidAnchor->getUnpaidQty() : null,
                'row_after_effective_unpaid_qty' => $effUnpaidAnchor,
             ]);
-            if ($rowUnpaidAnchor !== null && $effUnpaidAnchor !== null) {
-               $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId, $exclude_invoice_id);
+             if ($rowUnpaidAnchor !== null && $effUnpaidAnchor !== null) {
+                $limitEndDateYmd = $invEnd !== null ? $invEnd->format('Y-m-d') : null;
+                $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId, $exclude_invoice_id, $limitEndDateYmd);
                $this->logUnpaidQtyCalc('calc_return_chain_after_override', [
                   'project_item_id' => $piId,
                   'result_unpaid_qty' => $u,
