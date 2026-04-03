@@ -678,11 +678,14 @@ class InvoiceItemRepository extends ServiceEntityRepository
          $params['search_like'] = '%' . $searchTrim . '%';
       }
 
-      $dateClause = '';
-      if ($startOverrideYmd !== '') {
-         $dateClause .= ' AND i.start_date < :start_override';
-         $params['start_override'] = $startOverrideYmd;
-      }
+       $dateClause = '';
+       if ($startOverrideYmd !== '') {
+          // Incluir invoices hasta fin de mes del override (incluye invoice del mismo mes)
+          $d = \DateTime::createFromFormat('Y-m-d', $startOverrideYmd);
+          $endOfMonth = $d->format('Y-m-t'); // último día del mes
+          $dateClause .= ' AND i.end_date <= :start_override';
+          $params['start_override'] = $endOfMonth;
+       }
 
       $companyClause = '';
       if ($company_id !== '') {

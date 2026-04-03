@@ -1870,9 +1870,9 @@ class InvoiceService extends Base
                   $invStart !== null && $overrideStartDate !== null
                   && $this->isSameCalendarMonth($invStart, $overrideStartDate)
                ) {
-                  // Mismo mes que la cabecera: unpaid = snapshot + qty (sin restar paid - unpaid es independiente del paid)
-                  $tempUnpaid = $overrideBase;
-                  $lastUnpaidOverrideValue = max(0.0, $overrideBase + $iQty - $currentQbf);
+               // Mismo mes que la cabecera: unpaid = snapshot + qty - QBF (incluir qty del invoice actual)
+                   $tempUnpaid = max(0.0, $overrideBase + $iQty - $currentQbf);
+                   $lastUnpaidOverrideValue = $tempUnpaid;
                } else {
                   // Meses posteriores: encadenar (ej. snapshot 10 + qty oct 100 → 110 en nov)
                   // unpaid = unpaid_anterior + qty - paid (sí restar paid de estos invoices)
