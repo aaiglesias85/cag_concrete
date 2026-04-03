@@ -1085,10 +1085,32 @@ class ProjectService extends Base
                 return $resultado;
             }*/
 
+         $project_entity = $entity->getProject();
+         $item_entity = $entity->getItem();
+         $item_name = $item_entity !== null ? $item_entity->getName() : 'Unknown item';
+         $quantity_val = $entity->getQuantity();
+         $price_val = $entity->getPrice();
+         $line_total = ($quantity_val !== null && $price_val !== null)
+            ? (string) ((float) $quantity_val * (float) $price_val)
+            : '';
+         $qty_str = $quantity_val !== null ? (string) $quantity_val : '';
+         $price_str = $price_val !== null ? (string) $price_val : '';
+
          // eliminar informacion relacionada
          $this->EliminarInformacionDeProjectItem($project_item_id);
 
-         $item_name = $entity->getItem()->getName();
+         if ($project_entity !== null) {
+            $notas = [
+               [
+                  'notes' => 'Removed pay item: ' . $item_name
+                     . '. Previous quantity: ' . $qty_str
+                     . ', previous price: ' . $price_str
+                     . ', previous line total: ' . $line_total,
+                  'date' => new \DateTime(),
+               ],
+            ];
+            $this->SalvarNotesUpdate($project_entity, $notas);
+         }
 
          $em->remove($entity);
          $em->flush();
@@ -3352,7 +3374,7 @@ class ProjectService extends Base
 
          if ($federal_funding != $entity->getFederalFunding()) {
             $notas[] = [
-               'notes' => 'Change federal funding, old value: ' . $entity->getFederalFunding() ? 'Yes' : 'No',
+               'notes' => 'Change federal funding, old value: ' . ($entity->getFederalFunding() ? 'Yes' : 'No'),
                'date' => new \DateTime()
             ];
          }
@@ -3360,7 +3382,7 @@ class ProjectService extends Base
 
          if ($resurfacing != $entity->getResurfacing()) {
             $notas[] = [
-               'notes' => 'Change resurfacing, old value: ' . $entity->getResurfacing() ? 'Yes' : 'No',
+               'notes' => 'Change resurfacing, old value: ' . ($entity->getResurfacing() ? 'Yes' : 'No'),
                'date' => new \DateTime()
             ];
          }
@@ -3376,7 +3398,7 @@ class ProjectService extends Base
 
          if ($certified_payrolls != $entity->getCertifiedPayrolls()) {
             $notas[] = [
-               'notes' => 'Change certified payrolls, old value: ' . $entity->getCertifiedPayrolls() ? 'Yes' : 'No',
+               'notes' => 'Change certified payrolls, old value: ' . ($entity->getCertifiedPayrolls() ? 'Yes' : 'No'),
                'date' => new \DateTime()
             ];
          }
@@ -3516,7 +3538,7 @@ class ProjectService extends Base
 
          if ($retainage != $entity->getRetainage()) {
             $notas[] = [
-               'notes' => 'Change retainage, old value: ' . $entity->getRetainage() ? 'Yes' : 'No',
+               'notes' => 'Change retainage, old value: ' . ($entity->getRetainage() ? 'Yes' : 'No'),
                'date' => new \DateTime()
             ];
          }
@@ -3551,7 +3573,7 @@ class ProjectService extends Base
 
          if ($prevailing_wage != $entity->getPrevailingWage()) {
             $notas[] = [
-               'notes' => 'Change prevailing wage, old value: ' . $entity->getPrevailingWage() ? 'Yes' : 'No',
+               'notes' => 'Change prevailing wage, old value: ' . ($entity->getPrevailingWage() ? 'Yes' : 'No'),
                'date' => new \DateTime()
             ];
          }
