@@ -403,12 +403,14 @@ class OverridePaymentService extends Base
             $paidAmount = $aggPaid['paid_amount_total'];
          }
 
-         $overrideId = $mapOverrideId[$pid] ?? null;
-         if ($overrideId !== null && array_key_exists($pid, $unpaidExplicitByPi)) {
-            $unpaidQty = $unpaidExplicitByPi[$pid];
-         } else {
-            $unpaidQty = $this->invoiceService->getUnpaidQtyMatchingInvoiceListarForLastLineBeforeCutoff($pid, $cutoffYmd);
-         }
+          $overrideId = $mapOverrideId[$pid] ?? null;
+          if ($overrideId !== null && array_key_exists($pid, $unpaidExplicitByPi)) {
+             $unpaidQty = $unpaidExplicitByPi[$pid];
+          } else {
+             // Para override nuevo: unpaid = invoice qty total - paid total
+             // Esto es el unpaid calculado, no el valor persistido en el último invoice
+             $unpaidQty = max(0.0, $sumQtyFinal - $paidQtyDisplay);
+          }
 
          $hasPaidOverrideHist = $overrideId !== null && isset($overrideConHist[$overrideId]);
          $hasUnpaidOverrideHist = $overrideId !== null && isset($unpaidOverrideConHist[$overrideId]);
