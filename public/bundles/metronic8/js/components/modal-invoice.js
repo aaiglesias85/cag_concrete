@@ -31,6 +31,10 @@ var ModalInvoice = (function () {
       items = [];
       retainageContext = null;
       projectContractAmount = 0;
+      bond_add_period = 0;
+      bond_add_cumulative = 0;
+      bond_cumulative_before_invoice = 0;
+      bond_period_sign = -1;
       $('#modal_total_contract_amount').val('0.00');
       $('#modal_invoice_current_retainage').val('0.00');
       $('#modal_invoice_retainage_calculated').val('0.00');
@@ -469,6 +473,10 @@ var ModalInvoice = (function () {
       // reset
       items = [];
       projectContractAmount = 0;
+      bond_add_period = 0;
+      bond_add_cumulative = 0;
+      bond_cumulative_before_invoice = 0;
+      bond_period_sign = -1;
       $('#modal_total_contract_amount').val('0.00');
       $('#modal_total_bonded_x').val('0.00000');
       $('#modal_total_bonded_y').val('0.00');
@@ -501,6 +509,16 @@ var ModalInvoice = (function () {
                      if (response.bond_price != null) bond_price = Number(response.bond_price) || 0;
                      if (response.bon_general != null) bond_general = Number(response.bon_general) || 0;
                      bon_quantity_available = (response.bon_quantity_available != null && response.bon_quantity_available !== '') ? Number(response.bon_quantity_available) : 1.0;
+                     bond_add_period = Number(response.bon_amount) || 0;
+                     bond_add_cumulative =
+                        response.bond_amount_cumulative_to_date != null && response.bond_amount_cumulative_to_date !== ''
+                           ? Number(response.bond_amount_cumulative_to_date)
+                           : bond_add_period;
+                     bond_cumulative_before_invoice = bond_add_cumulative - bond_add_period;
+                     bond_period_sign =
+                        response.bon_amount != null && response.bon_amount !== '' && Number(response.bon_amount) !== 0
+                           ? Math.sign(Number(response.bon_amount))
+                           : -1;
                      if (response.bon_quantity != null && response.bon_amount != null) {
                         $('#modal_total_bonded_x').val(MyApp.formatearNumero(response.bon_quantity, 5, '.', ','));
                         $('#modal_total_bonded_y').val(MyApp.formatMoney(response.bon_amount, 2, '.', ','));
@@ -563,6 +581,7 @@ var ModalInvoice = (function () {
                      actualizarTableListaItems();
                      // Retainage en borrador (sin depender de guardar)
                      actualizarRetainagePreviewModal();
+                     actualizarFooterTotalesModal();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -714,6 +733,10 @@ var ModalInvoice = (function () {
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto para Y = bond_general * X
    var bon_quantity_available = 1.0; // Bond Quantity disponible para aplicar el mismo tope que el backend
+   var bond_add_period = 0;
+   var bond_add_cumulative = 0;
+   var bond_cumulative_before_invoice = 0;
+   var bond_period_sign = -1;
    var nEditingRowItem = null;
    var rowDeleteItem = null;
    var initTableItems = function () {
@@ -997,7 +1020,9 @@ var ModalInvoice = (function () {
                // Columnas de totales numéricos
                else if (colsToSum.includes(idx)) {
                   // Columna 4 = Contract: mostrar contract amount del proyecto, no la suma de ítems
-                  const total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
+                  var total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
+                  if (idx === 6) total += bond_add_cumulative;
+                  if (idx === 10 || idx === 13) total += bond_add_period;
                   const selector = totalsSelectors[idx];
                   if (selector) {
                      const $input = $(selector);
@@ -1100,6 +1125,11 @@ var ModalInvoice = (function () {
       
       $('#modal_total_bonded_x').val(x_formatted);
       $('#modal_total_bonded_y').val(y_formatted);
+
+      var sgn = bond_period_sign !== 0 ? bond_period_sign : -1;
+      bond_add_period = sgn * Math.abs(Number(y) || 0);
+      bond_add_cumulative = bond_cumulative_before_invoice + bond_add_period;
+      actualizarFooterTotalesModal();
       
       console.log('=== FIN CÁLCULO X e Y BONDED (MODAL) ===\n');
    };
@@ -1208,10 +1238,10 @@ var ModalInvoice = (function () {
          }, 0);
       };
       var totalContract = typeof projectContractAmount !== 'undefined' ? projectContractAmount : sum('contract_amount');
-      var totalCompleted = sum('amount_completed');
+      var totalCompleted = sum('amount_completed') + bond_add_cumulative;
       var totalUnpaid = sum('unpaid_amount');
-      var totalPeriod = sum('amount');
-      var totalFinal = sum('amount_final');
+      var totalPeriod = sum('amount') + bond_add_period;
+      var totalFinal = sum('amount_final') + bond_add_period;
       $('#modal_total_contract_amount').val(MyApp.formatearNumero(totalContract, 2, '.', ','));
       $('#modal_total_amount_completed').val(MyApp.formatearNumero(totalCompleted, 2, '.', ','));
       $('#modal_total_amount_unpaid').val(MyApp.formatearNumero(totalUnpaid, 2, '.', ','));

@@ -100,6 +100,26 @@ class InvoiceService extends Base
    }
 
    /**
+    * Suma algebraica de getBonAmount() desde el primer invoice del proyecto hasta $invoiceId (inclusive),
+    * orden start_date, invoice_id (igual que ObtenerDatosExportacionInvoice).
+    */
+   private function sumBonAmountThroughInvoice(int $project_id, int $invoiceId): float
+   {
+      /** @var InvoiceRepository $invoiceRepo */
+      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
+      $this->sortInvoicesByStartDateAndId($allInvoices);
+      $total = 0.0;
+      foreach ($allInvoices as $inv) {
+         $total += (float) ($inv->getBonAmount() ?? 0);
+         if ((int) $inv->getInvoiceId() === $invoiceId) {
+            break;
+         }
+      }
+      return $total;
+   }
+
+   /**
     * RecalcularBonProyecto: aplica la regla de tope Bond Quantity ≤ 1 en el proyecto,
     * considerando pagos: el consumo acumulado real = Σ bon_quantity (anteriores) − Σ paid_qty Bond (anteriores).
     * Por cada invoice (orden: start_date, invoice_id):
@@ -1649,6 +1669,9 @@ class InvoiceService extends Base
          $arreglo_resultado['bon_quantity'] = $entity->getBonQuantity() !== null ? (float) $entity->getBonQuantity() : null;
          $arreglo_resultado['bon_amount'] = $entity->getBonAmount() !== null ? (float) $entity->getBonAmount() : null;
 
+         // Suma algebraica de bon_amount hasta este invoice (incl.), misma regla que el Excel — cajitas superiores sin tocar la tabla
+         $arreglo_resultado['bond_amount_cumulative_to_date'] = $this->sumBonAmountThroughInvoice($project_id, (int) $invoice_id);
+
          // Valores para la vista: Current retainage ($) = retención de este invoice; Less Retainers = acumulado (mismo criterio que Excel)
          $retainage_efectivo = $this->CalcularRetainageEfectivoParaInvoice($invoice_id);
          $effective_current = $retainage_efectivo['effective_current'];
@@ -1734,7 +1757,7 @@ class InvoiceService extends Base
       $this->sortInvoicesByStartDateAndId($allInvoices);
 
       foreach ($lista as $key => $value) {
-         // El ítem marcado como Bond no se muestra en la tabla del invoice; solo se incluye en el Excel
+         // El ítem Bond no se muestra en la tabla; los totales superiores usan bon_amount / bond_amount_cumulative_to_date (CargarDatos).
          if ($value->getProjectItem()->getItem()->getBond()) {
             continue;
          }
@@ -2075,21 +2098,6 @@ class InvoiceService extends Base
          $amount_completed = $quantity_completed * $price;
          $amount_final = $quantity_final * $price;
          $amount = $quantity * $price;
-
-         // Ítem Bond: usar bon_quantity y bon_amount del invoice para que la tabla coincida con la caja amarilla (evitar redondeo quantity*price). Qty a 2 decimales.
-         if ($value->getProjectItem()->getItem()->getBond()) {
-            $bon_qty = $currentInvoice->getBonQuantity() !== null ? (float) $currentInvoice->getBonQuantity() : 0.0;
-            $bon_qty_rounded = round($bon_qty, 2);
-            $bon_amt = $currentInvoice->getBonAmount() !== null ? (float) $currentInvoice->getBonAmount() : 0.0;
-            $quantity = $bon_qty_rounded;
-            $quantity_final = $bon_qty_rounded;
-            $quantity_completed = $bon_qty_rounded;
-            $amount = $bon_amt;
-            $amount_final = $bon_amt;
-            $total_amount = $bon_amt;
-            $amount_completed = $bon_amt;
-            $amount_from_previous = 0.0;
-         }
 
          $pd = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($value);
          $paid_qty = (float) ($pd['effective'] ?? 0);

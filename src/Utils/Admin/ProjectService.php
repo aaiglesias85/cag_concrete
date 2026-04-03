@@ -1668,6 +1668,38 @@ class ProjectService extends Base
       $applied = round($applied, 5); // Bond qty con 5 decimales
       $bon_amount = round($bon_general * $applied, 2);
 
+      $bond_amount_cumulative_to_date = null;
+      $bondProjectItemsFooter = $projectItemRepo->ListarBondProjectItems($project_id);
+      if (!empty($bondProjectItemsFooter)) {
+         $allProjectInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+         usort($allProjectInvoices, static function (Invoice $a, Invoice $b) {
+            $da = $a->getStartDate();
+            $db = $b->getStartDate();
+            if ($da !== null && $db !== null) {
+               $c = $da <=> $db;
+               if ($c !== 0) {
+                  return $c;
+               }
+            }
+            return $a->getInvoiceId() <=> $b->getInvoiceId();
+         });
+         $draftStart = \DateTime::createFromFormat('m/d/Y', trim((string) $fecha_inicial));
+         $draftStartYmd = $draftStart !== false ? $draftStart->format('Y-m-d') : null;
+         $totalPrevBondAmt = 0.0;
+         if ($draftStartYmd !== null) {
+            foreach ($allProjectInvoices as $inv) {
+               $sd = $inv->getStartDate();
+               if ($sd === null) {
+                  continue;
+               }
+               if ($sd->format('Y-m-d') < $draftStartYmd) {
+                  $totalPrevBondAmt += (float) ($inv->getBonAmount() ?? 0);
+               }
+            }
+         }
+         $bond_amount_cumulative_to_date = $totalPrevBondAmt + $bon_amount;
+      }
+
       return [
          'items' => $items,
          'sum_bonded_project' => $sum_bonded_project,
@@ -1675,7 +1707,8 @@ class ProjectService extends Base
          'bon_general' => $bon_general,
          'bon_quantity_available' => $bon_quantity_available,
          'bon_quantity' => $applied,
-         'bon_amount' => $bon_amount
+         'bon_amount' => $bon_amount,
+         'bond_amount_cumulative_to_date' => $bond_amount_cumulative_to_date,
       ];
    }
 

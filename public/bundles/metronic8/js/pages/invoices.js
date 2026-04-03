@@ -586,6 +586,10 @@ var Invoices = (function () {
       items_lista = [];
       retainageContext = null;
       projectContractAmount = 0;
+      bond_add_period = 0;
+      bond_add_cumulative = 0;
+      bond_cumulative_before_invoice = 0;
+      bond_period_sign = -1;
       actualizarTableListaItems();
 
       $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
@@ -1143,6 +1147,17 @@ var Invoices = (function () {
             item.base_debt = unpaid + qbf;
          });
 
+         // Bond: cajitas = suma(líneas) + bon_amount con el signo del backend (típ. negativo); no restar en un paso aparte.
+         var bAmt = invoice.bon_amount;
+         bond_add_period = bAmt != null && bAmt !== '' ? Number(bAmt) : 0;
+         bond_add_cumulative =
+            invoice.bond_amount_cumulative_to_date != null && invoice.bond_amount_cumulative_to_date !== ''
+               ? Number(invoice.bond_amount_cumulative_to_date)
+               : bond_add_period;
+         bond_cumulative_before_invoice = bond_add_cumulative - bond_add_period;
+         bond_period_sign =
+            bAmt != null && bAmt !== '' && Number(bAmt) !== 0 ? Math.sign(Number(bAmt)) : -1;
+
          // En la tabla solo se muestran ítems con cantidad; al guardar se envían todos
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
          items_lista.forEach((item, index) => {
@@ -1558,6 +1573,10 @@ var Invoices = (function () {
       if (invoice_id == '') {
          items = [];
          projectContractAmount = 0;
+         bond_add_period = 0;
+         bond_add_cumulative = 0;
+         bond_cumulative_before_invoice = 0;
+         bond_period_sign = -1;
          $('#total_contract_amount').val(MyApp.formatMoney(0, 2, '.', ','));
          $('#total_bonded_x').val('0.00000');
          $('#total_bonded_y').val('0.00');
@@ -1601,6 +1620,16 @@ var Invoices = (function () {
                      if (response.bond_price != null) bond_price = Number(response.bond_price) || 0;
                      if (response.bon_general != null) bond_general = Number(response.bon_general) || 0;
                      bon_quantity_available = (response.bon_quantity_available != null && response.bon_quantity_available !== '') ? Number(response.bon_quantity_available) : 1.0;
+                     bond_add_period = Number(response.bon_amount) || 0;
+                     bond_add_cumulative =
+                        response.bond_amount_cumulative_to_date != null && response.bond_amount_cumulative_to_date !== ''
+                           ? Number(response.bond_amount_cumulative_to_date)
+                           : bond_add_period;
+                     bond_cumulative_before_invoice = bond_add_cumulative - bond_add_period;
+                     bond_period_sign =
+                        response.bon_amount != null && response.bon_amount !== '' && Number(response.bon_amount) !== 0
+                           ? Math.sign(Number(response.bon_amount))
+                           : -1;
                      // Contexto para cálculo de retainage en frontend
                      retainageContext = response.retainage_context || null;
                      // Valores listos para pintar (calculados en backend)
@@ -1665,6 +1694,7 @@ var Invoices = (function () {
                      actualizarTableListaItems();
                      // Retainage en borrador (sin depender de guardar)
                      actualizarRetainagePreview();
+                     actualizarFooterTotalesPage();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -1863,6 +1893,12 @@ var Invoices = (function () {
    var bond_price = 0; // Suma de precios de Items con bond=true
    var bond_general = 0; // Bond General del proyecto (monto ítem Bond) para Y = bond_general * X
    var bon_quantity_available = 1.0; // Bond Quantity disponible (1 - usado) para aplicar el mismo tope que el backend en el preview
+   /** Monto Bond del periodo y acumulado (con signo, como en BD). Totales cajitas = sum(líneas tabla) + estos valores — suma algebraica, no "total - bond" aparte. */
+   var bond_add_period = 0;
+   var bond_add_cumulative = 0;
+   var bond_cumulative_before_invoice = 0;
+   /** Signo del bon_amount al cargar (p.ej. -1 si es deducción); el preview Y positivo se aplica con este signo. */
+   var bond_period_sign = -1;
    var nEditingRowItem = null;
    var rowDeleteItem = null;
 
@@ -2256,7 +2292,9 @@ var Invoices = (function () {
                // Calcular total
                // Si es col 4 (Contract), usar variable global, sino sumar columna
                var total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
-               
+               if (idx === 6) total += bond_add_cumulative;
+               if (idx === 10 || idx === 13) total += bond_add_period;
+
                var $input = $(selector);
                if ($input.length) {
                   // 1. Poner valor
@@ -2333,6 +2371,11 @@ var Invoices = (function () {
       // Mostrar valores aplicados en la card (mismo criterio que al cargar invoice guardado)
       $('#total_bonded_x').val(MyApp.formatearNumero(applied, 5, '.', ','));
       $('#total_bonded_y').val(MyApp.formatMoney(y, 2, '.', ','));
+
+      var sgn = bond_period_sign !== 0 ? bond_period_sign : -1;
+      bond_add_period = sgn * Math.abs(Number(y) || 0);
+      bond_add_cumulative = bond_cumulative_before_invoice + bond_add_period;
+      actualizarFooterTotalesPage();
    };
 
    var handleChangeOrderHistory = function () {
@@ -2439,10 +2482,10 @@ var Invoices = (function () {
       };
       var totalContract = typeof projectContractAmount !== 'undefined' ? projectContractAmount : sum('contract_amount');
       $('#total_contract_amount').val(MyApp.formatMoney(totalContract, 2, '.', ','));
-      $('#total_amount_completed').val(MyApp.formatMoney(sum('amount_completed'), 2, '.', ','));
+      $('#total_amount_completed').val(MyApp.formatMoney(sum('amount_completed') + bond_add_cumulative, 2, '.', ','));
       $('#total_amount_unpaid').val(MyApp.formatMoney(sum('unpaid_amount'), 2, '.', ','));
-      $('#total_amount_period').val(MyApp.formatMoney(sum('amount'), 2, '.', ','));
-      $('#total_amount_final').val(MyApp.formatMoney(sum('amount_final'), 2, '.', ','));
+      $('#total_amount_period').val(MyApp.formatMoney(sum('amount') + bond_add_period, 2, '.', ','));
+      $('#total_amount_final').val(MyApp.formatMoney(sum('amount_final') + bond_add_period, 2, '.', ','));
    };
 
    var actualizarTableListaItems = function () {
