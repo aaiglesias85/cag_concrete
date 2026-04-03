@@ -244,6 +244,10 @@ var OverridePayment = (function () {
             [10, 25, 30, 50, 'All'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
+         fixedColumns: {
+            start: 2,
+            end: 1,
+         },
          scrollX: true,
          scrollCollapse: true,
          ajax: datasource,
@@ -1010,6 +1014,7 @@ var OverridePayment = (function () {
    var nOpUnpaidEditingNoteRow = null;
    var resetFormOpUnpaidNotes = function () {
       $('#op-unpaid-history-note-id').val('');
+      $('#op-unpaid-note-unpaid-at-open').val('');
       if (typeof QuillUtil !== 'undefined') {
          QuillUtil.setHtml('#op-unpaid-note-quill', '');
       }
@@ -1128,8 +1133,11 @@ var OverridePayment = (function () {
          if (!rowData || rowData.isGroupHeader) return;
          $('#op-unpaid-note-project-item-id').val(rowData.project_item_id);
          resetFormOpUnpaidNotes();
-         var uq = rowData.unpaid_qty !== null && rowData.unpaid_qty !== undefined ? parseFloat(rowData.unpaid_qty) : 0;
+         var $inpUnpaid = $tr.find('input.override-unpaid-qty');
+         var uq = parseFloat(String($inpUnpaid.val() || '').replace(/,/g, ''));
          if (isNaN(uq)) uq = 0;
+         uq = Math.max(0, uq);
+         $('#op-unpaid-note-unpaid-at-open').val(String(uq));
          $('#op-manual-unpaid-qty-override').val(uq);
          BlockUtil.block('#modal-op-unpaid-note .modal-content');
          cargarListaNotasOpUnpaidDesdeServidor(function () {
@@ -1172,8 +1180,13 @@ var OverridePayment = (function () {
          formData.set('project_item_id', String(projectItemId));
          formData.set('notes', notes);
          formData.set('override_unpaid_qty', String(overrideUnpaid));
-         if (historyIdRaw !== '' && historyIdRaw !== undefined) {
+         if (historyIdRaw !== '' && historyIdRaw !== undefined && String(historyIdRaw).trim() !== '') {
             formData.set('history_id', String(historyIdRaw));
+         } else {
+            var uOpen = $('#op-unpaid-note-unpaid-at-open').val();
+            if (uOpen !== '' && uOpen !== null && uOpen !== undefined) {
+               formData.set('override_unpaid_qty_previous', String(uOpen));
+            }
          }
          BlockUtil.block('#modal-op-unpaid-note .modal-content');
          axios
@@ -1186,6 +1199,7 @@ var OverridePayment = (function () {
                      QuillUtil.setHtml('#op-unpaid-note-quill', '');
                   }
                   $('#op-unpaid-history-note-id').val('');
+                  $('#op-unpaid-note-unpaid-at-open').val('');
                   $('#op-manual-unpaid-qty-override').val('');
                   nOpUnpaidEditingNoteRow = null;
                   cargarListaNotasOpUnpaidDesdeServidor(function () {
@@ -1208,6 +1222,7 @@ var OverridePayment = (function () {
          var posicion = $(this).data('posicion');
          if (op_unpaid_notes_item[posicion]) {
             nOpUnpaidEditingNoteRow = posicion;
+            $('#op-unpaid-note-unpaid-at-open').val('');
             $('#op-unpaid-history-note-id').val(op_unpaid_notes_item[posicion].id);
             if (typeof QuillUtil !== 'undefined') {
                QuillUtil.setHtml('#op-unpaid-note-quill', op_unpaid_notes_item[posicion].notes || '');

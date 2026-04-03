@@ -590,7 +590,10 @@ class OverridePaymentService extends Base
             }
             $em->persist($hist);
          } else {
-            $oldPaid = (float) ($entity->getPaidQty() ?? 0);
+            $storedPaid = $entity->getPaidQty();
+            $oldPaid = $storedPaid === null
+               ? $this->baselinePaidFromInvoiceLinesNonBond($pi, $endDate)
+               : (float) $storedPaid;
             if (abs($oldPaid - $paidQtyNew) > 0.000001) {
                $entity->setPaidQty($paidQtyNew);
                $entity->setUpdatedAt(new \DateTime());
@@ -697,7 +700,8 @@ class OverridePaymentService extends Base
       int $project_item_id,
       string $notesHtml,
       ?string $override_unpaid_qty_raw,
-      ?int $history_id = null
+      ?int $history_id = null,
+      ?string $override_unpaid_qty_previous_raw = null
    ): array {
       $projectIdTrim = trim($project_id);
       if ($projectIdTrim === '') {
@@ -791,10 +795,22 @@ class OverridePaymentService extends Base
          $em->persist($parent);
       }
 
-      if ($parent->getUnpaidQty() !== null) {
-         $oldStr = (string) $parent->getUnpaidQty();
-      } else {
-         $oldStr = (string) $this->baselineUnpaidFromInvoiceLinesNonBond($pi, $parent, $endDate);
+      $oldStr = null;
+      if ($override_unpaid_qty_previous_raw !== null && trim($override_unpaid_qty_previous_raw) !== '') {
+         $prevTrim = trim($override_unpaid_qty_previous_raw);
+         if (is_numeric($prevTrim)) {
+            $oldStr = (string) (float) $prevTrim;
+         }
+      }
+      if ($oldStr === null) {
+         if ($parent->getUnpaidQty() !== null) {
+            $oldStr = (string) $parent->getUnpaidQty();
+         } else {
+            $oldStr = (string) $this->invoiceService->getUnpaidQtyMatchingInvoiceListarForLastLineBeforeCutoff(
+               (int) $pi->getId(),
+               $endDate->format('Y-m-d')
+            );
+         }
       }
 
       $unpaidHist = new InvoiceItemOverridePaymentUnpaidQtyHistory();
@@ -1085,37 +1101,19 @@ class OverridePaymentService extends Base
    }
 
    /**
-    * Paid “de sistema” antes del override: suma de paid_qty en líneas de factura (sin ítems bond),
-    * misma base que el listado Override Payment (mismo corte por start_date).
+    * Paid “de sistema” antes de fijar paid en esta fila: **mismo cálculo que la columna Pay Quantity**
+    * de la grilla ({@see ProjectService::computeInvoiceStyleCumulativePaidBeforeCutoffExclusive} — paid efectivo
+    * por línea vía resolver, sin ítems bond, `invoice.start_date` &lt; fecha del override).
+    *
+    * No usar solo SUM(invoice_item.paid_qty): si hay overrides previos en el histórico, el efectivo puede
+    * diferir y el historial de paid quedaría 0 → X aunque la pantalla muestre 300 → X.
     */
    private function baselinePaidFromInvoiceLinesNonBond(ProjectItem $pi, ?\DateTimeInterface $startOverride = null): float
    {
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
       $ymd = $startOverride !== null ? $startOverride->format('Y-m-d') : null;
-      $a = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem((int) $pi->getId(), $ymd);
+      $agg = $this->projectService->computeInvoiceStyleCumulativePaidBeforeCutoffExclusive((int) $pi->getId(), $ymd);
 
-      return (float) ($a['sum_paid_lines'] ?? 0);
-   }
-
-   /**
-    * Unpaid calculado antes de override explícito: max(0, invoice qty final − paid efectivo).
-    * Si ya hay paid en la fila de override, sustituye a la suma de líneas (como en la grilla).
-    */
-   private function baselineUnpaidFromInvoiceLinesNonBond(ProjectItem $pi, ?InvoiceItemOverridePayment $row, ?\DateTimeInterface $startOverride = null): float
-   {
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      $ymd = $startOverride !== null ? $startOverride->format('Y-m-d') : null;
-      $a = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem((int) $pi->getId(), $ymd);
-      $sumQtyFinal = (float) ($a['sum_qty_final'] ?? 0);
-      $sumPaidLines = (float) ($a['sum_paid_lines'] ?? 0);
-      $paidDisplay = $sumPaidLines;
-      if ($row !== null && $row->getPaidQty() !== null) {
-         $paidDisplay = (float) $row->getPaidQty();
-      }
-
-      return max(0.0, $sumQtyFinal - $paidDisplay);
+      return (float) ($agg['total_paid_effective'] ?? 0);
    }
 
    private function parseDateMDY(?string $s): ?\DateTimeInterface

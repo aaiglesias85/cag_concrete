@@ -315,6 +315,8 @@ class OverridePaymentController extends AbstractController
          $notes = '';
       }
 
+      $override_unpaid_qty_previous = $request->get('override_unpaid_qty_previous');
+
       try {
          $resultado = $this->overridePaymentService->SalvarNotaOverrideUnpaidQty(
             $project_id,
@@ -322,7 +324,10 @@ class OverridePaymentController extends AbstractController
             $project_item_id,
             $notes,
             $override_unpaid_qty !== null && $override_unpaid_qty !== '' ? (string) $override_unpaid_qty : null,
-            $history_id
+            $history_id,
+            $override_unpaid_qty_previous !== null && $override_unpaid_qty_previous !== ''
+               ? (string) $override_unpaid_qty_previous
+               : null
          );
 
          if (!empty($resultado['success'])) {
