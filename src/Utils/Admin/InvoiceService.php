@@ -1119,24 +1119,24 @@ class InvoiceService extends Base
       $qty = $value->getQuantity();
       $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
 
-      $previous_bill_qty = 0.0;
-      $previous_bill_amount = 0.0;
-      $prevInvoice = null;
-      foreach ($allInvoicesHistory as $inv) {
-         if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
-         $prevInvoice = $inv;
-      }
-      if ($prevInvoice !== null) {
-         foreach ($invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId()) as $prevItem) {
-            if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
-               $prev_qty = (float) $prevItem->getQuantity();
-               $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
-               $previous_bill_qty = $prev_qty + $prev_qbf;
-               $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
-               break;
-            }
-         }
-      }
+       $previous_bill_qty = 0.0;
+       $previous_bill_amount = 0.0;
+       $prevInvoice = null;
+       foreach ($allInvoicesHistory as $inv) {
+          if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
+          $prevInvoice = $inv;
+       }
+       if ($prevInvoice !== null) {
+          foreach ($invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId()) as $prevItem) {
+             if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
+                $prev_qty = (float) $prevItem->getQuantity();
+                $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
+                $previous_bill_qty = $prev_qty + $prev_qbf;
+                $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
+                break;
+             }
+          }
+       }
 
       $pending_qty_btd = 0.0;
       $pending_balance_btd = 0.0;
@@ -3202,5 +3202,69 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
       }
 
       $this->getDoctrine()->getManager()->flush();
-   }
+    }
+    
+     /**
+      * ObtenerSiguientePeriodoInvoice: Obtiene el siguiente período de invoice basado en el último invoice del proyecto
+      */
+     public function ObtenerSiguientePeriodoInvoice($project_id): array
+     {
+        $projectId = (int) $project_id;
+        
+        $invoiceRepo = $this->getDoctrine()->getRepository(\App\Entity\Invoice::class);
+        
+        // Obtener el último invoice del proyecto ordenado por start_date e invoice_id
+        $lastInvoice = $invoiceRepo->createQueryBuilder('i')
+           ->where('i.project = :project_id')
+           ->setParameter('project_id', $projectId)
+           ->orderBy('i.startDate', 'DESC')
+           ->addOrderBy('i.invoiceId', 'DESC')
+           ->setMaxResults(1)
+           ->getQuery()
+           ->getOneOrNullResult();
+        
+        $startDate = null;
+        $endDate = null;
+        
+        if ($lastInvoice !== null) {
+           $lastStart = $lastInvoice->getStartDate();
+           $lastEnd = $lastInvoice->getEndDate();
+           
+            if ($lastStart !== null && $lastEnd !== null) {
+               // Obtener mes y año del último invoice
+               $m = (int)$lastStart->format('m');
+               $y = (int)$lastStart->format('Y');
+               
+               // Sumar 1 mes
+               $m++;
+               if ($m > 12) {
+                  $m = 1;
+                  $y++;
+               }
+               
+               // Último día del nuevo mes
+               $nextEndDay = cal_days_in_month(CAL_GREGORIAN, $m, $y);
+               
+               // Start date: siempre día 1 del mes
+               // End date: siempre el último día del mes
+               $startDate = sprintf('%02d/01/%04d', $m, $y);
+               $endDate = sprintf('%02d/%02d/%04d', $m, $nextEndDay, $y);
+            }
+        } else {
+           // Si no hay invoice anterior, usar el mes actual
+           $now = new \DateTime();
+           $m = (int)$now->format('m');
+           $y = (int)$now->format('Y');
+           $nextEndDay = cal_days_in_month(CAL_GREGORIAN, $m, $y);
+           
+           $startDate = sprintf('%02d/01/%04d', $m, $y);
+           $endDate = sprintf('%02d/%02d/%04d', $m, $nextEndDay, $y);
+        }
+        
+        return [
+           'success' => true,
+           'start_date' => $startDate,
+           'end_date' => $endDate
+        ];
+     }
 }

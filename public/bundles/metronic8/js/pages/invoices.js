@@ -1475,25 +1475,38 @@ var Invoices = (function () {
 
       initChangeFlatpickr();
    };
-   var initChangeFlatpickr = function () {
-      offChangeStart = FlatpickrUtil.on('datetimepicker-start-date', 'change', ({ selectedDates, dateStr, instance }) => {
-         // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
-         // selectedDates[0] => objeto Date nativo (si hay selección)     
+    var initChangeFlatpickr = function () {
+       offChangeStart = FlatpickrUtil.on('datetimepicker-start-date', 'change', ({ selectedDates, dateStr, instance }) => {
+          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
+          // selectedDates[0] => objeto Date nativo (si hay selección)     
 
-         listarItems();
-      });
+          // Auto-llenar end date al último día del mes
+          if (selectedDates && selectedDates[0]) {
+             var startDate = selectedDates[0];
+             var year = startDate.getFullYear();
+             var month = startDate.getMonth();
+             // Último día del mes (el día 0 del siguiente mes = último día del mes actual)
+             var lastDayOfMonth = new Date(year, month + 1, 0);
+             
+             // Establecer el end_date al último día del mes
+             FlatpickrUtil.setDate('datetimepicker-end-date', lastDayOfMonth);
+          }
 
-      offChangeEnd = FlatpickrUtil.on('datetimepicker-end-date', 'change', ({ selectedDates, dateStr, instance }) => {
-         // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
-         // selectedDates[0] => objeto Date nativo (si hay selección)
-       
-         listarItems();
-      });
-   };
+          listarItems();
+       });
 
+       offChangeEnd = FlatpickrUtil.on('datetimepicker-end-date', 'change', ({ selectedDates, dateStr, instance }) => {
+          // dateStr => string formateado según tu `format` (p.ej. 09/30/2025)
+          // selectedDates[0] => objeto Date nativo (si hay selección)
+        
+          listarItems();
+       });
+    };
    // change project
    var changeProject = function () {
       var project_id = $('#project').val();
+      
+      //console.log('changeProject triggered, project_id:', project_id);
       
       // Si no hay proyecto seleccionado, resetear Bon
       if (!project_id) {
@@ -1502,10 +1515,44 @@ var Invoices = (function () {
       }
 
       // definir fechas
-      definirFechasDueDate();
+      if (project_id) {
+         // Obtener el siguiente período de invoice basado en el último
+         var formData = new URLSearchParams();
+         formData.set('project_id', project_id);
+         
+         axios
+            .post('invoice/obtenerSiguientePeriodo', formData, { responseType: 'json' })
+            .then(function (res) {
+               //console.log('Response obtenerSiguientePeriodo:', res.data);
+               if (res.data.success) {
+                  // Establecer las fechas sugeridas
+                  if (res.data.start_date) {
+                     var startParts = res.data.start_date.split('/');
+                     var startDate = new Date(startParts[2], startParts[0] - 1, startParts[1]);
+                     FlatpickrUtil.setDate('datetimepicker-start-date', startDate);
+                  }
+                  if (res.data.end_date) {
+                     var endParts = res.data.end_date.split('/');
+                     var endDate = new Date(endParts[2], endParts[0] - 1, endParts[1]);
+                     FlatpickrUtil.setDate('datetimepicker-end-date', endDate);
+                  }
+               }
+               // Siempre listar items después de intentar setear fechas
+               listarItems();
+            })
+            .catch(function (err) {
+              // console.error('Error obtenerSiguientePeriodo:', err);
+               // En caso de error, usar el método original
+               definirFechasDueDate();
+               listarItems();
+            });
+      } else {
+         // definir fechas
+         definirFechasDueDate();
 
-      // listar items
-      listarItems();
+         // listar items
+         listarItems();
+      }
    };
 
    var definirFechasDueDate = function () {
