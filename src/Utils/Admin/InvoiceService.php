@@ -1119,19 +1119,29 @@ class InvoiceService extends Base
       $qty = $value->getQuantity();
       $qty_completed = $value->getQuantity() + $value->getQuantityFromPrevious();
 
-       $previous_bill_qty = 0.0;
+   $previous_bill_qty = 0.0;
        $previous_bill_amount = 0.0;
+       
+       // 1. Buscamos cuál fue el invoice inmediatamente anterior a este
        $prevInvoice = null;
        foreach ($allInvoicesHistory as $inv) {
           if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
           $prevInvoice = $inv;
        }
+       
+       // 2. Si hay un invoice anterior, buscamos este mismo ítem en ese invoice
        if ($prevInvoice !== null) {
           foreach ($invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId()) as $prevItem) {
              if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
-                $prev_qty = (float) $prevItem->getQuantity();
+                
+                // 3. Tomamos el Unpaid real de la base de datos (que YA incluye los overrides aplicados)
+                $prev_unpaid = (float) ($prevItem->getUnpaidQty() ?? 0);
+                
+                // 4. Tomamos el QBF que se aplicó en ese invoice
                 $prev_qbf = $prevItem->getQuantityBroughtForward() !== null ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
-                $previous_bill_qty = $prev_qty + $prev_qbf;
+                
+                // 5. Reconstruimos la deuda: Unpaid + QBF
+                $previous_bill_qty = max(0.0, $prev_unpaid + $prev_qbf);
                 $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
                 break;
              }
@@ -1990,7 +2000,10 @@ class InvoiceService extends Base
             // ACUMULAR PARA EL FUTURO
             $historialQty += $iQty;
             $historialPaid += $iPaid;
-            $historialQbf += $currentQbf;
+
+            $deudaAntesDeQbf = $historialQty - $iQty - $historialPaid - $historialQbf;
+            $qbfEfectivo = min($currentQbf, max(0.0, $deudaAntesDeQbf));
+            $historialQbf += $qbfEfectivo;
             
          }
 
@@ -3018,7 +3031,10 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
             // 3. Sumar al historial para el siguiente invoice
             $historialQty += $iQty;
             $historialPaid += $iPaid;
-            $historialQbf += $currentQbf;
+            
+            $deudaAntesDeQbf = $historialQty - $iQty - $historialPaid - $historialQbf;
+            $qbfEfectivo = min($currentQbf, max(0.0, $deudaAntesDeQbf));
+            $historialQbf += $qbfEfectivo;
          }
       }
    }
@@ -3197,7 +3213,10 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
 
             $historialQty += $iQty;
             $historialPaid += $iPaid;
-            $historialQbf += $currentQbf;
+          
+            $deudaAntesDeQbf = $historialQty - $iQty - $historialPaid - $historialQbf;
+            $qbfEfectivo = min($currentQbf, max(0.0, $deudaAntesDeQbf));
+            $historialQbf += $qbfEfectivo;
          }
       }
 
