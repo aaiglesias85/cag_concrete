@@ -296,24 +296,28 @@ class InvoiceService extends Base
     * Nueva Fórmula Simplificada:
     * Unpaid = (Suma Qty Anteriores - Suma Paid Anteriores) - QBF Actual
     */
-   private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaid, float $currentQbf): float
-   {
-      // (100 del inv1) - (70 del inv1) = 30.
-      // 30 - 0 (QBF) = 30.
-      $deudaNetaPrev = $sumPrevQty - $sumPrevPaid;
-      $out = max(0.0, $deudaNetaPrev - $currentQbf);
-      if (abs($currentQbf) > 1e-12) {
-         $this->logQbf('calculateInvoiceUnpaidQty', [
-            'sum_prev_qty' => $sumPrevQty,
-            'sum_prev_paid' => $sumPrevPaid,
-            'current_qbf' => $currentQbf,
-            'deuda_neta_prev' => $deudaNetaPrev,
-            'unpaid_out' => $out,
-         ]);
-      }
+  private function calculateInvoiceUnpaidQty(float $sumPrevQty, float $sumPrevPaid, float $currentQbf, float $sumPrevQbf = 0.0): float
+{
+   // 1. Calculamos la deuda neta real considerando TODO lo que se ha ajustado en el pasado
+   // Deuda = (Total trabajado) - (Total Pagado) - (Total Ajustes Pasados)
+   $deudaNetaPrev = $sumPrevQty - $sumPrevPaid - $sumPrevQbf;
 
-      return $out;
+   // 2. A esa deuda le restamos el ajuste de este mes
+   $out = max(0.0, $deudaNetaPrev - $currentQbf);
+
+   if (abs($currentQbf) > 1e-12 || abs($sumPrevQbf) > 1e-12) {
+      $this->logQbf('calculateInvoiceUnpaidQty', [
+         'sum_prev_qty' => $sumPrevQty,
+         'sum_prev_paid' => $sumPrevPaid,
+         'sum_prev_qbf' => $sumPrevQbf, // el historial
+         'current_qbf' => $currentQbf,
+         'deuda_neta_prev' => $deudaNetaPrev,
+         'unpaid_out' => $out,
+      ]);
    }
+
+   return $out;
+}
 
    /**
     * ValidarInvoice: Valida un invoice en la BD
@@ -1771,6 +1775,7 @@ class InvoiceService extends Base
 
          $historialQty = 0.0;
          $historialPaid = 0.0;
+         $historialQbf = 0.0;
 
          // Paid: fila del período del invoice. Unpaid ancla: cabecera ≤ mes invoice (puede ser otra fila que la de paid).
          $invPeriodStart = $currentInvoice->getStartDate();
@@ -1854,7 +1859,7 @@ class InvoiceService extends Base
 
             if (!$isAfterOverride) {
                // Pre-partición: recalcular desde cadena invoice (no invoice_item.unpaid_qty persistido).
-               $tempUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+               $tempUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf,$historialQbf);
             } elseif ($latestOverride !== null && $anchorUnpaidEffective !== null) {
                // Desde el override en adelante: base = unpaid efectivo de la ancla (columna o historial)
                $overrideBase = (float) $anchorUnpaidEffective;
@@ -1887,7 +1892,9 @@ class InvoiceService extends Base
                $tempUnpaid = $this->calculateInvoiceUnpaidQty(
                   $historialQty,
                   $historialPaid,
-                  $currentQbf
+                  $currentQbf,
+                  $historialQbf                 
+
                );
             }
 
@@ -1921,7 +1928,7 @@ class InvoiceService extends Base
                // QBF: siempre se resta del unpaid mostrado (una sola vez). Primero la deuda “antes de aplicar QBF
                // de esta línea”; luego max(0, esa − QBF). No depende del mes del override.
                if (!$isAfterOverride) {
-                  $unpaidBeforeQbfForRow = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, 0.0);
+                  $unpaidBeforeQbfForRow = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, 0.0, $historialQbf);
                } elseif ($latestOverride !== null && $anchorUnpaidEffective !== null && $isAfterOverride) {
                   if (
                      $invStart !== null && $overrideStartDate !== null
@@ -1983,6 +1990,8 @@ class InvoiceService extends Base
             // ACUMULAR PARA EL FUTURO
             $historialQty += $iQty;
             $historialPaid += $iPaid;
+            $historialQbf += $currentQbf;
+            
          }
 
          // Si por alguna razón el invoice actual no estaba en la lista (caso raro), usamos el override si aplica
@@ -2037,7 +2046,7 @@ class InvoiceService extends Base
                ]);
             } else {
                // Calcular normalmente
-               $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $value->getQuantityBroughtForward());
+$unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $value->getQuantityBroughtForward(), $historialQbf);
                $unpaidPrevSpecific = $lastLoopUnpaid;
                $this->logOverrideInvoice('fallback_calculate_invoice_unpaid_qty', [
                   'invoice_item_id' => $value->getId(),
@@ -2903,6 +2912,7 @@ class InvoiceService extends Base
 
          $historialQty = 0.0;
          $historialPaid = 0.0;
+         $historialQbf = 0.0;
          $seenOverrideIdsQbf = [];
          $lastUnpaidOverrideValue = null;
 
@@ -2973,7 +2983,7 @@ class InvoiceService extends Base
                $lastUnpaidOverrideValue = max(0.0, $carryIn + $iQty - $iPaid - $currentQbf);
             } else {
                // Calcular normalmente
-               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf, $historialQbf);
             }
 
             if (abs($currentQbf) > 1e-12 || $invId === (int) $current_invoice_id) {
@@ -3008,6 +3018,7 @@ class InvoiceService extends Base
             // 3. Sumar al historial para el siguiente invoice
             $historialQty += $iQty;
             $historialPaid += $iPaid;
+            $historialQbf += $currentQbf;
          }
       }
    }
@@ -3118,6 +3129,7 @@ class InvoiceService extends Base
 
          $historialQty = 0.0;
          $historialPaid = 0.0;
+         $historialQbf = 0.0;
          $seenOverrideIdsRecalc = [];
          $lastUnpaidOverrideCarry = null;
 
@@ -3173,7 +3185,8 @@ class InvoiceService extends Base
                   }
                }
             } else {
-               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+               //$nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf);
+               $nuevoUnpaid = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, $currentQbf, $historialQbf);
                $lastUnpaidOverrideCarry = null;
             }
 
@@ -3184,6 +3197,7 @@ class InvoiceService extends Base
 
             $historialQty += $iQty;
             $historialPaid += $iPaid;
+            $historialQbf += $currentQbf;
          }
       }
 
