@@ -1136,20 +1136,8 @@ class InvoiceService extends Base
 
       $pending_qty_btd = 0.0;
       $pending_balance_btd = 0.0;
+
       if (!$value->getProjectItem()->getItem()->getBond()) {
-         $sum_qty_prev = 0.0;
-         $sum_paid_prev = 0.0;
-         $seenOverrideIdsExcel = [];
-         foreach ($allInvoicesHistory as $inv) {
-            if ((int) $inv->getInvoiceId() === (int) $currentInvoiceId) break;
-            foreach ($invoiceItemRepo->ListarItems($inv->getInvoiceId()) as $prevItem) {
-               if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
-                  $sum_qty_prev += (float) $prevItem->getQuantity();
-                  $sum_paid_prev += $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($prevItem, $seenOverrideIdsExcel);
-                  break;
-               }
-            }
-         }
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
          $hasNoteOverride = false;
          foreach ($notes as $note) {
@@ -1160,17 +1148,21 @@ class InvoiceService extends Base
                break;
             }
          }
+         
          if (!$hasNoteOverride) {
-            $unpaidOverride = $this->unpaidQtyOverrideResolver->getEffectiveUnpaidQty($value);
-            if ($unpaidOverride > 0) {
-               $pending_qty_btd = max(0.0, $unpaidOverride);
-               $pending_balance_btd = $pending_qty_btd * $price;
-            }
+            // Recuperamos la deuda real sumando el unpaid actual + el QBF que se le aplicó
+            $unpaid_qty = (float) ($value->getUnpaidQty() ?? 0);
+            $qbf = (float) ($value->getQuantityBroughtForward() ?? 0);
+            
+            $pending_qty_btd = max(0.0, $unpaid_qty + $qbf);
+            $pending_balance_btd = $pending_qty_btd * $price;
          }
       } else {
-         $quantity_final = $qty + ($value->getQuantityBroughtForward() ?? 0.0);
-         $paid_qty = $this->paidQtyOverrideResolver->getEffectivePaidQty($value);
-         $pending_qty_btd = max(0.0, $quantity_final - $paid_qty);
+         // Hacemos lo mismo para el Bond
+         $unpaid_qty = (float) ($value->getUnpaidQty() ?? 0);
+         $qbf = (float) ($value->getQuantityBroughtForward() ?? 0);
+         
+         $pending_qty_btd = max(0.0, $unpaid_qty + $qbf);
          $pending_balance_btd = $pending_qty_btd * $price;
       }
 

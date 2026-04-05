@@ -250,7 +250,7 @@ class OverrideUnpaidQtyService extends Base
 
          return [
             'success' => false,
-            'error' => 'Ya existe un override de pago para este proyecto y fecha.',
+            'error' => 'A payment override already exists for this project and date.',
          ];
       }
 
