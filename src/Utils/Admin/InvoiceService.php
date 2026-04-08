@@ -1857,7 +1857,11 @@ class InvoiceService extends Base
             // estrictamente anteriores no deben mostrar unpaid “congelado” en BD si quedó desalineado respecto
             // al paid (p. ej. override de octubre no debe dejar septiembre con unpaid tomado de un guardado viejo).
             // Aquí: misma fórmula que sin override (qty/paid acumulados + paidIncrementForHistorialTimeline).
-            $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
+            //$isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
+$isAfterOverride = ($overridePartitionDate === null)
+    || ($invStart !== null && $invStart >= $overridePartitionDate)
+    || ($invStart !== null && $overridePartitionDate !== null
+        && $this->isSameCalendarMonth($invStart, $overridePartitionDate));
 
             $currentQbf = ($invItem) ? (float)$invItem->getQuantityBroughtForward() : 0.0;
             $iQty = ($invItem) ? (float)$invItem->getQuantity() : 0.0;
@@ -2018,7 +2022,12 @@ class InvoiceService extends Base
             $currentInvStart = ($currentInv) ? $currentInv->getStartDate() : null;
 
             // Si el invoice actual es posterior a la partición unpaid, usar override / cálculo
-            $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
+           // $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
+$isAfterOverride = ($overridePartitionDate === null)
+    || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate)
+    || ($currentInvStart !== null && $overridePartitionDate !== null
+        && $this->isSameCalendarMonth($currentInvStart, $overridePartitionDate));
+
 
             if ($isAfterOverride && $latestOverride !== null && $anchorUnpaidEffective !== null) {
                // Usar el override como base; QBF siempre: unpaid = max(0, deuda_antes_qbf − QBF)
@@ -2936,8 +2945,13 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
             $invStart = $inv->getStartDate();
 
             // Solo tocar unpaid desde la primera cabecera con unpaid efectivo (misma partición que ListarItemsDeInvoice)
-            $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
+            //$isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
+$isAfterOverride = ($overridePartitionDate === null)
+    || ($invStart !== null && $invStart >= $overridePartitionDate)
+    || ($invStart !== null && $overridePartitionDate !== null
+        && $this->isSameCalendarMonth($invStart, $overridePartitionDate));
 
+        
             // Si el invoice es anterior al override, NO modificar su unpaid
             if (!$isAfterOverride && $invItem) {
                // Solo sumar al historial para los siguientes invoices
