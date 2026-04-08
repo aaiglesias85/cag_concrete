@@ -5,12 +5,10 @@ namespace App\Utils\Admin;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\Estimate;
-use App\Entity\EstimateBidDeadline;
 use App\Entity\EstimateCompany;
 use App\Entity\Project;
 use App\Repository\CompanyContactRepository;
 use App\Repository\CompanyRepository;
-use App\Repository\EstimateBidDeadlineRepository;
 use App\Repository\EstimateCompanyRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
@@ -330,14 +328,6 @@ class CompanyService extends Base
       $estimates = $estimateCompanyRepo->ListarEstimatesDeCompany($company_id);
       foreach ($estimates as $estimate) {
          $em->remove($estimate);
-      }
-
-      // bid deadline estimates
-      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
-      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
-      $bid_deadline_estimates = $estimateBidDeadlineRepo->ListarBidDeadlineEstimatesDeCompany($company_id);
-      foreach ($bid_deadline_estimates as $bid_deadline_estimate) {
-         $em->remove($bid_deadline_estimate);
       }
    }
 

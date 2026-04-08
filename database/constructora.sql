@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-03-2026 a las 01:26:39
+-- Tiempo de generación: 08-04-2026 a las 02:03:00
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -486,21 +486,6 @@ CREATE TABLE `estimate` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `estimate_bid_deadline`
---
-
-CREATE TABLE `estimate_bid_deadline` (
-  `id` int(11) NOT NULL,
-  `bid_deadline` datetime DEFAULT NULL,
-  `tag` varchar(50) DEFAULT NULL,
-  `address` text,
-  `estimate_id` int(11) DEFAULT NULL,
-  `company_id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
 -- Estructura de tabla para la tabla `estimate_company`
 --
 
@@ -508,7 +493,10 @@ CREATE TABLE `estimate_company` (
   `id` int(11) NOT NULL,
   `estimate_id` int(11) DEFAULT NULL,
   `company_id` int(11) DEFAULT NULL,
-  `contact_id` int(11) DEFAULT NULL
+  `contact_id` int(11) DEFAULT NULL,
+  `bid_deadline` datetime DEFAULT NULL,
+  `tag` varchar(50) DEFAULT NULL,
+  `address` text
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -2331,14 +2319,6 @@ ALTER TABLE `estimate`
   ADD KEY `county_id` (`county_id`);
 
 --
--- Indices de la tabla `estimate_bid_deadline`
---
-ALTER TABLE `estimate_bid_deadline`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `Refestimate_bid_dealine1` (`estimate_id`),
-  ADD KEY `Refestimate_bid_dealine2` (`company_id`);
-
---
 -- Indices de la tabla `estimate_company`
 --
 ALTER TABLE `estimate_company`
@@ -2914,12 +2894,6 @@ ALTER TABLE `estimate`
   MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `estimate_bid_deadline`
---
-ALTER TABLE `estimate_bid_deadline`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `estimate_company`
 --
 ALTER TABLE `estimate_company`
@@ -3378,13 +3352,6 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
   ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`),
   ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
-
---
--- Filtros para la tabla `estimate_bid_deadline`
---
-ALTER TABLE `estimate_bid_deadline`
-  ADD CONSTRAINT `Refestimate_bid_dealine1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
-  ADD CONSTRAINT `Refestimate_bid_dealine2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`);
 
 --
 -- Filtros para la tabla `estimate_company`

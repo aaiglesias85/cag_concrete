@@ -415,10 +415,6 @@ var Estimates = (function () {
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('estimate-form'));
 
-      //bid deadlines
-      bid_deadlines = [];
-      actualizarTableListaBidDeadLines();
-
       // items
       items = [];
       actualizarTableListaItems();
@@ -426,6 +422,7 @@ var Estimates = (function () {
       //companys
       companys = [];
       actualizarTableListaCompanysEstimate();
+      definirFechaMasReciente();
 
       // template notes (Notes tab)
       template_notes = [];
@@ -550,7 +547,6 @@ var Estimates = (function () {
             $('#btn-wizard-anterior').addClass('hide');
          }
          if (activeTab < totalTabs) {
-            $('#btn-wizard-finalizar').addClass('hide');
             $('#btn-wizard-siguiente').removeClass('hide');
          }
          mostrarTab();
@@ -590,18 +586,18 @@ var Estimates = (function () {
          $('#btn-wizard-anterior').removeClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide');
       }
+      $('#btn-wizard-finalizar').removeClass('hide');
       if (activeTab == totalTabs) {
-         $('#btn-wizard-finalizar').removeClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide').addClass('hide');
       } else {
-         $('#btn-wizard-finalizar').addClass('hide');
+         $('#btn-wizard-siguiente').removeClass('hide');
       }
       mostrarTab();
       marcarPasosValidosWizard();
       setTimeout(function () {
          switch (activeTab) {
             case 2:
-               actualizarTableListaBidDeadLines();
+               actualizarTableListaCompanysEstimate();
                break;
             case 3:
                actualizarTableListaItems();
@@ -685,7 +681,7 @@ var Estimates = (function () {
          activeTab = 1;
          $('#btn-wizard-anterior').addClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide');
-         $('#btn-wizard-finalizar').addClass('hide');
+         $('#btn-wizard-finalizar').removeClass('hide');
          $('.nav-item-hide').removeClass('hide');
       }
    };
@@ -771,7 +767,6 @@ var Estimates = (function () {
       formData.set('bidInstructions', $('#bidInstructions').val());
       formData.set('planLink', $('#planLink').val());
       formData.set('quoteReceived', $('#quoteReceived').prop('checked') ? 1 : 0);
-      formData.set('bid_deadlines', JSON.stringify(bid_deadlines));
       formData.set('companys', JSON.stringify(companys));
 
       return formData;
@@ -883,7 +878,12 @@ var Estimates = (function () {
          KTUtil.find(KTUtil.get('form-estimate'), '.card-label').innerHTML = 'Update Project Estimate: ' + estimate.name;
 
          $('#name').val(estimate.name);
-         $('#bidDeadline').val(estimate.bidDeadline);
+
+         if (estimate.bidDeadline) {
+            FlatpickrUtil.setDate('datetimepicker-bidDeadline', MyApp.convertirStringAFechaHora(estimate.bidDeadline));
+         } else {
+            FlatpickrUtil.clear('datetimepicker-bidDeadline');
+         }
 
          $('#project_id').val(estimate.project_id);
          $('#bidNo').val(estimate.bidNo);
@@ -976,19 +976,21 @@ var Estimates = (function () {
          $('#planLink').val(estimate.planLink);
          $('#quoteReceived').prop('checked', estimate.quoteReceived);
 
-         // bid deadlines
-         bid_deadlines = estimate.bid_deadlines;
-         actualizarTableListaBidDeadLines();
-         actualizarTableListaProjectInformation();
-
          // items y quotes (cuotas con items agrupados; quotes para pestaña Send)
          items = estimate.items || [];
          quotes = estimate.quotes || [];
          actualizarTableListaItems();
 
-         // companys
-         companys = estimate.companys;
+         // companys (incluye bid por licitador)
+         companys = (estimate.companys || []).map(function (c, i) {
+            c.bidDeadline = c.bidDeadline || '';
+            c.tag = c.tag || '';
+            c.address = c.address || '';
+            c.posicion = i;
+            return c;
+         });
          actualizarTableListaCompanysEstimate();
+         definirFechaMasReciente();
 
          // template notes (Notes tab)
          template_notes = (estimate.template_notes || []).map(function (tn, i) {
@@ -1000,6 +1002,7 @@ var Estimates = (function () {
          // habilitar tab
          totalTabs = 5;
          $('#btn-wizard-siguiente').removeClass('hide');
+         $('#btn-wizard-finalizar').removeClass('hide');
 
          // pestaña Send quotes usa la variable quotes ya cargada
          renderQuotesSendTab();
@@ -1176,6 +1179,22 @@ var Estimates = (function () {
       }
    };
 
+   /** Select2 en el modal de compañía del estimate; Bid tag usa placeholder "Select". */
+   function initSelect2CompanyEstimateModal() {
+      $('.select-modal-company-estimate').each(function () {
+         var $el = $(this);
+         if ($el.hasClass('select2-hidden-accessible')) {
+            $el.select2('destroy');
+         }
+         var config = { dropdownParent: $('#modal-company-estimate') };
+         if ($el.attr('id') === 'company-bid-tag') {
+            config.placeholder = 'Select';
+            config.allowClear = true;
+         }
+         $el.select2(config);
+      });
+   }
+
    var initWidgets = function () {
       // init widgets generales
       MyApp.initWidgets();
@@ -1184,10 +1203,6 @@ var Estimates = (function () {
 
       $('.select-modal-item').select2({
          dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
-      });
-
-      $('.select-modal-bid-deadline').select2({
-         dropdownParent: $('#modal-bid-deadline'),
       });
 
       $('.select-stage').select2({
@@ -1337,9 +1352,7 @@ var Estimates = (function () {
          defaultText: 'Add phone...',
       });
 
-      $('.select-modal-company-estimate').select2({
-         dropdownParent: $('#modal-company-estimate'),
-      });
+      initSelect2CompanyEstimateModal();
 
       // google maps
       inicializarAutocomplete();
@@ -1420,10 +1433,17 @@ var Estimates = (function () {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy HH:mm' },
       });
 
-      // bid deadline date
-      FlatpickrUtil.initDate('datetimepicker-bid-deadline-date', {
-         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
-      });
+      const companyBidDateInput = document.getElementById('company-bid-date');
+      if (companyBidDateInput) {
+         const companyBidGroup = companyBidDateInput.closest('.input-group');
+         FlatpickrUtil.initDate('datetimepicker-company-bid-date', {
+            localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+            container: companyBidGroup,
+            positionElement: companyBidDateInput,
+            static: true,
+            position: 'above',
+         });
+      }
    };
 
    var changeItemType = function () {
@@ -1582,9 +1602,7 @@ var Estimates = (function () {
          $(select).append(new Option(contacts_company[i].name, contacts_company[i].contact_id, false, false));
       }
 
-      $('.select-modal-company-estimate').select2({
-         dropdownParent: $('#modal-company-estimate'),
-      });
+      initSelect2CompanyEstimateModal();
    };
 
    var changeCounty = function (e) {
@@ -1616,9 +1634,7 @@ var Estimates = (function () {
             $('.select-company').val(company.company_id);
             $('.select-company').trigger('change');
 
-            $('.select-modal-company-estimate').select2({
-               dropdownParent: $('#modal-company-estimate'),
-            });
+            initSelect2CompanyEstimateModal();
          }
       });
 
@@ -1892,368 +1908,39 @@ var Estimates = (function () {
       });
    };
 
-   // Bid deadlines
-   var bid_deadlines = [];
-   var oTableListaBidDeadlines;
-   var nEditingRowBidDeadlines = null;
-   var actualizarTableListaBidDeadLines = function () {
-      var html = '';
-
-      bid_deadlines.forEach(function (item, index) {
-         html += `
-        <div class="d-flex flex-stack py-2 w-500px">
-            <!--begin::Info-->
-            <div class="d-flex flex-column">
-                <span class="fw-semibold fs-6 text-gray-800">
-                    ${item.bidDeadline}
-                </span>
-                <span class="text-muted fs-7">
-                    ${item.company}
-                </span>
-            </div>
-            <!--end::Info-->
-
-            <!--begin::Actions-->
-            <div class="d-flex gap-2">
-                <a href="javascript:void(0)"
-                        class="btn btn-icon btn-sm btn-light-success edit"
-                        title="Edit record"
-                        data-posicion="${item.posicion}">
-                    <i class="la la-edit"></i>
-                </a>
-                <a href="javascript:void(0)"
-                        class="btn btn-icon btn-sm btn-light-danger delete"
-                        title="Delete record"
-                        data-posicion="${item.posicion}">
-                    <i class="la la-trash"></i>
-                </a>
-            </div>
-            <!--end::Actions-->
-        </div>
-        <div class="separator separator-dashed my-3 w-500px"></div>
-        `;
-      });
-
-      $('#lista-bid-deadline').html(html);
-   };
-   var initAccionesBidDeadLines = function () {
-      $(document).off('click', '.btn-agregar-bid-deadline');
-      $(document).on('click', '.btn-agregar-bid-deadline', function (e) {
-         // reset
-         resetFormBidDeadLines();
-
-         ModalUtil.show('modal-bid-deadline', { backdrop: 'static', keyboard: true });
-      });
-
-      $(document).off('click', '#btn-salvar-bid-deadline');
-      $(document).on('click', '#btn-salvar-bid-deadline', function (e) {
-         e.preventDefault();
-
-         var bidDeadline = FlatpickrUtil.getString('datetimepicker-bid-deadline-date');
-         var company_id = $('#company-bid-deadline').val();
-         var hour = $('#bid-deadline-hour').val();
-
-         if (bidDeadline !== '' && company_id !== '' && hour !== '') {
-            var company = $('#company-bid-deadline option:selected').text();
-
-            if (nEditingRowBidDeadlines == null) {
-               bid_deadlines.push({
-                  id: '',
-                  bidDeadline: `${bidDeadline} ${hour}`,
-                  company_id: company_id,
-                  company: company,
-                  tag: '',
-                  address: '',
-                  posicion: bid_deadlines.length,
-               });
-            } else {
-               var posicion = nEditingRowBidDeadlines;
-               if (bid_deadlines[posicion]) {
-                  bid_deadlines[posicion].bidDeadline = `${bidDeadline} ${hour}`;
-                  bid_deadlines[posicion].company_id = company_id;
-                  bid_deadlines[posicion].company = company;
-               }
-            }
-
-            //actualizar lista
-            actualizarTableListaBidDeadLines();
-            actualizarTableListaProjectInformation();
-
-            // reset
-            resetFormBidDeadLines();
-            ModalUtil.hide('modal-bid-deadline');
-
-            // definir la fecha mas reciente
-            definirFechaMasReciente();
-         } else {
-            if (bidDeadline === '') {
-               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-bid-deadline-date'), 'This field is required');
-            }
-            if (company_id === '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-company-bid-deadline'), 'This field is required');
-            }
-            if (hour === '') {
-               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-bid-deadline-hour'), 'This field is required');
-            }
-         }
-      });
-
-      $(document).off('click', '#lista-bid-deadline a.edit');
-      $(document).on('click', '#lista-bid-deadline a.edit', function () {
-         var posicion = $(this).data('posicion');
-         if (bid_deadlines[posicion]) {
-            // reset
-            resetFormBidDeadLines();
-
-            nEditingRowBidDeadlines = posicion;
-
-            var date_array = bid_deadlines[posicion].bidDeadline.split(' ');
-
-            const date = MyApp.convertirStringAFecha(date_array[0]);
-            FlatpickrUtil.setDate('datetimepicker-bid-deadline-date', date);
-
-            $('#bid-deadline-hour').val(date_array[1]);
-            $('#bid-deadline-hour').trigger('change');
-
-            $('#company-bid-deadline').val(bid_deadlines[posicion].company_id);
-            $('#company-bid-deadline').trigger('change');
-
-            // open modal
-            ModalUtil.show('modal-bid-deadline', { backdrop: 'static', keyboard: true });
-         }
-      });
-
-      $(document).off('click', '#lista-bid-deadline a.delete');
-      $(document).on('click', '#lista-bid-deadline a.delete', function (e) {
-         e.preventDefault();
-         var posicion = $(this).data('posicion');
-
-         Swal.fire({
-            text: 'Are you sure you want to delete the bid deadline?',
-            icon: 'warning',
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel',
-            customClass: {
-               confirmButton: 'btn fw-bold btn-success',
-               cancelButton: 'btn fw-bold btn-danger',
-            },
-         }).then(function (result) {
-            if (result.value) {
-               eliminarBidDeadline(posicion, '#lista-bid-deadline');
-            }
-         });
-      });
-   };
-   var eliminarBidDeadline = function (posicion, block_element) {
-      if (bid_deadlines[posicion]) {
-         if (bid_deadlines[posicion].id != '') {
-            var formData = new URLSearchParams();
-            formData.set('id', bid_deadlines[posicion].id);
-
-            BlockUtil.block(block_element);
-
-            axios
-               .post('estimate/eliminarBidDeadline', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if (res.status === 200 || res.status === 201) {
-                     var response = res.data;
-                     if (response.success) {
-                        toastr.success(response.message, '');
-
-                        deleteBidDeadline(posicion);
-                     } else {
-                        toastr.error(response.error, '');
-                     }
-                  } else {
-                     toastr.error('An internal error has occurred, please try again.', '');
-                  }
-               })
-               .catch(MyUtil.catchErrorAxios)
-               .then(function () {
-                  BlockUtil.unblock(block_element);
-               });
-         }
-      } else {
-         deleteBidDeadline(posicion);
+   var parseFechaBidStr = function (fechaStr) {
+      if (!fechaStr) {
+         return 0;
       }
-
-      function deleteBidDeadline(posicion) {
-         //Eliminar
-         bid_deadlines.splice(posicion, 1);
-         //actualizar posiciones
-         for (var i = 0; i < bid_deadlines.length; i++) {
-            bid_deadlines[i].posicion = i;
-         }
-         //actualizar lista
-         actualizarTableListaBidDeadLines();
-         actualizarTableListaProjectInformation();
-
-         // definir la fecha mas reciente
-         definirFechaMasReciente();
+      var parts = String(fechaStr).split(' ');
+      var fecha = parts[0];
+      var hora = parts[1] || '00:00';
+      var fd = fecha.split('/');
+      var fh = hora.split(':');
+      if (fd.length < 3) {
+         return 0;
       }
+      return new Date(parseInt(fd[2], 10), parseInt(fd[0], 10) - 1, parseInt(fd[1], 10), parseInt(fh[0], 10) || 0, parseInt(fh[1], 10) || 0).getTime();
    };
-   var resetFormBidDeadLines = function () {
-      // reset form
-      MyUtil.resetForm('bid-deadline-form');
 
-      $('#company-bid-deadline').val('');
-      $('#company-bid-deadline').trigger('change');
-
-      $('#bid-deadline-hour').val('');
-      $('#bid-deadline-hour').trigger('change');
-
-      // tooltips selects
-      MyApp.resetErrorMessageValidateSelect(KTUtil.get('bid-deadline-form'));
-
-      nEditingRowBidDeadlines = null;
-   };
+   /** Sincroniza el Bid Deadline principal del estimate (tab 1) con el bid más próximo entre compañías. */
    var definirFechaMasReciente = function () {
-      // Obtener la fecha más próxima en el futuro (ascendente)
-      var fechasOrdenadas = bid_deadlines.filter((b) => b.bidDeadline).sort((a, b) => parseFecha(a.bidDeadline) - parseFecha(b.bidDeadline));
-
-      // Tomar la fecha más cercana
-      var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
-
-      const date = MyApp.convertirStringAFechaHora(fechaMasCercana);
-      FlatpickrUtil.setDate('datetimepicker-bidDeadline', date);
-
-      // funcion para parsear
-      function parseFecha(fechaStr) {
-         // formato esperado: m/d/Y hh:mm
-         const [fecha, hora] = fechaStr.split(' ');
-         const [mes, dia, anio] = fecha.split('/');
-         const [horas, minutos] = hora.split(':');
-         return new Date(anio, mes - 1, dia, horas, minutos);
-      }
-   };
-
-   // project information
-   var oTableProjectInformation;
-   var initTableListaProjectInformation = function () {
-      const table = '#project-information-table-editable';
-
-      const tagOptions = [{ text: '' }, { text: 'No Tag' }, { text: 'High Priority' }, { text: 'Medium Priority' }, { text: 'Low Priority' }, { text: "Don't Bid" }];
-
-      // columns
-      const columns = [{ data: 'company' }, { data: 'tag' }, { data: 'address' }, { data: null }];
-
-      // column defs
-      let columnDefs = [
-         {
-            targets: 1,
-            render: function (data, type, row) {
-               const current = data ?? '';
-               const optionsHtml = tagOptions
-                  .map((option) => {
-                     const selected = option.text === current ? 'selected' : '';
-                     return `<option value="${option.text}" ${selected}>${option.text}</option>`;
-                  })
-                  .join('');
-
-               return `<div class="w-150px"><select class="form-select form-select2 form-select-solid fw-bold project-information-tag" data-posicion="${row.posicion}">${optionsHtml}</select></div>`;
-            },
-         },
-         {
-            targets: 2,
-            render: function (data, type, row) {
-               return `<div class="w-400px"><input type="text" class="form-control project-information-address" value="${data}" data-posicion="${row.posicion}" /></div>`;
-            },
-         },
-         {
-            targets: -1,
-            data: null,
-            orderable: false,
-            className: 'text-center',
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['delete']);
-            },
-         },
-      ];
-
-      // language
-      const language = DatatableUtil.getDataTableLenguaje();
-
-      // order
-      const order = [[0, 'asc']];
-
-      // escapar contenido de la tabla
-      oTableProjectInformation = DatatableUtil.initSafeDataTable(table, {
-         data: bid_deadlines,
-         displayLength: 30,
-         lengthMenu: [
-            [10, 25, 30, 50, -1],
-            [10, 25, 30, 50, 'All'],
-         ],
-         order: order,
-         columns: columns,
-         columnDefs: columnDefs,
-         language: language,
-         createdRow: (row, data, index) => {
-            // init select
-            setTimeout(function () {
-               $('.project-information-tag').select2();
-            }, 1000);
-         },
-      });
-
-      handleSearchDatatableProjectInformation();
-   };
-   var handleSearchDatatableProjectInformation = function () {
-      $(document).off('keyup', '#lista-project-information [data-table-filter="search"]');
-      $(document).on('keyup', '#lista-project-information [data-table-filter="search"]', function (e) {
-         oTableContacts.search(e.target.value).draw();
-      });
-   };
-
-   var actualizarTableListaProjectInformation = function () {
-      if (oTableProjectInformation) {
-         oTableProjectInformation.destroy();
-      }
-
-      initTableListaProjectInformation();
-   };
-
-   var initAccionesProjectInformation = function () {
-      $(document).off('change', '.project-information-address');
-      $(document).on('change', '.project-information-address', function () {
-         var posicion = $(this).data('posicion');
-         if (bid_deadlines[posicion]) {
-            bid_deadlines[posicion].address = $(this).val();
-         }
-      });
-
-      $(document).off('change', '.project-information-tag');
-      $(document).on('change', '.project-information-tag', function () {
-         var posicion = $(this).data('posicion');
-         if (bid_deadlines[posicion]) {
-            bid_deadlines[posicion].tag = $(this).val();
-         }
-      });
-
-      $(document).off('click', '#project-information-table-editable a.delete');
-      $(document).on('click', '#project-information-table-editable a.delete', function (e) {
-         e.preventDefault();
-         var posicion = $(this).data('posicion');
-
-         Swal.fire({
-            text: 'Are you sure you want to delete the project information?',
-            icon: 'warning',
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel',
-            customClass: {
-               confirmButton: 'btn fw-bold btn-success',
-               cancelButton: 'btn fw-bold btn-danger',
-            },
-         }).then(function (result) {
-            if (result.value) {
-               eliminarBidDeadline(posicion, '#lista-project-information');
-            }
+      var fechasOrdenadas = companys
+         .filter(function (c) {
+            return c.bidDeadline;
+         })
+         .sort(function (a, b) {
+            return parseFechaBidStr(a.bidDeadline) - parseFechaBidStr(b.bidDeadline);
          });
-      });
+      var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
+      if (!fechaMasCercana) {
+         if (companys.length === 0) {
+            FlatpickrUtil.clear('datetimepicker-bidDeadline');
+         }
+         return;
+      }
+      var date = MyApp.convertirStringAFechaHora(fechaMasCercana);
+      FlatpickrUtil.setDate('datetimepicker-bidDeadline', date);
    };
 
    // items (flat) y quotes (para agrupar y pestaña Send)
@@ -2970,48 +2657,65 @@ var Estimates = (function () {
    // Companys
    var companys = [];
    var nEditingRowCompany = null;
+   var escAttr = function (t) {
+      if (t == null || t === '') {
+         return '';
+      }
+      return String(t)
+         .replace(/&/g, '&amp;')
+         .replace(/</g, '&lt;')
+         .replace(/"/g, '&quot;');
+   };
+
    var actualizarTableListaCompanysEstimate = function () {
       var html = '';
 
       companys.forEach(function (item) {
-         html += `
-        <div class="d-flex flex-stack py-2 w-500px">
-            <!--begin::Info-->
-            <div class="d-flex flex-column">
-                <span class="fw-semibold fs-6 text-gray-800">
-                    ${item.company}
-                </span>
-                <span class="text-muted fs-7">
-                    ${item.contact}
-                </span>
-                <span class="text-muted fs-7">
-                    ${item.email}
-                </span>
-                <span class="text-muted fs-7">
-                    ${item.phone}
-                </span>
-            </div>
-            <!--end::Info-->
+         var bidBlock = '';
+         if (item.bidDeadline) {
+            bidBlock =
+               '<div class="mt-2 p-3 rounded bg-light-primary border border-primary border-dashed">' +
+               '<div class="text-primary text-uppercase fw-bold fs-8 mb-1">Bid deadline</div>' +
+               '<div class="fw-bold fs-5 text-gray-900">' +
+               escAttr(item.bidDeadline) +
+               '</div>' +
+               (item.tag ? '<div class="mt-2"><span class="badge badge-light-dark">' + escAttr(item.tag) + '</span></div>' : '') +
+               (item.address
+                  ? '<div class="text-gray-700 fs-7 mt-2 whitespace-pre-wrap">' + escAttr(item.address) + '</div>'
+                  : '') +
+               '</div>';
+         } else {
+            bidBlock =
+               '<div class="mt-2 p-2 rounded bg-light-secondary"><span class="text-muted fs-8">No bid deadline set — edit company to add.</span></div>';
+         }
 
-            <!--begin::Actions-->
-            <div class="d-flex gap-2">
-                <a href="javascript:void(0)"
-                        class="btn btn-icon btn-sm btn-light-success edit"
-                        title="Edit record"
-                        data-posicion="${item.posicion}">
-                    <i class="la la-edit"></i>
-                </a>
-                <a href="javascript:void(0)"
-                        class="btn btn-icon btn-sm btn-light-danger delete"
-                        title="Delete record"
-                        data-posicion="${item.posicion}">
-                    <i class="la la-trash"></i>
-                </a>
-            </div>
-            <!--end::Actions-->
-        </div>
-        <div class="separator separator-dashed my-3 w-500px"></div>
-        `;
+         html +=
+            '<div class="d-flex flex-stack py-3 flex-wrap gap-3" style="max-width: 720px;">' +
+            '<div class="d-flex flex-column flex-grow-1 min-w-200px">' +
+            '<span class="fw-semibold fs-6 text-gray-800">' +
+            escAttr(item.company) +
+            '</span>' +
+            '<span class="text-muted fs-7">' +
+            escAttr(item.contact) +
+            '</span>' +
+            '<span class="text-muted fs-7">' +
+            escAttr(item.email) +
+            '</span>' +
+            '<span class="text-muted fs-7">' +
+            escAttr(item.phone) +
+            '</span>' +
+            bidBlock +
+            '</div>' +
+            '<div class="d-flex gap-2 align-items-start">' +
+            '<a href="javascript:void(0)" class="btn btn-icon btn-sm btn-light-success edit" title="Edit record" data-posicion="' +
+            item.posicion +
+            '"><i class="la la-edit"></i></a>' +
+            '<a href="javascript:void(0)" class="btn btn-icon btn-sm btn-light-danger delete" title="Delete record" data-posicion="' +
+            item.posicion +
+            '"><i class="la la-trash"></i></a>' +
+            '</div>' +
+            '</div>' +
+            '<div class="separator separator-dashed my-3" style="max-width: 720px;"></div>';
       });
 
       $('#lista-company').html(html);
@@ -3033,6 +2737,19 @@ var Estimates = (function () {
          var company_id = $('#company').val();
          var contact_id = $('#contact').val();
 
+         var bidDate = FlatpickrUtil.getString('datetimepicker-company-bid-date');
+         var bidHour = $('#company-bid-hour').val() || '';
+         var bidDeadlineStr = '';
+         if (bidDate !== '' && bidHour !== '') {
+            bidDeadlineStr = bidDate.trim() + ' ' + bidHour.trim();
+         } else if (bidDate !== '' || bidHour !== '') {
+            toastr.warning('Enter both date and hour for the bid, or leave both empty.');
+            return;
+         }
+
+         var tag = $('#company-bid-tag').val() || '';
+         var address = $('#company-bid-address').val() || '';
+
          if (company_id !== '' && contact_id !== '') {
             var company = $('#company option:selected').text();
             var contact = $('#contact option:selected').text();
@@ -3051,6 +2768,9 @@ var Estimates = (function () {
                   email: email,
                   phone: phone,
                   contacts: contacts_company,
+                  bidDeadline: bidDeadlineStr,
+                  tag: tag,
+                  address: address,
                   posicion: companys.length,
                });
             } else {
@@ -3063,11 +2783,15 @@ var Estimates = (function () {
                   companys[posicion].email = email;
                   companys[posicion].phone = phone;
                   companys[posicion].contacts = contacts_company;
+                  companys[posicion].bidDeadline = bidDeadlineStr;
+                  companys[posicion].tag = tag;
+                  companys[posicion].address = address;
                }
             }
 
             //actualizar lista
             actualizarTableListaCompanysEstimate();
+            definirFechaMasReciente();
             actualizarTagsContact(contact_id);
 
             // reset
@@ -3135,6 +2859,20 @@ var Estimates = (function () {
             $('#contact').trigger('change');
 
             $(document).on('change', '#company', changeCompany);
+
+            var bd = companys[posicion].bidDeadline || '';
+            if (bd) {
+               var dateParts = bd.split(' ');
+               var dOnly = dateParts[0];
+               var hOnly = dateParts.length > 1 ? dateParts[1] : '';
+               FlatpickrUtil.setDate('datetimepicker-company-bid-date', MyApp.convertirStringAFecha(dOnly));
+               $('#company-bid-hour').val(hOnly).trigger('change');
+            } else {
+               FlatpickrUtil.clear('datetimepicker-company-bid-date');
+               $('#company-bid-hour').val('').trigger('change');
+            }
+            $('#company-bid-tag').val(companys[posicion].tag || '').trigger('change');
+            $('#company-bid-address').val(companys[posicion].address || '');
 
             // mostar modal
             ModalUtil.show('modal-company-estimate', { backdrop: 'static', keyboard: true });
@@ -3211,6 +2949,7 @@ var Estimates = (function () {
 
          // Actualizar lista
          actualizarTableListaCompanysEstimate();
+         definirFechaMasReciente();
 
          // Remover tags del contacto eliminado si ya no están en uso
          removeContactTagsIfUnused(removed.email, removed.phone);
@@ -3257,6 +2996,13 @@ var Estimates = (function () {
 
       MyUtil.limpiarSelect('#contact');
 
+      FlatpickrUtil.clear('datetimepicker-company-bid-date');
+      $('#company-bid-hour').val('');
+      $('#company-bid-hour').trigger('change');
+      $('#company-bid-tag').val('');
+      $('#company-bid-tag').trigger('change');
+      $('#company-bid-address').val('');
+
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('company-estimate-form'));
 
@@ -3269,17 +3015,6 @@ var Estimates = (function () {
          return (q.companies_count || 0) > 0 || (q.companies && q.companies.length > 0);
       });
 
-      if (withCompanies.length === 0) {
-         $('#lista-quotes-empty').removeClass('hide');
-         if (oTableQuotesSend) {
-            oTableQuotesSend.destroy();
-            oTableQuotesSend = null;
-         }
-         $('#quotes-send-table-editable').addClass('hide');
-         return;
-      }
-
-      $('#lista-quotes-empty').addClass('hide');
       $('#quotes-send-table-editable').removeClass('hide');
 
       var table = '#quotes-send-table-editable';
@@ -3743,14 +3478,8 @@ var Estimates = (function () {
 
          initAccionChangeProjectStage();
 
-         // bid deadlines
-         initAccionesBidDeadLines();
-
          // companys
          initAccionesCompanysEstimate();
-
-         // project information
-         initAccionesProjectInformation();
 
          // items
          initTableItems();

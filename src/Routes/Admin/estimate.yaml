@@ -26,10 +26,6 @@ cambiarStageEstimateAdmin:
   path: /estimate/cambiarStage
   defaults: { _controller: App\Controller\Admin\EstimateController::cambiarStage, _format: json }
 
-eliminarBidDeadlineStageEstimateAdmin:
-  path: /estimate/eliminarBidDeadline
-  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarBidDeadline, _format: json }
-
 #items
 eliminarItemEstimateAdmin:
   path: /estimate/eliminarItem

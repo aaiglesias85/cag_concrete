@@ -8,7 +8,6 @@ use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Estimate;
-use App\Entity\EstimateBidDeadline;
 use App\Entity\EstimateCompany;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateProjectType;
@@ -25,7 +24,6 @@ use App\Entity\ProjectStage;
 use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Usuario;
-use App\Repository\EstimateBidDeadlineRepository;
 use App\Repository\EstimateCompanyRepository;
 use App\Repository\EstimateEstimatorRepository;
 use App\Repository\EstimateProjectTypeRepository;
@@ -795,41 +793,6 @@ class EstimateService extends Base
    }
 
    /**
-    * EliminarBidDeadline: Elimina un bid deadline en la BD
-    * @param int $id Id
-    * @author Marcel
-    */
-   public function EliminarBidDeadline($id)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-         ->find($id);
-      /**@var EstimateBidDeadline $entity */
-      if ($entity != null) {
-
-         $estimate_name = $entity->getEstimate()->getName();
-         $bid_deadline = $entity->getBidDeadline()->format('d/m/Y H:i');
-
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Bid Deadline Estimate";
-         $log_descripcion = "The bid deadline estimate is deleted: $estimate_name Bid Deadline: $bid_deadline";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
     * CambiarStage: Cambia stage del estiamte en la BD
     * @param int $estimate_id Id
     * @author Marcel
@@ -928,10 +891,6 @@ class EstimateService extends Base
          $project_types_id = $this->ListarProjectTypesId($estimate_id);
          $arreglo_resultado['project_types_id'] = $project_types_id;
 
-         // bid deadlines
-         $bid_deadlines = $this->ListarBidDeadlines($estimate_id);
-         $arreglo_resultado['bid_deadlines'] = $bid_deadlines;
-
          // quotes con items y companies (agrupados)
          $quotes = $this->ListarQuotesDeEstimate($estimate_id);
          $arreglo_resultado['quotes'] = $quotes;
@@ -990,7 +949,12 @@ class EstimateService extends Base
             'email' => $email,
             'phone' => $phone,
             'contacts' => $contacts,
-            "posicion" => $key
+            'bidDeadline' => $estimate_company->getBidDeadline()
+               ? $estimate_company->getBidDeadline()->format('m/d/Y H:i')
+               : '',
+            'tag' => $estimate_company->getTag() ?? '',
+            'address' => $estimate_company->getAddress() ?? '',
+            'posicion' => $key,
          ];
       }
 
@@ -1134,29 +1098,6 @@ class EstimateService extends Base
          "note_ids" => $note_ids,
          "posicion" => $key
       ];
-   }
-
-   // listar los bid deadlines del estimate
-   private function ListarBidDeadlines($estimate_id)
-   {
-      $bid_deadlines = [];
-
-      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
-      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
-      $estimate_bid_deadlines = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate_id);
-      foreach ($estimate_bid_deadlines as $key => $estimate_bid_deadline) {
-         $bid_deadlines[] = [
-            'id' => $estimate_bid_deadline->getId(),
-            'bidDeadline' => $estimate_bid_deadline->getBidDeadline()->format('m/d/Y H:i'),
-            'tag' => $estimate_bid_deadline->getTag() ?? '',
-            'address' => $estimate_bid_deadline->getAddress() ?? '',
-            'company_id' => $estimate_bid_deadline->getCompany()->getCompanyId(),
-            'company' => $estimate_bid_deadline->getCompany()->getName(),
-            "posicion" => $key
-         ];
-      }
-
-      return $bid_deadlines;
    }
 
    // listar los estimators del estimate
@@ -1330,15 +1271,7 @@ class EstimateService extends Base
          $em->remove($estimate_project_type);
       }
 
-      // 5) bid deadlines
-      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
-      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
-      $bid_deadlines = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate_id);
-      foreach ($bid_deadlines as $bid_deadline) {
-         $em->remove($bid_deadline);
-      }
-
-      // 6) companys (estimate_company)
+      // 5) companys (estimate_company)
       /** @var EstimateCompanyRepository $estimateCompanyRepo */
       $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
       $companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate_id);
@@ -1369,7 +1302,6 @@ class EstimateService extends Base
       $district_id,
       $project_types_id,
       $estimators_id,
-      $bid_deadlines,
       $jobWalk,
       $rfiDueDate,
       $projectStart,
@@ -1514,9 +1446,6 @@ class EstimateService extends Base
          // save estimators
          $this->SalvarEstimators($entity, $estimators_id, false);
 
-         // bid_deadlines
-         $this->SalvarBidDeadlines($entity, $bid_deadlines);
-
          // companys
          $this->SalvarCompanys($entity, $companys);
 
@@ -1532,55 +1461,6 @@ class EstimateService extends Base
          $resultado['estimate_id'] = $entity->getEstimateId();
 
          return $resultado;
-      }
-   }
-
-   /**
-    * SalvarBidDeadlines
-    * @param $bid_deadlines
-    * @param Estimate $entity
-    * @return void
-    */
-   public function SalvarBidDeadlines($entity, $bid_deadlines)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      if (!empty($bid_deadlines)) {
-         foreach ($bid_deadlines as $value) {
-
-            $bid_deadline_entity = null;
-
-            if (is_numeric($value->id)) {
-               $bid_deadline_entity = $this->getDoctrine()->getRepository(EstimateBidDeadline::class)
-                  ->find($value->id);
-            }
-
-            $is_new_bid_deadline = false;
-            if ($bid_deadline_entity == null) {
-               $bid_deadline_entity = new EstimateBidDeadline();
-               $is_new_bid_deadline = true;
-            }
-
-            if ($value->bidDeadline != '') {
-               $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $value->bidDeadline);
-               $bid_deadline_entity->setBidDeadline($bidDeadline);
-            }
-
-            $bid_deadline_entity->setTag($value->tag);
-            $bid_deadline_entity->setAddress($value->address);
-
-            if ($value->company_id != '') {
-               $company = $this->getDoctrine()->getRepository(Company::class)
-                  ->find($value->company_id);
-               $bid_deadline_entity->setCompany($company);
-            }
-
-            if ($is_new_bid_deadline) {
-               $bid_deadline_entity->setEstimate($entity);
-
-               $em->persist($bid_deadline_entity);
-            }
-         }
       }
    }
 
@@ -1622,6 +1502,21 @@ class EstimateService extends Base
                $estimate_company_entity->setContact($contact);
             }
 
+            $tag = $value->tag ?? null;
+            $estimate_company_entity->setTag($tag !== '' && $tag !== null ? (string) $tag : null);
+
+            $address = $value->address ?? null;
+            $estimate_company_entity->setAddress($address !== '' && $address !== null ? (string) $address : null);
+
+            $estimate_company_entity->setBidDeadline(null);
+            $bidDeadlineRaw = $value->bidDeadline ?? '';
+            if ($bidDeadlineRaw !== '' && $bidDeadlineRaw !== null) {
+               $bidDt = \DateTime::createFromFormat('m/d/Y H:i', (string) $bidDeadlineRaw);
+               if ($bidDt !== false) {
+                  $estimate_company_entity->setBidDeadline($bidDt);
+               }
+            }
+
             if ($is_new_estimate_company) {
                $estimate_company_entity->setEstimate($entity);
 
@@ -1652,7 +1547,6 @@ class EstimateService extends Base
       $district_id,
       $project_types_id,
       $estimators_id,
-      $bid_deadlines,
       $jobWalk,
       $rfiDueDate,
       $projectStart,
@@ -1783,9 +1677,6 @@ class EstimateService extends Base
 
       // save estimators
       $this->SalvarEstimators($entity, $estimators_id);
-
-      // bid_deadlines
-      $this->SalvarBidDeadlines($entity, $bid_deadlines);
 
       // companys
       $this->SalvarCompanys($entity, $companys);
@@ -2002,16 +1893,6 @@ class EstimateService extends Base
       $estimate_companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate->getEstimateId());
       foreach ($estimate_companys as $estimate_company) {
          $companies[] = $estimate_company->getCompany()->getName();
-      }
-
-      /** @var EstimateBidDeadlineRepository $estimateBidDeadlineRepo */
-      $estimateBidDeadlineRepo = $this->getDoctrine()->getRepository(EstimateBidDeadline::class);
-      $lista = $estimateBidDeadlineRepo->ListarBidDeadlineDeEstimate($estimate->getEstimateId());
-      foreach ($lista as $value) {
-         $nombre = $value->getCompany()->getName();
-         if (!in_array($nombre, $companies)) {
-            $companies[] = $nombre;
-         }
       }
 
       if (count($companies) === 0) {

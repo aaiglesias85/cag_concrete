@@ -216,10 +216,6 @@ class EstimateController extends AbstractController
       // estimators
       $estimators_id = $request->get('estimators_id');
 
-      // bid deadlines
-      $bid_deadlines = $request->get('bid_deadlines');
-      $bid_deadlines = json_decode($bid_deadlines);
-
       // companys
       $companys = $request->get('companys');
       $companys = json_decode($companys);
@@ -244,7 +240,6 @@ class EstimateController extends AbstractController
                $district_id,
                $project_types_id,
                $estimators_id,
-               $bid_deadlines,
                $jobWalk,
                $rfiDueDate,
                $projectStart,
@@ -279,7 +274,6 @@ class EstimateController extends AbstractController
                $district_id,
                $project_types_id,
                $estimators_id,
-               $bid_deadlines,
                $jobWalk,
                $rfiDueDate,
                $projectStart,
@@ -468,33 +462,6 @@ class EstimateController extends AbstractController
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
 
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarBidDeadline Acción que elimina un bid deadline estimate en la BD
-    *
-    */
-   public function eliminarBidDeadline(Request $request)
-   {
-      $id = $request->get('id');
-
-      try {
-         $resultado = $this->estimateService->EliminarBidDeadline($id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
             return $this->json($resultadoJson);
          }
       } catch (\Exception $e) {

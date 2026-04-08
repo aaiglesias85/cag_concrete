@@ -793,21 +793,13 @@
                      <div class="form-group ic-form-group">
                         <label class="form-label">
                            <span class="ic-step-number">1</span>
-                           Bid Deadline
-                        </label>
-                        <div>
-                           <a href="javascript:;" class="btn btn-icon btn-success btn-sm mb-3 btn-agregar-bid-deadline" title="Add deadline" data-bs-toggle="tooltip"><i class="la la-plus"></i></a>
-                        </div>
-                        <div id="lista-bid-deadline"></div>
-                     </div>
-
-                     <div class="form-group ic-form-group">
-                        <label class="form-label">
-                           <span class="ic-step-number">2</span>
                            Companies
                         </label>
                         <div>
-                           <a href="javascript:;" id="btn-agregar-company-estimate" class="btn btn-icon btn-success btn-sm mb-3" title="Add company" data-bs-toggle="tooltip"><i class="la la-plus"></i></a>
+                           <a href="javascript:;" id="btn-agregar-company-estimate" class="btn btn-success btn-sm mb-3 d-inline-flex align-items-center gap-2">
+                              <i class="la la-plus fs-3"></i>
+                              <span>Add company</span>
+                           </a>
                         </div>
                         <div id="lista-company"></div>
                      </div>
@@ -848,8 +840,9 @@
                               <!-- Acciones -->
                               <div class="d-flex flex-wrap gap-3">
                                  {% if permiso.agregar or permiso.editar %}
-                                 <button id="btn-agregar-item" class="btn btn-icon btn-success w-125px" title="New" data-bs-toggle="tooltip">
-                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                 <button type="button" id="btn-agregar-item" class="btn btn-success d-inline-flex align-items-center gap-2">
+                                    <i class="ki-duotone ki-plus-circle fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    <span>Add item</span>
                                  </button>
                                  {% endif %}
                               </div>
@@ -903,8 +896,9 @@
                               <!-- Acciones -->
                               <div class="d-flex flex-wrap gap-3">
                                  {% if permiso.agregar or permiso.editar %}
-                                 <button class="btn btn-icon btn-success btn-agregar-bid-deadline w-125px" title="Manage companies" data-bs-toggle="tooltip">
-                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                 <button type="button" class="btn btn-success btn-agregar-bid-deadline d-inline-flex align-items-center gap-2">
+                                    <i class="ki-duotone ki-plus-circle fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    <span>Manage companies</span>
                                  </button>
                                  {% endif %}
                               </div>
@@ -983,8 +977,9 @@
                            <div class="col-md-12">
                               <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4 mb-5">
                                  <div class="d-flex flex-wrap gap-3">
-                                    <button type="button" id="btn-agregar-template-note" class="btn btn-icon btn-success w-125px" title="New" data-bs-toggle="tooltip">
-                                       <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    <button type="button" id="btn-agregar-template-note" class="btn btn-success d-inline-flex align-items-center gap-2">
+                                       <i class="ki-duotone ki-plus-circle fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                       <span>Add template note</span>
                                     </button>
                                  </div>
                                  <div class="d-flex flex-wrap align-items-center gap-3">
@@ -1017,8 +1012,9 @@
                               <!-- Acciones -->
                               <div class="d-flex flex-wrap gap-3">
                                  {% if permiso.agregar or permiso.editar %}
-                                 <button type="button" id="btn-nuevo-send" class="btn btn-icon btn-success w-125px" title="New" data-bs-toggle="tooltip">
-                                    <i class="ki-duotone ki-plus-circle fs-1"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                 <button type="button" id="btn-nuevo-send" class="btn btn-success d-inline-flex align-items-center gap-2">
+                                    <i class="ki-duotone ki-plus-circle fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+                                    <span>New quote send</span>
                                  </button>
                                  {% endif %}
                               </div>
@@ -1034,11 +1030,8 @@
                            </div>
                            <!--end::Wrapper-->
 
-                           <p class="text-muted mb-3">Quotes are sent to the companies of this estimate (in <strong>Companies</strong>). Use New to assign which of those companies receive each quote.</p>
-                           <div id="lista-quotes-container">
-                              <div id="lista-quotes-empty" class="text-muted text-center py-5 hide">No sends yet. Click "New" to assign companies (from this estimate's Companies) to a quote; only then will it appear here.</div>
-                              <!--begin::Datatable-->
-                              <table id="quotes-send-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                           <!--begin::Datatable-->
+                           <table id="quotes-send-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                                  <thead>
                                     <tr class="fw-bold fs-6 text-gray-800 px-7">
                                        <th>Name</th>
@@ -1049,8 +1042,7 @@
                                  </thead>
                                  <tbody class="text-gray-600 fw-semibold"></tbody>
                               </table>
-                              <!--end::Datatable-->
-                           </div>
+                           <!--end::Datatable-->
                         </div>
                      </div>
                   </div>
@@ -1092,83 +1084,11 @@
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-change-project-stage" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Close"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
-         </div>
-      </div>
-   </div>
-</div>
-
-<!-- modal add bid deadline -->
-<div class="modal fade" id="modal-bid-deadline" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-   <div class="modal-dialog" role="document">
-      <div class="modal-content">
-         <div class="modal-header">
-            <h5 class="modal-title">Add bid deadline</h5>
-            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
-               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
-            </div>
-         </div>
-         <div class="modal-body">
-            <form class="m-form" id="bid-deadline-form" action="#" enctype="multipart/form-data" method="post">
-               <div class="form-group ic-form-group">
-                  <label class="form-label required">
-                     <span class="ic-step-number">1</span>
-                     Bid Deadline
-                  </label>
-                  <div class="row">
-                     <div class="col-md-8">
-                        <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-bid-deadline-date" data-td-target-input="nearest" data-td-target-toggle="nearest">
-                           <input
-                              type="text"
-                              class="form-control filter-date"
-                              data-td-target="#datetimepicker-bid-deadline-date"
-                              placeholder="Select a date"
-                              id="bid-deadline-date"
-                              autocomplete="off"
-                              name="day"
-                           />
-                           <span class="input-group-text" data-td-target="#datetimepicker-bid-deadline-date" data-td-toggle="datetimepicker">
-                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
-                           </span>
-                        </div>
-                     </div>
-                     <div class="col-md-4" id="select-bid-deadline-hour">
-                        <select class="form-control form-select select-validate form-select-solid select-modal-bid-deadline" id="bid-deadline-hour" name="hour">
-                           <option value="">Hour</option>
-                           {% for h in 0..23 %} {% set hour = "%02d:00"|format(h) %}
-                           <option value="{{ hour }}">{{ hour }}</option>
-                           {% endfor %}
-                        </select>
-                     </div>
-                  </div>
-               </div>
-
-               <div class="form-group ic-form-group">
-                  <label class="form-label required">
-                     <span class="ic-step-number">2</span>
-                     Company
-                  </label>
-
-                  <div id="select-company-bid-deadline" class="input-group input-group-solid flex-nowrap">
-                     <div class="overflow-hidden flex-grow-1">
-                        <select id="company-bid-deadline" class="form-control form-select select-validate form-select-solid rounded-end-0 border-end select-company select-modal-bid-deadline">
-                           <option value="">Select</option>
-                           {% for item in companies %}
-                           <option value="{{ item.companyId }}">{{ item.name }}</option>
-                           {% endfor %}
-                        </select>
-                     </div>
-                     <span class="input-group-text btn-add-company" title="Add company" data-bs-toggle="tooltip" style="cursor: pointer">
-                        <i class="ki-duotone ki-plus fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                     </span>
-                  </div>
-               </div>
-            </form>
-         </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-bid-deadline" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-change-project-stage">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1335,8 +1255,11 @@
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-item" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Close"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-item">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1389,11 +1312,65 @@
                      </span>
                   </div>
                </div>
+
+               <div class="form-group ic-form-group">
+                  <label class="form-label">
+                     <span class="ic-step-number">3</span>
+                     Bid deadline
+                  </label>
+                  <div class="row g-2">
+                     <div class="col-md-8">
+                        <div class="input-group input-group-solid date-picker-filter" id="datetimepicker-company-bid-date" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                           <input
+                              type="text"
+                              class="form-control filter-date"
+                              data-td-target="#datetimepicker-company-bid-date"
+                              placeholder="Date"
+                              id="company-bid-date"
+                              autocomplete="off"
+                              name="company_bid_day"
+                           />
+                           <span class="input-group-text" data-td-target="#datetimepicker-company-bid-date" data-td-toggle="datetimepicker">
+                              <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                           </span>
+                        </div>
+                     </div>
+                     <div class="col-md-4" id="select-company-bid-hour-wrap">
+                        <select class="form-control form-select form-select-solid select-modal-company-estimate" id="company-bid-hour" name="company_bid_hour">
+                           <option value="">Hour</option>
+                           {% for h in 0..23 %} {% set hour = "%02d:00"|format(h) %}
+                           <option value="{{ hour }}">{{ hour }}</option>
+                           {% endfor %}
+                        </select>
+                     </div>
+                  </div>
+                  <div class="form-text">Optional. Shown prominently for this bidder.</div>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <label class="form-label">Bid tag</label>
+                  <select class="form-control form-select form-select-solid select-modal-company-estimate" id="company-bid-tag">
+                     <option value=""></option>
+                     <option value="No Tag">No Tag</option>
+                     <option value="High Priority">High Priority</option>
+                     <option value="Medium Priority">Medium Priority</option>
+                     <option value="Low Priority">Low Priority</option>
+                     <option value="Don't Bid">Don't Bid</option>
+                  </select>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <label class="form-label">Bid notes / details</label>
+                  <textarea class="form-control form-control-solid" id="company-bid-address" rows="3" placeholder="Additional bid information"></textarea>
+               </div>
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-company-estimate" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-company-estimate">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1432,8 +1409,11 @@
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-template-note" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-template-note">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1458,8 +1438,11 @@
             </form>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-new-template-note" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-danger" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-new-template-note">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1483,8 +1466,11 @@
             </div>
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-success" id="btn-salvar-quote" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-secondary" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-quote">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
          </div>
       </div>
    </div>
@@ -1510,17 +1496,23 @@
                </select>
             </div>
             <div class="form-group">
-               <label class="form-label">Companies (from this estimate's bid deadlines)</label>
+               <label class="form-label">Companies (from this estimate)</label>
                <select id="quote-companies-select" class="form-select form-select2 form-select-solid" multiple>
                   <!-- filled in JS from estimate companies (estimate_company) -->
                </select>
                <div id="quote-companies-empty-hint" class="form-text text-warning hide">No companies yet. Add companies in the <strong>Companies</strong> step first.</div>
             </div>
          </div>
-         <div class="modal-footer">
-            <button type="button" class="btn btn-icon btn-secondary btn-sm" data-bs-dismiss="modal" title="Cancel" data-bs-toggle="tooltip"><i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i></button>
-            <button type="button" class="btn btn-icon btn-light-primary btn-sm" id="btn-salvar-quote-companies" title="Save" data-bs-toggle="tooltip"><i class="las la-save"></i></button>
-            <button type="button" class="btn btn-icon btn-success btn-sm" id="btn-salvar-y-enviar-quote-companies" title="Save and send email" data-bs-toggle="tooltip"><i class="ki-duotone ki-send fs-1"><span class="path1"></span><span class="path2"></span></i></button>
+         <div class="modal-footer d-flex flex-wrap gap-2 justify-content-end">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-light-primary d-inline-flex align-items-center gap-2" id="btn-salvar-quote-companies">
+               <i class="las la-save fs-3"></i>
+               <span>Save</span>
+            </button>
+            <button type="button" class="btn btn-success d-inline-flex align-items-center gap-2" id="btn-salvar-y-enviar-quote-companies">
+               <i class="ki-duotone ki-send fs-2"><span class="path1"></span><span class="path2"></span></i>
+               <span>Save and send</span>
+            </button>
          </div>
       </div>
    </div>

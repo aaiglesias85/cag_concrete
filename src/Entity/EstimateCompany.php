@@ -25,6 +25,15 @@ class EstimateCompany
     #[ORM\JoinColumn(name: 'contact_id', referencedColumnName: 'contact_id')]
     private ?CompanyContact $contact = null;
 
+    #[ORM\Column(name: 'bid_deadline', type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $bidDeadline = null;
+
+    #[ORM\Column(name: 'tag', type: 'string', length: 50, nullable: true)]
+    private ?string $tag = null;
+
+    #[ORM\Column(name: 'address', type: 'text', nullable: true)]
+    private ?string $address = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -58,5 +67,35 @@ class EstimateCompany
     public function setContact(?CompanyContact $contact): void
     {
         $this->contact = $contact;
+    }
+
+    public function getBidDeadline(): ?\DateTimeInterface
+    {
+        return $this->bidDeadline;
+    }
+
+    public function setBidDeadline(?\DateTimeInterface $bidDeadline): void
+    {
+        $this->bidDeadline = $bidDeadline;
+    }
+
+    public function getTag(): ?string
+    {
+        return $this->tag;
+    }
+
+    public function setTag(?string $tag): void
+    {
+        $this->tag = $tag;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): void
+    {
+        $this->address = $address;
     }
 }
