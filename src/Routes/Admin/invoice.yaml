@@ -37,3 +37,7 @@ changeNumberInvoiceAdmin:
 validarInvoiceAdmin:
    path: /invoice/validarInvoice
    defaults: { _controller: App\Controller\Admin\InvoiceController::validar, _format: json }
+
+obtenerSiguientePeriodoInvoice:
+   path: /invoice/obtenerSiguientePeriodo
+   defaults: { _controller: App\Controller\Admin\InvoiceController::obtenerSiguientePeriodoInvoice, _format: json }

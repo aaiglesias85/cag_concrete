@@ -357,17 +357,35 @@ class InvoiceController extends AbstractController
 
       try {
 
-         $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date, $number);
+          $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date, $number);
 
-         $resultadoJson['success'] = true;
-         $resultadoJson['error'] = $resultado;
+          $resultadoJson['success'] = true;
+          $resultadoJson['error'] = $resultado;
 
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+          return $this->json($resultadoJson);
+       } catch (\Exception $e) {
+          $resultadoJson['success'] = false;
+          $resultadoJson['error'] = $e->getMessage();
 
-         return $this->json($resultadoJson);
-      }
-   }
+          return $this->json($resultadoJson);
+       }
+    }
+
+    /**
+     * obtenerSiguientePeriodoInvoice: Obtiene el siguiente período de invoice basado en el último invoice del proyecto
+     */
+    public function obtenerSiguientePeriodoInvoice(Request $request)
+    {
+       try {
+          $project_id = $request->get('project_id');
+          $resultado = $this->invoiceService->ObtenerSiguientePeriodoInvoice($project_id);
+
+          return $this->json($resultado);
+       } catch (\Exception $e) {
+          return $this->json([
+             'success' => false,
+             'error' => $e->getMessage()
+          ]);
+       }
+    }
 }
