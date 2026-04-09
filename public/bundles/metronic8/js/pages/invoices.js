@@ -187,9 +187,10 @@ var Invoices = (function () {
          // number
          {
             targets: 1,
-            render: function (data, type, row) {
-               return `<input type="text" class="form-control invoice-number just-number w-100px" data-id="${row.id}" value="${data}" />`;
-            },
+           render: function (data, type, row) {
+   var overrideIcon = row.hasOverride ? ' <i class="bi bi-patch-check-fill text-warning" title="Has Override" style="cursor:pointer;"></i>' : '';
+   return `<div class="d-flex align-items-center"><input type="text" class="form-control invoice-number just-number w-100px" data-id="${row.id}" value="${data}" />${overrideIcon}</div>`;
+},
          },
          // company
          {

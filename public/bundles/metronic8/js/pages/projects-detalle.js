@@ -1085,11 +1085,10 @@ var ProjectsDetalle = (function () {
          {
             targets: 0,
             render: function (data, type, row) {
-               var html = `<a href="javascript:;" class="invoice-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(
-                  data,
-               )}</a>`;
-               return DatatableUtil.getRenderColumnDiv(html, 100);
-            },
+   var overrideIcon = row.hasOverride ? ' <i class="bi bi-patch-check-fill text-warning" title="Has Override" style="cursor:pointer;"></i>' : '';
+   var html = `<a href="javascript:;" class="invoice-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(data)}${overrideIcon}</a>`;
+   return DatatableUtil.getRenderColumnDiv(html, 100);
+},
          },
          {
             targets: 5,

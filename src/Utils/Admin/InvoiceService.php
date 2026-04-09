@@ -32,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xls\Style\CellAlignment;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use App\Entity\InvoiceOverridePayment;
 
 class InvoiceService extends Base
 {
@@ -2793,6 +2794,9 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       $resultado = $invoiceRepo->ListarInvoicesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin);
 
+
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+$headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
       $data = [];
 
       foreach ($resultado['data'] as $value) {
@@ -2815,7 +2819,15 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
             "notes" => $this->truncate($value->getNotes(), 50),
             "total" => $total,
             "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
-            "paid" => $value->getPaid() ? 1 : 0
+            "paid" => $value->getPaid() ? 1 : 0,
+           
+"hasOverride" => ($value->getStartDate() !== null && $value->getEndDate() !== null)
+   ? $headerRepo->existsForProjectInDateRange(
+      (int) $value->getProject()->getProjectId(),
+      $value->getStartDate(),
+      $value->getEndDate()
+   )
+   : false
          );
       }
 
@@ -2951,7 +2963,7 @@ $isAfterOverride = ($overridePartitionDate === null)
     || ($invStart !== null && $overridePartitionDate !== null
         && $this->isSameCalendarMonth($invStart, $overridePartitionDate));
 
-        
+
             // Si el invoice es anterior al override, NO modificar su unpaid
             if (!$isAfterOverride && $invItem) {
                // Solo sumar al historial para los siguientes invoices

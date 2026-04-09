@@ -29,6 +29,32 @@ class InvoiceOverridePaymentRepository extends ServiceEntityRepository
 
       return $qb->setMaxResults(1)->getQuery()->getOneOrNullResult();
    }
+   public function existsForProjectInDateRange(int $projectId, \DateTimeInterface $start, \DateTimeInterface $end): bool
+{
+    return $this->createQueryBuilder('h')
+        ->select('1')
+        ->join('h.project', 'p')
+        ->where('p.projectId = :pid')
+        ->andWhere('h.date >= :start')
+        ->andWhere('h.date <= :end')
+        ->setParameter('pid', $projectId)
+        ->setParameter('start', $start)
+        ->setParameter('end', $end)
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult() !== null;
+}
+public function existsForProject(int $projectId): bool
+{
+    return $this->createQueryBuilder('h')
+        ->select('1')
+        ->join('h.project', 'p')
+        ->where('p.projectId = :pid')
+        ->setParameter('pid', $projectId)
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult() !== null;
+}
 
    /**
     * Listado paginado de cabeceras con los mismos filtros que el conteo.

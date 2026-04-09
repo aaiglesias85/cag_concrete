@@ -65,6 +65,7 @@ use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
 use App\Repository\EmployeeRoleRepository;
 use App\Entity\EmployeeRole;
+use App\Entity\InvoiceOverridePayment;
 
 use App\Utils\Admin\InvoiceService;
 use App\Utils\Base;
@@ -2752,30 +2753,44 @@ class ProjectService extends Base
       /** @var InvoiceRepository $invoiceRepo */
       $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
       $lista = $invoiceRepo->ListarInvoicesDeProject($project_id);
-      foreach ($lista as $key => $value) {
+       foreach ($lista as $key => $value) {
 
-         $invoice_id = $value->getInvoiceId();
+          $invoice_id = $value->getInvoiceId();
 
-         /** @var InvoiceItemRepository $invoiceItemRepo */
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
-         $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+          /** @var InvoiceItemRepository $invoiceItemRepo */
+          $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+          // Usar TotalInvoiceFinalAmountThisPeriod para calcular el total (suma de Final Amount This Period)
+          $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+// Verificar si este invoice tiene override aplicado
+$hasOverride = false;
+$invStart = $value->getStartDate();
+$invEnd = $value->getEndDate();
+if ($invStart !== null && $invEnd !== null) {
+   /** @var InvoiceOverridePaymentRepository $headerRepo */
+   $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
+   $hasOverride = $headerRepo->existsForProjectInDateRange(
+      (int) $value->getProject()->getProjectId(),
+      $invStart,
+      $invEnd
+   );
+}
 
-         $invoice = [
-            "invoice_id" => $invoice_id,
-            "number" => $value->getNumber(),
-            "company" => $value->getProject()->getCompany()->getName(),
-            "project" => $value->getProject()->getName(),
-            "startDate" => $value->getStartDate()->format('m/d/Y'),
-            "endDate" => $value->getEndDate()->format('m/d/Y'),
-            "notes" => $this->truncate($value->getNotes(), 50),
-            "total" => number_format($total, 2, '.', ','),
-            "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
-            "paid" => $value->getPaid() ? 1 : 0,
-            "posicion" => $key
-         ];
-         $invoices[] = $invoice;
-      }
+          $invoice = [
+             "invoice_id" => $invoice_id,
+             "number" => $value->getNumber(),
+             "company" => $value->getProject()->getCompany()->getName(),
+             "project" => $value->getProject()->getName(),
+             "startDate" => $value->getStartDate()->format('m/d/Y'),
+             "endDate" => $value->getEndDate()->format('m/d/Y'),
+             "notes" => $this->truncate($value->getNotes(), 50),
+             "total" => number_format($total, 2, '.', ','),
+             "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
+             "paid" => $value->getPaid() ? 1 : 0,
+             "posicion" => $key,
+             "hasOverride" => $hasOverride
+          ];
+          $invoices[] = $invoice;
+       }
 
       return $invoices;
    }
@@ -4366,6 +4381,9 @@ class ProjectService extends Base
          );
       }
 
+      /** @var InvoiceOverridePaymentRepository $headerRepo */
+$headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class);
+
       foreach ($projects as $value) {
          $project_id = $value->getProjectId();
 
@@ -4387,7 +4405,8 @@ class ProjectService extends Base
             "endDate" => $value->getEndDate() != '' ? $value->getEndDate()->format('m/d/Y') : '',
             "dueDate" => $value->getDueDate() != '' ? $value->getDueDate()->format('m/d/Y') : '',
             'nota' => $nota,
-            "acciones" => $acciones
+            "acciones" => $acciones,
+            "hasOverride" => $headerRepo->existsForProject((int) $project_id)
          );
 
 

@@ -117,9 +117,10 @@ var Projects = (function () {
          },
          {
             targets: 1,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 150);
-            },
+        render: function (data, type, row) {
+   var overrideIcon = row.hasOverride ? ' <i class="bi bi-patch-check-fill text-warning" title="Has Override" style="cursor:pointer;"></i>' : '';
+   return DatatableUtil.getRenderColumnDiv(data + overrideIcon, 150);
+},
          },
          {
             targets: 2,
@@ -3728,20 +3729,19 @@ var Projects = (function () {
    var initTableInvoices = function () {
       const table = '#invoices-table-editable';
 
-      // columns
-      const columns = [{ data: 'number' }, { data: 'startDate' }, { data: 'endDate' }, { data: 'total' }, { data: 'notes' }, { data: 'paid' }, { data: 'createdAt' }, { data: null }];
+       // columns
+       const columns = [{ data: 'number' }, { data: 'startDate' }, { data: 'endDate' }, { data: 'total' }, { data: 'notes' }, { data: 'paid' }, { data: 'createdAt' }, { data: null }];
 
-      // column defs
-      let columnDefs = [
-         {
-            targets: 0,
-            render: function (data, type, row) {
-               var html = `<a href="javascript:;" class="invoice-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(
-                  data,
-               )}</a>`;
-               return DatatableUtil.getRenderColumnDiv(html, 100);
-            },
-         },
+       // column defs
+       let columnDefs = [
+          {
+             targets: 0,
+             render: function (data, type, row) {
+                var overrideIcon = row.hasOverride ? ' <i class="bi bi-patch-check-fill text-warning" title="Has Override" style="cursor:pointer;"></i>' : '';
+                var html = `<a href="javascript:;" class="invoice-link text-primary text-hover-primary" data-invoice-id="${row.invoice_id}" style="cursor: pointer;">${DatatableUtil.escapeHtml(data)}${overrideIcon}</a>`;
+                return DatatableUtil.getRenderColumnDiv(html, 100);
+             },
+          },
          {
             targets: 5,
             render: function (data, type, row) {
