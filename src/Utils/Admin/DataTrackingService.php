@@ -659,8 +659,11 @@ class DataTrackingService extends Base
          $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value->getProjectItem());
 
          $quantity = $value->getQuantity();
+         $punch_quantity = $value->getPunchQuantity() ?? 0.0;
+         $normal_quantity = $quantity - $punch_quantity;
          $price = $value->getPrice();
-         $total = $quantity * $price;
+         // Contribución neto a profit del ítem: N*price - P*price
+         $total = ($quantity - 2.0 * $punch_quantity) * $price;
 
          $yield_calculation_valor = $this->CalcularTotalConcreteYielItem($value);
 
@@ -681,6 +684,8 @@ class DataTrackingService extends Base
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,
+            "punch_quantity" => $punch_quantity,
+            "normal_quantity" => $normal_quantity,
             "quantity_old" => $value->getProjectItem()->getQuantityOld() ?? '',
             "price" => $price,
             "price_old" => $value->getProjectItem()->getPriceOld() ?? '',
@@ -1340,7 +1345,11 @@ class DataTrackingService extends Base
          }
 
          $data_tracking_item_entity->setPrice($value->price);
-         $data_tracking_item_entity->setQuantity($value->quantity);
+         $qty = (float) $value->quantity;
+         $data_tracking_item_entity->setQuantity($qty);
+         $punchRaw = isset($value->punch_quantity) ? (float) $value->punch_quantity : 0.0;
+         $punch = max(0.0, min($punchRaw, $qty));
+         $data_tracking_item_entity->setPunchQuantity($punch);
          $data_tracking_item_entity->setNotes($value->notes);
 
          if ($value->item_id != '') {
@@ -1355,7 +1364,7 @@ class DataTrackingService extends Base
             $em->persist($data_tracking_item_entity);
          }
 
-         if ($value->quantity == 0) {
+         if ($qty == 0) {
             $pending = true;
          }
       }
@@ -1373,11 +1382,11 @@ class DataTrackingService extends Base
     *
     * @author Marcel
     */
-   public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
+   public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending, $only_punch = '')
    {
       /** @var DataTrackingRepository $dataTrackingRepo */
       $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
-      $resultado = $dataTrackingRepo->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
+      $resultado = $dataTrackingRepo->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending, $only_punch);
 
       $data = [];
 

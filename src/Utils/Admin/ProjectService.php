@@ -621,11 +621,11 @@ class ProjectService extends Base
     *
     * @author Marcel
     */
-   public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending)
+   public function ListarDataTrackings($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending, $only_punch = '')
    {
       /** @var DataTrackingRepository $dataTrackingRepo */
       $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
-      $resultado = $dataTrackingRepo->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending);
+      $resultado = $dataTrackingRepo->ListarDataTrackingsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin, $pending, $only_punch);
 
       $data = [];
 
@@ -1549,6 +1549,8 @@ class ProjectService extends Base
 
    /**
     * ListarItemsParaInvoice
+    * Cantidad del periodo desde Data Tracking = facturable (Total − PUNCH); la parte PUNCH no entra en invoice.
+    *
     * @param $project_id
     * @param $fecha_inicial
     * @param $fecha_fin
@@ -1575,7 +1577,7 @@ class ProjectService extends Base
 
          /** @var DataTrackingItemRepository $dataTrackingItemRepo */
          $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
-         $quantity = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
+         $quantity = $dataTrackingItemRepo->TotalBillableQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
 
          $contract_qty = $value->getQuantity();
          $price = $value->getPrice();

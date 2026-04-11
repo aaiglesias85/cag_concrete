@@ -16,6 +16,10 @@ class DataTrackingItem
     #[ORM\Column(name: 'quantity', type: 'float', nullable: false)]
     private ?float $quantity;
 
+    /** Cantidad PUNCH List (no facturable; impacto negativo en profit). Normal = quantity - punch_quantity */
+    #[ORM\Column(name: 'punch_quantity', type: 'float', nullable: false, options: ['default' => 0])]
+    private ?float $punchQuantity = 0.0;
+
     #[ORM\Column(name: 'price', type: 'float', nullable: false)]
     private ?float $price;
 
@@ -43,6 +47,16 @@ class DataTrackingItem
     public function setQuantity(?float $quantity): void
     {
         $this->quantity = $quantity;
+    }
+
+    public function getPunchQuantity(): ?float
+    {
+        return $this->punchQuantity;
+    }
+
+    public function setPunchQuantity(?float $punchQuantity): void
+    {
+        $this->punchQuantity = $punchQuantity ?? 0.0;
     }
 
     public function getPrice(): ?float

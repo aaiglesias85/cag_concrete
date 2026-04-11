@@ -123,7 +123,7 @@ class ProjectService extends Base
       $result = $adminProjectService->CargarDatosProject($project_id);
 
       if ($result['success'] && isset($result['project'])) {
-         $listarDt = $adminProjectService->ListarDataTrackings(0, 5000, '', 0, 'asc', (string) $project_id, '', '', '');
+         $listarDt = $adminProjectService->ListarDataTrackings(0, 5000, '', 0, 'asc', (string) $project_id, '', '', '', '');
          $result['project']['data_tracking'] = $listarDt['data'] ?? [];
 
          $invoices = $adminProjectService->ListarInvoicesDeProject($project_id);

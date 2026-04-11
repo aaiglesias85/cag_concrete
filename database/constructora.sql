@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 11-04-2026 a las 01:35:45
+-- Tiempo de generación: 11-04-2026 a las 01:46:14
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -231,6 +231,7 @@ INSERT INTO `data_tracking_conc_vendor` (`id`, `conc_vendor`, `total_conc_used`,
 CREATE TABLE `data_tracking_item` (
   `id` int(11) NOT NULL,
   `quantity` decimal(18,6) DEFAULT NULL,
+  `punch_quantity` decimal(18,6) NOT NULL DEFAULT '0.000000',
   `price` decimal(18,2) DEFAULT NULL,
   `notes` text,
   `data_tracking_id` int(11) DEFAULT NULL,
@@ -241,20 +242,20 @@ CREATE TABLE `data_tracking_item` (
 -- Volcado de datos para la tabla `data_tracking_item`
 --
 
-INSERT INTO `data_tracking_item` (`id`, `quantity`, `price`, `notes`, `data_tracking_id`, `project_item_id`) VALUES
-(8, 400.000000, 160.00, 'test', 3, 11),
-(9, 500.000000, 200.00, 'otra test', 3, 12),
-(11, 50.000000, 16.50, NULL, 4, 1),
-(13, 10.000000, 300.00, 'test pending', 3, 13),
-(15, 10.000000, 100.00, '', 3, 16),
-(16, 10.000000, 160.00, '', 5, 11),
-(17, 10.000000, 200.00, '', 5, 12),
-(18, 10.000000, 300.00, '', 5, 13),
-(19, 10.000000, 100.00, '', 5, 16),
-(20, 10.000000, 100.00, '', 5, 17),
-(21, 10.000000, 100.00, '', 6, 18),
-(22, 10.000000, 100.00, '', 7, 18),
-(26, 10.000000, 100.00, '', 11, 18);
+INSERT INTO `data_tracking_item` (`id`, `quantity`, `punch_quantity`, `price`, `notes`, `data_tracking_id`, `project_item_id`) VALUES
+(8, 400.000000, 0.000000, 160.00, 'test', 3, 11),
+(9, 500.000000, 0.000000, 200.00, 'otra test', 3, 12),
+(11, 50.000000, 0.000000, 16.50, NULL, 4, 1),
+(13, 10.000000, 0.000000, 300.00, 'test pending', 3, 13),
+(15, 10.000000, 0.000000, 100.00, '', 3, 16),
+(16, 10.000000, 0.000000, 160.00, '', 5, 11),
+(17, 10.000000, 0.000000, 200.00, '', 5, 12),
+(18, 10.000000, 0.000000, 300.00, '', 5, 13),
+(19, 10.000000, 0.000000, 100.00, '', 5, 16),
+(20, 10.000000, 0.000000, 100.00, '', 5, 17),
+(21, 10.000000, 0.000000, 100.00, '', 6, 18),
+(22, 10.000000, 0.000000, 100.00, '', 7, 18),
+(26, 10.000000, 0.000000, 100.00, '', 11, 18);
 
 -- --------------------------------------------------------
 

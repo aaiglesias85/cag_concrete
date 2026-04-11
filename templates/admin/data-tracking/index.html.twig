@@ -141,6 +141,13 @@
                               </div>
                            </div>
 
+                           <div class="mb-3">
+                              <div class="form-check form-check-custom form-check-solid">
+                                 <input class="form-check-input" type="checkbox" value="1" id="only_punch_dt" />
+                                 <label class="form-check-label fw-semibold text-gray-700" for="only_punch_dt">Show only PUNCH List?</label>
+                              </div>
+                           </div>
+
                            <!--begin::Actions-->
                            <div class="d-flex justify-content-end mt-10">
                               <button type="reset" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6" data-kt-menu-dismiss="true" id="btn-reset-filtrar">Reset filters</button>
@@ -1764,6 +1771,37 @@
                   <div class="row">
                      <div class="col-md-3">
                         <input type="text" class="form-control form-control-validate form-control-solid" id="data-tracking-quantity" name="quantity" />
+                     </div>
+                  </div>
+               </div>
+
+               <div class="form-group mb-5">
+                  <div class="d-flex flex-wrap align-items-start column-gap-4 row-gap-3">
+                     <div class="form-check form-switch form-check-custom form-check-solid m-0 pt-1">
+                        <input class="form-check-input" type="checkbox" id="data-tracking-is-punch" value="1" />
+                        <label class="form-check-label fw-semibold mb-0" for="data-tracking-is-punch">Is PUNCH List?</label>
+                     </div>
+                     <div id="data-tracking-punch-fields" class="d-none" style="min-width: 7rem; max-width: 12rem">
+                        <label class="form-label mb-1" for="data-tracking-punch-quantity">
+                           PUNCH quantity
+                           <i
+                              class="ki-duotone ki-information-5 fs-6 ms-1 text-gray-600 punch-qty-help-tip"
+                              data-bs-toggle="tooltip"
+                              data-bs-placement="top"
+                              data-punch-help-tooltip="1"
+                              title="Punch-list is work you do not bill—rework or corrections you absorb. It still counts as quantity installed for the job, but only the part you do not mark as punch goes on the invoice. Enter how much of the total above is punch; that share hits profit like a cost here."
+                           >
+                              <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                           </i>
+                        </label>
+                        <input
+                           type="text"
+                           class="form-control form-control-validate form-control-solid"
+                           id="data-tracking-punch-quantity"
+                           name="punch_quantity"
+                           autocomplete="off"
+                           disabled="disabled"
+                        />
                      </div>
                   </div>
                </div>

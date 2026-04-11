@@ -7,6 +7,47 @@ var DataTracking = (function () {
       console.log('[DT item qty]', step, payload !== undefined ? payload : '');
    };
 
+   /** Contribución del ítem al Daily Total / profit: (Normal − PUNCH) × price = (qty − 2×punch) × price */
+   var punchNetLineTotal = function (item) {
+      var q = parseFloat(item.quantity);
+      if (isNaN(q)) {
+         q = 0;
+      }
+      var p = parseFloat(item.punch_quantity);
+      if (isNaN(p)) {
+         p = 0;
+      }
+      if (p > q) {
+         p = q;
+      }
+      var price = parseFloat(item.price);
+      if (isNaN(price)) {
+         price = 0;
+      }
+      return (q - 2 * p) * price;
+   };
+
+   var togglePunchFieldsVisibility = function () {
+      var on = $('#data-tracking-is-punch').is(':checked');
+      var $wrap = $('#data-tracking-punch-fields');
+      if (on) {
+         $wrap.removeClass('d-none').addClass('d-flex flex-column');
+         $('#data-tracking-punch-quantity').prop('disabled', false);
+         setTimeout(function () {
+            document.querySelectorAll('#data-tracking-punch-fields [data-punch-help-tooltip="1"]').forEach(function (el) {
+               var t = bootstrap.Tooltip.getInstance(el);
+               if (t) {
+                  t.dispose();
+               }
+               new bootstrap.Tooltip(el);
+            });
+         }, 0);
+      } else {
+         $wrap.addClass('d-none').removeClass('d-flex flex-column');
+         $('#data-tracking-punch-quantity').val('').prop('disabled', true);
+      }
+   };
+
    var rowDelete = null;
    var items = [];
 
@@ -24,6 +65,7 @@ var DataTracking = (function () {
                pending: $('#pending').val(),
                fechaInicial: FlatpickrUtil.getString('datetimepicker-desde'),
                fechaFin: FlatpickrUtil.getString('datetimepicker-hasta'),
+               only_punch: $('#only_punch_dt').is(':checked') ? '1' : '',
             });
          },
          method: 'post',
@@ -421,6 +463,8 @@ var DataTracking = (function () {
 
       $('#pending').val('');
       $('#pending').trigger('change');
+
+      $('#only_punch_dt').prop('checked', false);
 
       FlatpickrUtil.clear('datetimepicker-desde');
       FlatpickrUtil.clear('datetimepicker-hasta');
@@ -1436,7 +1480,7 @@ var DataTracking = (function () {
       var total = 0;
 
       for (var i = 0; i < items_data_tracking.length; i++) {
-         total += items_data_tracking[i].quantity * items_data_tracking[i].price;
+         total += punchNetLineTotal(items_data_tracking[i]);
       }
 
       return total;
@@ -1757,12 +1801,40 @@ var DataTracking = (function () {
                      project_item_id +
                      '" title="View quantity history"></i>';
                }
-               return `<div style="width: 120px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${MyApp.formatearNumero(
-                  data,
-                  2,
-                  '.',
-                  ',',
-               )}</span>${icono}</div>`;
+               var q = parseFloat(row.quantity);
+               if (isNaN(q)) {
+                  q = 0;
+               }
+               var punch = parseFloat(row.punch_quantity);
+               if (isNaN(punch)) {
+                  punch = 0;
+               }
+               if (punch > q) {
+                  punch = q;
+               }
+               var normal = q - punch;
+               var qtyHtml = '';
+               if (punch <= 0) {
+                  qtyHtml = MyApp.formatearNumero(data, 2, '.', ',');
+               } else if (punch >= q - 1e-9) {
+                  qtyHtml =
+                     MyApp.formatearNumero(data, 2, '.', ',') +
+                     ' <span class="badge badge-light-warning ms-1">PUNCH List</span>';
+               } else {
+                  var tip =
+                     'Normal: ' +
+                     MyApp.formatearNumero(normal, 2, '.', ',') +
+                     ' | PUNCH: ' +
+                     MyApp.formatearNumero(punch, 2, '.', ',') +
+                     ' | Total: ' +
+                     MyApp.formatearNumero(q, 2, '.', ',');
+                  qtyHtml =
+                     MyApp.formatearNumero(normal, 2, '.', ',') +
+                     ' <i class="fas fa-exclamation-triangle text-warning ms-1 punch-partial-tip" data-bs-toggle="tooltip" data-bs-placement="top" title="' +
+                     tip.replace(/"/g, '&quot;') +
+                     '"></i>';
+               }
+               return `<div style="width: 160px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${qtyHtml}</span>${icono}</div>`;
             },
          },
          {
@@ -1793,7 +1865,8 @@ var DataTracking = (function () {
             targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return `<span>${MyApp.formatMoney(data)}</span>`;
+               var net = punchNetLineTotal(row);
+               return `<span>${MyApp.formatMoney(net)}</span>`;
             },
          },
          {
@@ -1842,6 +1915,14 @@ var DataTracking = (function () {
                $(row).find('td:not(:first)').hide();
             }
          },
+      });
+
+      oTableItems.on('draw.dt', function () {
+         document.querySelectorAll('#items-table-editable .punch-partial-tip').forEach(function (el) {
+            if (!bootstrap.Tooltip.getInstance(el)) {
+               new bootstrap.Tooltip(el);
+            }
+         });
       });
 
       handleSearchDatatableItems();
@@ -1987,6 +2068,11 @@ var DataTracking = (function () {
       return result;
    };
    var initAccionesItems = function () {
+      $(document).off('change', '#data-tracking-is-punch');
+      $(document).on('change', '#data-tracking-is-punch', function () {
+         togglePunchFieldsVisibility();
+      });
+
       $(document).off('click', '#btn-agregar-item');
       $(document).on('click', '#btn-agregar-item', function (e) {
          // reset
@@ -2049,8 +2135,22 @@ var DataTracking = (function () {
             });
             var notes = $('#notes-item-data-tracking').val();
 
+            var punchQty = 0;
+            if ($('#data-tracking-is-punch').is(':checked')) {
+               var punchRaw = String($('#data-tracking-punch-quantity').val() || '').replace(/,/g, '');
+               punchQty = parseFloat(punchRaw);
+               if (isNaN(punchQty) || punchQty <= 0) {
+                  toastr.error('Enter a PUNCH quantity greater than zero.', '');
+                  return;
+               }
+               if (punchQty > quantity) {
+                  toastr.error('PUNCH quantity cannot exceed total quantity.', '');
+                  return;
+               }
+            }
+
             var price = item.price;
-            var total = quantity * price;
+            var total = punchNetLineTotal({ quantity: quantity, punch_quantity: punchQty, price: price });
 
             var yield_calculation = item.yield_calculation;
             var equation_id = item.equation_id;
@@ -2077,6 +2177,7 @@ var DataTracking = (function () {
                   yield_calculation: yield_calculation,
                   yield_calculation_name: yield_calculation_name,
                   quantity: quantity,
+                  punch_quantity: punchQty,
                   quantity_old: item.quantity_old || '',
                   yield_calculation_valor: yield_calculation_valor,
                   price: price,
@@ -2102,6 +2203,7 @@ var DataTracking = (function () {
                   items_data_tracking[posicion].yield_calculation_valor = yield_calculation_valor;
                   items_data_tracking[posicion].equation_id = equation_id;
                   items_data_tracking[posicion].quantity = quantity;
+                  items_data_tracking[posicion].punch_quantity = punchQty;
                   items_data_tracking[posicion].quantity_old = item.quantity_old || '';
                   items_data_tracking[posicion].price = price;
                   items_data_tracking[posicion].price_old = item.price_old || '';
@@ -2156,6 +2258,14 @@ var DataTracking = (function () {
             $('#item-data-tracking').trigger('change');
 
             $('#data-tracking-quantity').val(items_data_tracking[posicion].quantity);
+
+            var pqEdit = parseFloat(items_data_tracking[posicion].punch_quantity);
+            if (isNaN(pqEdit) || pqEdit < 0) {
+               pqEdit = 0;
+            }
+            $('#data-tracking-is-punch').prop('checked', pqEdit > 0);
+            $('#data-tracking-punch-quantity').val(pqEdit > 0 ? pqEdit : '');
+            togglePunchFieldsVisibility();
 
             $('#notes-item-data-tracking').val(items_data_tracking[posicion].notes);
 
@@ -2375,6 +2485,16 @@ var DataTracking = (function () {
    var resetFormItem = function () {
       // reset form
       MyUtil.resetForm('data-tracking-item-form');
+
+      $('#data-tracking-is-punch').prop('checked', false);
+      $('#data-tracking-punch-fields').addClass('d-none').removeClass('d-flex flex-column');
+      $('#data-tracking-punch-quantity').val('').prop('disabled', true);
+      document.querySelectorAll('#data-tracking-punch-fields [data-punch-help-tooltip="1"]').forEach(function (el) {
+         var t = bootstrap.Tooltip.getInstance(el);
+         if (t) {
+            t.dispose();
+         }
+      });
 
       actualizarSelectProjectItems();
 
@@ -3820,7 +3940,8 @@ var DataTracking = (function () {
          }
 
          var price = item.price;
-         var total = quantity * price;
+         var punchZero = 0;
+         var total = punchNetLineTotal({ quantity: quantity, punch_quantity: punchZero, price: price });
 
          var yield_calculation = item.yield_calculation;
          var equation_id = item.equation_id;
@@ -3846,6 +3967,7 @@ var DataTracking = (function () {
             yield_calculation: yield_calculation,
             yield_calculation_name: yield_calculation_name,
             quantity: quantity,
+            punch_quantity: punchZero,
             quantity_old: item.quantity_old || '',
             yield_calculation_valor: yield_calculation_valor,
             price: price,

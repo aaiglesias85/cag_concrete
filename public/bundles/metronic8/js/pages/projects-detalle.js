@@ -1253,6 +1253,7 @@ var ProjectsDetalle = (function () {
                pending: $('#pending-data-tracking-detalle').val(),
                fechaInicial: FlatpickrUtil.getString('datetimepicker-desde-data-tracking-detalle'),
                fechaFin: FlatpickrUtil.getString('datetimepicker-hasta-data-tracking-detalle'),
+               only_punch: $('#only_punch_data_tracking_detalle').is(':checked') ? '1' : '',
             });
          },
          method: 'post',

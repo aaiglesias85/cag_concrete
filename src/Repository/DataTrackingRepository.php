@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\DataTracking;
+use App\Entity\DataTrackingItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -238,7 +239,7 @@ class DataTrackingRepository extends ServiceEntityRepository
      *
      * @return []
      */
-    public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = ''): array
+    public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = '', ?string $only_punch = ''): array
     {
 
         // Whitelist de columnas ordenables
@@ -287,6 +288,12 @@ class DataTrackingRepository extends ServiceEntityRepository
         if ($pending !== '') {
             $baseQb->andWhere('d_t.pending = :pending')
                 ->setParameter('pending', $pending);
+        }
+
+        if ($only_punch === '1') {
+            $baseQb->andWhere(
+                'EXISTS (SELECT 1 FROM ' . DataTrackingItem::class . ' dti_pf WHERE dti_pf.dataTracking = d_t AND dti_pf.punchQuantity > 0)'
+            );
         }
 
         // 1) Datos

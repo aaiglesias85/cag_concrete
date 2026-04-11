@@ -3071,7 +3071,7 @@ $isAfterOverride = ($overridePartitionDate === null)
     * el/los invoice(s) cuyo periodo contiene esa fecha; los invoices posteriores (#6, #7…)
     * se recalculan en cascada (quantity_from_previous, unpaid, etc.). Los anteriores (#1-#4) no se tocan.
     *
-    * - Cantidad (Qty This Period): suma de quantity en Data T para ese project_item en [start_date, end_date].
+    * - Cantidad (Qty This Period): suma de cantidad facturable (quantity - punch_quantity) en Data T para ese project_item en [start_date, end_date].
     * - Precio: promedio ponderado por cantidad en ese periodo; si no hay datos, se mantiene el actual.
     * - Si la cantidad queda en 0 se deja la línea con quantity=0 (no se elimina, para conservar datos de invoices anteriores).
     *
@@ -3117,7 +3117,7 @@ $isAfterOverride = ($overridePartitionDate === null)
                continue;
             }
 
-            $newQuantity = (float) $dataTrackingItemRepo->TotalQuantity('', (string) $project_item_id, $startDate, $endDate);
+            $newQuantity = (float) $dataTrackingItemRepo->TotalBillableQuantity('', (string) $project_item_id, $startDate, $endDate);
 
             $invoiceItem->setQuantity(max(0.0, $newQuantity));
             if ($newQuantity > 0.0) {

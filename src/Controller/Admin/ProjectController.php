@@ -991,6 +991,7 @@ class ProjectController extends AbstractController
          $pending = $request->get('pending');
          $fecha_inicial = $request->get('fechaInicial');
          $fecha_fin = $request->get('fechaFin');
+         $only_punch = $request->get('only_punch', '');
 
          // total + data en una sola llamada a tu servicio
          $result = $project_id != "" ? $this->projectService->ListarDataTrackings(
@@ -1002,7 +1003,8 @@ class ProjectController extends AbstractController
             $project_id,
             $fecha_inicial,
             $fecha_fin,
-            $pending
+            $pending,
+            $only_punch
          ) : ['data' => [], 'total' => 0];
 
          $resultadoJson = [
