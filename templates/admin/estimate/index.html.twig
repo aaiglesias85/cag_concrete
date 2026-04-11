@@ -1,5 +1,6 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Estimates{% endblock %} {% block stylesheetspecific %}
 <link href="{{ asset('bundles/metronic8/plugins/jquery-tags-input/jquery.tagsinput.css') }}" rel="stylesheet" />
+<link href="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet" />
 <style>
    .m-widget4 .m-widget4__item {
       padding-top: 5px;
@@ -12,6 +13,43 @@
 
    .popover-company {
       cursor: pointer;
+   }
+
+   .fc-slats tr,
+   .fc-slats td {
+      border: none !important;
+      background: none !important;
+   }
+
+   .fc-timegrid-event {
+      height: 30px;
+   }
+
+   .fc-event-time {
+      display: none !important;
+   }
+
+   .feriado-event {
+      background-color: black !important;
+      background: black !important;
+      color: white !important;
+      border: none !important;
+      font-weight: bold;
+      opacity: 1 !important;
+   }
+
+   .fc-day.feriado-cell {
+      background-color: black !important;
+      background: black !important;
+      opacity: 1 !important;
+   }
+
+   .feriado-event .fc-event-title {
+      color: #fff !important;
+   }
+
+   .estimate-event-quote-received {
+      box-shadow: inset 0 0 0 2px #198754;
    }
 </style>
 {% endblock %} {% block content %}
@@ -79,6 +117,10 @@
             </div>
             <div class="card-toolbar">
                <div class="d-flex justify-content-end">
+                  <a href="javascript:;" id="btn-calendario-estimate" class="btn btn-secondary me-3">
+                     <i class="ki-duotone ki-calendar"><span class="path1"></span><span class="path2"></span></i>
+                     <span class="kt-hidden-mobile font-weight-bold">Hide Calendar</span>
+                  </a>
                   <!--filter-->
                   <div>
                      <button type="button" class="btn btn-primary me-3" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
@@ -241,6 +283,7 @@
             </div>
          </div>
          <div class="card-body">
+            <div id="div-lista-estimate-table" class="hide">
             <!--begin::Datatable-->
             <table id="estimate-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                <thead>
@@ -268,6 +311,13 @@
                <tbody class="text-gray-600 fw-semibold"></tbody>
             </table>
             <!--end::Datatable-->
+            </div>
+
+            <div class="row mt-2" id="div-calendario-estimate">
+               <div class="col-md-12">
+                  <div id="calendario-estimate"></div>
+               </div>
+            </div>
          </div>
       </div>
 
@@ -1569,6 +1619,9 @@
 <script src="{{ asset('bundles/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/plugins/jquery-tags-input/jquery.tagsinput.min.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
 
 <script src="{{ asset('bundles/metronic8/js/pages/estimates.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
@@ -1578,6 +1631,8 @@
        editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
        eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
    };
+
+   var holidays = {{ holidays|default([])|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 
    jQuery(document).ready(function () {
        <!-- init components -->

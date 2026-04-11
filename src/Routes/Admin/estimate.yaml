@@ -6,6 +6,10 @@ listarEstimateAdmin:
   path: /estimate/listar
   defaults: { _controller: App\Controller\Admin\EstimateController::listar, _format: json }
 
+listarParaCalendarioEstimateAdmin:
+  path: /estimate/listarParaCalendario
+  defaults: { _controller: App\Controller\Admin\EstimateController::listarParaCalendario, _format: json }
+
 salvarEstimateAdmin:
   path: /estimate/salvar
   defaults: { _controller: App\Controller\Admin\EstimateController::salvar, _format: json }

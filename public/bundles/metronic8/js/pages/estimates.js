@@ -1,6 +1,199 @@
 var Estimates = (function () {
    var rowDelete = null;
 
+   var calendarEstimate = null;
+   var estimateCalendarEvents = [];
+   var mostrarCalendarioEstimate = true;
+
+   var listarCalendarioEstimate = function () {
+      var formData = new URLSearchParams();
+      var search = $('#lista-estimate [data-table-filter="search"]').val();
+      formData.set('search', search || '');
+      formData.set('stage_id', $('#filtro-stage').val() || '');
+      formData.set('project_type_id', $('#filtro-project-type').val() || '');
+      formData.set('proposal_type_id', $('#filtro-proposal-type').val() || '');
+      formData.set('status_id', $('#filtro-plan-status').val() || '');
+      formData.set('county_id', $('#filtro-county').val() || '');
+      formData.set('district_id', $('#filtro-district').val() || '');
+      formData.set('fecha_inicial', FlatpickrUtil.getString('datetimepicker-desde'));
+      formData.set('fecha_fin', FlatpickrUtil.getString('datetimepicker-hasta'));
+
+      BlockUtil.block('#kt_app_content_container');
+      axios
+         .post('estimate/listarParaCalendario', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status === 200 || res.status === 201) {
+               var response = res.data;
+               if (response.success) {
+                  estimateCalendarEvents = response.events || [];
+                  actualizarCalendarioEstimate();
+               } else {
+                  toastr.error(response.error || '', '');
+               }
+            } else {
+               toastr.error('An internal error has occurred, please try again.', '');
+            }
+         })
+         .catch(MyUtil.catchErrorAxios)
+         .then(function () {
+            BlockUtil.unblock('#kt_app_content_container');
+         });
+   };
+
+   var actualizarCalendarioEstimate = function () {
+      if (calendarEstimate) {
+         calendarEstimate.destroy();
+      }
+      initCalendarioEstimate();
+   };
+
+   var initCalendarioEstimate = function () {
+      var todayDate = moment().startOf('day');
+      var TODAY = todayDate.format('YYYY-MM-DD');
+      var fechaInicial = FlatpickrUtil.getString('datetimepicker-desde');
+      if (fechaInicial !== '') {
+         todayDate = moment(MyApp.convertirStringAFecha(fechaInicial)).startOf('day');
+         TODAY = todayDate.format('YYYY-MM-DD');
+      }
+
+      var feriadoEvents = (typeof holidays !== 'undefined' ? holidays : []).map(function (feriado) {
+         return {
+            id: 'holiday-' + feriado.holiday_id,
+            title: feriado.description.toUpperCase(),
+            start: feriado.fecha,
+            allDay: true,
+            display: 'background',
+            classNames: ['feriado-event'],
+         };
+      });
+
+      var allEvents = estimateCalendarEvents.concat(feriadoEvents);
+
+      function escapeHtml(s) {
+         if (s == null) return '';
+         return String(s).replace(/[&<>"']/g, function (m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+         });
+      }
+
+      function buildPopoverContent(p) {
+         return (
+            '<b>Bid deadline:</b> ' +
+            escapeHtml(p.bidDeadline || '') +
+            '<br>' +
+            '<b>Stage:</b> ' +
+            escapeHtml(p.stage || '') +
+            '<br>' +
+            '<b>County:</b> ' +
+            escapeHtml(p.county || '') +
+            '<br>' +
+            '<b>Proposal #:</b> ' +
+            escapeHtml(p.proposalNo || '')
+         );
+      }
+
+      function setupPopover(el, content) {
+         if (window.bootstrap && bootstrap.Popover) {
+            var prev = bootstrap.Popover.getInstance(el);
+            if (prev) prev.dispose();
+            new bootstrap.Popover(el, {
+               trigger: 'hover',
+               html: true,
+               content: content,
+               placement: 'top',
+               container: 'body',
+            });
+         }
+      }
+
+      function disposePopover(el) {
+         if (window.bootstrap && bootstrap.Popover) {
+            var inst = bootstrap.Popover.getInstance(el);
+            if (inst) inst.dispose();
+         }
+      }
+
+      var calendarEl = document.getElementById('calendario-estimate');
+      if (!calendarEl) return;
+
+      calendarEstimate = new FullCalendar.Calendar(calendarEl, {
+         headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth',
+         },
+         height: 800,
+         contentHeight: 780,
+         aspectRatio: 3,
+         nowIndicator: true,
+         initialView: 'dayGridMonth',
+         initialDate: TODAY,
+         editable: false,
+         dayMaxEvents: true,
+         navLinks: true,
+         events: allEvents,
+         eventDidMount: function (info) {
+            var el = info.el;
+            el.setAttribute('data-id', info.event.id);
+            if (info.event.display === 'background') return;
+            var p = info.event.extendedProps || {};
+            if (p.bidDeadline || p.stage || p.county) {
+               setupPopover(el, buildPopoverContent(p));
+            }
+         },
+         eventWillUnmount: function (info) {
+            disposePopover(info.el);
+         },
+         eventClick: function (info) {
+            if (String(info.event.id).indexOf('holiday') === 0) return;
+            info.jsEvent.preventDefault();
+            resetForms();
+            $('#estimate_id').val(String(info.event.id));
+            $('#form-estimate').removeClass('hide');
+            $('#lista-estimate').addClass('hide');
+            editRow(String(info.event.id));
+         },
+      });
+
+      calendarEstimate.render();
+
+      if (typeof holidays !== 'undefined') {
+         holidays.forEach(function (feriado) {
+            var selector = '[data-date="' + feriado.fecha + '"]';
+            var cell = document.querySelector(selector);
+            if (cell) cell.classList.add('feriado-cell');
+         });
+      }
+   };
+
+   var initAccionesCalendarioEstimate = function () {
+      $(document).off('click', '#btn-calendario-estimate');
+      $(document).on('click', '#btn-calendario-estimate', function () {
+         mostrarCalendarioEstimate = !mostrarCalendarioEstimate;
+         if (mostrarCalendarioEstimate) {
+            $('#div-lista-estimate-table').addClass('hide');
+            $('#div-calendario-estimate').removeClass('hide');
+            $(this).find('.font-weight-bold').last().text('Hide Calendar');
+            listarCalendarioEstimate();
+         } else {
+            $('#div-lista-estimate-table').removeClass('hide');
+            $('#div-calendario-estimate').addClass('hide');
+            $(this).find('.font-weight-bold').last().text('Show Calendar');
+            var search = $('#lista-estimate [data-table-filter="search"]').val();
+            oTable.search(search).draw();
+         }
+      });
+   };
+
+   var refreshEstimateActiveView = function () {
+      if (mostrarCalendarioEstimate) {
+         listarCalendarioEstimate();
+      } else {
+         var search = $('#lista-estimate [data-table-filter="search"]').val();
+         oTable.search(search).draw();
+      }
+   };
+
    //Inicializar table
    var oTable;
    var initTable = function () {
@@ -208,7 +401,11 @@ var Estimates = (function () {
 
          debounceTimeout = setTimeout(function () {
             if (searchTerm === '' || searchTerm.length >= 3) {
-               oTable.search(searchTerm).draw();
+               if (mostrarCalendarioEstimate) {
+                  listarCalendarioEstimate();
+               } else {
+                  oTable.search(searchTerm).draw();
+               }
             }
          }, 300); // 300ms de debounce
       });
@@ -332,7 +529,11 @@ var Estimates = (function () {
    };
    var btnClickFiltrar = function () {
       const search = $('#lista-estimate [data-table-filter="search"]').val();
-      oTable.search(search).draw();
+      if (mostrarCalendarioEstimate) {
+         listarCalendarioEstimate();
+      } else {
+         oTable.search(search).draw();
+      }
    };
    var btnClickResetFilters = function () {
       // reset
@@ -359,7 +560,11 @@ var Estimates = (function () {
       FlatpickrUtil.clear('datetimepicker-desde');
       FlatpickrUtil.clear('datetimepicker-hasta');
 
-      oTable.search('').draw();
+      if (mostrarCalendarioEstimate) {
+         listarCalendarioEstimate();
+      } else {
+         oTable.search('').draw();
+      }
    };
 
    //Reset forms
@@ -1133,7 +1338,7 @@ var Estimates = (function () {
                   if (response.success) {
                      toastr.success(response.message, '');
 
-                     oTable.draw();
+                     refreshEstimateActiveView();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -1164,7 +1369,7 @@ var Estimates = (function () {
                   if (response.success) {
                      toastr.success(response.message, '');
 
-                     oTable.draw();
+                     refreshEstimateActiveView();
                   } else {
                      toastr.error(response.error, '');
                   }
@@ -3473,6 +3678,7 @@ var Estimates = (function () {
          initAccionCerrar();
 
          initAccionFiltrar();
+         initAccionesCalendarioEstimate();
 
          initAccionesCompany();
 
@@ -3500,6 +3706,8 @@ var Estimates = (function () {
          initQuotesSend();
 
          initAccionChange();
+
+         listarCalendarioEstimate();
       },
    };
 })();

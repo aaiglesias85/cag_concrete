@@ -89,6 +89,8 @@ class EstimateController extends AbstractController
             $estimate_note_items = $this->estimateService->getDoctrine()->getRepository(EstimateNoteItem::class)
                ->ListarOrdenados();
 
+            $holidays = $this->estimateService->ListarTodosHolidays();
+
             return $this->render('admin/estimate/index.html.twig', array(
                'permiso' => $permiso[0],
                'companies' => $companies,
@@ -104,7 +106,8 @@ class EstimateController extends AbstractController
                'equations' => $equations,
                'yields_calculation' => $yields_calculation,
                'units' => $units,
-               'estimate_note_items' => $estimate_note_items
+               'estimate_note_items' => $estimate_note_items,
+               'holidays' => $holidays,
             ));
          }
       } else {
@@ -169,6 +172,47 @@ class EstimateController extends AbstractController
          $resultadoJson['error'] = $e->getMessage();
 
          return $this->json($resultadoJson);
+      }
+   }
+
+   /**
+    * listarParaCalendario: eventos para FullCalendar (bid deadline) con los mismos filtros que el listado.
+    */
+   public function listarParaCalendario(Request $request)
+   {
+      $search = $request->get('search');
+      $stage_id = $request->get('stage_id');
+      $project_type_id = $request->get('project_type_id');
+      $proposal_type_id = $request->get('proposal_type_id');
+      $status_id = $request->get('status_id');
+      $county_id = $request->get('county_id');
+      $district_id = $request->get('district_id');
+      $fecha_inicial = $request->get('fecha_inicial');
+      $fecha_fin = $request->get('fecha_fin');
+
+      try {
+         $events = $this->estimateService->ListarEstimatesParaCalendario(
+            $search,
+            $stage_id,
+            $project_type_id,
+            $proposal_type_id,
+            $status_id,
+            $county_id,
+            $district_id,
+            $fecha_inicial,
+            $fecha_fin
+         );
+
+         return $this->json([
+            'success' => true,
+            'events' => $events,
+         ]);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'events' => [],
+         ]);
       }
    }
 

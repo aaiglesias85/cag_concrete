@@ -157,6 +157,100 @@ class EstimateProjectTypeRepository extends ServiceEntityRepository
     }
 
     /**
+     * ListarEstimatesParaCalendario: estimates con tipo de proyecto (sin paginación).
+     *
+     * @return Estimate[]
+     */
+    public function ListarEstimatesParaCalendario(
+        string $sSearch = '',
+        string $stage_id = '',
+        string $proposal_type_id = '',
+        string $status_id = '',
+        string $county_id = '',
+        string $district_id = '',
+        string $project_type_id = '',
+        string $fecha_inicial = '',
+        string $fecha_fin = ''
+    ): array {
+        $consulta = $this->createQueryBuilder('e_p_t')
+            ->leftJoin('e_p_t.estimate', 'e')
+            ->leftJoin('e_p_t.type', 't')
+            ->leftJoin('e.proposalType', 'p_t')
+            ->leftJoin('e.status', 'pl_s')
+            ->leftJoin('e.countyObj', 'c_o')
+            ->leftJoin('e.district', 'd')
+            ->leftJoin('e.stage', 'pr_s');
+
+        if ($sSearch != "") {
+            $consulta->andWhere('e.projectId LIKE :search OR e.name LIKE :search OR c_o.description LIKE :search OR e.priority LIKE :search OR
+            e.bidNo LIKE :search OR e.phone LIKE :search OR e.email LIKE :search OR
+            p_t.description LIKE :search OR pl_s.description LIKE :search OR d.description LIKE :search OR pr_s.description LIKE :search OR
+            t.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ($stage_id != '') {
+            $consulta->andWhere('pr_s.stageId = :stage_id')
+                ->setParameter('stage_id', $stage_id);
+        }
+
+        if ($proposal_type_id != '') {
+            $consulta->andWhere('p_t.typeId = :proposal_type_id')
+                ->setParameter('proposal_type_id', $proposal_type_id);
+        }
+
+        if ($status_id != '') {
+            $consulta->andWhere('pl_s.statusId = :status_id')
+                ->setParameter('status_id', $status_id);
+        }
+
+        if ($county_id != '') {
+            $consulta->andWhere('c_o.countyId = :county_id')
+                ->setParameter('county_id', $county_id);
+        }
+
+        if ($district_id != '') {
+            $consulta->andWhere('d.districtId = :district_id')
+                ->setParameter('district_id', $district_id);
+        }
+
+        if ($project_type_id != '') {
+            $consulta->andWhere('t.typeId = :project_type_id')
+                ->setParameter('project_type_id', $project_type_id);
+        }
+
+        if ($fecha_inicial != "") {
+            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
+            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+
+            $consulta->andWhere('e.bidDeadline >= :fecha_inicial')
+                ->setParameter('fecha_inicial', $fecha_inicial);
+        }
+
+        if ($fecha_fin != "") {
+            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
+            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+
+            $consulta->andWhere('e.bidDeadline <= :fecha_final')
+                ->setParameter('fecha_final', $fecha_fin);
+        }
+
+        $consulta->orderBy('e.bidDeadline', 'ASC');
+        $consulta->groupBy('e.estimateId');
+
+        $rows = $consulta->getQuery()->getResult();
+        $estimates = [];
+        foreach ($rows as $ept) {
+            $est = $ept->getEstimate();
+            if ($est !== null) {
+                $estimates[] = $est;
+            }
+        }
+
+        return $estimates;
+    }
+
+    /**
      * TotalEstimates: Total de estimates de la BD
      * @param string $sSearch Para buscar
      *

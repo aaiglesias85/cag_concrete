@@ -2028,6 +2028,115 @@ class EstimateService extends Base
    }
 
    /**
+    * ListarEstimatesParaCalendario: eventos FullCalendar (bid deadline).
+    *
+    * @return array<int, array<string, mixed>>
+    */
+   public function ListarEstimatesParaCalendario(
+      $search,
+      $stage_id,
+      $project_type_id,
+      $proposal_type_id,
+      $status_id,
+      $county_id,
+      $district_id,
+      $fecha_inicial,
+      $fecha_fin
+   ): array {
+      $sSearch = $search !== null && $search !== '' ? (string) $search : '';
+
+      if ($project_type_id === '' || $project_type_id === null) {
+         /** @var EstimateRepository $estimateRepo */
+         $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+         $lista = $estimateRepo->ListarEstimatesParaCalendario(
+            $sSearch,
+            (string) $stage_id,
+            (string) $proposal_type_id,
+            (string) $status_id,
+            (string) $county_id,
+            (string) $district_id,
+            (string) $fecha_inicial,
+            (string) $fecha_fin
+         );
+      } else {
+         /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
+         $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
+         $lista = $estimateProjectTypeRepo->ListarEstimatesParaCalendario(
+            $sSearch,
+            (string) $stage_id,
+            (string) $proposal_type_id,
+            (string) $status_id,
+            (string) $county_id,
+            (string) $district_id,
+            (string) $project_type_id,
+            (string) $fecha_inicial,
+            (string) $fecha_fin
+         );
+      }
+
+      $events = [];
+      foreach ($lista as $entity) {
+         if (!$entity instanceof Estimate) {
+            continue;
+         }
+         $bd = $entity->getBidDeadline();
+         if ($bd === null) {
+            continue;
+         }
+
+         $start = \DateTime::createFromInterface($bd);
+         $end = clone $start;
+         $end->modify('+30 minutes');
+
+         $stage = $entity->getStage();
+         $stageColor = $stage !== null ? $stage->getColor() : null;
+         $stageName = $stage !== null ? (string) $stage->getDescription() : '';
+
+         $countyLabel = '';
+         if (method_exists($entity, 'getCountyObj') && $entity->getCountyObj()) {
+            $countyLabel = (string) $entity->getCountyObj()->getDescription();
+         } elseif (method_exists($entity, 'getCounty') && $entity->getCounty()) {
+            $countyLabel = (string) $entity->getCounty();
+         }
+
+         $name = $entity->getName() ?? '';
+         $projectId = $entity->getProjectId() ?? '';
+         $title = trim($projectId !== '' ? $projectId . ' · ' . $name : $name);
+         if ($entity->getQuoteReceived()) {
+            $title .= ' ✓';
+         }
+
+         $ev = [
+            'id' => (string) $entity->getEstimateId(),
+            'title' => $title,
+            'start' => $start->format('Y-m-d\TH:i:s'),
+            'end' => $end->format('Y-m-d\TH:i:s'),
+            'extendedProps' => [
+               'projectId' => $projectId,
+               'proposalNo' => $entity->getBidNo() ?? '',
+               'stage' => $stageName,
+               'county' => $countyLabel,
+               'bidDeadline' => $start->format('m/d/Y H:i'),
+               'quoteReceived' => (bool) $entity->getQuoteReceived(),
+            ],
+         ];
+
+         if ($stageColor !== null && $stageColor !== '') {
+            $ev['backgroundColor'] = $stageColor;
+            $ev['borderColor'] = $stageColor;
+         }
+
+         if ($entity->getQuoteReceived()) {
+            $ev['className'] = 'estimate-event-quote-received';
+         }
+
+         $events[] = $ev;
+      }
+
+      return $events;
+   }
+
+   /**
     * TotalEstimates: Total de estimates
     * @param string $sSearch Para buscar
     * @author Marcel
