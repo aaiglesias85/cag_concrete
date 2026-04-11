@@ -9,6 +9,7 @@ use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Estimate;
 use App\Entity\EstimateCompany;
+use App\Entity\EstimateCounty;
 use App\Entity\EstimateEstimator;
 use App\Entity\EstimateProjectType;
 use App\Entity\EstimateQuote;
@@ -25,6 +26,7 @@ use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Usuario;
 use App\Repository\EstimateCompanyRepository;
+use App\Repository\EstimateCountyRepository;
 use App\Repository\EstimateEstimatorRepository;
 use App\Repository\EstimateProjectTypeRepository;
 use App\Repository\EstimateQuoteCompanyRepository;
@@ -877,7 +879,9 @@ class EstimateService extends Base
          $arreglo_resultado['proposal_type_id'] = $entity->getProposalType() != null ? $entity->getProposalType()->getTypeId() : '';
          $arreglo_resultado['status_id'] = $entity->getStatus() != null ? $entity->getStatus()->getStatusId() : '';
 
-         $county_id = $entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : null;
+         $county_ids = $this->ListarCountiesId($estimate_id);
+         $arreglo_resultado['county_ids'] = $county_ids;
+         $county_id = count($county_ids) > 0 ? $county_ids[0] : ($entity->getCountyObj() ? $entity->getCountyObj()->getCountyId() : null);
          $arreglo_resultado['county_id'] = $county_id;
 
          $arreglo_resultado['district_id'] = $entity->getDistrict() != null ? $entity->getDistrict()->getDistrictId() : '';
@@ -1131,6 +1135,54 @@ class EstimateService extends Base
    }
 
    /**
+    * @return int[]
+    */
+   private function ListarCountiesId($estimate_id): array
+   {
+      $ids = [];
+
+      /** @var EstimateCountyRepository $estimateCountyRepo */
+      $estimateCountyRepo = $this->getDoctrine()->getRepository(EstimateCounty::class);
+      foreach ($estimateCountyRepo->ListarCountiesDeEstimate($estimate_id) as $estimateCounty) {
+         $c = $estimateCounty->getCounty();
+         if ($c !== null) {
+            $ids[] = $c->getCountyId();
+         }
+      }
+
+      return $ids;
+   }
+
+   /**
+    * Texto para listado / calendario: condados asociados (tabla + legacy county_id).
+    */
+   private function DescripcionCountiesParaListado(Estimate $value): string
+   {
+      $estimate_id = $value->getEstimateId();
+      /** @var EstimateCountyRepository $estimateCountyRepo */
+      $estimateCountyRepo = $this->getDoctrine()->getRepository(EstimateCounty::class);
+      $rows = $estimateCountyRepo->ListarCountiesDeEstimate($estimate_id);
+      $names = [];
+      foreach ($rows as $ec) {
+         $c = $ec->getCounty();
+         if ($c !== null) {
+            $names[] = $c->getDescription();
+         }
+      }
+      if (count($names) > 0) {
+         return implode(', ', $names);
+      }
+      if (method_exists($value, 'getCountyObj') && $value->getCountyObj()) {
+         return $value->getCountyObj()->getDescription();
+      }
+      if (method_exists($value, 'getCounty') && $value->getCounty()) {
+         return (string) $value->getCounty();
+      }
+
+      return '';
+   }
+
+   /**
     * EliminarEstimate: Elimina un rol en la BD
     * @param int $estimate_id Id
     * @author Marcel
@@ -1263,7 +1315,14 @@ class EstimateService extends Base
          $em->remove($estimate_estimator);
       }
 
-      // 4) project types
+      // 4) counties (estimate_county)
+      /** @var EstimateCountyRepository $estimateCountyRepo */
+      $estimateCountyRepo = $this->getDoctrine()->getRepository(EstimateCounty::class);
+      foreach ($estimateCountyRepo->ListarCountiesDeEstimate($estimate_id) as $estimateCounty) {
+         $em->remove($estimateCounty);
+      }
+
+      // 5) project types
       /** @var EstimateProjectTypeRepository $estimateProjectTypeRepo */
       $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
       $estimates_project_types = $estimateProjectTypeRepo->ListarTypesDeEstimate($estimate_id);
@@ -1271,7 +1330,7 @@ class EstimateService extends Base
          $em->remove($estimate_project_type);
       }
 
-      // 5) companys (estimate_company)
+      // 6) companys (estimate_company)
       /** @var EstimateCompanyRepository $estimateCompanyRepo */
       $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
       $companys = $estimateCompanyRepo->ListarCompanysDeEstimate($estimate_id);
@@ -1290,7 +1349,7 @@ class EstimateService extends Base
       $project_id,
       $name,
       $bidDeadline,
-      $county_id,
+      $county_ids,
       $priority,
       $bidNo,
       $workHour,
@@ -1378,11 +1437,6 @@ class EstimateService extends Base
          }
 
          $entity->setCountyObj(NULL);
-         if ($county_id != '') {
-            $county = $this->getDoctrine()->getRepository(County::class)
-               ->find($county_id);
-            $entity->setCountyObj($county);
-         }
 
          $entity->setDistrict(NULL);
          if ($district_id != '') {
@@ -1445,6 +1499,9 @@ class EstimateService extends Base
 
          // save estimators
          $this->SalvarEstimators($entity, $estimators_id, false);
+
+         // counties
+         $this->SalvarCounties($entity, $county_ids, false);
 
          // companys
          $this->SalvarCompanys($entity, $companys);
@@ -1535,7 +1592,7 @@ class EstimateService extends Base
       $project_id,
       $name,
       $bidDeadline,
-      $county_id,
+      $county_ids,
       $priority,
       $bidNo,
       $workHour,
@@ -1615,12 +1672,6 @@ class EstimateService extends Base
          $entity->setStatus($plan_status);
       }
 
-      if ($county_id != '') {
-         $county = $this->getDoctrine()->getRepository(County::class)
-            ->find($county_id);
-         $entity->setCountyObj($county);
-      }
-
       if ($district_id != '') {
          $district = $this->getDoctrine()->getRepository(District::class)
             ->find($district_id);
@@ -1677,6 +1728,9 @@ class EstimateService extends Base
 
       // save estimators
       $this->SalvarEstimators($entity, $estimators_id);
+
+      // counties (N) + primer county en estimate.county_id
+      $this->SalvarCounties($entity, $county_ids, true);
 
       // companys
       $this->SalvarCompanys($entity, $companys);
@@ -1786,6 +1840,53 @@ class EstimateService extends Base
       }
    }
 
+   /**
+    * SalvarCounties: tabla estimate_county + county_id principal (primer condado) para compatibilidad.
+    *
+    * @param string|array|null $counties_id IDs separados por coma o array
+    */
+   public function SalvarCounties(Estimate $entity, $counties_id, bool $is_new = true): void
+   {
+      $em = $this->getDoctrine()->getManager();
+
+      if (!$is_new) {
+         /** @var EstimateCountyRepository $estimateCountyRepo */
+         $estimateCountyRepo = $this->getDoctrine()->getRepository(EstimateCounty::class);
+         foreach ($estimateCountyRepo->ListarCountiesDeEstimate($entity->getEstimateId()) as $ec) {
+            $em->remove($ec);
+         }
+      }
+
+      $entity->setCountyObj(null);
+
+      if ($counties_id === null || $counties_id === '') {
+         return;
+      }
+
+      $ids = is_array($counties_id) ? $counties_id : explode(',', (string) $counties_id);
+      $ids = array_values(array_unique(array_filter(array_map('intval', $ids), static fn (int $id): bool => $id > 0)));
+
+      if (count($ids) === 0) {
+         return;
+      }
+
+      $first = true;
+      foreach ($ids as $cid) {
+         $county = $this->getDoctrine()->getRepository(County::class)->find($cid);
+         if ($county === null) {
+            continue;
+         }
+         $ec = new EstimateCounty();
+         $ec->setEstimate($entity);
+         $ec->setCounty($county);
+         $em->persist($ec);
+         if ($first) {
+            $entity->setCountyObj($county);
+            $first = false;
+         }
+      }
+   }
+
 
    /**
     * ListarEstimates: Listar los estimates
@@ -1848,12 +1949,7 @@ class EstimateService extends Base
          // estimators
          $estimators = $this->ListarEstimatorsParaListado($estimate_id);
 
-         $county_name = '';
-         if (method_exists($value, 'getCountyObj') && $value->getCountyObj()) {
-            $county_name = $value->getCountyObj()->getDescription();
-         } elseif (method_exists($value, 'getCounty') && $value->getCounty()) {
-            $county_name = $value->getCounty();
-         }
+         $county_name = $this->DescripcionCountiesParaListado($value);
 
          // stage
          $stage = $this->DevolverStageParaListado($estimate_id, $value->getStage());
@@ -2092,12 +2188,7 @@ class EstimateService extends Base
          $stageColor = $stage !== null ? $stage->getColor() : null;
          $stageName = $stage !== null ? (string) $stage->getDescription() : '';
 
-         $countyLabel = '';
-         if (method_exists($entity, 'getCountyObj') && $entity->getCountyObj()) {
-            $countyLabel = (string) $entity->getCountyObj()->getDescription();
-         } elseif (method_exists($entity, 'getCounty') && $entity->getCounty()) {
-            $countyLabel = (string) $entity->getCounty();
-         }
+         $countyLabel = $this->DescripcionCountiesParaListado($entity);
 
          $name = $entity->getName() ?? '';
          $projectId = $entity->getProjectId() ?? '';

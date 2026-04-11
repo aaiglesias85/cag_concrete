@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-04-2026 a las 02:03:11
+-- Tiempo de generación: 11-04-2026 a las 01:35:56
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -28211,7 +28211,7 @@ INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `co
 (40, '25-226		', 'Barnwell Road at Niblick Drive Intersection Improvement		 		', '2025-08-12 12:00:00', 'Fulton', 'Medium', 'N/A', '9 am - 4 pm', '', '', NULL, NULL, NULL, '2026-08-30 00:00:00', NULL, NULL, NULL, 'Barnwell Rd, Johns Creek, GA, USA', '', '', NULL, NULL, 1, 5, 1, 2, NULL, 8, NULL, NULL, 2),
 (41, 'S016170		', 'SR 95 at US 27 Intersection Improvements		 		', '2025-07-31 12:00:00', 'Walker', 'Medium', 'N/A', 'N/A', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', 'Public', '', '', '', NULL, 4, 1, 1, 6, 105, NULL, NULL, 2),
 (42, 'N/A', 'Canton Creek Pedestrian Bridge and Sidewalk Improvement		 		', '2025-08-07 12:00:00', 'Cherokee', 'Medium', 'PE‑66114‑NONST‑2026‑000000025		', '', '', '', NULL, NULL, NULL, NULL, '2025-07-31 11:00:00', NULL, NULL, 'GA-20, Canton, GA, USA', 'Public', '', '', '', NULL, 6, 1, 1, 6, 30, 108, NULL, 2),
-(43, '25-79		', ' Mill Road Widening		 		', '2025-07-22 12:00:00', 'Henry', '', 'N/A', '', '', '', NULL, NULL, NULL, '2026-04-07 12:00:00', '2026-04-07 21:49:00', NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 6, 1, 1, NULL, 11, NULL, NULL, NULL),
+(43, '25-79		', ' Mill Road Widening		 		', '2025-07-22 12:00:00', 'Henry', '', 'N/A', '', '555-000-0000', 'usuario17@ejemplo.com', NULL, NULL, NULL, '2026-04-07 12:00:00', '2026-04-07 12:00:00', NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 6, 1, 1, NULL, 11, NULL, NULL, NULL),
 (44, 'SU-700', 'Flat Shoals Road ATMS – SU 700 - Fulton', '2025-07-25 08:00:00', 'Fulton', 'Low', '25-08', '', '', 'estimating-ga@lumin8.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', NULL, 6, 1, 1, 7, 8, 54, NULL, NULL),
 (45, '30100560', 'Neese Rd Improvements Northern Segment - Woodstock', '2025-07-22 08:00:00', 'Cherokee', 'Low', '2025-08', '', '', 'wilson-bids@wilsoncm.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', '', '', NULL, 6, 1, 1, 6, 30, 43, NULL, NULL),
 (46, '4048,4090,4091,4092', 'Cleveland Ave Metropolitan Pkwy Arterial Rapid Transit', '2025-09-16 12:00:00', 'Fulton', 'Medium', 'N/A', 'Weekdays: 7:00 AM to 8:00 PM &  Weekends & Sundays', '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', NULL, NULL, 0, 4, 1, 1, 7, 8, NULL, NULL, NULL),
@@ -29211,9 +29211,9 @@ INSERT INTO `estimate_company` (`id`, `estimate_id`, `company_id`, `contact_id`,
 (700, 40, 43, NULL, '2025-08-12 12:00:00', '', ''),
 (701, 42, 62, NULL, '2025-08-01 12:00:00', '', ''),
 (702, 42, 106, NULL, '2025-08-01 12:00:00', '', ''),
-(703, 43, 5, NULL, '2025-07-22 12:00:00', '', ''),
-(704, 43, 43, NULL, '2025-07-22 12:00:00', '', ''),
-(705, 43, 90, NULL, '2025-07-22 12:00:00', '', ''),
+(703, 43, 5, 17, '2025-07-22 12:00:00', 'High Priority', 'test'),
+(704, 43, 43, NULL, '2025-07-22 12:00:00', NULL, NULL),
+(705, 43, 90, NULL, '2025-07-22 12:00:00', NULL, NULL),
 (706, 44, 14, NULL, '2025-07-25 08:00:00', '', ''),
 (707, 44, 23, NULL, '2025-07-25 08:00:00', '', ''),
 (708, 44, 71, NULL, '2025-07-25 08:00:00', '', ''),
@@ -29348,6 +29348,345 @@ INSERT INTO `estimate_company` (`id`, `estimate_id`, `company_id`, `contact_id`,
 (837, 290, 91, NULL, '2026-02-18 12:00:00', '', ''),
 (838, 290, 135, NULL, '2026-02-18 12:00:00', '', ''),
 (839, 310, 129, NULL, '2026-02-14 12:00:00', '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_county`
+--
+
+CREATE TABLE `estimate_county` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) NOT NULL,
+  `county_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_county`
+--
+
+INSERT INTO `estimate_county` (`id`, `estimate_id`, `county_id`) VALUES
+(1, 32, 2),
+(2, 60, 2),
+(3, 75, 2),
+(4, 77, 2),
+(5, 99, 2),
+(6, 133, 2),
+(7, 212, 2),
+(8, 216, 2),
+(9, 226, 2),
+(10, 242, 2),
+(11, 323, 2),
+(12, 326, 2),
+(13, 86, 3),
+(14, 125, 3),
+(15, 264, 3),
+(16, 315, 3),
+(17, 8, 4),
+(18, 61, 4),
+(19, 291, 4),
+(20, 2, 5),
+(21, 13, 5),
+(22, 111, 6),
+(23, 27, 7),
+(24, 29, 8),
+(25, 40, 8),
+(26, 44, 8),
+(27, 46, 8),
+(28, 55, 8),
+(29, 56, 8),
+(30, 63, 8),
+(31, 66, 8),
+(32, 74, 8),
+(33, 80, 8),
+(34, 81, 8),
+(35, 84, 8),
+(36, 104, 8),
+(37, 105, 8),
+(38, 108, 8),
+(39, 121, 8),
+(40, 122, 8),
+(41, 130, 8),
+(42, 140, 8),
+(43, 146, 8),
+(44, 147, 8),
+(45, 148, 8),
+(46, 152, 8),
+(47, 153, 8),
+(48, 158, 8),
+(49, 164, 8),
+(50, 165, 8),
+(51, 169, 8),
+(52, 170, 8),
+(53, 172, 8),
+(54, 174, 8),
+(55, 175, 8),
+(56, 179, 8),
+(57, 200, 8),
+(58, 204, 8),
+(59, 205, 8),
+(60, 206, 8),
+(61, 207, 8),
+(62, 222, 8),
+(63, 231, 8),
+(64, 235, 8),
+(65, 239, 8),
+(66, 247, 8),
+(67, 248, 8),
+(68, 249, 8),
+(69, 262, 8),
+(70, 265, 8),
+(71, 276, 8),
+(72, 292, 8),
+(73, 295, 8),
+(74, 310, 8),
+(75, 311, 8),
+(76, 316, 8),
+(77, 318, 8),
+(78, 325, 8),
+(79, 35, 9),
+(80, 127, 9),
+(81, 19, 11),
+(82, 38, 11),
+(84, 115, 11),
+(85, 128, 11),
+(86, 307, 11),
+(87, 33, 12),
+(88, 62, 12),
+(89, 71, 12),
+(90, 131, 12),
+(91, 149, 12),
+(92, 162, 12),
+(93, 173, 12),
+(94, 189, 12),
+(95, 196, 12),
+(96, 229, 12),
+(97, 260, 12),
+(98, 296, 12),
+(99, 298, 12),
+(100, 25, 13),
+(101, 78, 13),
+(102, 134, 13),
+(103, 178, 13),
+(104, 180, 13),
+(105, 30, 16),
+(106, 167, 16),
+(107, 192, 16),
+(108, 275, 16),
+(109, 103, 17),
+(110, 197, 17),
+(111, 241, 17),
+(112, 15, 22),
+(113, 26, 22),
+(114, 208, 22),
+(115, 211, 22),
+(116, 304, 22),
+(117, 7, 23),
+(118, 157, 23),
+(119, 176, 23),
+(120, 213, 23),
+(121, 321, 23),
+(122, 90, 24),
+(123, 161, 24),
+(124, 228, 24),
+(125, 268, 24),
+(126, 324, 24),
+(127, 76, 28),
+(128, 79, 28),
+(129, 88, 28),
+(130, 110, 28),
+(131, 151, 28),
+(132, 232, 28),
+(133, 233, 28),
+(134, 245, 28),
+(135, 255, 28),
+(136, 234, 29),
+(137, 240, 29),
+(138, 299, 29),
+(139, 39, 30),
+(140, 42, 30),
+(141, 45, 30),
+(142, 65, 30),
+(143, 83, 30),
+(144, 126, 30),
+(145, 154, 30),
+(146, 183, 30),
+(147, 188, 30),
+(148, 237, 30),
+(149, 238, 30),
+(150, 246, 30),
+(151, 261, 30),
+(152, 69, 34),
+(153, 243, 35),
+(154, 312, 35),
+(155, 36, 37),
+(156, 58, 37),
+(157, 100, 37),
+(158, 177, 37),
+(159, 250, 37),
+(160, 267, 37),
+(161, 317, 37),
+(162, 116, 39),
+(163, 284, 39),
+(164, 139, 40),
+(165, 163, 40),
+(166, 195, 41),
+(167, 225, 41),
+(168, 184, 44),
+(169, 259, 45),
+(170, 191, 46),
+(171, 93, 48),
+(172, 120, 49),
+(173, 286, 49),
+(174, 300, 49),
+(175, 181, 54),
+(176, 306, 54),
+(177, 53, 55),
+(178, 314, 58),
+(179, 12, 59),
+(180, 124, 59),
+(181, 293, 62),
+(182, 59, 64),
+(183, 136, 64),
+(184, 28, 71),
+(185, 117, 71),
+(186, 118, 71),
+(187, 119, 71),
+(188, 155, 71),
+(189, 201, 71),
+(190, 251, 71),
+(191, 97, 73),
+(192, 48, 74),
+(193, 73, 74),
+(194, 273, 74),
+(195, 320, 74),
+(196, 114, 75),
+(197, 214, 76),
+(198, 263, 76),
+(199, 70, 78),
+(200, 199, 78),
+(201, 82, 79),
+(202, 21, 81),
+(203, 143, 81),
+(204, 186, 81),
+(205, 18, 85),
+(206, 253, 87),
+(207, 219, 92),
+(208, 254, 93),
+(209, 91, 100),
+(210, 109, 100),
+(211, 322, 101),
+(212, 50, 103),
+(213, 72, 104),
+(214, 106, 104),
+(215, 41, 105),
+(216, 198, 105),
+(217, 305, 105),
+(218, 85, 108),
+(219, 309, 108),
+(220, 313, 108),
+(221, 145, 109),
+(222, 285, 109),
+(223, 141, 110),
+(224, 223, 110),
+(225, 266, 112),
+(226, 289, 112),
+(227, 34, 117),
+(228, 210, 117),
+(229, 107, 123),
+(230, 288, 123),
+(231, 319, 123),
+(232, 22, 124),
+(233, 156, 128),
+(234, 160, 128),
+(235, 209, 128),
+(236, 47, 132),
+(237, 96, 136),
+(238, 112, 136),
+(239, 271, 136),
+(240, 282, 137),
+(241, 144, 139),
+(242, 290, 143),
+(243, 87, 144),
+(244, 98, 144),
+(245, 123, 144),
+(246, 129, 144),
+(247, 132, 144),
+(248, 150, 144),
+(249, 159, 144),
+(250, 166, 144),
+(251, 171, 144),
+(252, 185, 144),
+(253, 236, 144),
+(254, 244, 144),
+(255, 252, 144),
+(256, 269, 144),
+(257, 270, 144),
+(258, 272, 144),
+(259, 274, 144),
+(260, 278, 144),
+(261, 279, 144),
+(262, 280, 144),
+(263, 281, 144),
+(264, 294, 144),
+(265, 297, 144),
+(266, 301, 144),
+(267, 302, 144),
+(268, 303, 144),
+(269, 308, 144),
+(270, 20, 150),
+(271, 203, 157),
+(272, 220, 157),
+(273, 6, 158),
+(274, 16, 158),
+(275, 142, 158),
+(276, 68, 161),
+(277, 221, 166),
+(278, 3, 172),
+(279, 4, 173),
+(280, 5, 174),
+(281, 9, 175),
+(282, 10, 176),
+(283, 11, 177),
+(284, 187, 177),
+(285, 193, 177),
+(286, 257, 177),
+(287, 17, 178),
+(288, 287, 178),
+(289, 23, 179),
+(290, 24, 180),
+(291, 31, 181),
+(292, 37, 182),
+(293, 49, 183),
+(294, 52, 184),
+(295, 113, 185),
+(296, 54, 186),
+(297, 217, 186),
+(298, 57, 187),
+(299, 94, 191),
+(300, 101, 192),
+(301, 135, 192),
+(302, 202, 192),
+(303, 230, 197),
+(304, 258, 197),
+(305, 92, 201),
+(306, 138, 201),
+(307, 224, 208),
+(308, 89, 218),
+(309, 190, 224),
+(310, 137, 226),
+(311, 168, 226),
+(312, 227, 226),
+(313, 256, 233),
+(314, 95, 234),
+(315, 218, 236),
+(316, 215, 237),
+(317, 277, 238),
+(318, 194, 240),
+(319, 283, 247),
+(320, 182, 248),
+(513, 43, 11),
+(514, 43, 20);
 
 -- --------------------------------------------------------
 
@@ -29695,7 +30034,7 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (1262, 62, 43),
 (1272, 229, 2),
 (1277, 113, 38),
-(1278, 43, 41);
+(1292, 43, 41);
 
 -- --------------------------------------------------------
 
@@ -33091,7 +33430,20 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (553, 'Update', 'Override Payment', 'Override payment quantities saved for project #TT0001', '::1', '2026-04-03 13:42:47', 1),
 (554, 'Delete', 'Project Item', 'The item: 12 IN HEADER CURB of the project is deleted', '::1', '2026-04-03 14:53:50', 1),
 (555, 'Delete', 'Override Payment', 'Override payment header #10 deleted', '::1', '2026-04-03 20:39:02', 1),
-(556, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 01:50:07', 1);
+(556, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 01:50:07', 1),
+(557, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:26:02', 1),
+(558, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:30:44', 1),
+(559, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:31:00', 1),
+(560, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:32:59', 1),
+(561, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:33:02', 1),
+(562, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:33:03', 1),
+(563, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:33:28', 1),
+(564, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:33:35', 1),
+(565, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:34:06', 1),
+(566, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:34:08', 1),
+(567, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-08 02:36:52', 1),
+(568, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-11 01:25:01', 1),
+(569, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-11 01:35:29', 1);
 
 -- --------------------------------------------------------
 
@@ -46257,6 +46609,14 @@ ALTER TABLE `estimate_company`
   ADD KEY `Refestimate_company3` (`contact_id`);
 
 --
+-- Indices de la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_estimate_county_estimate_id` (`estimate_id`),
+  ADD KEY `idx_estimate_county_county_id` (`county_id`);
+
+--
 -- Indices de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -46828,7 +47188,13 @@ ALTER TABLE `estimate`
 -- AUTO_INCREMENT de la tabla `estimate_company`
 --
 ALTER TABLE `estimate_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1070;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=840;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=515;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
@@ -46846,7 +47212,7 @@ ALTER TABLE `estimate_note_item`
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1279;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1293;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -46924,19 +47290,19 @@ ALTER TABLE `invoice_item_notes`
 -- AUTO_INCREMENT de la tabla `invoice_item_override_payment`
 --
 ALTER TABLE `invoice_item_override_payment`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_override_payment_paid_qty_history`
 --
 ALTER TABLE `invoice_item_override_payment_paid_qty_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_override_payment_unpaid_qty_history`
 --
 ALTER TABLE `invoice_item_override_payment_unpaid_qty_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `invoice_item_unpaid_qty_history`
@@ -46954,7 +47320,7 @@ ALTER TABLE `invoice_notes`
 -- AUTO_INCREMENT de la tabla `invoice_override_payment`
 --
 ALTER TABLE `invoice_override_payment`
-  MODIFY `invoice_override_payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `invoice_override_payment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de la tabla `item`
@@ -46966,7 +47332,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=557;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=570;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -47297,6 +47663,13 @@ ALTER TABLE `estimate_company`
   ADD CONSTRAINT `Refestimate_company1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_company2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refestimate_company3` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  ADD CONSTRAINT `Refestimate_county_county` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_county_estimate` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estimate_estimator`

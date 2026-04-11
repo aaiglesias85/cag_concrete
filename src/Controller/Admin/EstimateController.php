@@ -228,7 +228,10 @@ class EstimateController extends AbstractController
       $project_id = $request->get('project_id');
       $name = $request->get('name');
       $bidDeadline = $request->get('bidDeadline');
-      $county_id = $request->get('county_id');
+      $county_ids = $request->get('county_ids');
+      if ($county_ids === null || $county_ids === '') {
+         $county_ids = $request->get('county_id');
+      }
       $priority = $request->get('priority');
       $bidNo = $request->get('bidNo');
       $workHour = $request->get('workHour');
@@ -272,7 +275,7 @@ class EstimateController extends AbstractController
                $project_id,
                $name,
                $bidDeadline,
-               $county_id,
+               $county_ids,
                $priority,
                $bidNo,
                $workHour,
@@ -306,7 +309,7 @@ class EstimateController extends AbstractController
                $project_id,
                $name,
                $bidDeadline,
-               $county_id,
+               $county_ids,
                $priority,
                $bidNo,
                $workHour,

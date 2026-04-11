@@ -174,8 +174,13 @@ class EstimateRepository extends ServiceEntityRepository
         }
 
         if ($county_id != '') {
-            $consulta->andWhere('c_o.countyId = :county_id')
-                ->setParameter('county_id', $county_id);
+            $consulta->andWhere(
+                '(c_o.countyId = :county_id OR EXISTS (
+                    SELECT 1 FROM App\Entity\EstimateCounty ec_filt
+                    INNER JOIN ec_filt.county c_ec_filt
+                    WHERE ec_filt.estimate = e AND c_ec_filt.countyId = :county_id
+                ))'
+            )->setParameter('county_id', $county_id);
         }
 
         if ($district_id != '') {
@@ -267,8 +272,13 @@ class EstimateRepository extends ServiceEntityRepository
         }
 
         if ($county_id != '') {
-            $consulta->andWhere('c_o.countyId = :county_id')
-                ->setParameter('county_id', $county_id);
+            $consulta->andWhere(
+                '(c_o.countyId = :county_id OR EXISTS (
+                    SELECT 1 FROM App\Entity\EstimateCounty ec_filt
+                    INNER JOIN ec_filt.county c_ec_filt
+                    WHERE ec_filt.estimate = e AND c_ec_filt.countyId = :county_id
+                ))'
+            )->setParameter('county_id', $county_id);
         }
 
         if ($district_id != '') {
@@ -337,8 +347,13 @@ class EstimateRepository extends ServiceEntityRepository
         }
 
         if ($county_id != '') {
-            $consulta->andWhere('c_o.countyId = :county_id')
-                ->setParameter('county_id', $county_id);
+            $consulta->andWhere(
+                '(c_o.countyId = :county_id OR EXISTS (
+                    SELECT 1 FROM App\Entity\EstimateCounty ec_filt
+                    INNER JOIN ec_filt.county c_ec_filt
+                    WHERE ec_filt.estimate = e AND c_ec_filt.countyId = :county_id
+                ))'
+            )->setParameter('county_id', $county_id);
         }
 
         if ($district_id != '') {

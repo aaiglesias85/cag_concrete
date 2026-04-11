@@ -587,7 +587,7 @@ var Estimates = (function () {
       $('#plan-status').val('');
       $('#plan-status').trigger('change');
 
-      $('#county').val('');
+      $('#county').val(null);
       $('#county').trigger('change');
 
       $('#district').val('');
@@ -944,7 +944,8 @@ var Estimates = (function () {
       formData.set('estimators_id', estimators_id ? estimators_id.join(',') : '');
 
       formData.set('stage_id', $('#project-stage').val());
-      formData.set('county_id', $('#county').val());
+      var countySel = $('#county').val();
+      formData.set('county_ids', countySel && countySel.length ? countySel.join(',') : '');
 
       var project_types_id = $('#project-type').val();
       formData.set('project_types_id', project_types_id ? project_types_id.join(',') : '');
@@ -1112,7 +1113,15 @@ var Estimates = (function () {
          // select dependientes
          $(document).off('change', '#county', changeCounty);
 
-         $('#county').val(estimate.county_id);
+         var cids = [];
+         if (estimate.county_ids && estimate.county_ids.length) {
+            cids = estimate.county_ids.map(function (id) {
+               return String(id);
+            });
+         } else if (estimate.county_id) {
+            cids = [String(estimate.county_id)];
+         }
+         $('#county').val(cids);
          $('#county').trigger('change');
 
          $('#district').val(estimate.district_id);
@@ -1547,6 +1556,16 @@ var Estimates = (function () {
          },
       });
 
+      if ($('#county').hasClass('select2-hidden-accessible')) {
+         $('#county').select2('destroy');
+      }
+      $('#county').select2({
+         multiple: true,
+         placeholder: 'Select counties',
+         allowClear: true,
+         closeOnSelect: false,
+      });
+
       $('#email').tagsInput({
          width: 'auto',
          defaultText: 'Add email...',
@@ -1811,13 +1830,22 @@ var Estimates = (function () {
    };
 
    var changeCounty = function (e) {
-      var county_id = $(this).val();
+      var vals = $(this).val();
+      if (!vals || (Array.isArray(vals) && vals.length === 0)) {
+         $('#district').val('');
+         $('#district').trigger('change');
+         return;
+      }
+      var first = Array.isArray(vals) ? vals[0] : vals;
 
-      // reset
       $('#district').val('');
       $('#district').trigger('change');
 
-      var district_id = $('#county option[value="' + county_id + '"]').attr('data-district');
+      if (Array.isArray(vals) && vals.length > 1) {
+         return;
+      }
+
+      var district_id = $('#county option[value="' + first + '"]').attr('data-district');
       if (district_id) {
          $('#district').val(district_id);
          $('#district').trigger('change');

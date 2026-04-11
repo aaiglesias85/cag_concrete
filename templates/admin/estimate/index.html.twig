@@ -597,13 +597,12 @@
 
                      <div class="form-group ic-form-group">
                         <div class="row">
-                           <div class="col-md-2" id="select-county">
+                           <div class="col-md-4" id="select-county">
                               <label class="form-label">
                                  <span class="ic-step-number">3</span>
                                  County
                               </label>
-                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="county" name="county">
-                                 <option value="">Select</option>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="county" name="county" multiple data-placeholder="Select">
                                  {% for item in countys %}
                                  <option value="{{ item.countyId }}" data-district="{% if item.district %}{{ item.district.districtId }}{% endif %}">{{ item.description }}</option>
                                  {% endfor %}

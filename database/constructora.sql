@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 08-04-2026 a las 02:03:00
+-- Tiempo de generación: 11-04-2026 a las 01:35:45
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -497,6 +497,18 @@ CREATE TABLE `estimate_company` (
   `bid_deadline` datetime DEFAULT NULL,
   `tag` varchar(50) DEFAULT NULL,
   `address` text
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_county`
+--
+
+CREATE TABLE `estimate_county` (
+  `id` int(11) NOT NULL,
+  `estimate_id` int(11) NOT NULL,
+  `county_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -2328,6 +2340,14 @@ ALTER TABLE `estimate_company`
   ADD KEY `Refestimate_company3` (`contact_id`);
 
 --
+-- Indices de la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_estimate_county_estimate_id` (`estimate_id`),
+  ADD KEY `idx_estimate_county_county_id` (`county_id`);
+
+--
 -- Indices de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -2900,6 +2920,12 @@ ALTER TABLE `estimate_company`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
@@ -3360,6 +3386,13 @@ ALTER TABLE `estimate_company`
   ADD CONSTRAINT `Refestimate_company1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`),
   ADD CONSTRAINT `Refestimate_company2` FOREIGN KEY (`company_id`) REFERENCES `company` (`company_id`),
   ADD CONSTRAINT `Refestimate_company3` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`);
+
+--
+-- Filtros para la tabla `estimate_county`
+--
+ALTER TABLE `estimate_county`
+  ADD CONSTRAINT `Refestimate_county_county` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Refestimate_county_estimate` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `estimate_estimator`
