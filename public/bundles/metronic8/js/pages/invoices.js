@@ -1161,6 +1161,7 @@ var Invoices = (function () {
 
          // En la tabla solo se muestran ítems con cantidad; al guardar se envían todos
          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
+//items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 || (parseFloat(item.quantity_brought_forward) || 0) > 0);
          items_lista.forEach((item, index) => {
             item.posicion = index;
          });
@@ -1734,7 +1735,8 @@ var Invoices = (function () {
                      }
 
                      // En la tabla solo se muestran ítems con cantidad; al guardar se envían todos
-                     items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
+                     //items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0);
+          items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 || (parseFloat(item.quantity_brought_forward) || 0) > 0);
                      items_lista.forEach((item, index) => {
                         item.posicion = index;
                      });
