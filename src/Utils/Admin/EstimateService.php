@@ -39,7 +39,6 @@ use App\Utils\Base;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -536,20 +535,12 @@ class EstimateService extends Base
          $sheet->getRowDimension($r)->setVisible(false);
       }
 
-      // Igual que InvoiceService PDF: escala para 1 página de ancho (setFitToHeight(0)) para que no salga en miniatura
-      $pageSetup = $sheet->getPageSetup();
-      $pageSetup->setFitToPage(true);
-      $pageSetup->setFitToWidth(1);
-      $pageSetup->setFitToHeight(0); // 0 = sin límite de alto; escala solo por ancho → texto legible
-      $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE);
-      $pageSetup->setPaperSize(PageSetup::PAPERSIZE_LEGAL);
-      $margins = $sheet->getPageMargins();
-      $margins->setTop(0.5);
-      $margins->setBottom(0.5);
-      $margins->setLeft(0.35);
-      $margins->setRight(0.35);
-      $sheet->setShowGridlines(false);
-      $pageSetup->setHorizontalCentered(true);
+      // PDF vía PhpSpreadsheet→HTML→Mpdf: no sobrescribir PageSetup de la plantilla (Carta vertical, fit 1×1, márgenes).
+      // Las plantillas incluyen columnas vacías hasta O/Z; ocultarlas evita una tabla HTML demasiado ancha y escala incorrecta.
+      $lastColIndex = Coordinate::columnIndexFromString($sheet->getHighestDataColumn());
+      for ($ci = 8; $ci <= $lastColIndex; $ci++) {
+         $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($ci))->setVisible(false);
+      }
 
       return $spreadsheet;
    }
