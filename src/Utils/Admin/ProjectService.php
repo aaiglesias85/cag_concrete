@@ -2396,6 +2396,43 @@ class ProjectService extends Base
    }
 
    /**
+    * Misma fila Bond que al cargar Payments (PaymentService): bond_qty = Σ paid_amount (filas bonded) / contract_amount_bonded del proyecto;
+    * unpaid_qty = max(0, 1 − bond_qty); importe coherente con bond_general.
+    *
+    * @return array{diff_qty: float, diff_amt: float}
+    */
+   private function computeBondDiffQtyAmtLikePayments(int $project_id, int $invoice_id): array
+   {
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+
+      $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
+      $bond_general = $projectItemRepo->TotalBondAmountProjectItems($project_id);
+
+      $payments = $this->ListarPaymentsDeInvoice($invoice_id);
+
+      $contract_amount_bonded = $sum_bonded_project;
+      $paid_amount_bonded = 0.0;
+      foreach ($payments as $p) {
+         if (!empty($p['bonded'])) {
+            $paid_amount_bonded += (float) ($p['paid_amount'] ?? 0);
+         }
+      }
+
+      $bond_qty_payments = 0.0;
+      $bond_amount_payments = 0.0;
+      if ($contract_amount_bonded > 0) {
+         $bond_qty_payments = round($paid_amount_bonded / $contract_amount_bonded, 5);
+         $bond_amount_payments = round($bond_general * $bond_qty_payments, 2);
+      }
+
+      $diff_qty = max(0.0, 1.0 - $bond_qty_payments);
+      $diff_amt = max(0.0, round($bond_general - $bond_amount_payments, 2));
+
+      return ['diff_qty' => $diff_qty, 'diff_amt' => $diff_amt];
+   }
+
+   /**
     * ListarItemsCompletion
     * Comp. Qty To Date = misma lógica que invoice: cantidad facturable SUM(quantity - punch_quantity) en Data T en el rango.
     *
@@ -2440,14 +2477,30 @@ class ProjectService extends Base
          $paid_qty = (float) ($aggPaidCompletion['total_paid_effective'] ?? 0);
          $total_paid_amount = (float) ($aggPaidCompletion['paid_amount_total'] ?? 0);
 
-         // Diff Qty / Diff Amt: suma del mismo unpaid que la grilla Payments (quantity_final − paid_qty, bond, override notas), por cada línea de factura del ítem.
+         // Diff Qty / Diff Amt: mismo unpaid que Payments. No-Bond: Σ por línea (qty final − paid, override notas). Bond: fórmula agregada como al cargar Payments (no sumar líneas).
          $diff_qty = 0.0;
          $diff_amt = 0.0;
-         foreach ($invoiceItemRepo->ListarInvoicesDeItem($project_item_id) as $invLine) {
-            $uq = $this->computeUnpaidQtyForPaymentsDisplay($invLine);
-            $linePrice = (float) ($invLine->getPrice() ?? 0);
-            $diff_qty += $uq;
-            $diff_amt += $uq * $linePrice;
+         $invoiceLines = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+         if ($invoiceLines !== []) {
+            if ($value->getItem()->getBond()) {
+               $lastLine = $invoiceLines[count($invoiceLines) - 1];
+               $latestInv = $lastLine->getInvoice();
+               if ($latestInv !== null) {
+                  $bondDiff = $this->computeBondDiffQtyAmtLikePayments(
+                     (int) $project_id,
+                     (int) $latestInv->getInvoiceId()
+                  );
+                  $diff_qty = $bondDiff['diff_qty'];
+                  $diff_amt = $bondDiff['diff_amt'];
+               }
+            } else {
+               foreach ($invoiceLines as $invLine) {
+                  $uq = $this->computeUnpaidQtyForPaymentsDisplay($invLine);
+                  $linePrice = (float) ($invLine->getPrice() ?? 0);
+                  $diff_qty += $uq;
+                  $diff_amt += $uq * $linePrice;
+               }
+            }
          }
 
          // Verificar si hay historial de cantidad, precio y unpaid qty

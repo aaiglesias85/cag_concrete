@@ -1126,10 +1126,10 @@ var Payments = (function () {
                var isClosed = isPaymentItemVisuallyClosed(item, isInvoicePaid);
 
                if (isClosed) {
-                  return `<div class="w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span></div>`;
+                  return `<div class="w-100px"><span class="text-muted">${MyApp.formatearNumero(safeValue, 6, '.', ',')}</span></div>`;
                }
                return `<div class="w-100px">
-                        <input type="number" class="form-control paid_qty" value="${safeValue}" 
+                        <input type="number" class="form-control paid_qty" value="${safeValue}" step="any"
                         data-position="${row.posicion}" style="min-width: 80px;" />
                        </div>`;
             },
@@ -1161,7 +1161,7 @@ var Payments = (function () {
 
                if (isClosed) {
                   return `<div class="d-flex align-items-center gap-2" style="min-width: 150px;">
-                           <span class="text-muted">${MyApp.formatearNumero(safeValue, 2, '.', ',')}</span>
+                           <span class="text-muted">${MyApp.formatearNumero(safeValue, 6, '.', ',')}</span>
                            ${unpaidHistoryIcon}
                            <a href="javascript:void(0)" class="${noteColorClass} add-note-btn" title="Notes" data-position="${row.posicion}">
                               <i class="ki-outline ki-message-text fs-2 ${noteColorClass}"></i>
@@ -1169,7 +1169,7 @@ var Payments = (function () {
                           </div>`;
                }
 
-               let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" data-position="${row.posicion}" style="width: 80px;" />`;
+               let valueHtml = `<input type="number" class="form-control form-control-sm unpaid_qty" value="${safeValue}" step="any" data-position="${row.posicion}" style="width: 80px;" />`;
                return `<div class="d-flex align-items-center gap-2" style="min-width: 150px;">
                         ${valueHtml}
                         ${unpaidHistoryIcon}

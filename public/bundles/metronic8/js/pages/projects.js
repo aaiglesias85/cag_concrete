@@ -5059,7 +5059,7 @@ var Projects = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_qty);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '').display(val) : val;
                if (type === 'display') {
                   var negClass = val < 0 ? ' text-danger' : '';
                   if (row.has_unpaid_qty_history && row.project_item_id) {
@@ -5081,7 +5081,7 @@ var Projects = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_amt);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '$').display(val) : val;
                if (type === 'display' && val < 0) {
                   return '<span class="text-danger">' + numHtml + '</span>';
                }
