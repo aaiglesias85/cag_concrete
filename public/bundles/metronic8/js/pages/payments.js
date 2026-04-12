@@ -1236,6 +1236,14 @@ var Payments = (function () {
          ],
          ordering: false,
          order: [],
+
+         fixedColumns: {
+            start: 2,
+            end: 1,
+         },
+         scrollCollapse: true,
+         scrollX: true,
+
          columns: columns,
          columnDefs: columnDefs,
          language: language,
