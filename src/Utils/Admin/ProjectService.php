@@ -2397,7 +2397,7 @@ class ProjectService extends Base
 
    /**
     * ListarItemsCompletion
-    * Comp. Qty To Date = suma física de quantity en Data T (incluye PUNCH: punch_quantity es parte del total guardado, no se resta aquí).
+    * Comp. Qty To Date = misma lógica que invoice: cantidad facturable SUM(quantity - punch_quantity) en Data T en el rango.
     *
     * @param $project_id
     * @return array
@@ -2423,8 +2423,7 @@ class ProjectService extends Base
 
          /** @var DataTrackingItemRepository $dataTrackingItemRepo */
          $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
-         // TotalQuantity = SUM(quantity): trabajo reportado en campo completo (normal + PUNCH). No usar TotalBillableQuantity.
-         $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
+         $quantity_completed = $dataTrackingItemRepo->TotalBillableQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
 
          $amount_completed = $quantity_completed * $price;
 
@@ -2441,29 +2440,14 @@ class ProjectService extends Base
          $paid_qty = (float) ($aggPaidCompletion['total_paid_effective'] ?? 0);
          $total_paid_amount = (float) ($aggPaidCompletion['paid_amount_total'] ?? 0);
 
-         // Override de unpaid desde Payments (notas): Diff Qty/Amt = base + suma de los últimos override_unpaid_qty
-         // por invoice_item (notas ordenadas por fecha DESC; primera nota con valor = estado final vigente).
-         // No se acumulan overrides históricos de la misma línea; solo el último valor por factura/ítem.
-         $total_qty_adjustment = 0.0;
-         $total_amt_adjustment = 0.0;
-         $is_bond_item = $value->getItem()->getBond();
-         if (!$is_bond_item) {
-            $invoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-            foreach ($invoiceItems as $invItem) {
-               $notes = $this->ListarNotesDeItemInvoice($invItem->getId());
-               $override = null;
-               foreach ($notes as $n) {
-                  if (isset($n['override_unpaid_qty']) && $n['override_unpaid_qty'] !== null && $n['override_unpaid_qty'] !== '') {
-                     $override = (float) $n['override_unpaid_qty'];
-                     break;
-                  }
-               }
-               if ($override !== null) {
-                  $priceLine = (float) ($invItem->getPrice() ?? 0);
-                  $total_qty_adjustment += $override;
-                  $total_amt_adjustment += $override * $priceLine;
-               }
-            }
+         // Diff Qty / Diff Amt: suma del mismo unpaid que la grilla Payments (quantity_final − paid_qty, bond, override notas), por cada línea de factura del ítem.
+         $diff_qty = 0.0;
+         $diff_amt = 0.0;
+         foreach ($invoiceItemRepo->ListarInvoicesDeItem($project_item_id) as $invLine) {
+            $uq = $this->computeUnpaidQtyForPaymentsDisplay($invLine);
+            $linePrice = (float) ($invLine->getPrice() ?? 0);
+            $diff_qty += $uq;
+            $diff_amt += $uq * $linePrice;
          }
 
          // Verificar si hay historial de cantidad, precio y unpaid qty
@@ -2477,14 +2461,6 @@ class ProjectService extends Base
          /** @var InvoiceItemOverridePaymentPaidQtyHistoryRepository $paidOverrideHistRepo */
          $paidOverrideHistRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePaymentPaidQtyHistory::class);
          $has_paid_qty_override_history = $paidOverrideHistRepo->TieneHistorialPorProjectItem($project_item_id);
-
-         // Diff Qty = (Paid qty - Inv qty) + suma últimos overrides qty; Diff Amt = (Paid Amt - Inv Amt) + suma (override × price línea)
-         $invQty = (float) $invoiced_qty;
-         $invAmt = (float) $total_invoiced_amount;
-         $paidQty = (float) $paid_qty;
-         $paidAmt = (float) $total_paid_amount;
-         $diff_qty = ($paidQty - $invQty) + $total_qty_adjustment;
-         $diff_amt = ($paidAmt - $invAmt) + $total_amt_adjustment;
 
          $this->logCompletionPaidTrace(
             'completion_fila project_id=' . $project_id
@@ -2893,11 +2869,11 @@ if ($invStart !== null && $invEnd !== null) {
       $price = $value->getPrice();
       $total = $quantity * $price;
 
-      // Calcular porcentaje de completion
+      // Calcular porcentaje de completion (misma base que invoice: sin PUNCH)
       $project_item_id = $value->getId();
       /** @var DataTrackingItemRepository $dataTrackingItemRepo */
       $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
-      $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
+      $quantity_completed = $dataTrackingItemRepo->TotalBillableQuantity("", $project_item_id, "", "");
       $porciento_completion = $quantity > 0 ? $quantity_completed / $quantity * 100 : 0;
 
       // Calcular valores de invoices y payments
@@ -2971,7 +2947,7 @@ if ($invStart !== null && $invEnd !== null) {
 
       /** @var DataTrackingItemRepository $dataTrackingItemRepo */
       $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
-      $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, "", "");
+      $quantity_completed = $dataTrackingItemRepo->TotalBillableQuantity("", $project_item_id, "", "");
 
       $porciento_completion = $quantity_completed / $quantity * 100;
 

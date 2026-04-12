@@ -1795,12 +1795,12 @@ var ProjectsDetalle = (function () {
             }
          },
          {
-            targets: 12, // Diff Qty = (Paid - Inv) + suma últimos override_unpaid_qty por línea (+ ícono historial unpaid qty)
+            targets: 12, // Diff Qty = Σ unpaid como Payments (qty final − paid por línea + override notas; no columna persistida) (+ ícono historial)
             className: 'text-end',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_qty);
-               if (isNaN(val)) val = (parseFloat(row.paid_qty) || 0) - (parseFloat(row.invoiced_qty) || 0);
+               if (isNaN(val)) val = 0;
                var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
                if (type === 'display') {
                   var negClass = val < 0 ? ' text-danger' : '';
@@ -1817,12 +1817,12 @@ var ProjectsDetalle = (function () {
             }
          },
          {
-            targets: 13, // Diff Amt = Paid Amt - Inv Amt + ajuste override
+            targets: 13, // Diff Amt = Σ (unpaid Payments × price línea) por cada factura del ítem
             className: 'text-end',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_amt);
-               if (isNaN(val)) val = (parseFloat(row.total_paid_amount) || 0) - (parseFloat(row.total_invoiced_amount) || 0);
+               if (isNaN(val)) val = 0;
                var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
                if (type === 'display' && val < 0) {
                   return '<span class="text-danger">' + numHtml + '</span>';

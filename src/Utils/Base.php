@@ -1521,6 +1521,46 @@ class Base
    }
 
    /**
+    * Mismo unpaid_qty que muestra la grilla de Payments (no el campo persistido invoice_item.unpaid_qty).
+    * quantity_final − paid_qty; bond usa bon_quantity del invoice; notas con override_unpaid_qty (orden DESC).
+    *
+    * @param array<int, array<string, mixed>>|null $notes Si null, se cargan con ListarNotesDeItemInvoice.
+    */
+   public function computeUnpaidQtyForPaymentsDisplay(\App\Entity\InvoiceItem $value, ?array $notes = null): float
+   {
+      $invoice = $value->getInvoice();
+      $bon_quantity = $invoice && $invoice->getBonQuantity() !== null ? (float) $invoice->getBonQuantity() : null;
+
+      $is_bond_item = $value->getProjectItem()->getItem()->getBond();
+
+      $quantity = $value->getQuantity();
+      $quantity_brought_forward = $value->getQuantityBroughtForward();
+      $quantity_final = $quantity + ($quantity_brought_forward ?? 0);
+
+      $paid_qty = $value->getPaidQty();
+      $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
+
+      if ($is_bond_item) {
+         $quantity_final = $bon_quantity !== null ? $bon_quantity : 0.0;
+         $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
+      }
+
+      if ($notes === null) {
+         $notes = $this->ListarNotesDeItemInvoice($value->getId());
+      }
+      if (!$is_bond_item) {
+         foreach ($notes as $note) {
+            if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
+               $unpaid_qty = (float) $note['override_unpaid_qty'];
+               break;
+            }
+         }
+      }
+
+      return $unpaid_qty;
+   }
+
+   /**
     * ListarPaymentsDeInvoice
     * @param $invoice_id
     * @return array
@@ -1562,26 +1602,17 @@ class Base
          $paid_qty = $value->getPaidQty();
          $paid_amount = $value->getPaidAmount();
          $paid_amount_total = $value->getPaidAmountTotal();
-         $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
 
          // Ítem Bond: Invoiced Qty e Invoiced Amount son bon_quantity y bon_amount del invoice
          if ($is_bond_item) {
             $quantity_final = $bon_quantity !== null ? $bon_quantity : 0.0;
             $amount = $bon_amount !== null ? $bon_amount : 0.0;
             $total_amount = $amount;
-            $unpaid_qty = max(0.0, $quantity_final - ($paid_qty ?? 0.0));
          }
 
          // notes (orden DESC por fecha: la más reciente primero)
          $notes = $this->ListarNotesDeItemInvoice($value->getId());
-         if (!$is_bond_item) {
-            foreach ($notes as $note) {
-               if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
-                  $unpaid_qty = (float) $note['override_unpaid_qty'];
-                  break;
-               }
-            }
-         }
+         $unpaid_qty = $this->computeUnpaidQtyForPaymentsDisplay($value, $notes);
 
          $project_item_id = $value->getProjectItem()->getId();
          $invoice_item_id = $value->getId();
