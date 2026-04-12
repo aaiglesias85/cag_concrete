@@ -2397,6 +2397,8 @@ class ProjectService extends Base
 
    /**
     * ListarItemsCompletion
+    * Comp. Qty To Date = suma física de quantity en Data T (incluye PUNCH: punch_quantity es parte del total guardado, no se resta aquí).
+    *
     * @param $project_id
     * @return array
     */
@@ -2421,6 +2423,7 @@ class ProjectService extends Base
 
          /** @var DataTrackingItemRepository $dataTrackingItemRepo */
          $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+         // TotalQuantity = SUM(quantity): trabajo reportado en campo completo (normal + PUNCH). No usar TotalBillableQuantity.
          $quantity_completed = $dataTrackingItemRepo->TotalQuantity("", $project_item_id, $fecha_inicial, $fecha_fin);
 
          $amount_completed = $quantity_completed * $price;
