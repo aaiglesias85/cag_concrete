@@ -983,6 +983,7 @@ var Payments = (function () {
             isGroupHeader: true,
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
+            code: null,
             item: null,
             unit: null,
             contract_qty: null,
@@ -1010,6 +1011,7 @@ var Payments = (function () {
       datosAgrupados = ordenarPorEstadoAbiertoArriba(datosAgrupados, isInvoicePaid);
 
       const columns = [
+         { data: 'code' },
          { data: 'item' },
          { data: 'unit' },
          { data: 'contract_qty' },
@@ -1030,6 +1032,13 @@ var Payments = (function () {
             targets: 0,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
@@ -1059,14 +1068,14 @@ var Payments = (function () {
             },
          },
          {
-            targets: 1,
+            targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 2,
+            targets: 3,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1080,7 +1089,7 @@ var Payments = (function () {
             },
          },
          {
-            targets: 3,
+            targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1094,14 +1103,14 @@ var Payments = (function () {
             },
          },
          {
-            targets: 4,
+            targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
          {
-            targets: 5,
+            targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var decimals = (row.bond == 1 || row.bond === true) ? 5 : 2;
@@ -1109,15 +1118,15 @@ var Payments = (function () {
             },
          },
          {
-            targets: 6,
+            targets: 7,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatMoney(data)}</div>`;
             },
          },
-         // Target 7: Paid Qty (Agregar lógica disabled)
+         // Target 8: Paid Qty (Agregar lógica disabled)
          {
-            targets: 7,
+            targets: 8,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var safeValue = data !== null && data !== undefined ? data : 0;
@@ -1134,9 +1143,9 @@ var Payments = (function () {
                        </div>`;
             },
          },
-         // Target 8: Unpaid Qty (cuando closed o invoice pagado: solo texto, sin inputs)
+         // Target 9: Unpaid Qty (cuando closed o invoice pagado: solo texto, sin inputs)
          {
-            targets: 8,
+            targets: 9,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var safeValue = data !== null && data !== undefined ? data : 0;
@@ -1181,7 +1190,7 @@ var Payments = (function () {
          },
 
          {
-            targets: 9,
+            targets: 10,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span class="paid_amount_text">${MyApp.formatMoney(data)}</span>`;
@@ -1189,7 +1198,7 @@ var Payments = (function () {
          },
          // --- STATUS ---
          {
-            targets: 10, // Columna Status de los ÍTEMS (Adentro)
+            targets: 11, // Columna Status de los ÍTEMS (Adentro)
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -1238,7 +1247,7 @@ var Payments = (function () {
          order: [],
 
          fixedColumns: {
-            start: 2,
+            start: 3,
             end: 1,
          },
          scrollCollapse: true,
@@ -1279,9 +1288,9 @@ var Payments = (function () {
                      return num(a) + num(b);
                   }, 0),
             });
-            const { total: totalInvoice } = sumCol(6);
+            const { total: totalInvoice } = sumCol(7);
             $('#total_invoice_amount').val(MyApp.formatMoney(totalInvoice, 2, '.', ','));
-            const { total: totalPayment } = sumCol(9);
+            const { total: totalPayment } = sumCol(10);
             $('#total_payment_amount').val(MyApp.formatMoney(totalPayment, 2, '.', ','));
          },
       });

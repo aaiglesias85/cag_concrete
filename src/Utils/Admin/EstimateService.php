@@ -601,11 +601,14 @@ class EstimateService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids = [])
+   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids = [], $code = null, $contract_name = null)
    {
       $resultado = [];
 
       $em = $this->getDoctrine()->getManager();
+
+      $codeCatalog = $this->normalizeNullableTrimmedString($code);
+      $contractNameCatalog = $this->normalizeNullableTrimmedString($contract_name);
 
       // validar si existe el mismo item en la misma cuota (puede repetirse en otra quote)
       if ($item_id !== '') {
@@ -629,6 +632,15 @@ class EstimateService extends Base
             $resultado['success'] = false;
             $resultado['error'] = "The item name is in use, please try entering another one.";
             return $resultado;
+         }
+         if ($codeCatalog !== null) {
+            $itemByCode = $this->getDoctrine()->getRepository(Item::class)
+               ->findOneBy(['code' => $codeCatalog]);
+            if ($itemByCode != null) {
+               $resultado['success'] = false;
+               $resultado['error'] = "The item code is already in use, please try another one.";
+               return $resultado;
+            }
          }
       }
 
@@ -691,7 +703,9 @@ class EstimateService extends Base
                'item' => $item_name,
                'price' => $price,
                'yield_calculation' => $yield_calculation,
-               'unit_id' => $unit_id
+               'unit_id' => $unit_id,
+               'code' => $codeCatalog,
+               'contract_name' => $contractNameCatalog,
             ]);
             $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
 

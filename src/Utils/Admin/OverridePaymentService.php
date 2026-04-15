@@ -428,6 +428,7 @@ class OverridePaymentService extends Base
             'apply_retainage' => $pi->getApplyRetainage() ? 1 : 0,
             'bonded' => $pi->getBonded() ? 1 : 0,
             'bond' => $itemEntity->getBond() ? 1 : 0,
+            'code' => $itemEntity->getCode() ?? '',
             'item' => $itemEntity->getName() ?? '',
             'unit' => $itemEntity->getUnit() ? $itemEntity->getUnit()->getDescription() : '',
             'contract_qty' => $contractQty,

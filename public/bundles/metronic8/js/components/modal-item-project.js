@@ -52,6 +52,8 @@ var ModalItemProject = (function () {
       $('#div-item').removeClass('hide');
 
       $('#item-name').val('');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
       $('#item-name').removeClass('hide').addClass('hide');
 
       $('#unit').val('');
@@ -79,6 +81,11 @@ var ModalItemProject = (function () {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
          $('#select-unit').removeClass('hide');
+         $('#div-item-new-meta').removeClass('hide');
+      } else {
+         $('#div-item-new-meta').removeClass('hide');
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -116,20 +123,28 @@ var ModalItemProject = (function () {
       }
 
       if (item_id != '') {
-         var yield = $('#item option[value="' + item_id + '"]').data('yield');
+         var $optItem = $('#item option[value="' + item_id + '"]');
+         var yield = $optItem.data('yield');
          $('#yield-calculation').val(yield);
          $('#yield-calculation').trigger('change');
 
-         var equation = $('#item option[value="' + item_id + '"]').data('equation');
+         var equation = $optItem.data('equation');
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
+         $('#item-code-new').val($optItem.data('code') != null ? $optItem.data('code') : '');
+         $('#item-contract-name-new').val($optItem.data('contractName') != null ? $optItem.data('contractName') : '');
+         $('#div-item-new-meta').removeClass('hide');
+
          // mostrar campo bond editable para items existentes (usuario con permiso bond)
          if (item_type && $('#div-bond-existing-item').length > 0) {
-            var bond = $('#item option[value="' + item_id + '"]').data('bond');
+            var bond = $optItem.data('bond');
             $('#div-bond-existing-item').removeClass('hide');
             $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
+      } else {
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -213,6 +228,9 @@ var ModalItemProject = (function () {
 
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
+
+            formData.set('code', $('#item-code-new').val() || '');
+            formData.set('contract_name', $('#item-contract-name-new').val() || '');
 
             var change_order = $('#change-order').prop('checked');
             formData.set('change_order', change_order);
@@ -342,6 +360,9 @@ var ModalItemProject = (function () {
 
       $('#div-item').removeClass('hide');
       $('#item-name').removeClass('hide').addClass('hide');
+      $('#div-item-new-meta').addClass('hide');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
 
       $('#unit-item-project').val('');
       $('#unit-item-project').trigger('change');

@@ -1679,6 +1679,8 @@ var Estimates = (function () {
       $('#div-item').removeClass('hide');
 
       $('#item-name').val('');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
       $('#item-name').removeClass('hide').addClass('hide');
 
       $('#unit').val('');
@@ -1689,6 +1691,11 @@ var Estimates = (function () {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
          $('#select-unit').removeClass('hide');
+         $('#div-item-new-meta').removeClass('hide');
+      } else {
+         $('#div-item-new-meta').addClass('hide');
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -2401,7 +2408,7 @@ var Estimates = (function () {
       $(document).on('click', '#btn-salvar-item', function (e) {
          e.preventDefault();
 
-         var item_type = $('#item-type').prop('checked');
+         var item_type = $('#item-type-existing').prop('checked');
 
          var item_id = $('#item').val();
          var item = item_type ? $('#item option:selected').text() : $('#item-name').val();
@@ -2440,6 +2447,14 @@ var Estimates = (function () {
 
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
+
+            if (!item_type) {
+               formData.set('code', $('#item-code-new').val() || '');
+               formData.set('contract_name', $('#item-contract-name-new').val() || '');
+            } else {
+               formData.set('code', '');
+               formData.set('contract_name', '');
+            }
 
             var noteIds = $('#item_notes').val();
             formData.set('note_ids', Array.isArray(noteIds) ? noteIds.join(',') : noteIds || '');
@@ -2799,6 +2814,9 @@ var Estimates = (function () {
 
       $('#div-item').removeClass('hide');
       $('#item-name').removeClass('hide').addClass('hide');
+      $('#div-item-new-meta').addClass('hide');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
 
       $('#unit').val('');
       $('#unit').trigger('change');

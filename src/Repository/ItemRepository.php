@@ -78,7 +78,9 @@ class ItemRepository extends ServiceEntityRepository
 
       // Agregar filtro de búsqueda si se proporciona
       if (!empty($sSearch)) {
-         $qb->andWhere('i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search')
+         $qb->andWhere(
+            'i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search OR i.code LIKE :search OR i.contractName LIKE :search'
+         )
             ->setParameter('search', "%{$sSearch}%");
       }
 
@@ -117,7 +119,9 @@ class ItemRepository extends ServiceEntityRepository
 
       // Agregar filtro de búsqueda si se proporciona
       if (!empty($sSearch)) {
-         $qb->andWhere('i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search')
+         $qb->andWhere(
+            'i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search OR i.code LIKE :search OR i.contractName LIKE :search'
+         )
             ->setParameter('search', "%{$sSearch}%");
       }
 
@@ -136,6 +140,8 @@ class ItemRepository extends ServiceEntityRepository
       $sortable = [
          'itemId'  => 'i.itemId',
          'name' => 'i.name',
+         'code' => 'i.code',
+         'contractName' => 'i.contractName',
          'description' => 'i.description',
          'unit' => 'u.description',
          'yieldCalculation' => 'i.yieldCalculation',
@@ -149,7 +155,9 @@ class ItemRepository extends ServiceEntityRepository
          ->leftJoin('i.unit', 'u');
 
       if (!empty($sSearch)) {
-         $baseQb->andWhere('i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search')
+         $baseQb->andWhere(
+            'i.description LIKE :search OR u.description LIKE :search OR i.name LIKE :search OR i.code LIKE :search OR i.contractName LIKE :search'
+         )
             ->setParameter('search', "%{$sSearch}%");
       }
 

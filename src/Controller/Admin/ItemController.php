@@ -57,7 +57,7 @@ class ItemController extends AbstractController
          // parsear los parametros de la tabla
          $dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'name', 'equation', 'status'],
+            allowedOrderFields: ['id', 'name', 'code', 'contractName', 'unit', 'yieldCalculation', 'status'],
             defaultOrderField: 'name'
          );
 
@@ -102,6 +102,8 @@ class ItemController extends AbstractController
       $bond = $request->get('bond');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
+      $code = $request->get('code');
+      $contract_name = $request->get('contract_name');
 
       // Validar que solo usuarios con bond activo puedan marcar items como bond
       $usuario = $this->getUser();
@@ -114,9 +116,9 @@ class ItemController extends AbstractController
       try {
 
          if ($item_id == "") {
-            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id, $code, $contract_name);
          } else {
-            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id, $code, $contract_name);
          }
 
          if ($resultado['success']) {

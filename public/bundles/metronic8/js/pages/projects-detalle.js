@@ -440,6 +440,7 @@ var ProjectsDetalle = (function () {
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
             // Agregar todas las propiedades que DataTables espera para evitar errores
+            code: null,
             item: null,
             unit: null,
             yield_calculation_name: null,
@@ -471,23 +472,31 @@ var ProjectsDetalle = (function () {
 
       // columns (sin checkbox ni acciones, solo visualización)
       const columns = [
-         { data: 'item' },         // 0 - Item
-         { data: 'unit' },         // 1 - Unit
-         { data: 'yield_calculation_name' }, // 2 - Yield Calculation
-         { data: 'quantity' },     // 3 - Quantity
-         { data: 'price' },        // 4 - Price
-         { data: 'total' },        // 5 - Total
-         { data: '_groupOrder', visible: false }, // 6 - Columna oculta para ordenamiento
+         { data: 'code' },         // 0 - Code
+         { data: 'item' },         // 1 - Item
+         { data: 'unit' },         // 2 - Unit
+         { data: 'yield_calculation_name' }, // 3 - Yield Calculation
+         { data: 'quantity' },     // 4 - Quantity
+         { data: 'price' },        // 5 - Price
+         { data: 'total' },        // 6 - Total
+         { data: '_groupOrder', visible: false }, // 7 - Columna oculta para ordenamiento
       ];
 
       // column defs (igual que edición pero sin checkbox ni acciones)
       let columnDefs = [
          {
-            targets: 0, // Item
+            targets: 0, // Code
             render: function (data, type, row) {
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+            },
+         },
+         {
+            targets: 1, // Item
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
 
                var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
@@ -522,21 +531,21 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 1, // Unit
+            targets: 2, // Unit
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 2, // Yield Calculation
+            targets: 3, // Yield Calculation
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3, // Quantity
+            targets: 4, // Quantity
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -547,7 +556,7 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 4, // Price
+            targets: 5, // Price
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -558,7 +567,7 @@ var ProjectsDetalle = (function () {
             },
          },
          {
-            targets: 5, // Total
+            targets: 6, // Total
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
@@ -567,7 +576,7 @@ var ProjectsDetalle = (function () {
       ];
 
       const language = DatatableUtil.getDataTableLenguaje();
-      const order = [[6, 'asc']]; // Ordenar por _groupOrder (columna 6)
+      const order = [[7, 'asc']]; // Ordenar por _groupOrder (columna oculta)
 
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
@@ -588,7 +597,7 @@ var ProjectsDetalle = (function () {
                var $firstCell = $(row).find('td:first');
                $firstCell.css('text-align', 'left');
                $firstCell.css('padding-left', '15px');
-               $firstCell.attr('colspan', 6); // Expandir para ocupar todas las columnas visibles
+               $firstCell.attr('colspan', 7); // Expandir para ocupar todas las columnas visibles
                $(row).find('td:not(:first)').hide();
             } else {
                if (!data.principal) $(row).addClass('row-secondary');
@@ -1801,7 +1810,7 @@ var ProjectsDetalle = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_qty);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
                if (type === 'display') {
                   var negClass = val < 0 ? ' text-danger' : '';
                   if (row.has_unpaid_qty_history && row.project_item_id) {
@@ -1823,7 +1832,7 @@ var ProjectsDetalle = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_amt);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '$').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
                if (type === 'display' && val < 0) {
                   return '<span class="text-danger">' + numHtml + '</span>';
                }

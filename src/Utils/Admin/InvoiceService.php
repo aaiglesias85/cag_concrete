@@ -1109,6 +1109,21 @@ class InvoiceService extends Base
    }
 
    /**
+    * Texto del ítem en exportación (Excel/PDF): contract_name si no está vacío; si no, name.
+    */
+   private function getItemDisplayNameForExport(Item $item): string
+   {
+      $contractName = $item->getContractName();
+      if ($contractName !== null && trim($contractName) !== '') {
+         return trim($contractName);
+      }
+
+      $name = $item->getName();
+
+      return $name !== null ? (string) $name : '';
+   }
+
+   /**
     * ObtenerFilaItemData: Devuelve los datos de una fila de ítem (sin escribir en Excel).
     * @return array Con keys: item_number, description, unit, unit_price, contract_qty, contract_amount, total_qty_btd, total_amount_btd,
     *   previous_bill_qty, previous_bill_amount, pending_qty, pending_balance, qty_this_period, amount_this_period, prev_bill (para totales)
@@ -1186,7 +1201,7 @@ class InvoiceService extends Base
 
       return [
          'item_number' => $item_number,
-         'description' => $value->getProjectItem()->getItem()->getName(),
+         'description' => $this->getItemDisplayNameForExport($value->getProjectItem()->getItem()),
          'unit' => $unit,
          'unit_price' => $price,
          'contract_qty' => $contract_qty,
@@ -1215,7 +1230,7 @@ class InvoiceService extends Base
       $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
       return [
          'item_number' => $item_number,
-         'description' => $projectItem->getItem()->getName(),
+         'description' => $this->getItemDisplayNameForExport($projectItem->getItem()),
          'unit' => $unit,
          'unit_price' => $price,
          'contract_qty' => $contract_qty,
@@ -2182,6 +2197,7 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
             "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
             "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
+            "code" => $value->getProjectItem()->getItem()->getCode(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,

@@ -1699,6 +1699,7 @@ var DataTracking = (function () {
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
             // Agregar todas las propiedades que DataTables espera para evitar errores
+            code: null,
             item: null,
             unit: null,
             yield_calculation_name: null,
@@ -1726,6 +1727,7 @@ var DataTracking = (function () {
 
       // columns
       const columns = [
+         { data: 'code' },
          { data: 'item' },
          { data: 'unit' },
          { data: 'yield_calculation_name' },
@@ -1739,25 +1741,35 @@ var DataTracking = (function () {
 
       // column defs
       let columnDefs = [
-       {
+         {
             targets: 0,
             render: function (data, type, row) {
-            
-               var badgeRetainage = '';               
+               if (row.isGroupHeader) {
+                  return '<strong>' + row.groupTitle + '</strong>';
+               }
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+
+               var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-               
+
                var badgeBond = '';
                if (row.bond == 1 || row.bond === true) {
                   badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
                }
-               
+
                var badgeBonded = '';
                if (row.bonded == 1 || row.bonded === true) {
                   badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
-               
+
                var icono = '';
                if (row.change_order) {
                   icono =
@@ -1776,21 +1788,21 @@ var DataTracking = (function () {
             },
          },
          {
-            targets: 1,
+            targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 2,
+            targets: 3,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3,
+            targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1838,14 +1850,14 @@ var DataTracking = (function () {
             },
          },
          {
-            targets: 4,
+            targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${MyApp.formatearNumero(data, 2, '.', ',')}</div>`;
             },
          },
          {
-            targets: 5,
+            targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1862,7 +1874,7 @@ var DataTracking = (function () {
             },
          },
          {
-            targets: 6,
+            targets: 7,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var net = punchNetLineTotal(row);
@@ -1885,7 +1897,7 @@ var DataTracking = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[7, 'asc']];
+      const order = [[8, 'asc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
@@ -3685,24 +3697,24 @@ var DataTracking = (function () {
       const table = '#subcontracts-table-editable';
 
       // columns
-      const columns = [{ data: 'subcontractor' }, { data: 'item' }, { data: 'unit' }, { data: 'quantity' }, { data: 'price' }, { data: 'total' }, { data: null }];
+      const columns = [{ data: 'subcontractor' }, { data: 'code' }, { data: 'item' }, { data: 'unit' }, { data: 'quantity' }, { data: 'price' }, { data: 'total' }, { data: null }];
 
       // column defs
       let columnDefs = [
          {
-            targets: 3,
+            targets: 4,
             render: function (data, type, row) {
                return `<span>${MyApp.formatearNumero(data, 2, '.', ',')}</span>`;
             },
          },
          {
-            targets: 4,
+            targets: 5,
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
-            targets: 5,
+            targets: 6,
             render: function (data, type, row) {
                return `<span>${MyApp.formatMoney(data)}</span>`;
             },

@@ -16,6 +16,12 @@ class Item
    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
    private ?string $name;
 
+   #[ORM\Column(name: 'code', type: 'string', length: 100, nullable: true)]
+   private ?string $code = null;
+
+   #[ORM\Column(name: 'contract_name', type: 'string', length: 255, nullable: true)]
+   private ?string $contractName = null;
+
    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
    private ?string $description;
 
@@ -64,6 +70,28 @@ class Item
    public function setName(?string $name): self
    {
       $this->name = $name;
+      return $this;
+   }
+
+   public function getCode(): ?string
+   {
+      return $this->code;
+   }
+
+   public function setCode(?string $code): self
+   {
+      $this->code = $code;
+      return $this;
+   }
+
+   public function getContractName(): ?string
+   {
+      return $this->contractName;
+   }
+
+   public function setContractName(?string $contractName): self
+   {
+      $this->contractName = $contractName;
       return $this;
    }
 

@@ -619,6 +619,7 @@ var OverridePayment = (function () {
             isGroupHeader: true,
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
+            code: null,
             item: null,
             unit: null,
             contract_qty: null,
@@ -651,6 +652,7 @@ var OverridePayment = (function () {
    };
    var getColumns = function () {
       return [
+         { data: 'code' },
          { data: 'item' },
          { data: 'unit' },
          { data: 'contract_qty' },
@@ -672,6 +674,13 @@ var OverridePayment = (function () {
                if (row.isGroupHeader) {
                   return '<strong>' + DatatableUtil.escapeHtml(row.groupTitle || 'Change Order') + '</strong>';
                }
+               return '<span style="display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + DatatableUtil.escapeHtml(data || '') + '</span>';
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
                var badgeRetainage = '';
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage =
@@ -706,14 +715,14 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 1,
+            targets: 2,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return DatatableUtil.escapeHtml(data || '');
             },
          },
          {
-            targets: 2,
+            targets: 3,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -724,7 +733,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 3,
+            targets: 4,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -735,14 +744,14 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 4,
+            targets: 5,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return MyApp.formatMoney(data);
             },
          },
          {
-            targets: 5,
+            targets: 6,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var d = row.bond == 1 || row.bond === true ? 5 : 2;
@@ -750,14 +759,14 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 6,
+            targets: 7,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return MyApp.formatMoney(data);
             },
          },
          {
-            targets: 7,
+            targets: 8,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var v = data !== null && data !== undefined ? data : 0;
@@ -781,7 +790,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 8,
+            targets: 9,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var v = data !== null && data !== undefined ? data : 0;
@@ -819,7 +828,7 @@ var OverridePayment = (function () {
             },
          },
          {
-            targets: 9,
+            targets: 10,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return '<span class="override-paid-amount-display">' + MyApp.formatMoney(data) + '</span>';
@@ -858,7 +867,7 @@ var OverridePayment = (function () {
          serverSide: false,
          searchDelay: 400,
          ordering: true,
-         order: [[5, 'desc']],
+         order: [[6, 'desc']],
          displayLength: 50,
          lengthMenu: [
             [25, 50, 100, -1],

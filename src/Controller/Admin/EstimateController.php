@@ -562,6 +562,8 @@ class EstimateController extends AbstractController
       $price = $request->get('price');
       $yield_calculation = $request->get('yield_calculation');
       $equation_id = $request->get('equation_id');
+      $code = $request->get('code');
+      $contract_name = $request->get('contract_name');
       $note_ids = $request->get('note_ids');
       if (is_string($note_ids)) {
          $note_ids = $note_ids === '' ? [] : array_filter(array_map('intval', explode(',', $note_ids)));
@@ -570,7 +572,7 @@ class EstimateController extends AbstractController
       }
 
       try {
-         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids);
+         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids, $code, $contract_name);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";

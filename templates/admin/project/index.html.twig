@@ -1261,6 +1261,7 @@
                                        </div>
                                     </th>
 
+                                    <th>Code</th>
                                     <th>Item</th>
                                     <th>Unit</th>
                                     <th>Yield Calculation</th>
@@ -2628,6 +2629,7 @@
                            <table id="items-table-editable-detalle" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Code</th>
                                     <th>Item</th>
                                     <th>Unit</th>
                                     <th>Yield Calculation</th>
@@ -3099,12 +3101,25 @@
                               data-yield="{{ item.yieldCalculation }}"
                               data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
                               data-bond="{% if item.bond %}1{% else %}0{% endif %}"
+                              data-code="{{ item.code|default('')|e('html_attr') }}"
+                              data-contract-name="{{ item.contractName|default('')|e('html_attr') }}"
                            >
                               {{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                            </option>
                            {% endfor %}
                         </select>
                      </div>
+                  </div>
+               </div>
+
+               <div id="div-item-new-meta" class="hide">
+                  <div class="form-group mb-3">
+                     <label class="form-label">Code</label>
+                     <input type="text" class="form-control form-control-solid" id="item-code-new" maxlength="100" autocomplete="off" />
+                  </div>
+                  <div class="form-group">
+                     <label class="form-label">Contract name</label>
+                     <input type="text" class="form-control form-control-solid" id="item-contract-name-new" maxlength="255" autocomplete="off" />
                   </div>
                </div>
 

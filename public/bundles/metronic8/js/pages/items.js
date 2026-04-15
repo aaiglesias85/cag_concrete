@@ -17,8 +17,8 @@ var Items = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order
-      const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+      // order (por Name: con checkbox Code=1, Name=2; sin checkbox Name=1)
+      const order = permiso.eliminar ? [[2, 'asc']] : [[1, 'asc']];
 
       oTable = $(table).DataTable({
          searchDelay: 500,
@@ -71,9 +71,27 @@ var Items = (function () {
       if (permiso.eliminar) {
          columns.push({ data: 'id' });
       }
-      columns.push({ data: 'name' }, { data: 'unit' }, { data: 'yieldCalculation' }, { data: 'status' }, { data: null });
+      columns.push(
+         { data: 'code' },
+         { data: 'name' },
+         { data: 'unit' },
+         { data: 'yieldCalculation' },
+         { data: 'status' },
+         { data: null }
+      );
 
       return columns;
+   };
+   var renderNameWithBond = function (data, type, row) {
+      var badgeBond = '';
+      if (row.bond == 1 || row.bond === true) {
+         badgeBond =
+            '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+      }
+      return `<div class="d-flex align-items-center" style="white-space: nowrap;">
+                  <span>${data || ''}</span>
+                  ${badgeBond}
+              </div>`;
    };
    var getColumnsDefTable = function () {
       let columnDefs = [
@@ -83,20 +101,11 @@ var Items = (function () {
             render: DatatableUtil.getRenderColumnCheck,
          },
          {
-            targets: 1, // Name column
-            render: function (data, type, row) {
-               var badgeBond = '';
-               if (row.bond == 1 || row.bond === true) {
-                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
-               }
-               return `<div class="d-flex align-items-center" style="white-space: nowrap;">
-                           <span>${data || ''}</span>
-                           ${badgeBond}
-                       </div>`;
-            },
+            targets: 2,
+            render: renderNameWithBond,
          },
          {
-            targets: 4,
+            targets: 5,
             className: 'text-center',
             render: DatatableUtil.getRenderColumnEstado,
          },
@@ -105,20 +114,11 @@ var Items = (function () {
       if (!permiso.eliminar) {
          columnDefs = [
             {
-               targets: 0, // Name column (when no checkbox)
-               render: function (data, type, row) {
-                  var badgeBond = '';
-                  if (row.bond == 1 || row.bond === true) {
-                     badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
-                  }
-                  return `<div class="d-flex align-items-center" style="white-space: nowrap;">
-                              <span>${data || ''}</span>
-                              ${badgeBond}
-                          </div>`;
-               },
+               targets: 1,
+               render: renderNameWithBond,
             },
             {
-               targets: 3,
+               targets: 4,
                className: 'text-center',
                render: DatatableUtil.getRenderColumnEstado,
             },
@@ -280,6 +280,9 @@ var Items = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
       $('#select-equation').removeClass('hide').addClass('hide');
+
+      $('#code').val('');
+      $('#contract_name').val('');
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));
@@ -518,6 +521,9 @@ var Items = (function () {
          var equation_id = $('#equation').val();
          formData.set('equation_id', equation_id);
 
+         formData.set('code', $('#code').val() || '');
+         formData.set('contract_name', $('#contract_name').val() || '');
+
          BlockUtil.block('#form-item');
 
          axios
@@ -660,6 +666,8 @@ var Items = (function () {
       KTUtil.find(KTUtil.get('form-item'), '.card-label').innerHTML = 'Update Item: ' + (item.name || item.descripcion);
 
       $('#name').val(item.name);
+      $('#code').val(item.code || '');
+      $('#contract_name').val(item.contract_name || '');
       $('#descripcion').val(item.descripcion);
 
       $('#unit').val(item.unit_id);

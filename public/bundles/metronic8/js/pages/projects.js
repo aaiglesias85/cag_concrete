@@ -1583,6 +1583,8 @@ var Projects = (function () {
       $('#div-item').removeClass('hide');
 
       $('#item-name').val('');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
       $('#item-name').removeClass('hide').addClass('hide');
 
       $('#unit').val('');
@@ -1610,6 +1612,11 @@ var Projects = (function () {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
          $('#select-unit').removeClass('hide');
+         $('#div-item-new-meta').removeClass('hide');
+      } else {
+         $('#div-item-new-meta').removeClass('hide');
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -1647,20 +1654,28 @@ var Projects = (function () {
       }
 
       if (item_id != '') {
-         var yield = $('#item option[value="' + item_id + '"]').data('yield');
+         var $optItem = $('#item option[value="' + item_id + '"]');
+         var yield = $optItem.data('yield');
          $('#yield-calculation').val(yield);
          $('#yield-calculation').trigger('change');
 
-         var equation = $('#item option[value="' + item_id + '"]').data('equation');
+         var equation = $optItem.data('equation');
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
+         $('#item-code-new').val($optItem.data('code') != null ? $optItem.data('code') : '');
+         $('#item-contract-name-new').val($optItem.data('contractName') != null ? $optItem.data('contractName') : '');
+         $('#div-item-new-meta').removeClass('hide');
+
          // mostrar campo bond editable para items existentes (usuario con permiso bond)
          if (item_type && $('#div-bond-existing-item').length > 0) {
-            var bond = $('#item option[value="' + item_id + '"]').data('bond');
+            var bond = $optItem.data('bond');
             $('#div-bond-existing-item').removeClass('hide');
             $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
+      } else {
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -1702,6 +1717,7 @@ var Projects = (function () {
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
             // Agregar todas las propiedades que DataTables espera para evitar errores
+            code: null,
             item: null,
             unit: null,
             yield_calculation_name: null,
@@ -1751,6 +1767,7 @@ var Projects = (function () {
                _groupOrder: orderCounter++,
                apply_retainage: 0,
                bonded: 0,
+               code: null,
                item: null,
                unit: null,
                yield_calculation_name: null,
@@ -1773,14 +1790,15 @@ var Projects = (function () {
       // 2. Definición de Columnas
       const columns = [
          { data: 'apply_retainage' }, // 0
-         { data: 'item' }, // 1
-         { data: 'unit' }, // 2
-         { data: 'yield_calculation_name' }, // 3
-         { data: 'quantity' }, // 4
-         { data: 'price' }, // 5
-         { data: 'total' }, // 6
-         { data: '_groupOrder', visible: false }, // 7
-         { data: null }, // 8
+         { data: 'code' }, // 1
+         { data: 'item' }, // 2
+         { data: 'unit' }, // 3
+         { data: 'yield_calculation_name' }, // 4
+         { data: 'quantity' }, // 5
+         { data: 'price' }, // 6
+         { data: 'total' }, // 7
+         { data: '_groupOrder', visible: false }, // 8
+         { data: null }, // 9
       ];
 
       // 3. Configuración de Columnas (CORREGIDO)
@@ -1801,7 +1819,14 @@ var Projects = (function () {
             },
          },
          {
-            targets: 1, // Item
+            targets: 1, // Code
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
+               return `<div style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+            },
+         },
+         {
+            targets: 2, // Item
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
 
@@ -1839,21 +1864,21 @@ var Projects = (function () {
             },
          },
          {
-            targets: 2, // Unit
+            targets: 3, // Unit
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 3, // Yield
+            targets: 4, // Yield
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<div style="width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
             },
          },
          {
-            targets: 4, // Quantity
+            targets: 5, // Quantity
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1864,7 +1889,7 @@ var Projects = (function () {
             },
          },
          {
-            targets: 5, // Price
+            targets: 6, // Price
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                var icono = '';
@@ -1875,7 +1900,7 @@ var Projects = (function () {
             },
          },
          {
-            targets: 6, // Total
+            targets: 7, // Total
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
                return `<span>${MyApp.formatMoney(data)}</span>`;
@@ -1894,7 +1919,7 @@ var Projects = (function () {
       ];
 
       const language = DatatableUtil.getDataTableLenguaje();
-      const order = [[7, 'asc']]; // Ordenar por _groupOrder
+      const order = [[8, 'asc']]; // Ordenar por _groupOrder
 
       oTableItems = DatatableUtil.initSafeDataTable(table, {
          data: datosAgrupados,
@@ -1919,7 +1944,7 @@ var Projects = (function () {
                $firstCell.css('padding-left', '15px'); // Darle un margen visual
                // ------------------------------------------------------
 
-               $firstCell.attr('colspan', 8); // Expandir para ocupar todo el ancho
+               $firstCell.attr('colspan', 9); // Expandir para ocupar todo el ancho
                $(row).find('td:not(:first)').hide();
             } else {
                if (!data.principal) $(row).addClass('row-secondary');
@@ -2311,6 +2336,9 @@ var Projects = (function () {
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
 
+            formData.set('code', $('#item-code-new').val() || '');
+            formData.set('contract_name', $('#item-contract-name-new').val() || '');
+
             var change_order = $('#change-order').prop('checked');
             formData.set('change_order', change_order);
 
@@ -2363,14 +2391,29 @@ var Projects = (function () {
                         // new item
                         if (response.is_new_item) {
                            $('#item').append(new Option(item_new.item, item_new.item_id, false, false));
-                           $('#item option[value="' + item_new.item_id + '"]').attr('data-price', item_new.price);
-                           $('#item option[value="' + item_new.item_id + '"]').attr('data-unit', item_new.unit);
-                           $('#item option[value="' + item_new.item_id + '"]').attr('data-equation', item_new.equation_id);
-                           $('#item option[value="' + item_new.item_id + '"]').attr('data-yield', item_new.yield_calculation);
+                           var $optNew = $('#item option[value="' + item_new.item_id + '"]');
+                           $optNew.attr('data-price', item_new.price);
+                           $optNew.attr('data-unit', item_new.unit);
+                           $optNew.attr('data-equation', item_new.equation_id);
+                           $optNew.attr('data-yield', item_new.yield_calculation);
+                           $optNew.attr('data-code', item_new.code != null && item_new.code !== undefined ? item_new.code : '');
+                           $optNew.attr(
+                              'data-contract-name',
+                              item_new.contract_name != null && item_new.contract_name !== undefined ? item_new.contract_name : '',
+                           );
 
                            $('.select-modal-item').select2({
                               dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
                            });
+                        } else if (item_new.item_id) {
+                           var $optUpd = $('#item option[value="' + item_new.item_id + '"]');
+                           if ($optUpd.length) {
+                              $optUpd.attr('data-code', item_new.code != null && item_new.code !== undefined ? item_new.code : '');
+                              $optUpd.attr(
+                                 'data-contract-name',
+                                 item_new.contract_name != null && item_new.contract_name !== undefined ? item_new.contract_name : '',
+                              );
+                           }
                         }
 
                         //actualizar lista
@@ -2486,6 +2529,12 @@ var Projects = (function () {
             if (items[posicion].change_order_date && items[posicion].change_order_date !== '') {
                FlatpickrUtil.setDate('change-order-date', items[posicion].change_order_date.split(' ')[0]);
             }
+
+            $('#item-code-new').val(items[posicion].code != null && items[posicion].code !== undefined ? items[posicion].code : '');
+            $('#item-contract-name-new').val(
+               items[posicion].contract_name != null && items[posicion].contract_name !== undefined ? items[posicion].contract_name : '',
+            );
+            $('#div-item-new-meta').removeClass('hide');
 
             // mostar modal
             ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });
@@ -2641,6 +2690,9 @@ var Projects = (function () {
 
       $('#div-item').removeClass('hide');
       $('#item-name').removeClass('hide').addClass('hide');
+      $('#div-item-new-meta').addClass('hide');
+      $('#item-code-new').val('');
+      $('#item-contract-name-new').val('');
 
       $('#unit').val('');
       $('#unit').trigger('change');
@@ -5059,7 +5111,7 @@ var Projects = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_qty);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '').display(val) : val;
                if (type === 'display') {
                   var negClass = val < 0 ? ' text-danger' : '';
                   if (row.has_unpaid_qty_history && row.project_item_id) {
@@ -5081,7 +5133,7 @@ var Projects = (function () {
                if (row.isGroupHeader) return '';
                var val = parseFloat(row.diff_amt);
                if (isNaN(val)) val = 0;
-               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 6, '$').display(val) : val;
+               var numHtml = type === 'display' ? $.fn.dataTable.render.number(',', '.', 2, '$').display(val) : val;
                if (type === 'display' && val < 0) {
                   return '<span class="text-danger">' + numHtml + '</span>';
                }

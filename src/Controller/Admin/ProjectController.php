@@ -801,6 +801,9 @@ class ProjectController extends AbstractController
          $bonded = (bool)$bonded;
       }
 
+      $code = $request->get('code');
+      $contract_name = $request->get('contract_name');
+
       // Validar que solo usuarios con permiso bond puedan crear items con bond=true
       $usuario = $this->getUser();
       $usuario_bond = $usuario->getBond() ? true : false;
@@ -822,7 +825,7 @@ class ProjectController extends AbstractController
       }
 
       try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond, $bonded);
+         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond, $bonded, $code, $contract_name);
 
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];

@@ -1984,6 +1984,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
             groupTitle: 'Change Order',
             _groupOrder: orderCounter++,
             // Agregar todas las propiedades que DataTables espera para evitar errores
+            code: null,
             item: null,
             unit: null,
             price: null,
@@ -2018,52 +2019,59 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
 
       // columns
       const columns = [
+         { data: 'code' },
          { data: 'item' },
          { data: 'unit' },
          { data: 'price' },
          { data: 'contract_qty' },
-         { data: 'contract_amount' }, // 3 (sum)
+         { data: 'contract_amount' }, // sum
          { data: 'quantity_completed' },
-         { data: 'amount_completed' }, // 5 (sum)
+         { data: 'amount_completed' }, // sum
          { data: 'unpaid_qty' },
-         { data: 'unpaid_amount' }, // 7 (sum)
+         { data: 'unpaid_amount' }, // sum
          { data: 'quantity' },
-         { data: 'amount' }, // 9 (sum)
+         { data: 'amount' }, // sum
          { data: 'quantity_brought_forward' },
          { data: 'quantity_final' },
-         { data: 'amount_final' }, // 12 (sum)
+         { data: 'amount_final' }, // sum
          { data: '_groupOrder', visible: false }, // Columna oculta para ordenamiento
          { data: null },
       ];
 
       // column defs
       let columnDefs = [
-         // item
+         // code
          {
             targets: 0,
             render: function (data, type, row) {
-               
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
+               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+            },
+         },
+         // item
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               if (row.isGroupHeader) return '';
 
-              var badgeRetainage = '';
-              
+               var badgeRetainage = '';
+
                if (row.apply_retainage == 1 || row.apply_retainage === true) {
                   badgeRetainage = '<span class="badge badge-circle badge-light-success border border-success ms-2 fw-bold fs-8" title="Retainage Applied" data-bs-toggle="tooltip">R</span>';
                }
-              
+
                var badgeBond = '';
                if (row.bond == 1 || row.bond === true) {
-                 badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
-   }
-               
+                  badgeBond = '<span class="badge badge-circle badge-light-danger border border-danger ms-2 fw-bold fs-8" title="Bond Applied" data-bs-toggle="tooltip">B</span>';
+               }
+
                var badgeBonded = '';
                if (row.bonded == 1 || row.bonded === true) {
                   badgeBonded = '<span class="badge badge-circle badge-light-primary border border-primary ms-2 fw-bold fs-8" title="Bonded Applied" data-bs-toggle="tooltip">B</span>';
                }
-              
-               // Si es change order, agregar icono de historial
+
                var icono = '';
                if (row.change_order && !row.isGroupHeader) {
                   icono =
@@ -2072,7 +2080,6 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                      '" title="View change order history"></i>';
                }
 
-               // ${badgeRetainage} al HTML
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
                            ${badgeRetainage}
@@ -2084,7 +2091,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // unit
          {
-            targets: 1,
+            targets: 2,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2093,7 +2100,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // price
          {
-            targets: 2,
+            targets: 3,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2114,7 +2121,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // contract_qty
          {
-            targets: 3,
+            targets: 4,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2135,7 +2142,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // contract_amount
          {
-            targets: 4,
+            targets: 5,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2144,7 +2151,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // quantity_completed
          {
-            targets: 5,
+            targets: 6,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2153,7 +2160,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // amount_completed
          {
-            targets: 6,
+            targets: 7,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2162,7 +2169,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // unpaid_qty
          {
-            targets: 7,
+            targets: 8,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2171,7 +2178,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // unpaid_amount
          {
-            targets: 8,
+            targets: 9,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2180,7 +2187,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // quantity
          {
-            targets: 9,
+            targets: 10,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2189,7 +2196,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // amount
          {
-            targets: 10,
+            targets: 11,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2198,7 +2205,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // quantity_brought_forward
          {
-            targets: 11,
+            targets: 12,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2211,7 +2218,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // quantity_final
          {
-            targets: 12,
+            targets: 13,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2220,7 +2227,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          },
          // amount_final
          {
-            targets: 13,
+            targets: 14,
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
@@ -2244,7 +2251,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order - ordenar por columna oculta _groupOrder para mantener orden de agrupación
-      const order = [[14, 'asc']];
+      const order = [[15, 'asc']];
 
       // escapar contenido de la tabla
       oTableItems = DatatableUtil.initSafeDataTable(table, {
@@ -2257,7 +2264,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          order: order,
 
          fixedColumns: {
-            start: 1,
+            start: 2,
             end: 1,
          },
 
@@ -2285,23 +2292,23 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                const $cells = $('td', row);
 
                // 🔵 quantity_completed y amount_completed (#daeef3)
-               $cells.eq(5).css('background-color', '#daeef3');
                $cells.eq(6).css('background-color', '#daeef3');
+               $cells.eq(7).css('background-color', '#daeef3');
 
                // 🔴 unpaid_qty y unpaid_amount (#f79494)
-               $cells.eq(7).css('background-color', '#f79494');
                $cells.eq(8).css('background-color', '#f79494');
+               $cells.eq(9).css('background-color', '#f79494');
 
                // 🟠 quantity y amount (#fcd5b4)
-               $cells.eq(9).css('background-color', '#fcd5b4');
                $cells.eq(10).css('background-color', '#fcd5b4');
+               $cells.eq(11).css('background-color', '#fcd5b4');
 
                // 🟡 quantity_brought_forward (#f2d068)
-               $cells.eq(11).css('background-color', '#f2d068');
+               $cells.eq(12).css('background-color', '#f2d068');
 
                // 🟢 quantity_final y amount_final (#d8e4bc)
-               $cells.eq(12).css('background-color', '#d8e4bc');
                $cells.eq(13).css('background-color', '#d8e4bc');
+               $cells.eq(14).css('background-color', '#d8e4bc');
 
                // Si mantienes la lógica para "row-secondary"
                if (!data.principal) {
@@ -2327,11 +2334,11 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
 
             // Columnas y sus selectores
             const totalsSelectors = {
-               4: '#total_contract_amount',
-               6: '#total_amount_completed',
-               8: '#total_amount_unpaid',
-               10: '#total_amount_period',
-               13: '#total_amount_final',
+               5: '#total_contract_amount',
+               7: '#total_amount_completed',
+               9: '#total_amount_unpaid',
+               11: '#total_amount_period',
+               14: '#total_amount_final',
             };
 
             // Recorrer las columnas configuradas
@@ -2341,9 +2348,9 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                
                // Calcular total
                // Si es col 4 (Contract), usar variable global, sino sumar columna
-               var total = (idx === 4) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
-               if (idx === 6) total += bond_add_cumulative;
-               if (idx === 10 || idx === 13) total += bond_add_period;
+               var total = (idx === 5) ? (typeof projectContractAmount !== 'undefined' ? projectContractAmount : 0) : sumCol(idx).total;
+               if (idx === 7) total += bond_add_cumulative;
+               if (idx === 11 || idx === 14) total += bond_add_period;
 
                var $input = $(selector);
                if ($input.length) {
