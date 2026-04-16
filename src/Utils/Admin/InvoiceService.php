@@ -2,7 +2,6 @@
 
 namespace App\Utils\Admin;
 
-use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
@@ -1109,18 +1108,25 @@ class InvoiceService extends Base
    }
 
    /**
-    * Texto del ítem en exportación (Excel/PDF): contract_name si no está vacío; si no, name.
+    * Texto del ítem en exportación (Excel/PDF): "{code} - {contract_name || name del catálogo}".
+    * Si code está vacío, solo la segunda parte; si ambas partes vacías, cadena vacía.
     */
-   private function getItemDisplayNameForExport(Item $item): string
+   private function getItemDisplayNameForExport(ProjectItem $projectItem): string
    {
-      $contractName = $item->getContractName();
-      if ($contractName !== null && trim($contractName) !== '') {
-         return trim($contractName);
+      $item = $projectItem->getItem();
+      $name = $item !== null && $item->getName() !== null ? trim((string) $item->getName()) : '';
+
+      $codeRaw = $projectItem->getCode();
+      $code = $codeRaw !== null && trim((string) $codeRaw) !== '' ? trim((string) $codeRaw) : '';
+
+      $cnRaw = $projectItem->getContractName();
+      $second = ($cnRaw !== null && trim((string) $cnRaw) !== '') ? trim((string) $cnRaw) : $name;
+
+      if ($code !== '') {
+         return $second !== '' ? $code . ' - ' . $second : $code;
       }
 
-      $name = $item->getName();
-
-      return $name !== null ? (string) $name : '';
+      return $second;
    }
 
    /**
@@ -1201,7 +1207,7 @@ class InvoiceService extends Base
 
       return [
          'item_number' => $item_number,
-         'description' => $this->getItemDisplayNameForExport($value->getProjectItem()->getItem()),
+         'description' => $this->getItemDisplayNameForExport($value->getProjectItem()),
          'unit' => $unit,
          'unit_price' => $price,
          'contract_qty' => $contract_qty,
@@ -1230,7 +1236,7 @@ class InvoiceService extends Base
       $unit = $projectItem->getItem()->getUnit() ? $projectItem->getItem()->getUnit()->getDescription() : '';
       return [
          'item_number' => $item_number,
-         'description' => $this->getItemDisplayNameForExport($projectItem->getItem()),
+         'description' => $this->getItemDisplayNameForExport($projectItem),
          'unit' => $unit,
          'unit_price' => $price,
          'contract_qty' => $contract_qty,
@@ -2197,7 +2203,7 @@ $unpaidQtySpecific = $this->calculateInvoiceUnpaidQty($historialQty, $historialP
             "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
             "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "code" => $value->getProjectItem()->getItem()->getCode(),
+            "code" => $value->getProjectItem()->getCode(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,

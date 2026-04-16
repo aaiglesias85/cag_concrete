@@ -52,8 +52,6 @@
                               data-yield="{{ item.yieldCalculation }}"
                               data-equation="{% if item.equation != null %}{{ item.equation.equationId }}{% endif %}"
                               data-bond="{% if item.bond %}1{% else %}0{% endif %}"
-                              data-code="{{ item.code|default('')|e('html_attr') }}"
-                              data-contract-name="{{ item.contractName|default('')|e('html_attr') }}"
                            >
                               {{ item.name }}{% if item.unit != null %} - {{ item.unit.description }}{% endif %}
                            </option>

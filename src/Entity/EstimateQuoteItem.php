@@ -34,6 +34,12 @@ class EstimateQuoteItem
     #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
     private ?Equation $equation = null;
 
+    #[ORM\Column(name: "code", type: "string", length: 100, nullable: true)]
+    private ?string $code = null;
+
+    #[ORM\Column(name: "contract_name", type: "string", length: 255, nullable: true)]
+    private ?string $contractName = null;
+
     /** Notas asociadas (many-to-many con estimate_note_item vía estimate_quote_item_note) */
     #[ORM\OneToMany(targetEntity: EstimateQuoteItemNote::class, mappedBy: 'quoteItem', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private $quoteItemNotes = [];
@@ -91,6 +97,30 @@ class EstimateQuoteItem
     public function setEquation(?Equation $equation): void
     {
         $this->equation = $equation;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function getContractName(): ?string
+    {
+        return $this->contractName;
+    }
+
+    public function setContractName(?string $contractName): self
+    {
+        $this->contractName = $contractName;
+
+        return $this;
     }
 
     public function getQuantity(): ?float

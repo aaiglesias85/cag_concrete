@@ -627,7 +627,7 @@ class DataTrackingService extends Base
          $subcontracts[] = [
             'subcontract_id' => $value->getId(),
             "project_item_id" => $value->getProjectItem()->getId(),
-            "code" => $value->getProjectItem()->getItem()->getCode(),
+            "code" => $value->getProjectItem()->getCode(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "subcontractor_id" => $value->getSubcontractor() ? $value->getSubcontractor()->getSubcontractorId() : '',
@@ -682,7 +682,7 @@ class DataTrackingService extends Base
             "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
             "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
             "project_item_id" => $project_item_id,
-            "code" => $value->getProjectItem()->getItem()->getCode(),
+            "code" => $value->getProjectItem()->getCode(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "quantity" => $quantity,

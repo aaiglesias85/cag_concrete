@@ -43,6 +43,12 @@ class ProjectItem
    #[ORM\Column(name: "bonded", type: "boolean", nullable: true)]
    private ?bool $bonded = null;
 
+   #[ORM\Column(name: "code", type: "string", length: 100, nullable: true)]
+   private ?string $code = null;
+
+   #[ORM\Column(name: "contract_name", type: "string", length: 255, nullable: true)]
+   private ?string $contractName = null;
+
    #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
    private ?Project $project;
@@ -76,6 +82,30 @@ class ProjectItem
    public function setBonded(?bool $bonded): self
    {
       $this->bonded = $bonded;
+
+      return $this;
+   }
+
+   public function getCode(): ?string
+   {
+      return $this->code;
+   }
+
+   public function setCode(?string $code): self
+   {
+      $this->code = $code;
+
+      return $this;
+   }
+
+   public function getContractName(): ?string
+   {
+      return $this->contractName;
+   }
+
+   public function setContractName(?string $contractName): self
+   {
+      $this->contractName = $contractName;
 
       return $this;
    }

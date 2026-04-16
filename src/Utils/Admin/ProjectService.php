@@ -923,15 +923,6 @@ class ProjectService extends Base
             $resultado['error'] = "The item name is in use, please try entering another one.";
             return $resultado;
          }
-         if ($codeCatalog !== null) {
-            $itemByCode = $this->getDoctrine()->getRepository(Item::class)
-               ->findOneBy(['code' => $codeCatalog]);
-            if ($itemByCode != null) {
-               $resultado['success'] = false;
-               $resultado['error'] = "The item code is already in use, please try another one.";
-               return $resultado;
-            }
-         }
       }
 
 
@@ -999,20 +990,6 @@ class ProjectService extends Base
             }
             // Actualizar bond del item del catálogo cuando el usuario con permiso bond lo modifica desde el proyecto
             $item_entity->setBond($bond);
-
-            // Code y contract name editables desde el wizard de proyecto (misma validación de código único que en admin)
-            $currentCatalogId = (int) $item_entity->getItemId();
-            if ($codeCatalog !== null) {
-               $itemByCode = $this->getDoctrine()->getRepository(Item::class)
-                  ->findOneBy(['code' => $codeCatalog]);
-               if ($itemByCode !== null && (int) $itemByCode->getItemId() !== $currentCatalogId) {
-                  $resultado['success'] = false;
-                  $resultado['error'] = "The item code is already in use, please try another one.";
-                  return $resultado;
-               }
-            }
-            $item_entity->setCode($codeCatalog);
-            $item_entity->setContractName($contractNameCatalog);
          } else {
             // add new item
             $new_item_data = json_encode([
@@ -1021,8 +998,6 @@ class ProjectService extends Base
                'yield_calculation' => $yield_calculation,
                'unit_id' => $unit_id,
                'bond' => $bond,
-               'code' => $codeCatalog,
-               'contract_name' => $contractNameCatalog,
             ]);
             $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
 
@@ -1031,6 +1006,8 @@ class ProjectService extends Base
 
          $item_description = $item_entity->getName();
          $project_item_entity->setItem($item_entity);
+         $project_item_entity->setCode($codeCatalog);
+         $project_item_entity->setContractName($contractNameCatalog);
 
          if ($is_new_project_item) {
 
@@ -1671,7 +1648,7 @@ class ProjectService extends Base
             "bonded" => $value->getBonded() ? 1 : 0,
             "bond" => $value->getItem()->getBond() ? 1 : 0,
             "item_id" => $value->getItem()->getItemId(),
-            "code" => $value->getItem()->getCode(),
+            "code" => $value->getCode(),
             "item" => $value->getItem()->getName(),
             "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,
@@ -2985,8 +2962,8 @@ if ($invStart !== null && $invEnd !== null) {
          // ---------------------------------
          'project_item_id' => $value->getId(),
          "item_id" => $value->getItem()->getItemId(),
-         "code" => $value->getItem()->getCode(),
-         "contract_name" => $value->getItem()->getContractName(),
+         "code" => $value->getCode(),
+         "contract_name" => $value->getContractName(),
          "item" => $value->getItem()->getName(),
          "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
          "quantity" => $quantity,

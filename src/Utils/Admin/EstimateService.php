@@ -633,15 +633,6 @@ class EstimateService extends Base
             $resultado['error'] = "The item name is in use, please try entering another one.";
             return $resultado;
          }
-         if ($codeCatalog !== null) {
-            $itemByCode = $this->getDoctrine()->getRepository(Item::class)
-               ->findOneBy(['code' => $codeCatalog]);
-            if ($itemByCode != null) {
-               $resultado['success'] = false;
-               $resultado['error'] = "The item code is already in use, please try another one.";
-               return $resultado;
-            }
-         }
       }
 
 
@@ -704,8 +695,6 @@ class EstimateService extends Base
                'price' => $price,
                'yield_calculation' => $yield_calculation,
                'unit_id' => $unit_id,
-               'code' => $codeCatalog,
-               'contract_name' => $contractNameCatalog,
             ]);
             $item_entity = $this->AgregarNewItem(json_decode($new_item_data), $equation_entity);
 
@@ -713,6 +702,8 @@ class EstimateService extends Base
          }
 
          $estimate_item_entity->setItem($item_entity);
+         $estimate_item_entity->setCode($codeCatalog);
+         $estimate_item_entity->setContractName($contractNameCatalog);
 
          if ($is_new_estimate_item && $default_quote !== null) {
             $estimate_item_entity->setQuote($default_quote);
@@ -1095,6 +1086,8 @@ class EstimateService extends Base
          'estimate_item_id' => $value->getId(),
          'quote_id' => $value->getQuote() !== null ? $value->getQuote()->getId() : null,
          "item_id" => $value->getItem()->getItemId(),
+         "code" => $value->getCode(),
+         "contract_name" => $value->getContractName(),
          "item" => $value->getItem()->getName(),
          "unit" => $value->getItem()->getUnit() != null ? $value->getItem()->getUnit()->getDescription() : '',
          "quantity" => $quantity,

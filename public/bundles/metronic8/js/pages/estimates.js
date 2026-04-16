@@ -1693,7 +1693,7 @@ var Estimates = (function () {
          $('#select-unit').removeClass('hide');
          $('#div-item-new-meta').removeClass('hide');
       } else {
-         $('#div-item-new-meta').addClass('hide');
+         $('#div-item-new-meta').removeClass('hide');
          $('#item-code-new').val('');
          $('#item-contract-name-new').val('');
       }
@@ -1731,6 +1731,13 @@ var Estimates = (function () {
          var equation = $('#item option[value="' + item_id + '"]').data('equation');
          $('#equation').val(equation);
          $('#equation').trigger('change');
+
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
+         $('#div-item-new-meta').removeClass('hide');
+      } else {
+         $('#item-code-new').val('');
+         $('#item-contract-name-new').val('');
       }
    };
 
@@ -2448,13 +2455,8 @@ var Estimates = (function () {
             var equation_id = $('#equation').val();
             formData.set('equation_id', equation_id);
 
-            if (!item_type) {
-               formData.set('code', $('#item-code-new').val() || '');
-               formData.set('contract_name', $('#item-contract-name-new').val() || '');
-            } else {
-               formData.set('code', '');
-               formData.set('contract_name', '');
-            }
+            formData.set('code', $('#item-code-new').val() || '');
+            formData.set('contract_name', $('#item-contract-name-new').val() || '');
 
             var noteIds = $('#item_notes').val();
             formData.set('note_ids', Array.isArray(noteIds) ? noteIds.join(',') : noteIds || '');
@@ -2650,7 +2652,15 @@ var Estimates = (function () {
 
                $('#unit').val(items[posicion].unit_id);
                $('#unit').trigger('change');
+            } else {
+               $('#item-type-existing').prop('checked', true);
             }
+
+            $('#item-code-new').val(items[posicion].code != null && items[posicion].code !== undefined ? items[posicion].code : '');
+            $('#item-contract-name-new').val(
+               items[posicion].contract_name != null && items[posicion].contract_name !== undefined ? items[posicion].contract_name : '',
+            );
+            $('#div-item-new-meta').removeClass('hide');
 
             // mostar modal
             ModalUtil.show('modal-item', { backdrop: 'static', keyboard: true });

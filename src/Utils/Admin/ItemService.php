@@ -42,8 +42,6 @@ class ItemService extends Base
       if ($entity != null) {
 
          $arreglo_resultado['name'] = $entity->getName();
-         $arreglo_resultado['code'] = $entity->getCode();
-         $arreglo_resultado['contract_name'] = $entity->getContractName();
          $arreglo_resultado['descripcion'] = $entity->getDescription();
          // $arreglo_resultado['price'] = $entity->getPrice();
          $arreglo_resultado['status'] = $entity->getStatus();
@@ -280,7 +278,7 @@ class ItemService extends Base
     * @param int $item_id Id
     * @author Marcel
     */
-   public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id, $code = null, $contract_name = null)
+   public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -297,20 +295,7 @@ class ItemService extends Base
             return $resultado;
          }
 
-         $codeNorm = $this->normalizeItemCode($code);
-         if ($codeNorm !== null) {
-            $itemByCode = $this->getDoctrine()->getRepository(Item::class)
-               ->findOneBy(['code' => $codeNorm]);
-            if ($itemByCode !== null && $entity->getItemId() !== $itemByCode->getItemId()) {
-               $resultado['success'] = false;
-               $resultado['error'] = "The item code is already in use, please try another one.";
-               return $resultado;
-            }
-         }
-
          $entity->setName($name);
-         $entity->setCode($codeNorm);
-         $entity->setContractName($this->normalizeItemContractName($contract_name));
          $entity->setDescription($description);
          // $entity->setPrice($price);
          $entity->setStatus($status);
@@ -380,7 +365,7 @@ class ItemService extends Base
     * @param string $description Descripción
     * @author Marcel
     */
-   public function SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id, $code = null, $contract_name = null)
+   public function SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -393,22 +378,9 @@ class ItemService extends Base
          return $resultado;
       }
 
-      $codeNorm = $this->normalizeItemCode($code);
-      if ($codeNorm !== null) {
-         $itemByCode = $this->getDoctrine()->getRepository(Item::class)
-            ->findOneBy(['code' => $codeNorm]);
-         if ($itemByCode != null) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The item code is already in use, please try another one.";
-            return $resultado;
-         }
-      }
-
       $entity = new Item();
 
       $entity->setName($name);
-      $entity->setCode($codeNorm);
-      $entity->setContractName($this->normalizeItemContractName($contract_name));
       $entity->setDescription($description);
       // $entity->setPrice($price);
       $entity->setStatus($status);
@@ -505,8 +477,6 @@ class ItemService extends Base
          $data[] = array(
             "id" => $item_id,
             "name" => $value->getName(),
-            "code" => $value->getCode(),
-            "contractName" => $value->getContractName(),
             "description" => $value->getDescription(),
             // "price" => number_format($value->getPrice(), 2, '.', ','),
             "status" => $value->getStatus() ? 1 : 0,
@@ -560,25 +530,5 @@ class ItemService extends Base
       }
 
       return $acciones;
-   }
-
-   private function normalizeItemCode(?string $code): ?string
-   {
-      if ($code === null) {
-         return null;
-      }
-      $t = trim($code);
-
-      return $t === '' ? null : $t;
-   }
-
-   private function normalizeItemContractName(?string $contractName): ?string
-   {
-      if ($contractName === null) {
-         return null;
-      }
-      $t = trim($contractName);
-
-      return $t === '' ? null : $t;
    }
 }

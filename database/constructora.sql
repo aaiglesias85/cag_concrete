@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 15-04-2026 a las 00:58:58
+-- Tiempo de generación: 16-04-2026 a las 00:50:08
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -586,7 +586,9 @@ CREATE TABLE `estimate_quote_items` (
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL,
   `estimate_note_item_id` int(11) DEFAULT NULL,
-  `estimate_quote_id` int(11) DEFAULT NULL
+  `estimate_quote_id` int(11) DEFAULT NULL,
+  `code` varchar(100) DEFAULT NULL COMMENT 'Código por línea de estimate',
+  `contract_name` varchar(255) DEFAULT NULL COMMENT 'Nombre en contrato por línea de estimate'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
@@ -907,8 +909,6 @@ CREATE TABLE `invoice_override_payment` (
 CREATE TABLE `item` (
   `item_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
-  `code` varchar(100) DEFAULT NULL COMMENT 'Código alfanumérico del item',
-  `contract_name` varchar(255) DEFAULT NULL COMMENT 'Nombre del item tal como figura en el contrato',
   `description` varchar(255) DEFAULT NULL,
   `price` float(8,2) DEFAULT NULL,
   `yield_calculation` varchar(50) DEFAULT NULL,
@@ -926,30 +926,30 @@ CREATE TABLE `item` (
 -- Volcado de datos para la tabla `item`
 --
 
-INSERT INTO `item` (`item_id`, `name`, `code`, `contract_name`, `description`, `price`, `yield_calculation`, `status`, `bond`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
-(1, 'CONC MEDIAN 4IN', NULL, NULL, 'CONC MEDIAN 4IN', 29.00, NULL, 1, NULL, '2024-04-12 20:18:17', NULL, 1, NULL, NULL, NULL),
-(2, 'CONC MEDIAN 6IN', NULL, NULL, 'CONC MEDIAN 6IN', 70.00, NULL, 1, NULL, '2024-04-12 20:18:40', NULL, 1, NULL, NULL, NULL),
-(3, 'CONCRETE V GUTTER', NULL, NULL, 'CONCRETE V GUTTER', 25.00, NULL, 1, NULL, '2024-04-12 20:19:00', NULL, 2, NULL, NULL, NULL),
-(4, 'CONC VALLEY GUTTER 6IN', NULL, NULL, 'CONC VALLEY GUTTER 6IN', 58.00, NULL, 1, NULL, '2024-04-12 20:19:26', NULL, 1, NULL, NULL, NULL),
-(5, 'CONC VALLEY GUTTER 8IN', NULL, NULL, 'CONC VALLEY GUTTER 8IN', 77.00, NULL, 1, NULL, '2024-04-12 20:19:51', NULL, 1, NULL, NULL, NULL),
-(6, 'CONC CURB & GUTTEER 8INX30IN TP2', NULL, NULL, 'CONC CURB & GUTTEER 8INX30IN TP2', 16.50, NULL, 1, NULL, '2024-04-12 20:20:29', NULL, 2, NULL, NULL, NULL),
-(7, 'CONC CURB & GUTTEER 8INX30IN TP7', NULL, NULL, 'CONC CURB & GUTTEER 8INX30IN TP7', 16.50, NULL, 1, NULL, '2024-04-12 20:22:07', NULL, 2, NULL, NULL, NULL),
-(8, 'CLASS B CONCRETE', NULL, NULL, 'CLASS B CONCRETE', 700.00, NULL, 1, NULL, '2024-04-12 20:22:31', NULL, 3, NULL, NULL, NULL),
-(9, 'CLASS B CONCRETE, INCL REINF STEEL', NULL, NULL, 'CLASS B CONCRETE, INCL REINF STEEL', 0.00, NULL, 1, NULL, '2024-04-12 20:23:08', NULL, 3, NULL, NULL, NULL),
-(10, 'CLASS B CONC, BASE OR PVMT WIDENING', NULL, NULL, 'CLASS B CONC, BASE OR PVMT WIDENING', 253.00, NULL, 1, NULL, '2024-04-12 20:23:35', NULL, 3, NULL, NULL, NULL),
-(11, 'BAR REINF. STEEL ', NULL, NULL, 'BAR REINF. STEEL ', 0.00, NULL, 1, NULL, '2024-04-12 20:23:52', NULL, 4, NULL, NULL, NULL),
-(12, 'CONC DRIVEWAY 8IN', NULL, NULL, 'CONC DRIVEWAY 8IN', 70.00, NULL, 1, NULL, '2024-04-12 20:24:09', NULL, 1, NULL, NULL, NULL),
-(13, 'CONC SLOPE DRAIN ', NULL, NULL, 'CONC SLOPE DRAIN ', 100.00, NULL, 1, NULL, '2024-04-12 20:24:29', NULL, 1, NULL, NULL, NULL),
-(14, 'CONC SIDEWALK 4IN', NULL, NULL, 'CONC SIDEWALK 4IN', 30.00, NULL, 1, NULL, '2024-04-12 20:25:08', NULL, 1, NULL, NULL, NULL),
-(15, 'CONC SIDEWALK 8IN', NULL, NULL, 'CONC SIDEWALK 8IN', 63.00, NULL, 1, NULL, '2024-04-12 20:25:30', NULL, 1, NULL, NULL, NULL),
-(16, 'CONC SPILLWAY TP3', NULL, NULL, 'CONC SPILLWAY TP3', 2100.00, 'none', 1, NULL, '2024-04-12 20:25:50', '2024-05-12 19:18:34', 5, NULL, NULL, NULL),
-(17, 'PLAIN CONC DITCH PAVING', NULL, NULL, 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, NULL, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2, NULL, NULL),
-(18, 'EXTRA CONCRETE', NULL, NULL, 'EXTRA CONCRETE', 208.00, NULL, 1, NULL, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL, NULL, NULL),
-(19, 'EXTRA LABOR', NULL, NULL, 'EXTRA LABOR', 1500.00, 'same', 1, NULL, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL, NULL, NULL),
-(20, 'Cubic Yards of Concrete', NULL, NULL, 'Cubic Yards of Concrete', 150.00, 'none', 1, NULL, '2024-04-12 20:28:15', '2025-01-25 17:25:02', 3, NULL, NULL, NULL),
-(21, 'Test', NULL, NULL, 'Test', 100.00, 'none', 1, NULL, '2025-02-16 17:49:58', NULL, 3, NULL, NULL, NULL),
-(22, 'Test 2', NULL, NULL, 'Test 2', NULL, NULL, 1, NULL, '2025-02-16 19:46:08', NULL, 3, NULL, NULL, NULL),
-(23, 'Test 3', NULL, NULL, 'Test 3', NULL, NULL, 1, NULL, '2025-02-16 19:47:33', NULL, 3, NULL, NULL, NULL);
+INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculation`, `status`, `bond`, `created_at`, `updated_at`, `unit_id`, `equation_id`, `txn_id`, `edit_sequence`) VALUES
+(1, 'CONC MEDIAN 4IN', 'CONC MEDIAN 4IN', 29.00, NULL, 1, NULL, '2024-04-12 20:18:17', NULL, 1, NULL, NULL, NULL),
+(2, 'CONC MEDIAN 6IN', 'CONC MEDIAN 6IN', 70.00, NULL, 1, NULL, '2024-04-12 20:18:40', NULL, 1, NULL, NULL, NULL),
+(3, 'CONCRETE V GUTTER', 'CONCRETE V GUTTER', 25.00, NULL, 1, NULL, '2024-04-12 20:19:00', NULL, 2, NULL, NULL, NULL),
+(4, 'CONC VALLEY GUTTER 6IN', 'CONC VALLEY GUTTER 6IN', 58.00, NULL, 1, NULL, '2024-04-12 20:19:26', NULL, 1, NULL, NULL, NULL),
+(5, 'CONC VALLEY GUTTER 8IN', 'CONC VALLEY GUTTER 8IN', 77.00, NULL, 1, NULL, '2024-04-12 20:19:51', NULL, 1, NULL, NULL, NULL),
+(6, 'CONC CURB & GUTTEER 8INX30IN TP2', 'CONC CURB & GUTTEER 8INX30IN TP2', 16.50, NULL, 1, NULL, '2024-04-12 20:20:29', NULL, 2, NULL, NULL, NULL),
+(7, 'CONC CURB & GUTTEER 8INX30IN TP7', 'CONC CURB & GUTTEER 8INX30IN TP7', 16.50, NULL, 1, NULL, '2024-04-12 20:22:07', NULL, 2, NULL, NULL, NULL),
+(8, 'CLASS B CONCRETE', 'CLASS B CONCRETE', 700.00, NULL, 1, NULL, '2024-04-12 20:22:31', NULL, 3, NULL, NULL, NULL),
+(9, 'CLASS B CONCRETE, INCL REINF STEEL', 'CLASS B CONCRETE, INCL REINF STEEL', 0.00, NULL, 1, NULL, '2024-04-12 20:23:08', NULL, 3, NULL, NULL, NULL),
+(10, 'CLASS B CONC, BASE OR PVMT WIDENING', 'CLASS B CONC, BASE OR PVMT WIDENING', 253.00, NULL, 1, NULL, '2024-04-12 20:23:35', NULL, 3, NULL, NULL, NULL),
+(11, 'BAR REINF. STEEL ', 'BAR REINF. STEEL ', 0.00, NULL, 1, NULL, '2024-04-12 20:23:52', NULL, 4, NULL, NULL, NULL),
+(12, 'CONC DRIVEWAY 8IN', 'CONC DRIVEWAY 8IN', 70.00, NULL, 1, NULL, '2024-04-12 20:24:09', NULL, 1, NULL, NULL, NULL),
+(13, 'CONC SLOPE DRAIN ', 'CONC SLOPE DRAIN ', 100.00, NULL, 1, NULL, '2024-04-12 20:24:29', NULL, 1, NULL, NULL, NULL),
+(14, 'CONC SIDEWALK 4IN', 'CONC SIDEWALK 4IN', 30.00, NULL, 1, NULL, '2024-04-12 20:25:08', NULL, 1, NULL, NULL, NULL),
+(15, 'CONC SIDEWALK 8IN', 'CONC SIDEWALK 8IN', 63.00, NULL, 1, NULL, '2024-04-12 20:25:30', NULL, 1, NULL, NULL, NULL),
+(16, 'CONC SPILLWAY TP3', 'CONC SPILLWAY TP3', 2100.00, 'none', 1, NULL, '2024-04-12 20:25:50', '2024-05-12 19:18:34', 5, NULL, NULL, NULL),
+(17, 'PLAIN CONC DITCH PAVING', 'PLAIN CONC DITCH PAVING', 47.18, 'equation', 1, NULL, '2024-04-12 20:26:54', '2024-05-12 19:18:15', 1, 2, NULL, NULL),
+(18, 'EXTRA CONCRETE', 'EXTRA CONCRETE', 208.00, NULL, 1, NULL, '2024-04-12 20:27:17', '2024-05-12 19:18:05', 3, NULL, NULL, NULL),
+(19, 'EXTRA LABOR', 'EXTRA LABOR', 1500.00, 'same', 1, NULL, '2024-04-12 20:27:37', '2024-05-12 19:17:54', 6, NULL, NULL, NULL),
+(20, 'Cubic Yards of Concrete', 'Cubic Yards of Concrete', 150.00, 'none', 1, NULL, '2024-04-12 20:28:15', '2025-01-25 17:25:02', 3, NULL, NULL, NULL),
+(21, 'Test', 'Test', 100.00, 'none', 1, NULL, '2025-02-16 17:49:58', NULL, 3, NULL, NULL, NULL),
+(22, 'Test 2', 'Test 2', NULL, NULL, 1, NULL, '2025-02-16 19:46:08', NULL, 3, NULL, NULL, NULL),
+(23, 'Test 3', 'Test 3', NULL, NULL, 1, NULL, '2025-02-16 19:47:33', NULL, 3, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1639,27 +1639,29 @@ CREATE TABLE `project_item` (
   `item_id` int(11) DEFAULT NULL,
   `equation_id` int(11) DEFAULT NULL,
   `apply_retainage` tinyint(1) DEFAULT NULL,
-  `bonded` tinyint(1) DEFAULT NULL
+  `bonded` tinyint(1) DEFAULT NULL,
+  `code` varchar(100) DEFAULT NULL COMMENT 'Código por línea de proyecto',
+  `contract_name` varchar(255) DEFAULT NULL COMMENT 'Nombre en contrato por línea de proyecto'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `project_item`
 --
 
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`) VALUES
-(1, 1500.000000, 16.50, 'equation', NULL, NULL, 1, NULL, NULL, 3, 6, 2, NULL, NULL),
-(2, 2000.000000, 63.00, 'same', NULL, NULL, 1, NULL, NULL, 3, 15, NULL, NULL, NULL),
-(4, 1600.000000, 150.00, 'none', NULL, NULL, 1, NULL, NULL, 3, 20, NULL, NULL, NULL),
-(8, 2500.000000, 25.00, 'equation', NULL, NULL, 1, NULL, NULL, 3, 3, 2, NULL, NULL),
-(9, 2500.000000, 16.50, 'equation', NULL, NULL, 1, NULL, NULL, 3, 7, 2, NULL, NULL),
-(10, 5000.000000, 70.00, 'equation', NULL, NULL, 1, NULL, NULL, 3, 12, 2, NULL, NULL),
-(11, 50.000000, 160.00, 'none', NULL, NULL, 1, NULL, NULL, 2, 12, NULL, NULL, NULL),
-(12, 60.000000, 200.00, '', NULL, NULL, 1, NULL, NULL, 2, 6, NULL, NULL, NULL),
-(13, 50.000000, 300.00, '', NULL, NULL, 1, NULL, NULL, 2, 7, NULL, NULL, NULL),
-(15, 10.000000, 100.00, 'same', NULL, NULL, 1, NULL, NULL, 3, 21, NULL, NULL, NULL),
-(16, 0.000000, 100.00, 'same', NULL, NULL, 1, NULL, NULL, 2, 11, NULL, NULL, NULL),
-(17, 100.000000, 100.00, 'equation', NULL, NULL, 1, NULL, NULL, 2, 8, 2, NULL, NULL),
-(18, 10.000000, 100.00, 'none', NULL, NULL, 1, NULL, NULL, 1, 11, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(1, 1500.000000, 16.50, 'equation', NULL, NULL, 1, NULL, NULL, 3, 6, 2, NULL, NULL, NULL, NULL),
+(2, 2000.000000, 63.00, 'same', NULL, NULL, 1, NULL, NULL, 3, 15, NULL, NULL, NULL, NULL, NULL),
+(4, 1600.000000, 150.00, 'none', NULL, NULL, 1, NULL, NULL, 3, 20, NULL, NULL, NULL, NULL, NULL),
+(8, 2500.000000, 25.00, 'equation', NULL, NULL, 1, NULL, NULL, 3, 3, 2, NULL, NULL, NULL, NULL),
+(9, 2500.000000, 16.50, 'equation', NULL, NULL, 1, NULL, NULL, 3, 7, 2, NULL, NULL, NULL, NULL),
+(10, 5000.000000, 70.00, 'equation', NULL, NULL, 1, NULL, NULL, 3, 12, 2, NULL, NULL, NULL, NULL),
+(11, 50.000000, 160.00, 'none', NULL, NULL, 1, NULL, NULL, 2, 12, NULL, NULL, NULL, NULL, NULL),
+(12, 60.000000, 200.00, '', NULL, NULL, 1, NULL, NULL, 2, 6, NULL, NULL, NULL, NULL, NULL),
+(13, 50.000000, 300.00, '', NULL, NULL, 1, NULL, NULL, 2, 7, NULL, NULL, NULL, NULL, NULL),
+(15, 10.000000, 100.00, 'same', NULL, NULL, 1, NULL, NULL, 3, 21, NULL, NULL, NULL, NULL, NULL),
+(16, 0.000000, 100.00, 'same', NULL, NULL, 1, NULL, NULL, 2, 11, NULL, NULL, NULL, NULL, NULL),
+(17, 100.000000, 100.00, 'equation', NULL, NULL, 1, NULL, NULL, 2, 8, 2, NULL, NULL, NULL, NULL),
+(18, 10.000000, 100.00, 'none', NULL, NULL, 1, NULL, NULL, 1, 11, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 

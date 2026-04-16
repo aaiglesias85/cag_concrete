@@ -989,20 +989,6 @@ class Base
       $item_entity->setStatus(1);
       $item_entity->setYieldCalculation($value->yield_calculation);
 
-      $codeNorm = null;
-      if (isset($value->code) && $value->code !== null && $value->code !== '') {
-         $c = trim((string) $value->code);
-         $codeNorm = $c === '' ? null : $c;
-      }
-      $item_entity->setCode($codeNorm);
-
-      $contractNorm = null;
-      if (isset($value->contract_name) && $value->contract_name !== null && $value->contract_name !== '') {
-         $c = trim((string) $value->contract_name);
-         $contractNorm = $c === '' ? null : $c;
-      }
-      $item_entity->setContractName($contractNorm);
-
       if (isset($value->bond)) {
          $item_entity->setBond($value->bond == 1 || $value->bond === '1' || $value->bond === true);
       }
@@ -1054,8 +1040,6 @@ class Base
       return [
          "item_id" => $value->getItemId(),
          "item" => $value->getName(),
-         "code" => $value->getCode(),
-         "contract_name" => $value->getContractName(),
          "unit" => $value->getUnit() != null ? $value->getUnit()->getDescription() : '',
          "yield_calculation" => $value->getYieldCalculation(),
          "yield_calculation_name" => $yield_calculation_name,
@@ -1666,7 +1650,7 @@ class Base
             "paid_amount_total" => $paid_amount_total,
 
             "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "code" => $value->getProjectItem()->getItem()->getCode(),
+            "code" => $value->getProjectItem()->getCode(),
             "item" => $value->getProjectItem()->getItem()->getName(),
             "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
             "contract_qty" => $contract_qty,

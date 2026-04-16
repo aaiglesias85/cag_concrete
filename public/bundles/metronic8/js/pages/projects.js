@@ -1612,9 +1612,11 @@ var Projects = (function () {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
          $('#select-unit').removeClass('hide');
+         // New item (catálogo personalizado): mostrar code / contract name
          $('#div-item-new-meta').removeClass('hide');
       } else {
-         $('#div-item-new-meta').removeClass('hide');
+         // Existing item al agregar: ocultar code / contract name (van solo con "New item")
+         $('#div-item-new-meta').addClass('hide');
          $('#item-code-new').val('');
          $('#item-contract-name-new').val('');
       }
@@ -1636,6 +1638,7 @@ var Projects = (function () {
    var changeItem = function () {
       var item_id = $('#item').val();
       var item_type = $('#item-type-existing').prop('checked');
+      var editingLine = $('#project_item_id').val() !== '' && $('#project_item_id').val() !== undefined;
 
       // reset
 
@@ -1663,9 +1666,18 @@ var Projects = (function () {
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
-         $('#item-code-new').val($optItem.data('code') != null ? $optItem.data('code') : '');
-         $('#item-contract-name-new').val($optItem.data('contractName') != null ? $optItem.data('contractName') : '');
-         $('#div-item-new-meta').removeClass('hide');
+         if (editingLine) {
+            // Editar línea: siempre mostrar code / contract (por project_item)
+            $('#div-item-new-meta').removeClass('hide');
+         } else if (item_type) {
+            // Agregar + ítem de catálogo: ocultar (no aplica code de línea hasta guardar; usuario no rellena aquí)
+            $('#div-item-new-meta').addClass('hide');
+            $('#item-code-new').val('');
+            $('#item-contract-name-new').val('');
+         } else {
+            // Agregar + flujo "New item" con select aún con valor (raro): mostrar meta
+            $('#div-item-new-meta').removeClass('hide');
+         }
 
          // mostrar campo bond editable para items existentes (usuario con permiso bond)
          if (item_type && $('#div-bond-existing-item').length > 0) {
@@ -1674,8 +1686,17 @@ var Projects = (function () {
             $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
       } else {
-         $('#item-code-new').val('');
-         $('#item-contract-name-new').val('');
+         if (editingLine) {
+            $('#div-item-new-meta').removeClass('hide');
+         } else if (item_type) {
+            $('#item-code-new').val('');
+            $('#item-contract-name-new').val('');
+            $('#div-item-new-meta').addClass('hide');
+         } else {
+            $('#item-code-new').val('');
+            $('#item-contract-name-new').val('');
+            $('#div-item-new-meta').removeClass('hide');
+         }
       }
    };
 
@@ -2396,24 +2417,10 @@ var Projects = (function () {
                            $optNew.attr('data-unit', item_new.unit);
                            $optNew.attr('data-equation', item_new.equation_id);
                            $optNew.attr('data-yield', item_new.yield_calculation);
-                           $optNew.attr('data-code', item_new.code != null && item_new.code !== undefined ? item_new.code : '');
-                           $optNew.attr(
-                              'data-contract-name',
-                              item_new.contract_name != null && item_new.contract_name !== undefined ? item_new.contract_name : '',
-                           );
 
                            $('.select-modal-item').select2({
                               dropdownParent: $('#modal-item'), // Asegúrate de que es el ID del modal
                            });
-                        } else if (item_new.item_id) {
-                           var $optUpd = $('#item option[value="' + item_new.item_id + '"]');
-                           if ($optUpd.length) {
-                              $optUpd.attr('data-code', item_new.code != null && item_new.code !== undefined ? item_new.code : '');
-                              $optUpd.attr(
-                                 'data-contract-name',
-                                 item_new.contract_name != null && item_new.contract_name !== undefined ? item_new.contract_name : '',
-                              );
-                           }
                         }
 
                         //actualizar lista

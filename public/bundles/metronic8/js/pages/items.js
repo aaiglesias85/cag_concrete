@@ -17,8 +17,8 @@ var Items = (function () {
       // language
       const language = DatatableUtil.getDataTableLenguaje();
 
-      // order (por Name: con checkbox Code=1, Name=2; sin checkbox Name=1)
-      const order = permiso.eliminar ? [[2, 'asc']] : [[1, 'asc']];
+      // order (por Name: con checkbox Name=1; sin checkbox Name=0)
+      const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
 
       oTable = $(table).DataTable({
          searchDelay: 500,
@@ -72,7 +72,6 @@ var Items = (function () {
          columns.push({ data: 'id' });
       }
       columns.push(
-         { data: 'code' },
          { data: 'name' },
          { data: 'unit' },
          { data: 'yieldCalculation' },
@@ -101,11 +100,11 @@ var Items = (function () {
             render: DatatableUtil.getRenderColumnCheck,
          },
          {
-            targets: 2,
+            targets: 1,
             render: renderNameWithBond,
          },
          {
-            targets: 5,
+            targets: 4,
             className: 'text-center',
             render: DatatableUtil.getRenderColumnEstado,
          },
@@ -114,11 +113,11 @@ var Items = (function () {
       if (!permiso.eliminar) {
          columnDefs = [
             {
-               targets: 1,
+               targets: 0,
                render: renderNameWithBond,
             },
             {
-               targets: 4,
+               targets: 3,
                className: 'text-center',
                render: DatatableUtil.getRenderColumnEstado,
             },
@@ -280,9 +279,6 @@ var Items = (function () {
       $('#equation').val('');
       $('#equation').trigger('change');
       $('#select-equation').removeClass('hide').addClass('hide');
-
-      $('#code').val('');
-      $('#contract_name').val('');
 
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));
@@ -521,8 +517,6 @@ var Items = (function () {
          var equation_id = $('#equation').val();
          formData.set('equation_id', equation_id);
 
-         formData.set('code', $('#code').val() || '');
-         formData.set('contract_name', $('#contract_name').val() || '');
 
          BlockUtil.block('#form-item');
 
@@ -666,8 +660,6 @@ var Items = (function () {
       KTUtil.find(KTUtil.get('form-item'), '.card-label').innerHTML = 'Update Item: ' + (item.name || item.descripcion);
 
       $('#name').val(item.name);
-      $('#code').val(item.code || '');
-      $('#contract_name').val(item.contract_name || '');
       $('#descripcion').val(item.descripcion);
 
       $('#unit').val(item.unit_id);
