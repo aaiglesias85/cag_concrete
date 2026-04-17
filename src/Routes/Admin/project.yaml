@@ -78,6 +78,10 @@ agregarItemProjectAdmin:
    path: /project/agregarItem
    defaults: { _controller: App\Controller\Admin\ProjectController::agregarItem, _format: json }
 
+sugerirCodeContractItemProyectoAdmin:
+   path: /project/sugerirCodeContractItemProyecto
+   defaults: { _controller: App\Controller\Admin\ProjectController::sugerirCodeContractItemEnProyecto, _format: json }
+
 #contacts
 listarContactsDeProjectAdmin:
    path: /project/listarContacts

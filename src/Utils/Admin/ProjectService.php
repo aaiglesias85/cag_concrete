@@ -1087,6 +1087,34 @@ class ProjectService extends Base
    }
 
    /**
+    * Sugiere code y contract_name desde la última project_item del mismo proyecto con ese item_id de catálogo.
+    */
+   public function SugerirCodeContractItemEnProyecto($project_id, $item_id): array
+   {
+      $pid = (int) $project_id;
+      $iid = (int) $item_id;
+      if ($pid <= 0 || $iid <= 0) {
+         return ['success' => false, 'error' => 'Invalid parameters', 'code' => '', 'contract_name' => ''];
+      }
+
+      /** @var ProjectItemRepository $projectItemRepo */
+      $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
+      $pi = $projectItemRepo->findLatestByProjectIdAndCatalogItemId($pid, $iid);
+      if ($pi === null) {
+         return ['success' => true, 'code' => '', 'contract_name' => ''];
+      }
+
+      $code = $pi->getCode();
+      $cn = $pi->getContractName();
+
+      return [
+         'success' => true,
+         'code' => $code !== null && trim((string) $code) !== '' ? trim((string) $code) : '',
+         'contract_name' => $cn !== null && trim((string) $cn) !== '' ? trim((string) $cn) : '',
+      ];
+   }
+
+   /**
     * EliminarItem: Elimina un item en la BD
     * @param int $project_item_id Id
     * @author Marcel

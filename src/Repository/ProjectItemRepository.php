@@ -90,6 +90,26 @@ class ProjectItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Última línea de proyecto (por id) con ese ítem de catálogo, para sugerir code/contract al agregar otra línea.
+    */
+   public function findLatestByProjectIdAndCatalogItemId(int $projectId, int $itemId): ?ProjectItem
+   {
+      $row = $this->createQueryBuilder('pi')
+         ->innerJoin('pi.project', 'p')
+         ->innerJoin('pi.item', 'i')
+         ->andWhere('p.projectId = :pid')
+         ->andWhere('i.itemId = :iid')
+         ->setParameter('pid', $projectId)
+         ->setParameter('iid', $itemId)
+         ->orderBy('pi.id', 'DESC')
+         ->setMaxResults(1)
+         ->getQuery()
+         ->getOneOrNullResult();
+
+      return $row instanceof ProjectItem ? $row : null;
+   }
+
+   /**
     * ListarProjectItemsDeEquation: Lista los items de una equation
     *
     * @return ProjectItem[]

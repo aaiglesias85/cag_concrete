@@ -1574,6 +1574,33 @@ var Projects = (function () {
       
    };
 
+   /** Sugiere code/contract desde la última project_item del mismo proyecto con ese item_id (sin tocar tabla item). */
+   var cargarSugerenciaCodeContractItemProyecto = function (item_id) {
+      var project_id = $('#project_id').val();
+      if (!project_id || !item_id) {
+         return;
+      }
+      var formData = new URLSearchParams();
+      formData.set('project_id', project_id);
+      formData.set('item_id', item_id);
+      axios
+         .post('project/sugerirCodeContractItemProyecto', formData, { responseType: 'json' })
+         .then(function (res) {
+            if (res.status !== 200 && res.status !== 201) {
+               return;
+            }
+            var d = res.data;
+            if (!d || !d.success) {
+               return;
+            }
+            $('#item-code-new').val(d.code != null && d.code !== undefined ? d.code : '');
+            $('#item-contract-name-new').val(d.contract_name != null && d.contract_name !== undefined ? d.contract_name : '');
+         })
+         .catch(function () {
+            /* silencioso: sugerencia opcional */
+         });
+   };
+
    var changeItemType = function () {
       var state = $('#item-type-existing').prop('checked');
 
@@ -1590,6 +1617,9 @@ var Projects = (function () {
       $('#unit').val('');
       $('#unit').trigger('change');
       $('#select-unit').removeClass('hide').addClass('hide');
+
+      // Code / contract siempre visibles en el modal (valores por línea project_item)
+      $('#div-item-new-meta').removeClass('hide');
 
       // mostrar/ocultar campo bond según el tipo de item
       if ($('#div-bond-new-item').length > 0 && $('#div-bond-existing-item').length > 0) {
@@ -1612,13 +1642,6 @@ var Projects = (function () {
          $('#div-item').removeClass('hide').addClass('hide');
          $('#item-name').removeClass('hide');
          $('#select-unit').removeClass('hide');
-         // New item (catálogo personalizado): mostrar code / contract name
-         $('#div-item-new-meta').removeClass('hide');
-      } else {
-         // Existing item al agregar: ocultar code / contract name (van solo con "New item")
-         $('#div-item-new-meta').addClass('hide');
-         $('#item-code-new').val('');
-         $('#item-contract-name-new').val('');
       }
    };
 
@@ -1656,6 +1679,8 @@ var Projects = (function () {
          $('#bond-existing').prop('checked', false);
       }
 
+      $('#div-item-new-meta').removeClass('hide');
+
       if (item_id != '') {
          var $optItem = $('#item option[value="' + item_id + '"]');
          var yield = $optItem.data('yield');
@@ -1666,17 +1691,8 @@ var Projects = (function () {
          $('#equation').val(equation);
          $('#equation').trigger('change');
 
-         if (editingLine) {
-            // Editar línea: siempre mostrar code / contract (por project_item)
-            $('#div-item-new-meta').removeClass('hide');
-         } else if (item_type) {
-            // Agregar + ítem de catálogo: ocultar (no aplica code de línea hasta guardar; usuario no rellena aquí)
-            $('#div-item-new-meta').addClass('hide');
-            $('#item-code-new').val('');
-            $('#item-contract-name-new').val('');
-         } else {
-            // Agregar + flujo "New item" con select aún con valor (raro): mostrar meta
-            $('#div-item-new-meta').removeClass('hide');
+         if (!editingLine && item_type) {
+            cargarSugerenciaCodeContractItemProyecto(item_id);
          }
 
          // mostrar campo bond editable para items existentes (usuario con permiso bond)
@@ -1686,16 +1702,9 @@ var Projects = (function () {
             $('#bond-existing').prop('checked', bond == 1 || bond === '1' || bond === true);
          }
       } else {
-         if (editingLine) {
-            $('#div-item-new-meta').removeClass('hide');
-         } else if (item_type) {
+         if (!editingLine) {
             $('#item-code-new').val('');
             $('#item-contract-name-new').val('');
-            $('#div-item-new-meta').addClass('hide');
-         } else {
-            $('#item-code-new').val('');
-            $('#item-contract-name-new').val('');
-            $('#div-item-new-meta').removeClass('hide');
          }
       }
    };
@@ -2697,7 +2706,7 @@ var Projects = (function () {
 
       $('#div-item').removeClass('hide');
       $('#item-name').removeClass('hide').addClass('hide');
-      $('#div-item-new-meta').addClass('hide');
+      $('#div-item-new-meta').removeClass('hide');
       $('#item-code-new').val('');
       $('#item-contract-name-new').val('');
 

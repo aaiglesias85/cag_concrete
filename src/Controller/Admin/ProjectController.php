@@ -735,6 +735,28 @@ class ProjectController extends AbstractController
    }
 
    /**
+    * Sugiere code / contract_name desde project_item existente en el mismo proyecto (mismo item_id de catálogo).
+    */
+   public function sugerirCodeContractItemEnProyecto(Request $request): JsonResponse
+   {
+      $project_id = $request->get('project_id');
+      $item_id = $request->get('item_id');
+
+      try {
+         $resultado = $this->projectService->SugerirCodeContractItemEnProyecto($project_id, $item_id);
+
+         return $this->json($resultado);
+      } catch (\Exception $e) {
+         return $this->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'code' => '',
+            'contract_name' => '',
+         ]);
+      }
+   }
+
+   /**
     * eliminarItem Acción que elimina un item en la BD
     *
     */
