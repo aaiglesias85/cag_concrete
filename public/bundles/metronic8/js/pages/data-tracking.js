@@ -2162,94 +2162,76 @@ var DataTracking = (function () {
             }
 
             var price = item.price;
-            var total = punchNetLineTotal({ quantity: quantity, punch_quantity: punchQty, price: price });
+            var data_tracking_id = $('#data_tracking_id').val() || '';
+            var project_id = $('#project').val() || '';
+            var date = FlatpickrUtil.getString('datetimepicker-date') || '';
 
-            var yield_calculation = item.yield_calculation;
-            var equation_id = item.equation_id;
-            var yield_calculation_name = item.yield_calculation_name;
-
-            // calcular yield
-            var yield_calculation_valor = '';
-            if (yield_calculation !== '' && yield_calculation !== 'none') {
-               if (yield_calculation === 'same') {
-                  yield_calculation_valor = quantity;
-               } else {
-                  yield_calculation_valor = MyApp.evaluateExpression(yield_calculation_name, quantity);
-               }
+            if (data_tracking_id === '' && (project_id === '' || date === '')) {
+               toastr.error('Select project and date before adding items (or save the data tracking header first).', '');
+               return;
             }
 
-            if (nEditingRowItem == null) {
-               items_data_tracking.push({
-                  data_tracking_item_id: '',
-                  item_id: item_id,
-                  project_item_id: item.project_item_id || item_id,
-                  item: item.item,
-                  unit: item.unit,
-                  equation_id: equation_id,
-                  yield_calculation: yield_calculation,
-                  yield_calculation_name: yield_calculation_name,
-                  quantity: quantity,
-                  punch_quantity: punchQty,
-                  quantity_old: item.quantity_old || '',
-                  yield_calculation_valor: yield_calculation_valor,
-                  price: price,
-                  price_old: item.price_old || '',
-                  total: total,
-                  notes: notes,
-                  change_order: item.change_order || false,
-                  change_order_date: item.change_order_date || '',
-                  apply_retainage: item.apply_retainage == 1 || item.apply_retainage === true,
-                  bonded: item.bonded == 1 || item.bonded === true,
-                  bond: item.bond == 1 || item.bond === true,
-                  posicion: items_data_tracking.length,
+            var wasEditing = nEditingRowItem;
+            var existingLineId =
+               wasEditing != null && items_data_tracking[wasEditing] ? items_data_tracking[wasEditing].data_tracking_item_id : '';
+
+            var formData = new URLSearchParams();
+            formData.set('data_tracking_id', data_tracking_id);
+            formData.set('project_id', project_id);
+            formData.set('date', date);
+            formData.set('data_tracking_item_id', existingLineId != null && existingLineId !== '' ? String(existingLineId) : '');
+            formData.set('item_id', String(item_id));
+            formData.set('quantity', String(quantity));
+            formData.set('punch_quantity', String(punchQty));
+            formData.set('notes', notes != null ? String(notes) : '');
+            formData.set('price', String(price));
+
+            BlockUtil.block('#lista-items');
+
+            axios
+               .post('data-tracking/salvarItem', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success && response.item) {
+                        if (response.data_tracking_id != null && response.data_tracking_id !== '') {
+                           $('#data_tracking_id').val(String(response.data_tracking_id));
+                        }
+
+                        if (wasEditing != null) {
+                           response.item.posicion = wasEditing;
+                           items_data_tracking[wasEditing] = response.item;
+                           logDtItemQty('btn-salvar-item servidor OK (edición)', {
+                              posicion: wasEditing,
+                              quantityEnArray: items_data_tracking[wasEditing].quantity,
+                              data_tracking_item_id: response.item.data_tracking_item_id,
+                           });
+                        } else {
+                           items_data_tracking.push(response.item);
+                           logDtItemQty('btn-salvar-item servidor OK (nuevo)', {
+                              ultima: items_data_tracking[items_data_tracking.length - 1],
+                           });
+                        }
+
+                        toastr.success(response.message || 'Saved', '');
+                        actualizarTableListaItems();
+
+                        if (wasEditing != null) {
+                           ModalUtil.hide('modal-data-tracking-item');
+                        }
+
+                        resetFormItem();
+                     } else {
+                        toastr.error(response.error || 'An error occurred', '');
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#lista-items');
                });
-            } else {
-               var posicion = nEditingRowItem;
-               if (items_data_tracking[posicion]) {
-                  items_data_tracking[posicion].item_id = item_id;
-                  items_data_tracking[posicion].project_item_id = item.project_item_id || item_id;
-                  items_data_tracking[posicion].item = item.item;
-                  items_data_tracking[posicion].unit = item.unit;
-                  items_data_tracking[posicion].yield_calculation = yield_calculation;
-                  items_data_tracking[posicion].yield_calculation_name = yield_calculation_name;
-                  items_data_tracking[posicion].yield_calculation_valor = yield_calculation_valor;
-                  items_data_tracking[posicion].equation_id = equation_id;
-                  items_data_tracking[posicion].quantity = quantity;
-                  items_data_tracking[posicion].punch_quantity = punchQty;
-                  items_data_tracking[posicion].quantity_old = item.quantity_old || '';
-                  items_data_tracking[posicion].price = price;
-                  items_data_tracking[posicion].price_old = item.price_old || '';
-                  items_data_tracking[posicion].total = total;
-                  items_data_tracking[posicion].notes = notes;
-                  items_data_tracking[posicion].change_order = item.change_order || false;
-                  items_data_tracking[posicion].change_order_date = item.change_order_date || '';
-                  items_data_tracking[posicion].apply_retainage = item.apply_retainage == 1 || item.apply_retainage === true;
-                  items_data_tracking[posicion].bonded = item.bonded == 1 || item.bonded === true;
-                  items_data_tracking[posicion].bond = item.bond == 1 || item.bond === true;
-               }
-            }
-
-            //actualizar lista
-            actualizarTableListaItems();
-
-            if (nEditingRowItem != null && items_data_tracking[nEditingRowItem]) {
-               logDtItemQty('btn-salvar-item fila actualizada en memoria', {
-                  posicion: nEditingRowItem,
-                  quantityEnArray: items_data_tracking[nEditingRowItem].quantity,
-                  totalEnArray: items_data_tracking[nEditingRowItem].total,
-               });
-            } else if (nEditingRowItem == null) {
-               logDtItemQty('btn-salvar-item nueva fila (última)', {
-                  ultima: items_data_tracking[items_data_tracking.length - 1],
-               });
-            }
-
-            if (nEditingRowItem != null) {
-               ModalUtil.hide('modal-data-tracking-item');
-            }
-
-            // reset
-            resetFormItem();
          } else {
             if (item_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-item-data-tracking'), 'This field is required');

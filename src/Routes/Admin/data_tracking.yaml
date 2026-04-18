@@ -26,6 +26,10 @@ eliminarItemDataTrackingAdmin:
   path: /data-tracking/eliminarItem
   defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarItem, _format: json }
 
+salvarItemDataTrackingAdmin:
+  path: /data-tracking/salvarItem
+  defaults: { _controller: App\Controller\Admin\DataTrackingController::salvarItem, _format: json }
+
 eliminarSubcontractDataTrackingAdmin:
   path: /data-tracking/eliminarSubcontract
   defaults: { _controller: App\Controller\Admin\DataTrackingController::eliminarSubcontract, _format: json }

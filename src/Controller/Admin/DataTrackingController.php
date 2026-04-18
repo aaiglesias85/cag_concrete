@@ -353,6 +353,44 @@ class DataTrackingController extends AbstractController
    }
 
    /**
+    * salvarItem: alta o edición de una línea de ítem de data tracking (persistencia inmediata).
+    */
+   public function salvarItem(Request $request)
+   {
+      try {
+         $resultado = $this->dataTrackingService->SalvarItemDataTracking(
+            $request->get('data_tracking_id'),
+            $request->get('project_id'),
+            $request->get('date'),
+            $request->get('data_tracking_item_id'),
+            $request->get('item_id'),
+            $request->get('quantity'),
+            $request->get('punch_quantity'),
+            $request->get('notes'),
+            $request->get('price')
+         );
+
+         if ($resultado['success']) {
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = 'The operation was successful';
+            $resultadoJson['data_tracking_id'] = $resultado['data_tracking_id'];
+            $resultadoJson['data_tracking_item_id'] = $resultado['data_tracking_item_id'];
+            $resultadoJson['item'] = $resultado['item'];
+         } else {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $resultado['error'] ?? 'Unknown error';
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   /**
     * eliminarSubcontract Acción que elimina un subcontract en la BD
     *
     */

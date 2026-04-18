@@ -315,6 +315,235 @@ class DataTrackingService extends Base
    }
 
    /**
+    * SalvarItemDataTracking: crea o actualiza una sola línea de ítem contra la BD (sin guardar el formulario global).
+    *
+    * @param string|int|null $data_tracking_id
+    * @param string|int|null $project_id   requerido si no hay data_tracking_id
+    * @param string|null     $date         m/d/Y; requerido si no hay data_tracking_id
+    * @param string|int|null $data_tracking_item_id vacío = alta
+    * @param string|int|null $item_id      id de project_item (mismo criterio que SalvarItems)
+    */
+   public function SalvarItemDataTracking(
+      $data_tracking_id,
+      $project_id,
+      $date,
+      $data_tracking_item_id,
+      $item_id,
+      $quantity,
+      $punch_quantity,
+      $notes,
+      $price
+   ): array {
+      $resultado = ['success' => false];
+      $em = $this->getDoctrine()->getManager();
+
+      if ($item_id === '' || $item_id === null) {
+         $resultado['error'] = 'The item is required.';
+
+         return $resultado;
+      }
+
+      /** @var ProjectItem|null $projectItemEntity */
+      $projectItemEntity = $this->getDoctrine()->getRepository(ProjectItem::class)->find($item_id);
+      if ($projectItemEntity === null) {
+         $resultado['error'] = 'The project item does not exist.';
+
+         return $resultado;
+      }
+
+      $dtEntity = null;
+      $createdHeader = false;
+
+      if (is_numeric($data_tracking_id)) {
+         $dtEntity = $this->getDoctrine()->getRepository(DataTracking::class)->find((int) $data_tracking_id);
+         if ($dtEntity === null) {
+            $resultado['error'] = 'The data tracking does not exist.';
+
+            return $resultado;
+         }
+      } else {
+         if ($project_id === '' || $project_id === null || $date === '' || $date === null) {
+            $resultado['error'] = 'Project and date are required to add an item when the data tracking is not saved yet.';
+
+            return $resultado;
+         }
+
+         /** @var Project|null $project_entity */
+         $project_entity = $this->getDoctrine()->getRepository(Project::class)->find($project_id);
+         if ($project_entity === null) {
+            $resultado['error'] = 'The project not exist.';
+
+            return $resultado;
+         }
+
+         $dateObj = \DateTime::createFromFormat('m/d/Y', $date);
+         if ($dateObj === false) {
+            $resultado['error'] = 'Invalid date.';
+
+            return $resultado;
+         }
+
+         /** @var DataTrackingRepository $dataTrackingRepo */
+         $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
+         $existentes = $dataTrackingRepo->ListarDataTracking($project_id, $date, $date);
+         if (!empty($existentes)) {
+            $dtEntity = $existentes[0];
+         } else {
+            $dtEntity = $this->createEmptyDataTrackingForProjectAndDate($project_entity, $dateObj);
+            $em->persist($dtEntity);
+            $this->ModificarStatusProject($project_entity, $date);
+            $createdHeader = true;
+            $em->flush();
+         }
+      }
+
+      $data_tracking_item_entity = null;
+      if (is_numeric($data_tracking_item_id)) {
+         $data_tracking_item_entity = $this->getDoctrine()->getRepository(DataTrackingItem::class)
+            ->find((int) $data_tracking_item_id);
+         if ($data_tracking_item_entity === null) {
+            $resultado['error'] = 'The data tracking item does not exist.';
+
+            return $resultado;
+         }
+         if ($data_tracking_item_entity->getDataTracking()->getId() !== $dtEntity->getId()) {
+            $resultado['error'] = 'The data tracking item does not belong to this data tracking.';
+
+            return $resultado;
+         }
+      }
+
+      $oldProjectItemId = null;
+      if ($data_tracking_item_entity !== null && $data_tracking_item_entity->getProjectItem() !== null) {
+         $oldProjectItemId = $data_tracking_item_entity->getProjectItem()->getId();
+      }
+
+      /** @var DataTrackingItemRepository $dtiRepo */
+      $dtiRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $qbDup = $dtiRepo->createQueryBuilder('i')
+         ->select('COUNT(i.id)')
+         ->andWhere('i.dataTracking = :dt')
+         ->andWhere('i.projectItem = :pi')
+         ->setParameter('dt', $dtEntity)
+         ->setParameter('pi', $projectItemEntity);
+      if ($data_tracking_item_entity !== null) {
+         $qbDup->andWhere('i.id != :selfId')->setParameter('selfId', $data_tracking_item_entity->getId());
+      }
+      if ((int) $qbDup->getQuery()->getSingleScalarResult() > 0) {
+         $resultado['error'] = 'The selected item has already been added';
+
+         return $resultado;
+      }
+
+      $isNewLine = $data_tracking_item_entity === null;
+      if ($isNewLine) {
+         $data_tracking_item_entity = new DataTrackingItem();
+         $data_tracking_item_entity->setDataTracking($dtEntity);
+         $em->persist($data_tracking_item_entity);
+      }
+
+      $qty = (float) $quantity;
+      $punchRaw = isset($punch_quantity) ? (float) $punch_quantity : 0.0;
+      $punch = max(0.0, min($punchRaw, $qty));
+      $notesStr = $notes !== null && $notes !== '' ? (string) $notes : '';
+      $priceVal = (float) $price;
+
+      $data_tracking_item_entity->setProjectItem($projectItemEntity);
+      $data_tracking_item_entity->setQuantity($qty);
+      $data_tracking_item_entity->setPunchQuantity($punch);
+      $data_tracking_item_entity->setNotes($notesStr);
+      $data_tracking_item_entity->setPrice($priceVal);
+
+      if (!$createdHeader) {
+         $dtEntity->setUpdatedAt(new \DateTime());
+      }
+
+      $em->flush();
+
+      $this->updateDataTrackingPendingFromItems($dtEntity);
+      $em->flush();
+
+      $project_id_final = $dtEntity->getProject()->getProjectId();
+      $dateObjFinal = $dtEntity->getDate();
+      $invoiceItemIds = [(int) $item_id];
+      if ($oldProjectItemId !== null && $oldProjectItemId !== (int) $item_id) {
+         $invoiceItemIds[] = (int) $oldProjectItemId;
+      }
+      $this->invoiceService->ActualizarInvoicesPorCambioDataTracking(
+         $project_id_final,
+         $dateObjFinal,
+         array_values(array_unique($invoiceItemIds))
+      );
+
+      $savedId = $data_tracking_item_entity->getId();
+      $itemRow = null;
+      foreach ($this->ListarItemsDeDataTracking($dtEntity->getId()) as $row) {
+         if ((int) $row['data_tracking_item_id'] === (int) $savedId) {
+            $itemRow = $row;
+            break;
+         }
+      }
+
+      $log_operacion = $isNewLine ? 'Add' : 'Update';
+      $project_desc = $dtEntity->getProject()->getProjectNumber() . ' - ' . $dtEntity->getProject()->getName();
+      $dateStr = $dateObjFinal->format('m/d/Y');
+      $log_descripcion = $isNewLine
+         ? "The data tracking item is added (inline), Project: $project_desc, Date: $dateStr"
+         : "The data tracking item is modified (inline), Project: $project_desc, Date: $dateStr";
+      $this->SalvarLog($log_operacion, 'Data Tracking', $log_descripcion);
+
+      $resultado['success'] = true;
+      $resultado['data_tracking_id'] = $dtEntity->getId();
+      $resultado['data_tracking_item_id'] = $savedId;
+      $resultado['item'] = $itemRow;
+
+      return $resultado;
+   }
+
+   private function createEmptyDataTrackingForProjectAndDate(Project $project, \DateTimeInterface $date): DataTracking
+   {
+      $entity = new DataTracking();
+      $entity->setProject($project);
+      $entity->setDate($date);
+      $entity->setStationNumber('');
+      $entity->setMeasuredBy('');
+      $entity->setCrewLead('');
+      $entity->setNotes('');
+      $entity->setOtherMaterials('');
+      $entity->setConcVendor('');
+      $entity->setTotalConcUsed(0.0);
+      $entity->setConcPrice(0.0);
+      $entity->setTotalStamps(0.0);
+      $entity->setTotalPeople(0.0);
+      $entity->setOverhead(null);
+      $entity->setOverheadPrice(0.0);
+      $entity->setColorUsed(0.0);
+      $entity->setColorPrice(0.0);
+      $entity->setPending(false);
+      $entity->setCreatedAt(new \DateTime());
+
+      return $entity;
+   }
+
+   private function updateDataTrackingPendingFromItems(DataTracking $entity): void
+   {
+      if ($entity->getId() === null) {
+         return;
+      }
+      /** @var DataTrackingItemRepository $repo */
+      $repo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+      $lista = $repo->ListarItems($entity->getId());
+      $pending = false;
+      foreach ($lista as $it) {
+         if ((float) $it->getQuantity() === 0.0) {
+            $pending = true;
+            break;
+         }
+      }
+      $entity->setPending($pending);
+   }
+
+   /**
     * CargarDatosDataTracking: Carga los datos de un item project
     *
     * @param int $data_tracking_id Id
