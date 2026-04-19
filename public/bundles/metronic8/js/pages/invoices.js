@@ -2751,42 +2751,70 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          actualizarTableListaItems();
       }
 
-      // Guardar último valor válido al enfocar (para restaurar si excede el máximo)
+      var parseQtyInput = function (v) {
+         if (v === '' || v === null || v === undefined) return 0;
+         var n = typeof v === 'number' ? v : Number(String(v).replace(/,/g, ''));
+         return Number.isFinite(n) ? n : 0;
+      };
+
+      // Guardar último valor válido y el tope QBF al enfocar (tope = unpaid + qbf en ese momento; no usar solo base_debt si vino mal o undefined).
       $(document).off('focus', '#items-table-editable input.quantity_brought_forward');
       $(document).on('focus', '#items-table-editable input.quantity_brought_forward', function () {
-         $(this).data('lastValid', $(this).val() || '');
+         var $this = $(this);
+         $this.data('lastValid', $this.val() || '');
+         var pos = $this.attr('data-position');
+         var it = items_lista[pos];
+         if (!it) return;
+         var cap = parseQtyInput(it.unpaid_qty) + parseQtyInput(it.quantity_brought_forward);
+         if (!Number.isFinite(cap) || cap < 0) cap = 0;
+         $this.data('qbfCap', cap);
       });
-      // Validación en input: si es mayor que base, borrar el último número escrito (restaurar valor anterior)
+      // Validación en input: QBF no puede superar el tope fijado al focus (ni NaN mientras se escribe).
       $(document).off('input', '#items-table-editable input.quantity_brought_forward');
       $(document).on('input', '#items-table-editable input.quantity_brought_forward', function (e) {
          var $this = $(this);
          var posicion = $this.attr('data-position');
          if (!items_lista[posicion] || !oTableItems) return;
-         var base = Number(items_lista[posicion].base_debt || 0);
+         var item = items_lista[posicion];
+         var cap = Number($this.data('qbfCap'));
+         if (!Number.isFinite(cap)) {
+            cap = parseQtyInput(item.unpaid_qty) + parseQtyInput(item.quantity_brought_forward);
+            $this.data('qbfCap', cap);
+         }
          var rawVal = $this.val();
-         var isEmpty = rawVal === '' || rawVal === null || rawVal === undefined;
-         var new_qbf = isEmpty ? 0 : Number(rawVal || 0);
-         if (!isEmpty && new_qbf > base) {
+         var rawTrim = rawVal === null || rawVal === undefined ? '' : String(rawVal).trim();
+         var isEmpty = rawTrim === '';
+         var new_qbf = isEmpty ? 0 : Number(rawTrim);
+         if (!isEmpty && !Number.isFinite(new_qbf)) {
+            return;
+         }
+         if (!isEmpty && new_qbf > cap) {
             $this.val($this.data('lastValid') ?? '');
-            new_qbf = Number($this.val() || 0);
+            new_qbf = Number(String($this.val() || '').trim() || 0);
+            if (!Number.isFinite(new_qbf)) new_qbf = 0;
          } else {
             $this.data('lastValid', rawVal);
          }
-         var item = items_lista[posicion];
          item.quantity_brought_forward = new_qbf;
-         var new_unpaid = Math.max(0, base - new_qbf);
+         var new_unpaid = Math.max(0, cap - new_qbf);
          item.unpaid_qty = new_unpaid;
+         item.base_debt = cap;
          item.quantity_final = Number(item.quantity) + new_qbf;
          item.amount_final = item.quantity_final * item.price;
          item.unpaid_amount = new_unpaid * item.price;
 
-         // Actualizar solo las celdas de esta fila en el DOM (sin tocar datos del DataTable = no se reemplaza el input ni se pierde foco)
-         var $row = $this.closest('tr');
-         var $cells = $row.find('td');
-         $cells.eq(7).find('div').first().text(item.unpaid_qty ?? '');
-         $cells.eq(8).find('div').first().text(MyApp.formatMoney(item.unpaid_amount, 2, '.', ','));
-         $cells.eq(12).find('div').first().text(item.quantity_final ?? '');
-         $cells.eq(13).find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
+         // Actualizar celdas vecinas desde el td del QBF (evita desajuste si cambia el número de columnas / fixedColumns).
+         var $tdQbf = $this.closest('td');
+         if ($tdQbf.length) {
+            var $unpaidQtyCell = $tdQbf.prev().prev().prev().prev();
+            var $unpaidAmtCell = $tdQbf.prev().prev().prev();
+            var $qtyFinalCell = $tdQbf.next();
+            var $amtFinalCell = $tdQbf.next().next();
+            if ($unpaidQtyCell.length) $unpaidQtyCell.find('div').first().text(item.unpaid_qty ?? '');
+            if ($unpaidAmtCell.length) $unpaidAmtCell.find('div').first().text(MyApp.formatMoney(item.unpaid_amount, 2, '.', ','));
+            if ($qtyFinalCell.length) $qtyFinalCell.find('div').first().text(item.quantity_final ?? '');
+            if ($amtFinalCell.length) $amtFinalCell.find('div').first().text(MyApp.formatMoney(item.amount_final, 2, '.', ','));
+         }
          actualizarFooterTotalesPage();
          // Log: QBF modificado → dispara recálculo retainage y bond
          console.log('[QBF] Cambio en Quantity Brought Forward', {
