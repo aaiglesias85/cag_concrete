@@ -3317,7 +3317,7 @@ var Estimates = (function () {
             '<i class="ki-duotone ki-file-down fs-3"><span class="path1"></span><span class="path2"></span></i></a>' +
             '<a href="javascript:;" data-id="' +
             row.id +
-            '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">' +
+            '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1 d-none" data-bs-toggle="tooltip" aria-hidden="true">' +
             '<i class="ki-duotone ki-sms fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>' +
             (permiso.eliminar
                ? '<a href="javascript:;" data-id="' +
