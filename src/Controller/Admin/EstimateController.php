@@ -532,6 +532,9 @@ class EstimateController extends AbstractController
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
+            if (array_key_exists('quote_removed_id', $resultado) && $resultado['quote_removed_id'] !== null) {
+               $resultadoJson['quote_removed_id'] = $resultado['quote_removed_id'];
+            }
          } else {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
@@ -564,6 +567,7 @@ class EstimateController extends AbstractController
       $equation_id = $request->get('equation_id');
       $code = $request->get('code');
       $contract_name = $request->get('contract_name');
+      $new_quote_name = $request->get('new_quote_name');
       $note_ids = $request->get('note_ids');
       if (is_string($note_ids)) {
          $note_ids = $note_ids === '' ? [] : array_filter(array_map('intval', explode(',', $note_ids)));
@@ -572,12 +576,15 @@ class EstimateController extends AbstractController
       }
 
       try {
-         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids, $code, $contract_name);
+         $resultado = $this->estimateService->AgregarItem($estimate_item_id, $estimate_id, $quote_id ?? '', $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids, $code, $contract_name, $new_quote_name !== null && $new_quote_name !== '' ? (string) $new_quote_name : null);
          if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = "The operation was successful";
             $resultadoJson['item'] = $resultado['item'];
             $resultadoJson['is_new_item'] = $resultado['is_new_item'];
+            if (!empty($resultado['quote_created'])) {
+               $resultadoJson['quote_created'] = $resultado['quote_created'];
+            }
          } else {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];

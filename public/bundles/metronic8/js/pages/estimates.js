@@ -2204,7 +2204,6 @@ var Estimates = (function () {
          var quoteItems = itemsList.filter(function (it) {
             return it.quote_id == quote.id;
          });
-         if (quoteItems.length === 0) return;
          resultado.push({
             isGroupHeader: true,
             groupTitle: quote.name,
@@ -2301,7 +2300,26 @@ var Estimates = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               if (row.isGroupHeader) return '';
+               if (row.isGroupHeader) {
+                  var qid = row.quote_id;
+                  var html = '<div class="d-flex justify-content-center flex-shrink-0">';
+                  if (permiso.editar || permiso.agregar) {
+                     html +=
+                        '<a href="javascript:;" class="btn-edit-quote-name-row btn btn-icon btn-light-success btn-sm me-1" data-quote-id="' +
+                        qid +
+                        '" title="Edit quote" data-bs-toggle="tooltip">' +
+                        '<i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i></a>';
+                  }
+                  if (permiso.eliminar) {
+                     html +=
+                        '<a href="javascript:;" class="btn-delete-quote-row btn btn-icon btn-light-danger btn-sm" data-quote-id="' +
+                        qid +
+                        '" title="Delete quote" data-bs-toggle="tooltip">' +
+                        '<i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>';
+                  }
+                  html += '</div>';
+                  return html;
+               }
                return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
             },
          },
@@ -2423,6 +2441,14 @@ var Estimates = (function () {
          }
 
          if (validateFormItem() && isValidItem() && isValidYield() && isValidUnit()) {
+            var quote_id = $('#quote_id_item').val();
+            if (!quote_id || quote_id === '') {
+               MyApp.resetErrorMessageValidateSelect(KTUtil.get('item-form'));
+               MyApp.showErrorMessageValidateSelect(KTUtil.get('select-quote-item'), 'This field is required');
+               toastr.error('Select a quote.');
+               return;
+            }
+
             var formData = new URLSearchParams();
 
             var estimate_item_id = $('#estimate_item_id').val();
@@ -2431,8 +2457,7 @@ var Estimates = (function () {
             var estimate_id = $('#estimate_id').val();
             formData.set('estimate_id', estimate_id);
 
-            var quote_id = $('#quote_id_item').val();
-            formData.set('quote_id', quote_id || '');
+            formData.set('quote_id', quote_id);
 
             formData.set('item_id', item_id);
 
@@ -2688,6 +2713,88 @@ var Estimates = (function () {
             }
          });
       });
+
+      $(document).off('click', '#items-table-editable a.btn-edit-quote-name-row');
+      $(document).on('click', '#items-table-editable a.btn-edit-quote-name-row', function (e) {
+         e.preventDefault();
+         var quoteId = $(this).data('quote-id');
+         var q = (quotes || []).find(function (x) {
+            return String(x.id) === String(quoteId);
+         });
+         $('#quote_id').val(quoteId);
+         $('#quote_name').val(q ? q.name : '');
+         $('#modal-quote-title').text('Edit quote');
+         new bootstrap.Modal(document.getElementById('modal-quote')).show();
+      });
+
+      $(document).off('click', '#items-table-editable a.btn-delete-quote-row');
+      $(document).on('click', '#items-table-editable a.btn-delete-quote-row', function (e) {
+         e.preventDefault();
+         var quoteId = $(this).data('quote-id');
+         var q = (quotes || []).find(function (x) {
+            return String(x.id) === String(quoteId);
+         });
+         var name = q ? q.name : '';
+
+         Swal.fire({
+            text:
+               'Are you sure you want to delete the quote "' +
+               (name || 'this quote') +
+               '" and all its items? This cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: {
+               confirmButton: 'btn fw-bold btn-success',
+               cancelButton: 'btn fw-bold btn-danger',
+            },
+         }).then(function (result) {
+            if (result.value) {
+               eliminarQuoteDesdeTablaItems(quoteId);
+            }
+         });
+      });
+
+      function eliminarQuoteDesdeTablaItems(quoteId) {
+         var formData = new URLSearchParams();
+         formData.set('quote_id', quoteId);
+         BlockUtil.block('#lista-items');
+         axios
+            .post('estimate/eliminarQuote', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     quotes = (quotes || []).filter(function (x) {
+                        return String(x.id) !== String(quoteId);
+                     });
+                     items = (items || []).filter(function (it) {
+                        return String(it.quote_id) !== String(quoteId);
+                     });
+                     for (var i = 0; i < items.length; i++) {
+                        items[i].posicion = i;
+                     }
+                     if ($('#quote_id_item').length && String($('#quote_id_item').val()) === String(quoteId)) {
+                        $('#quote_id_item').val('');
+                     }
+                     actualizarSelectQuoteEnModalItem();
+                     renderQuotesSendTab();
+                     actualizarTableListaItems();
+                     toastr.success(response.message || 'The operation was successful.');
+                  } else {
+                     toastr.error(response.error || 'Error.');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-items');
+            });
+      }
 
       function eliminarItem(posicion) {
          if (items[posicion]) {
@@ -3487,6 +3594,7 @@ var Estimates = (function () {
             toastr.error('Quote name and estimate are required.');
             return;
          }
+         var editingExisting = quoteId !== '' && quoteId !== null && quoteId !== undefined && String(quoteId).trim() !== '';
          var formData = new FormData();
          formData.append('estimate_id', estimateId);
          formData.append('quote_id', quoteId);
@@ -3496,13 +3604,29 @@ var Estimates = (function () {
             .then(function (response) {
                if (response.data.success) {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote')).hide();
-                  var newId = response.data.quote_id;
-                  quotes.push({ id: newId, name: name, items_count: 0, companies_count: 0, companies: [] });
+                  var returnedId = response.data.quote_id;
+                  if (editingExisting) {
+                     var qEdit = quotes.find(function (x) {
+                        return String(x.id) === String(quoteId);
+                     });
+                     if (qEdit) {
+                        qEdit.name = name;
+                     }
+                  } else {
+                     quotes.push({
+                        id: returnedId,
+                        name: name,
+                        items_count: 0,
+                        companies_count: 0,
+                        companies: [],
+                     });
+                     if ($('#quote_id_item').length) {
+                        $('#quote_id_item').val(returnedId).trigger('change');
+                     }
+                  }
                   renderQuotesSendTab();
                   actualizarSelectQuoteEnModalItem();
-                  if ($('#quote_id_item').length) {
-                     $('#quote_id_item').val(newId).trigger('change');
-                  }
+                  actualizarTableListaItems();
                   toastr.success(response.data.message || 'Saved.');
                } else {
                   toastr.error(response.data.error || 'Error saving quote.');
@@ -3524,8 +3648,19 @@ var Estimates = (function () {
             toastr.error('Please select a quote.');
             return;
          }
+         var qRow = quotes.find(function (x) {
+            return String(x.id) === String(quoteId);
+         });
+         if (!qRow || (qRow.items_count || 0) < 1) {
+            toastr.error('This quote has no line items. Add items in the Quotes tab first.');
+            return;
+         }
          var selected = $('#quote-companies-select').val();
          var estimateCompanyIds = Array.isArray(selected) ? selected : [];
+         if (!estimateCompanyIds.length) {
+            toastr.error('Select at least one company.');
+            return;
+         }
          var formData = new FormData();
          formData.append('quote_id', quoteId);
          formData.append('company_ids', estimateCompanyIds.join(','));
@@ -3565,8 +3700,19 @@ var Estimates = (function () {
             toastr.error('Please select a quote.');
             return;
          }
+         var qRowSend = quotes.find(function (x) {
+            return String(x.id) === String(quoteId);
+         });
+         if (!qRowSend || (qRowSend.items_count || 0) < 1) {
+            toastr.error('This quote has no line items. Add items in the Quotes tab first.');
+            return;
+         }
          var selected = $('#quote-companies-select').val();
          var estimateCompanyIds = Array.isArray(selected) ? selected : [];
+         if (!estimateCompanyIds.length) {
+            toastr.error('Select at least one company.');
+            return;
+         }
          var formData = new FormData();
          formData.append('quote_id', quoteId);
          formData.append('company_ids', estimateCompanyIds.join(','));

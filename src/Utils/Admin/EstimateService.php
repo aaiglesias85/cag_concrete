@@ -149,6 +149,10 @@ class EstimateService extends Base
       if ($estimate === null) {
          return ['success' => false, 'error' => 'Estimate not found'];
       }
+      $name = trim((string) $name);
+      if ($name === '') {
+         return ['success' => false, 'error' => 'Quote name is required'];
+      }
       if ($quote_id !== '' && is_numeric($quote_id)) {
          $quote = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
          if ($quote === null) {
@@ -271,13 +275,22 @@ class EstimateService extends Base
       if ($quote === null) {
          return ['success' => false, 'error' => 'Quote not found'];
       }
+      /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+      $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+      if ($estimateQuoteItemRepo->countItemsDeQuote((int) $quote_id) < 1) {
+         return ['success' => false, 'error' => 'This quote has no line items. Add items in the Quotes tab first.'];
+      }
+      $ids = is_array($estimate_company_ids) ? $estimate_company_ids : (strpos((string)$estimate_company_ids, ',') !== false ? explode(',', $estimate_company_ids) : [$estimate_company_ids]);
+      $ids = array_values(array_filter(array_map('trim', $ids), static fn ($v) => $v !== ''));
+      if ($ids === []) {
+         return ['success' => false, 'error' => 'Select at least one company.'];
+      }
       /** @var EstimateQuoteCompanyRepository $estimateQuoteCompanyRepo */
       $estimateQuoteCompanyRepo = $this->getDoctrine()->getRepository(EstimateQuoteCompany::class);
       $existing = $estimateQuoteCompanyRepo->ListarCompaniesDeQuote($quote_id);
       foreach ($existing as $eqc) {
          $em->remove($eqc);
       }
-      $ids = is_array($estimate_company_ids) ? $estimate_company_ids : (strpos((string)$estimate_company_ids, ',') !== false ? explode(',', $estimate_company_ids) : [$estimate_company_ids]);
       $estimateCompanyRepo = $this->getDoctrine()->getRepository(EstimateCompany::class);
       foreach ($ids as $eid) {
          $eid = trim((string)$eid);
@@ -601,7 +614,7 @@ class EstimateService extends Base
     * @param $equation_id
     * @return array
     */
-   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids = [], $code = null, $contract_name = null)
+   public function AgregarItem($estimate_item_id, $estimate_id, $quote_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $note_ids = [], $code = null, $contract_name = null, ?string $new_quote_name = null)
    {
       $resultado = [];
 
@@ -638,25 +651,33 @@ class EstimateService extends Base
 
       $estimate_entity = $this->getDoctrine()->getRepository(Estimate::class)->find($estimate_id);
       if ($estimate_entity != null) {
-         /** @var EstimateQuoteRepository $estimateQuoteRepo */
-         $estimateQuoteRepo = $this->getDoctrine()->getRepository(EstimateQuote::class);
-         $quotes = $estimateQuoteRepo->ListarQuotesDeEstimate($estimate_id);
-         $default_quote = !empty($quotes) ? $quotes[0] : null;
+         $newQuoteNameTrim = $this->normalizeNullableTrimmedString($new_quote_name);
+         $newQuoteNameTrim = ($newQuoteNameTrim !== null && $newQuoteNameTrim !== '') ? $newQuoteNameTrim : null;
+
+         $default_quote = null;
          $quote_created_in_request = false;
-         if ($default_quote === null) {
-            $default_quote = new EstimateQuote();
-            $default_quote->setName('Quote 1');
-            $default_quote->setEstimate($estimate_entity);
-            $em->persist($default_quote);
-            $em->flush();
-            $quote_created_in_request = true;
-         }
-         // Si se envió quote_id y es válido, usar esa cuota para el ítem nuevo
+
          if ($quote_id !== '' && is_numeric($quote_id)) {
-            $quote_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)->find($quote_id);
+            $quote_entity = $this->getDoctrine()->getRepository(EstimateQuote::class)->find((int) $quote_id);
             if ($quote_entity !== null && $quote_entity->getEstimate()->getEstimateId() == (int) $estimate_id) {
                $default_quote = $quote_entity;
             }
+         }
+
+         if ($default_quote === null && $newQuoteNameTrim !== null) {
+            $nq = new EstimateQuote();
+            $nq->setName($newQuoteNameTrim);
+            $nq->setEstimate($estimate_entity);
+            $em->persist($nq);
+            $em->flush();
+            $default_quote = $nq;
+            $quote_created_in_request = true;
+         }
+
+         if ($default_quote === null) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'Select a quote.';
+            return $resultado;
          }
 
          $estimate_item_entity = null;
@@ -764,6 +785,8 @@ class EstimateService extends Base
       if ($entity != null) {
 
          $item_name = $entity->getItem()->getName();
+         $quoteAfterDelete = $entity->getQuote();
+         $quoteIdAfterDelete = $quoteAfterDelete !== null ? $quoteAfterDelete->getId() : null;
 
          // Eliminar notas del ítem (estimate_quote_item_note)
          /** @var EstimateQuoteItemNoteRepository $eqinRepo */
@@ -775,6 +798,16 @@ class EstimateService extends Base
          $em->remove($entity);
          $em->flush();
 
+         $quoteRemovedId = null;
+         if ($quoteIdAfterDelete !== null) {
+            /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
+            $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
+            if ($estimateQuoteItemRepo->countItemsDeQuote((int) $quoteIdAfterDelete) < 1) {
+               $this->EliminarQuote((int) $quoteIdAfterDelete);
+               $quoteRemovedId = (int) $quoteIdAfterDelete;
+            }
+         }
+
          //Salvar log
          $log_operacion = "Delete";
          $log_categoria = "Estimate Item";
@@ -782,6 +815,7 @@ class EstimateService extends Base
          $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
          $resultado['success'] = true;
+         $resultado['quote_removed_id'] = $quoteRemovedId;
       } else {
          $resultado['success'] = false;
          $resultado['error'] = "The requested record does not exist";

@@ -122,4 +122,41 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
 
         return $consulta->getQuery()->getResult();
     }
+
+    /**
+     * Cuenta líneas de ítem (estimate_quote_items) de todas las cuotas de un estimate.
+     */
+    public function countItemsDeEstimate(int|string $estimate_id): int
+    {
+        if ($estimate_id === '' || $estimate_id === null) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('e_q')
+            ->select('COUNT(e_q.id)')
+            ->innerJoin('e_q.quote', 'q')
+            ->innerJoin('q.estimate', 'p')
+            ->andWhere('p.estimateId = :estimate_id')
+            ->setParameter('estimate_id', $estimate_id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Cuenta líneas de ítem de una cuota concreta.
+     */
+    public function countItemsDeQuote(int|string $quote_id): int
+    {
+        if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+            return 0;
+        }
+
+        return (int) $this->createQueryBuilder('e_q')
+            ->select('COUNT(e_q.id)')
+            ->innerJoin('e_q.quote', 'q')
+            ->andWhere('q.id = :quote_id')
+            ->setParameter('quote_id', (int) $quote_id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }
