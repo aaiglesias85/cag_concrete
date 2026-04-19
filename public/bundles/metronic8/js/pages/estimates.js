@@ -726,6 +726,9 @@ var Estimates = (function () {
          var item = parseInt($(this).data('item'), 10);
 
          if (item > activeTab) {
+            if (item > totalTabs) {
+               return;
+            }
             persistEstimateAndAdvance(item);
             return;
          }
@@ -742,6 +745,9 @@ var Estimates = (function () {
       $(document).off('click', '#btn-wizard-siguiente');
       $(document).on('click', '#btn-wizard-siguiente', function (e) {
          var nextTab = activeTab + 1;
+         if (nextTab > totalTabs) {
+            return;
+         }
          persistEstimateAndAdvance(nextTab);
       });
       //anterior
@@ -882,7 +888,7 @@ var Estimates = (function () {
 
          mostrarForm();
 
-         totalTabs = 5;
+         totalTabs = 4;
          activeTab = 1;
          $('#btn-wizard-anterior').addClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide');
@@ -1213,8 +1219,8 @@ var Estimates = (function () {
          });
          actualizarTableListaTemplateNotes();
 
-         // habilitar tab
-         totalTabs = 5;
+         // habilitar tab (Send quotes queda fuera del stepper; no navegable por Next)
+         totalTabs = 4;
          $('#btn-wizard-siguiente').removeClass('hide');
          $('#btn-wizard-finalizar').removeClass('hide');
 
@@ -1278,11 +1284,10 @@ var Estimates = (function () {
                toastr.error(response.error || '', '');
                return;
             }
-            toastr.success(response.message, '');
             $('#estimate_id').val(response.estimate_id);
             btnClickFiltrar();
             return reloadEstimateFromBackend(response.estimate_id, function () {
-               advanceWizardToTab(newTab);
+               advanceWizardToTab(newTab > totalTabs ? totalTabs : newTab);
             });
          })
          .catch(MyUtil.catchErrorAxios)
