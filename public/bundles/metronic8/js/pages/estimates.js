@@ -726,9 +726,6 @@ var Estimates = (function () {
          var item = parseInt($(this).data('item'), 10);
 
          if (item > activeTab) {
-            if (item > totalTabs) {
-               return;
-            }
             persistEstimateAndAdvance(item);
             return;
          }
@@ -745,9 +742,6 @@ var Estimates = (function () {
       $(document).off('click', '#btn-wizard-siguiente');
       $(document).on('click', '#btn-wizard-siguiente', function (e) {
          var nextTab = activeTab + 1;
-         if (nextTab > totalTabs) {
-            return;
-         }
          persistEstimateAndAdvance(nextTab);
       });
       //anterior
@@ -888,7 +882,7 @@ var Estimates = (function () {
 
          mostrarForm();
 
-         totalTabs = 4;
+         totalTabs = 5;
          activeTab = 1;
          $('#btn-wizard-anterior').addClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide');
@@ -1219,8 +1213,8 @@ var Estimates = (function () {
          });
          actualizarTableListaTemplateNotes();
 
-         // habilitar tab (Send quotes queda fuera del stepper; no navegable por Next)
-         totalTabs = 4;
+         // habilitar tab
+         totalTabs = 5;
          $('#btn-wizard-siguiente').removeClass('hide');
          $('#btn-wizard-finalizar').removeClass('hide');
 
@@ -1287,7 +1281,7 @@ var Estimates = (function () {
             $('#estimate_id').val(response.estimate_id);
             btnClickFiltrar();
             return reloadEstimateFromBackend(response.estimate_id, function () {
-               advanceWizardToTab(newTab > totalTabs ? totalTabs : newTab);
+               advanceWizardToTab(newTab);
             });
          })
          .catch(MyUtil.catchErrorAxios)
@@ -3320,10 +3314,12 @@ var Estimates = (function () {
             row.id +
             '" title="Export PDF" class="btn-export-excel-quote btn btn-icon btn-light-warning btn-sm me-1" data-bs-toggle="tooltip">' +
             '<i class="ki-duotone ki-file-down fs-3"><span class="path1"></span><span class="path2"></span></i></a>' +
-            '<a href="javascript:;" data-id="' +
-            row.id +
-            '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1 d-none" data-bs-toggle="tooltip" aria-hidden="true">' +
-            '<i class="ki-duotone ki-sms fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>' +
+            (permiso.editar || permiso.agregar
+               ? '<a href="javascript:;" data-id="' +
+                 row.id +
+                 '" title="Send by email" class="btn-send-quote btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">' +
+                 '<i class="ki-duotone ki-sms fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i></a>'
+               : '') +
             (permiso.eliminar
                ? '<a href="javascript:;" data-id="' +
                  row.id +
