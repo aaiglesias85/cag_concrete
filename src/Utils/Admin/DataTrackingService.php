@@ -251,7 +251,7 @@ class DataTrackingService extends Base
          $project_name = $entity->getDataTracking()->getProject()->getProjectNumber() . " - " . $entity->getDataTracking()->getProject()->getName();
          $date = $entity->getDataTracking()->getDate()->format('m/d/Y');
 
-         $item_name = $entity->getItem()->getName();
+         $item_name = $entity->getProjectItem()->getItem()->getName();
 
          $em->remove($entity);
          $em->flush();
