@@ -472,6 +472,19 @@ var DataTracking = (function () {
       oTable.search('').draw();
    };
 
+   /** Título del formulario: prefijo New/Edit y fecha del data tracking */
+   var syncDataTrackingFormHeaderDate = function () {
+      var dateStr = '';
+      try {
+         dateStr = FlatpickrUtil.getString('datetimepicker-date') || '';
+      } catch (e) {
+         dateStr = '';
+      }
+      $('#data-tracking-form-title-date').text(dateStr);
+      var isEdit = String($('#data_tracking_id').val() || '').trim() !== '';
+      $('#data-tracking-form-title-prefix').text(isEdit ? 'Edit Data Tracking' : 'New Data Tracking');
+   };
+
    //Reset forms
    var resetForms = function () {
       // reset form
@@ -529,6 +542,8 @@ var DataTracking = (function () {
          $('#proyect-number').html(project[0]);
          $('#proyect-name').html(project[1]);
       }
+
+      syncDataTrackingFormHeaderDate();
    };
 
    //Validacion
@@ -991,6 +1006,7 @@ var DataTracking = (function () {
 
          var data_tracking_id = $(this).data('id');
          $('#data_tracking_id').val(data_tracking_id);
+         syncDataTrackingFormHeaderDate();
 
          mostrarForm();
 
@@ -1040,6 +1056,8 @@ var DataTracking = (function () {
             const date = MyApp.convertirStringAFecha(data_tracking.date);
             FlatpickrUtil.setDate('datetimepicker-date', date);
          }
+
+         syncDataTrackingFormHeaderDate();
 
          $('#inspector').val(data_tracking.inspector_id);
          $('#inspector').trigger('change');
@@ -1312,6 +1330,24 @@ var DataTracking = (function () {
       FlatpickrUtil.initDate('datetimepicker-date', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
       });
+      var fpDtDate = FlatpickrUtil.getInstance('datetimepicker-date');
+      if (fpDtDate && fpDtDate.config) {
+         var onCh = fpDtDate.config.onChange;
+         var syncHeader = function () {
+            syncDataTrackingFormHeaderDate();
+         };
+         if (Array.isArray(onCh)) {
+            onCh.push(syncHeader);
+         } else if (typeof onCh === 'function') {
+            fpDtDate.config.onChange = [onCh, syncHeader];
+         } else {
+            fpDtDate.config.onChange = [syncHeader];
+         }
+      }
+      $('#datetimepicker-date input').on('change input', function () {
+         syncDataTrackingFormHeaderDate();
+      });
+      syncDataTrackingFormHeaderDate();
    };
 
    var initSelectsModal = function () {
@@ -4509,6 +4545,7 @@ var DataTracking = (function () {
             resetForms();
 
             $('#data_tracking_id').val(data_tracking_id_edit);
+            syncDataTrackingFormHeaderDate();
 
             // mostrar form
             mostrarForm();
