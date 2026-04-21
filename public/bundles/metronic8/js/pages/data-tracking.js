@@ -3860,6 +3860,7 @@ var DataTracking = (function () {
                   subcontractor_id: subcontractor_id,
                   subcontractor: subcontractor,
                   project_item_id: project_item_id,
+                  code: item.code,
                   item: item.item,
                   unit: item.unit,
                   quantity: quantity,
@@ -3877,6 +3878,7 @@ var DataTracking = (function () {
                   subcontracts[posicion].subcontractor_id = subcontractor_id;
                   subcontracts[posicion].subcontractor = subcontractor;
                   subcontracts[posicion].project_item_id = project_item_id;
+                  subcontracts[posicion].code = item.code || '';
                   subcontracts[posicion].item = item.item;
                   subcontracts[posicion].unit = item.unit;
                   subcontracts[posicion].quantity = quantity;
