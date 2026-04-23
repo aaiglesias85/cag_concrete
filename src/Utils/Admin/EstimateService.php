@@ -1440,10 +1440,10 @@ class EstimateService extends Base
          $entity->setPlanLink($planLink);
          $entity->setQuoteReceived($quoteReceived);
 
-         $entity->setBidDeadline(NULL);
-         if ($bidDeadline != '') {
-            $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
-            $entity->setBidDeadline($bidDeadline);
+         $entity->setBidDeadline(null);
+         $resolvedBid = $this->resolveEstimateBidDeadline((string) ($bidDeadline ?? ''), $companys);
+         if ($resolvedBid !== null) {
+            $entity->setBidDeadline($resolvedBid);
          }
 
          $entity->setStage(NULL);
@@ -1680,9 +1680,9 @@ class EstimateService extends Base
       $entity->setPlanLink($planLink);
       $entity->setQuoteReceived($quoteReceived);
 
-      if ($bidDeadline != '') {
-         $bidDeadline = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadline);
-         $entity->setBidDeadline($bidDeadline);
+      $resolvedBid = $this->resolveEstimateBidDeadline((string) ($bidDeadline ?? ''), $companys);
+      if ($resolvedBid !== null) {
+         $entity->setBidDeadline($resolvedBid);
       }
 
       if ($stage_id != '') {
@@ -1779,6 +1779,59 @@ class EstimateService extends Base
       $resultado['estimate_id'] = $entity->getEstimateId();
 
       return $resultado;
+   }
+
+   /**
+    * Fecha de bid deadline más reciente entre las compañías del payload (tab bidders).
+    *
+    * @param mixed $companys iterable de stdClass (json_decode) o null
+    */
+   private function maxBidDeadlineFromCompanys($companys): ?\DateTime
+   {
+      if ($companys === null || !is_iterable($companys)) {
+         return null;
+      }
+      $max = null;
+      foreach ($companys as $value) {
+         $raw = '';
+         if (is_object($value)) {
+            $raw = trim((string) ($value->bidDeadline ?? ''));
+         } elseif (is_array($value)) {
+            $raw = trim((string) ($value['bidDeadline'] ?? ''));
+         }
+         if ($raw === '') {
+            continue;
+         }
+         $dt = \DateTime::createFromFormat('m/d/Y H:i', $raw);
+         if ($dt === false) {
+            continue;
+         }
+         if ($max === null || $dt > $max) {
+            $max = $dt;
+         }
+      }
+
+      return $max;
+   }
+
+   /**
+    * Bid deadline del estimate: si hay fechas en compañías, la más reciente; si no, la del tab General (si viene bien formateada).
+    *
+    * @param mixed $companys
+    */
+   private function resolveEstimateBidDeadline(string $bidDeadlineFromForm, $companys): ?\DateTime
+   {
+      $maxCompany = $this->maxBidDeadlineFromCompanys($companys);
+      if ($maxCompany !== null) {
+         return $maxCompany;
+      }
+      $bidDeadlineFromForm = trim($bidDeadlineFromForm);
+      if ($bidDeadlineFromForm === '') {
+         return null;
+      }
+      $dt = \DateTime::createFromFormat('m/d/Y H:i', $bidDeadlineFromForm);
+
+      return $dt !== false ? $dt : null;
    }
 
    /**

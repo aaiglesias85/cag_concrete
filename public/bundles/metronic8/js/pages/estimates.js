@@ -2169,23 +2169,29 @@ var Estimates = (function () {
       return new Date(parseInt(fd[2], 10), parseInt(fd[0], 10) - 1, parseInt(fd[1], 10), parseInt(fh[0], 10) || 0, parseInt(fh[1], 10) || 0).getTime();
    };
 
-   /** Sincroniza el Bid Deadline principal del estimate (tab 1) con el bid más próximo entre compañías. */
+   /**
+    * Sincroniza el Bid Deadline del tab General con los bidders (tab 2):
+    * - Si alguna compañía tiene bid deadline: el estimate toma la fecha más reciente (máximo).
+    * - Si ninguna compañía tiene fecha: no toca el campo (se respeta el valor manual).
+    */
    var definirFechaMasReciente = function () {
-      var fechasOrdenadas = companys
-         .filter(function (c) {
-            return c.bidDeadline;
-         })
-         .sort(function (a, b) {
-            return parseFechaBidStr(a.bidDeadline) - parseFechaBidStr(b.bidDeadline);
-         });
-      var fechaMasCercana = fechasOrdenadas.length > 0 ? fechasOrdenadas[0].bidDeadline : null;
-      if (!fechaMasCercana) {
-         if (companys.length === 0) {
-            FlatpickrUtil.clear('datetimepicker-bidDeadline');
-         }
+      var conFecha = companys.filter(function (c) {
+         return c.bidDeadline && String(c.bidDeadline).trim() !== '';
+      });
+      if (conFecha.length === 0) {
          return;
       }
-      var date = MyApp.convertirStringAFechaHora(fechaMasCercana);
+      var masReciente = conFecha.reduce(function (best, c) {
+         var t = parseFechaBidStr(c.bidDeadline);
+         if (!best || t > parseFechaBidStr(best.bidDeadline)) {
+            return c;
+         }
+         return best;
+      }, null);
+      if (!masReciente) {
+         return;
+      }
+      var date = MyApp.convertirStringAFechaHora(masReciente.bidDeadline);
       FlatpickrUtil.setDate('datetimepicker-bidDeadline', date);
    };
 
