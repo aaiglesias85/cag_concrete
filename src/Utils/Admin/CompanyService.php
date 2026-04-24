@@ -211,9 +211,16 @@ class CompanyService extends Base
             $resultado['error'] = "The company could not be deleted, because it is related to a project";
             return $resultado;
          }
+         $estimates = $this->getDoctrine()->getRepository(Estimate::class)->findBy(['company' => $entity]);
+         if (count($estimates) > 0) {
+            $resultado['success'] = false;
+            $resultado['error'] = "The company could not be deleted, because it is related to an estimate";
+            return $resultado;
+         }
 
          // eliminar info
          $this->EliminarInformacionDeCompany($company_id);
+
 
          $company_descripcion = $entity->getName();
 
