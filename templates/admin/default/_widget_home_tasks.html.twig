@@ -1,0 +1,146 @@
+{# Renders the Tasks home widget (expects w = widget def, home_task = payload from DefaultController) #}
+<div class="col-12 col-md-6 col-xl-4" id="widget-tasks">
+    <div class="card h-100" data-home-task-card="1">
+        <div class="card-header border-0 pt-5 d-flex flex-row flex-wrap align-items-start justify-content-between gap-3">
+            <div class="card-title flex-grow-1 me-3 mb-0 min-w-200px">
+                <h3 class="d-flex flex-column align-items-start mb-0">
+                    <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
+                    <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+                </h3>
+            </div>
+            <div class="card-toolbar flex-shrink-0 pt-1">
+                <div class="d-flex justify-content-end flex-wrap align-items-center gap-2">
+                    {% if home_task.permiso.agregar %}
+                        <button type="button" class="btn btn-icon btn-sm btn-success" id="btn-home-new-task" title="New task">
+                            <i class="ki-duotone ki-plus fs-3">
+                                <span class="path1"></span>
+                                <span class="path2"></span>
+                            </i>
+                        </button>
+                    {% endif %}
+                    {% for link in w.links %}
+                        {% if link.canView %}
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Open tasks module">
+                                {{ link.label }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="scroll-y h-250px my-2 px-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
+                        <thead>
+                        <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Due date</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody id="home-tasks-tbody">
+                        {% for t in home_task.tasks %}
+                            <tr data-task-id="{{ t.id }}">
+                                <td>
+                                    <span class="text-gray-800 home-task-status">{{ t.status_label }}</span>
+                                </td>
+                                <td>
+                                    <div class="text-gray-800">{{ t.description|default('')|nl2br }}</div>
+                                    {% if t.show_assigned|default(false) and t.assigned|default('') %}
+                                        <div class="text-muted fs-8 mt-1">Assigned: {{ t.assigned }}</div>
+                                    {% endif %}
+                                </td>
+                                <td><span class="text-gray-800">{{ t.due_date|default('—') }}</span></td>
+                                <td class="text-end text-nowrap">
+                                    {% if t.can_mark_done %}
+                                        <button type="button" class="btn btn-sm btn-light btn-active-light-primary btn-home-task-mark-done" data-task-id="{{ t.id }}">Done</button>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr id="home-tasks-empty-row">
+                                <td colspan="4" class="text-center text-muted py-5">No tasks in this range.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" id="modal-nueva-tarea-home" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">New task</h3>
+                <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal"
+                     aria-label="Close" title="Close" data-bs-toggle="tooltip">
+                    <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </div>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="form-nueva-tarea-home" action="javascript:;" method="post">
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required">
+                            <span class="ic-step-number">1</span>
+                            Assigned user
+                        </label>
+                        <div class="row">
+                            <div class="col-md-12" id="select-usuario-home-task">
+                                <select class="form-control form-select form-select-solid" id="home-new-task-usuario">
+                                    <option></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <label class="form-label required">
+                            <span class="ic-step-number">2</span>
+                            Description
+                        </label>
+                        <textarea class="form-control form-control-solid" id="home-new-task-description" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group ic-form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <span class="ic-step-number">3</span>
+                                    Due date
+                                </label>
+                                <div class="input-group input-group-solid date-picker-filter"
+                                     id="home-datetimepicker-due" data-td-target-input="nearest"
+                                     data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control filter-date" placeholder="Select a date"
+                                           id="home-new-task-due" data-td-target="#home-datetimepicker-due"
+                                           autocomplete="off" name="home_new_task_due"/>
+                                    <span class="input-group-text" data-td-target="#home-datetimepicker-due"
+                                          data-td-toggle="datetimepicker">
+                                        <i class="ki-duotone ki-calendar fs-2"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <div class="w-100">
+                                    <label class="form-label">Status</label>
+                                    <input type="text" class="form-control form-control-solid" value="Pending" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="home-new-task-save">
+                    <span class="indicator-label">Save</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

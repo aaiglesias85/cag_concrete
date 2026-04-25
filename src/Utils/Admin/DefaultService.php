@@ -433,4 +433,147 @@ class DefaultService extends Base
 
       return $arreglo_resultado;
    }
+
+   /**
+    * @return list<array<string, mixed>>
+    */
+   public function ObtenerWidgetsDashboardV3($usuarioId): array
+   {
+      $definiciones = [
+         [
+            'id' => 'tasks',
+            'title' => 'Tasks',
+            'description' => 'Your assigned work and due dates',
+            'layout' => 'table',
+            'columns' => ['Status', 'Description', 'Due date', 'Actions'],
+            'links' => [
+               ['route' => 'tasks', 'label' => 'Tasks', 'funcion_id' => 40],
+            ],
+         ],
+         [
+            'id' => 'work_schedule',
+            'title' => 'Work Schedule',
+            'description' => 'Weekly view of field operations and priorities.',
+            'layout' => 'table',
+            'columns' => ['Project #', 'Day', 'Priority'],
+            'links' => [
+               ['route' => 'schedule', 'label' => 'Open schedule', 'funcion_id' => 22],
+            ],
+         ],
+         [
+            'id' => 'bid_deadlines',
+            'title' => 'Upcoming bid deadlines',
+            'description' => 'Projects with critical proposal dates and assigned estimator.',
+            'layout' => 'table',
+            'columns' => ['Project', 'Bid deadline', 'Estimator'],
+            'links' => [
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+            ],
+         ],
+         [
+            'id' => 'estimate_win_loss',
+            'title' => 'Estimate win / loss ratio',
+            'description' => 'Submitted estimates won vs. lost.',
+            'layout' => 'placeholder',
+            'placeholder_hint' => 'Donut chart: won vs. lost (coming soon)',
+            'links' => [
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+            ],
+         ],
+         [
+            'id' => 'estimates_submitted_totals',
+            'title' => 'Total estimates — submitted / not submitted',
+            'description' => 'Count of submitted vs. draft or pending.',
+            'layout' => 'table',
+            'columns' => ['Category', 'Count'],
+            'links' => [
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+            ],
+         ],
+         [
+            'id' => 'estimator_submitted_share',
+            'title' => 'Estimator submitted share',
+            'description' => 'Share of submitted proposals by estimator.',
+            'layout' => 'placeholder',
+            'placeholder_hint' => 'Donut or bar chart (coming soon)',
+            'links' => [
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+            ],
+         ],
+         [
+            'id' => 'current_month_data_tracking',
+            'title' => 'Current month projects (data tracking)',
+            'description' => 'Aggregates for the current month from data tracking.',
+            'layout' => 'table',
+            'columns' => ['Daily total', 'Profit total', 'Labor total', 'Concrete total'],
+            'links' => [
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+            ],
+         ],
+         [
+            'id' => 'pay_item_totals',
+            'title' => 'Pay item totals (period)',
+            'description' => 'Sums of pay item quantities and amounts; filter by project later.',
+            'layout' => 'table',
+            'columns' => ['Item', 'Quantity', 'Amount'],
+            'links' => [
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+            ],
+         ],
+         [
+            'id' => 'invoiced_projects',
+            'title' => 'Invoiced projects (period)',
+            'description' => 'Billed amount and quick glance of payment total.',
+            'layout' => 'table',
+            'columns' => ['Project', 'Invoiced', 'Payment total'],
+            'links' => [
+               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => 11],
+               ['route' => 'payment', 'label' => 'Payments', 'funcion_id' => 33],
+            ],
+         ],
+         [
+            'id' => 'invoice_profit_share',
+            'title' => 'Invoice / profit share',
+            'description' => 'Real profitability vs. invoiced amounts.',
+            'layout' => 'table',
+            'columns' => ['Label', 'Value'],
+            'links' => [
+               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => 11],
+            ],
+         ],
+         [
+            'id' => 'job_cost_breakdown',
+            'title' => 'Job Cost Breakdown',
+            'description' => 'Labor, materials, and other direct costs.',
+            'layout' => 'table',
+            'columns' => ['Category', 'Amount'],
+            'links' => [
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+            ],
+         ],
+      ];
+
+      $out = [];
+      foreach ($definiciones as $def) {
+         $linkViews = [];
+         $widgetVisible = false;
+         foreach ($def['links'] as $link) {
+            $p = $this->BuscarPermiso($usuarioId, (int) $link['funcion_id']);
+            $ok = is_array($p) && count($p) > 0 && !empty($p[0]['ver']);
+            $linkViews[] = array_merge($link, ['canView' => $ok]);
+            if ($ok) {
+               $widgetVisible = true;
+            }
+         }
+         if (!$widgetVisible) {
+            continue;
+         }
+         $out[] = array_merge($def, [
+            'links' => $linkViews,
+            'canView' => true,
+         ]);
+      }
+
+      return $out;
+   }
 }

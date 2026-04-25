@@ -2,6 +2,10 @@ tasks:
   path: /tasks
   defaults: { _controller: App\Controller\Admin\TaskController::index }
 
+listarTaskHome:
+  path: /tasks/home-list
+  defaults: { _controller: App\Controller\Admin\TaskController::listarHome, _format: json }
+
 listarTaskAdmin:
   path: /tasks/listar
   defaults: { _controller: App\Controller\Admin\TaskController::listar, _format: json }

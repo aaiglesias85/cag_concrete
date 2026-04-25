@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Task;
+use App\Entity\Usuario;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -160,12 +161,47 @@ class TaskController extends AbstractController
         }
     }
 
+    public function listarHome(Request $request)
+    {
+        $usuario = $this->getUser();
+        if (!($usuario instanceof Usuario)) {
+            return $this->json(['success' => false, 'error' => 'Unauthenticated'], 401);
+        }
+        $perm = $this->taskService->BuscarPermiso($usuario->getUsuarioId(), self::FUNCION_ID);
+        if (count($perm) === 0 || empty($perm[0]['ver'])) {
+            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
+        }
+        try {
+            $period = (string) $request->query->get('period', 'current_month');
+            $fi = (string) $request->query->get('fechaInicial', '');
+            $ff = (string) $request->query->get('fechaFin', '');
+            $rango = $this->taskService->resolverRangoFechasPeriodo($period, $fi, $ff);
+            $tasks = $this->taskService->listarTareasPayloadHome($usuario, $perm[0], $rango['inicial'], $rango['final']);
+
+            return $this->json([
+                'success' => true,
+                'tasks' => $tasks,
+                'range' => $rango,
+            ]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
     public function cambiarEstado(Request $request)
     {
         $task_id = $request->get('task_id');
         $status = (string) $request->get('status', '');
         try {
-            $resultado = $this->taskService->CambiarEstadoTask($task_id, $status);
+            $usuario = $this->getUser();
+            if (!($usuario instanceof Usuario)) {
+                return $this->json(['success' => false, 'error' => 'Unauthenticated'], 401);
+            }
+            $perm = $this->taskService->BuscarPermiso($usuario->getUsuarioId(), self::FUNCION_ID);
+            if (count($perm) === 0) {
+                return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
+            }
+            $resultado = $this->taskService->CambiarEstadoTask($task_id, $status, $usuario, $perm[0]);
             if ($resultado['success']) {
                 return $this->json([
                     'success' => true,

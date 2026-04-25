@@ -10,6 +10,7 @@ use App\Utils\Admin\AdvertisementService;
 use App\Utils\Admin\DefaultService;
 use App\Utils\Admin\LogService;
 use App\Utils\Admin\NotificationService;
+use App\Utils\Admin\TaskService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,69 +22,76 @@ class DefaultController extends AbstractController
    private $notificationService;
 
    private $advertisementService;
+   private TaskService $taskService;
 
    public function __construct(
       DefaultService       $defaultService,
       LogService $logService,
       NotificationService  $notificationService,
-      AdvertisementService $advertisementService
+      AdvertisementService $advertisementService,
+      TaskService            $taskService
    ) {
       $this->defaultService = $defaultService;
       $this->logService = $logService;
       $this->notificationService = $notificationService;
       $this->advertisementService = $advertisementService;
+      $this->taskService = $taskService;
    }
 
    public function index()
    {
       $usuario = $this->getUser();
       $permiso = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), 1);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
+      if (count($permiso) > 0 && $permiso[0]['ver']) {
+         $dashboardWidgets = $this->defaultService->ObtenerWidgetsDashboardV3(
+            $usuario->getUsuarioId()
+         );
 
-            // primer dia del mes
-            // $from = $this->defaultService->ObtenerPrimerDiaMes();
-            //$from = '';
-            // fecha actual
-            $from = new \DateTime();
-            // restar 90 días
-            $from->sub(new \DateInterval('P90D'));
-            $from = $from->format('m/d/Y');
-
-            //last 6 projects
-            $projects = $this->defaultService->ListarProjectsParaDashboard('', $from, '', 'DESC', 6);
-
-            // filter projects
-            $filter_projects = $this->defaultService->ListarProjectsParaDashboard('', $from);
-
-            // stats
-            $stats = $this->defaultService->ListarStats($from);
-            // chart 1
-            $chart1 = $this->defaultService->DevolverDataChartCosts('', $from);
-            // chart 2
-            $chart2 = $this->defaultService->DevolverDataChartProfit('', $from);
-            // chart 3
-            $chart3 = $this->defaultService->DevolverDataChart3('', $from);
-            // items
-            $items = $this->defaultService->ListarItemsConMontos('', $from);
-            // materials
-            $materials = $this->defaultService->ListarMaterialsConMontos('', $from);
-
-            return $this->render('admin/default/index.html.twig', array(
-               'usuario' => $usuario,
-               'stats' => $stats,
-               'chart1' => $chart1,
-               'chart2' => $chart2,
-               'chart3' => $chart3,
-               'items' => $items,
-               'materials' => $materials,
-               'projects' => $projects,
-               'filter_projects' => $filter_projects,
-            ));
+         $homeTask = null;
+         $homeInvoiceProfit = null;
+         $homeCostBreakdown = null;
+         foreach ($dashboardWidgets as $w) {
+            if (!empty($w['id']) && $w['id'] === 'tasks') {
+               $p40 = $this->taskService->BuscarPermiso($usuario->getUsuarioId(), 40);
+               if (is_array($p40) && count($p40) > 0 && !empty($p40[0]['ver'])) {
+                  $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+                  $homeTask = [
+                     'permiso' => $p40[0],
+                     'tasks' => $this->taskService->listarTareasPayloadHome($usuario, $p40[0], $r0['inicial'], $r0['final']),
+                     'range' => $r0,
+                  ];
+               }
+               continue;
+            }
+            if (!empty($w['id']) && $w['id'] === 'invoice_profit_share') {
+               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+               $homeInvoiceProfit = $this->defaultService->DevolverDataChartProfit(
+                  '',
+                  $r0['inicial'],
+                  $r0['final']
+               );
+               continue;
+            }
+            if (!empty($w['id']) && $w['id'] === 'job_cost_breakdown') {
+               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+               $homeCostBreakdown = $this->defaultService->DevolverDataChartCosts(
+                  '',
+                  $r0['inicial'],
+                  $r0['final']
+               );
+            }
          }
-      } else {
-         return $this->redirectToRoute('denegado');
+
+         return $this->render('admin/default/index.html.twig', [
+            'usuario' => $usuario,
+            'dashboard_widgets' => $dashboardWidgets,
+            'home_task' => $homeTask,
+            'home_invoice_profit' => $homeInvoiceProfit,
+            'home_cost_breakdown' => $homeCostBreakdown,
+         ]);
       }
+
+      return $this->redirectToRoute('denegado');
    }
 
    /**

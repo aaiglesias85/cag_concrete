@@ -148,6 +148,7 @@ class TaskService extends Base
             (string) $fecha_fin,
             (string) $statusFiltro,
             (string) $usuarioFiltro,
+            null,
         );
 
         $data = [];
@@ -170,6 +171,108 @@ class TaskService extends Base
         return ['data' => $data, 'total' => $resultado['total']];
     }
 
+    /**
+     * @return array{inicial: string, final: string}
+     */
+    public function resolverRangoFechasPeriodo(string $period, string $customFi, string $customFf): array
+    {
+        $p = strtolower(trim($period));
+        if ($p === 'all' || $p === 'all_time' || $p === '') {
+            return ['inicial' => '', 'final' => ''];
+        }
+        if ($p === 'custom') {
+            return [
+                'inicial' => trim($customFi),
+                'final' => trim($customFf),
+            ];
+        }
+        $now = new \DateTime('now', new \DateTimeZone(date_default_timezone_get()));
+        if ($p === 'current_month') {
+            $inicio = (clone $now)->modify('first day of this month')->setTime(0, 0, 0);
+            $fin = (clone $now)->modify('last day of this month')->setTime(0, 0, 0);
+
+            return [
+                'inicial' => $inicio->format('m/d/Y'),
+                'final' => $fin->format('m/d/Y'),
+            ];
+        }
+        if ($p === 'last_month') {
+            $inicio = (clone $now)->modify('first day of last month')->setTime(0, 0, 0);
+            $fin = (clone $now)->modify('last day of last month')->setTime(0, 0, 0);
+
+            return [
+                'inicial' => $inicio->format('m/d/Y'),
+                'final' => $fin->format('m/d/Y'),
+            ];
+        }
+
+        $inicio = (clone $now)->modify('first day of this month')->setTime(0, 0, 0);
+        $fin = (clone $now)->modify('last day of this month')->setTime(0, 0, 0);
+
+        return [
+            'inicial' => $inicio->format('m/d/Y'),
+            'final' => $fin->format('m/d/Y'),
+        ];
+    }
+
+    /**
+     * Tasks for the home widget: admin sees all; other users only rows assigned to them.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function listarTareasPayloadHome(Usuario $viewer, array $perm, string $fi, string $ff, int $limit = 30): array
+    {
+        if (empty($perm['ver'])) {
+            return [];
+        }
+        $only = $viewer->isAdministrador() ? null : (int) $viewer->getUsuarioId();
+
+        /** @var TaskRepository $repo */
+        $repo = $this->getDoctrine()->getRepository(Task::class);
+        $resultado = $repo->ListarTasksConTotal(
+            0,
+            $limit,
+            null,
+            'due_date',
+            'desc',
+            $fi,
+            $ff,
+            '',
+            '',
+            $only,
+        );
+        $list = [];
+        foreach ($resultado['data'] as $task) {
+            $u = $task->getAssignedUser();
+            $st = $this->normalizarStatus($task->getStatus());
+            $assignedId = $u ? (int) $u->getUsuarioId() : 0;
+            $viewerId = (int) $viewer->getUsuarioId();
+            $list[] = [
+                'id' => $task->getTaskId(),
+                'description' => $task->getDescription() ?? '',
+                'due_date' => $task->getDueDate() ? $task->getDueDate()->format('m/d/Y') : '',
+                'assigned' => $u ? $u->getNombreCompleto() : '',
+                'show_assigned' => $assignedId > 0 && $assignedId !== $viewerId,
+                'status' => $st,
+                'status_label' => Task::getStatusLabel($st),
+                'label_pending' => Task::getStatusLabel(Task::STATUS_PENDING),
+                'label_complete' => Task::getStatusLabel(Task::STATUS_COMPLETE),
+                'can_mark_done' => $this->puedeMostrarAccionHecho($viewer, $perm, $task),
+            ];
+        }
+
+        return $list;
+    }
+
+    public function puedeMostrarAccionHecho(Usuario $viewer, array $perm, Task $task): bool
+    {
+        if ($this->normalizarStatus($task->getStatus()) === Task::STATUS_COMPLETE) {
+            return false;
+        }
+
+        return $this->elActorPuedeCambiarEstadoTarea($viewer, $perm, $task);
+    }
+
     private function normalizarStatus(?string $status): string
     {
         $s = strtolower(trim((string) $status));
@@ -190,13 +293,31 @@ class TaskService extends Base
         return $d !== false ? $d : null;
     }
 
-   public function CambiarEstadoTask($task_id, string $status): array
+   public function elActorPuedeCambiarEstadoTarea(Usuario $actor, array $perm, Task $entity): bool
+   {
+      if (empty($perm['editar'])) {
+         return false;
+      }
+      if ($actor->isAdministrador()) {
+         return true;
+      }
+      $u = $entity->getAssignedUser();
+
+      return $u !== null && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId();
+   }
+
+   public function CambiarEstadoTask($task_id, string $status, ?Usuario $actor, array $perm = []): array
    {
       $nuevo = $this->normalizarStatus($status);
       $em = $this->getDoctrine()->getManager();
       $entity = $em->getRepository(Task::class)->find($task_id);
       if (!($entity instanceof Task)) {
          return ['success' => false, 'error' => 'The requested record does not exist'];
+      }
+      if ($actor !== null) {
+         if (!$this->elActorPuedeCambiarEstadoTarea($actor, $perm, $entity)) {
+            return ['success' => false, 'error' => 'Not allowed to change this task state'];
+         }
       }
       if ($entity->getStatus() === $nuevo) {
          return ['success' => true, 'message' => 'The operation was successful'];

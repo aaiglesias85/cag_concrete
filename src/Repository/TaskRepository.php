@@ -15,6 +15,7 @@ class TaskRepository extends ServiceEntityRepository
 
     /**
      * @return array{data: Task[], total: int}
+     * @param int|null $onlyAssignedToUserId if set, only tasks with assignee with this user id
      */
     public function ListarTasksConTotal(
         int $start,
@@ -26,6 +27,7 @@ class TaskRepository extends ServiceEntityRepository
         ?string $fecha_fin = '',
         ?string $statusFiltro = '',
         ?string $usuarioFiltro = '',
+        ?int $onlyAssignedToUserId = null,
     ): array {
         $sortable = [
             'id' => 't.taskId',
@@ -70,6 +72,11 @@ class TaskRepository extends ServiceEntityRepository
         if ($usuarioFiltro !== null && $usuarioFiltro !== '') {
             $baseQb->andWhere('u.usuarioId = :uid')
                 ->setParameter('uid', (int) $usuarioFiltro);
+        }
+
+        if ($onlyAssignedToUserId !== null) {
+            $baseQb->andWhere('u.usuarioId = :onlyUid')
+                ->setParameter('onlyUid', (int) $onlyAssignedToUserId);
         }
 
         $dataQb = clone $baseQb;
