@@ -1,4 +1,5 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Estimates{% endblock %} {% block stylesheetspecific %}
+<link href="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
 <link href="{{ asset('bundles/metronic8/plugins/jquery-tags-input/jquery.tagsinput.css') }}" rel="stylesheet" />
 <link href="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet" />
 <style>
@@ -1755,6 +1756,7 @@
 <script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
 <script src="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
+<script src="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
 
 <script src="{{ asset('bundles/metronic8/js/pages/estimates.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
@@ -1764,6 +1766,8 @@
        editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
        eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
    };
+
+   var direccion_url = "{{ direccion_url }}";
 
    var holidays = {{ holidays|default([])|json_encode(constant('JSON_PRETTY_PRINT'))|raw }};
 

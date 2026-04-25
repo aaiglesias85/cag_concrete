@@ -108,6 +108,7 @@ class EstimateController extends AbstractController
                'units' => $units,
                'estimate_note_items' => $estimate_note_items,
                'holidays' => $holidays,
+               'direccion_url' => $this->estimateService->ObtenerURL(),
             ));
          }
       } else {

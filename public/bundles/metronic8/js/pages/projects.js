@@ -455,6 +455,9 @@ var Projects = (function () {
       contacts = [];
       actualizarTableListaContacts();
 
+      inspectors_datatracking = [];
+      actualizarTableListaInspectorsDataTracking();
+
       //concrete_classes
       concrete_classes = [];
       actualizarTableListaConcreteClasses();
@@ -596,6 +599,7 @@ var Projects = (function () {
                   });
                }
                actualizarTableListaContacts();
+               actualizarTableListaInspectorsDataTracking();
                break;
             case 8:
                actualizarTableListaArchivos();
@@ -1211,6 +1215,9 @@ var Projects = (function () {
             actualizarSelectContactCompany();
          });
          actualizarTableListaContacts();
+
+         inspectors_datatracking = project.inspectors_datatracking || [];
+         actualizarTableListaInspectorsDataTracking();
 
          // concrete_classes
          concrete_classes = project.concrete_classes || [];
@@ -3305,6 +3312,44 @@ var Projects = (function () {
          oTableContacts.destroy();
       }
       initTableContacts();
+   };
+
+   // Inspectors linked via data tracking (same rule as Projects tab on inspector)
+   var inspectors_datatracking = [];
+   var oTableInspectorsDataTracking;
+   var initTableInspectorsDataTracking = function () {
+      const table = '#project-inspectors-datatracking-table';
+      const columns = [{ data: 'name' }, { data: 'email' }, { data: 'phone' }, { data: 'status' }];
+      const columnDefs = [
+         { targets: 1, render: DatatableUtil.getRenderColumnEmail },
+         { targets: 2, render: DatatableUtil.getRenderColumnPhone },
+         { targets: 3, className: 'text-center', render: DatatableUtil.getRenderColumnEstado },
+      ];
+      const language = DatatableUtil.getDataTableLenguaje();
+      oTableInspectorsDataTracking = DatatableUtil.initSafeDataTable(table, {
+         data: inspectors_datatracking,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'All'],
+         ],
+         order: [[0, 'asc']],
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+      $(document).off('keyup', '#lista-project-inspectors-datatracking [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-project-inspectors-datatracking [data-table-filter="search"]', function (e) {
+         if (oTableInspectorsDataTracking) {
+            oTableInspectorsDataTracking.search(e.target.value).draw();
+         }
+      });
+   };
+   var actualizarTableListaInspectorsDataTracking = function () {
+      if (oTableInspectorsDataTracking) {
+         oTableInspectorsDataTracking.destroy();
+      }
+      initTableInspectorsDataTracking();
    };
 
    var validateFormContact = function () {

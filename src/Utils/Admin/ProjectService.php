@@ -2393,6 +2393,22 @@ class ProjectService extends Base
          $contacts = $this->ListarContactsDeProject($project_id);
          $arreglo_resultado['contacts'] = $contacts;
 
+         /** @var DataTrackingRepository $dataTrackingRepo */
+         $dataTrackingRepo = $this->getDoctrine()->getRepository(DataTracking::class);
+         $inspectors_datatracking = [];
+         foreach ($dataTrackingRepo->ListarInspectorsDeProject($project_id) as $key => $insp) {
+            /** @var Inspector $insp */
+            $inspectors_datatracking[] = [
+               'inspector_id' => $insp->getInspectorId(),
+               'name' => $insp->getName(),
+               'email' => $insp->getEmail(),
+               'phone' => $insp->getPhone(),
+               'status' => $insp->getStatus() ? 1 : 0,
+               'posicion' => $key,
+            ];
+         }
+         $arreglo_resultado['inspectors_datatracking'] = $inspectors_datatracking;
+
          // concrete classes
          $concrete_classes = $this->ListarConcreteClassesDeProject($project_id);
          $arreglo_resultado['concrete_classes'] = $concrete_classes;

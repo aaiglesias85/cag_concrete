@@ -113,6 +113,30 @@ class DataTrackingRepository extends ServiceEntityRepository
     }
 
     /**
+     * Inspectores distintos que tienen al menos un data tracking en el proyecto.
+     * Simétrico a ListarProjectsDeInspector.
+     *
+     * @return \App\Entity\Inspector[]
+     */
+    public function ListarInspectorsDeProject($project_id): array
+    {
+        if ($project_id === '' || $project_id === null) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('d_t')
+            ->select('i')
+            ->innerJoin('d_t.inspector', 'i')
+            ->innerJoin('d_t.project', 'p')
+            ->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id)
+            ->groupBy('i.inspectorId')
+            ->orderBy('i.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * ListarDataTrackings: Lista los datatrackings
      * @param int $start Inicio
      * @param int $limit Limite
