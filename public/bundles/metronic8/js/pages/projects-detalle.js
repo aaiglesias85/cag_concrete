@@ -1627,14 +1627,7 @@ var ProjectsDetalle = (function () {
          if (archivos[posicion]) {
             var archivo = archivos[posicion].file;
             var url = direccion_url + '/uploads/project/' + archivo;
-
-            // crear link para que se descargue el archivo
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', archivo); // El nombre con el que se descargará el archivo
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            AttachmentPreviewUtil.open(url, archivo);
          }
       });
    };

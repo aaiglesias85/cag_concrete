@@ -305,10 +305,10 @@ var DatatableUtil = (function () {
             </a>`;
       }
 
-      // download
+      // download (abre vista previa con opción de descargar en el modal)
       if (acciones.includes('download')) {
-         html += `<a href="javascript:;" data-posicion="${row.posicion}" target="_blank" title="Download" class="download btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
-              <i class="ki-duotone ki-cloud-download fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+         html += `<a href="javascript:;" data-posicion="${row.posicion}" title="View" class="download btn btn-icon btn-light-primary btn-sm me-1" data-bs-toggle="tooltip">
+              <i class="ki-duotone ki-eye fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
             </a>`;
       }
 

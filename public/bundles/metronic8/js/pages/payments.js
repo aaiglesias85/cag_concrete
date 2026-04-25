@@ -2432,12 +2432,7 @@ var Payments = (function () {
          if (archivos[posicion]) {
             var archivo = archivos[posicion].file;
             var url = direccion_url + '/uploads/invoice/' + archivo;
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', archivo);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            AttachmentPreviewUtil.open(url, archivo);
          }
       });
       $(document).off('click', '#btn-eliminar-archivos');

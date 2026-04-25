@@ -1,0 +1,21 @@
+{# Vista previa de adjuntos (imagen, PDF, Office vía visor Microsoft). Incluido desde layout admin. #}
+<div class="modal fade" id="modal-attachment-preview" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-xl modal-dialog-centered">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h2 class="modal-title fs-5" id="modal-attachment-preview-title">Attachment</h2>
+            <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close" title="Close" data-bs-toggle="tooltip">
+               <i class="ki-duotone ki-cross fs-1"><span class="path1"></span><span class="path2"></span></i>
+            </div>
+         </div>
+         <div class="modal-body p-0" id="modal-attachment-preview-body" style="min-height: 12rem;"></div>
+         <div class="modal-footer">
+            <a href="#" class="btn btn-primary" id="modal-attachment-preview-download" download>
+               <i class="ki-duotone ki-cloud-download fs-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
+               Download
+            </a>
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
