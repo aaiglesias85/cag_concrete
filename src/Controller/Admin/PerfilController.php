@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Funcion;
+use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Utils\Admin\PerfilService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,10 +13,12 @@ class PerfilController extends AbstractController
 {
 
     private $perfilService;
+    private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-    public function __construct(PerfilService $perfilService)
+    public function __construct(PerfilService $perfilService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
     {
         $this->perfilService = $perfilService;
+        $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
     }
 
     public function index()
@@ -27,9 +30,11 @@ class PerfilController extends AbstractController
 
                 $funciones = $this->perfilService->getDoctrine()->getRepository(Funcion::class)
                     ->ListarOrdenados();
+                $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
 
                 return $this->render('admin/rol/index.html.twig', array(
                     'funciones' => $funciones,
+                    'funcionesAgrupadas' => $funcionesAgrupadas,
                     'permiso' => $permiso[0]
                 ));
             }

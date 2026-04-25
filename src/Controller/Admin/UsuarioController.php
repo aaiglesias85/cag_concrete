@@ -6,6 +6,7 @@ use App\Entity\Funcion;
 use App\Entity\Rol;
 
 use App\Http\DataTablesHelper;
+use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Utils\Admin\UsuarioService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -22,10 +23,12 @@ class UsuarioController extends AbstractController
    private $usuarioService;
    private $funcionRepository;
    private $rolRepository;
+   private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-   public function __construct(UsuarioService $usuarioService)
+   public function __construct(UsuarioService $usuarioService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
    {
       $this->usuarioService = $usuarioService;
+      $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
 
       $this->funcionRepository = $this->usuarioService->getDoctrine()->getRepository(Funcion::class);
       $this->rolRepository = $this->usuarioService->getDoctrine()->getRepository(Rol::class);
@@ -154,10 +157,12 @@ class UsuarioController extends AbstractController
 
             $perfiles = $this->rolRepository->ListarOrdenados();
             $funciones = $this->funcionRepository->ListarOrdenados();
+            $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
 
             return $this->render('admin/usuario/index.html.twig', array(
                'perfiles' => $perfiles,
                'funciones' => $funciones,
+               'funcionesAgrupadas' => $funcionesAgrupadas,
                'permiso' => $permiso[0]
             ));
          }

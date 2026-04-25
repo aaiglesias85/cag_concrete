@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Users{% endblock %} {% block stylesheetspecific %}
 <style>
-   #table-permisos td .form-check {
+   .permisos-modulos-accordion td .form-check {
       display: flex;
       justify-content: center;
       align-items: center;
@@ -445,52 +445,7 @@
                            <span class="ic-step-number">1</span>
                            User permissions
                         </label>
-                        <div class="table-responsive">
-                           <table id="table-permisos" class="table table-striped">
-                              <thead>
-                                 <tr class="fw-bold fs-6 text-gray-800">
-                                    <th>Description</th>
-                                    <th class="text-center w-100px">View</th>
-                                    <th class="text-center w-100px">Add</th>
-                                    <th class="text-center w-100px">Edit</th>
-                                    <th class="text-center w-100px">Delete</th>
-                                    <th class="text-center w-100px">All</th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                 {% for item in funciones %}
-                                 <tr class="tr-permiso" data-id="{{ item.funcionId }}">
-                                    <td>{{ item.descripcion }}</td>
-                                    <td class="text-center w-100px">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                          <input class="form-check-input checkbox-permiso checkbox-permiso-ver" type="checkbox" data-id="{{ item.funcionId }}" />
-                                       </div>
-                                    </td>
-                                    <td class="text-center w-100px">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                          <input class="form-check-input checkbox-permiso checkbox-permiso-agregar" type="checkbox" data-id="{{ item.funcionId }}" />
-                                       </div>
-                                    </td>
-                                    <td class="text-center w-100px">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                          <input class="form-check-input checkbox-permiso checkbox-permiso-editar" type="checkbox" data-id="{{ item.funcionId }}" />
-                                       </div>
-                                    </td>
-                                    <td class="text-center w-100px">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                          <input class="form-check-input checkbox-permiso checkbox-permiso-eliminar" type="checkbox" data-id="{{ item.funcionId }}" />
-                                       </div>
-                                    </td>
-                                    <td class="text-center w-100px">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid">
-                                          <input class="form-check-input checkbox-permiso checkbox-permiso-todos" type="checkbox" data-id="{{ item.funcionId }}" />
-                                       </div>
-                                    </td>
-                                 </tr>
-                                 {% endfor %}
-                              </tbody>
-                           </table>
-                        </div>
+                        {% include 'admin/_permisos_accordion.html.twig' %}
                      </div>
                   </div>
                </div>
