@@ -204,10 +204,12 @@ class InvoiceRepository extends ServiceEntityRepository
       $orderBy = $sortable[$sortField] ?? 'i.startDate';
       $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
-      // QB base con JOIN y filtros
+      // QB base con JOIN y filtros (carga p/c evitar N+1)
       $baseQb = $this->createQueryBuilder('i')
          ->leftJoin('i.project', 'p')
-         ->leftJoin('p.company', 'c');
+         ->addSelect('p')
+         ->leftJoin('p.company', 'c')
+         ->addSelect('c');
 
       // Filtros de búsqueda
       if (!empty($sSearch)) {
@@ -278,7 +280,9 @@ class InvoiceRepository extends ServiceEntityRepository
    {
       $qb = $this->createQueryBuilder('i')
          ->leftJoin('i.project', 'p')
-         ->leftJoin('p.company', 'c');
+         ->addSelect('p')
+         ->leftJoin('p.company', 'c')
+         ->addSelect('c');
 
       // Filtros adicionales
       if (!empty($company_id)) {
@@ -378,10 +382,12 @@ class InvoiceRepository extends ServiceEntityRepository
       $orderBy = $sortable[$sortField] ?? 'i.startDate';
       $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
 
-      // QB base con JOIN y filtros
+      // QB base con JOIN y filtros (carga p/c evitar N+1)
       $baseQb = $this->createQueryBuilder('i')
          ->leftJoin('i.project', 'p')
-         ->leftJoin('p.company', 'c');
+         ->addSelect('p')
+         ->leftJoin('p.company', 'c')
+         ->addSelect('c');
 
       // Filtros de búsqueda
       if (!empty($sSearch)) {

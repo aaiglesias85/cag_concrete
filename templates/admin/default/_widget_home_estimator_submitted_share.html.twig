@@ -20,14 +20,13 @@
         <div class="card-body pt-0">
             <div class="scroll-y h-250px my-2 px-3">
                 <div class="d-flex flex-column h-100">
-                    {% set total = home_cost_breakdown.total|default(0) %}
                     <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="text-gray-600 fs-7">Current period total</span>
-                        <span class="fw-bold fs-6 home-money {{ total > 0 ? 'home-money-positive' : (total < 0 ? 'home-money-negative' : 'home-money-zero') }}" id="home-total-cost-breakdown">
-                            {{ total < 0 ? '-$' : '$' }}{{ total|abs|number_format(2, '.', ',') }}
+                        <span class="text-gray-600 fs-7">Total submitted estimates</span>
+                        <span class="fw-bold text-gray-900 fs-6" id="home-total-estimator-submitted-share">
+                            {{ home_estimator_submitted_share.total|default(0) }}
                         </span>
                     </div>
-                    <div id="home-chart-cost-breakdown" class="min-h-auto flex-grow-1" style="height: 200px;"></div>
+                    <div id="home-chart-estimator-submitted-share" class="min-h-auto flex-grow-1" style="height: 200px;"></div>
                 </div>
             </div>
         </div>

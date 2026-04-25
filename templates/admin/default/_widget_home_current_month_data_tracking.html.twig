@@ -1,0 +1,59 @@
+<div class="col-12 col-md-6 col-xl-4" id="widget-current_month_data_tracking">
+    <div class="card h-100">
+        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+            <div class="card-title align-items-start flex-column m-0 min-w-0">
+                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
+                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+            </div>
+            <div class="card-toolbar flex-shrink-0">
+                <div class="d-flex justify-content-end align-items-center gap-2">
+                    {% for link in w.links %}
+                        {% if link.canView %}
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Open data tracking module">
+                                {{ link.label }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="scroll-y h-250px my-2 px-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
+                        <thead>
+                        <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
+                            <th>Date</th>
+                            <th>Project #</th>
+                            <th>Daily total</th>
+                            <th>Profit total</th>
+                            <th>Labor total</th>
+                            <th>Concrete total</th>
+                        </tr>
+                        </thead>
+                        <tbody id="home-current-month-data-tracking-tbody">
+                        {% for row in home_current_month_data_tracking %}
+                            {% set daily = row.total_daily_today|default(0) %}
+                            {% set profit = row.profit|default(0) %}
+                            {% set labor = row.totalLabor|default(0) %}
+                            {% set concrete = row.total_concrete|default(0) %}
+                            <tr data-data-tracking-id="{{ row.id }}" style="cursor: pointer;">
+                                <td class="text-gray-800">{{ row.date|default('—') }}</td>
+                                <td class="text-gray-800">{{ row.project_number|default('—') }}</td>
+                                <td class="text-gray-800"><span class="home-money {{ daily > 0 ? 'home-money-positive' : (daily < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ daily < 0 ? '-$' : '$' }}{{ daily|abs|number_format(2, '.', ',') }}</span></td>
+                                <td class="text-gray-800"><span class="home-money {{ profit > 0 ? 'home-money-positive' : (profit < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ profit < 0 ? '-$' : '$' }}{{ profit|abs|number_format(2, '.', ',') }}</span></td>
+                                <td class="text-gray-800"><span class="home-money {{ labor > 0 ? 'home-money-positive' : (labor < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ labor < 0 ? '-$' : '$' }}{{ labor|abs|number_format(2, '.', ',') }}</span></td>
+                                <td class="text-gray-800"><span class="home-money {{ concrete > 0 ? 'home-money-positive' : (concrete < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ concrete < 0 ? '-$' : '$' }}{{ concrete|abs|number_format(2, '.', ',') }}</span></td>
+                            </tr>
+                        {% else %}
+                            <tr id="home-current-month-data-tracking-empty-row">
+                                <td colspan="6" class="text-center text-muted py-5">No data tracking records in this range.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

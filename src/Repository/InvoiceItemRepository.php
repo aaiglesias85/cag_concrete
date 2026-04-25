@@ -620,6 +620,64 @@ class InvoiceItemRepository extends ServiceEntityRepository
    }
 
    /**
+    * Equivale a llamar TotalInvoice solo con invoice_id, en lote (una query por trozo de IDs).
+    *
+    * @param int[] $invoiceIds
+    * @return array<int, float>
+    */
+   public function mapTotalInvoiceLineAmountByInvoiceIds(array $invoiceIds): array
+   {
+      if ($invoiceIds === []) {
+         return [];
+      }
+      $out = [];
+      $chunks = array_chunk(array_values(array_unique($invoiceIds)), 400);
+      foreach ($chunks as $chunk) {
+         $qb = $this->createQueryBuilder('i_i')
+            ->select('i.invoiceId AS hid')
+            ->addSelect('SUM(i_i.quantity * i_i.price) AS amt')
+            ->leftJoin('i_i.invoice', 'i')
+            ->andWhere('i.invoiceId IN (:ids)')
+            ->setParameter('ids', $chunk)
+            ->groupBy('i.invoiceId');
+         foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $out[(int) $row['hid']] = (float) ($row['amt'] ?? 0);
+         }
+      }
+
+      return $out;
+   }
+
+   /**
+    * Equivale a TotalInvoiceFinalAmountThisPeriod con solo invoice_id, en lote.
+    *
+    * @param int[] $invoiceIds
+    * @return array<int, float>
+    */
+   public function mapTotalInvoiceFinalAmountThisPeriodByInvoiceIds(array $invoiceIds): array
+   {
+      if ($invoiceIds === []) {
+         return [];
+      }
+      $out = [];
+      $chunks = array_chunk(array_values(array_unique($invoiceIds)), 400);
+      foreach ($chunks as $chunk) {
+         $qb = $this->createQueryBuilder('i_i')
+            ->select('i.invoiceId AS hid')
+            ->addSelect('SUM((i_i.quantity + COALESCE(i_i.quantityBroughtForward, 0)) * i_i.price) AS amt')
+            ->leftJoin('i_i.invoice', 'i')
+            ->andWhere('i.invoiceId IN (:ids)')
+            ->setParameter('ids', $chunk)
+            ->groupBy('i.invoiceId');
+         foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $out[(int) $row['hid']] = (float) ($row['amt'] ?? 0);
+         }
+      }
+
+      return $out;
+   }
+
+   /**
     * ListarParaOverridePaymentConTotal: invoice_item agrupados por project_item_id (solo pantalla Override Payment).
     *
     * `fecha_fin` (m/d/Y), si no está vacío: solo se suman líneas de invoices con `start_date` **estrictamente

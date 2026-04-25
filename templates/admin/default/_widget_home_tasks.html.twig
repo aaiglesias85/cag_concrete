@@ -1,15 +1,13 @@
 {# Renders the Tasks home widget (expects w = widget def, home_task = payload from DefaultController) #}
 <div class="col-12 col-md-6 col-xl-4" id="widget-tasks">
     <div class="card h-100" data-home-task-card="1">
-        <div class="card-header border-0 pt-5 d-flex flex-row flex-wrap align-items-start justify-content-between gap-3">
-            <div class="card-title flex-grow-1 me-3 mb-0 min-w-200px">
-                <h3 class="d-flex flex-column align-items-start mb-0">
-                    <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
-                    <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
-                </h3>
+        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+            <div class="card-title align-items-start flex-column m-0 min-w-0">
+                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
+                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
             </div>
-            <div class="card-toolbar flex-shrink-0 pt-1">
-                <div class="d-flex justify-content-end flex-wrap align-items-center gap-2">
+            <div class="card-toolbar flex-shrink-0">
+                <div class="d-flex justify-content-end align-items-center gap-2">
                     {% if home_task.permiso.agregar %}
                         <button type="button" class="btn btn-icon btn-sm btn-success" id="btn-home-new-task" title="New task">
                             <i class="ki-duotone ki-plus fs-3">
@@ -42,20 +40,35 @@
                         </thead>
                         <tbody id="home-tasks-tbody">
                         {% for t in home_task.tasks %}
+                            {% set is_complete = t.status|default('') == 'complete' %}
                             <tr data-task-id="{{ t.id }}">
                                 <td>
-                                    <span class="text-gray-800 home-task-status">{{ t.status_label }}</span>
+                                    <span class="{{ is_complete ? 'text-success text-decoration-line-through' : 'text-gray-800' }} home-task-status">{{ t.status_label }}</span>
                                 </td>
                                 <td>
-                                    <div class="text-gray-800">{{ t.description|default('')|nl2br }}</div>
+                                    <div class="{{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.description|default('')|nl2br }}</div>
                                     {% if t.show_assigned|default(false) and t.assigned|default('') %}
                                         <div class="text-muted fs-8 mt-1">Assigned: {{ t.assigned }}</div>
                                     {% endif %}
                                 </td>
-                                <td><span class="text-gray-800">{{ t.due_date|default('—') }}</span></td>
+                                <td><span class="{{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.due_date|default('—') }}</span></td>
                                 <td class="text-end text-nowrap">
-                                    {% if t.can_mark_done %}
-                                        <button type="button" class="btn btn-sm btn-light btn-active-light-primary btn-home-task-mark-done" data-task-id="{{ t.id }}">Done</button>
+                                    {% if t.can_toggle_status|default(false) %}
+                                        <button type="button"
+                                                class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status"
+                                                data-task-id="{{ t.id }}"
+                                                data-current-status="{{ t.status|default('pending') }}"
+                                                data-next-status="{{ is_complete ? 'pending' : 'complete' }}"
+                                                title="{{ is_complete ? 'Mark as pending' : 'Mark as done' }}"
+                                                data-bs-toggle="tooltip"
+                                                aria-label="{{ is_complete ? 'Mark as pending' : 'Mark as done' }}">
+                                            <i class="ki-duotone {{ is_complete ? 'ki-cross' : 'ki-check' }} fs-3">
+                                                <span class="path1"></span>
+                                                <span class="path2"></span>
+                                            </i>
+                                        </button>
+                                    {% elseif is_complete %}
+                                        <span class="badge badge-light-success">Done</span>
                                     {% else %}
                                         <span class="text-muted">—</span>
                                     {% endif %}

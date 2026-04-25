@@ -23,6 +23,7 @@ use App\Entity\Item;
 use App\Entity\PlanDownloading;
 use App\Entity\PlanStatus;
 use App\Entity\ProjectStage;
+use App\Entity\Project;
 use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Usuario;
@@ -1636,7 +1637,7 @@ class EstimateService extends Base
 
    /**
     * SalvarEstimate: Guarda los datos de estimate en la BD
-    * @param string $description Nombre
+    * @param string $name Nombre
     * @author Marcel
     */
    public function SalvarEstimate(
@@ -2449,6 +2450,75 @@ class EstimateService extends Base
       }
 
       return $events;
+   }
+
+   /**
+    * Lightweight payload for Home widget: upcoming bid deadlines.
+    *
+    * @return list<array<string, mixed>>
+    */
+   public function listarUpcomingBidDeadlinesPayloadHome(string $fechaInicial, string $fechaFin, int $limit = 0, string $project_id = ''): array
+   {
+      $fechaInicial = trim($fechaInicial);
+      $fechaFin = trim($fechaFin);
+      $project_id = trim($project_id);
+
+      $projectNumberFilter = '';
+      if ($project_id !== '') {
+         $project = $this->getDoctrine()->getRepository(Project::class)->find((int) $project_id);
+         if ($project !== null) {
+            $projectNumberFilter = (string) ($project->getProjectNumber() ?? '');
+         }
+      }
+
+      /** @var EstimateRepository $estimateRepo */
+      $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+      $rows = $estimateRepo->ListarEstimatesParaCalendario(
+         '',
+         '',
+         '',
+         '',
+         '',
+         '',
+         $fechaInicial,
+         $fechaFin
+      );
+
+      $out = [];
+      foreach ($rows as $entity) {
+         if (!$entity instanceof Estimate) {
+            continue;
+         }
+         if ($project_id !== '') {
+            $estimateProjectId = trim((string) ($entity->getProjectId() ?? ''));
+            $matchesByNumber = ($projectNumberFilter !== '' && $estimateProjectId === $projectNumberFilter);
+            $matchesByRaw = ($estimateProjectId !== '' && $estimateProjectId === $project_id);
+            if (!$matchesByNumber && !$matchesByRaw) {
+               continue;
+            }
+         }
+         $bd = $entity->getBidDeadline();
+         if ($bd === null) {
+            continue;
+         }
+         $estimateId = (int) $entity->getEstimateId();
+         $out[] = [
+            'estimate_id' => $estimateId,
+            'project_name' => (string) ($entity->getName() ?? ''),
+            'bid_deadline' => $bd->format('m/d/Y H:i'),
+            'estimator_html' => $this->ListarEstimatorsParaListado($estimateId),
+         ];
+      }
+
+      usort($out, static function (array $a, array $b): int {
+         $da = \DateTime::createFromFormat('m/d/Y H:i', (string) ($a['bid_deadline'] ?? ''));
+         $db = \DateTime::createFromFormat('m/d/Y H:i', (string) ($b['bid_deadline'] ?? ''));
+         $ta = $da ? $da->getTimestamp() : 0;
+         $tb = $db ? $db->getTimestamp() : 0;
+         return $tb <=> $ta; // DESC
+      });
+
+      return $out;
    }
 
    /**

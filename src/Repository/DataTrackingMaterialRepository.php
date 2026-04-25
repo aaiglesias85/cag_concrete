@@ -156,4 +156,66 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
 
         return $consulta->getQuery()->getSingleScalarResult();
     }
+
+   /**
+    * Suma cantidad e importe por material (misma lógica que TotalQuantity + TotalMaterials por fila) en un query.
+    *
+    * @return list<array{material_id: int, total_qty: float, total_amount: float}>
+    */
+   public function aggregateTotalsByMaterialId(
+      string $projectId = '',
+      string $fechaInicial = '',
+      string $fechaFin = '',
+      string $status = ''
+   ): array {
+      $qb = $this->createQueryBuilder('d_t_m')
+         ->select('m.materialId AS material_id')
+         ->addSelect('SUM(d_t_m.quantity) AS total_qty')
+         ->addSelect('SUM(d_t_m.quantity * d_t_m.price) AS total_amount')
+         ->leftJoin('d_t_m.dataTracking', 'd_t')
+         ->leftJoin('d_t_m.material', 'm')
+         ->leftJoin('d_t.project', 'p')
+         ->where('d_t_m.quantity IS NOT NULL')
+         ->andWhere('d_t_m.price IS NOT NULL');
+
+      if (!empty($projectId)) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $projectId);
+      }
+
+      if (!empty($fechaInicial)) {
+         $d = \DateTime::createFromFormat('m/d/Y', $fechaInicial);
+         if ($d) {
+            $qb->andWhere('d_t.date >= :start')
+               ->setParameter('start', $d->format('Y-m-d'));
+         }
+      }
+
+      if (!empty($fechaFin)) {
+         $d = \DateTime::createFromFormat('m/d/Y', $fechaFin);
+         if ($d) {
+            $qb->andWhere('d_t.date <= :end')
+               ->setParameter('end', $d->format('Y-m-d'));
+         }
+      }
+
+      if ($status !== '') {
+         $qb->andWhere('p.status = :status')
+            ->setParameter('status', $status);
+      }
+
+      $qb->groupBy('m.materialId')
+         ->having('SUM(d_t_m.quantity) > 0');
+
+      $out = [];
+      foreach ($qb->getQuery()->getArrayResult() as $row) {
+         $out[] = [
+            'material_id' => (int) $row['material_id'],
+            'total_qty' => (float) ($row['total_qty'] ?? 0),
+            'total_amount' => (float) ($row['total_amount'] ?? 0),
+         ];
+      }
+
+      return $out;
+   }
 }

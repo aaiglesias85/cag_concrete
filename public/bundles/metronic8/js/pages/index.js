@@ -83,15 +83,30 @@ var Index = (function () {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
     };
+    var formatHomeMoney = function (value) {
+        var n = parseFloat(value);
+        if (!isFinite(n)) n = 0;
+        var cls = n > 0 ? 'home-money-positive' : (n < 0 ? 'home-money-negative' : 'home-money-zero');
+        var sign = n < 0 ? '-$' : '$';
+        return '<span class="home-money ' + cls + '">' + sign + MyApp.formatearNumero(Math.abs(n), 2, '.', ',') + '</span>';
+    };
 
-    var blockCard = function () {
-        if (document.getElementById('widget-tasks')) {
-            BlockUtil.block('#widget-tasks');
+    var blockDashboardWidgets = function () {
+        var nodes = document.querySelectorAll('[id^="widget-"]');
+        for (var i = 0; i < nodes.length; i++) {
+            var id = nodes[i].id;
+            if (id) {
+                BlockUtil.block('#' + id);
+            }
         }
     };
-    var unblockCard = function () {
-        if (document.getElementById('widget-tasks')) {
-            BlockUtil.unblock('#widget-tasks');
+    var unblockDashboardWidgets = function () {
+        var nodes = document.querySelectorAll('[id^="widget-"]');
+        for (var i = 0; i < nodes.length; i++) {
+            var id = nodes[i].id;
+            if (id) {
+                BlockUtil.unblock('#' + id);
+            }
         }
     };
     var chartInvoiceProfit = null;
@@ -238,6 +253,204 @@ var Index = (function () {
             chartCostBreakdown.render();
         }, 120);
     };
+    var chartEstimateWinLoss = null;
+    var initEstimateWinLossChart = function () {
+        var element = document.getElementById('home-chart-estimate-win-loss');
+        if (!element || typeof ApexCharts === 'undefined') {
+            return;
+        }
+        if (chartEstimateWinLoss) {
+            chartEstimateWinLoss.destroy();
+            chartEstimateWinLoss = null;
+        }
+
+        var payload = C.estimateWinLossData || { data: [] };
+        var items = Array.isArray(payload.data) ? payload.data : [];
+        var series = items.map(function (it) {
+            return Math.max(0, parseInt(it.amount, 10) || 0);
+        });
+        var labels = items.map(function (it) {
+            return it.name || '';
+        });
+        var colors = items.map(function (it) {
+            return it.color || '#3699FF';
+        });
+        var total = series.reduce(function (a, b) { return a + b; }, 0);
+        var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
+
+        chartEstimateWinLoss = new ApexCharts(element, {
+            series: series,
+            chart: { type: 'donut', height: height },
+            labels: labels,
+            colors: colors,
+            dataLabels: { enabled: false },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        var count = parseInt(val, 10) || 0;
+                        var percent = total > 0 ? (count / total) * 100 : 0;
+                        return count + ' · ' + percent.toFixed(1) + '%';
+                    },
+                },
+            },
+            legend: {
+                show: true,
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '12px',
+                formatter: function (seriesName, opts) {
+                    var idx = opts.seriesIndex;
+                    var count = (items[idx] && items[idx].amount !== undefined) ? (parseInt(items[idx].amount, 10) || 0) : 0;
+                    return seriesName + ': ' + count;
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '55%',
+                        labels: { show: false },
+                    },
+                },
+            },
+        });
+
+        setTimeout(function () {
+            chartEstimateWinLoss.render();
+        }, 120);
+    };
+    var chartEstimatesSubmitted = null;
+    var initEstimatesSubmittedTotalsChart = function () {
+        var element = document.getElementById('home-chart-estimates-submitted');
+        if (!element || typeof ApexCharts === 'undefined') {
+            return;
+        }
+        if (chartEstimatesSubmitted) {
+            chartEstimatesSubmitted.destroy();
+            chartEstimatesSubmitted = null;
+        }
+
+        var payload = C.estimatesSubmittedTotalsData || { data: [] };
+        var items = Array.isArray(payload.data) ? payload.data : [];
+        var series = items.map(function (it) {
+            return Math.max(0, parseInt(it.amount, 10) || 0);
+        });
+        var labels = items.map(function (it) {
+            return it.name || '';
+        });
+        var colors = items.map(function (it) {
+            return it.color || '#3699FF';
+        });
+        var total = series.reduce(function (a, b) { return a + b; }, 0);
+        var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
+
+        chartEstimatesSubmitted = new ApexCharts(element, {
+            series: series,
+            chart: { type: 'donut', height: height },
+            labels: labels,
+            colors: colors,
+            dataLabels: { enabled: false },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        var count = parseInt(val, 10) || 0;
+                        var percent = total > 0 ? (count / total) * 100 : 0;
+                        return count + ' · ' + percent.toFixed(1) + '%';
+                    },
+                },
+            },
+            legend: {
+                show: true,
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '12px',
+                formatter: function (seriesName, opts) {
+                    var idx = opts.seriesIndex;
+                    var count = (items[idx] && items[idx].amount !== undefined) ? (parseInt(items[idx].amount, 10) || 0) : 0;
+                    return seriesName + ': ' + count;
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '55%',
+                        labels: { show: false },
+                    },
+                },
+            },
+        });
+
+        setTimeout(function () {
+            chartEstimatesSubmitted.render();
+        }, 120);
+    };
+    var chartEstimatorSubmittedShare = null;
+    var initEstimatorSubmittedShareChart = function () {
+        var element = document.getElementById('home-chart-estimator-submitted-share');
+        if (!element || typeof ApexCharts === 'undefined') {
+            return;
+        }
+        if (chartEstimatorSubmittedShare) {
+            chartEstimatorSubmittedShare.destroy();
+            chartEstimatorSubmittedShare = null;
+        }
+
+        var payload = C.estimatorSubmittedShareData || { total: 0, data: [] };
+        var items = Array.isArray(payload.data) ? payload.data : [];
+        var series = items.map(function (it) {
+            return Math.max(0, parseFloat(it.amount) || 0);
+        });
+        var labels = items.map(function (it) {
+            return it.name || '';
+        });
+        var colors = items.map(function (it) {
+            return it.color || '#3699FF';
+        });
+        var total = parseFloat(payload.total) || 0;
+        if (total <= 0) {
+            total = series.reduce(function (a, b) { return a + b; }, 0);
+        }
+        var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
+
+        chartEstimatorSubmittedShare = new ApexCharts(element, {
+            series: series,
+            chart: { type: 'donut', height: height },
+            labels: labels,
+            colors: colors,
+            dataLabels: { enabled: false },
+            tooltip: {
+                y: {
+                    formatter: function (val) {
+                        var amount = parseFloat(val) || 0;
+                        var percent = total > 0 ? (amount / total) * 100 : 0;
+                        return amount.toFixed(2) + ' · ' + percent.toFixed(1) + '%';
+                    },
+                },
+            },
+            legend: {
+                show: true,
+                position: 'bottom',
+                horizontalAlign: 'center',
+                fontSize: '12px',
+                formatter: function (seriesName, opts) {
+                    var idx = opts.seriesIndex;
+                    var amount = (items[idx] && items[idx].amount !== undefined) ? (parseFloat(items[idx].amount) || 0) : 0;
+                    return seriesName + ': ' + amount.toFixed(2);
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '55%',
+                        labels: { show: false },
+                    },
+                },
+            },
+        });
+
+        setTimeout(function () {
+            chartEstimatorSubmittedShare.render();
+        }, 120);
+    };
 
     var renderTbody = function (tasks) {
         var $tb = $('#home-tasks-tbody');
@@ -248,21 +461,222 @@ var Index = (function () {
             );
             return;
         }
+        var ordered = tasks.slice().sort(function (a, b) {
+            var aDone = (a && a.status === 'complete') ? 1 : 0;
+            var bDone = (b && b.status === 'complete') ? 1 : 0;
+            if (aDone !== bDone) {
+                return aDone - bDone; // pending first, complete last
+            }
+            return 0;
+        });
         var rows = '';
-        for (var i = 0; i < tasks.length; i++) {
-            var t = tasks[i];
+        for (var i = 0; i < ordered.length; i++) {
+            var t = ordered[i];
+            var isComplete = t.status === 'complete';
+            var textClass = isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800';
+            var statusClass = isComplete ? 'text-success text-decoration-line-through' : 'text-gray-800';
             var assigned = (t.show_assigned && t.assigned) ? ('<div class="text-muted fs-8 mt-1">Assigned: ' + esc(t.assigned) + '</div>') : '';
-            var act = t.can_mark_done
-                ? '<button type="button" class="btn btn-sm btn-light btn-active-light-primary btn-home-task-mark-done" data-task-id="' + esc(t.id) + '">Done</button>'
-                : '<span class="text-muted">-</span>';
+            var nextStatus = isComplete ? 'pending' : 'complete';
+            var actionTitle = isComplete ? 'Mark as pending' : 'Mark as done';
+            var actionIcon = isComplete ? 'ki-cross' : 'ki-check';
+            var act = t.can_toggle_status
+                ? '<button type="button" class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status" data-task-id="' + esc(t.id) + '" data-current-status="' + esc(t.status || 'pending') + '" data-next-status="' + esc(nextStatus) + '" title="' + esc(actionTitle) + '" data-bs-toggle="tooltip" aria-label="' + esc(actionTitle) + '">' +
+                    '<i class="ki-duotone ' + actionIcon + ' fs-3"><span class="path1"></span><span class="path2"></span></i></button>'
+                : (isComplete ? '<span class="badge badge-light-success">Done</span>' : '<span class="text-muted">-</span>');
             rows +=
                 '<tr data-task-id="' + esc(t.id) + '">' +
-                '<td><span class="text-gray-800 home-task-status">' + esc(t.status_label) + '</span></td>' +
-                '<td><div class="text-gray-800">' + esc(t.description).replace(/\n/g, '<br>') + '</div>' + assigned + '</td>' +
-                '<td><span class="text-gray-800">' + esc(t.due_date || '-') + '</span></td>' +
+                '<td><span class="' + statusClass + ' home-task-status">' + esc(t.status_label) + '</span></td>' +
+                '<td><div class="' + textClass + '">' + esc(t.description).replace(/\n/g, '<br>') + '</div>' + assigned + '</td>' +
+                '<td><span class="' + textClass + '">' + esc(t.due_date || '-') + '</span></td>' +
                 '<td class="text-end text-nowrap">' + act + '</td></tr>';
         }
         $tb.html(rows);
+        initTaskTooltips();
+    };
+    var renderWorkScheduleTbody = function (rows) {
+        var $tb = $('#home-work-schedule-tbody');
+        if (!$tb.length) return;
+        if (!rows || !rows.length) {
+            $tb.html(
+                '<tr id="home-work-schedule-empty-row"><td colspan="3" class="text-center text-muted py-5">No schedules in this range.</td></tr>'
+            );
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i] || {};
+            var isHigh = !!r.highpriority;
+            var label = r.priority_label || (isHigh ? 'High' : 'Normal');
+            var badgeClass = isHigh ? 'badge badge-light-danger' : 'badge badge-light';
+            var projectNumber = esc(r.project_number || '-');
+            var projectCell = projectNumber;
+            if (r.project_id) {
+                projectCell = '<a href="javascript:;" class="project-link fw-semibold" data-project-id="' + esc(r.project_id) + '">' + projectNumber + '</a>';
+            }
+            html +=
+                '<tr data-schedule-id="' + esc(r.id || '') + '">' +
+                '<td class="text-gray-800">' + projectCell + '</td>' +
+                '<td class="text-gray-800">' + esc(r.day || '-') + '</td>' +
+                '<td><span class="' + badgeClass + '">' + esc(label) + '</span></td>' +
+                '</tr>';
+        }
+        $tb.html(html);
+    };
+    var renderBidDeadlinesTbody = function (rows) {
+        var $tb = $('#home-bid-deadlines-tbody');
+        if (!$tb.length) return;
+        if (!rows || !rows.length) {
+            $tb.html(
+                '<tr id="home-bid-deadlines-empty-row"><td colspan="3" class="text-center text-muted py-5">No upcoming bid deadlines in this range.</td></tr>'
+            );
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i] || {};
+            var estimatorCell = '-';
+            if (r.estimator_html != null && r.estimator_html !== '') {
+                estimatorCell =
+                    '<div style="display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; white-space:nowrap; gap:6px; padding-bottom:2px;">' +
+                    r.estimator_html +
+                    '</div>';
+            }
+            html +=
+                '<tr data-estimate-id="' + esc(r.estimate_id || '') + '" class="home-bid-deadline-row" style="cursor: pointer;">' +
+                '<td class="text-gray-800">' + esc(r.project_name || '-') + '</td>' +
+                '<td class="text-gray-800">' + esc(r.bid_deadline || '-') + '</td>' +
+                '<td class="text-gray-800">' + estimatorCell + '</td>' +
+                '</tr>';
+        }
+        $tb.html(html);
+    };
+    var renderCurrentMonthDataTrackingTbody = function (rows) {
+        var $tb = $('#home-current-month-data-tracking-tbody');
+        if (!$tb.length) return;
+        if (!rows || !rows.length) {
+            $tb.html(
+                '<tr id="home-current-month-data-tracking-empty-row"><td colspan="6" class="text-center text-muted py-5">No data tracking records in this range.</td></tr>'
+            );
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i] || {};
+            html +=
+                '<tr data-data-tracking-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
+                '<td class="text-gray-800">' + esc(r.date || '-') + '</td>' +
+                '<td class="text-gray-800">' + esc(r.project_number || '-') + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.total_daily_today || 0) + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.profit || 0) + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.totalLabor || 0) + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.total_concrete || 0) + '</td>' +
+                '</tr>';
+        }
+        $tb.html(html);
+    };
+    var renderPayItemTotalsTbody = function (rows) {
+        var $tb = $('#home-pay-item-totals-tbody');
+        if (!$tb.length) return;
+        if (!rows || !rows.length) {
+            $tb.html(
+                '<tr id="home-pay-item-totals-empty-row"><td colspan="3" class="text-center text-muted py-5">No pay item totals in this range.</td></tr>'
+            );
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i] || {};
+            html +=
+                '<tr>' +
+                '<td class="text-gray-800">' + esc(r.name || '-') + '</td>' +
+                '<td class="text-gray-800">' + MyApp.formatearNumero(r.quantity || 0, 2, ".", ",") + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.amount || 0) + '</td>' +
+                '</tr>';
+        }
+        $tb.html(html);
+    };
+    var renderInvoicedProjectsTbody = function (rows) {
+        var $tb = $('#home-invoiced-projects-tbody');
+        if (!$tb.length) return;
+        if (!rows || !rows.length) {
+            $tb.html(
+                '<tr id="home-invoiced-projects-empty-row"><td colspan="3" class="text-center text-muted py-5">No invoices in this range.</td></tr>'
+            );
+            return;
+        }
+        var html = '';
+        for (var i = 0; i < rows.length; i++) {
+            var r = rows[i] || {};
+            html +=
+                '<tr data-invoice-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
+                '<td class="text-gray-800">' + esc(r.project_label || '-') + '</td>' +
+                '<td class="text-gray-800">' + esc(r.invoice_label || '-') + '</td>' +
+                '<td class="text-gray-800">' + formatHomeMoney(r.amount_total || 0) + '</td>' +
+                '</tr>';
+        }
+        $tb.html(html);
+    };
+
+    var initTaskTooltips = function () {
+        if (!window.bootstrap || !bootstrap.Tooltip) {
+            return;
+        }
+        var nodes = document.querySelectorAll('#home-tasks-tbody [data-bs-toggle="tooltip"]');
+        for (var i = 0; i < nodes.length; i++) {
+            bootstrap.Tooltip.getOrCreateInstance(nodes[i]);
+        }
+    };
+
+    var markTaskRowAsComplete = function ($btn) {
+        var $row = $btn.closest('tr');
+        if (!$row.length) {
+            return;
+        }
+        var nextStatus = String($btn.data('next-status') || '').toLowerCase();
+        if (nextStatus !== 'complete' && nextStatus !== 'pending') {
+            nextStatus = 'complete';
+        }
+        var isComplete = nextStatus === 'complete';
+        var $status = $row.find('.home-task-status');
+        if ($status.length) {
+            $status
+                .text(isComplete ? 'Complete' : 'Pending')
+                .removeClass('text-gray-800 text-success text-muted text-decoration-line-through')
+                .addClass(isComplete ? 'text-success text-decoration-line-through' : 'text-gray-800');
+        }
+        var $cells = $row.children('td');
+        if ($cells.length >= 3) {
+            var $desc = $cells.eq(1).find('div').first();
+            var $due = $cells.eq(2).find('span').first();
+            $desc.removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
+            $due.removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
+        }
+        var $actions = $row.find('td').last();
+        if ($actions.length) {
+            var btnTitle = isComplete ? 'Mark as pending' : 'Mark as done';
+            var icon = isComplete ? 'ki-cross' : 'ki-check';
+            var newNext = isComplete ? 'pending' : 'complete';
+            $actions.html(
+                '<button type="button" class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status" data-task-id="' + esc($btn.data('task-id')) + '" data-current-status="' + esc(nextStatus) + '" data-next-status="' + esc(newNext) + '" title="' + esc(btnTitle) + '" data-bs-toggle="tooltip" aria-label="' + esc(btnTitle) + '">' +
+                '<i class="ki-duotone ' + icon + ' fs-3"><span class="path1"></span><span class="path2"></span></i></button>'
+            );
+        }
+        var $tbody = $('#home-tasks-tbody');
+        if ($tbody.length) {
+            if (isComplete) {
+                $tbody.append($row); // complete always at bottom
+            } else {
+                var $firstComplete = $tbody.find('tr').filter(function () {
+                    return $(this).find('.home-task-status').text().trim().toLowerCase() === 'complete';
+                }).first();
+                if ($firstComplete.length) {
+                    $row.insertBefore($firstComplete);
+                } else {
+                    $tbody.prepend($row);
+                }
+            }
+        }
+        initTaskTooltips();
     };
 
     var validateHomeFilters = function () {
@@ -280,36 +694,26 @@ var Index = (function () {
         return true;
     };
 
-    var reloadTasks = function () {
-        if (!C.urlList) {
-            return;
-        }
-        if (!validateHomeFilters()) {
-            return;
-        }
-        var params = getPeriodParams();
-        blockCard();
-        axios
-            .get(C.urlList, { params: params, responseType: 'json' })
-            .then(function (res) {
-                var d = res.data;
-                if (d.success && d.tasks) {
-                    renderTbody(d.tasks);
-                } else {
-                    toastr.error(d.error || 'Could not load tasks', '');
-                }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-                unblockCard();
-            });
-    };
-
-    var reloadKpiCharts = function () {
+    var reloadDashboardData = function () {
         if (!C.urlDashboardStats) {
             return;
         }
-        if (!document.getElementById('home-chart-invoice-profit') && !document.getElementById('home-chart-cost-breakdown')) {
+        var hasTasks = !!document.getElementById('widget-tasks');
+        var hasWorkSchedule = !!document.getElementById('widget-work_schedule');
+        var hasBidDeadlines = !!document.getElementById('widget-bid_deadlines');
+        var hasCurrentMonthDataTracking = !!document.getElementById('widget-current_month_data_tracking');
+        var hasPayItemTotals = !!document.getElementById('widget-pay_item_totals');
+        var hasInvoicedProjects = !!document.getElementById('widget-invoiced_projects');
+        var hasCharts =
+            !!document.getElementById('home-chart-invoice-profit') ||
+            !!document.getElementById('home-chart-cost-breakdown') ||
+            !!document.getElementById('home-chart-estimate-win-loss') ||
+            !!document.getElementById('home-chart-estimates-submitted') ||
+            !!document.getElementById('home-chart-estimator-submitted-share');
+        if (!hasTasks && !hasWorkSchedule && !hasBidDeadlines && !hasCurrentMonthDataTracking && !hasPayItemTotals && !hasInvoicedProjects && !hasCharts) {
+            return;
+        }
+        if (!validateHomeFilters()) {
             return;
         }
         var p = getPeriodParams();
@@ -334,51 +738,166 @@ var Index = (function () {
         formData.set('fechaInicial', fi);
         formData.set('fechaFin', ff);
 
+        blockDashboardWidgets();
         axios
             .post(C.urlDashboardStats, formData, { responseType: 'json' })
             .then(function (res) {
                 var d = res.data || {};
                 if (d.success && d.stats) {
+                    if (hasTasks && Array.isArray(d.stats.tasks)) {
+                        renderTbody(d.stats.tasks);
+                    }
+                    if (hasWorkSchedule && Array.isArray(d.stats.work_schedule)) {
+                        renderWorkScheduleTbody(d.stats.work_schedule);
+                    }
+                    if (hasBidDeadlines && Array.isArray(d.stats.bid_deadlines)) {
+                        renderBidDeadlinesTbody(d.stats.bid_deadlines);
+                    }
+                    if (hasCurrentMonthDataTracking && Array.isArray(d.stats.current_month_data_tracking)) {
+                        renderCurrentMonthDataTrackingTbody(d.stats.current_month_data_tracking);
+                    }
+                    if (hasPayItemTotals && Array.isArray(d.stats.pay_item_totals)) {
+                        renderPayItemTotalsTbody(d.stats.pay_item_totals);
+                    }
+                    if (hasInvoicedProjects && Array.isArray(d.stats.invoiced_projects)) {
+                        renderInvoicedProjectsTbody(d.stats.invoiced_projects);
+                    }
+                    C.estimateWinLossData = d.stats.chart_estimate_win_loss || { total: 0, data: [] };
+                    C.estimatesSubmittedTotalsData = d.stats.chart_estimates_submitted_totals || { total: 0, data: [] };
+                    C.estimatorSubmittedShareData = d.stats.chart_estimator_submitted_share || { total: 0, data: [] };
                     C.invoiceProfitData = d.stats.chart_profit || { total: 0, data: [] };
                     C.costBreakdownData = d.stats.chart_costs || { total: 0, data: [] };
+                    if ($('#home-total-estimate-win-loss').length) {
+                        $('#home-total-estimate-win-loss').text(parseInt(C.estimateWinLossData.total, 10) || 0);
+                    }
+                    if ($('#home-total-estimates-submitted').length) {
+                        $('#home-total-estimates-submitted').text(parseInt(C.estimatesSubmittedTotalsData.total, 10) || 0);
+                    }
+                    if ($('#home-total-estimator-submitted-share').length) {
+                        $('#home-total-estimator-submitted-share').text(parseInt(C.estimatorSubmittedShareData.total, 10) || 0);
+                    }
                     if ($('#home-total-invoice-profit').length) {
-                        $('#home-total-invoice-profit').text(MyApp.formatMoney(C.invoiceProfitData.total || 0));
+                        $('#home-total-invoice-profit').html(formatHomeMoney(C.invoiceProfitData.total || 0));
                     }
                     if ($('#home-total-cost-breakdown').length) {
-                        $('#home-total-cost-breakdown').text(MyApp.formatMoney(C.costBreakdownData.total || 0));
+                        $('#home-total-cost-breakdown').html(formatHomeMoney(C.costBreakdownData.total || 0));
                     }
+                    initEstimateWinLossChart();
+                    initEstimatesSubmittedTotalsChart();
+                    initEstimatorSubmittedShareChart();
                     initInvoiceProfitChart();
                     initCostBreakdownChart();
                 } else if (d.error) {
                     toastr.error(d.error, '');
                 }
             })
-            .catch(MyUtil.catchErrorAxios);
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                unblockDashboardWidgets();
+            });
     };
 
-    var onMarkDone = function (e) {
+    var onToggleTaskStatus = function (e) {
         var $btn = $(e.currentTarget);
         var id = $btn.data('task-id');
         if (!id || !C.urlCambioEstado) return;
-        $btn.prop('disabled', true);
-        var formData = new URLSearchParams();
-        formData.set('task_id', id);
-        formData.set('status', 'complete');
-        axios
-            .post(C.urlCambioEstado, formData, { responseType: 'json' })
-            .then(function (res) {
-                if (res.data && res.data.success) {
-                    toastr.success(res.data.message || 'Updated', '');
-                    reloadTasks();
-                } else {
-                    toastr.error((res.data && res.data.error) || 'Error', '');
+        var nextStatus = String($btn.data('next-status') || '').toLowerCase() === 'pending' ? 'pending' : 'complete';
+        var nextLabel = nextStatus === 'complete' ? 'Complete' : 'Pending';
+
+        var apply = function () {
+            $btn.prop('disabled', true);
+            var formData = new URLSearchParams();
+            formData.set('task_id', id);
+            formData.set('status', nextStatus);
+            axios
+                .post(C.urlCambioEstado, formData, { responseType: 'json' })
+                .then(function (res) {
+                    if (res.data && res.data.success) {
+                        toastr.success(res.data.message || 'Updated', '');
+                        markTaskRowAsComplete($btn);
+                    } else {
+                        toastr.error((res.data && res.data.error) || 'Error', '');
+                        $btn.prop('disabled', false);
+                    }
+                })
+                .catch(function (err) {
+                    MyUtil.catchErrorAxios(err);
                     $btn.prop('disabled', false);
-                }
-            })
-            .catch(function (err) {
-                MyUtil.catchErrorAxios(err);
-                $btn.prop('disabled', false);
-            });
+                });
+        };
+
+        if (typeof Swal === 'undefined') {
+            if (window.confirm('The status will be changed to "' + nextLabel + '". Do you want to continue?')) {
+                apply();
+            }
+            return;
+        }
+        Swal.fire({
+            title: 'Change Status',
+            text: 'The status will be changed to "' + nextLabel + '". Do you want to continue?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, change it!',
+            cancelButtonText: 'No, cancel',
+        }).then(function (result) {
+            if (result.isConfirmed || result.value) {
+                apply();
+            }
+        });
+    };
+    var onOpenProjectFromWorkSchedule = function (e) {
+        e.preventDefault();
+        var projectId = $(e.currentTarget).data('project-id');
+        if (!projectId) {
+            return;
+        }
+        localStorage.setItem('project_id_edit', projectId);
+        if (typeof url_project !== 'undefined' && url_project) {
+            window.location.href = url_project;
+            return;
+        }
+        window.location.href = 'project';
+    };
+    var onOpenEstimateFromBidDeadlines = function (e) {
+        e.preventDefault();
+        var estimateId = $(e.currentTarget).data('estimate-id');
+        if (!estimateId) {
+            return;
+        }
+        localStorage.setItem('estimate_id_edit', estimateId);
+        if (C.urlEstimate) {
+            window.location.href = C.urlEstimate;
+            return;
+        }
+        window.location.href = 'estimate';
+    };
+    var onOpenDataTrackingFromCurrentMonthWidget = function (e) {
+        e.preventDefault();
+        var dataTrackingId = $(e.currentTarget).data('data-tracking-id');
+        if (!dataTrackingId) {
+            return;
+        }
+        localStorage.setItem('data_tracking_id_edit', dataTrackingId);
+        if (C.urlDataTracking) {
+            window.location.href = C.urlDataTracking;
+            return;
+        }
+        window.location.href = 'data_tracking';
+    };
+    var onOpenInvoiceFromInvoicedProjects = function (e) {
+        e.preventDefault();
+        var invoiceId = $(e.currentTarget).data('invoice-id');
+        if (!invoiceId) {
+            return;
+        }
+        localStorage.setItem('invoice_id_edit', invoiceId);
+        if (C.urlInvoice) {
+            window.location.href = C.urlInvoice;
+            return;
+        }
+        window.location.href = 'invoice';
     };
 
     var resetHomeTaskFilters = function () {
@@ -386,11 +905,13 @@ var Index = (function () {
         var $project = $('#home-filter-project');
         if (!$sel.length) return;
         if ($.fn.select2 && $sel.hasClass('select2-hidden-accessible')) {
-            $sel.val('current_month').trigger('change');
+            $sel.val('all').trigger('change');
         } else {
-            $sel.val('current_month');
+            $sel.val('all');
             syncDatesWithPeriodSelect();
         }
+        FlatpickrUtil.clear('home-datetimepicker-fecha-desde');
+        FlatpickrUtil.clear('home-datetimepicker-fecha-hasta');
         if ($project.length) {
             if ($.fn.select2 && $project.hasClass('select2-hidden-accessible')) {
                 $project.val(null).trigger('change');
@@ -398,8 +919,7 @@ var Index = (function () {
                 $project.val('');
             }
         }
-        reloadTasks();
-        reloadKpiCharts();
+        reloadDashboardData();
     };
 
     var initPeriodControls = function () {
@@ -476,8 +996,7 @@ var Index = (function () {
             if (!validateHomeFilters()) {
                 return;
             }
-            reloadTasks();
-            reloadKpiCharts();
+            reloadDashboardData();
         });
         $(document).off('click', '#btn-reset-filtrar-home-task');
         $(document).on('click', '#btn-reset-filtrar-home-task', function () {
@@ -587,7 +1106,7 @@ var Index = (function () {
                         toastr.success(res.data.message || 'Saved', '');
                         var modal = bootstrap.Modal.getInstance(document.getElementById('modal-nueva-tarea-home'));
                         if (modal) modal.hide();
-                        reloadTasks();
+                        reloadDashboardData();
                     } else {
                         toastr.error((res.data && res.data.error) || 'Error', '');
                     }
@@ -602,8 +1121,20 @@ var Index = (function () {
 
     var initActions = function () {
         $(document)
-            .off('click', '.btn-home-task-mark-done')
-            .on('click', '.btn-home-task-mark-done', onMarkDone);
+            .off('click', '.btn-home-task-toggle-status')
+            .on('click', '.btn-home-task-toggle-status', onToggleTaskStatus);
+        $(document)
+            .off('click', '#home-work-schedule-tbody a.project-link')
+            .on('click', '#home-work-schedule-tbody a.project-link', onOpenProjectFromWorkSchedule);
+        $(document)
+            .off('click', '#home-bid-deadlines-tbody tr[data-estimate-id]')
+            .on('click', '#home-bid-deadlines-tbody tr[data-estimate-id]', onOpenEstimateFromBidDeadlines);
+        $(document)
+            .off('click', '#home-current-month-data-tracking-tbody tr[data-data-tracking-id]')
+            .on('click', '#home-current-month-data-tracking-tbody tr[data-data-tracking-id]', onOpenDataTrackingFromCurrentMonthWidget);
+        $(document)
+            .off('click', '#home-invoiced-projects-tbody tr[data-invoice-id]')
+            .on('click', '#home-invoiced-projects-tbody tr[data-invoice-id]', onOpenInvoiceFromInvoicedProjects);
     };
 
     return {
@@ -611,6 +1142,10 @@ var Index = (function () {
             initPeriodControls();
             initNewTaskModal();
             initActions();
+            initTaskTooltips();
+            initEstimateWinLossChart();
+            initEstimatesSubmittedTotalsChart();
+            initEstimatorSubmittedShareChart();
             initInvoiceProfitChart();
             initCostBreakdownChart();
         },

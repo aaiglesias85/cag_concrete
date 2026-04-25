@@ -257,19 +257,29 @@ class TaskService extends Base
                 'status_label' => Task::getStatusLabel($st),
                 'label_pending' => Task::getStatusLabel(Task::STATUS_PENDING),
                 'label_complete' => Task::getStatusLabel(Task::STATUS_COMPLETE),
-                'can_mark_done' => $this->puedeMostrarAccionHecho($viewer, $perm, $task),
+                'can_toggle_status' => $this->puedeMostrarAccionHecho($viewer, $perm, $task),
             ];
         }
+
+        usort($list, static function (array $a, array $b): int {
+            $aDone = ($a['status'] ?? '') === Task::STATUS_COMPLETE ? 1 : 0;
+            $bDone = ($b['status'] ?? '') === Task::STATUS_COMPLETE ? 1 : 0;
+            if ($aDone !== $bDone) {
+                return $aDone - $bDone; // pending first, complete last
+            }
+            $aDue = !empty($a['due_date']) ? \DateTime::createFromFormat('m/d/Y', (string) $a['due_date']) : false;
+            $bDue = !empty($b['due_date']) ? \DateTime::createFromFormat('m/d/Y', (string) $b['due_date']) : false;
+            $aTs = $aDue instanceof \DateTimeInterface ? (int) $aDue->format('U') : 0;
+            $bTs = $bDue instanceof \DateTimeInterface ? (int) $bDue->format('U') : 0;
+
+            return $bTs <=> $aTs; // keep due_date desc inside each status group
+        });
 
         return $list;
     }
 
     public function puedeMostrarAccionHecho(Usuario $viewer, array $perm, Task $task): bool
     {
-        if ($this->normalizarStatus($task->getStatus()) === Task::STATUS_COMPLETE) {
-            return false;
-        }
-
         return $this->elActorPuedeCambiarEstadoTarea($viewer, $perm, $task);
     }
 

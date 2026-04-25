@@ -244,6 +244,12 @@ var Estimates = (function () {
             [10, 25, 30, 50, 'All'],
          ],
          stateSaveParams: DatatableUtil.stateSaveParams,
+         fixedColumns: {
+            start: permiso.eliminar ? 2 : 1,
+            end: 1,
+         },
+         scrollX: true,
+         scrollCollapse: true,
 
          select: {
             info: false,
@@ -367,8 +373,10 @@ var Estimates = (function () {
          // 7. Estimators
          {
             targets: i++,
+            className: 'estimate-col-estimators text-nowrap',
             render: function (data) {
-               return DatatableUtil.getRenderColumnDiv(data, 50);
+               var normalized = String(data || '').replace(/<br\s*\/?>/gi, ' ');
+               return '<div class="estimate-estimators-cell">' + normalized + '</div>';
             },
          },
          // 8. Stage
@@ -382,7 +390,7 @@ var Estimates = (function () {
          {
             targets: -1,
             orderable: false,
-            className: 'text-center',
+            className: 'text-center text-nowrap',
             render: function (data, type, row) {
                return row.acciones;
             },
@@ -3888,6 +3896,19 @@ var Estimates = (function () {
       actualizarTableListaArchivosEstimate();
    };
 
+   var initEstimateDeepLinkFromStorage = function () {
+      var estimate_id_edit = localStorage.getItem('estimate_id_edit');
+      if (!estimate_id_edit) {
+         return;
+      }
+      resetForms();
+      $('#estimate_id').val(estimate_id_edit);
+      $('#form-estimate').removeClass('hide');
+      $('#lista-estimate').addClass('hide');
+      localStorage.removeItem('estimate_id_edit');
+      editRow(estimate_id_edit);
+   };
+
    var initQuotesSend = function () {
       $(document).off('shown.bs.tab', '#tab-send-quotes');
       $(document).on('shown.bs.tab', '#tab-send-quotes', function () {
@@ -4231,6 +4252,7 @@ var Estimates = (function () {
          initAccionChange();
 
          listarCalendarioEstimate();
+         initEstimateDeepLinkFromStorage();
       },
    };
 })();

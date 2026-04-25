@@ -261,4 +261,65 @@ class DataTrackingItemRepository extends ServiceEntityRepository
 
       return (float) $qb->getQuery()->getSingleScalarResult();
    }
+
+   /**
+    * Totales por project_item (misma lógica que TotalQuantity + TotalDaily por fila) en una sola consulta.
+    * Omite filas con cantidad total 0.
+    *
+    * @return list<array{project_item_id: int, total_qty: float, total_amount: float}>
+    */
+   public function aggregatePayItemTotalsByProjectItem(
+      string $projectId = '',
+      string $fechaInicial = '',
+      string $fechaFin = '',
+      string $status = ''
+   ): array {
+      $qb = $this->createQueryBuilder('d_t_i')
+         ->select('p_i.id AS project_item_id')
+         ->addSelect('SUM(d_t_i.quantity) AS total_qty')
+         ->addSelect('SUM((d_t_i.quantity - 2 * d_t_i.punchQuantity) * d_t_i.price) AS total_amount')
+         ->leftJoin('d_t_i.dataTracking', 'd_t')
+         ->leftJoin('d_t_i.projectItem', 'p_i')
+         ->leftJoin('d_t.project', 'p');
+
+      if (!empty($projectId)) {
+         $qb->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $projectId);
+      }
+
+      if (!empty($fechaInicial)) {
+         $dt = \DateTime::createFromFormat('m/d/Y', $fechaInicial);
+         if ($dt) {
+            $qb->andWhere('d_t.date >= :start')
+               ->setParameter('start', $dt->format('Y-m-d'));
+         }
+      }
+
+      if (!empty($fechaFin)) {
+         $dt = \DateTime::createFromFormat('m/d/Y', $fechaFin);
+         if ($dt) {
+            $qb->andWhere('d_t.date <= :end')
+               ->setParameter('end', $dt->format('Y-m-d'));
+         }
+      }
+
+      if (!empty($status)) {
+         $qb->andWhere('p.status = :status')
+            ->setParameter('status', $status);
+      }
+
+      $qb->groupBy('p_i.id')
+         ->having('SUM(d_t_i.quantity) > 0');
+
+      $arreglo = [];
+      foreach ($qb->getQuery()->getArrayResult() as $row) {
+         $arreglo[] = [
+            'project_item_id' => (int) $row['project_item_id'],
+            'total_qty' => (float) ($row['total_qty'] ?? 0),
+            'total_amount' => (float) ($row['total_amount'] ?? 0),
+         ];
+      }
+
+      return $arreglo;
+   }
 }

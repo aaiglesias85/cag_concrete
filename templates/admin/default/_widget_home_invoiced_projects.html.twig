@@ -1,0 +1,51 @@
+<div class="col-12 col-md-6 col-xl-4" id="widget-invoiced_projects">
+    <div class="card h-100">
+        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+            <div class="card-title align-items-start flex-column m-0 min-w-0">
+                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
+                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+            </div>
+            <div class="card-toolbar flex-shrink-0">
+                <div class="d-flex justify-content-end align-items-center gap-2">
+                    {% for link in w.links %}
+                        {% if link.canView %}
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Open invoice module">
+                                {{ link.label }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="card-body pt-0">
+            <div class="scroll-y h-250px my-2 px-3">
+                <div class="table-responsive">
+                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
+                        <thead>
+                        <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
+                            <th>Project</th>
+                            <th>Invoice</th>
+                            <th>Amount total</th>
+                        </tr>
+                        </thead>
+                        <tbody id="home-invoiced-projects-tbody">
+                        {% for row in home_invoiced_projects %}
+                            {% set amount = row.amount_total|default(0) %}
+                            {% set moneyClass = amount > 0 ? 'home-money-positive' : (amount < 0 ? 'home-money-negative' : 'home-money-zero') %}
+                            <tr data-invoice-id="{{ row.id }}" style="cursor: pointer;">
+                                <td class="text-gray-800">{{ row.project_label ?: '—' }}</td>
+                                <td class="text-gray-800">{{ row.invoice_label|default('—') }}</td>
+                                <td class="text-gray-800"><span class="home-money {{ moneyClass }}">{{ amount < 0 ? '-$' : '$' }}{{ amount|abs|number_format(2, '.', ',') }}</span></td>
+                            </tr>
+                        {% else %}
+                            <tr id="home-invoiced-projects-empty-row">
+                                <td colspan="3" class="text-center text-muted py-5">No invoices in this range.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

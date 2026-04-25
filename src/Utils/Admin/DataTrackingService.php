@@ -1718,4 +1718,47 @@ class DataTrackingService extends Base
          'total' => $resultado['total'], // ya viene con el filtro aplicado
       ];
    }
+
+   /**
+    * Payload Home widget: current month projects (data tracking).
+    *
+    * @return list<array<string, mixed>>
+    */
+   public function listarCurrentMonthProjectsPayloadHome(string $project_id, string $fecha_inicial, string $fecha_fin): array
+   {
+      $result = $this->ListarDataTrackings(
+         0,
+         0,
+         '',
+         'date',
+         'DESC',
+         $project_id,
+         $fecha_inicial,
+         $fecha_fin,
+         '',
+         ''
+      );
+
+      $out = [];
+      foreach ($result['data'] as $row) {
+         $projectLabel = (string) ($row['project'] ?? '');
+         $projectNumber = '';
+         if ($projectLabel !== '') {
+            $parts = explode(' - ', $projectLabel, 2);
+            $projectNumber = trim((string) ($parts[0] ?? ''));
+         }
+
+         $out[] = [
+            'id' => (int) ($row['id'] ?? 0),
+            'date' => (string) ($row['date'] ?? ''),
+            'project_number' => $projectNumber,
+            'total_daily_today' => (float) ($row['total_daily_today'] ?? 0),
+            'profit' => (float) ($row['profit'] ?? 0),
+            'totalLabor' => (float) ($row['totalLabor'] ?? 0),
+            'total_concrete' => (float) ($row['total_concrete'] ?? 0),
+         ];
+      }
+
+      return $out;
+   }
 }

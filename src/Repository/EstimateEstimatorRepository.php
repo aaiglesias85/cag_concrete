@@ -35,6 +35,35 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
     }
 
     /**
+     * Relaciones estimate/estimator para muchos estimate_id a la vez (evita N+1 en el dashboard).
+     *
+     * @param int[] $estimateIds
+     * @return EstimateEstimator[]
+     */
+    public function listarByEstimateIds(array $estimateIds): array
+    {
+        if ($estimateIds === []) {
+            return [];
+        }
+        $out = [];
+        $chunks = array_chunk(array_values(array_unique($estimateIds)), 400);
+        foreach ($chunks as $chunk) {
+            $consulta = $this->createQueryBuilder('e_e')
+                ->leftJoin('e_e.estimate', 'e')
+                ->addSelect('e')
+                ->leftJoin('e_e.usuario', 'u')
+                ->addSelect('u')
+                ->andWhere('e.estimateId IN (:ids)')
+                ->setParameter('ids', $chunk)
+                ->orderBy('e.estimateId', 'ASC')
+                ->addOrderBy('u.nombre', 'ASC');
+            $out = array_merge($out, $consulta->getQuery()->getResult());
+        }
+
+        return $out;
+    }
+
+    /**
      * ListarEstimatesDeUsuario: Lista los estimates de un usuario
      *
      * @return EstimateEstimator[]

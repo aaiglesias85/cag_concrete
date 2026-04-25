@@ -308,6 +308,116 @@ class EstimateRepository extends ServiceEntityRepository
     }
 
     /**
+     * Contar estimates por presencia/ausencia de un campo datetime,
+     * con filtros de dashboard (project y rango sobre ese campo).
+     */
+    public function CountByDateFieldPresenceForDashboard(
+        string $field,
+        bool $mustHaveDate,
+        string $projectNumber = '',
+        string $projectIdRaw = '',
+        string $fecha_inicial = '',
+        string $fecha_fin = ''
+    ): int {
+        $allowedFields = ['submittedDate', 'awardedDate', 'lostDate'];
+        if (!in_array($field, $allowedFields, true)) {
+            throw new \InvalidArgumentException('Invalid estimate date field.');
+        }
+
+        $consulta = $this->createQueryBuilder('e')
+            ->select('COUNT(e.estimateId)');
+
+        if ($projectNumber !== '' || $projectIdRaw !== '') {
+            $parts = [];
+            if ($projectNumber !== '') {
+                $parts[] = 'e.projectId = :project_number';
+                $consulta->setParameter('project_number', $projectNumber);
+            }
+            if ($projectIdRaw !== '') {
+                $parts[] = 'e.projectId = :project_id_raw';
+                $consulta->setParameter('project_id_raw', $projectIdRaw);
+            }
+            if (count($parts) > 0) {
+                $consulta->andWhere('(' . implode(' OR ', $parts) . ')');
+            }
+        }
+
+        if ($mustHaveDate) {
+            $consulta->andWhere("e.{$field} IS NOT NULL");
+        } else {
+            $consulta->andWhere("e.{$field} IS NULL");
+        }
+
+        if ($mustHaveDate && $fecha_inicial !== '') {
+            $fi = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial . ' 00:00:00');
+            if ($fi !== false) {
+                $consulta->andWhere("e.{$field} >= :fecha_inicial_dashboard")
+                    ->setParameter('fecha_inicial_dashboard', $fi->format('Y-m-d H:i:s'));
+            }
+        }
+
+        if ($mustHaveDate && $fecha_fin !== '') {
+            $ff = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin . ' 23:59:59');
+            if ($ff !== false) {
+                $consulta->andWhere("e.{$field} <= :fecha_final_dashboard")
+                    ->setParameter('fecha_final_dashboard', $ff->format('Y-m-d H:i:s'));
+            }
+        }
+
+        return (int) $consulta->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Estimates enviados (submitted_date) para dashboard con filtros.
+     *
+     * @return Estimate[]
+     */
+    public function ListarSubmittedEstimatesForDashboard(
+        string $projectNumber = '',
+        string $projectIdRaw = '',
+        string $fecha_inicial = '',
+        string $fecha_fin = ''
+    ): array {
+        $consulta = $this->createQueryBuilder('e')
+            ->andWhere('e.submittedDate IS NOT NULL');
+
+        if ($projectNumber !== '' || $projectIdRaw !== '') {
+            $parts = [];
+            if ($projectNumber !== '') {
+                $parts[] = 'e.projectId = :project_number';
+                $consulta->setParameter('project_number', $projectNumber);
+            }
+            if ($projectIdRaw !== '') {
+                $parts[] = 'e.projectId = :project_id_raw';
+                $consulta->setParameter('project_id_raw', $projectIdRaw);
+            }
+            if (count($parts) > 0) {
+                $consulta->andWhere('(' . implode(' OR ', $parts) . ')');
+            }
+        }
+
+        if ($fecha_inicial !== '') {
+            $fi = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial . ' 00:00:00');
+            if ($fi !== false) {
+                $consulta->andWhere('e.submittedDate >= :submitted_fi')
+                    ->setParameter('submitted_fi', $fi->format('Y-m-d H:i:s'));
+            }
+        }
+
+        if ($fecha_fin !== '') {
+            $ff = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin . ' 23:59:59');
+            if ($ff !== false) {
+                $consulta->andWhere('e.submittedDate <= :submitted_ff')
+                    ->setParameter('submitted_ff', $ff->format('Y-m-d H:i:s'));
+            }
+        }
+
+        return $consulta->orderBy('e.submittedDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * TotalEstimates: Total de estimates de la BD
      * @param string $sSearch Para buscar
      *

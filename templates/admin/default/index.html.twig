@@ -2,7 +2,17 @@
 
 {% block subtitle %} - Home{% endblock %}
 
-{% block stylesheetspecific %}{% endblock %}
+{% block stylesheetspecific %}
+<style>
+    .home-money {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+    .home-money-positive { color: #50cd89; }
+    .home-money-negative { color: #f1416c; }
+    .home-money-zero { color: #7e8299; }
+</style>
+{% endblock %}
 
 {% block content %}
 
@@ -112,6 +122,22 @@
                     {% for w in dashboard_widgets %}
                         {% if w.id is defined and w.id == 'tasks' and home_task is not null %}
                             {% include 'admin/default/_widget_home_tasks.html.twig' with { w: w, home_task: home_task } only %}
+                        {% elseif w.id is defined and w.id == 'work_schedule' and home_work_schedule is not null %}
+                            {% include 'admin/default/_widget_home_work_schedule.html.twig' with { w: w, home_work_schedule: home_work_schedule } only %}
+                        {% elseif w.id is defined and w.id == 'bid_deadlines' and home_bid_deadlines is not null %}
+                            {% include 'admin/default/_widget_home_bid_deadlines.html.twig' with { w: w, home_bid_deadlines: home_bid_deadlines } only %}
+                        {% elseif w.id is defined and w.id == 'estimate_win_loss' and home_estimate_win_loss is not null %}
+                            {% include 'admin/default/_widget_home_estimate_win_loss.html.twig' with { w: w, home_estimate_win_loss: home_estimate_win_loss } only %}
+                        {% elseif w.id is defined and w.id == 'estimates_submitted_totals' and home_estimates_submitted_totals is not null %}
+                            {% include 'admin/default/_widget_home_estimates_submitted_totals.html.twig' with { w: w, home_estimates_submitted_totals: home_estimates_submitted_totals } only %}
+                        {% elseif w.id is defined and w.id == 'estimator_submitted_share' and home_estimator_submitted_share is not null %}
+                            {% include 'admin/default/_widget_home_estimator_submitted_share.html.twig' with { w: w, home_estimator_submitted_share: home_estimator_submitted_share } only %}
+                        {% elseif w.id is defined and w.id == 'current_month_data_tracking' and home_current_month_data_tracking is not null %}
+                            {% include 'admin/default/_widget_home_current_month_data_tracking.html.twig' with { w: w, home_current_month_data_tracking: home_current_month_data_tracking } only %}
+                        {% elseif w.id is defined and w.id == 'pay_item_totals' and home_pay_item_totals is not null %}
+                            {% include 'admin/default/_widget_home_pay_item_totals.html.twig' with { w: w, home_pay_item_totals: home_pay_item_totals } only %}
+                        {% elseif w.id is defined and w.id == 'invoiced_projects' and home_invoiced_projects is not null %}
+                            {% include 'admin/default/_widget_home_invoiced_projects.html.twig' with { w: w, home_invoiced_projects: home_invoiced_projects } only %}
                         {% elseif w.id is defined and w.id == 'invoice_profit_share' and home_invoice_profit is not null %}
                             {% include 'admin/default/_widget_home_invoice_profit.html.twig' with { w: w, home_invoice_profit: home_invoice_profit } only %}
                         {% elseif w.id is defined and w.id == 'job_cost_breakdown' and home_cost_breakdown is not null %}
@@ -119,15 +145,13 @@
                         {% else %}
                         <div class="col-12 col-md-6 col-xl-4" id="widget-{{ w.id }}">
                             <div class="card h-100">
-                                <div class="card-header border-0 pt-5 min-h-100px d-flex flex-column align-items-stretch">
-                                    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 w-100">
-                                        <div class="flex-grow-1 me-1">
-                                            <h3 class="card-title align-items-start flex-column">
-                                                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
-                                                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
-                                            </h3>
-                                        </div>
-                                        <div class="d-flex flex-wrap align-items-center justify-content-end gap-2">
+                                <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+                                    <div class="card-title align-items-start flex-column m-0 min-w-0">
+                                        <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
+                                        <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+                                    </div>
+                                    <div class="card-toolbar flex-shrink-0">
+                                        <div class="d-flex justify-content-end align-items-center gap-2">
                                             {% for link in w.links %}
                                                 {% if link.canView %}
                                                     <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Go to module">
@@ -188,11 +212,19 @@
     {% if dashboard_widgets is not empty %}
     <script>
         window.HomeTaskConfig = {
-            urlList: {% if home_task is not null %}{{ path('listarTaskHome')|json_encode|raw }}{% else %}null{% endif %},
             urlSave: {% if home_task is not null %}{{ path('salvarTaskAdmin')|json_encode|raw }}{% else %}null{% endif %},
             urlCambioEstado: {% if home_task is not null %}{{ path('cambiarEstadoTaskAdmin')|json_encode|raw }}{% else %}null{% endif %},
+            estimateWinLossData: {% if home_estimate_win_loss is not null %}{{ home_estimate_win_loss|json_encode|raw }}{% else %}null{% endif %},
+            estimatesSubmittedTotalsData: {% if home_estimates_submitted_totals is not null %}{{ home_estimates_submitted_totals|json_encode|raw }}{% else %}null{% endif %},
+            estimatorSubmittedShareData: {% if home_estimator_submitted_share is not null %}{{ home_estimator_submitted_share|json_encode|raw }}{% else %}null{% endif %},
+            currentMonthDataTrackingData: {% if home_current_month_data_tracking is not null %}{{ home_current_month_data_tracking|json_encode|raw }}{% else %}null{% endif %},
+            payItemTotalsData: {% if home_pay_item_totals is not null %}{{ home_pay_item_totals|json_encode|raw }}{% else %}null{% endif %},
+            invoicedProjectsData: {% if home_invoiced_projects is not null %}{{ home_invoiced_projects|json_encode|raw }}{% else %}null{% endif %},
             invoiceProfitData: {% if home_invoice_profit is not null %}{{ home_invoice_profit|json_encode|raw }}{% else %}null{% endif %},
             costBreakdownData: {% if home_cost_breakdown is not null %}{{ home_cost_breakdown|json_encode|raw }}{% else %}null{% endif %},
+            urlEstimate: {{ url('estimate')|json_encode|raw }},
+            urlDataTracking: {{ url('data_tracking')|json_encode|raw }},
+            urlInvoice: {{ url('invoice')|json_encode|raw }},
             urlDashboardStats: {{ path('listarStatsDashboard')|json_encode|raw }}
         };
     </script>

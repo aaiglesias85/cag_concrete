@@ -1209,6 +1209,43 @@ class ScheduleService extends Base
    }
 
    /**
+    * Lightweight payload for Home widget (Project #, Day, Priority).
+    *
+    * @return list<array<string, mixed>>
+    */
+   public function listarSchedulesPayloadHome(string $fechaInicial, string $fechaFin, int $limit = 30, string $project_id = ''): array
+   {
+      /** @var ScheduleRepository $scheduleRepo */
+      $scheduleRepo = $this->getDoctrine()->getRepository(Schedule::class);
+      $resultado = $scheduleRepo->ListarSchedulesConTotal(
+         0,
+         $limit,
+         null,
+         'day',
+         'DESC',
+         $project_id,
+         '',
+         $fechaInicial,
+         $fechaFin
+      );
+
+      $list = [];
+      foreach ($resultado['data'] as $value) {
+         $project = $value->getProject();
+         $list[] = [
+            'id' => $value->getScheduleId(),
+            'project_id' => $project ? (int) $project->getProjectId() : 0,
+            'project_number' => $project ? (string) $project->getProjectNumber() : '',
+            'day' => $value->getDay() ? $value->getDay()->format('m/d/Y') : '',
+            'highpriority' => (bool) $value->getHighpriority(),
+            'priority_label' => $value->getHighpriority() ? 'High' : 'Normal',
+         ];
+      }
+
+      return $list;
+   }
+
+   /**
     * TotalSchedules: Total de schedules
     * @param string $sSearch Para buscar
     * @author Marcel
