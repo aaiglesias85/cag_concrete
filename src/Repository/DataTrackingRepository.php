@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingItem;
+use App\Entity\Inspector;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -124,13 +125,14 @@ class DataTrackingRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('d_t')
-            ->select('i')
-            ->innerJoin('d_t.inspector', 'i')
+        // Root must be Inspector: selecting only "i" from a DataTracking QB drops the root alias (Doctrine error).
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select('DISTINCT i')
+            ->from(Inspector::class, 'i')
+            ->innerJoin(DataTracking::class, 'd_t', 'WITH', 'd_t.inspector = i')
             ->innerJoin('d_t.project', 'p')
             ->andWhere('p.projectId = :project_id')
             ->setParameter('project_id', $project_id)
-            ->groupBy('i.inspectorId')
             ->orderBy('i.name', 'ASC')
             ->getQuery()
             ->getResult();
