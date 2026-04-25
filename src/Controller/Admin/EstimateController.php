@@ -267,6 +267,11 @@ class EstimateController extends AbstractController
       $companys = $request->get('companys');
       $companys = json_decode($companys);
 
+      $archivos_raw = $request->get('archivos');
+      $archivos = json_decode($archivos_raw ?? '[]');
+      if (!is_array($archivos)) {
+         $archivos = [];
+      }
 
       try {
 
@@ -301,7 +306,8 @@ class EstimateController extends AbstractController
                $bidInstructions,
                $planLink,
                $quoteReceived,
-               $companys
+               $companys,
+               $archivos
             );
          } else {
             $resultado = $this->estimateService->ActualizarEstimate(
@@ -335,7 +341,8 @@ class EstimateController extends AbstractController
                $bidInstructions,
                $planLink,
                $quoteReceived,
-               $companys
+               $companys,
+               $archivos
             );
          }
 
@@ -747,6 +754,90 @@ class EstimateController extends AbstractController
          return $this->json(['success' => true, 'message' => 'The operation was successful', 'url' => $url]);
       } catch (\Exception $e) {
          return $this->json(['success' => false, 'error' => $e->getMessage()]);
+      }
+   }
+
+   /**
+    * salvarArchivo: sube un fichero al directorio de estimates (mismo flujo que project/payment).
+    */
+   public function salvarArchivo(Request $request)
+   {
+      $resultadoJson = [];
+
+      try {
+         $file = $request->files->get('file');
+         if ($file === null) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Invalid file';
+
+            return $this->json($resultadoJson);
+         }
+
+         $dir = 'uploads/estimate/';
+         $file_name = $this->estimateService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
+
+         if ($file_name != '') {
+            $resultadoJson['success'] = true;
+            $resultadoJson['message'] = 'The operation was successful';
+            $resultadoJson['name'] = $file_name;
+            $resultadoJson['size'] = filesize($dir . $file_name);
+         } else {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Invalid file';
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   public function eliminarArchivo(Request $request)
+   {
+      $archivo = $request->get('archivo');
+
+      try {
+         $resultado = $this->estimateService->EliminarArchivo($archivo);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = 'The operation was successful';
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'] ?? '';
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
+      }
+   }
+
+   public function eliminarArchivos(Request $request)
+   {
+      $archivos = $request->get('archivos');
+
+      try {
+         $resultado = $this->estimateService->EliminarArchivos($archivos);
+         if ($resultado['success']) {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['message'] = 'The operation was successful';
+         } else {
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'] ?? '';
+         }
+
+         return $this->json($resultadoJson);
+      } catch (\Exception $e) {
+         $resultadoJson['success'] = false;
+         $resultadoJson['error'] = $e->getMessage();
+
+         return $this->json($resultadoJson);
       }
    }
 }

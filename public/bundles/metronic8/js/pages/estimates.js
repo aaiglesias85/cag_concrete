@@ -633,6 +633,9 @@ var Estimates = (function () {
       template_notes = [];
       actualizarTableListaTemplateNotes();
 
+      archivos = [];
+      actualizarTableListaArchivosEstimate();
+
       //Mostrar el primer tab
       resetWizard();
 
@@ -774,6 +777,9 @@ var Estimates = (function () {
                $('#tab-bid-information').tab('show');
                break;
             case 5:
+               $('#tab-archivos-estimate').tab('show');
+               break;
+            case 6:
                $('#tab-send-quotes').tab('show');
                break;
          }
@@ -809,6 +815,9 @@ var Estimates = (function () {
                break;
             case 4:
                actualizarTableListaTemplateNotes();
+               break;
+            case 5:
+               actualizarTableListaArchivosEstimate();
                break;
          }
       }, 0);
@@ -882,7 +891,7 @@ var Estimates = (function () {
 
          mostrarForm();
 
-         totalTabs = 5;
+         totalTabs = 6;
          activeTab = 1;
          $('#btn-wizard-anterior').addClass('hide');
          $('#btn-wizard-siguiente').removeClass('hide');
@@ -974,6 +983,7 @@ var Estimates = (function () {
       formData.set('planLink', $('#planLink').val());
       formData.set('quoteReceived', $('#quoteReceived').prop('checked') ? 1 : 0);
       formData.set('companys', JSON.stringify(companys));
+      formData.set('archivos', JSON.stringify(archivos));
 
       return formData;
    };
@@ -1213,8 +1223,14 @@ var Estimates = (function () {
          });
          actualizarTableListaTemplateNotes();
 
+         archivos = (estimate.archivos || []).map(function (a, i) {
+            a.posicion = i;
+            return a;
+         });
+         actualizarTableListaArchivosEstimate();
+
          // habilitar tab
-         totalTabs = 5;
+         totalTabs = 6;
          $('#btn-wizard-siguiente').removeClass('hide');
          $('#btn-wizard-finalizar').removeClass('hide');
 
@@ -3029,6 +3045,7 @@ var Estimates = (function () {
 
    // Companys
    var companys = [];
+   var archivos = [];
    var nEditingRowCompany = null;
    var escAttr = function (t) {
       if (t == null || t === '') {
@@ -3576,6 +3593,306 @@ var Estimates = (function () {
       }
    };
 
+   var oTableArchivosEstimate;
+   var nEditingRowArchivoEstimate = null;
+   var initTableListaArchivosEstimate = function () {
+      var table = '#archivo-estimate-table-editable';
+      var columns = [];
+      if (permiso.eliminar) {
+         columns.push({ data: 'id' });
+      }
+      columns.push({ data: 'name' }, { data: 'file' }, { data: null });
+
+      var columnDefs = [
+         {
+            targets: 0,
+            orderable: false,
+            render: DatatableUtil.getRenderColumnCheck,
+         },
+      ];
+      if (!permiso.eliminar) {
+         columnDefs = [];
+      }
+      columnDefs.push({
+         targets: -1,
+         data: null,
+         orderable: false,
+         className: 'text-center',
+         render: function (data, type, row) {
+            return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
+         },
+      });
+      var language = DatatableUtil.getDataTableLenguaje();
+      var order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+      oTableArchivosEstimate = DatatableUtil.initSafeDataTable(table, {
+         data: archivos,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'All'],
+         ],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+      $(document).off('keyup', '#lista-archivos-estimate [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-archivos-estimate [data-table-filter="search"]', function (e) {
+         oTableArchivosEstimate.search(e.target.value).draw();
+      });
+   };
+   var actualizarTableListaArchivosEstimate = function () {
+      if (oTableArchivosEstimate) {
+         oTableArchivosEstimate.destroy();
+      }
+      initTableListaArchivosEstimate();
+   };
+   var resetFormArchivoEstimate = function () {
+      MyUtil.resetForm('archivo-form-estimate');
+      $('#fileinput-estimate').val('');
+      $('#fileinput-archivo-estimate .fileinput-filename').html('');
+      $('#fileinput-archivo-estimate').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      nEditingRowArchivoEstimate = null;
+   };
+   var initAccionesArchivoEstimate = function () {
+      $(document).off('click', '#btn-agregar-archivo-estimate');
+      $(document).on('click', '#btn-agregar-archivo-estimate', function () {
+         resetFormArchivoEstimate();
+         ModalUtil.show('modal-archivo-estimate', { backdrop: 'static', keyboard: true });
+      });
+
+      $(document).off('click', '#btn-salvar-archivo-estimate');
+      $(document).on('click', '#btn-salvar-archivo-estimate', function (e) {
+         e.preventDefault();
+         var form = KTUtil.get('archivo-form-estimate');
+         var constraints = {
+            name: {
+               presence: { message: 'This field is required' },
+            },
+         };
+         var errors = validate(form, constraints);
+         if (errors) {
+            MyApp.showErrorsValidateForm(form, errors);
+            MyUtil.attachChangeValidacion(form, constraints);
+            return;
+         }
+         if (!$('#fileinput-archivo-estimate').hasClass('fileinput-exists')) {
+            toastr.error('Select the file', '');
+            return;
+         }
+         var nombre = $('#archivo-name-estimate').val();
+         function existeNombre(name) {
+            var pos = nEditingRowArchivoEstimate;
+            if (pos == null) {
+               return archivos.some(function (item) {
+                  return item.name === name;
+               });
+            }
+            var excludeId = archivos[pos] ? archivos[pos].id : null;
+            return archivos.some(function (item) {
+               return item.name === name && item.id !== excludeId;
+            });
+         }
+         if (existeNombre(nombre)) {
+            toastr.error('The attachment has already been added', 'Error');
+            return;
+         }
+         var fileInput = document.getElementById('fileinput-estimate');
+         var file = fileInput.files[0];
+         if (file) {
+            var formData = new FormData();
+            formData.set('file', file);
+            BlockUtil.block('#modal-archivo-estimate .modal-content');
+            axios
+               .post('estimate/salvarArchivo', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status == 200) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, 'Done');
+                        if (nEditingRowArchivoEstimate == null) {
+                           archivos.push({
+                              id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
+                              name: nombre,
+                              file: response.name,
+                              posicion: archivos.length,
+                           });
+                        } else {
+                           archivos[nEditingRowArchivoEstimate].name = nombre;
+                           archivos[nEditingRowArchivoEstimate].file = response.name;
+                        }
+                        ModalUtil.hide('modal-archivo-estimate');
+                        actualizarTableListaArchivosEstimate();
+                        resetFormArchivoEstimate();
+                     } else {
+                        toastr.error(response.error, 'Error');
+                     }
+                  } else {
+                     toastr.error('Upload failed', 'Error');
+                  }
+               })
+               .catch(function () {
+                  toastr.error(
+                     'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.',
+                     'Error !!!',
+                  );
+               })
+               .then(function () {
+                  BlockUtil.unblock('#modal-archivo-estimate .modal-content');
+               });
+         } else {
+            archivos[nEditingRowArchivoEstimate].name = nombre;
+            actualizarTableListaArchivosEstimate();
+            resetFormArchivoEstimate();
+            ModalUtil.hide('modal-archivo-estimate');
+         }
+      });
+
+      $(document).off('click', '#archivo-estimate-table-editable a.edit');
+      $(document).on('click', '#archivo-estimate-table-editable a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (archivos[posicion]) {
+            resetFormArchivoEstimate();
+            nEditingRowArchivoEstimate = posicion;
+            $('#archivo-name-estimate').val(archivos[posicion].name);
+            $('#fileinput-archivo-estimate .fileinput-filename').html(archivos[nEditingRowArchivoEstimate].file);
+            $('#fileinput-archivo-estimate').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
+            ModalUtil.show('modal-archivo-estimate', { backdrop: 'static', keyboard: true });
+         }
+      });
+
+      $(document).off('click', '#archivo-estimate-table-editable a.delete');
+      $(document).on('click', '#archivo-estimate-table-editable a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         Swal.fire({
+            text: 'Are you sure you want to delete the attachment?',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: {
+               confirmButton: 'btn fw-bold btn-success',
+               cancelButton: 'btn fw-bold btn-danger',
+            },
+         }).then(function (result) {
+            if (result.value) {
+               if (!archivos[posicion]) {
+                  return;
+               }
+               var formData = new URLSearchParams();
+               formData.set('archivo', archivos[posicion].file);
+               BlockUtil.block('#lista-archivos-estimate');
+               axios
+                  .post('estimate/eliminarArchivo', formData, { responseType: 'json' })
+                  .then(function (res) {
+                     if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                           toastr.success(response.message, '');
+                           archivos.splice(posicion, 1);
+                           for (var i = 0; i < archivos.length; i++) {
+                              archivos[i].posicion = i;
+                           }
+                           actualizarTableListaArchivosEstimate();
+                        } else {
+                           toastr.error(response.error, '');
+                        }
+                     } else {
+                        toastr.error('An internal error has occurred, please try again.', '');
+                     }
+                  })
+                  .catch(MyUtil.catchErrorAxios)
+                  .then(function () {
+                     BlockUtil.unblock('#lista-archivos-estimate');
+                  });
+            }
+         });
+      });
+
+      $(document).off('click', '#archivo-estimate-table-editable a.download');
+      $(document).on('click', '#archivo-estimate-table-editable a.download', function () {
+         var posicion = $(this).data('posicion');
+         if (archivos[posicion]) {
+            var archivo = archivos[posicion].file;
+            var url = direccion_url + '/uploads/estimate/' + archivo;
+            var link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', archivo);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+         }
+      });
+
+      $(document).off('click', '#btn-eliminar-archivos-estimate');
+      $(document).on('click', '#btn-eliminar-archivos-estimate', function () {
+         var ids = DatatableUtil.getTableSelectedRowKeys('#archivo-estimate-table-editable');
+         var archivos_name = [];
+         for (var i = 0; i < ids.length; i++) {
+            var archivo = archivos.find(function (item) {
+               return item.id == ids[i];
+            });
+            if (archivo) {
+               archivos_name.push(archivo.file);
+            }
+         }
+         if (archivos_name.length > 0) {
+            Swal.fire({
+               text: 'Are you sure you want to delete the selected atachments?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               confirmButtonClass: 'btn btn-sm btn-bold btn-success',
+               cancelButtonText: 'No, cancel',
+               cancelButtonClass: 'btn btn-sm btn-bold btn-danger',
+            }).then(function (result) {
+               if (result.value) {
+                  var formData = new URLSearchParams();
+                  formData.set('archivos', archivos_name.join(','));
+                  BlockUtil.block('#lista-archivos-estimate');
+                  axios
+                     .post('estimate/eliminarArchivos', formData, { responseType: 'json' })
+                     .then(function (res) {
+                        if (res.status === 200 || res.status === 201) {
+                           var response = res.data;
+                           if (response.success) {
+                              toastr.success(response.message, '');
+                              for (var j = 0; j < ids.length; j++) {
+                                 var pos = archivos.findIndex(function (item) {
+                                    return item.id == ids[j];
+                                 });
+                                 if (pos >= 0) {
+                                    archivos.splice(pos, 1);
+                                 }
+                              }
+                              for (var k = 0; k < archivos.length; k++) {
+                                 archivos[k].posicion = k;
+                              }
+                              actualizarTableListaArchivosEstimate();
+                           } else {
+                              toastr.error(response.error, '');
+                           }
+                        } else {
+                           toastr.error('An internal error has occurred, please try again.', '');
+                        }
+                     })
+                     .catch(MyUtil.catchErrorAxios)
+                     .then(function () {
+                        BlockUtil.unblock('#lista-archivos-estimate');
+                     });
+               }
+            });
+         } else {
+            toastr.error('Select attachments to delete', '');
+         }
+      });
+
+      actualizarTableListaArchivosEstimate();
+   };
+
    var initQuotesSend = function () {
       $(document).off('shown.bs.tab', '#tab-send-quotes');
       $(document).on('shown.bs.tab', '#tab-send-quotes', function () {
@@ -3910,6 +4227,8 @@ var Estimates = (function () {
          initTableTemplateNotes();
          initAccionesTemplateNotes();
          handleSearchDatatableTemplateNotes();
+
+         initAccionesArchivoEstimate();
 
          // send quotes (cuotas)
          initQuotesSend();

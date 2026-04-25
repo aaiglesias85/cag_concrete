@@ -8,6 +8,7 @@ use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Equation;
 use App\Entity\Estimate;
+use App\Entity\EstimateAttachment;
 use App\Entity\EstimateCompany;
 use App\Entity\EstimateCounty;
 use App\Entity\EstimateEstimator;
@@ -25,6 +26,7 @@ use App\Entity\ProjectStage;
 use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Usuario;
+use App\Repository\EstimateAttachmentRepository;
 use App\Repository\EstimateCompanyRepository;
 use App\Repository\EstimateCountyRepository;
 use App\Repository\EstimateEstimatorRepository;
@@ -941,6 +943,8 @@ class EstimateService extends Base
          $template_notes = $this->ListarTemplateNotesDeEstimate($estimate_id);
          $arreglo_resultado['template_notes'] = $template_notes;
 
+         $arreglo_resultado['archivos'] = $this->ListarArchivosDeEstimate($estimate_id);
+
          $resultado['success'] = true;
          $resultado['estimate'] = $arreglo_resultado;
       }
@@ -1310,6 +1314,18 @@ class EstimateService extends Base
    {
       $em = $this->getDoctrine()->getManager();
 
+      // 0) attachments (ficheros en disco + filas)
+      /** @var EstimateAttachmentRepository $estimateAttachmentRepo */
+      $estimateAttachmentRepo = $this->getDoctrine()->getRepository(EstimateAttachment::class);
+      $dir = 'uploads/estimate/';
+      foreach ($estimateAttachmentRepo->ListarAttachmentsDeEstimate($estimate_id) as $attachment) {
+         $fn = $attachment->getFile();
+         if ($fn !== null && $fn !== '' && is_file($dir . $fn)) {
+            unlink($dir . $fn);
+         }
+         $em->remove($attachment);
+      }
+
       // 1) Quote items (y sus notas estimate_quote_item_note se eliminan por CASCADE en BD o explícitamente)
       /** @var EstimateQuoteItemRepository $estimateQuoteItemRepo */
       $estimateQuoteItemRepo = $this->getDoctrine()->getRepository(EstimateQuoteItem::class);
@@ -1407,7 +1423,8 @@ class EstimateService extends Base
       $bidInstructions,
       $planLink,
       $quoteReceived,
-      $companys
+      $companys,
+      $archivos
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -1538,6 +1555,8 @@ class EstimateService extends Base
          // companys
          $this->SalvarCompanys($entity, $companys);
 
+         $this->SalvarArchivos($entity, $archivos);
+
          $em->flush();
 
          //Salvar log
@@ -1650,7 +1669,8 @@ class EstimateService extends Base
       $bidInstructions,
       $planLink,
       $quoteReceived,
-      $companys
+      $companys,
+      $archivos
    ) {
       $em = $this->getDoctrine()->getManager();
 
@@ -1769,6 +1789,9 @@ class EstimateService extends Base
 
       $em->flush();
 
+      $this->SalvarArchivos($entity, $archivos);
+      $em->flush();
+
       //Salvar log
       $log_operacion = "Add";
       $log_categoria = "Project Estimate";
@@ -1777,6 +1800,122 @@ class EstimateService extends Base
 
       $resultado['success'] = true;
       $resultado['estimate_id'] = $entity->getEstimateId();
+
+      return $resultado;
+   }
+
+   /**
+    * ListarArchivosDeEstimate
+    *
+    * @return array<int, array{id: int, name: string|null, file: string|null, posicion: int}>
+    */
+   public function ListarArchivosDeEstimate($estimate_id): array
+   {
+      $archivos = [];
+
+      /** @var EstimateAttachmentRepository $estimateAttachmentRepo */
+      $estimateAttachmentRepo = $this->getDoctrine()->getRepository(EstimateAttachment::class);
+      $rows = $estimateAttachmentRepo->ListarAttachmentsDeEstimate($estimate_id);
+      foreach ($rows as $key => $row) {
+         $archivos[] = [
+            'id' => $row->getId(),
+            'name' => $row->getName(),
+            'file' => $row->getFile(),
+            'posicion' => $key,
+         ];
+      }
+
+      return $archivos;
+   }
+
+   /**
+    * @param iterable<int, object>|null $archivos
+    */
+   public function SalvarArchivos(Estimate $entity, $archivos): void
+   {
+      if ($archivos === null || $archivos === '') {
+         return;
+      }
+
+      $em = $this->getDoctrine()->getManager();
+
+      foreach ($archivos as $value) {
+         $archivo_entity = null;
+
+         if (isset($value->id) && is_numeric($value->id)) {
+            $archivo_entity = $this->getDoctrine()->getRepository(EstimateAttachment::class)
+               ->find((int) $value->id);
+         }
+
+         $is_new_archivo = false;
+         if ($archivo_entity == null) {
+            $archivo_entity = new EstimateAttachment();
+            $is_new_archivo = true;
+         }
+
+         $archivo_entity->setName($value->name ?? null);
+         $archivo_entity->setFile($value->file ?? null);
+
+         if ($is_new_archivo) {
+            $archivo_entity->setEstimate($entity);
+
+            $em->persist($archivo_entity);
+         }
+      }
+   }
+
+   /**
+    * @return array{success: bool}
+    */
+   public function EliminarArchivos($archivos): array
+   {
+      $resultado = [];
+      $em = $this->getDoctrine()->getManager();
+
+      $archivos = explode(',', $archivos);
+      foreach ($archivos as $archivo) {
+         $dir = 'uploads/estimate/';
+         if (is_file($dir . $archivo)) {
+            unlink($dir . $archivo);
+         }
+
+         $archivo_entity = $this->getDoctrine()->getRepository(EstimateAttachment::class)
+            ->findOneBy(['file' => $archivo]);
+         if ($archivo_entity != null) {
+            $em->remove($archivo_entity);
+         }
+      }
+
+      $em->flush();
+
+      $resultado['success'] = true;
+
+      return $resultado;
+   }
+
+   /**
+    * @return array{success: bool}
+    */
+   public function EliminarArchivo($archivo): array
+   {
+      $resultado = [];
+
+      $dir = 'uploads/estimate/';
+      if (is_file($dir . $archivo)) {
+         unlink($dir . $archivo);
+      }
+
+      $em = $this->getDoctrine()->getManager();
+
+      $archivo_entity = $this->getDoctrine()->getRepository(EstimateAttachment::class)
+         ->findOneBy(['file' => $archivo]);
+      if ($archivo_entity != null) {
+         $em->remove($archivo_entity);
+      }
+
+      $em->flush();
+
+      $resultado['success'] = true;
 
       return $resultado;
    }

@@ -26,6 +26,18 @@ cargarDatosEstimateAdmin:
   path: /estimate/cargarDatos
   defaults: { _controller: App\Controller\Admin\EstimateController::cargarDatos, _format: json }
 
+salvarArchivoEstimateAdmin:
+  path: /estimate/salvarArchivo
+  defaults: { _controller: App\Controller\Admin\EstimateController::salvarArchivo, _format: json }
+
+eliminarArchivoEstimateAdmin:
+  path: /estimate/eliminarArchivo
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarArchivo, _format: json }
+
+eliminarArchivosEstimateAdmin:
+  path: /estimate/eliminarArchivos
+  defaults: { _controller: App\Controller\Admin\EstimateController::eliminarArchivos, _format: json }
+
 cambiarStageEstimateAdmin:
   path: /estimate/cambiarStage
   defaults: { _controller: App\Controller\Admin\EstimateController::cambiarStage, _format: json }
