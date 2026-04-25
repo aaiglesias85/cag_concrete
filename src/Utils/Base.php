@@ -421,6 +421,7 @@ class Base
       $menuEstimate = false;
       $menuPlanDownloading = false;
       $menuHoliday = false;
+      $menuTasks = false;
       $menuCounty = false;
       $menuPayment = false;
       $menuOverridePayment = false;
@@ -526,6 +527,9 @@ class Base
          if ($permiso['funcion_id'] == 31 && $permiso['ver']) {
             $menuHoliday = true;
          }
+         if ($permiso['funcion_id'] == 40 && $permiso['ver']) {
+            $menuTasks = true;
+         }
          if ($permiso['funcion_id'] == 32 && $permiso['ver']) {
             $menuCounty = true;
          }
@@ -588,6 +592,7 @@ class Base
          'menuEstimate' => $menuEstimate,
          'menuPlanDownloading' => $menuPlanDownloading,
          'menuHoliday' => $menuHoliday,
+         'menuTasks' => $menuTasks,
          'menuCounty' => $menuCounty,
          'menuPayment' => $menuPayment,
          'menuOverridePayment' => $menuOverridePayment,

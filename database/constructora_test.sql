@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 16-04-2026 a las 00:50:33
+-- Tiempo de generación: 25-04-2026 a las 02:09:20
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -25977,6 +25977,19 @@ INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `co
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `estimate_attachment`
+--
+
+CREATE TABLE `estimate_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `estimate_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `estimate_company`
 --
 
@@ -27991,7 +28004,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (36, 'concrete_class', 'Concrete Class'),
 (37, 'employee_role', 'Employee Role'),
 (38, 'note_estimate_item', 'Items Notes'),
-(39, 'override_payment', 'Override Payment');
+(39, 'override_payment', 'Override Payment'),
+(40, 'tasks', 'Tasks');
 
 -- --------------------------------------------------------
 
@@ -37502,7 +37516,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (489, 1, 1, 1, 1, 1, 36),
 (490, 1, 1, 1, 1, 1, 37),
 (491, 1, 1, 1, 1, 1, 38),
-(492, 1, 1, 1, 1, 1, 39);
+(492, 1, 1, 1, 1, 1, 39),
+(493, 1, 1, 1, 1, 1, 40);
 
 -- --------------------------------------------------------
 
@@ -41715,6 +41730,21 @@ INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`,
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `tasks`
+--
+
+CREATE TABLE `tasks` (
+  `task_id` int(11) NOT NULL,
+  `description` text,
+  `status` varchar(20) NOT NULL DEFAULT 'pending' COMMENT 'pending | complete',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `due_date` date DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `unit`
 --
 
@@ -42335,7 +42365,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (4015, 1, 1, 1, 1, 1, 38),
 (4016, 1, 1, 1, 1, 27, 38),
 (4017, 1, 1, 1, 1, 1, 39),
-(4018, 1, 1, 1, 1, 27, 39);
+(4018, 1, 1, 1, 1, 27, 39),
+(4019, 1, 1, 1, 1, 1, 40);
 
 -- --------------------------------------------------------
 
@@ -42497,6 +42528,13 @@ ALTER TABLE `estimate`
   ADD KEY `Refestimate6` (`contact_id`),
   ADD KEY `plan_downloading_id` (`plan_downloading_id`),
   ADD KEY `county_id` (`county_id`);
+
+--
+-- Indices de la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_attachment1` (`estimate_id`);
 
 --
 -- Indices de la tabla `estimate_company`
@@ -42932,6 +42970,15 @@ ALTER TABLE `sync_queue_qbwc`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  ADD PRIMARY KEY (`task_id`),
+  ADD KEY `idx_tasks_user` (`user_id`),
+  ADD KEY `idx_tasks_status` (`status`),
+  ADD KEY `idx_tasks_due_date` (`due_date`);
+
+--
 -- Indices de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -43086,6 +43133,12 @@ ALTER TABLE `estimate`
   MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=242;
 
 --
+-- AUTO_INCREMENT de la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `estimate_company`
 --
 ALTER TABLE `estimate_company`
@@ -43149,7 +43202,7 @@ ALTER TABLE `estimate_template_note`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -43389,7 +43442,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=493;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=494;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -43434,6 +43487,12 @@ ALTER TABLE `sync_queue_qbwc`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=424;
 
 --
+-- AUTO_INCREMENT de la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -43455,7 +43514,7 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4019;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4020;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -43556,6 +43615,12 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
   ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`),
   ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
+-- Filtros para la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  ADD CONSTRAINT `Refestimate_attachment1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`);
 
 --
 -- Filtros para la tabla `estimate_company`
@@ -43839,6 +43904,12 @@ ALTER TABLE `subcontractor_employee`
 --
 ALTER TABLE `subcontractor_notes`
   ADD CONSTRAINT `Refsubcontractor36` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  ADD CONSTRAINT `fk_tasks_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `user`

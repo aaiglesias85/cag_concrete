@@ -1,0 +1,27 @@
+tasks:
+  path: /tasks
+  defaults: { _controller: App\Controller\Admin\TaskController::index }
+
+listarTaskAdmin:
+  path: /tasks/listar
+  defaults: { _controller: App\Controller\Admin\TaskController::listar, _format: json }
+
+salvarTaskAdmin:
+  path: /tasks/salvar
+  defaults: { _controller: App\Controller\Admin\TaskController::salvar, _format: json }
+
+eliminarTaskAdmin:
+  path: /tasks/eliminar
+  defaults: { _controller: App\Controller\Admin\TaskController::eliminar, _format: json }
+
+eliminarTasksAdmin:
+  path: /tasks/eliminarTasks
+  defaults: { _controller: App\Controller\Admin\TaskController::eliminarTasks, _format: json }
+
+cargarDatosTaskAdmin:
+  path: /tasks/cargarDatos
+  defaults: { _controller: App\Controller\Admin\TaskController::cargarDatos, _format: json }
+
+cambiarEstadoTaskAdmin:
+  path: /tasks/cambiarEstado
+  defaults: { _controller: App\Controller\Admin\TaskController::cambiarEstado, _format: json }

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 16-04-2026 a las 00:50:21
+-- Tiempo de generación: 25-04-2026 a las 02:09:08
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -3678,7 +3678,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (2968, '2025-12-03', '', 'Empleado_Prueba_2968', NULL, 'Empleado_Prueba_2968', '', '', NULL, NULL, 0.00, 7.00, 286.00, 0.00, 0.00, 0, '2025-12-05 14:30:25', '2026-01-20 16:20:09', 31, NULL, 1),
 (2969, '2025-12-04', '', 'Empleado_Prueba_2969', NULL, 'Empleado_Prueba_2969', '', '', NULL, NULL, 0.00, 3.00, 0.00, 0.00, 0.00, 0, '2025-12-05 14:31:15', NULL, 31, NULL, NULL),
 (2971, '2025-09-10', '', 'Empleado_Prueba_2971', NULL, 'Empleado_Prueba_2971', '', '', NULL, NULL, 0.00, 1.00, 0.00, 0.00, 0.00, 0, '2025-12-05 16:32:04', '2026-01-28 02:46:29', 513, NULL, NULL),
-(2972, '2025-08-21', '', 'Empleado_Prueba_2972', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 1.00, 0.00, 0.00, 0.00, 0, '2025-12-05 16:40:03', '2026-04-12 20:27:31', 513, 48, NULL),
+(2972, '2025-08-21', '', 'Empleado_Prueba_2972', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 1.00, 0.00, 0.00, 0.00, 0, '2025-12-05 16:40:03', '2026-04-18 02:12:39', 513, 48, NULL),
 (2975, '2025-12-01', '', 'Empleado_Prueba_2975', NULL, 'Empleado_Prueba_2975', '', '', NULL, NULL, 0.00, 4.00, 286.00, 0.00, 0.00, 0, '2025-12-15 18:25:11', '2025-12-16 14:46:46', 87, NULL, 1),
 (2976, '2025-12-03', '', 'Empleado_Prueba_2976', NULL, 'Empleado_Prueba_2976', '', '', NULL, NULL, 0.00, 10.00, 286.00, 0.00, 0.00, 0, '2025-12-15 18:26:03', '2026-01-06 20:46:28', 87, NULL, 1),
 (2977, '2025-12-11', '', 'Empleado_Prueba_2977', NULL, 'Empleado_Prueba_2977', '', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 0, '2025-12-16 02:02:24', '2026-02-09 18:02:01', 118, NULL, NULL),
@@ -11787,7 +11787,7 @@ INSERT INTO `data_tracking_item` (`id`, `quantity`, `punch_quantity`, `price`, `
 (4612, 67.020000, 0.000000, 127.00, '', 2963, 789),
 (4613, 13.000000, 0.000000, 27.00, '', 2965, 1416),
 (4614, 16.440000, 0.000000, 43.00, '', 2965, 1418),
-(4620, 150.000000, 50.000000, 36.68, '', 2972, 3026),
+(4620, 150.000000, 60.000000, 36.68, '', 2972, 3026),
 (4621, 100.000000, 0.000000, 36.00, '', 2971, 3026),
 (4622, 100.000000, 0.000000, 36.00, '', 2890, 3026),
 (4624, 100.000000, 0.000000, 36.00, '', 2888, 3026),
@@ -28495,7 +28495,30 @@ INSERT INTO `estimate` (`estimate_id`, `project_id`, `name`, `bid_deadline`, `co
 (323, 'ITB 26-001', '2026 Capital Paving Project', '2026-03-11 12:00:00', NULL, 'Medium', 'N/A', 'N/A', '(678) 230-0744', 'Jvelasquez@cwmatthews.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 4, 1, 3, 7, 2, NULL, NULL, NULL),
 (324, '50425-293', 'West White Street improvements', '2026-03-10 12:00:00', NULL, 'Medium', 'N/A', 'N/A', '', 'penny@cwmatthews.com,mferriss@shcreel.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 4, 1, 1, 6, 24, NULL, NULL, NULL),
 (325, 'N/A', 'Northwest Corridor Segment 3B – Construction', '2026-03-18 12:00:00', NULL, 'Medium', 'N/A', 'N/A', '7704864905', 'estimating@fsscarbrough.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 6, 1, 1, 7, 8, NULL, NULL, NULL),
-(326, 'N/A', '2026 City of Decatur S. McDonough Street Infrastructure Improvements Phase II', '2026-03-11 12:00:00', NULL, 'Medium', 'N/A', '60 CAL DAYS / NTP', '470-667-7968', 'ymandlecha@fsscarbrough.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 4, 1, 1, 7, 2, NULL, NULL, NULL);
+(326, 'N/A', '2026 City of Decatur S. McDonough Street Infrastructure Improvements Phase II', '2026-03-11 12:00:00', NULL, 'Medium', 'N/A', '60 CAL DAYS / NTP', '470-667-7968', 'ymandlecha@fsscarbrough.com', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 4, 1, 1, 7, 2, NULL, NULL, NULL),
+(327, '', 'Prueba Estimado', '2026-04-30 10:00:00', NULL, '', '', '', '(786) 720-8643', 'logiccore@logiccore-tech.com', NULL, NULL, NULL, '2026-04-30 12:00:00', NULL, NULL, NULL, '', '', '', 'undefined', 'undefined', 0, 9, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `estimate_attachment`
+--
+
+CREATE TABLE `estimate_attachment` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `estimate_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `estimate_attachment`
+--
+
+INSERT INTO `estimate_attachment` (`id`, `name`, `file`, `estimate_id`) VALUES
+(2, 'test', 'test.pdf', 43),
+(3, 'imagen', '300-1.jpg', 43),
+(4, 'doc', 'test.docx', 43);
 
 -- --------------------------------------------------------
 
@@ -29350,7 +29373,8 @@ INSERT INTO `estimate_company` (`id`, `estimate_id`, `company_id`, `contact_id`,
 (836, 289, 93, NULL, '2026-02-18 12:00:00', '', ''),
 (837, 290, 91, NULL, '2026-02-18 12:00:00', '', ''),
 (838, 290, 135, NULL, '2026-02-18 12:00:00', '', ''),
-(839, 310, 129, NULL, '2026-02-14 12:00:00', '', '');
+(839, 310, 129, NULL, '2026-02-14 12:00:00', '', ''),
+(840, 327, 46, 8, '2026-04-30 10:00:00', 'High Priority', 'Test');
 
 -- --------------------------------------------------------
 
@@ -29688,8 +29712,8 @@ INSERT INTO `estimate_county` (`id`, `estimate_id`, `county_id`) VALUES
 (318, 194, 240),
 (319, 283, 247),
 (320, 182, 248),
-(517, 43, 11),
-(518, 43, 20);
+(587, 43, 11),
+(588, 43, 20);
 
 -- --------------------------------------------------------
 
@@ -30037,7 +30061,7 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (1262, 62, 43),
 (1272, 229, 2),
 (1277, 113, 38),
-(1294, 43, 41);
+(1329, 43, 41);
 
 -- --------------------------------------------------------
 
@@ -30991,7 +31015,8 @@ INSERT INTO `function` (`function_id`, `url`, `description`) VALUES
 (36, 'concrete_class', 'Concrete Class'),
 (37, 'employee_role', 'Employee Role'),
 (38, 'note_estimate_item', 'Items Notes'),
-(39, 'override_payment', 'Override Payment');
+(39, 'override_payment', 'Override Payment'),
+(40, 'tasks', 'Tasks');
 
 -- --------------------------------------------------------
 
@@ -31224,7 +31249,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (319, '1', '2025-06-01', '2025-06-30', '', 0, '2026-02-24 01:45:02', '2026-03-22 20:47:27', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
 (320, '3', '2025-10-01', '2025-10-31', '', 0, '2026-02-24 01:47:00', '2026-03-22 20:47:52', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
 (321, '5', '2026-11-01', '2026-11-30', '', 0, '2026-02-24 01:48:14', '2026-03-22 20:48:30', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
-(344, '1', '2025-08-01', '2025-08-31', '', 0, '2026-03-27 18:10:08', '2026-03-31 00:42:58', 513, NULL, NULL, NULL, 0.042050, -85.57, 0, 0.00, NULL, 4280.00, 428.00);
+(344, '1', '2025-08-01', '2025-08-31', '', 0, '2026-03-27 18:10:08', '2026-03-31 00:42:58', 513, NULL, NULL, NULL, 0.038450, -78.25, 0, 0.00, NULL, 3913.20, 391.32);
 
 -- --------------------------------------------------------
 
@@ -31864,7 +31889,7 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (2954, 79.000000, 70.000000, 0.000000, 44.00, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 321, 2942, NULL),
 (2955, 0.000000, 0.000000, 0.000000, 185.00, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 321, 2943, NULL),
 (2956, 20.000000, 20.000000, 0.000000, 45.00, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 321, 2958, NULL),
-(3177, 0.000000, 0.000000, 100.000000, 36.68, 100.000000, 0.000000, 0, 0.000000, 3668.000000, 0.000000, 344, 3026, NULL),
+(3177, 0.000000, 0.000000, 90.000000, 36.68, 100.000000, 0.000000, 0, 0.000000, 3668.000000, 0.000000, 344, 3026, NULL),
 (3178, 0.000000, 0.000000, 300.000000, 2.04, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3027, NULL),
 (3179, 0.000000, 0.000000, 0.000000, 3.06, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3028, NULL),
 (3180, 0.000000, 0.000000, 0.000000, 2.04, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3029, NULL),
@@ -32400,7 +32425,7 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (413, 'INSTALL CONC ROLL CURB SPECIAL DESIGN', 'INSTALL CONC ROLL CURB SPECIAL DESIGN', 27.75, '', 1, NULL, '2025-05-30 20:28:07', NULL, 12, NULL, NULL, NULL),
 (414, 'REMOVE & REPLACE CONC DRIVEWAY APRON 6 IN', 'REMOVE & REPLACE CONC DRIVEWAY APRON 6 IN', 11.00, '', 1, NULL, '2025-05-30 20:29:07', NULL, 16, NULL, NULL, NULL),
 (415, 'REMOVE & REPLCE CONC SIDEWALK 4 IN', 'REMOVE & REPLCE CONC SIDEWALK 4 IN', 12.00, '', 1, NULL, '2025-05-30 20:29:51', NULL, 16, NULL, NULL, NULL),
-(416, '18\" C&G $5 LOT', '18\" C&G $5 LOT', 18.00, '', 1, NULL, '2025-06-02 17:59:31', '2025-10-21 18:17:44', 12, NULL, NULL, NULL),
+(416, '18\" C&G $5 LOT', '18\" C&G $5 LOT', 18.00, '', 1, 0, '2025-06-02 17:59:31', '2025-10-21 18:17:44', 12, NULL, NULL, NULL),
 (417, '4 IN SIDEWALK $5 LOT', '4 IN SIDEWALK $5 LOT', 50.00, 'equation', 1, NULL, '2025-06-02 18:00:20', '2025-06-26 20:41:18', 13, 11, NULL, NULL),
 (418, 'CONCRETE FLUME $5 LOT', 'CONCRETE FLUME $5 LOT', 80.00, '', 1, NULL, '2025-06-02 18:00:56', NULL, 12, NULL, NULL, NULL),
 (419, 'ADA DETECTABLE WARNING STRIP $5 LOT', 'ADA DETECTABLE WARNING STRIP $5 LOT', 18.75, 'none', 1, NULL, '2025-06-02 18:01:32', '2025-06-26 20:40:54', 16, NULL, NULL, NULL),
@@ -33448,7 +33473,59 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (575, 'Delete', 'Invoice', 'The invoice #2 is deleted', '::1', '2026-04-12 20:26:33', 1),
 (576, 'Update', 'Data Tracking', 'The data tracking is modified, Project: TT0001 - TESTING001, Date: 08/21/2025', '::1', '2026-04-12 20:27:31', 1),
 (577, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2026-04-15 01:06:20', 1),
-(578, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2026-04-15 01:06:27', 1);
+(578, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2026-04-15 01:06:27', 1),
+(579, 'Update', 'Data Tracking', 'The data tracking item is modified (inline), Project: TT0001 - TESTING001, Date: 08/21/2025', '::1', '2026-04-18 02:12:03', 1),
+(580, 'Update', 'Data Tracking', 'The data tracking item is modified (inline), Project: TT0001 - TESTING001, Date: 08/21/2025', '::1', '2026-04-18 02:12:30', 1),
+(581, 'Update', 'Data Tracking', 'The data tracking is modified, Project: TT0001 - TESTING001, Date: 08/21/2025', '::1', '2026-04-18 02:12:39', 1),
+(582, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:28:36', 1),
+(583, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:28:37', 1),
+(584, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:28:39', 1),
+(585, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:29:29', 1),
+(586, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:29:30', 1),
+(587, 'Add', 'Estimate Quote', 'Quote added: Quote 2', '::1', '2026-04-19 17:29:36', 1),
+(588, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:31:10', 1),
+(589, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:31:51', 1),
+(590, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:31:58', 1),
+(591, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:32:03', 1),
+(592, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:32:06', 1),
+(593, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:38:53', 1),
+(594, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:38:54', 1),
+(595, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:38:55', 1),
+(596, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:39:03', 1),
+(597, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:50:23', 1),
+(598, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:50:24', 1),
+(599, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:50:25', 1),
+(600, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:50:26', 1),
+(601, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:52:22', 1),
+(602, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:55:04', 1),
+(603, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:55:59', 1),
+(604, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 17:56:36', 1),
+(605, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 18:06:37', 1),
+(606, 'Add', 'Estimate Quote', 'Quote added: Quote 3', '::1', '2026-04-19 18:06:43', 1),
+(607, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 18:14:41', 1),
+(608, 'Delete', 'Estimate Quote', 'Quote deleted: Quote 2', '::1', '2026-04-19 18:14:46', 1),
+(609, 'Delete', 'Estimate Item', 'The item: 12 IN HEADER CURB of the project estimate is deleted', '::1', '2026-04-19 18:14:46', 1),
+(610, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 18:20:37', 1),
+(611, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 18:20:41', 1),
+(612, 'Delete', 'Estimate Quote', 'Quote deleted: Quote 3', '::1', '2026-04-19 18:20:46', 1),
+(613, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-19 18:21:00', 1),
+(614, 'Add', 'Estimate Quote', 'Quote added: Quote 2', '::1', '2026-04-19 18:21:18', 1),
+(615, 'Delete', 'Estimate Quote', 'Quote deleted: Quote 2', '::1', '2026-04-19 18:21:43', 1),
+(616, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-23 00:09:07', 1),
+(617, 'Add', 'Project Estimate', 'The project estimate is added: Prueba Estimado', '::1', '2026-04-23 00:14:08', 1),
+(618, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:14:14', 1),
+(619, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:14:19', 1),
+(620, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:14:31', 1),
+(621, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:15:01', 1),
+(622, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:15:06', 1),
+(623, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-23 00:15:10', 1),
+(624, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 00:14:04', 1),
+(625, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 00:18:14', 1),
+(626, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 00:19:03', 1),
+(627, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 00:20:25', 1),
+(628, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:38:14', 1),
+(629, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:40:09', 1),
+(630, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:42:54', 1);
 
 -- --------------------------------------------------------
 
@@ -35662,7 +35739,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (344, 121.000000, 56.00, 'equation', NULL, NULL, 1, NULL, NULL, 47, 757, 22, 0, NULL, NULL, NULL),
 (345, 174.000000, 260.00, 'same', NULL, NULL, 1, NULL, NULL, 47, 760, NULL, 0, NULL, NULL, NULL),
 (346, 1.000000, 19895.05, 'none', NULL, NULL, 1, NULL, NULL, 47, 123, NULL, 0, NULL, NULL, NULL),
-(347, 297.000000, 50.00, 'equation', NULL, -3.000000, 1, 0, NULL, 48, 77, 22, 0, 0, NULL, NULL),
+(347, 297.000000, 50.00, 'equation', NULL, -3.000000, 1, 0, NULL, 48, 77, 22, 0, 0, 'CONC', NULL),
 (348, 620.000000, 32.00, 'equation', NULL, NULL, 1, NULL, NULL, 48, 31, 11, 0, NULL, NULL, NULL),
 (349, 358.000000, 57.00, 'equation', NULL, NULL, 1, NULL, NULL, 48, 79, 22, 0, NULL, NULL, NULL),
 (350, 1630.000000, 17.57, 'equation', NULL, NULL, 1, NULL, NULL, 48, 26, 8, 0, NULL, NULL, NULL),
@@ -38244,7 +38321,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (3024, 0.000000, 600.00, 'equation', NULL, NULL, 1, 0, NULL, 8, 600, 16, 0, NULL, NULL, NULL),
 (3025, 0.000000, 230.00, 'same', NULL, NULL, 1, 0, NULL, 104, 101, NULL, 0, NULL, NULL, NULL),
 (3026, 2400.000000, 36.68, 'equation', 2300.000000, 36.000000, 1, 0, NULL, 513, 211, 23, 1, 1, 'H12', '12 IN HEADER CURB'),
-(3027, 49.000000, 2.04, 'none', 59.000000, 2.000000, 1, 1, '2025-08-05 19:00:14', 513, 416, NULL, 1, 1, NULL, NULL),
+(3027, 49.000000, 2.04, 'none', 59.000000, 2.000000, 1, 1, '2025-08-05 01:00:18', 513, 416, NULL, 1, 1, 'LOT', NULL),
 (3028, 30.000000, 3.06, 'equation', 3.000000, 3.000000, 1, 1, '2025-11-27 19:00:14', 513, 694, 14, 1, 1, NULL, NULL),
 (3029, 90.000000, 2.04, 'equation', 45.000000, 2.000000, 1, 1, '2026-04-15 19:00:14', 513, 553, 11, 1, 1, NULL, NULL),
 (3030, 0.000000, 8.00, 'same', NULL, NULL, 0, 0, NULL, 77, 831, NULL, 0, NULL, NULL, NULL),
@@ -40913,7 +40990,8 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (489, 1, 1, 1, 1, 1, 36),
 (490, 1, 1, 1, 1, 1, 37),
 (491, 1, 1, 1, 1, 1, 38),
-(492, 1, 1, 1, 1, 1, 39);
+(492, 1, 1, 1, 1, 1, 39),
+(493, 1, 1, 1, 1, 1, 40);
 
 -- --------------------------------------------------------
 
@@ -45864,6 +45942,21 @@ INSERT INTO `sync_queue_qbwc` (`id`, `tipo`, `entidad_id`, `estado`, `intentos`,
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `tasks`
+--
+
+CREATE TABLE `tasks` (
+  `task_id` int(11) NOT NULL,
+  `description` text,
+  `status` varchar(20) NOT NULL DEFAULT 'pending' COMMENT 'pending | complete',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `due_date` date DEFAULT NULL,
+  `user_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `unit`
 --
 
@@ -46443,7 +46536,8 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3976, 1, 1, 1, 1, 30, 36),
 (3977, 1, 1, 1, 1, 30, 37),
 (3978, 1, 1, 1, 1, 1, 38),
-(3979, 1, 1, 1, 1, 1, 39);
+(3979, 1, 1, 1, 1, 1, 39),
+(3980, 1, 1, 1, 1, 1, 40);
 
 -- --------------------------------------------------------
 
@@ -46606,6 +46700,13 @@ ALTER TABLE `estimate`
   ADD KEY `Refestimate6` (`contact_id`),
   ADD KEY `plan_downloading_id` (`plan_downloading_id`),
   ADD KEY `county_id` (`county_id`);
+
+--
+-- Indices de la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Refestimate_attachment1` (`estimate_id`);
 
 --
 -- Indices de la tabla `estimate_company`
@@ -47039,6 +47140,15 @@ ALTER TABLE `sync_queue_qbwc`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indices de la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  ADD PRIMARY KEY (`task_id`),
+  ADD KEY `idx_tasks_user` (`user_id`),
+  ADD KEY `idx_tasks_status` (`status`),
+  ADD KEY `idx_tasks_due_date` (`due_date`);
+
+--
 -- Indices de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -47190,19 +47300,25 @@ ALTER TABLE `equation`
 -- AUTO_INCREMENT de la tabla `estimate`
 --
 ALTER TABLE `estimate`
-  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
+  MODIFY `estimate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
+
+--
+-- AUTO_INCREMENT de la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_company`
 --
 ALTER TABLE `estimate_company`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=840;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=841;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_county`
 --
 ALTER TABLE `estimate_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=519;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=589;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
@@ -47220,13 +47336,13 @@ ALTER TABLE `estimate_note_item`
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1295;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1330;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
 --
 ALTER TABLE `estimate_quote`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=514;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=517;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote_company`
@@ -47238,7 +47354,7 @@ ALTER TABLE `estimate_quote_company`
 -- AUTO_INCREMENT de la tabla `estimate_quote_items`
 --
 ALTER TABLE `estimate_quote_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=481;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=483;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote_item_note`
@@ -47256,7 +47372,7 @@ ALTER TABLE `estimate_template_note`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -47340,7 +47456,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=579;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=631;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -47496,7 +47612,7 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=493;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=494;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -47541,6 +47657,12 @@ ALTER TABLE `sync_queue_qbwc`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=396;
 
 --
+-- AUTO_INCREMENT de la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de la tabla `unit`
 --
 ALTER TABLE `unit`
@@ -47562,7 +47684,7 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3980;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3981;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -47663,6 +47785,12 @@ ALTER TABLE `estimate`
   ADD CONSTRAINT `Refestimate6` FOREIGN KEY (`contact_id`) REFERENCES `company_contact` (`contact_id`),
   ADD CONSTRAINT `Refestimate7` FOREIGN KEY (`plan_downloading_id`) REFERENCES `plan_downloading` (`plan_downloading_id`),
   ADD CONSTRAINT `Refestimatecountyid` FOREIGN KEY (`county_id`) REFERENCES `county` (`county_id`);
+
+--
+-- Filtros para la tabla `estimate_attachment`
+--
+ALTER TABLE `estimate_attachment`
+  ADD CONSTRAINT `Refestimate_attachment1` FOREIGN KEY (`estimate_id`) REFERENCES `estimate` (`estimate_id`);
 
 --
 -- Filtros para la tabla `estimate_company`
@@ -47938,6 +48066,12 @@ ALTER TABLE `subcontractor_employee`
 --
 ALTER TABLE `subcontractor_notes`
   ADD CONSTRAINT `Refsubcontractor36` FOREIGN KEY (`subcontractor_id`) REFERENCES `subcontractor` (`subcontractor_id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Filtros para la tabla `tasks`
+--
+ALTER TABLE `tasks`
+  ADD CONSTRAINT `fk_tasks_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Filtros para la tabla `user`

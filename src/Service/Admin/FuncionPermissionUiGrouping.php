@@ -26,7 +26,7 @@ final class FuncionPermissionUiGrouping
         ['rrhh', 'RRHH', ['race', 'employee_rrhh']],
         ['libraries', 'Libraries', [
             'unit', 'equation', 'item', 'inspectors', 'employees', 'employee_role',
-            'materials', 'overhead', 'advertisement', 'reminder', 'holiday',
+            'materials', 'overhead', 'advertisement', 'reminder', 'holiday', 'tasks',
         ]],
         ['system', 'Settings', ['rol', 'users', 'notification', 'log']],
     ];
