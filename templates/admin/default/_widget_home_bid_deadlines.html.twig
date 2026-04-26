@@ -1,57 +1,73 @@
-<div class="col-12 col-md-6 col-xl-4" id="widget-bid_deadlines">
-    <div class="card h-100">
-        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+<div class="col-12 col-md-6 col-xl-4 mb-5 mb-xl-10" id="widget-bid_deadlines">
+    <div class="card card-flush h-100 shadow-sm">
+        <div class="card-header pt-5 border-0 d-flex align-items-start justify-content-between flex-nowrap gap-3">
             <div class="card-title align-items-start flex-column m-0 min-w-0">
-                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
-                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
+                <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
             </div>
             <div class="card-toolbar flex-shrink-0">
                 <div class="d-flex justify-content-end align-items-center gap-2">
                     {% for link in w.links %}
                         {% if link.canView %}
-                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Open estimate module">
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="Open estimate module">
+                                <i class="ki-duotone ki-entrance-left fs-4 me-1">
+                                    <span class="path1"></span>
+                                    <span class="path2"></span>
+                                </i>
                                 {{ link.label }}
                             </a>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
-        </div>
-        <div class="card-body pt-0">
-            <div class="scroll-y h-250px my-2 px-3">
+            </div>
+        <div class="card-body pt-4">
+            <div class="scroll-y h-250px pe-3">
                 <div class="table-responsive">
-                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
+                    <table class="table table-row-dashed table-hover table-row-gray-200 align-middle gs-0 gy-4">
                         <thead>
-                        <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
-                            <th>Project Name</th>
-                            <th>Bid deadline</th>
-                            <th>Estimator</th>
-                        </tr>
+                            <tr class="fw-bold text-muted text-uppercase fs-8 text-nowrap">
+                                <th class="min-w-150px">Project Name</th>
+                                <th class="min-w-100px">Bid Deadline</th>
+                                <th class="min-w-100px">Estimator</th>
+                            </tr>
                         </thead>
                         <tbody id="home-bid-deadlines-tbody">
                         {% for row in home_bid_deadlines %}
                             <tr data-estimate-id="{{ row.estimate_id }}" class="home-bid-deadline-row" style="cursor: pointer;">
-                                <td class="text-gray-800">{{ row.project_name|default('—') }}</td>
-                                <td class="text-gray-800">{{ row.bid_deadline|default('—') }}</td>
-                                <td class="text-gray-800">
+                                <td>
+                                    <span class="text-gray-900 fw-bold text-hover-primary mb-1 fs-6">{{ row.project_name|default('—') }}</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted fw-semibold d-block fs-7">
+                                        <i class="ki-duotone ki-calendar fs-6 me-1"><span class="path1"></span><span class="path2"></span></i>
+                                        {{ row.bid_deadline|default('—') }}
+                                    </span>
+                                </td>
+                                <td>
                                     {% if row.estimator_html is defined and row.estimator_html %}
-                                        <div style="display:flex; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; white-space:nowrap; gap:6px; padding-bottom:2px;">
+                                        <div class="d-flex align-items-center gap-1">
                                             {{ row.estimator_html|raw }}
                                         </div>
                                     {% else %}
-                                        —
+                                        <span class="badge badge-light-danger fw-bold px-4 py-3">Unassigned</span>
                                     {% endif %}
                                 </td>
                             </tr>
                         {% else %}
                             <tr id="home-bid-deadlines-empty-row">
-                                <td colspan="3" class="text-center text-muted py-5">No upcoming bid deadlines in this range.</td>
+                                <td colspan="3" class="text-center">
+                                    <div class="d-flex flex-column align-items-center justify-content-center py-10">
+                                        <i class="ki-duotone ki-magnifier fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span></i>
+                                        <span class="text-muted fw-semibold fs-6">No upcoming bid deadlines in this range.</span>
+                                    </div>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
-                    </table>
+                        </table>
+                </div>
                 </div>
             </div>
         </div>
     </div>
-</div>

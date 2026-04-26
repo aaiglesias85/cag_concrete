@@ -206,24 +206,33 @@ var Index = (function () {
         var totalAbs = series.reduce(function (a, b) { return a + b; }, 0);
         var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
 
-        var options = {
+       var options = {
             series: series,
             chart: {
                 type: 'donut',
                 height: height,
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: { enabled: true, delay: 150 },
+                    dynamicAnimation: { enabled: true, speed: 350 }
+                }
             },
             labels: labels,
             colors: colors,
+            stroke: { width: 0 },
             dataLabels: {
-                enabled: false,
+                enabled: false, 
             },
             tooltip: {
+                style: { fontSize: '13px' },
                 y: {
                     formatter: function (val, opts) {
                         var idx = opts.seriesIndex;
                         var amount = (items[idx] && items[idx].amount !== undefined) ? items[idx].amount : val;
                         var percent = totalAbs > 0 ? (Math.abs(amount) / totalAbs) * 100 : 0;
-                        return MyApp.formatMoney(amount) + ' · ' + percent.toFixed(1) + '%';
+                        return MyApp.formatMoney(amount) + ' (' + percent.toFixed(1) + '%)';
                     },
                 },
             },
@@ -231,22 +240,53 @@ var Index = (function () {
                 show: true,
                 position: 'bottom',
                 horizontalAlign: 'center',
-                fontSize: '12px',
+                fontSize: '13px',
+                fontWeight: 500,
+                markers: { radius: 12 }, 
                 formatter: function (seriesName, opts) {
                     var idx = opts.seriesIndex;
                     var amount = (items[idx] && items[idx].amount !== undefined) ? items[idx].amount : 0;
-                    return seriesName + ': ' + MyApp.formatMoney(amount);
+                    return seriesName + ' <span style="color:#A1A5B7; font-weight:400; margin-left:5px">' + MyApp.formatMoney(amount) + '</span>';
                 },
             },
-            plotOptions: {
+          plotOptions: {
                 pie: {
                     donut: {
-                        size: '55%',
-                        labels: { show: false },
+                        size: '72%', 
+                        labels: {
+                            show: true,
+                            name: { 
+                                show: true, 
+                                fontSize: '12px', 
+                                color: '#A1A5B7', 
+                                fontWeight: 500,
+                                offsetY: -10 
+                            },
+                            value: {
+                                show: true, 
+                                fontSize: '16px', 
+                                fontWeight: 700, 
+                                color: '#3F4254',
+                                offsetY: 10, 
+                                formatter: function (val) {
+                                    return MyApp.formatMoney(val);
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Total Costs',
+                                color: '#A1A5B7',
+                                fontSize: '12px',
+                                formatter: function (w) {
+                                    return MyApp.formatMoney(totalAbs);
+                                }
+                            }
+                        }
                     },
                 },
             },
         };
+
 
         chartCostBreakdown = new ApexCharts(element, options);
         setTimeout(function () {
@@ -278,18 +318,30 @@ var Index = (function () {
         var total = series.reduce(function (a, b) { return a + b; }, 0);
         var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
 
-        chartEstimateWinLoss = new ApexCharts(element, {
+       chartEstimateWinLoss = new ApexCharts(element, {
             series: series,
-            chart: { type: 'donut', height: height },
+            chart: { 
+                type: 'donut', 
+                height: height,
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 800,
+                    animateGradually: { enabled: true, delay: 150 },
+                    dynamicAnimation: { enabled: true, speed: 350 }
+                }
+            },
             labels: labels,
             colors: colors,
+            stroke: { width: 0 },
             dataLabels: { enabled: false },
             tooltip: {
+                style: { fontSize: '13px' },
                 y: {
                     formatter: function (val) {
                         var count = parseInt(val, 10) || 0;
                         var percent = total > 0 ? (count / total) * 100 : 0;
-                        return count + ' · ' + percent.toFixed(1) + '%';
+                        return count + ' (' + percent.toFixed(1) + '%)';
                     },
                 },
             },
@@ -297,18 +349,48 @@ var Index = (function () {
                 show: true,
                 position: 'bottom',
                 horizontalAlign: 'center',
-                fontSize: '12px',
+                fontSize: '13px',
+                fontWeight: 500,
+                markers: { radius: 12 },
                 formatter: function (seriesName, opts) {
                     var idx = opts.seriesIndex;
                     var count = (items[idx] && items[idx].amount !== undefined) ? (parseInt(items[idx].amount, 10) || 0) : 0;
-                    return seriesName + ': ' + count;
+                    return seriesName + ' <span style="color:#A1A5B7; font-weight:400; margin-left:5px">' + count + '</span>';
                 },
             },
             plotOptions: {
                 pie: {
                     donut: {
-                        size: '55%',
-                        labels: { show: false },
+                        size: '72%', 
+                        labels: { 
+                            show: true,
+                            name: { 
+                                show: true, 
+                                fontSize: '12px', 
+                                color: '#A1A5B7', 
+                                fontWeight: 500,
+                                offsetY: -10 
+                            },
+                            value: {
+                                show: true, 
+                                fontSize: '20px', 
+                                fontWeight: 700, 
+                                color: '#3F4254',
+                                offsetY: 10,
+                                formatter: function (val) {
+                                    return val;
+                                }
+                            },
+                            total: {
+                                show: true,
+                                label: 'Total',
+                                color: '#A1A5B7',
+                                fontSize: '12px',
+                                formatter: function (w) {
+                                    return total;
+                                }
+                            }
+                        }
                     },
                 },
             },
@@ -343,37 +425,45 @@ var Index = (function () {
         var total = series.reduce(function (a, b) { return a + b; }, 0);
         var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
 
-        chartEstimatesSubmitted = new ApexCharts(element, {
+    chartEstimatesSubmitted = new ApexCharts(element, {
             series: series,
-            chart: { type: 'donut', height: height },
+            chart: { 
+                type: 'donut', 
+                height: height,
+                animations: { enabled: true, easing: 'easeinout', speed: 800 }
+            },
             labels: labels,
             colors: colors,
+            stroke: { width: 0 },
             dataLabels: { enabled: false },
             tooltip: {
+                style: { fontSize: '13px' },
                 y: {
                     formatter: function (val) {
                         var count = parseInt(val, 10) || 0;
                         var percent = total > 0 ? (count / total) * 100 : 0;
-                        return count + ' · ' + percent.toFixed(1) + '%';
+                        return count + ' (' + percent.toFixed(1) + '%)';
                     },
                 },
             },
             legend: {
-                show: true,
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '12px',
+                show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '13px', fontWeight: 500, markers: { radius: 12 },
                 formatter: function (seriesName, opts) {
                     var idx = opts.seriesIndex;
                     var count = (items[idx] && items[idx].amount !== undefined) ? (parseInt(items[idx].amount, 10) || 0) : 0;
-                    return seriesName + ': ' + count;
+                    return seriesName + ' <span style="color:#A1A5B7; font-weight:400; margin-left:5px">' + count + '</span>';
                 },
             },
             plotOptions: {
                 pie: {
                     donut: {
-                        size: '55%',
-                        labels: { show: false },
+                        size: '72%',
+                        labels: { 
+                            show: true,
+                            name: { show: true, fontSize: '12px', color: '#A1A5B7', fontWeight: 500, offsetY: -10 },
+                            value: { show: true, fontSize: '20px', fontWeight: 700, color: '#3F4254', offsetY: 10, formatter: function (val) { return val; } },
+                            total: { show: true, label: 'Total', color: '#A1A5B7', fontSize: '12px', formatter: function (w) { return total; } }
+                        }
                     },
                 },
             },
@@ -411,37 +501,45 @@ var Index = (function () {
         }
         var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
 
-        chartEstimatorSubmittedShare = new ApexCharts(element, {
+      chartEstimatorSubmittedShare = new ApexCharts(element, {
             series: series,
-            chart: { type: 'donut', height: height },
+            chart: { 
+                type: 'donut', 
+                height: height,
+                animations: { enabled: true, easing: 'easeinout', speed: 800 }
+            },
             labels: labels,
             colors: colors,
+            stroke: { width: 0 },
             dataLabels: { enabled: false },
             tooltip: {
+                style: { fontSize: '13px' },
                 y: {
                     formatter: function (val) {
                         var amount = parseFloat(val) || 0;
                         var percent = total > 0 ? (amount / total) * 100 : 0;
-                        return amount.toFixed(2) + ' · ' + percent.toFixed(1) + '%';
+                        return amount.toFixed(2) + ' (' + percent.toFixed(1) + '%)';
                     },
                 },
             },
             legend: {
-                show: true,
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '12px',
+                show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '13px', fontWeight: 500, markers: { radius: 12 },
                 formatter: function (seriesName, opts) {
                     var idx = opts.seriesIndex;
                     var amount = (items[idx] && items[idx].amount !== undefined) ? (parseFloat(items[idx].amount) || 0) : 0;
-                    return seriesName + ': ' + amount.toFixed(2);
+                    return seriesName + ' <span style="color:#A1A5B7; font-weight:400; margin-left:5px">' + amount.toFixed(2) + '</span>';
                 },
             },
             plotOptions: {
                 pie: {
                     donut: {
-                        size: '55%',
-                        labels: { show: false },
+                        size: '72%',
+                        labels: { 
+                            show: true,
+                            name: { show: true, fontSize: '12px', color: '#A1A5B7', fontWeight: 500, offsetY: -10 },
+                            value: { show: true, fontSize: '20px', fontWeight: 700, color: '#3F4254', offsetY: 10, formatter: function (val) { return val; } },
+                            total: { show: true, label: 'Total', color: '#A1A5B7', fontSize: '12px', formatter: function (w) { return total; } }
+                        }
                     },
                 },
             },
@@ -493,12 +591,16 @@ var Index = (function () {
         $tb.html(rows);
         initTaskTooltips();
     };
-    var renderWorkScheduleTbody = function (rows) {
+   var renderWorkScheduleTbody = function (rows) {
         var $tb = $('#home-work-schedule-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-work-schedule-empty-row"><td colspan="3" class="text-center text-muted py-5">No schedules in this range.</td></tr>'
+                '<tr id="home-work-schedule-empty-row"><td colspan="3" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No schedules in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -507,21 +609,22 @@ var Index = (function () {
             var r = rows[i] || {};
             var isHigh = !!r.highpriority;
             var label = r.priority_label || (isHigh ? 'High' : 'Normal');
-            var badgeClass = isHigh ? 'badge badge-light-danger' : 'badge badge-light';
+            var badgeClass = isHigh ? 'badge badge-light-danger fw-bold px-3 py-2' : 'badge badge-light-primary fw-bold px-3 py-2';
             var projectNumber = esc(r.project_number || '-');
-            var projectCell = projectNumber;
+            var projectCell = '<span class="text-gray-900 fw-bold fs-6">' + projectNumber + '</span>';
             if (r.project_id) {
-                projectCell = '<a href="javascript:;" class="project-link fw-semibold" data-project-id="' + esc(r.project_id) + '">' + projectNumber + '</a>';
+                projectCell = '<a href="javascript:;" class="project-link text-gray-900 fw-bold text-hover-primary mb-1 fs-6" data-project-id="' + esc(r.project_id) + '">' + projectNumber + '</a>';
             }
             html +=
                 '<tr data-schedule-id="' + esc(r.id || '') + '">' +
-                '<td class="text-gray-800">' + projectCell + '</td>' +
-                '<td class="text-gray-800">' + esc(r.day || '-') + '</td>' +
-                '<td><span class="' + badgeClass + '">' + esc(label) + '</span></td>' +
+                '<td>' + projectCell + '</td>' +
+                '<td><span class="text-muted fw-semibold d-block fs-7"><i class="ki-duotone ki-time fs-6 me-1"><span class="path1"></span><span class="path2"></span></i>' + esc(r.day || '-') + '</span></td>' +
+                '<td class="text-end"><span class="' + badgeClass + '">' + esc(label) + '</span></td>' +
                 '</tr>';
         }
         $tb.html(html);
     };
+    
     var renderBidDeadlinesTbody = function (rows) {
         var $tb = $('#home-bid-deadlines-tbody');
         if (!$tb.length) return;

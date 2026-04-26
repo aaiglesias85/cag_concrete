@@ -1,34 +1,36 @@
-<div class="col-12 col-md-6 col-xl-4" id="widget-{{ w.id }}">
-    <div class="card h-100">
+<div class="col-12 col-md-6 col-xl-4 mb-5 mb-xl-10" id="widget-{{ w.id }}">
+    <div class="card card-flush h-100 shadow-sm">
         <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
             <div class="card-title align-items-start flex-column m-0 min-w-0">
-                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
-                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
+                <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
             </div>
             <div class="card-toolbar flex-shrink-0">
                 <div class="d-flex justify-content-end align-items-center gap-2">
                     {% for link in w.links %}
                         {% if link.canView %}
-                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Go to module">
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-info fw-bold" title="Go to module">
+                                <i class="ki-duotone ki-document fs-4 me-1">
+                                    <span class="path1"></span><span class="path2"></span>
+                                </i>
                                 {{ link.label }}
                             </a>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
-        </div>
-        <div class="card-body pt-0">
-            <div class="scroll-y h-250px my-2 px-3">
-                <div class="d-flex flex-column h-100">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <span class="text-gray-600 fs-7">Total estimates</span>
-                        <span class="fw-bold text-gray-900 fs-6" id="home-total-estimates-submitted">
-                            {{ home_estimates_submitted_totals.total|default(0) }}
-                        </span>
-                    </div>
-                    <div id="home-chart-estimates-submitted" class="min-h-auto flex-grow-1" style="height: 200px;"></div>
-                </div>
             </div>
+        <div class="card-body pt-4 pb-4">
+            <div class="d-flex flex-column h-100">
+                
+                <div class="d-flex flex-stack bg-light-info rounded px-5 py-4 mb-5">
+                    <div class="text-info fw-semibold fs-6">Total estimates</div>
+                    <div class="fw-bold fs-3 text-info" id="home-total-estimates-submitted">
+                        {{ home_estimates_submitted_totals.total|default(0) }}
+                    </div>
+                </div>
+                <div id="home-chart-estimates-submitted" class="min-h-auto flex-grow-1" style="height: 220px;"></div>
+                </div>
+        </div>
         </div>
     </div>
-</div>
