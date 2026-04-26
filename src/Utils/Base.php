@@ -431,6 +431,19 @@ class Base
       $menuEmployeeRole = false;
       $menuEstimateNoteItem = false;
 
+      // widgets (capa 1 - permisos)
+      $widgetTasks = false;
+      $widgetWorkSchedule = false;
+      $widgetBidDeadlines = false;
+      $widgetEstimateWinLoss = false;
+      $widgetEstimatesSubmitted = false;
+      $widgetEstimatorShare = false;
+      $widgetCurrentMonthProjects = false;
+      $widgetInvoicedProjects = false;
+      $widgetPayItemTotals = false;
+      $widgetInvoiceProfitShare = false;
+      $widgetJobCostBreakdown = false;
+
       // obtener permisos
       $permisos = $this->ListarPermisosDeUsuario($usuario_id);
       foreach ($permisos as $permiso) {
@@ -558,6 +571,41 @@ class Base
          if ($permiso['funcion_id'] == 38 && $permiso['ver']) {
             $menuEstimateNoteItem = true;
          }
+
+         // widgets
+         if ($permiso['funcion_id'] == 40 && $permiso['ver']) {
+            $widgetTasks = true;
+         }
+         if ($permiso['funcion_id'] == 41 && $permiso['ver']) {
+            $widgetWorkSchedule = true;
+         }
+         if ($permiso['funcion_id'] == 42 && $permiso['ver']) {
+            $widgetBidDeadlines = true;
+         }
+         if ($permiso['funcion_id'] == 43 && $permiso['ver']) {
+            $widgetEstimateWinLoss = true;
+         }
+         if ($permiso['funcion_id'] == 44 && $permiso['ver']) {
+            $widgetEstimatesSubmitted = true;
+         }
+         if ($permiso['funcion_id'] == 45 && $permiso['ver']) {
+            $widgetEstimatorShare = true;
+         }
+         if ($permiso['funcion_id'] == 46 && $permiso['ver']) {
+            $widgetCurrentMonthProjects = true;
+         }
+         if ($permiso['funcion_id'] == 47 && $permiso['ver']) {
+            $widgetInvoicedProjects = true;
+         }
+         if ($permiso['funcion_id'] == 48 && $permiso['ver']) {
+            $widgetPayItemTotals = true;
+         }
+         if ($permiso['funcion_id'] == 49 && $permiso['ver']) {
+            $widgetInvoiceProfitShare = true;
+         }
+         if ($permiso['funcion_id'] == 50 && $permiso['ver']) {
+            $widgetJobCostBreakdown = true;
+         }
       }
 
       return [
@@ -601,6 +649,18 @@ class Base
          'menuConcreteClass' => $menuConcreteClass,
          'menuEmployeeRole' => $menuEmployeeRole,
          'menuEstimateNoteItem' => $menuEstimateNoteItem,
+         // widgets (capa 1 - permisos)
+         'widgetTasks' => $widgetTasks,
+         'widgetWorkSchedule' => $widgetWorkSchedule,
+         'widgetBidDeadlines' => $widgetBidDeadlines,
+         'widgetEstimateWinLoss' => $widgetEstimateWinLoss,
+         'widgetEstimatesSubmitted' => $widgetEstimatesSubmitted,
+         'widgetEstimatorShare' => $widgetEstimatorShare,
+         'widgetCurrentMonthProjects' => $widgetCurrentMonthProjects,
+         'widgetInvoicedProjects' => $widgetInvoicedProjects,
+         'widgetPayItemTotals' => $widgetPayItemTotals,
+         'widgetInvoiceProfitShare' => $widgetInvoiceProfitShare,
+         'widgetJobCostBreakdown' => $widgetJobCostBreakdown,
       ];
    }
 

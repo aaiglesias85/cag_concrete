@@ -8,14 +8,14 @@
                type="button"
                data-bs-toggle="collapse"
                data-bs-target="#{{ grupo.grupoId }}"
-               aria-expanded="true"
+               aria-expanded="false"
                aria-controls="{{ grupo.grupoId }}"
                style="background-color:#f1f3f4;"
             >
                {{ grupo.titulo }}
             </button>
          </h2>
-         <div id="{{ grupo.grupoId }}" class="accordion-collapse collapse show" aria-labelledby="heading-{{ grupo.grupoId }}">
+         <div id="{{ grupo.grupoId }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ grupo.grupoId }}">
             <div class="accordion-body p-0">
                <div class="table-responsive">
                   <table class="table table-striped table-row-bordered align-middle gs-0 gy-2 mb-0">

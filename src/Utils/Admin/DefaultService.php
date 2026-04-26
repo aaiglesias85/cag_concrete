@@ -738,11 +738,14 @@ class DefaultService extends Base
    /**
     * @return list<array<string, mixed>>
     */
-   public function ObtenerWidgetsDashboardV3($usuarioId): array
+   public function ObtenerWidgetsDashboardV3($usuarioId, ?\App\Repository\UserWidgetPreferenceRepository $prefRepo = null): array
    {
+      // widget_funcion_id = Capa 1: permiso dedicado por widget (funcion_ids 40-50)
+      // links[].funcion_id = controla visibilidad de los botones de enlace al módulo
       $definiciones = [
          [
             'id' => 'tasks',
+            'widget_funcion_id' => 40,
             'title' => 'Tasks',
             'description' => 'Your assigned work and due dates',
             'layout' => 'table',
@@ -753,6 +756,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'work_schedule',
+            'widget_funcion_id' => 41,
             'title' => 'Work Schedule',
             'description' => 'Weekly view of field operations and priorities.',
             'layout' => 'table',
@@ -763,6 +767,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'bid_deadlines',
+            'widget_funcion_id' => 42,
             'title' => 'Upcoming bid deadlines',
             'description' => 'Projects with critical proposal dates and assigned estimator.',
             'layout' => 'table',
@@ -773,6 +778,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'estimate_win_loss',
+            'widget_funcion_id' => 43,
             'title' => 'Estimate win / loss ratio',
             'description' => 'Submitted estimates won vs. lost.',
             'layout' => 'placeholder',
@@ -783,6 +789,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'estimates_submitted_totals',
+            'widget_funcion_id' => 44,
             'title' => 'Total estimates — submitted / not submitted',
             'description' => 'Count of submitted vs. draft or pending.',
             'layout' => 'table',
@@ -793,6 +800,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'estimator_submitted_share',
+            'widget_funcion_id' => 45,
             'title' => 'Estimator submitted share',
             'description' => 'Share of submitted proposals by estimator.',
             'layout' => 'placeholder',
@@ -803,6 +811,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'current_month_data_tracking',
+            'widget_funcion_id' => 46,
             'title' => 'Current month projects (data tracking)',
             'description' => 'Aggregates for the current month from data tracking.',
             'layout' => 'table',
@@ -813,6 +822,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'pay_item_totals',
+            'widget_funcion_id' => 48,
             'title' => 'Pay item totals (period)',
             'description' => 'Sums of pay item quantities and amounts; filter by project later.',
             'layout' => 'table',
@@ -823,6 +833,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'invoiced_projects',
+            'widget_funcion_id' => 47,
             'title' => 'Invoiced projects (period)',
             'description' => 'Billed amount and quick glance of payment total.',
             'layout' => 'table',
@@ -834,6 +845,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'invoice_profit_share',
+            'widget_funcion_id' => 49,
             'title' => 'Invoice / profit share',
             'description' => 'Real profitability vs. invoiced amounts.',
             'layout' => 'table',
@@ -844,6 +856,7 @@ class DefaultService extends Base
          ],
          [
             'id' => 'job_cost_breakdown',
+            'widget_funcion_id' => 50,
             'title' => 'Job Cost Breakdown',
             'description' => 'Labor, materials, and other direct costs.',
             'layout' => 'table',
@@ -854,21 +867,31 @@ class DefaultService extends Base
          ],
       ];
 
+      // Capa 2: preferencias del usuario (null = tabla aún no existe, mostrar todo lo permitido)
+      $prefMap = $prefRepo !== null ? $prefRepo->getPreferenceMapForUser($usuarioId) : null;
+
       $out = [];
       foreach ($definiciones as $def) {
-         $linkViews = [];
-         $widgetVisible = false;
-         foreach ($def['links'] as $link) {
-            $p = $this->BuscarPermiso($usuarioId, (int) $link['funcion_id']);
-            $ok = is_array($p) && count($p) > 0 && !empty($p[0]['ver']);
-            $linkViews[] = array_merge($link, ['canView' => $ok]);
-            if ($ok) {
-               $widgetVisible = true;
-            }
-         }
-         if (!$widgetVisible) {
+         // Capa 1: el usuario debe tener permiso VIEW sobre el widget_funcion_id dedicado
+         $p = $this->BuscarPermiso($usuarioId, (int) $def['widget_funcion_id']);
+         if (!is_array($p) || count($p) === 0 || empty($p[0]['ver'])) {
             continue;
          }
+
+         // Capa 2: si hay preferencias guardadas, respetar la elección del usuario
+         if ($prefMap !== null && isset($prefMap[$def['id']]) && $prefMap[$def['id']] === false) {
+            continue;
+         }
+
+         // Resolver visibilidad de cada botón de enlace al módulo
+         $linkViews = [];
+         foreach ($def['links'] as $link) {
+            $lp = $this->BuscarPermiso($usuarioId, (int) $link['funcion_id']);
+            $linkViews[] = array_merge($link, [
+               'canView' => is_array($lp) && count($lp) > 0 && !empty($lp[0]['ver']),
+            ]);
+         }
+
          $out[] = array_merge($def, [
             'links' => $linkViews,
             'canView' => true,

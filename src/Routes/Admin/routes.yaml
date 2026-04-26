@@ -5,3 +5,11 @@ home:
 listarStatsDashboard:
   path: /dashboard/listarStats
   defaults: { _controller: App\Controller\Admin\DefaultController::listarStats, _format: json }
+
+userWidgetPreferences:
+  path: /user/widgets
+  defaults: { _controller: App\Controller\Admin\DefaultController::widgetPreferences }
+
+saveUserWidgetPreference:
+  path: /user/widgets/save
+  defaults: { _controller: App\Controller\Admin\DefaultController::saveWidgetPreference, _format: json }

@@ -6,6 +6,7 @@ use App\Entity\Company;
 use App\Entity\Equation;
 use App\Entity\Item;
 use App\Entity\Unit;
+use App\Repository\UserWidgetPreferenceRepository;
 use App\Utils\Admin\AdvertisementService;
 use App\Utils\Admin\DefaultService;
 use App\Utils\Admin\EstimateService;
@@ -23,22 +24,23 @@ class DefaultController extends AbstractController
    private $defaultService;
    private $logService;
    private $notificationService;
-
    private $advertisementService;
    private TaskService $taskService;
    private ScheduleService $scheduleService;
    private EstimateService $estimateService;
    private DataTrackingService $dataTrackingService;
+   private UserWidgetPreferenceRepository $widgetPrefRepo;
 
    public function __construct(
-      DefaultService       $defaultService,
-      LogService $logService,
-      NotificationService  $notificationService,
-      AdvertisementService $advertisementService,
-      TaskService $taskService,
-      ScheduleService $scheduleService,
-      EstimateService $estimateService,
-      DataTrackingService $dataTrackingService
+      DefaultService                  $defaultService,
+      LogService                      $logService,
+      NotificationService             $notificationService,
+      AdvertisementService            $advertisementService,
+      TaskService                     $taskService,
+      ScheduleService                 $scheduleService,
+      EstimateService                 $estimateService,
+      DataTrackingService             $dataTrackingService,
+      UserWidgetPreferenceRepository  $widgetPrefRepo
    ) {
       $this->defaultService = $defaultService;
       $this->logService = $logService;
@@ -48,6 +50,7 @@ class DefaultController extends AbstractController
       $this->scheduleService = $scheduleService;
       $this->estimateService = $estimateService;
       $this->dataTrackingService = $dataTrackingService;
+      $this->widgetPrefRepo = $widgetPrefRepo;
    }
 
    public function index()
@@ -56,7 +59,8 @@ class DefaultController extends AbstractController
       $permiso = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), 1);
       if (count($permiso) > 0 && $permiso[0]['ver']) {
          $dashboardWidgets = $this->defaultService->ObtenerWidgetsDashboardV3(
-            $usuario->getUsuarioId()
+            $usuario->getUsuarioId(),
+            $this->widgetPrefRepo
          );
 
          $homeTask = null;
@@ -191,6 +195,39 @@ class DefaultController extends AbstractController
       }
 
       return $this->redirectToRoute('denegado');
+   }
+
+   public function widgetPreferences(): Response
+   {
+      $usuario = $this->getUser();
+      $allWidgets = $this->defaultService->ObtenerWidgetsDashboardV3($usuario->getUsuarioId());
+      $prefMap   = $this->widgetPrefRepo->getPreferenceMapForUser($usuario->getUsuarioId());
+
+      $widgets = array_map(static function (array $w) use ($prefMap): array {
+         $w['user_active'] = $prefMap[$w['id']] ?? true;
+         return $w;
+      }, $allWidgets);
+
+      return $this->render('admin/default/widget_preferences.html.twig', [
+         'usuario' => $usuario,
+         'widgets' => $widgets,
+         'urlSave' => $this->generateUrl('saveUserWidgetPreference'),
+      ]);
+   }
+
+   public function saveWidgetPreference(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+   {
+      $usuario   = $this->getUser();
+      $widgetId  = $request->request->get('widget_id', '');
+      $isActive  = filter_var($request->request->get('is_active', true), FILTER_VALIDATE_BOOLEAN);
+
+      if ($widgetId === '') {
+         return $this->json(['success' => false, 'message' => 'Missing widget_id'], 400);
+      }
+
+      $this->widgetPrefRepo->savePreference($usuario->getUsuarioId(), $widgetId, $isActive);
+
+      return $this->json(['success' => true]);
    }
 
    /**
