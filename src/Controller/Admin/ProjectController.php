@@ -3,1421 +3,1373 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\Company;
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
+use App\Entity\EmployeeRole;
 use App\Entity\Equation;
 use App\Entity\Inspector;
 use App\Entity\Invoice;
-use App\Entity\ReimbursementHistory;
 use App\Entity\Item;
 use App\Entity\Project;
+use App\Entity\ReimbursementHistory;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
-use App\Entity\EmployeeRole;
+use App\Service\Admin\AdminAccessService;
 use App\Utils\Admin\InvoiceService;
 use App\Utils\Admin\ProjectService;
-use App\Service\Admin\AdminAccessService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProjectController extends AbstractAdminController
 {
+    private $projectService;
+    private $invoiceService;
 
-   private $projectService;
-   private $invoiceService;
+    public function __construct(AdminAccessService $adminAccess, ProjectService $projectService, InvoiceService $invoiceService)
+    {
+        parent::__construct($adminAccess);
+        $this->projectService = $projectService;
+        $this->invoiceService = $invoiceService;
+    }
 
-   public function __construct(AdminAccessService $adminAccess, ProjectService $projectService, InvoiceService $invoiceService)
-   {
-      parent::__construct($adminAccess);
-      $this->projectService = $projectService;
-      $this->invoiceService = $invoiceService;
-   }
+    public function index(Request $request)
+    {
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
+        }
+        $usuario = $acceso['usuario'];
+        $permiso = $acceso['permisos'];
 
-   public function index(Request $request)
-   {
-      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT);
-      if ($acceso instanceof RedirectResponse) {
-         return $acceso;
-      }
-      $usuario = $acceso['usuario'];
-      $permiso = $acceso['permisos'];
+        // companies
+        $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
+           ->ListarOrdenados();
 
-      // companies
-      $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
-         ->ListarOrdenados();
+        // inspectors
+        $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
+           ->ListarOrdenados();
 
-      // inspectors
-      $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
-         ->ListarOrdenados();
+        // items
+        $items = $this->projectService->getDoctrine()->getRepository(Item::class)
+           ->ListarOrdenados();
 
-      // items
-      $items = $this->projectService->getDoctrine()->getRepository(Item::class)
-         ->ListarOrdenados();
+        $equations = $this->projectService->getDoctrine()->getRepository(Equation::class)
+           ->ListarOrdenados();
 
-      $equations = $this->projectService->getDoctrine()->getRepository(Equation::class)
-         ->ListarOrdenados();
+        $units = $this->projectService->getDoctrine()->getRepository(Unit::class)
+           ->ListarOrdenados();
 
-      $units = $this->projectService->getDoctrine()->getRepository(Unit::class)
-         ->ListarOrdenados();
+        $yields_calculation = $this->projectService->ListarYieldsCalculation();
 
-      $yields_calculation = $this->projectService->ListarYieldsCalculation();
+        // countys
+        $countys = $this->projectService->getDoctrine()->getRepository(County::class)
+           ->ListarOrdenados();
 
-      // countys
-      $countys = $this->projectService->getDoctrine()->getRepository(County::class)
-         ->ListarOrdenados();
+        // concrete vendors
+        $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
+           ->ListarOrdenados();
 
-      // concrete vendors
-      $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
-         ->ListarOrdenados();
+        // concrete classes
+        $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
+           ->ListarOrdenados();
 
-      // concrete classes
-      $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
-         ->ListarOrdenados();
+        // employee roles
+        $employee_roles = $this->projectService->getDoctrine()->getRepository(EmployeeRole::class)
+           ->ListarOrdenados();
 
-      // employee roles
-      $employee_roles = $this->projectService->getDoctrine()->getRepository(EmployeeRole::class)
-         ->ListarOrdenados();
+        return $this->render('admin/project/index.html.twig', [
+            'permiso' => $permiso[0],
+            'companies' => $companies,
+            'inspectors' => $inspectors,
+            'items' => $items,
+            'equations' => $equations,
+            'yields_calculation' => $yields_calculation,
+            'units' => $units,
+            'countys' => $countys,
+            'concrete_vendors' => $concrete_vendors,
+            'concrete_classes' => $concrete_classes,
+            'employee_roles' => $employee_roles,
+            'direccion_url' => $this->projectService->ObtenerURL(),
+            'usuario_bond' => $usuario->getBond() ? true : false,
+            'usuario_retainage' => $usuario->getRetainage() ? true : false,
+        ]);
+    }
 
-      return $this->render('admin/project/index.html.twig', array(
-         'permiso' => $permiso[0],
-         'companies' => $companies,
-         'inspectors' => $inspectors,
-         'items' => $items,
-         'equations' => $equations,
-         'yields_calculation' => $yields_calculation,
-         'units' => $units,
-         'countys' => $countys,
-         'concrete_vendors' => $concrete_vendors,
-         'concrete_classes' => $concrete_classes,
-         'employee_roles' => $employee_roles,
-         'direccion_url' => $this->projectService->ObtenerURL(),
-         'usuario_bond' => $usuario->getBond() ? true : false,
-         'usuario_retainage' => $usuario->getRetainage() ? true : false
-      ));
-   }
-
-   /**
-    * listar Acción que lista los usuarios
-    *
-    */
-   public function listar(Request $request)
-   {
-      try {
-
-         // parsear los parametros de la tabla
-         $dt = DataTablesHelper::parse(
-            $request,
-            allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'name', 'dueDate', 'company', 'nota'],
-            defaultOrderField: 'projectNumber'
-         );
-
-         // filtros
-         $company_id = $request->get('company_id');
-         $status = $request->get('status');
-         $fecha_inicial = $request->get('fechaInicial');
-         $fecha_fin = $request->get('fechaFin');
-         $missing_info = $request->get('missing_info') ? true : false;
-
-         $data = $this->projectService->ListarProjects(
-            $dt['start'],
-            $dt['length'],
-            $dt['search'],
-            $dt['orderField'],
-            $dt['orderDir'],
-            $company_id,
-            $status,
-            $fecha_inicial,
-            $fecha_fin,
-            $missing_info
-         );
-
-         $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info);
-
-         $resultadoJson = [
-            'draw'            => $dt['draw'],
-            'data'            => $data,
-            'recordsTotal'    => (int) $total,
-            'recordsFiltered' => (int) $total
-         ];
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * salvar Acción que inserta un menu en la BD
-    *
-    */
-   public function salvar(Request $request)
-   {
-      $project_id = $request->get('project_id');
-
-      $company_id = $request->get('company_id');
-      $inspector_id = $request->get('inspector_id');
-      $number = $request->get('number');
-      $name = $request->get('name');
-      $description = $request->get('description');
-      $location = $request->get('location');
-      $po_number = $request->get('po_number');
-      $po_cg = $request->get('po_cg');
-      $contract_amount = $request->get('contract_amount');
-      $proposal_number = $request->get('proposal_number');
-      $project_id_number = $request->get('project_id_number');
-
-      $manager = $request->get('manager');
-      $status = $request->get('status');
-      $owner = $request->get('owner');
-      $subcontract = $request->get('subcontract');
-      $federal_funding = $request->get('federal_funding');
-      // county_id puede venir como array o string separado por comas
-      $county_id = $request->get('county_id');
-      if (is_string($county_id) && !empty($county_id)) {
-         $county_id = explode(',', $county_id);
-      }
-      if (!is_array($county_id)) {
-         $county_id = [];
-      }
-      $resurfacing = $request->get('resurfacing');
-      $invoice_contact = $request->get('invoice_contact');
-      $certified_payrolls = $request->get('certified_payrolls');
-      $start_date = $request->get('start_date');
-      $end_date = $request->get('end_date');
-      $due_date = $request->get('due_date');
-
-      $vendor_id = $request->get('vendor_id');
-      $concrete_class_id = $request->get('concrete_class_id');
-      $concrete_quote_price = $request->get('concrete_quote_price');
-      $concrete_start_date = $request->get('concrete_start_date');
-      $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
-      $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
-      $concrete_time_period_unit = $request->get('concrete_time_period_unit');
-
-      $retainage = $request->get('retainage');
-      $retainage_percentage = $request->get('retainage_percentage');
-      $retainage_adjustment_percentage = $request->get('retainage_adjustment_percentage');
-      $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
-
-      $prevailing_wage = $request->get('prevailing_wage');
-      $prevailing_roles = $request->get('prevailing_roles');
-
-      // items
-      $items = $request->get('items');
-      $items = json_decode($items);
-
-      // contacts
-      $contacts = $request->get('contacts');
-      $contacts = json_decode($contacts);
-
-      // concrete_classes
-      $concrete_classes = $request->get('concrete_classes');
-      $concrete_classes = json_decode($concrete_classes);
-
-      // ajustes_precio
-      $ajustes_precio = $request->get('ajustes_precio');
-      $ajustes_precio = json_decode($ajustes_precio);
-
-      // archivos
-      $archivos = $request->get('archivos');
-      $archivos = json_decode($archivos);
-
-      try {
-
-         if ($project_id == "") {
-            $resultado = $this->projectService->SalvarProject(
-               $company_id,
-               $inspector_id,
-               $number,
-               $name,
-               $description,
-               $location,
-               $po_number,
-               $po_cg,
-               $manager,
-               $status,
-               $owner,
-               $subcontract,
-               $federal_funding,
-               $county_id,
-               $resurfacing,
-               $invoice_contact,
-               $certified_payrolls,
-               $start_date,
-               $end_date,
-               $due_date,
-               $contract_amount,
-               $proposal_number,
-               $project_id_number,
-               $items,
-               $contacts,
-               $concrete_classes,
-               $vendor_id,
-               $concrete_class_id,
-               $concrete_quote_price,
-               $concrete_start_date,
-               $concrete_quote_price_escalator,
-               $concrete_time_period_every_n,
-               $concrete_time_period_unit,
-               $retainage,
-               $retainage_percentage,
-               $retainage_adjustment_percentage,
-               $retainage_adjustment_completion,
-               $prevailing_wage,
-               $prevailing_roles
+    /**
+     * listar Acción que lista los usuarios.
+     */
+    public function listar(Request $request)
+    {
+        try {
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'name', 'dueDate', 'company', 'nota'],
+                defaultOrderField: 'projectNumber'
             );
-         } else {
-            $resultado = $this->projectService->ActualizarProject(
-               $project_id,
-               $company_id,
-               $inspector_id,
-               $number,
-               $name,
-               $description,
-               $location,
-               $po_number,
-               $po_cg,
-               $manager,
-               $status,
-               $owner,
-               $subcontract,
-               $federal_funding,
-               $county_id,
-               $resurfacing,
-               $invoice_contact,
-               $certified_payrolls,
-               $start_date,
-               $end_date,
-               $due_date,
-               $contract_amount,
-               $proposal_number,
-               $project_id_number,
-               $items,
-               $contacts,
-               $concrete_classes,
-               $ajustes_precio,
-               $archivos,
-               $vendor_id,
-               $concrete_class_id,
-               $concrete_quote_price,
-               $concrete_start_date,
-               $concrete_quote_price_escalator,
-               $concrete_time_period_every_n,
-               $concrete_time_period_unit,
-               $retainage,
-               $retainage_percentage,
-               $retainage_adjustment_percentage,
-               $retainage_adjustment_completion,
-               $prevailing_wage,
-               $prevailing_roles
+
+            // filtros
+            $company_id = $request->get('company_id');
+            $status = $request->get('status');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
+            $missing_info = $request->get('missing_info') ? true : false;
+
+            $data = $this->projectService->ListarProjects(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $company_id,
+                $status,
+                $fecha_inicial,
+                $fecha_fin,
+                $missing_info
             );
-         }
 
-         if ($resultado['success']) {
+            $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info);
 
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['project_id'] = $resultado['project_id'];
-            $resultadoJson['message'] = "The operation was successful";
-
-            // new items
-            $resultadoJson['items'] = $resultado['items'];
-
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
+            $resultadoJson = [
+                'draw' => $dt['draw'],
+                'data' => $data,
+                'recordsTotal' => (int) $total,
+                'recordsFiltered' => (int) $total,
+            ];
 
             return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminar Acción que elimina un project en la BD
-    *
-    */
-   public function eliminar(Request $request)
-   {
-      $project_id = $request->get('project_id');
-
-      try {
-         $resultado = $this->projectService->EliminarProject($project_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarProjects Acción que elimina los projects seleccionados en la BD
-    *
-    */
-   public function eliminarProjects(Request $request)
-   {
-      $ids = $request->get('ids');
-
-      try {
-         $resultado = $this->projectService->EliminarProjects($ids);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * cargarDatos Acción que carga los datos del project en la BD
-    *
-    */
-   public function cargarDatos(Request $request)
-   {
-      $project_id = $request->get('project_id');
-
-      try {
-         $resultado = $this->projectService->CargarDatosProject($project_id);
-         if ($resultado['success']) {
-
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['project'] = $resultado['project'];
-
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarOrdenados Acción para listar los projects ordenados
-    *
-    */
-   public function listarOrdenados(Request $request)
-   {
-      $company_id = $request->get('company_id') ?? '';
-      $inspector_id = $request->get('inspector_id') ?? '';
-      $search = $request->get('search') ?? '';
-      $from = $request->get('from') ?? '';
-      $to = $request->get('to') ?? '';
-      $status = $request->get('status') ?? '';
-
-      try {
-         $projects = $this->projectService->ListarOrdenados($search, $company_id, $inspector_id, $from, $to, $status);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['projects'] = $projects;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarItemsParaInvoice Acción para listar los items para el invoice
-    *
-    */
-   public function listarItemsParaInvoice(Request $request)
-   {
-      $project_id = $request->get('project_id');
-      $fecha_inicial = $request->get('start_date');
-      $fecha_fin = $request->get('end_date');
-
-      try {
-         $result = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
-         $retainageContext = $this->invoiceService->getRetainageContextForProject($project_id);
-         $retainageValues = $this->invoiceService->getRetainageForDraftItems($project_id, $result['items']);
-
-         $project = $this->projectService->getDoctrine()->getRepository(Project::class)->find($project_id);
-         $contract_amount = $project && $project->getContractAmount() !== null ? (float) $project->getContractAmount() : 0.0;
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['items'] = $result['items'];
-         $resultadoJson['contract_amount'] = $contract_amount;
-         $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
-         $resultadoJson['bond_price'] = $result['bond_price'];
-         $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
-         $resultadoJson['bon_quantity'] = $result['bon_quantity'] ?? 0;
-         $resultadoJson['bon_amount'] = $result['bon_amount'] ?? 0;
-         $resultadoJson['bond_amount_cumulative_to_date'] = $result['bond_amount_cumulative_to_date'] ?? null;
-         $resultadoJson['retainage_context'] = $retainageContext;
-         $resultadoJson['retainage_current'] = $retainageValues['effective_current_retainage'];
-         $resultadoJson['retainage_accumulated'] = $retainageValues['total_retainage_accumulated'];
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarNotes Acción que lista los notes subcontractors
-    *
-    */
-   public function listarNotes(Request $request)
-   {
-      try {
-         // parsear los parametros de la tabla
-         $dt = DataTablesHelper::parse(
-            $request,
-            allowedOrderFields: ['id', 'date', 'notes'],
-            defaultOrderField: 'date'
-         );
-
-         // filtros
-         $project_id = $request->get('project_id');
-         $fecha_inicial = $request->get('fechaInicial');
-         $fecha_fin = $request->get('fechaFin');
-
-         // total + data en una sola llamada a tu servicio
-         $result = $project_id != "" ? $this->projectService->ListarNotes(
-            $dt['start'],
-            $dt['length'],
-            $dt['search'],
-            $dt['orderField'],
-            $dt['orderDir'],
-            $project_id,
-            $fecha_inicial,
-            $fecha_fin
-         ) : ['data' => [], 'total' => 0];
-
-         $resultadoJson = [
-            'draw'            => $dt['draw'],
-            'data'            => $result['data'],
-            'recordsTotal'    => (int) $result['total'],
-            'recordsFiltered' => (int) $result['total'],
-         ];
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * salvarNotes Acción que salvar un notes en la BD
-    *
-    */
-   public function salvarNotes(Request $request)
-   {
-      $notes_id = $request->get('notes_id');
-
-      $project_id = $request->get('project_id');
-      $notes = $request->get('notes');
-      $date = $request->get('date');
-
-      try {
-
-         $resultado = $this->projectService->SalvarNotes($notes_id, $project_id, $notes, $date);
-
-         if ($resultado['success']) {
-
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * cargarDatosNotes Acción que carga los datos del notes project en la BD
-    *
-    */
-   public function cargarDatosNotes(Request $request)
-   {
-      $notes_id = $request->get('notes_id');
-
-      try {
-         $resultado = $this->projectService->CargarDatosNotes($notes_id);
-         if ($resultado['success']) {
-
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['notes'] = $resultado['notes'];
-
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarNotes Acción que elimina un notes en la BD
-    *
-    */
-   public function eliminarNotes(Request $request)
-   {
-      $notes_id = $request->get('notes_id');
-
-      try {
-         $resultado = $this->projectService->EliminarNotes($notes_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarNotesDate Acción que elimina un notes en la BD
-    *
-    */
-   public function eliminarNotesDate(Request $request)
-   {
-      $project_id = $request->get('project_id');
-      $from = $request->get('from');
-      $to = $request->get('to');
-
-      try {
-         $resultado = $this->projectService->EliminarNotesDate($project_id, $from, $to);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarItems Acción que lista los item en la BD
-    *
-    */
-   public function listarItems(Request $request)
-   {
-      $project_id = $request->get('project_id');
-
-      try {
-         $items = $this->projectService->ListarItemsDeProject($project_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['items'] = $items;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * obtenerPorcentajeCompletionItem Acción que obtiene el porcentaje de completion de un item
-    *
-    */
-   public function obtenerPorcentajeCompletionItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-
-      try {
-         $porcentaje = $this->projectService->ObtenerPorcentajeCompletionItem($project_item_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['porcentaje_completion'] = $porcentaje;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarHistorialItem Acción que lista el historial de cambios de un item
-    *
-    */
-   public function listarHistorialItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-
-      try {
-         $historial = $this->projectService->ListarHistorialDeItem($project_item_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['historial'] = $historial;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * Sugiere code / contract_name desde project_item existente en el mismo proyecto (mismo item_id de catálogo).
-    */
-   public function sugerirCodeContractItemEnProyecto(Request $request): JsonResponse
-   {
-      $project_id = $request->get('project_id');
-      $item_id = $request->get('item_id');
-
-      try {
-         $resultado = $this->projectService->SugerirCodeContractItemEnProyecto($project_id, $item_id);
-
-         return $this->json($resultado);
-      } catch (\Exception $e) {
-         return $this->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'code' => '',
-            'contract_name' => '',
-         ]);
-      }
-   }
-
-   /**
-    * eliminarItem Acción que elimina un item en la BD
-    *
-    */
-   public function eliminarItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-
-      try {
-         $resultado = $this->projectService->EliminarItem($project_item_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-         }
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * agregarItem Acción que agrega un item en la BD
-    *
-    */
-   public function agregarItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-      $project_id = $request->get('project_id');
-      $item_id = $request->get('item_id');
-      $item_name = $request->get('item');
-      $unit_id = $request->get('unit_id');
-      $quantity = $request->get('quantity');
-      $price = $request->get('price');
-      $yield_calculation = $request->get('yield_calculation');
-      $equation_id = $request->get('equation_id');
-      $change_order = $request->get('change_order');
-      // Convertir a booleano correctamente
-      $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
-      $change_order_date = $request->get('change_order_date');
-      $apply_retainage = $request->get('apply_retainage') ?? 0;
-      $apply_retainage = (int) $apply_retainage;
-      if ($apply_retainage !== 0) {
-         $apply_retainage = 1;
-      }
-      $bond = $request->get('bond') ?? false;
-      // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
-      if (is_string($bond)) {
-         $bond = strtolower($bond) === 'true' || $bond === '1';
-      } else {
-         $bond = (bool)$bond;
-      }
-
-      $bonded = $request->get('bonded') ?? false;
-      // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
-      if (is_string($bonded)) {
-         $bonded = strtolower($bonded) === 'true' || $bonded === '1';
-      } else {
-         $bonded = (bool)$bonded;
-      }
-
-      $code = $request->get('code');
-      $contract_name = $request->get('contract_name');
-
-      // Validar que solo usuarios con permiso bond puedan crear items con bond=true
-      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-      if ($g instanceof RedirectResponse) {
-         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-      }
-      $usuario = $g;
-      $usuario_bond = $usuario->getBond() ? true : false;
-      if ($bond && !$usuario_bond) {
-         // Si el usuario intenta crear un item con bond=true pero no tiene permiso, forzar a false
-         $bond = false;
-      }
-
-      // Validar que solo usuarios con permiso bond puedan marcar items como bonded=true
-      if ($bonded && !$usuario_bond) {
-         // Si el usuario intenta marcar un item como bonded=true pero no tiene permiso, forzar a false
-         $bonded = false;
-      }
-
-      $usuario_retainage = $usuario->getRetainage() ? true : false;
-      if ($apply_retainage && !$usuario_retainage) {
-         // Si el usuario intenta marcar apply_retainage pero no tiene permiso, forzar a 0
-         $apply_retainage = 0;
-      }
-
-      try {
-         $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond, $bonded, $code, $contract_name);
-
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            $resultadoJson['item'] = $resultado['item'];
-            $resultadoJson['is_new_item'] = $resultado['is_new_item'];
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-         }
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage() . 'line ' . $e->getLine();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarContact Acción que elimina un contact en la BD
-    *
-    */
-   public function eliminarContact(Request $request)
-   {
-      $contact_id = $request->get('contact_id');
-
-      try {
-         $resultado = $this->projectService->EliminarContact($contact_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-         }
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarConcreteClass Acción que elimina una concrete class en la BD
-    *
-    */
-   public function eliminarConcreteClass(Request $request)
-   {
-      $concrete_class_id = $request->get('concrete_class_id');
-
-      try {
-         $resultado = $this->projectService->EliminarConcreteClass($concrete_class_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-         }
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarSubcontractors Acción que lista los subcontractors de un project
-    *
-    */
-   public function listarSubcontractors(Request $request)
-   {
-
-      $project_id = $request->get('project_id');
-
-      try {
-
-         $subcontractors = $this->projectService->ListarSubcontractors($project_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['subcontractors'] = $subcontractors;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarEmployees Acción que lista los employees de un project
-    *
-    */
-   public function listarEmployees(Request $request)
-   {
-
-      $project_id = $request->get('project_id');
-
-      try {
-
-         $employees = $this->projectService->ListarEmployees($project_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['employees'] = $employees;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarContacts Acción que lista los contacts de un project
-    *
-    */
-   public function listarContacts(Request $request)
-   {
-
-      $project_id = $request->get('project_id');
-
-      try {
-
-         $contacts = $this->projectService->ListarContactsDeProject($project_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['contacts'] = $contacts;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarDataTracking Acción que lista el datatracking
-    *
-    */
-   public function listarDataTracking(Request $request)
-   {
-      try {
-         // parsear los parametros de la tabla
-         $dt = DataTablesHelper::parse(
-            $request,
-            allowedOrderFields: ['id', 'date', 'leads', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
-            defaultOrderField: 'date'
-         );
-
-         // filtros
-         $project_id = $request->get('project_id');
-         $pending = $request->get('pending');
-         $fecha_inicial = $request->get('fechaInicial');
-         $fecha_fin = $request->get('fechaFin');
-         $only_punch = $request->get('only_punch', '');
-
-         // total + data en una sola llamada a tu servicio
-         $result = $project_id != "" ? $this->projectService->ListarDataTrackings(
-            $dt['start'],
-            $dt['length'],
-            $dt['search'],
-            $dt['orderField'],
-            $dt['orderDir'],
-            $project_id,
-            $fecha_inicial,
-            $fecha_fin,
-            $pending,
-            $only_punch
-         ) : ['data' => [], 'total' => 0];
-
-         $resultadoJson = [
-            'draw'            => $dt['draw'],
-            'data'            => $result['data'],
-            'recordsTotal'    => (int) $result['total'],
-            'recordsFiltered' => (int) $result['total'],
-         ];
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarAjustePrecio Acción que elimina un ajuste de precio en la BD
-    *
-    */
-   public function eliminarAjustePrecio(Request $request)
-   {
-      $id = $request->get('id');
-
-      try {
-         $resultado = $this->projectService->EliminarAjustePrecio($id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-         }
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-
-   /**
-    * salvarArchivo Accion que salva un archivo en la BD
-    */
-   public function salvarArchivo(Request $request)
-   {
-      $resultadoJson = array();
-
-      try {
-
-         $file = $request->files->get('file');
-
-         //Manejar el archivo
-         $dir = 'uploads/project/';
-         $file_name = $this->projectService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
-
-         if ($file_name != '') {
-            $resultadoJson['success'] = true;
-            $resultadoJson['message'] = "The operation was successful";
-
-            $resultadoJson['name'] = $file_name;
-            $resultadoJson['size'] = filesize($dir . $file_name);
-         } else {
+        } catch (\Exception $e) {
             $resultadoJson['success'] = false;
-            $resultadoJson['error'] = 'Invalid file';
-         }
+            $resultadoJson['error'] = $e->getMessage();
 
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+            return $this->json($resultadoJson);
+        }
+    }
 
-         return $this->json($resultadoJson);
-      }
-   }
+    /**
+     * salvar Acción que inserta un menu en la BD.
+     */
+    public function salvar(Request $request)
+    {
+        $project_id = $request->get('project_id');
 
-   /**
-    * eliminarArchivo Acción que elimina un archivo en la BD
-    *
-    */
-   public function eliminarArchivo(Request $request)
-   {
-      $archivo = $request->get('archivo');
+        $company_id = $request->get('company_id');
+        $inspector_id = $request->get('inspector_id');
+        $number = $request->get('number');
+        $name = $request->get('name');
+        $description = $request->get('description');
+        $location = $request->get('location');
+        $po_number = $request->get('po_number');
+        $po_cg = $request->get('po_cg');
+        $contract_amount = $request->get('contract_amount');
+        $proposal_number = $request->get('proposal_number');
+        $project_id_number = $request->get('project_id_number');
 
-      try {
-         $resultado = $this->projectService->EliminarArchivo($archivo);
-         if ($resultado['success']) {
+        $manager = $request->get('manager');
+        $status = $request->get('status');
+        $owner = $request->get('owner');
+        $subcontract = $request->get('subcontract');
+        $federal_funding = $request->get('federal_funding');
+        // county_id puede venir como array o string separado por comas
+        $county_id = $request->get('county_id');
+        if (is_string($county_id) && !empty($county_id)) {
+            $county_id = explode(',', $county_id);
+        }
+        if (!is_array($county_id)) {
+            $county_id = [];
+        }
+        $resurfacing = $request->get('resurfacing');
+        $invoice_contact = $request->get('invoice_contact');
+        $certified_payrolls = $request->get('certified_payrolls');
+        $start_date = $request->get('start_date');
+        $end_date = $request->get('end_date');
+        $due_date = $request->get('due_date');
 
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
+        $vendor_id = $request->get('vendor_id');
+        $concrete_class_id = $request->get('concrete_class_id');
+        $concrete_quote_price = $request->get('concrete_quote_price');
+        $concrete_start_date = $request->get('concrete_start_date');
+        $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
+        $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
+        $concrete_time_period_unit = $request->get('concrete_time_period_unit');
+
+        $retainage = $request->get('retainage');
+        $retainage_percentage = $request->get('retainage_percentage');
+        $retainage_adjustment_percentage = $request->get('retainage_adjustment_percentage');
+        $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
+
+        $prevailing_wage = $request->get('prevailing_wage');
+        $prevailing_roles = $request->get('prevailing_roles');
+
+        // items
+        $items = $request->get('items');
+        $items = json_decode($items);
+
+        // contacts
+        $contacts = $request->get('contacts');
+        $contacts = json_decode($contacts);
+
+        // concrete_classes
+        $concrete_classes = $request->get('concrete_classes');
+        $concrete_classes = json_decode($concrete_classes);
+
+        // ajustes_precio
+        $ajustes_precio = $request->get('ajustes_precio');
+        $ajustes_precio = json_decode($ajustes_precio);
+
+        // archivos
+        $archivos = $request->get('archivos');
+        $archivos = json_decode($archivos);
+
+        try {
+            if ('' == $project_id) {
+                $resultado = $this->projectService->SalvarProject(
+                    $company_id,
+                    $inspector_id,
+                    $number,
+                    $name,
+                    $description,
+                    $location,
+                    $po_number,
+                    $po_cg,
+                    $manager,
+                    $status,
+                    $owner,
+                    $subcontract,
+                    $federal_funding,
+                    $county_id,
+                    $resurfacing,
+                    $invoice_contact,
+                    $certified_payrolls,
+                    $start_date,
+                    $end_date,
+                    $due_date,
+                    $contract_amount,
+                    $proposal_number,
+                    $project_id_number,
+                    $items,
+                    $contacts,
+                    $concrete_classes,
+                    $vendor_id,
+                    $concrete_class_id,
+                    $concrete_quote_price,
+                    $concrete_start_date,
+                    $concrete_quote_price_escalator,
+                    $concrete_time_period_every_n,
+                    $concrete_time_period_unit,
+                    $retainage,
+                    $retainage_percentage,
+                    $retainage_adjustment_percentage,
+                    $retainage_adjustment_completion,
+                    $prevailing_wage,
+                    $prevailing_roles
+                );
+            } else {
+                $resultado = $this->projectService->ActualizarProject(
+                    $project_id,
+                    $company_id,
+                    $inspector_id,
+                    $number,
+                    $name,
+                    $description,
+                    $location,
+                    $po_number,
+                    $po_cg,
+                    $manager,
+                    $status,
+                    $owner,
+                    $subcontract,
+                    $federal_funding,
+                    $county_id,
+                    $resurfacing,
+                    $invoice_contact,
+                    $certified_payrolls,
+                    $start_date,
+                    $end_date,
+                    $due_date,
+                    $contract_amount,
+                    $proposal_number,
+                    $project_id_number,
+                    $items,
+                    $contacts,
+                    $concrete_classes,
+                    $ajustes_precio,
+                    $archivos,
+                    $vendor_id,
+                    $concrete_class_id,
+                    $concrete_quote_price,
+                    $concrete_start_date,
+                    $concrete_quote_price_escalator,
+                    $concrete_time_period_every_n,
+                    $concrete_time_period_unit,
+                    $retainage,
+                    $retainage_percentage,
+                    $retainage_adjustment_percentage,
+                    $retainage_adjustment_completion,
+                    $prevailing_wage,
+                    $prevailing_roles
+                );
+            }
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['project_id'] = $resultado['project_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                // new items
+                $resultadoJson['items'] = $resultado['items'];
+
+                return $this->json($resultadoJson);
+            }
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
-         }
 
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-         return $this->json($resultadoJson);
-      }
-   }
+            return $this->json($resultadoJson);
+        }
+    }
 
-   /**
-    * eliminarArchivos Acción que elimina varios archivos en la BD
-    *
-    */
-   public function eliminarArchivos(Request $request)
-   {
-      $archivos = $request->get('archivos');
+    /**
+     * eliminar Acción que elimina un project en la BD.
+     */
+    public function eliminar(Request $request)
+    {
+        $project_id = $request->get('project_id');
 
-      try {
-         $resultado = $this->projectService->EliminarArchivos($archivos);
-         if ($resultado['success']) {
+        try {
+            $resultado = $this->projectService->EliminarProject($project_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
 
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-         } else {
+                return $this->json($resultadoJson);
+            }
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
-         }
 
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-         return $this->json($resultadoJson);
-      }
-   }
+            return $this->json($resultadoJson);
+        }
+    }
 
-   /**
-    * listarItemsCompletion Acción para listar los items completion
-    *
-    */
-   public function listarItemsCompletion(Request $request)
-   {
-      $project_id = $request->get('project_id');
-      $fecha_inicial = $request->get('fechaInicial');
-      $fecha_fin = $request->get('fechaFin');
+    /**
+     * eliminarProjects Acción que elimina los projects seleccionados en la BD.
+     */
+    public function eliminarProjects(Request $request)
+    {
+        $ids = $request->get('ids');
 
-      try {
-         $items = $this->projectService->ListarItemsCompletion($project_id, $fecha_inicial, $fecha_fin);
+        try {
+            $resultado = $this->projectService->EliminarProjects($ids);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
 
-         $resultadoJson['success'] = true;
-         $resultadoJson['items'] = $items;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarHistorialUnpaidQtyPorProjectItem Lista el historial de cambios de unpaid qty de un project_item (tab Completion).
-    */
-   public function listarHistorialUnpaidQtyPorProjectItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-
-      try {
-         $historial = $this->projectService->ListarHistorialUnpaidQtyPorProjectItem((int) $project_item_id);
-         $resultadoJson['success'] = true;
-         $resultadoJson['historial'] = $historial;
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * Historial de cambios de paid_qty en invoice_item_override_payment (tab Completion, columna Paid Qty).
-    */
-   public function listarHistorialPaidQtyOverridePorProjectItem(Request $request)
-   {
-      $project_item_id = $request->get('project_item_id');
-
-      try {
-         $historial = $this->projectService->ListarHistorialPaidQtyOverridePorProjectItem((int) $project_item_id);
-         $resultadoJson['success'] = true;
-         $resultadoJson['historial'] = $historial;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto
-    *
-    */
-   public function listarInvoicesRetainage(Request $request)
-   {
-      $project_id = $request->get('project_id');
-
-      try {
-         $invoices = $this->projectService->ListarInvoicesConRetainage($project_id);
-
-         $resultadoJson['success'] = true;
-         $resultadoJson['invoices'] = $invoices;
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * Actualizar los Item con Retainage
-    */
-   public function bulkRetainageUpdate(Request $request)
-   {
-      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-      if ($g instanceof RedirectResponse) {
-         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-      }
-      $usuario = $g;
-      $usuario_retainage = $usuario->getRetainage() ? true : false;
-      if (!$usuario_retainage) {
-         return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
-      }
-
-      $ids = $request->get('ids');
-      $status = $request->get('status');
-
-
-      if (empty($ids)) {
-         $content = $request->getContent();
-         if (!empty($content)) {
-            $data = json_decode($content, true);
-            if (is_array($data)) {
-               $ids = $data['ids'] ?? [];
-               $status = $data['status'] ?? null;
+                return $this->json($resultadoJson);
             }
-         }
-      }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
 
-      // 3. Validación final
-      if (empty($ids) || !is_array($ids)) {
-         return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
-      }
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-      try {
-         $this->projectService->ActualizarRetainageItems($ids, $status);
-         return $this->json(['success' => true]);
-      } catch (\Exception $e) {
-         return $this->json(['success' => false, 'error' => $e->getMessage()]);
-      }
-   }
+            return $this->json($resultadoJson);
+        }
+    }
 
-   /**
-    * Actualizar los Item con Bonded
-    */
-   public function bulkBondedUpdate(Request $request)
-   {
-      // Validar que solo usuarios con permiso bond puedan actualizar bonded
-      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-      if ($g instanceof RedirectResponse) {
-         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-      }
-      $usuario = $g;
-      $usuario_bond = $usuario->getBond() ? true : false;
-      if (!$usuario_bond) {
-         return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);
-      }
+    /**
+     * cargarDatos Acción que carga los datos del project en la BD.
+     */
+    public function cargarDatos(Request $request)
+    {
+        $project_id = $request->get('project_id');
 
-      $ids = $request->get('ids');
-      $status = $request->get('status');
+        try {
+            $resultado = $this->projectService->CargarDatosProject($project_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['project'] = $resultado['project'];
 
-      if (empty($ids)) {
-         $content = $request->getContent();
-         if (!empty($content)) {
-            $data = json_decode($content, true);
-            if (is_array($data)) {
-               $ids = $data['ids'] ?? [];
-               $status = $data['status'] ?? null;
+                return $this->json($resultadoJson);
             }
-         }
-      }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
 
-      // 3. Validación final
-      if (empty($ids) || !is_array($ids)) {
-         return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
-      }
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-      try {
-         $this->projectService->ActualizarBonedItems($ids, $status);
-         return $this->json(['success' => true]);
-      } catch (\Exception $e) {
-         return $this->json(['success' => false, 'error' => $e->getMessage()]);
-      }
-   }
+            return $this->json($resultadoJson);
+        }
+    }
 
-   /**
-    * @param Request $request
-    * @param ManagerRegistry $doctrine  <-- Inyectamos Doctrine aquí
-    * @return JsonResponse
-    */
-   public function getReimbursementHistory(Request $request, ManagerRegistry $doctrine): JsonResponse
-   {
-      $id = $request->request->get('invoice_id');
+    /**
+     * listarOrdenados Acción para listar los projects ordenados.
+     */
+    public function listarOrdenados(Request $request)
+    {
+        $company_id = $request->get('company_id') ?? '';
+        $inspector_id = $request->get('inspector_id') ?? '';
+        $search = $request->get('search') ?? '';
+        $from = $request->get('from') ?? '';
+        $to = $request->get('to') ?? '';
+        $status = $request->get('status') ?? '';
 
-      // IMPORTANTE: 'invoiceId' es el nombre de la propiedad en tu clase Invoice.php
-      $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $id]);
+        try {
+            $projects = $this->projectService->ListarOrdenados($search, $company_id, $inspector_id, $from, $to, $status);
 
-      if (!$invoice) {
-         return new JsonResponse(['success' => false, 'error' => 'Invoice #' . $id . ' not found']);
-      }
+            $resultadoJson['success'] = true;
+            $resultadoJson['projects'] = $projects;
 
-      $historyData = [];
-      foreach ($invoice->getReimbursementHistories() as $h) {
-         $historyData[] = [
-            'date' => $h->getCreatedAt()->format('m/d/Y h:i A'),
-            'amount' => (float)$h->getAmount()
-         ];
-      }
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-      return new JsonResponse(['success' => true, 'history' => $historyData]);
-   }
+            return $this->json($resultadoJson);
+        }
+    }
 
-   /**
-    * saveReimbursement: Guarda un nuevo reembolso sumándolo al anterior
-    */
+    /**
+     * listarItemsParaInvoice Acción para listar los items para el invoice.
+     */
+    public function listarItemsParaInvoice(Request $request)
+    {
+        $project_id = $request->get('project_id');
+        $fecha_inicial = $request->get('start_date');
+        $fecha_fin = $request->get('end_date');
 
-   public function saveReimbursement(Request $request, ManagerRegistry $doctrine): JsonResponse
-   {
-      $em = $doctrine->getManager();
-      $invoice_id = $request->request->get('invoice_id');
-      $amount_to_add = (float)$request->request->get('amount');
+        try {
+            $result = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
+            $retainageContext = $this->invoiceService->getRetainageContextForProject($project_id);
+            $retainageValues = $this->invoiceService->getRetainageForDraftItems($project_id, $result['items']);
 
-      if ($amount_to_add <= 0) {
-         return new JsonResponse(['success' => false, 'error' => 'Amount must be greater than 0']);
-      }
+            $project = $this->projectService->getDoctrine()->getRepository(Project::class)->find($project_id);
+            $contract_amount = $project && null !== $project->getContractAmount() ? (float) $project->getContractAmount() : 0.0;
 
-      $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $invoice_id]);
+            $resultadoJson['success'] = true;
+            $resultadoJson['items'] = $result['items'];
+            $resultadoJson['contract_amount'] = $contract_amount;
+            $resultadoJson['sum_bonded_project'] = $result['sum_bonded_project'];
+            $resultadoJson['bond_price'] = $result['bond_price'];
+            $resultadoJson['bon_general'] = $result['bon_general'] ?? null;
+            $resultadoJson['bon_quantity'] = $result['bon_quantity'] ?? 0;
+            $resultadoJson['bon_amount'] = $result['bon_amount'] ?? 0;
+            $resultadoJson['bond_amount_cumulative_to_date'] = $result['bond_amount_cumulative_to_date'] ?? null;
+            $resultadoJson['retainage_context'] = $retainageContext;
+            $resultadoJson['retainage_current'] = $retainageValues['effective_current_retainage'];
+            $resultadoJson['retainage_accumulated'] = $retainageValues['total_retainage_accumulated'];
 
-      if (!$invoice) {
-         return new JsonResponse(['success' => false, 'error' => 'Invoice not found']);
-      }
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-      try {
-         // 1. OBTENER ACUMULADO ACTUAL
-         $current_reimbursed = (float)$invoice->getRetainageReimbursedAmount();
+            return $this->json($resultadoJson);
+        }
+    }
 
-         // 2. SUMAR LO NUEVO
-         $new_total = $current_reimbursed + $amount_to_add;
+    /**
+     * listarNotes Acción que lista los notes subcontractors.
+     */
+    public function listarNotes(Request $request)
+    {
+        try {
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'date', 'notes'],
+                defaultOrderField: 'date'
+            );
 
-         // 3. ACTUALIZAR FACTURA
-         $invoice->setRetainageReimbursedAmount($new_total);
-         $invoice->setRetainageReimbursed(true);
-         $invoice->setRetainageReimbursedDate(new \DateTime());
+            // filtros
+            $project_id = $request->get('project_id');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
 
-         // 4. GUARDAR HISTORIAL
-         $history = new ReimbursementHistory();
-         $history->setInvoice($invoice);
-         $history->setAmount($amount_to_add);
-         $history->setCreatedAt(new \DateTime());
+            // total + data en una sola llamada a tu servicio
+            $result = '' != $project_id ? $this->projectService->ListarNotes(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $project_id,
+                $fecha_inicial,
+                $fecha_fin
+            ) : ['data' => [], 'total' => 0];
 
-         $em->persist($history);
-         $em->flush();
+            $resultadoJson = [
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
-         return new JsonResponse(['success' => true]);
-      } catch (\Exception $e) {
-         return new JsonResponse(['success' => false, 'error' => $e->getMessage()]);
-      }
-   }
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * salvarNotes Acción que salvar un notes en la BD.
+     */
+    public function salvarNotes(Request $request)
+    {
+        $notes_id = $request->get('notes_id');
+
+        $project_id = $request->get('project_id');
+        $notes = $request->get('notes');
+        $date = $request->get('date');
+
+        try {
+            $resultado = $this->projectService->SalvarNotes($notes_id, $project_id, $notes, $date);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * cargarDatosNotes Acción que carga los datos del notes project en la BD.
+     */
+    public function cargarDatosNotes(Request $request)
+    {
+        $notes_id = $request->get('notes_id');
+
+        try {
+            $resultado = $this->projectService->CargarDatosNotes($notes_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['notes'] = $resultado['notes'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarNotes Acción que elimina un notes en la BD.
+     */
+    public function eliminarNotes(Request $request)
+    {
+        $notes_id = $request->get('notes_id');
+
+        try {
+            $resultado = $this->projectService->EliminarNotes($notes_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarNotesDate Acción que elimina un notes en la BD.
+     */
+    public function eliminarNotesDate(Request $request)
+    {
+        $project_id = $request->get('project_id');
+        $from = $request->get('from');
+        $to = $request->get('to');
+
+        try {
+            $resultado = $this->projectService->EliminarNotesDate($project_id, $from, $to);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarItems Acción que lista los item en la BD.
+     */
+    public function listarItems(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $items = $this->projectService->ListarItemsDeProject($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['items'] = $items;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * obtenerPorcentajeCompletionItem Acción que obtiene el porcentaje de completion de un item.
+     */
+    public function obtenerPorcentajeCompletionItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+
+        try {
+            $porcentaje = $this->projectService->ObtenerPorcentajeCompletionItem($project_item_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['porcentaje_completion'] = $porcentaje;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarHistorialItem Acción que lista el historial de cambios de un item.
+     */
+    public function listarHistorialItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+
+        try {
+            $historial = $this->projectService->ListarHistorialDeItem($project_item_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['historial'] = $historial;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * Sugiere code / contract_name desde project_item existente en el mismo proyecto (mismo item_id de catálogo).
+     */
+    public function sugerirCodeContractItemEnProyecto(Request $request): JsonResponse
+    {
+        $project_id = $request->get('project_id');
+        $item_id = $request->get('item_id');
+
+        try {
+            $resultado = $this->projectService->SugerirCodeContractItemEnProyecto($project_id, $item_id);
+
+            return $this->json($resultado);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+                'code' => '',
+                'contract_name' => '',
+            ]);
+        }
+    }
+
+    /**
+     * eliminarItem Acción que elimina un item en la BD.
+     */
+    public function eliminarItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+
+        try {
+            $resultado = $this->projectService->EliminarItem($project_item_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * agregarItem Acción que agrega un item en la BD.
+     */
+    public function agregarItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+        $project_id = $request->get('project_id');
+        $item_id = $request->get('item_id');
+        $item_name = $request->get('item');
+        $unit_id = $request->get('unit_id');
+        $quantity = $request->get('quantity');
+        $price = $request->get('price');
+        $yield_calculation = $request->get('yield_calculation');
+        $equation_id = $request->get('equation_id');
+        $change_order = $request->get('change_order');
+        // Convertir a booleano correctamente
+        $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
+        $change_order_date = $request->get('change_order_date');
+        $apply_retainage = $request->get('apply_retainage') ?? 0;
+        $apply_retainage = (int) $apply_retainage;
+        if (0 !== $apply_retainage) {
+            $apply_retainage = 1;
+        }
+        $bond = $request->get('bond') ?? false;
+        // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+        if (is_string($bond)) {
+            $bond = 'true' === strtolower($bond) || '1' === $bond;
+        } else {
+            $bond = (bool) $bond;
+        }
+
+        $bonded = $request->get('bonded') ?? false;
+        // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+        if (is_string($bonded)) {
+            $bonded = 'true' === strtolower($bonded) || '1' === $bonded;
+        } else {
+            $bonded = (bool) $bonded;
+        }
+
+        $code = $request->get('code');
+        $contract_name = $request->get('contract_name');
+
+        // Validar que solo usuarios con permiso bond puedan crear items con bond=true
+        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+        if ($g instanceof RedirectResponse) {
+            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+        }
+        $usuario = $g;
+        $usuario_bond = $usuario->getBond() ? true : false;
+        if ($bond && !$usuario_bond) {
+            // Si el usuario intenta crear un item con bond=true pero no tiene permiso, forzar a false
+            $bond = false;
+        }
+
+        // Validar que solo usuarios con permiso bond puedan marcar items como bonded=true
+        if ($bonded && !$usuario_bond) {
+            // Si el usuario intenta marcar un item como bonded=true pero no tiene permiso, forzar a false
+            $bonded = false;
+        }
+
+        $usuario_retainage = $usuario->getRetainage() ? true : false;
+        if ($apply_retainage && !$usuario_retainage) {
+            // Si el usuario intenta marcar apply_retainage pero no tiene permiso, forzar a 0
+            $apply_retainage = 0;
+        }
+
+        try {
+            $resultado = $this->projectService->AgregarItem($project_item_id, $project_id, $item_id, $item_name, $unit_id, $quantity, $price, $yield_calculation, $equation_id, $change_order, $change_order_date, $apply_retainage, $bond, $bonded, $code, $contract_name);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['item'] = $resultado['item'];
+                $resultadoJson['is_new_item'] = $resultado['is_new_item'];
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage().'line '.$e->getLine();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarContact Acción que elimina un contact en la BD.
+     */
+    public function eliminarContact(Request $request)
+    {
+        $contact_id = $request->get('contact_id');
+
+        try {
+            $resultado = $this->projectService->EliminarContact($contact_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarConcreteClass Acción que elimina una concrete class en la BD.
+     */
+    public function eliminarConcreteClass(Request $request)
+    {
+        $concrete_class_id = $request->get('concrete_class_id');
+
+        try {
+            $resultado = $this->projectService->EliminarConcreteClass($concrete_class_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarSubcontractors Acción que lista los subcontractors de un project.
+     */
+    public function listarSubcontractors(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $subcontractors = $this->projectService->ListarSubcontractors($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['subcontractors'] = $subcontractors;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarEmployees Acción que lista los employees de un project.
+     */
+    public function listarEmployees(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $employees = $this->projectService->ListarEmployees($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['employees'] = $employees;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarContacts Acción que lista los contacts de un project.
+     */
+    public function listarContacts(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $contacts = $this->projectService->ListarContactsDeProject($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['contacts'] = $contacts;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarDataTracking Acción que lista el datatracking.
+     */
+    public function listarDataTracking(Request $request)
+    {
+        try {
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'date', 'leads', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
+                defaultOrderField: 'date'
+            );
+
+            // filtros
+            $project_id = $request->get('project_id');
+            $pending = $request->get('pending');
+            $fecha_inicial = $request->get('fechaInicial');
+            $fecha_fin = $request->get('fechaFin');
+            $only_punch = $request->get('only_punch', '');
+
+            // total + data en una sola llamada a tu servicio
+            $result = '' != $project_id ? $this->projectService->ListarDataTrackings(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir'],
+                $project_id,
+                $fecha_inicial,
+                $fecha_fin,
+                $pending,
+                $only_punch
+            ) : ['data' => [], 'total' => 0];
+
+            $resultadoJson = [
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarAjustePrecio Acción que elimina un ajuste de precio en la BD.
+     */
+    public function eliminarAjustePrecio(Request $request)
+    {
+        $id = $request->get('id');
+
+        try {
+            $resultado = $this->projectService->EliminarAjustePrecio($id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * salvarArchivo Accion que salva un archivo en la BD.
+     */
+    public function salvarArchivo(Request $request)
+    {
+        $resultadoJson = [];
+
+        try {
+            $file = $request->files->get('file');
+
+            // Manejar el archivo
+            $dir = 'uploads/project/';
+            $file_name = $this->projectService->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
+
+            if ('' != $file_name) {
+                $resultadoJson['success'] = true;
+                $resultadoJson['message'] = 'The operation was successful';
+
+                $resultadoJson['name'] = $file_name;
+                $resultadoJson['size'] = filesize($dir.$file_name);
+            } else {
+                $resultadoJson['success'] = false;
+                $resultadoJson['error'] = 'Invalid file';
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarArchivo Acción que elimina un archivo en la BD.
+     */
+    public function eliminarArchivo(Request $request)
+    {
+        $archivo = $request->get('archivo');
+
+        try {
+            $resultado = $this->projectService->EliminarArchivo($archivo);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarArchivos Acción que elimina varios archivos en la BD.
+     */
+    public function eliminarArchivos(Request $request)
+    {
+        $archivos = $request->get('archivos');
+
+        try {
+            $resultado = $this->projectService->EliminarArchivos($archivos);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+            } else {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['error'] = $resultado['error'];
+            }
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarItemsCompletion Acción para listar los items completion.
+     */
+    public function listarItemsCompletion(Request $request)
+    {
+        $project_id = $request->get('project_id');
+        $fecha_inicial = $request->get('fechaInicial');
+        $fecha_fin = $request->get('fechaFin');
+
+        try {
+            $items = $this->projectService->ListarItemsCompletion($project_id, $fecha_inicial, $fecha_fin);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['items'] = $items;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarHistorialUnpaidQtyPorProjectItem Lista el historial de cambios de unpaid qty de un project_item (tab Completion).
+     */
+    public function listarHistorialUnpaidQtyPorProjectItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+
+        try {
+            $historial = $this->projectService->ListarHistorialUnpaidQtyPorProjectItem((int) $project_item_id);
+            $resultadoJson['success'] = true;
+            $resultadoJson['historial'] = $historial;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * Historial de cambios de paid_qty en invoice_item_override_payment (tab Completion, columna Paid Qty).
+     */
+    public function listarHistorialPaidQtyOverridePorProjectItem(Request $request)
+    {
+        $project_item_id = $request->get('project_item_id');
+
+        try {
+            $historial = $this->projectService->ListarHistorialPaidQtyOverridePorProjectItem((int) $project_item_id);
+            $resultadoJson['success'] = true;
+            $resultadoJson['historial'] = $historial;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto.
+     */
+    public function listarInvoicesRetainage(Request $request)
+    {
+        $project_id = $request->get('project_id');
+
+        try {
+            $invoices = $this->projectService->ListarInvoicesConRetainage($project_id);
+
+            $resultadoJson['success'] = true;
+            $resultadoJson['invoices'] = $invoices;
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * Actualizar los Item con Retainage.
+     */
+    public function bulkRetainageUpdate(Request $request)
+    {
+        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+        if ($g instanceof RedirectResponse) {
+            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+        }
+        $usuario = $g;
+        $usuario_retainage = $usuario->getRetainage() ? true : false;
+        if (!$usuario_retainage) {
+            return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
+        }
+
+        $ids = $request->get('ids');
+        $status = $request->get('status');
+
+        if (empty($ids)) {
+            $content = $request->getContent();
+            if (!empty($content)) {
+                $data = json_decode($content, true);
+                if (is_array($data)) {
+                    $ids = $data['ids'] ?? [];
+                    $status = $data['status'] ?? null;
+                }
+            }
+        }
+
+        // 3. Validación final
+        if (empty($ids) || !is_array($ids)) {
+            return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
+        }
+
+        try {
+            $this->projectService->ActualizarRetainageItems($ids, $status);
+
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Actualizar los Item con Bonded.
+     */
+    public function bulkBondedUpdate(Request $request)
+    {
+        // Validar que solo usuarios con permiso bond puedan actualizar bonded
+        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+        if ($g instanceof RedirectResponse) {
+            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+        }
+        $usuario = $g;
+        $usuario_bond = $usuario->getBond() ? true : false;
+        if (!$usuario_bond) {
+            return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);
+        }
+
+        $ids = $request->get('ids');
+        $status = $request->get('status');
+
+        if (empty($ids)) {
+            $content = $request->getContent();
+            if (!empty($content)) {
+                $data = json_decode($content, true);
+                if (is_array($data)) {
+                    $ids = $data['ids'] ?? [];
+                    $status = $data['status'] ?? null;
+                }
+            }
+        }
+
+        // 3. Validación final
+        if (empty($ids) || !is_array($ids)) {
+            return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
+        }
+
+        try {
+            $this->projectService->ActualizarBonedItems($ids, $status);
+
+            return $this->json(['success' => true]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * @param ManagerRegistry $doctrine <-- Inyectamos Doctrine aquí
+     */
+    public function getReimbursementHistory(Request $request, ManagerRegistry $doctrine): JsonResponse
+    {
+        $id = $request->request->get('invoice_id');
+
+        // IMPORTANTE: 'invoiceId' es el nombre de la propiedad en tu clase Invoice.php
+        $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $id]);
+
+        if (!$invoice) {
+            return new JsonResponse(['success' => false, 'error' => 'Invoice #'.$id.' not found']);
+        }
+
+        $historyData = [];
+        foreach ($invoice->getReimbursementHistories() as $h) {
+            $historyData[] = [
+                'date' => $h->getCreatedAt()->format('m/d/Y h:i A'),
+                'amount' => (float) $h->getAmount(),
+            ];
+        }
+
+        return new JsonResponse(['success' => true, 'history' => $historyData]);
+    }
+
+    /**
+     * saveReimbursement: Guarda un nuevo reembolso sumándolo al anterior.
+     */
+    public function saveReimbursement(Request $request, ManagerRegistry $doctrine): JsonResponse
+    {
+        $em = $doctrine->getManager();
+        $invoice_id = $request->request->get('invoice_id');
+        $amount_to_add = (float) $request->request->get('amount');
+
+        if ($amount_to_add <= 0) {
+            return new JsonResponse(['success' => false, 'error' => 'Amount must be greater than 0']);
+        }
+
+        $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $invoice_id]);
+
+        if (!$invoice) {
+            return new JsonResponse(['success' => false, 'error' => 'Invoice not found']);
+        }
+
+        try {
+            // 1. OBTENER ACUMULADO ACTUAL
+            $current_reimbursed = (float) $invoice->getRetainageReimbursedAmount();
+
+            // 2. SUMAR LO NUEVO
+            $new_total = $current_reimbursed + $amount_to_add;
+
+            // 3. ACTUALIZAR FACTURA
+            $invoice->setRetainageReimbursedAmount($new_total);
+            $invoice->setRetainageReimbursed(true);
+            $invoice->setRetainageReimbursedDate(new \DateTime());
+
+            // 4. GUARDAR HISTORIAL
+            $history = new ReimbursementHistory();
+            $history->setInvoice($invoice);
+            $history->setAmount($amount_to_add);
+            $history->setCreatedAt(new \DateTime());
+
+            $em->persist($history);
+            $em->flush();
+
+            return new JsonResponse(['success' => true]);
+        } catch (\Exception $e) {
+            return new JsonResponse(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
 }

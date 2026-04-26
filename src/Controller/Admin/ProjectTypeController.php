@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ProjectTypeService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\ProjectTypeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,14 +27,13 @@ class ProjectTypeController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/project-type/index.html.twig', array(
+        return $this->render('admin/project-type/index.html.twig', [
             'permiso' => $permiso[0],
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -57,14 +55,13 @@ class ProjectTypeController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -74,37 +71,33 @@ class ProjectTypeController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar types en la BD
-     *
+     * salvar Acción para agregar types en la BD.
      */
     public function salvar(Request $request)
     {
         $type_id = $request->get('type_id');
-        
+
         $description = $request->get('description');
         $status = $request->get('status');
 
         try {
-
-            if ($type_id === "") {
+            if ('' === $type_id) {
                 $resultado = $this->projectTypeService->SalvarType($description, $status);
             } else {
                 $resultado = $this->projectTypeService->ActualizarType($type_id, $description, $status);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['type_id'] = $resultado['type_id'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -114,8 +107,7 @@ class ProjectTypeController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un type en la BD
-     *
+     * eliminar Acción que elimina un type en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -125,13 +117,14 @@ class ProjectTypeController extends AbstractAdminController
             $resultado = $this->projectTypeService->EliminarType($type_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -141,8 +134,7 @@ class ProjectTypeController extends AbstractAdminController
     }
 
     /**
-     * eliminarTypes Acción que elimina los types seleccionados en la BD
-     *
+     * eliminarTypes Acción que elimina los types seleccionados en la BD.
      */
     public function eliminarTypes(Request $request)
     {
@@ -152,26 +144,24 @@ class ProjectTypeController extends AbstractAdminController
             $resultado = $this->projectTypeService->EliminarTypes($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del type en la BD
-     *
+     * cargarDatos Acción que carga los datos del type en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -180,17 +170,15 @@ class ProjectTypeController extends AbstractAdminController
         try {
             $resultado = $this->projectTypeService->CargarDatosType($type_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['type'] = $resultado['type'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

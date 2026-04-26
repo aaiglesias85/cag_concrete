@@ -17,10 +17,6 @@ class MessageConversationRepository extends ServiceEntityRepository
     /**
      * Buscar o crear la conversación entre dos usuarios.
      * user1_id debe ser el menor y user2_id el mayor para unicidad.
-     *
-     * @param int $userIdA
-     * @param int $userIdB
-     * @return MessageConversation|null
      */
     public function BuscarConversacionEntreUsuarios(int $userIdA, int $userIdB): ?MessageConversation
     {
@@ -44,12 +40,13 @@ class MessageConversationRepository extends ServiceEntityRepository
      * Orden: última actividad (updated_at) descendente.
      *
      * @param Usuario $user Usuario autenticado
+     *
      * @return MessageConversation[]
      */
     public function ListarConversacionesDeUsuario(Usuario $user): array
     {
         $userId = $user->getUsuarioId();
-        if ($userId === null) {
+        if (null === $userId) {
             return [];
         }
 
@@ -63,13 +60,9 @@ class MessageConversationRepository extends ServiceEntityRepository
 
     /**
      * Comprueba si existe una conversación entre dos usuarios.
-     *
-     * @param int $userIdA
-     * @param int $userIdB
-     * @return bool
      */
     public function ExisteConversacionEntre(int $userIdA, int $userIdB): bool
     {
-        return $this->BuscarConversacionEntreUsuarios($userIdA, $userIdB) !== null;
+        return null !== $this->BuscarConversacionEntreUsuarios($userIdA, $userIdB);
     }
 }

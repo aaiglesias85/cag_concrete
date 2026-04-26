@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ConcreteVendorService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\ConcreteVendorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class ConcreteVendorController extends AbstractAdminController
 {
-
     private $concreteVendorService;
 
     public function __construct(AdminAccessService $adminAccess, ConcreteVendorService $concreteVendorService)
@@ -29,14 +27,13 @@ class ConcreteVendorController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/concrete-vendor/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/concrete-vendor/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los companies
-     *
+     * listar Acción que lista los companies.
      */
     public function listar(Request $request)
     {
@@ -58,14 +55,13 @@ class ConcreteVendorController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -75,8 +71,7 @@ class ConcreteVendorController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un conc vendor en la BD
-     *
+     * salvar Acción que inserta un conc vendor en la BD.
      */
     public function salvar(Request $request)
     {
@@ -93,26 +88,23 @@ class ConcreteVendorController extends AbstractAdminController
         $contacts = json_decode($contacts);
 
         try {
-
-            if ($vendor_id == "") {
+            if ('' == $vendor_id) {
                 $resultado = $this->concreteVendorService->SalvarVendor($name, $phone, $address, $contactName, $contactEmail, $contacts);
             } else {
                 $resultado = $this->concreteVendorService->ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail, $contacts);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['vendor_id'] = $resultado['vendor_id'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -122,8 +114,7 @@ class ConcreteVendorController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un subcontractor en la BD
-     *
+     * eliminar Acción que elimina un subcontractor en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -133,26 +124,24 @@ class ConcreteVendorController extends AbstractAdminController
             $resultado = $this->concreteVendorService->EliminarVendor($vendor_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarVendors Acción que elimina los companies seleccionados en la BD
-     *
+     * eliminarVendors Acción que elimina los companies seleccionados en la BD.
      */
     public function eliminarVendors(Request $request)
     {
@@ -162,26 +151,24 @@ class ConcreteVendorController extends AbstractAdminController
             $resultado = $this->concreteVendorService->EliminarVendors($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del subcontractor en la BD
-     *
+     * cargarDatos Acción que carga los datos del subcontractor en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -190,44 +177,37 @@ class ConcreteVendorController extends AbstractAdminController
         try {
             $resultado = $this->concreteVendorService->CargarDatosVendor($vendor_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['vendor'] = $resultado['vendor'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * listarContacts Acción que lista los contacts de un concrete vendor
-     *
+     * listarContacts Acción que lista los contacts de un concrete vendor.
      */
     public function listarContacts(Request $request)
     {
-
         $vendor_id = $request->get('vendor_id');
 
         try {
-
             $contacts = $this->concreteVendorService->ListarContactsDeConcreteVendor($vendor_id);
 
             $resultadoJson['success'] = true;
             $resultadoJson['contacts'] = $contacts;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -237,8 +217,7 @@ class ConcreteVendorController extends AbstractAdminController
     }
 
     /**
-     * eliminarContact Acción que elimina un contact en la BD
-     *
+     * eliminarContact Acción que elimina un contact en la BD.
      */
     public function eliminarContact(Request $request)
     {
@@ -248,8 +227,7 @@ class ConcreteVendorController extends AbstractAdminController
             $resultado = $this->concreteVendorService->EliminarContact($contact_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
+                $resultadoJson['message'] = 'The operation was successful';
             } else {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['error'] = $resultado['error'];
@@ -262,6 +240,5 @@ class ConcreteVendorController extends AbstractAdminController
 
             return $this->json($resultadoJson);
         }
-
     }
 }

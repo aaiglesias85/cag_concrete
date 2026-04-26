@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\NotificationService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\NotificationService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class NotificationController extends AbstractAdminController
 {
-
     private $notificationService;
 
     public function __construct(AdminAccessService $adminAccess, NotificationService $notificationService)
@@ -29,14 +27,13 @@ class NotificationController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/notification/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/notification/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los usuarios
-     *
+     * listar Acción que lista los usuarios.
      */
     public function listar(Request $request)
     {
@@ -50,7 +47,7 @@ class NotificationController extends AbstractAdminController
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'createdAt', 'usuario', 'content', 'readed' ],
+                allowedOrderFields: ['id', 'createdAt', 'usuario', 'content', 'readed'],
                 defaultOrderField: 'createdAt'
             );
 
@@ -75,14 +72,13 @@ class NotificationController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -92,8 +88,7 @@ class NotificationController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un notification en la BD
-     *
+     * eliminar Acción que elimina un notification en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -103,13 +98,14 @@ class NotificationController extends AbstractAdminController
             $resultado = $this->notificationService->EliminarNotification($notification_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -119,8 +115,7 @@ class NotificationController extends AbstractAdminController
     }
 
     /**
-     * eliminarNotifications Acción que elimina los notificationes seleccionados en la BD
-     *
+     * eliminarNotifications Acción que elimina los notificationes seleccionados en la BD.
      */
     public function eliminarNotifications(Request $request)
     {
@@ -130,26 +125,24 @@ class NotificationController extends AbstractAdminController
             $resultado = $this->notificationService->EliminarNotifications($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
-
     /**
-     * leer Acción para leer las notificaciones
-     *
+     * leer Acción para leer las notificaciones.
      */
     public function leer(Request $request)
     {
@@ -157,20 +150,19 @@ class NotificationController extends AbstractAdminController
             $resultado = $this->notificationService->LeerNotificaciones();
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
-
 }

@@ -9,14 +9,14 @@ use App\Utils\Base;
 class EstimateNoteItemService extends Base
 {
     /**
-     * CargarDatos: Carga los datos de un estimate note item
+     * CargarDatos: Carga los datos de un estimate note item.
      */
     public function CargarDatos($id): array
     {
         $resultado = [];
 
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
-        if ($entity !== null) {
+        if (null !== $entity) {
             $resultado['success'] = true;
             $resultado['item'] = [
                 'description' => $entity->getDescription(),
@@ -28,19 +28,20 @@ class EstimateNoteItemService extends Base
     }
 
     /**
-     * Eliminar: Elimina un estimate note item en la BD
+     * Eliminar: Elimina un estimate note item en la BD.
      */
     public function Eliminar($id): array
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
 
-        if ($entity !== null) {
+        if (null !== $entity) {
             $description = $entity->getDescription();
             $em->remove($entity);
             $em->flush();
 
             $this->SalvarLog('Delete', 'Estimate Note Item', "The estimate note item is deleted: $description");
+
             return ['success' => true];
         }
 
@@ -48,7 +49,7 @@ class EstimateNoteItemService extends Base
     }
 
     /**
-     * EliminarVarios: Elimina los estimate note items seleccionados
+     * EliminarVarios: Elimina los estimate note items seleccionados.
      */
     public function EliminarVarios($ids): array
     {
@@ -56,37 +57,38 @@ class EstimateNoteItemService extends Base
         $cant_eliminada = 0;
         $cant_total = 0;
 
-        if ($ids !== '') {
+        if ('' !== $ids) {
             $ids = explode(',', $ids);
             foreach ($ids as $id) {
                 $id = trim($id);
-                if ($id === '') {
+                if ('' === $id) {
                     continue;
                 }
-                $cant_total++;
+                ++$cant_total;
                 $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
-                if ($entity !== null) {
+                if (null !== $entity) {
                     $description = $entity->getDescription();
                     $em->remove($entity);
-                    $cant_eliminada++;
+                    ++$cant_eliminada;
                     $this->SalvarLog('Delete', 'Estimate Note Item', "The estimate note item is deleted: $description");
                 }
             }
             $em->flush();
         }
 
-        if ($cant_eliminada === 0) {
+        if (0 === $cant_eliminada) {
             return ['success' => false, 'error' => 'No records could be deleted.'];
         }
 
         $message = $cant_eliminada === $cant_total
             ? 'The operation was successful'
             : "The operation was successful. $cant_eliminada of $cant_total record(s) were deleted.";
+
         return ['success' => true, 'message' => $message];
     }
 
     /**
-     * Actualizar: Actualiza los datos del estimate note item en la BD
+     * Actualizar: Actualiza los datos del estimate note item en la BD.
      */
     public function Actualizar($id, $description, $type = 'item'): array
     {
@@ -94,12 +96,13 @@ class EstimateNoteItemService extends Base
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
 
-        if ($entity !== null) {
+        if (null !== $entity) {
             $entity->setDescription($description);
             $entity->setType($type);
             $em->flush();
 
             $this->SalvarLog('Update', 'Estimate Note Item', "The estimate note item is modified: $description");
+
             return ['success' => true, 'id' => $entity->getId()];
         }
 
@@ -107,7 +110,8 @@ class EstimateNoteItemService extends Base
     }
 
     /**
-     * Salvar: Guarda un nuevo estimate note item en la BD
+     * Salvar: Guarda un nuevo estimate note item en la BD.
+     *
      * @param string $type 'item' o 'template'; si se omite o está vacío se usa 'item' (ej. creación desde modal de ítem)
      */
     public function Salvar($description, $type = 'item'): array
@@ -122,17 +126,19 @@ class EstimateNoteItemService extends Base
         $em->flush();
 
         $this->SalvarLog('Add', 'Estimate Note Item', "The estimate note item is added: $description");
+
         return ['success' => true, 'id' => $entity->getId()];
     }
 
     private function normalizeType(?string $type): string
     {
-        $type = $type === null || $type === '' ? 'item' : strtolower(trim($type));
+        $type = null === $type || '' === $type ? 'item' : strtolower(trim($type));
+
         return in_array($type, ['item', 'template'], true) ? $type : 'item';
     }
 
     /**
-     * ListarItems: Lista los estimate note items con paginación
+     * ListarItems: Lista los estimate note items con paginación.
      */
     public function ListarItems($start, $limit, $sSearch, $orderField, $orderDir): array
     {

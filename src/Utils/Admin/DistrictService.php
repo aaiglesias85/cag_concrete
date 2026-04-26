@@ -12,270 +12,274 @@ use App\Utils\Base;
 
 class DistrictService extends Base
 {
+    /**
+     * CargarDatosDistrict: Carga los datos de un district.
+     *
+     * @param int $district_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosDistrict($district_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
 
-   /**
-    * CargarDatosDistrict: Carga los datos de un district
-    *
-    * @param int $district_id Id
-    *
-    * @author Marcel
-    */
-   public function CargarDatosDistrict($district_id)
-   {
-      $resultado = array();
-      $arreglo_resultado = array();
+        $entity = $this->getDoctrine()->getRepository(District::class)
+           ->find($district_id);
+        /** @var District $entity */
+        if (null != $entity) {
+            $arreglo_resultado['description'] = $entity->getDescription();
+            $arreglo_resultado['status'] = $entity->getStatus();
 
-      $entity = $this->getDoctrine()->getRepository(District::class)
-         ->find($district_id);
-      /** @var District $entity */
-      if ($entity != null) {
+            $resultado['success'] = true;
+            $resultado['district'] = $arreglo_resultado;
+        }
 
-         $arreglo_resultado['description'] = $entity->getDescription();
-         $arreglo_resultado['status'] = $entity->getStatus();
+        return $resultado;
+    }
 
-         $resultado['success'] = true;
-         $resultado['district'] = $arreglo_resultado;
-      }
+    /**
+     * EliminarDistrict: Elimina un district en la BD.
+     *
+     * @param int $district_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarDistrict($district_id)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-      return $resultado;
-   }
+        $entity = $this->getDoctrine()->getRepository(District::class)
+           ->find($district_id);
+        /** @var District $entity */
+        if (null != $entity) {
+            // verificar si se puede eliminar
+            $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
+            if ('' != $se_puede_eliminar) {
+                $resultado['success'] = false;
+                $resultado['error'] = $se_puede_eliminar;
 
-   /**
-    * EliminarDistrict: Elimina un district en la BD
-    * @param int $district_id Id
-    * @author Marcel
-    */
-   public function EliminarDistrict($district_id)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(District::class)
-         ->find($district_id);
-      /**@var District $entity */
-      if ($entity != null) {
-
-         // verificar si se puede eliminar
-         $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
-         if ($se_puede_eliminar != '') {
-            $resultado['success'] = false;
-            $resultado['error'] = $se_puede_eliminar;
-            return $resultado;
-         }
-
-         $district_descripcion = $entity->getDescription();
-
-
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "District";
-         $log_descripcion = "The district is deleted: $district_descripcion";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * EliminarDistricts: Elimina los districts seleccionados en la BD
-    * @param int $ids Ids
-    * @author Marcel
-    */
-   public function EliminarDistricts($ids)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      if ($ids != "") {
-         $ids = explode(',', $ids);
-         $cant_eliminada = 0;
-         $cant_total = 0;
-         foreach ($ids as $district_id) {
-            if ($district_id != "") {
-               $cant_total++;
-               $entity = $this->getDoctrine()->getRepository(District::class)
-                  ->find($district_id);
-               /** @var District $entity */
-               if ($entity != null) {
-
-                  // verificar si se puede eliminar
-                  $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
-                  if ($se_puede_eliminar === '') {
-                     $district_descripcion = $entity->getDescription();
-
-                     $em->remove($entity);
-                     $cant_eliminada++;
-
-                     //Salvar log
-                     $log_operacion = "Delete";
-                     $log_categoria = "District";
-                     $log_descripcion = "The district is deleted: $district_descripcion";
-                     $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-                  }
-               }
+                return $resultado;
             }
-         }
-      }
-      $em->flush();
 
-      if ($cant_eliminada == 0) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The districts could not be deleted, because they are associated with a project estimates";
-      } else {
-         $resultado['success'] = true;
+            $district_descripcion = $entity->getDescription();
 
-         $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected districts because they are associated with a project estimates";
-         $resultado['message'] = $mensaje;
-      }
+            $em->remove($entity);
+            $em->flush();
 
-      return $resultado;
-   }
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'District';
+            $log_descripcion = "The district is deleted: $district_descripcion";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-   /**
-    * SePuedeEliminarDistrict
-    * @param $district_id
-    * @return string
-    */
-   private function SePuedeEliminarDistrict($district_id)
-   {
-      $texto_error = '';
-
-      // countys
-      /** @var CountyRepository $countyRepo */
-      $countyRepo = $this->getDoctrine()->getRepository(County::class);
-      $countys = $countyRepo->ListarCountysDeDistrict($district_id);
-      if (count($countys) > 0) {
-         $texto_error = "The district could not be deleted because it is related to one or more districts.";
-      }
-
-      // estimates
-      /** @var EstimateRepository $estimateRepo */
-      $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
-      $estimates = $estimateRepo->ListarEstimatesDeDistrict($district_id);
-      if (count($estimates) > 0) {
-         $texto_error = "The district could not be deleted because it is related to one or more project estimates.";
-      }
-
-      return $texto_error;
-   }
-
-   /**
-    * ActualizarDistrict: Actuializa los datos del rol en la BD
-    * @param int $district_id Id
-    * @author Marcel
-    */
-   public function ActualizarDistrict($district_id, $description, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(District::class)
-         ->find($district_id);
-      /** @var District $entity */
-      if ($entity != null) {
-
-         //Verificar name
-         $district = $this->getDoctrine()->getRepository(District::class)
-            ->findOneBy(['description' => $description]);
-         if ($district != null && $entity->getDistrictId() != $district->getDistrictId()) {
+            $resultado['success'] = true;
+        } else {
             $resultado['success'] = false;
-            $resultado['error'] = "The district name is in use, please try entering another one.";
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarDistricts: Elimina los districts seleccionados en la BD.
+     *
+     * @param int $ids Ids
+     *
+     * @author Marcel
+     */
+    public function EliminarDistricts($ids)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ('' != $ids) {
+            $ids = explode(',', $ids);
+            $cant_eliminada = 0;
+            $cant_total = 0;
+            foreach ($ids as $district_id) {
+                if ('' != $district_id) {
+                    ++$cant_total;
+                    $entity = $this->getDoctrine()->getRepository(District::class)
+                       ->find($district_id);
+                    /** @var District $entity */
+                    if (null != $entity) {
+                        // verificar si se puede eliminar
+                        $se_puede_eliminar = $this->SePuedeEliminarDistrict($district_id);
+                        if ('' === $se_puede_eliminar) {
+                            $district_descripcion = $entity->getDescription();
+
+                            $em->remove($entity);
+                            ++$cant_eliminada;
+
+                            // Salvar log
+                            $log_operacion = 'Delete';
+                            $log_categoria = 'District';
+                            $log_descripcion = "The district is deleted: $district_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
+                    }
+                }
+            }
+        }
+        $em->flush();
+
+        if (0 == $cant_eliminada) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The districts could not be deleted, because they are associated with a project estimates';
+        } else {
+            $resultado['success'] = true;
+
+            $mensaje = ($cant_eliminada == $cant_total) ? 'The operation was successful' : 'The operation was successful. But attention, it was not possible to delete all the selected districts because they are associated with a project estimates';
+            $resultado['message'] = $mensaje;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * SePuedeEliminarDistrict.
+     *
+     * @return string
+     */
+    private function SePuedeEliminarDistrict($district_id)
+    {
+        $texto_error = '';
+
+        // countys
+        /** @var CountyRepository $countyRepo */
+        $countyRepo = $this->getDoctrine()->getRepository(County::class);
+        $countys = $countyRepo->ListarCountysDeDistrict($district_id);
+        if (count($countys) > 0) {
+            $texto_error = 'The district could not be deleted because it is related to one or more districts.';
+        }
+
+        // estimates
+        /** @var EstimateRepository $estimateRepo */
+        $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+        $estimates = $estimateRepo->ListarEstimatesDeDistrict($district_id);
+        if (count($estimates) > 0) {
+            $texto_error = 'The district could not be deleted because it is related to one or more project estimates.';
+        }
+
+        return $texto_error;
+    }
+
+    /**
+     * ActualizarDistrict: Actuializa los datos del rol en la BD.
+     *
+     * @param int $district_id Id
+     *
+     * @author Marcel
+     */
+    public function ActualizarDistrict($district_id, $description, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(District::class)
+           ->find($district_id);
+        /** @var District $entity */
+        if (null != $entity) {
+            // Verificar name
+            $district = $this->getDoctrine()->getRepository(District::class)
+               ->findOneBy(['description' => $description]);
+            if (null != $district && $entity->getDistrictId() != $district->getDistrictId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The district name is in use, please try entering another one.';
+
+                return $resultado;
+            }
+
+            $entity->setDescription($description);
+            $entity->setStatus($status);
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Update';
+            $log_categoria = 'District';
+            $log_descripcion = "The district is modified: $description";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['district_id'] = $entity->getDistrictId();
+
             return $resultado;
-         }
+        }
+    }
 
-         $entity->setDescription($description);
-         $entity->setStatus($status);
+    /**
+     * SalvarDistrict: Guarda los datos de district en la BD.
+     *
+     * @param string $description Nombre
+     *
+     * @author Marcel
+     */
+    public function SalvarDistrict($description, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-         $em->flush();
+        // Verificar name
+        $district = $this->getDoctrine()->getRepository(District::class)
+           ->findOneBy(['description' => $description]);
+        if (null != $district) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The district name is in use, please try entering another one.';
 
-         //Salvar log
-         $log_operacion = "Update";
-         $log_categoria = "District";
-         $log_descripcion = "The district is modified: $description";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+            return $resultado;
+        }
 
-         $resultado['success'] = true;
-         $resultado['district_id'] = $entity->getDistrictId();
+        $entity = new District();
 
-         return $resultado;
-      }
-   }
+        $entity->setDescription($description);
+        $entity->setStatus($status);
 
-   /**
-    * SalvarDistrict: Guarda los datos de district en la BD
-    * @param string $description Nombre
-    * @author Marcel
-    */
-   public function SalvarDistrict($description, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
+        $em->persist($entity);
 
-      //Verificar name
-      $district = $this->getDoctrine()->getRepository(District::class)
-         ->findOneBy(['description' => $description]);
-      if ($district != null) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The district name is in use, please try entering another one.";
-         return $resultado;
-      }
+        $em->flush();
 
-      $entity = new District();
+        // Salvar log
+        $log_operacion = 'Add';
+        $log_categoria = 'District';
+        $log_descripcion = "The district is added: $description";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-      $entity->setDescription($description);
-      $entity->setStatus($status);
+        $resultado['success'] = true;
+        $resultado['district_id'] = $entity->getDistrictId();
 
-      $em->persist($entity);
+        return $resultado;
+    }
 
-      $em->flush();
+    /**
+     * ListarDistricts: Listar los districts.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    {
+        /** @var DistrictRepository $districtRepo */
+        $districtRepo = $this->getDoctrine()->getRepository(District::class);
+        $resultado = $districtRepo->ListarDistrictsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-      //Salvar log
-      $log_operacion = "Add";
-      $log_categoria = "District";
-      $log_descripcion = "The district is added: $description";
-      $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+        $data = [];
 
-      $resultado['success'] = true;
-      $resultado['district_id'] = $entity->getDistrictId();
+        foreach ($resultado['data'] as $value) {
+            $district_id = $value->getDistrictId();
 
-      return $resultado;
-   }
+            $data[] = [
+                'id' => $district_id,
+                'description' => $value->getDescription(),
+                'status' => $value->getStatus() ? 1 : 0,
+            ];
+        }
 
-
-   /**
-    * ListarDistricts: Listar los districts
-    *
-    * @param int $start Inicio
-    * @param int $limit Limite
-    * @param string $sSearch Para buscar
-    *
-    * @author Marcel
-    */
-   public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-   {
-      /** @var DistrictRepository $districtRepo */
-      $districtRepo = $this->getDoctrine()->getRepository(District::class);
-      $resultado = $districtRepo->ListarDistrictsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
-
-      $data = [];
-
-      foreach ($resultado['data'] as $value) {
-         $district_id = $value->getDistrictId();
-
-         $data[] = array(
-            "id" => $district_id,
-            "description" => $value->getDescription(),
-            "status" => $value->getStatus() ? 1 : 0,
-         );
-      }
-
-      return [
-         'data' => $data,
-         'total' => $resultado['total'], // ya viene con el filtro aplicado
-      ];
-   }
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
 }

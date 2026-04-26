@@ -14,33 +14,34 @@ class PlanDownloadingRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista los planes ordenados
+     * ListarOrdenados: Lista los planes ordenados.
      *
      * @return PlanDownloading[]
      */
-    public function ListarOrdenados($sSearch = "", $status = "")
+    public function ListarOrdenados($sSearch = '', $status = '')
     {
         $consulta = $this->createQueryBuilder('p_d');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($status !== "") {
+        if ('' !== $status) {
             $consulta->andWhere('p_d.status = :status')
                 ->setParameter('status', $status);
         }
 
-        $consulta->orderBy('p_d.description', "ASC");
+        $consulta->orderBy('p_d.description', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarPlans: Lista los plans
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarPlans: Lista los plans.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return PlanDownloading[]
@@ -49,7 +50,7 @@ class PlanDownloadingRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('p_d');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -65,7 +66,8 @@ class PlanDownloadingRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalPlans: Total de plans de la BD
+     * TotalPlans: Total de plans de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -75,29 +77,29 @@ class PlanDownloadingRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('p_d')
             ->select('COUNT(p_d.planDownloadingId)');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarPlansConTotal Lista los plans con total
+     * ListarPlansConTotal Lista los plans con total.
      *
      * @return []
      */
-    public function ListarPlansConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarPlansConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'planDownloadingId'  => 'p_d.planDownloadingId',
+            'planDownloadingId' => 'p_d.planDownloadingId',
             'description' => 'p_d.description',
             'status' => 'p_d.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'p_d.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('p_d');
@@ -123,10 +125,8 @@ class PlanDownloadingRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
-
 }

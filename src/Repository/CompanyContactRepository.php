@@ -12,8 +12,9 @@ class CompanyContactRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, CompanyContact::class);
     }
+
     /**
-     * ListarContacts: Lista los contacts
+     * ListarContacts: Lista los contacts.
      *
      * @return CompanyContact[]
      */
@@ -31,6 +32,4 @@ class CompanyContactRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-
 }

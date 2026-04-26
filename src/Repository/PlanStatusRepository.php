@@ -14,33 +14,34 @@ class PlanStatusRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista los types ordenados
+     * ListarOrdenados: Lista los types ordenados.
      *
      * @return PlanStatus[]
      */
-    public function ListarOrdenados($sSearch = "", $status = "")
+    public function ListarOrdenados($sSearch = '', $status = '')
     {
         $consulta = $this->createQueryBuilder('p_s');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($status !== "") {
+        if ('' !== $status) {
             $consulta->andWhere('p_s.status = :status')
                 ->setParameter('status', $status);
         }
 
-        $consulta->orderBy('p_s.description', "ASC");
+        $consulta->orderBy('p_s.description', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarStatus: Lista los status
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarStatus: Lista los status.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return PlanStatus[]
@@ -49,7 +50,7 @@ class PlanStatusRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('p_s');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -65,7 +66,8 @@ class PlanStatusRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalStatus: Total de status de la BD
+     * TotalStatus: Total de status de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -75,29 +77,29 @@ class PlanStatusRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('p_s')
             ->select('COUNT(p_s.statusId)');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarStatusConTotal Lista los status con total
+     * ListarStatusConTotal Lista los status con total.
      *
      * @return []
      */
-    public function ListarStatusConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarStatusConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'statusId'  => 'p_s.statusId',
+            'statusId' => 'p_s.statusId',
             'description' => 'p_s.description',
             'status' => 'p_s.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'p_s.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('p_s');
@@ -123,10 +125,8 @@ class PlanStatusRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
-
 }

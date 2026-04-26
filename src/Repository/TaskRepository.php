@@ -14,8 +14,9 @@ class TaskRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array{data: Task[], total: int}
      * @param int|null $onlyAssignedToUserId if set, only tasks with assignee with this user id
+     *
+     * @return array{data: Task[], total: int}
      */
     public function ListarTasksConTotal(
         int $start,
@@ -38,50 +39,50 @@ class TaskRepository extends ServiceEntityRepository
             'assigned' => 'u.nombre',
         ];
         $orderBy = $sortable[$sortField] ?? 't.dueDate';
-        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
 
         $baseQb = $this->createQueryBuilder('t')
             ->leftJoin('t.assignedUser', 'u');
 
-        if ($sSearch !== null && $sSearch !== '') {
+        if (null !== $sSearch && '' !== $sSearch) {
             $baseQb->andWhere('t.description LIKE :search OR u.nombre LIKE :search OR u.apellidos LIKE :search OR u.email LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($fecha_inicial !== null && $fecha_inicial !== '') {
+        if (null !== $fecha_inicial && '' !== $fecha_inicial) {
             $fi = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
-            if ($fi !== false) {
+            if (false !== $fi) {
                 $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate >= :fecha_inicial')
                     ->setParameter('fecha_inicial', $fi->format('Y-m-d'));
             }
         }
 
-        if ($fecha_fin !== null && $fecha_fin !== '') {
+        if (null !== $fecha_fin && '' !== $fecha_fin) {
             $ff = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
-            if ($ff !== false) {
+            if (false !== $ff) {
                 $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate <= :fecha_final')
                     ->setParameter('fecha_final', $ff->format('Y-m-d'));
             }
         }
 
-        if ($statusFiltro !== null && $statusFiltro !== '') {
+        if (null !== $statusFiltro && '' !== $statusFiltro) {
             $baseQb->andWhere('t.status = :st')
                 ->setParameter('st', $statusFiltro);
         }
 
-        if ($usuarioFiltro !== null && $usuarioFiltro !== '') {
+        if (null !== $usuarioFiltro && '' !== $usuarioFiltro) {
             $baseQb->andWhere('u.usuarioId = :uid')
                 ->setParameter('uid', (int) $usuarioFiltro);
         }
 
-        if ($onlyAssignedToUserId !== null) {
+        if (null !== $onlyAssignedToUserId) {
             $baseQb->andWhere('u.usuarioId = :onlyUid')
                 ->setParameter('onlyUid', (int) $onlyAssignedToUserId);
         }
 
         $dataQb = clone $baseQb;
         $dataQb->orderBy($orderBy, $dir);
-        if ($sortField === 'assigned') {
+        if ('assigned' === $sortField) {
             $dataQb->addOrderBy('u.apellidos', $dir);
         }
         $dataQb->setFirstResult($start);

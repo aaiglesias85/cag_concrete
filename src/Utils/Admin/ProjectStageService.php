@@ -3,7 +3,6 @@
 namespace App\Utils\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\Estimate;
 use App\Entity\ProjectStage;
 use App\Repository\EstimateRepository;
@@ -12,286 +11,295 @@ use App\Utils\Base;
 
 class ProjectStageService extends Base
 {
-   /**
-    * CargarDatosStage: Carga los datos de un stage
-    *
-    * @param int $stage_id Id
-    *
-    * @author Marcel
-    */
-   public function CargarDatosStage($stage_id)
-   {
-      $resultado = array();
-      $arreglo_resultado = array();
+    /**
+     * CargarDatosStage: Carga los datos de un stage.
+     *
+     * @param int $stage_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosStage($stage_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
 
-      $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
-         ->find($stage_id);
-      /** @var ProjectStage $entity */
-      if ($entity != null) {
+        $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
+           ->find($stage_id);
+        /** @var ProjectStage $entity */
+        if (null != $entity) {
+            $arreglo_resultado['description'] = $entity->getDescription();
+            $arreglo_resultado['color'] = $entity->getColor();
+            $arreglo_resultado['status'] = $entity->getStatus();
 
-         $arreglo_resultado['description'] = $entity->getDescription();
-         $arreglo_resultado['color'] = $entity->getColor();
-         $arreglo_resultado['status'] = $entity->getStatus();
+            $resultado['success'] = true;
+            $resultado['stage'] = $arreglo_resultado;
+        }
 
-         $resultado['success'] = true;
-         $resultado['stage'] = $arreglo_resultado;
-      }
+        return $resultado;
+    }
 
-      return $resultado;
-   }
+    /**
+     * EliminarStage: Elimina un stage en la BD.
+     *
+     * @param int $stage_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarStage($stage_id)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-   /**
-    * EliminarStage: Elimina un stage en la BD
-    * @param int $stage_id Id
-    * @author Marcel
-    */
-   public function EliminarStage($stage_id)
-   {
-      $em = $this->getDoctrine()->getManager();
+        $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
+           ->find($stage_id);
+        /** @var ProjectStage $entity */
+        if (null != $entity) {
+            // estimates
+            /** @var EstimateRepository $estimateRepo */
+            $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+            $estimates = $estimateRepo->ListarEstimatesDeStage($stage_id);
+            if (count($estimates) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The project stage could not be deleted, because it is related to a project estimate';
 
-      $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
-         ->find($stage_id);
-      /**@var ProjectStage $entity */
-      if ($entity != null) {
-
-         // estimates
-         /** @var EstimateRepository $estimateRepo */
-         $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
-         $estimates = $estimateRepo->ListarEstimatesDeStage($stage_id);
-         if (count($estimates) > 0) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The project stage could not be deleted, because it is related to a project estimate";
-            return $resultado;
-         }
-
-         $stage_descripcion = $entity->getDescription();
-
-
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Project Stage";
-         $log_descripcion = "The project stage is deleted: $stage_descripcion";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * EliminarStages: Elimina los stages seleccionados en la BD
-    * @param int $ids Ids
-    * @author Marcel
-    */
-   public function EliminarStages($ids)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      if ($ids != "") {
-         $ids = explode(',', $ids);
-         $cant_eliminada = 0;
-         $cant_total = 0;
-         foreach ($ids as $stage_id) {
-            if ($stage_id != "") {
-               $cant_total++;
-               $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
-                  ->find($stage_id);
-               /** @var ProjectStage $entity */
-               if ($entity != null) {
-
-                  // estimates
-                  /** @var EstimateRepository $estimateRepo */
-                  $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
-                  $estimates = $estimateRepo->ListarEstimatesDeStage($stage_id);
-                  if (count($estimates) == 0) {
-                     $stage_descripcion = $entity->getDescription();
-
-                     $em->remove($entity);
-                     $cant_eliminada++;
-
-                     //Salvar log
-                     $log_operacion = "Delete";
-                     $log_categoria = "Project Stage";
-                     $log_descripcion = "The project stage is deleted: $stage_descripcion";
-                     $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-                  }
-               }
+                return $resultado;
             }
-         }
-      }
-      $em->flush();
 
-      if ($cant_eliminada == 0) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The project stages could not be deleted, because they are associated with a project estimates";
-      } else {
-         $resultado['success'] = true;
+            $stage_descripcion = $entity->getDescription();
 
-         $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected stages because they are associated with a project estimates";
-         $resultado['message'] = $mensaje;
-      }
+            $em->remove($entity);
+            $em->flush();
 
-      return $resultado;
-   }
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'Project Stage';
+            $log_descripcion = "The project stage is deleted: $stage_descripcion";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-   /**
-    * ActualizarStage: Actuializa los datos del stage en la BD
-    * @param int $stage_id Id
-    * @author Marcel
-    */
-   public function ActualizarStage($stage_id, $description, $color, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
-         ->find($stage_id);
-      /** @var ProjectStage $entity */
-      if ($entity != null) {
-
-         //Verificar name
-         $stage = $this->getDoctrine()->getRepository(ProjectStage::class)
-            ->findOneBy(['description' => $description]);
-         if ($stage != null && $entity->getStageId() != $stage->getStageId()) {
+            $resultado['success'] = true;
+        } else {
             $resultado['success'] = false;
-            $resultado['error'] = "The project stage name is in use, please try entering another one.";
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarStages: Elimina los stages seleccionados en la BD.
+     *
+     * @param int $ids Ids
+     *
+     * @author Marcel
+     */
+    public function EliminarStages($ids)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ('' != $ids) {
+            $ids = explode(',', $ids);
+            $cant_eliminada = 0;
+            $cant_total = 0;
+            foreach ($ids as $stage_id) {
+                if ('' != $stage_id) {
+                    ++$cant_total;
+                    $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
+                       ->find($stage_id);
+                    /** @var ProjectStage $entity */
+                    if (null != $entity) {
+                        // estimates
+                        /** @var EstimateRepository $estimateRepo */
+                        $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+                        $estimates = $estimateRepo->ListarEstimatesDeStage($stage_id);
+                        if (0 == count($estimates)) {
+                            $stage_descripcion = $entity->getDescription();
+
+                            $em->remove($entity);
+                            ++$cant_eliminada;
+
+                            // Salvar log
+                            $log_operacion = 'Delete';
+                            $log_categoria = 'Project Stage';
+                            $log_descripcion = "The project stage is deleted: $stage_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
+                    }
+                }
+            }
+        }
+        $em->flush();
+
+        if (0 == $cant_eliminada) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project stages could not be deleted, because they are associated with a project estimates';
+        } else {
+            $resultado['success'] = true;
+
+            $mensaje = ($cant_eliminada == $cant_total) ? 'The operation was successful' : 'The operation was successful. But attention, it was not possible to delete all the selected stages because they are associated with a project estimates';
+            $resultado['message'] = $mensaje;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * ActualizarStage: Actuializa los datos del stage en la BD.
+     *
+     * @param int $stage_id Id
+     *
+     * @author Marcel
+     */
+    public function ActualizarStage($stage_id, $description, $color, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
+           ->find($stage_id);
+        /** @var ProjectStage $entity */
+        if (null != $entity) {
+            // Verificar name
+            $stage = $this->getDoctrine()->getRepository(ProjectStage::class)
+               ->findOneBy(['description' => $description]);
+            if (null != $stage && $entity->getStageId() != $stage->getStageId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The project stage name is in use, please try entering another one.';
+
+                return $resultado;
+            }
+
+            $entity->setDescription($description);
+            $entity->setColor($color);
+            $entity->setStatus($status);
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Update';
+            $log_categoria = 'Project Stage';
+            $log_descripcion = "The project stage is modified: $description";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['stage_id'] = $entity->getStageId();
+
             return $resultado;
-         }
+        }
+    }
 
-         $entity->setDescription($description);
-         $entity->setColor($color);
-         $entity->setStatus($status);
+    /**
+     * SalvarStage: Guarda los datos de stage en la BD.
+     *
+     * @param string $description Nombre
+     *
+     * @author Marcel
+     */
+    public function SalvarStage($description, $color, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-         $em->flush();
+        // Verificar name
+        $stage = $this->getDoctrine()->getRepository(ProjectStage::class)
+           ->findOneBy(['description' => $description]);
+        if (null != $stage) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project stage name is in use, please try entering another one.';
 
-         //Salvar log
-         $log_operacion = "Update";
-         $log_categoria = "Project Stage";
-         $log_descripcion = "The project stage is modified: $description";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+            return $resultado;
+        }
 
-         $resultado['success'] = true;
-         $resultado['stage_id'] = $entity->getStageId();
+        $entity = new ProjectStage();
 
-         return $resultado;
-      }
-   }
+        $entity->setDescription($description);
+        $entity->setColor($color);
+        $entity->setStatus($status);
 
-   /**
-    * SalvarStage: Guarda los datos de stage en la BD
-    * @param string $description Nombre
-    * @author Marcel
-    */
-   public function SalvarStage($description, $color, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
+        $em->persist($entity);
 
-      //Verificar name
-      $stage = $this->getDoctrine()->getRepository(ProjectStage::class)
-         ->findOneBy(['description' => $description]);
-      if ($stage != null) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The project stage name is in use, please try entering another one.";
-         return $resultado;
-      }
+        $em->flush();
 
-      $entity = new ProjectStage();
+        // Salvar log
+        $log_operacion = 'Add';
+        $log_categoria = 'Project Stage';
+        $log_descripcion = "The project stage is added: $description";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-      $entity->setDescription($description);
-      $entity->setColor($color);
-      $entity->setStatus($status);
+        $resultado['success'] = true;
+        $resultado['stage_id'] = $entity->getStageId();
 
-      $em->persist($entity);
+        return $resultado;
+    }
 
-      $em->flush();
+    /**
+     * ListarStages: Listar los stages.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarStages($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    {
+        /** @var ProjectStageRepository $projectStageRepo */
+        $projectStageRepo = $this->getDoctrine()->getRepository(ProjectStage::class);
+        $resultado = $projectStageRepo->ListarStagesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-      //Salvar log
-      $log_operacion = "Add";
-      $log_categoria = "Project Stage";
-      $log_descripcion = "The project stage is added: $description";
-      $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+        $data = [];
 
-      $resultado['success'] = true;
-      $resultado['stage_id'] = $entity->getStageId();
+        foreach ($resultado['data'] as $value) {
+            $stage_id = $value->getStageId();
 
-      return $resultado;
-   }
+            $data[] = [
+                'id' => $stage_id,
+                'description' => $value->getDescription(),
+                'color' => $value->getColor(),
+                'status' => $value->getStatus() ? 1 : 0,
+            ];
+        }
 
-   /**
-    * ListarStages: Listar los stages
-    *
-    * @param int $start Inicio
-    * @param int $limit Limite
-    * @param string $sSearch Para buscar
-    *
-    * @author Marcel
-    */
-   public function ListarStages($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-   {
-      /** @var ProjectStageRepository $projectStageRepo */
-      $projectStageRepo = $this->getDoctrine()->getRepository(ProjectStage::class);
-      $resultado = $projectStageRepo->ListarStagesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
 
-      $data = [];
+    /**
+     * TotalStages: Total de stages.
+     *
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function TotalStages($sSearch)
+    {
+        /** @var ProjectStageRepository $projectStageRepo */
+        $projectStageRepo = $this->getDoctrine()->getRepository(ProjectStage::class);
 
-      foreach ($resultado['data'] as $value) {
-         $stage_id = $value->getStageId();
+        return $projectStageRepo->TotalStages($sSearch);
+    }
 
-         $data[] = array(
-            "id" => $stage_id,
-            "description" => $value->getDescription(),
-            "color" => $value->getColor(),
-            "status" => $value->getStatus() ? 1 : 0,
-         );
-      }
+    /**
+     * ListarAcciones: Lista los permisos de un usuario de la BD.
+     *
+     * @author Marcel
+     */
+    public function ListarAcciones($id)
+    {
+        $usuario = $this->getUser();
+        $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT_STAGE);
 
-      return [
-         'data' => $data,
-         'total' => $resultado['total'], // ya viene con el filtro aplicado
-      ];
-   }
+        $acciones = '';
 
-   /**
-    * TotalStages: Total de stages
-    * @param string $sSearch Para buscar
-    * @author Marcel
-    */
-   public function TotalStages($sSearch)
-   {
-      /** @var ProjectStageRepository $projectStageRepo */
-      $projectStageRepo = $this->getDoctrine()->getRepository(ProjectStage::class);
-      return $projectStageRepo->TotalStages($sSearch);
-   }
+        if (count($permiso) > 0) {
+            if ($permiso[0]['editar']) {
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="'.$id.'"> <i class="la la-edit"></i> </a> ';
+            } else {
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
+            }
+            if ($permiso[0]['eliminar']) {
+                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="'.$id.'"><i class="la la-trash"></i></a>';
+            }
+        }
 
-   /**
-    * ListarAcciones: Lista los permisos de un usuario de la BD
-    *
-    * @author Marcel
-    */
-   public function ListarAcciones($id)
-   {
-      $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT_STAGE);
-
-      $acciones = '';
-
-      if (count($permiso) > 0) {
-         if ($permiso[0]['editar']) {
-            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-         } else {
-            $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
-         }
-         if ($permiso[0]['eliminar']) {
-            $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
-         }
-      }
-
-      return $acciones;
-   }
+        return $acciones;
+    }
 }

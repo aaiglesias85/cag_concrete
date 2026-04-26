@@ -2,17 +2,16 @@
 
 namespace App\Utils\Admin;
 
+use App\Entity\Invoice;
+use App\Entity\InvoiceAttachment;
+use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemNotes;
+use App\Entity\InvoiceItemUnpaidQtyHistory;
 use App\Entity\InvoiceNotes;
 use App\Entity\Project;
-use App\Entity\Invoice;
-use App\Entity\InvoiceItem;
-use App\Entity\InvoiceItemUnpaidQtyHistory;
-
-use App\Entity\InvoiceAttachment;
 use App\Entity\ProjectItemHistory;
+use App\Entity\ReimbursementHistory;
 use App\Repository\InvoiceAttachmentRepository;
-use App\Repository\InvoiceItemNotesRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceItemUnpaidQtyHistoryRepository;
 use App\Repository\InvoiceNotesRepository;
@@ -20,7 +19,6 @@ use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectRepository;
 use App\Utils\Base;
-use App\Entity\ReimbursementHistory;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -29,1362 +27,1364 @@ use Symfony\Component\Mailer\MailerInterface;
 
 class PaymentService extends Base
 {
-   /** @var InvoiceService */
-   private $invoiceService;
+    /** @var InvoiceService */
+    private $invoiceService;
 
-   public function __construct(
-      ContainerInterface $container,
-      MailerInterface $mailer,
-      ContainerBagInterface $containerBag,
-      Security $security,
-      LoggerInterface $logger,
-      InvoiceService $invoiceService
-   ) {
-      parent::__construct($container, $mailer, $containerBag, $security, $logger);
-      $this->invoiceService = $invoiceService;
-   }
+    public function __construct(
+        ContainerInterface $container,
+        MailerInterface $mailer,
+        ContainerBagInterface $containerBag,
+        Security $security,
+        LoggerInterface $logger,
+        InvoiceService $invoiceService,
+    ) {
+        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        $this->invoiceService = $invoiceService;
+    }
 
-   /**
-    * EliminarNotesItem: Elimina un notes en la BD
-    * @param int $notes_id Id
-    * @author Marcel
-    */
-   public function EliminarNotesItem($notes_id)
-   {
-      $em = $this->getDoctrine()->getManager();
+    /**
+     * EliminarNotesItem: Elimina un notes en la BD.
+     *
+     * @param int $notes_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarNotesItem($notes_id)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-      $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
-         ->find($notes_id);
-      /**@var InvoiceItemNotes $entity */
-      if ($entity != null) {
-         $notes = $entity->getNotes();
-         $project_entity = $entity->getInvoiceItem()->getInvoice()->getProject();
-         $invoice_number = $entity->getInvoiceItem()->getInvoice()->getNumber();
-         $item_name = $entity->getInvoiceItem()->getProjectItem()->getItem()->getName();
+        $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
+           ->find($notes_id);
+        /** @var InvoiceItemNotes $entity */
+        if (null != $entity) {
+            $notes = $entity->getNotes();
+            $project_entity = $entity->getInvoiceItem()->getInvoice()->getProject();
+            $invoice_number = $entity->getInvoiceItem()->getInvoice()->getNumber();
+            $item_name = $entity->getInvoiceItem()->getProjectItem()->getItem()->getName();
 
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Invoice Notes";
-         $log_descripcion = "Notes '$notes' have been deleted to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * SalvarNotesItem
-    * @param $notes_id
-    * @param $invoice_item_id
-    * @param $notes
-    * @param float|null $override_unpaid_qty
-    * @return array
-    */
-   public function SalvarNotesItem($notes_id, $invoice_item_id, $notes, $override_unpaid_qty = null)
-   {
-
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
-         ->find($invoice_item_id);
-      /** @var InvoiceItem $invoice_item_entity */
-      if ($invoice_item_entity != null) {
-
-         $project_entity = $invoice_item_entity->getInvoice()->getProject();
-         $invoice_number = $invoice_item_entity->getInvoice()->getNumber();
-         $item_name = $invoice_item_entity->getProjectItem()->getItem()->getName();
-
-         $entity = null;
-         $is_new = false;
-
-         if (is_numeric($notes_id)) {
-            $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
-               ->find($notes_id);
-         }
-
-         if ($entity == null) {
-            $entity = new InvoiceItemNotes();
-            $is_new = true;
-         }
-
-         $entity->setNotes($notes);
-         if ($override_unpaid_qty !== null && $override_unpaid_qty !== '') {
-            $entity->setOverrideUnpaidQty((float) $override_unpaid_qty);
-            // Registrar historial de cambio de unpaid qty (cantidad anterior -> nueva)
-            $this->RegistrarHistorialUnpaidQty($invoice_item_entity, (float) $override_unpaid_qty);
-         }
-
-         $log_operacion = "Add";
-         $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
-
-         if ($is_new) {
-
-            $entity->setDate(new \DateTime());
-            $entity->setInvoiceItem($invoice_item_entity);
-
-            $em->persist($entity);
-         } else {
-            $log_operacion = "Update";
-            $log_descripcion = "Notes '$notes' have been updated to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
-         }
-
-         $em->flush();
-
-         //Salvar log
-         $log_categoria = "Invoice Notes";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-         $resultado['note'] = [
-            'id' => $entity->getId(),
-            'notes' => mb_convert_encoding($notes, 'UTF-8', 'UTF-8'),
-            'date' => $entity->getDate()->format('m/d/Y'),
-            'override_unpaid_qty' => $entity->getOverrideUnpaidQty()
-         ];
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The project not exist.";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * Obtiene el unpaid qty efectivo actual para un invoice item (misma lógica que listado Payments: quantity_final - paid_qty o override de la nota más reciente).
-    */
-   private function ObtenerUnpaidQtyEfectivoActual(InvoiceItem $invoice_item_entity): float
-   {
-      $quantity = (float) ($invoice_item_entity->getQuantity() ?? 0);
-      $quantity_brought_forward = (float) ($invoice_item_entity->getQuantityBroughtForward() ?? 0);
-      $paid_qty = (float) ($invoice_item_entity->getPaidQty() ?? 0);
-      $quantity_final = $quantity + $quantity_brought_forward;
-      $unpaid_effective = max(0.0, $quantity_final - $paid_qty);
-
-      $notes = $this->ListarNotesDeItemInvoice($invoice_item_entity->getId());
-      foreach ($notes as $note) {
-         if (isset($note['override_unpaid_qty']) && $note['override_unpaid_qty'] !== null && $note['override_unpaid_qty'] !== '') {
-            $unpaid_effective = (float) $note['override_unpaid_qty'];
-            break;
-         }
-      }
-      return $unpaid_effective;
-   }
-
-   /**
-    * Registra en historial el cambio de unpaid qty cuando se guarda una nota con override.
-    */
-   private function RegistrarHistorialUnpaidQty(InvoiceItem $invoice_item_entity, float $new_value): void
-   {
-      $old_value = $this->ObtenerUnpaidQtyEfectivoActual($invoice_item_entity);
-      if ($old_value == $new_value) {
-         return;
-      }
-      $em = $this->getDoctrine()->getManager();
-      $history = new InvoiceItemUnpaidQtyHistory();
-      $history->setInvoiceItem($invoice_item_entity);
-      $history->setOldValue((string) $old_value);
-      $history->setNewValue((string) $new_value);
-      $history->setCreatedAt(new \DateTime());
-      $history->setUser($this->getUser());
-      $em->persist($history);
-   }
-
-   /**
-    * ListarHistorialUnpaidQtyItem: Lista el historial de cambios de unpaid qty de un InvoiceItem (para Payments).
-    * @param int $invoice_item_id
-    * @return array
-    */
-   public function ListarHistorialUnpaidQtyItem($invoice_item_id): array
-   {
-      $historial = [];
-      /** @var InvoiceItemUnpaidQtyHistoryRepository $historyRepo */
-      $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
-      $lista = $historyRepo->ListarHistorialDeItem((int) $invoice_item_id);
-
-      foreach ($lista as $value) {
-         $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
-         $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
-         $old_value_raw = $value->getOldValue();
-         $new_value_raw = $value->getNewValue();
-         $old_value = $old_value_raw !== null && $old_value_raw !== '' ? number_format((float) $old_value_raw, 2, '.', ',') : $old_value_raw;
-         $new_value = $new_value_raw !== null && $new_value_raw !== '' ? number_format((float) $new_value_raw, 2, '.', ',') : $new_value_raw;
-         $mensaje = "{$fecha} Updated unpaid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
-
-         $historial[] = [
-            'id' => $value->getId(),
-            'mensaje' => $mensaje,
-            'fecha' => $value->getCreatedAt()->format('m/d/Y'),
-            'user_name' => $user_name,
-            'old_value' => $old_value,
-            'new_value' => $new_value,
-         ];
-      }
-      return $historial;
-   }
-
-   /**
-    * EliminarArchivos: Elimina varios archivos en la BD
-    *
-    * @param $archivos
-    * @return array
-    */
-   public function EliminarArchivos($archivos)
-   {
-      $resultado = array();
-
-      $archivos = explode(',', $archivos);
-      foreach ($archivos as $archivo) {
-         //Eliminar archivo
-         $dir = 'uploads/invoice/';
-         if (is_file($dir . $archivo)) {
-            unlink($dir . $archivo);
-         }
-
-         $em = $this->getDoctrine()->getManager();
-
-         $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
-            ->findOneBy(array('file' => $archivo));
-         if ($archivo_entity != null) {
-            $em->remove($archivo_entity);
-         }
-      }
-
-      $em->flush();
-
-      $resultado['success'] = true;
-      return $resultado;
-   }
-
-   /**
-    * EliminarArchivo: Elimina un archivo en la BD
-    *
-    * @param $archivo
-    * @return array
-    */
-   public function EliminarArchivo($archivo)
-   {
-      $resultado = array();
-
-      //Eliminar archivo
-      $dir = 'uploads/invoice/';
-      if (is_file($dir . $archivo)) {
-         unlink($dir . $archivo);
-      }
-
-      $em = $this->getDoctrine()->getManager();
-
-      $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
-         ->findOneBy(array('file' => $archivo));
-      if ($archivo_entity != null) {
-         $em->remove($archivo_entity);
-      }
-
-      $em->flush();
-
-      $resultado['success'] = true;
-      return $resultado;
-   }
-
-   /**
-    * EliminarNotes: Elimina un notes en la BD
-    * @param int $notes_id Id
-    * @author Marcel
-    */
-   public function EliminarNotes($notes_id)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
-         ->find($notes_id);
-      /**@var InvoiceNotes $entity */
-      if ($entity != null) {
-         $notes = $entity->getNotes();
-         $invoice_number = $entity->getInvoice()->getNumber();
-
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Invoice Notes";
-         $log_descripcion = "The notes: $notes is delete from invoice #: $invoice_number";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * EliminarNotesDate: Elimina un notes en un rango de fechas en la BD
-    * @param int $invoice_id Id
-    * @author Marcel
-    */
-   public function EliminarNotesDate($invoice_id, $from, $to)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
-      /** @var Invoice $invoice_entity */
-      if ($invoice_entity != null) {
-
-         $invoice_number = $invoice_entity->getNumber();
-
-
-         /** @var InvoiceNotesRepository $invoiceNotesRepo */
-         $invoiceNotesRepo = $this->getDoctrine()->getRepository(InvoiceNotes::class);
-         $notes = $invoiceNotesRepo->ListarNotesDeInvoice($invoice_id, $from, $to);
-         foreach ($notes as $entity) {
             $em->remove($entity);
-         }
-
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Invoice Notes";
-         $log_descripcion = "The notes $from and $to is delete from invoice #: $invoice_number";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * CargarDatosNotes: Carga los datos de un notes
-    *
-    * @param int $notes_id Id
-    *
-    * @author Marcel
-    */
-   public function CargarDatosNotes($notes_id)
-   {
-      $resultado = array();
-      $arreglo_resultado = array();
-
-      $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
-         ->find($notes_id);
-      /** @var InvoiceNotes $entity */
-      if ($entity != null) {
-
-         $arreglo_resultado['notes'] = $entity->getNotes();
-         $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
-
-         $resultado['success'] = true;
-         $resultado['notes'] = $arreglo_resultado;
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * SalvarNotes
-    * @param $notes_id
-    * @param $invoice_id
-    * @param $notes
-    * @param $date
-    * @return array
-    */
-   public function SalvarNotes($notes_id, $invoice_id, $notes, $date)
-   {
-
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
-      /** @var Invoice $invoice_entity */
-      if ($invoice_entity != null) {
-
-         $project_entity = $invoice_entity->getProject();
-         $invoice_number = $invoice_entity->getNumber();
-
-         $entity = null;
-         $is_new = false;
-
-         if (is_numeric($notes_id)) {
-            $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
-               ->find($notes_id);
-         }
-
-         if ($entity == null) {
-            $entity = new InvoiceNotes();
-            $is_new = true;
-         }
-
-         $entity->setNotes($notes);
-
-         if ($date != '') {
-            $date = \DateTime::createFromFormat('m/d/Y', $date);
-            $entity->setDate($date);
-         }
-
-         $entity->setInvoice($invoice_entity);
-
-         $log_operacion = "Add";
-         $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()})";
-
-         if ($is_new) {
-            $em->persist($entity);
-         } else {
-            $log_operacion = "Update";
-            $log_descripcion = "Notes '$notes' have been updated to invoice #$invoice_number (Project: {$project_entity->getName()})";
-         }
-
-         $em->flush();
-
-         //Salvar log
-         $log_categoria = "Invoice Notes";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The project not exist.";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * ListarNotes: Listar los notes
-    *
-    * @param int $start Inicio
-    * @param int $limit Limite
-    * @param string $sSearch Para buscar
-    *
-    * @author Marcel
-    */
-   public function ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin)
-   {
-      /** @var InvoiceNotesRepository $invoiceNotesRepo */
-      $invoiceNotesRepo = $this->getDoctrine()->getRepository(InvoiceNotes::class);
-      $resultado = $invoiceNotesRepo->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
-
-      $data = [];
-
-      foreach ($resultado['data'] as $value) {
-         $notes_id = $value->getId();
-
-         $notes = $value->getNotes();
-         $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
-
-         $data[] = array(
-            "id" => $notes_id,
-            "notes" => $notes,
-            "date" => $value->getDate()->format('m/d/Y'),
-         );
-      }
-
-      return [
-         'data' => $data,
-         'total' => $resultado['total'],
-      ];
-   }
-
-   /**
-    * CargarDatosPayment: Carga los datos de un invoice
-    *
-    * @param int $invoice_id Id
-    *
-    * @author Marcel
-    */
-
-   public function CargarDatosPayment($invoice_id)
-   {
-      $resultado = array();
-      $arreglo_resultado = array();
-
-      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-      /** @var Invoice $entity */
-      if ($entity != null) {
-         $project = $entity->getProject();
-         $project_id = $project->getProjectId();
-         // Recalcular bond y retainage antes de cargar datos (para tomar cambios en R o bonded)
-         $this->invoiceService->RecalcularRetainageYBonPorProyecto($project_id);
-         $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-
-         $company_id = $project->getCompany()->getCompanyId();
-
-         // ... (asignación de datos básicos igual que antes) ...
-         $arreglo_resultado['project_id'] = $project->getProjectId();
-         $arreglo_resultado['project_number'] = $project->getProjectNumber();
-         $arreglo_resultado['company_id'] = $company_id;
-         $arreglo_resultado['number'] = $entity->getNumber();
-         $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');
-         $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
-         $arreglo_resultado['notes'] = $entity->getNotes();
-         $arreglo_resultado['paid'] = $entity->getPaid();
-
-         // --- REGLA 1: CALCULAR CONTRATO REAL ---
-         $contract_amount_retainage_base = 0;
-         $projectItems = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class)
-            ->findBy(['project' => $project]);
-
-         foreach ($projectItems as $pItem) {
-            if ($pItem->getApplyRetainage()) {
-               $contract_amount_retainage_base += ($pItem->getQuantity() * $pItem->getPrice());
-            }
-         }
-
-         $std_retainage = (float)$project->getRetainagePercentage();
-         $red_retainage = (float)$project->getRetainageAdjustmentPercentage();
-         $target_completion = (float)$project->getRetainageAdjustmentCompletion();
-
-         $arreglo_resultado['contract_amount'] = $contract_amount_retainage_base;
-         $arreglo_resultado['retainage_adjustment_percentage'] = $red_retainage;
-         $arreglo_resultado['retainage_adjustment_completion'] = $target_completion;
-         
-         // --- REGLA 2: HISTORIAL CRONOLÓGICO (SOLO ANTERIORES) ---
-         /** @var \App\Repository\InvoiceRepository $invoiceRepo */
-         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-
-         //  Usamos la nueva función que filtra por fecha/ID
-         $historial_previo = $invoiceRepo->ObtenerTotalPagadoAnterior(
-            $project->getProjectId(),
-            $entity->getStartDate(),
-            $entity->getInvoiceId()
-         );
-
-         // Enviamos al JS el historial puro
-         $arreglo_resultado['total_work_completed'] = $historial_previo;
-
-         // --- CALCULAR DEUDA DE ESTA FACTURA (LO ACTUAL) ---
-         $pagado_esta_factura = 0;
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $current_items = $invoiceItemRepo->findBy(['invoice' => $entity]);
-
-         foreach ($current_items as $item) {
-            if ($item->getProjectItem()->getApplyRetainage()) {
-               $pagado_esta_factura += $item->getPaidAmount();
-            }
-         }
-
-         // --- DECIDIR PORCENTAJE INICIAL ---
-         // Sumamos: (Lo pagado ANTES de esta factura) + (Lo pagado EN esta factura)
-         $total_al_momento = $historial_previo + $pagado_esta_factura;
-
-         $porciento_retainage = $std_retainage; // 10%
-
-         if ($contract_amount_retainage_base > 0 && $target_completion > 0) {
-            $threshold = $contract_amount_retainage_base * ($target_completion / 100);
-
-            if ($total_al_momento >= $threshold) {
-               $porciento_retainage = $red_retainage; // 5%
-            }
-         }
-
-         $arreglo_resultado['retainage_percentage'] = $porciento_retainage;
-         $projects = $this->ListarProjectsDeCompany($company_id);
-         $arreglo_resultado['projects'] = $projects;
-
-         $items = $this->ListarItemsDeInvoice($invoice_id);
-         $arreglo_resultado['items'] = $items;
-
-         // 1. Obtenemos los pagos
-         $payments = $this->ListarPaymentsDeInvoice($invoice_id);
-
-         // Calcular Bond ---
-         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
-         $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
-
-         $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
-            ? $projectItemRepo->TotalBondedProjectItems($project->getProjectId())
-            : 0;
-
-         $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
-            ? $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId())
-            : 0;
-         $bond_general = method_exists($projectItemRepo, 'TotalBondAmountProjectItems')
-            ? $projectItemRepo->TotalBondAmountProjectItems($project->getProjectId())
-            : 0;
-         foreach ($payments as &$p) {
-            $p['sum_bonded_project'] = $sum_bonded_project;
-            $p['bond_price'] = $bond_price;
-         }
-         unset($p);
-
-         // Bond en Payments: fórmula distinta a Invoice. Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
-         $contract_amount_bonded = $sum_bonded_project;
-         $paid_amount_bonded = 0.0;
-         foreach ($payments as $p) {
-            if (!empty($p['bonded'])) {
-               $paid_amount_bonded += (float) ($p['paid_amount'] ?? 0);
-            }
-         }
-         $bond_qty_payments = 0.0;
-         $bond_amount_payments = 0.0;
-         if ($contract_amount_bonded > 0) {
-            $bond_qty_payments = round($paid_amount_bonded / $contract_amount_bonded, 5);
-            $bond_amount_payments = round($bond_general * $bond_qty_payments, 2);
-         }
-         // Actualizar fila Bond en payments con los valores calculados
-         foreach ($payments as &$p) {
-            if (!empty($p['bond'])) {
-               $p['paid_qty'] = $bond_qty_payments;
-               $p['unpaid_qty'] = max(0.0, 1.0 - $bond_qty_payments);
-               $p['paid_amount'] = $bond_amount_payments;
-               $p['paid_amount_total'] = $bond_amount_payments;
-               break;
-            }
-         }
-         unset($p);
-
-         $arreglo_resultado['payments'] = $payments;
-
-         $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
-         $arreglo_resultado['retainage_reimbursed_amount'] = $entity->getRetainageReimbursedAmount();
-
-         // Bond en Payments: datos para cálculo en tiempo real (contract_amount_bonded, bond_general)
-         $arreglo_resultado['contract_amount_bonded'] = $contract_amount_bonded;
-         $arreglo_resultado['bond_general'] = $bond_general;
-         $arreglo_resultado['bon_quantity'] = $bond_qty_payments;
-         $arreglo_resultado['bon_amount'] = $bond_amount_payments;
-
-         // Recalcular el monto visual inicial
-         $total_retainage_calc = 0;
-         foreach ($payments as $payItem) {
-            $apply_ret = isset($payItem['apply_retainage']) ? $payItem['apply_retainage'] : false;
-            $paid_amount = isset($payItem['paid_amount']) ? (float)$payItem['paid_amount'] : 0;
-
-            if (($apply_ret == 1 || $apply_ret === true) && $paid_amount > 0) {
-               $monto_ret = $paid_amount * ($porciento_retainage / 100);
-               $total_retainage_calc += $monto_ret;
-            }
-         }
-
-         $arreglo_resultado['total_retainage_amount'] = round($total_retainage_calc, 2);
-         // -----------------------------------------------------
-
-         $archivos = $this->ListarArchivosDeInvoice($invoice_id);
-         $arreglo_resultado['archivos'] = $archivos;
-
-         $resultado['success'] = true;
-         $resultado['payment'] = $arreglo_resultado;
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * Calcula el porcentaje de retainage
-    */
-   private function CalcularPorcientoRetainage($project_entity)
-   {
-      $porciento = 0;
-      if ($project_entity->getRetainage()) {
-         $porciento = $project_entity->getRetainagePercentage();
-      }
-      return $porciento;
-   }
-
-   /**
-    * ListarArchivosDeInvoice
-    * @param $invoice_id
-    * @return array
-    */
-   public function ListarArchivosDeInvoice($invoice_id)
-   {
-      $archivos = [];
-
-      /** @var InvoiceAttachmentRepository $invoiceAttachmentRepo */
-      $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
-      $project_archivos = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
-      foreach ($project_archivos as $key => $project_archivo) {
-         $archivos[] = [
-            'id' => $project_archivo->getId(),
-            'name' => $project_archivo->getName(),
-            'file' => $project_archivo->getFile(),
-            'posicion' => $key
-         ];
-      }
-
-      return $archivos;
-   }
-
-   /**
-    * ListarItemsDeInvoice
-    * @param $invoice_id
-    * @return array
-    */
-   public function ListarItemsDeInvoice($invoice_id)
-   {
-      $items = [];
-
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-      $lista = $invoiceItemRepo->ListarItems($invoice_id);
-      foreach ($lista as $key => $value) {
-
-         $contract_qty = $value->getProjectItem()->getQuantity();
-         $price = $value->getPrice();
-         $contract_amount = $contract_qty * $price;
-
-         $quantity_from_previous = $value->getQuantityFromPrevious();
-         $unpaid_from_previous = $value->getUnpaidFromPrevious();
-
-         $quantity = $value->getQuantity();
-
-         $quantity_completed = $quantity + $quantity_from_previous;
-
-         $amount = $quantity * $price;
-
-         $total_amount = $quantity_completed * $price;
-
-         // Verificar si hay historial de cantidad y precio
-         $project_item_id = $value->getProjectItem()->getId();
-         /** @var ProjectItemHistoryRepository $historyRepo */
-         $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
-         $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
-         $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
-
-         $items[] = [
-            "invoice_item_id" => $value->getId(),
-            "project_item_id" => $project_item_id,
-            "apply_retainage" => $value->getProjectItem()->getApplyRetainage(),
-            "bonded" => $value->getProjectItem()->getBonded() ? 1 : 0,
-            "bond" => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
-            "paid_qty" => $value->getPaidQty(),
-            "unpaid_qty" => $value->getUnpaidQty(),
-            "paid_amount" => $value->getPaidAmount(),
-            "paid_amount_total" => $value->getPaidAmountTotal(),
-            "item_id" => $value->getProjectItem()->getItem()->getItemId(),
-            "code" => $value->getProjectItem()->getCode(),
-            "item" => $value->getProjectItem()->getItem()->getName(),
-            "unit" => $value->getProjectItem()->getItem()->getUnit() != null ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
-            "contract_qty" => $contract_qty,
-            "price" => $price,
-            "contract_amount" => $contract_amount,
-            "quantity_from_previous" => $quantity_from_previous,
-            "unpaid_from_previous" => $unpaid_from_previous,
-            "quantity" => $quantity,
-            "quantity_completed" => $quantity_completed,
-            "amount" => $amount,
-            "total_amount" => $total_amount,
-            "principal" => $value->getProjectItem()->getPrincipal(),
-            "change_order" => $value->getProjectItem()->getChangeOrder(),
-            "change_order_date" => $value->getProjectItem()->getChangeOrderDate() != null ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
-            "has_quantity_history" => $has_quantity_history,
-            "has_price_history" => $has_price_history,
-            "posicion" => $key,
-            "is_closed_manual" => $value->getIsClosedManual() ? 1 : 0,
-         ];
-      }
-      $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-
-      if ($currentInvoice) {
-         $project_id = $currentInvoice->getProject()->getProjectId();
-         /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
-         $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
-
-         $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
-            ? $projectItemRepo->TotalBondedProjectItems($project_id)
-            : 0;
-
-         $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
-            ? $projectItemRepo->TotalBondPriceProjectItems($project_id)
-            : 0;
-
-         foreach ($items as &$item) {
-            $item['sum_bonded_project'] = $sum_bonded_project;
-            $item['bond_price'] = $bond_price;
-         }
-      }
-
-      return $items;
-   }
-
-   /**
-    * ListarProjectsDeCompany
-    * @param $company_id
-    * @return array
-    */
-   public function ListarProjectsDeCompany($company_id)
-   {
-      $projects = [];
-
-      /** @var ProjectRepository $projectRepo */
-      $projectRepo = $this->getDoctrine()->getRepository(Project::class);
-      $lista = $projectRepo->ListarOrdenados('', $company_id, '');
-      foreach ($lista as $value) {
-         $projects[] = [
-            'project_id' => $value->getProjectId(),
-            'number' => $value->getProjectNumber(),
-            'name' => $value->getName(),
-            'description' => $value->getDescription()
-         ];
-      }
-
-      return $projects;
-   }
-
-   /**
-    * ActualizarPayment: Actuializa los datos del rol en la BD
-    * @param int $invoice_id Id
-    * @author Marcel
-    */
-   public function ActualizarPayment($invoice_id, $payments, $archivos)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
-      /** @var Invoice $entity */
-      if ($entity != null) {
-
-         $entity->setUpdatedAt(new \DateTime());
-
-         // items
-         $this->SalvarPayments($entity, $payments);
-
-         // save archivos
-         $this->SalvarArchivos($entity, $archivos);
-
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Update";
-         $log_categoria = "Invoice";
-
-         $number = $entity->getNumber();
-         $log_descripcion = "The invoice #$number is modified";
-
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-         $resultado['invoice_id'] = $entity->getInvoiceId();
-
-         return $resultado;
-      }
-   }
-
-   /**
-    * SalvarArchivos
-    * @param $archivos
-    * @param Project $entity
-    * @return void
-    */
-   public function SalvarArchivos($entity, $archivos)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      foreach ($archivos as $value) {
-
-         $archivo_entity = null;
-
-         if (is_numeric($value->id)) {
-            $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
-               ->find($value->id);
-         }
-
-         $is_new_archivo = false;
-         if ($archivo_entity == null) {
-            $archivo_entity = new InvoiceAttachment();
-            $is_new_archivo = true;
-         }
-
-         $archivo_entity->setName($value->name);
-         $archivo_entity->setFile($value->file);
-
-         if ($is_new_archivo) {
-            $archivo_entity->setInvoice($entity);
-
-            $em->persist($archivo_entity);
-         }
-      }
-   }
-
-   /**
-    * SalvarPayments
-    * @param array $payments
-    * @param Invoice $entity
-    * @return void
-    */
-   public function SalvarPayments($entity, $payments)
-   {
-      $invoice_id = $entity->getInvoiceId();
-      $project_id = $entity->getProject()->getProjectId();
-
-      // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
-      $updated_project_item_ids = [];
-
-      // Marcar invoice como paid solo cuando TODOS los ítems estén completamente pagados (unpaid_qty <= 0)
-      $allFullyPaid = !empty($payments);
-      $epsilon = 0.0001;
-
-      foreach ($payments as $value) {
-
-         /** @var InvoiceItemRepository $invoiceItemRepo */
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $invoice_item_entity = $invoiceItemRepo->BuscarItem($invoice_id, $value->project_item_id);
-         if ($invoice_item_entity != null) {
-            // Guardar project_item_id para actualizar invoices siguientes
-            $updated_project_item_ids[] = $value->project_item_id;
-
-            // Cantidades y montos vienen del cliente tal cual (abrir/cerrar ítem solo afecta is_closed_manual en UI).
-            // unpaid_qty puede venir sobrescrito desde Notas; persistir tal cual.
-            $invoice_item_entity->setPaidQty((float)$value->paid_qty);
-            $invoice_item_entity->setUnpaidQty(\is_numeric($value->unpaid_qty ?? null) ? (float)$value->unpaid_qty : $invoice_item_entity->getUnpaidQty());
-            $invoice_item_entity->setPaidAmount($value->paid_amount);
-            $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
-            $invoice_item_entity->setIsClosedManual((bool) $value->is_closed_manual);
-         }
-
-         // Comprobar si este ítem está completamente pagado (unpaid_qty <= 0)
-         $unpaidQty = isset($value->unpaid_qty) && \is_numeric($value->unpaid_qty) ? (float) $value->unpaid_qty : null;
-         if ($unpaidQty !== null) {
-            if ($unpaidQty > $epsilon) {
-               $allFullyPaid = false;
-            }
-         } else {
-            // Fallback: comparar paid_qty con quantity (quantity_final)
-            $quantity = isset($value->quantity) && \is_numeric($value->quantity) ? (float) $value->quantity : 0;
-            $paidQty = isset($value->paid_qty) && \is_numeric($value->paid_qty) ? (float) $value->paid_qty : 0;
-            if ($paidQty < $quantity - $epsilon) {
-               $allFullyPaid = false;
-            }
-         }
-      }
-
-      // paid invoice - solo si TODOS los ítems están completamente pagados
-      if ($allFullyPaid && !$entity->getPaid()) {
-         $entity->setPaid(true);
-      }
-
-      // Actualizar unpaid_from_previous en invoices siguientes
-      if (!empty($updated_project_item_ids)) {
-         $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($entity, $updated_project_item_ids);
-      }
-   }
-
-   /**
-    * ActualizarUnpaidFromPreviousEnInvoicesSiguientes
-    * Actualiza el unpaid_from_previous y unpaid_qty en los invoices siguientes del mismo proyecto
-    * IMPORTANTE: NUNCA afecta al invoice actual, solo a los invoices posteriores
-    * 
-    * Ejemplo: Si se paga en Invoice 3, se actualizan Invoice 4 y 5, pero NUNCA el Invoice 3
-    * 
-    * @param Invoice $currentInvoice El invoice que se está pagando (este NO se afecta)
-    * @param array $project_item_ids Los project_item_ids que se están pagando
-    * @return void
-    */
-   private function ActualizarUnpaidFromPreviousEnInvoicesSiguientes($currentInvoice, $project_item_ids)
-   {
-      $project_id = $currentInvoice->getProject()->getProjectId();
-      $current_invoice_id = $currentInvoice->getInvoiceId();
-      $current_invoice_start_date = $currentInvoice->getStartDate();
-
-      /** @var InvoiceRepository $invoiceRepo */
-      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-
-      // Obtener todos los invoices del proyecto ordenados por fecha de inicio
-      $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
-
-      // Filtrar solo los invoices posteriores al actual (por fecha de inicio o ID)
-      // IMPORTANTE: El invoice actual ($current_invoice_id) NUNCA se incluye aquí
-      $followingInvoices = [];
-      foreach ($allInvoices as $invoice) {
-         /** @var Invoice $invoice */
-         // Excluir explícitamente el invoice actual - NUNCA se afecta a sí mismo
-         if ($invoice->getInvoiceId() != $current_invoice_id) {
-            $invoiceDate = $invoice->getStartDate();
-            // Considerar invoice siguiente si la fecha es mayor o igual (y es diferente)
-            if (
-               $invoiceDate > $current_invoice_start_date ||
-               ($invoiceDate == $current_invoice_start_date && $invoice->getInvoiceId() > $current_invoice_id)
-            ) {
-               $followingInvoices[] = $invoice;
-            }
-         }
-      }
-
-      // Ordenar por fecha de inicio ascendente, luego por ID
-      usort($followingInvoices, function ($a, $b) {
-         /** @var Invoice $a */
-         /** @var Invoice $b */
-         $dateCompare = $a->getStartDate() <=> $b->getStartDate();
-         if ($dateCompare != 0) {
-            return $dateCompare;
-         }
-         return $a->getInvoiceId() <=> $b->getInvoiceId();
-      });
-
-      /** @var InvoiceItemRepository $invoiceItemRepo */
-      $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-
-      // Para cada project_item_id actualizado
-      foreach ($project_item_ids as $project_item_id) {
-         // Para cada invoice siguiente, recalcular unpaid_from_previous
-         foreach ($followingInvoices as $followingInvoice) {
-            /** @var Invoice $followingInvoice */
-            $following_invoice_id = $followingInvoice->getInvoiceId();
-
-            // Buscar el item en este invoice siguiente
-            $following_item = $invoiceItemRepo->BuscarItem($following_invoice_id, $project_item_id);
-
-            if ($following_item != null) {
-               // Obtener todos los invoice items anteriores de este project_item
-               $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-
-               // Calcular unpaid_from_previous: suma del unpaid_qty de todos los invoices anteriores
-               $unpaid_from_previous = 0;
-
-               foreach ($allInvoiceItems as $previousItem) {
-                  /** @var InvoiceItem $previousItem */
-                  $previousInvoice = $previousItem->getInvoice();
-                  $previous_invoice_id = $previousInvoice->getInvoiceId();
-                  $previous_invoice_date = $previousInvoice->getStartDate();
-                  $following_invoice_date = $followingInvoice->getStartDate();
-
-                  // Solo considerar invoices anteriores a este invoice siguiente
-                  if (
-                     $previous_invoice_date < $following_invoice_date ||
-                     ($previous_invoice_date == $following_invoice_date && $previous_invoice_id < $following_invoice_id)
-                  ) {
-
-                     // Para calcular unpaid_from_previous, se suman los unpaid_qty de los invoices anteriores
-                     // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
-                     // donde quantity_final = quantity + quantity_brought_forward
-
-                     // SIEMPRE recalcular unpaid_qty para asegurar precisión
-                     // No usar el valor almacenado porque el primer invoice siempre tiene unpaid_qty = 0
-                     // pero para calcular unpaid_from_previous necesitamos quantity_final - paid_qty
-                     $quantity = $previousItem->getQuantity() ?? 0;
-                     $quantity_brought_forward = $previousItem->getQuantityBroughtForward() ?? 0;
-                     $paid_qty = $previousItem->getPaidQty() ?? 0;
-
-                     // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
-                     $quantity_final = $quantity + $quantity_brought_forward;
-
-                     // Calcular el unpaid_qty real: Invoice Qty - Paid Qty
-                     $unpaid_qty = $quantity_final - $paid_qty;
-                     $unpaid_qty = max(0, $unpaid_qty);
-
-                     // Sumar al unpaid_from_previous acumulado (solo valores positivos)
-                     $unpaid_from_previous += $unpaid_qty;
-                  }
-               }
-
-               // Actualizar unpaid_from_previous en el item siguiente
-               // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
-               $following_item->setUnpaidFromPrevious($unpaid_from_previous);
-
-               // Actualizar unpaid_qty del invoice siguiente
-               // En payments, cuando se actualiza después de un pago, unpaid_qty debe ser
-               // la suma de todos los unpaid_qty de los invoices anteriores
-               // Ejemplo: Si se paga invoice 3, invoice 4 debe tener unpaid_qty = suma de unpaid_qty de 1, 2, 3
-               $following_unpaid_qty = $unpaid_from_previous;
-               $following_item->setUnpaidQty($following_unpaid_qty);
-            }
-         }
-      }
-   }
-
-   /**
-    * ListarInvoices: Listar los invoices
-    *
-    * @param int $start Inicio
-    * @param int $limit Limite
-    * @param string $sSearch Para buscar
-    *
-    * @author Marcel
-    */
-   public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
-   {
-      /** @var InvoiceRepository $invoiceRepo */
-      $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-      $resultado = $invoiceRepo->ListarInvoicesParaPaymentsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
-
-      $data = [];
-
-      foreach ($resultado['data'] as $value) {
-         $invoice_id = $value->getInvoiceId();
-
-         /** @var InvoiceItemRepository $invoiceItemRepo */
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
-
-         // Llamada simple (ahora devuelve float directo)
-         $retainage_valor = $this->CalcularRetainageConRegla($invoice_id);
-
-         $data[] = array(
-            "id" => $invoice_id,
-            "number" => $value->getNumber(),
-            "company" => $value->getProject()->getCompany()->getName(),
-            "projectNumber" => $value->getProject()->getProjectNumber(),
-            "project" => $value->getProject()->getDescription(),
-            "project_id" => $value->getProject()->getProjectId(),
-            "startDate" => $value->getStartDate()->format('m/d/Y'),
-            "endDate" => $value->getEndDate()->format('m/d/Y'),
-            "notes" => $this->truncate($value->getNotes(), 50),
-            "total" => $total,
-            "retainage_amount" => number_format($retainage_valor, 2),
-            "createdAt" => $value->getCreatedAt()->format('m/d/Y'),
-            "paid" => $value->getPaid() ? 1 : 0
-         );
-      }
-
-      return [
-         'data' => $data,
-         'total' => $resultado['total'],
-      ];
-   }
-
-   /**
-    * PaidInvoice: Paga un invoice
-    * @param int $invoice_id Id
-    * @author Marcel
-    */
-   public function PaidInvoice($invoice_id)
-   {
-      $resultado = array();
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice = $this->getDoctrine()->getRepository(Invoice::class)
-         ->find($invoice_id);
-      /** @var Invoice $invoice */
-      if (!is_null($invoice)) {
-
-         // Verificar si ya está pagado - si está pagado, no hacer nada
-         if ($invoice->getPaid()) {
-            $resultado['success'] = false;
-            $resultado['error'] = "This invoice is already paid";
-            return $resultado;
-         }
-
-         // Marcar como pagado (no toggle, solo pagar)
-         $invoice->setPaid(true);
-
-         // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
-         $updated_project_item_ids = [];
-
-         /** @var InvoiceItemRepository $invoiceItemRepo */
-         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-         $items = $invoiceItemRepo->ListarItems($invoice_id);
-
-         $bon_quantity = $invoice->getBonQuantity() !== null ? (float) $invoice->getBonQuantity() : null;
-         $bon_amount = $invoice->getBonAmount() !== null ? (float) $invoice->getBonAmount() : null;
-
-         foreach ($items as $item) {
-            /** @var InvoiceItem $item */
-            $is_bond_item = $item->getProjectItem()->getItem()->getBond();
-            $price = $item->getPrice();
-            $project_item_id = $item->getProjectItem()->getId();
-
-            // Guardar project_item_id para actualizar invoices siguientes
-            $updated_project_item_ids[] = $project_item_id;
-
-            if ($is_bond_item) {
-               // Ítem Bond: cantidad y monto vienen del invoice (bon_quantity, bon_amount)
-               $quantity_final = $bon_quantity !== null ? $bon_quantity : 0.0;
-               $paidQty = $quantity_final;
-               $paidAmount = $bon_amount !== null ? $bon_amount : 0.0;
-               $paidAmountTotal = $paidAmount;
-               $unpaidQty = 0.0;
-            } else {
-               $quantity = $item->getQuantity();
-               $quantity_brought_forward = $item->getQuantityBroughtForward() ?? 0;
-               $unpaidFromPrevious = $item->getUnpaidFromPrevious();
-               $quantityFromPrevious = $item->getQuantityFromPrevious();
-
-               // quantity_final = quantity + quantity_brought_forward (mismo criterio que toggle en tabla items)
-               $quantity_final = $quantity + $quantity_brought_forward;
-
-               // Calcular cantidad total completada (incluyendo anteriores)
-               $quantityCompleted = ($quantity + $quantityFromPrevious) + $unpaidFromPrevious;
-
-               // Al marcar como pagado: paid_qty = quantity_final, unpaid_qty = 0 (igual que el toggle Status)
-               $paidQty = $quantity_final;
-               $paidAmount = $quantity_final * $price;
-               $paidAmountTotal = $quantityCompleted * $price;
-               $unpaidQty = 0.0;
-            }
-
-            // Actualizar item como pagado (mismo proceso que SalvarPayments al usar el toggle)
-            $item->setPaidQty($paidQty);
-            $item->setPaidAmount($paidAmount);
-            $item->setPaidAmountTotal($paidAmountTotal);
-            $item->setUnpaidQty($unpaidQty);
-         }
-
-         // Actualizar unpaid_from_previous en invoices siguientes después de marcar como paid
-         if (!empty($updated_project_item_ids)) {
-            $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($invoice, $updated_project_item_ids);
-         }
-
-         $em->flush();
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-      return $resultado;
-   }
-
-   /**
-    * SalvarRetainageReimbursement
-    * @param $params
-    * @return array
-    */
-   public function SalvarRetainageReimbursement($params)
-   {
-      $resultado = array();
-      $em = $this->getDoctrine()->getManager();
-
-      $invoice_id = isset($params['invoice_id']) ? $params['invoice_id'] : '';
-      $reimbursed = isset($params['retainage_reimbursed']) ? (int)$params['retainage_reimbursed'] : 0;
-
-      // Aseguramos que sea float para cálculos
-      $amount = isset($params['retainage_reimbursed_amount']) ? (float)$params['retainage_reimbursed_amount'] : 0.00;
-
-      /** @var Invoice $entity */
-      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-
-      if ($entity != null) {
-
-         if ($amount > 0) {
-            $history = new ReimbursementHistory();
-            $history->setAmount($amount);
-            $history->setCreatedAt(new \DateTime());
-
-            $history->setInvoice($entity);
-
-            $em->persist($history);
-         }
-
-         if (method_exists($entity, 'setRetainageReimbursed')) {
-            $entity->setRetainageReimbursed((bool)$reimbursed);
-         }
-
-         if (method_exists($entity, 'setRetainageReimbursedAmount')) {
-            $entity->setRetainageReimbursedAmount($amount);
-         }
-
-         if (method_exists($entity, 'setRetainageReimbursedDate')) {
-            $fecha = ($reimbursed == 1) ? new \DateTime() : null;
-            $entity->setRetainageReimbursedDate($fecha);
-         }
-
-         $em->persist($entity);
-         $em->flush();
-
-
-         if ($amount > 0) {
-            $log_operacion = "Update";
-            $log_categoria = "Retainage Reimbursement";
-            $log_descripcion = "Retainage reimbursed amount updated to $$amount for invoice #{$entity->getNumber()}";
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'Invoice Notes';
+            $log_descripcion = "Notes '$notes' have been deleted to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-         }
 
-         $resultado['success'] = true;
-         $resultado['message'] = 'Retainage reimbursement updated.';
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = 'Invoice not found.';
-      }
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+        }
 
-      return $resultado;
-   }
+        return $resultado;
+    }
 
-   /**
-    * CambiarEstadoInvoice: Cambia el estado paid (Open/Closed) manualmente
-    * @param int $invoice_id
-    * @param int $status (1 = Closed, 0 = Open)
-    */
-   public function CambiarEstadoInvoice($invoice_id, $status)
-   {
-      $resultado = array();
-      $em = $this->getDoctrine()->getManager();
+    /**
+     * SalvarNotesItem.
+     *
+     * @param float|null $override_unpaid_qty
+     *
+     * @return array
+     */
+    public function SalvarNotesItem($notes_id, $invoice_item_id, $notes, $override_unpaid_qty = null)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-      $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
-      /** @var Invoice $entity */
+        $invoice_item_entity = $this->getDoctrine()->getRepository(InvoiceItem::class)
+           ->find($invoice_item_id);
+        /** @var InvoiceItem $invoice_item_entity */
+        if (null != $invoice_item_entity) {
+            $project_entity = $invoice_item_entity->getInvoice()->getProject();
+            $invoice_number = $invoice_item_entity->getInvoice()->getNumber();
+            $item_name = $invoice_item_entity->getProjectItem()->getItem()->getName();
 
-      if ($entity != null) {
+            $entity = null;
+            $is_new = false;
 
-         // Convertir el status numérico a booleano
-         $isPaid = ($status == 1);
-         $entity->setPaid($isPaid);
+            if (is_numeric($notes_id)) {
+                $entity = $this->getDoctrine()->getRepository(InvoiceItemNotes::class)
+                   ->find($notes_id);
+            }
 
-         $em->flush();
+            if (null == $entity) {
+                $entity = new InvoiceItemNotes();
+                $is_new = true;
+            }
 
-         // Guardar en el Log
-         $statusLabel = $isPaid ? "Closed" : "Open";
-         $log_operacion = "Update";
-         $log_categoria = "Invoice Status";
-         $log_descripcion = "Invoice #{$entity->getNumber()} status changed to $statusLabel";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+            $entity->setNotes($notes);
+            if (null !== $override_unpaid_qty && '' !== $override_unpaid_qty) {
+                $entity->setOverrideUnpaidQty((float) $override_unpaid_qty);
+                // Registrar historial de cambio de unpaid qty (cantidad anterior -> nueva)
+                $this->RegistrarHistorialUnpaidQty($invoice_item_entity, (float) $override_unpaid_qty);
+            }
 
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "Invoice not found";
-      }
+            $log_operacion = 'Add';
+            $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
 
-      return $resultado;
-   }
+            if ($is_new) {
+                $entity->setDate(new \DateTime());
+                $entity->setInvoiceItem($invoice_item_entity);
 
-   /**
-    * CalcularRetainageConRegla: Calcula el retainage basado en lo PAGADO (Paid Amt)
-    */
-   public function CalcularRetainageConRegla($invoice_id)
-   {
-      $em = $this->getDoctrine()->getManager();
-      $invoice = $em->getRepository(Invoice::class)->find($invoice_id);
+                $em->persist($entity);
+            } else {
+                $log_operacion = 'Update';
+                $log_descripcion = "Notes '$notes' have been updated to invoice #$invoice_number (Project: {$project_entity->getName()}) (Item: {$item_name})";
+            }
 
-      if (!$invoice) return 0.00;
-      $project = $invoice->getProject();
-      if (!$project) return 0.00;
+            $em->flush();
 
-      $contract_amount = (float)$project->getContractAmount();
-      $std_retainage = (float)$project->getRetainagePercentage();
-      $completion_target = (float)$project->getRetainageAdjustmentCompletion();
-      $reduced_retainage = (float)$project->getRetainageAdjustmentPercentage();
+            // Salvar log
+            $log_categoria = 'Invoice Notes';
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-      /** @var \App\Repository\InvoiceRepository $invoiceRepo */
-      $invoiceRepo = $em->getRepository(Invoice::class);
+            $resultado['success'] = true;
+            $resultado['note'] = [
+                'id' => $entity->getId(),
+                'notes' => mb_convert_encoding($notes, 'UTF-8', 'UTF-8'),
+                'date' => $entity->getDate()->format('m/d/Y'),
+                'override_unpaid_qty' => $entity->getOverrideUnpaidQty(),
+            ];
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project not exist.';
+        }
 
-      // CORRECCIÓN AQUÍ: Cambia el nombre del método para que coincida con el repositorio
-      $total_paid_with_retainage = $invoiceRepo->ObtenerTotalPagadoConRetainage($project->getProjectId());
+        return $resultado;
+    }
 
-      $final_percent = $std_retainage;
+    /**
+     * Obtiene el unpaid qty efectivo actual para un invoice item (misma lógica que listado Payments: quantity_final - paid_qty o override de la nota más reciente).
+     */
+    private function ObtenerUnpaidQtyEfectivoActual(InvoiceItem $invoice_item_entity): float
+    {
+        $quantity = (float) ($invoice_item_entity->getQuantity() ?? 0);
+        $quantity_brought_forward = (float) ($invoice_item_entity->getQuantityBroughtForward() ?? 0);
+        $paid_qty = (float) ($invoice_item_entity->getPaidQty() ?? 0);
+        $quantity_final = $quantity + $quantity_brought_forward;
+        $unpaid_effective = max(0.0, $quantity_final - $paid_qty);
 
-      if ($contract_amount > 0 && $completion_target > 0) {
-         $threshold = $contract_amount * ($completion_target / 100);
+        $notes = $this->ListarNotesDeItemInvoice($invoice_item_entity->getId());
+        foreach ($notes as $note) {
+            if (isset($note['override_unpaid_qty']) && null !== $note['override_unpaid_qty'] && '' !== $note['override_unpaid_qty']) {
+                $unpaid_effective = (float) $note['override_unpaid_qty'];
+                break;
+            }
+        }
 
-         // Comparamos LO COBRADO (Paid Amt) vs el Umbral
-         if ($total_paid_with_retainage >= $threshold) {
-            $final_percent = $reduced_retainage;
-         }
-      }
+        return $unpaid_effective;
+    }
 
-      $invoice_retainage_base = 0;
-      $items = $em->getRepository(InvoiceItem::class)->findBy(['invoice' => $invoice]);
+    /**
+     * Registra en historial el cambio de unpaid qty cuando se guarda una nota con override.
+     */
+    private function RegistrarHistorialUnpaidQty(InvoiceItem $invoice_item_entity, float $new_value): void
+    {
+        $old_value = $this->ObtenerUnpaidQtyEfectivoActual($invoice_item_entity);
+        if ($old_value == $new_value) {
+            return;
+        }
+        $em = $this->getDoctrine()->getManager();
+        $history = new InvoiceItemUnpaidQtyHistory();
+        $history->setInvoiceItem($invoice_item_entity);
+        $history->setOldValue((string) $old_value);
+        $history->setNewValue((string) $new_value);
+        $history->setCreatedAt(new \DateTime());
+        $history->setUser($this->getUser());
+        $em->persist($history);
+    }
 
-      foreach ($items as $item) {
-         $pi = $item->getProjectItem();
-         if ($pi && $pi->getApplyRetainage()) {
-            $invoice_retainage_base += ($item->getPrice() * $item->getQuantity());
-         }
-      }
+    /**
+     * ListarHistorialUnpaidQtyItem: Lista el historial de cambios de unpaid qty de un InvoiceItem (para Payments).
+     *
+     * @param int $invoice_item_id
+     */
+    public function ListarHistorialUnpaidQtyItem($invoice_item_id): array
+    {
+        $historial = [];
+        /** @var InvoiceItemUnpaidQtyHistoryRepository $historyRepo */
+        $historyRepo = $this->getDoctrine()->getRepository(InvoiceItemUnpaidQtyHistory::class);
+        $lista = $historyRepo->ListarHistorialDeItem((int) $invoice_item_id);
 
-      return $invoice_retainage_base * ($final_percent / 100);
-   }
+        foreach ($lista as $value) {
+            $user_name = $value->getUser() ? $value->getUser()->getNombreCompleto() : 'Unknown';
+            $fecha = $value->getCreatedAt()->format('m/d/Y H:i');
+            $old_value_raw = $value->getOldValue();
+            $new_value_raw = $value->getNewValue();
+            $old_value = null !== $old_value_raw && '' !== $old_value_raw ? number_format((float) $old_value_raw, 2, '.', ',') : $old_value_raw;
+            $new_value = null !== $new_value_raw && '' !== $new_value_raw ? number_format((float) $new_value_raw, 2, '.', ',') : $new_value_raw;
+            $mensaje = "{$fecha} Updated unpaid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"";
+
+            $historial[] = [
+                'id' => $value->getId(),
+                'mensaje' => $mensaje,
+                'fecha' => $value->getCreatedAt()->format('m/d/Y'),
+                'user_name' => $user_name,
+                'old_value' => $old_value,
+                'new_value' => $new_value,
+            ];
+        }
+
+        return $historial;
+    }
+
+    /**
+     * EliminarArchivos: Elimina varios archivos en la BD.
+     *
+     * @return array
+     */
+    public function EliminarArchivos($archivos)
+    {
+        $resultado = [];
+
+        $archivos = explode(',', $archivos);
+        foreach ($archivos as $archivo) {
+            // Eliminar archivo
+            $dir = 'uploads/invoice/';
+            if (is_file($dir.$archivo)) {
+                unlink($dir.$archivo);
+            }
+
+            $em = $this->getDoctrine()->getManager();
+
+            $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+               ->findOneBy(['file' => $archivo]);
+            if (null != $archivo_entity) {
+                $em->remove($archivo_entity);
+            }
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarArchivo: Elimina un archivo en la BD.
+     *
+     * @return array
+     */
+    public function EliminarArchivo($archivo)
+    {
+        $resultado = [];
+
+        // Eliminar archivo
+        $dir = 'uploads/invoice/';
+        if (is_file($dir.$archivo)) {
+            unlink($dir.$archivo);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+           ->findOneBy(['file' => $archivo]);
+        if (null != $archivo_entity) {
+            $em->remove($archivo_entity);
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarNotes: Elimina un notes en la BD.
+     *
+     * @param int $notes_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarNotes($notes_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+           ->find($notes_id);
+        /** @var InvoiceNotes $entity */
+        if (null != $entity) {
+            $notes = $entity->getNotes();
+            $invoice_number = $entity->getInvoice()->getNumber();
+
+            $em->remove($entity);
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'Invoice Notes';
+            $log_descripcion = "The notes: $notes is delete from invoice #: $invoice_number";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarNotesDate: Elimina un notes en un rango de fechas en la BD.
+     *
+     * @param int $invoice_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarNotesDate($invoice_id, $from, $to)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)
+           ->find($invoice_id);
+        /** @var Invoice $invoice_entity */
+        if (null != $invoice_entity) {
+            $invoice_number = $invoice_entity->getNumber();
+
+            /** @var InvoiceNotesRepository $invoiceNotesRepo */
+            $invoiceNotesRepo = $this->getDoctrine()->getRepository(InvoiceNotes::class);
+            $notes = $invoiceNotesRepo->ListarNotesDeInvoice($invoice_id, $from, $to);
+            foreach ($notes as $entity) {
+                $em->remove($entity);
+            }
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'Invoice Notes';
+            $log_descripcion = "The notes $from and $to is delete from invoice #: $invoice_number";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * CargarDatosNotes: Carga los datos de un notes.
+     *
+     * @param int $notes_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosNotes($notes_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
+
+        $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+           ->find($notes_id);
+        /** @var InvoiceNotes $entity */
+        if (null != $entity) {
+            $arreglo_resultado['notes'] = $entity->getNotes();
+            $arreglo_resultado['date'] = $entity->getDate()->format('m/d/Y');
+
+            $resultado['success'] = true;
+            $resultado['notes'] = $arreglo_resultado;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * SalvarNotes.
+     *
+     * @return array
+     */
+    public function SalvarNotes($notes_id, $invoice_id, $notes, $date)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice_entity = $this->getDoctrine()->getRepository(Invoice::class)
+           ->find($invoice_id);
+        /** @var Invoice $invoice_entity */
+        if (null != $invoice_entity) {
+            $project_entity = $invoice_entity->getProject();
+            $invoice_number = $invoice_entity->getNumber();
+
+            $entity = null;
+            $is_new = false;
+
+            if (is_numeric($notes_id)) {
+                $entity = $this->getDoctrine()->getRepository(InvoiceNotes::class)
+                   ->find($notes_id);
+            }
+
+            if (null == $entity) {
+                $entity = new InvoiceNotes();
+                $is_new = true;
+            }
+
+            $entity->setNotes($notes);
+
+            if ('' != $date) {
+                $date = \DateTime::createFromFormat('m/d/Y', $date);
+                $entity->setDate($date);
+            }
+
+            $entity->setInvoice($invoice_entity);
+
+            $log_operacion = 'Add';
+            $log_descripcion = "Notes '$notes' have been added to invoice #$invoice_number (Project: {$project_entity->getName()})";
+
+            if ($is_new) {
+                $em->persist($entity);
+            } else {
+                $log_operacion = 'Update';
+                $log_descripcion = "Notes '$notes' have been updated to invoice #$invoice_number (Project: {$project_entity->getName()})";
+            }
+
+            $em->flush();
+
+            // Salvar log
+            $log_categoria = 'Invoice Notes';
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project not exist.';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * ListarNotes: Listar los notes.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarNotes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin)
+    {
+        /** @var InvoiceNotesRepository $invoiceNotesRepo */
+        $invoiceNotesRepo = $this->getDoctrine()->getRepository(InvoiceNotes::class);
+        $resultado = $invoiceNotesRepo->ListarNotesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $project_id, $fecha_inicial, $fecha_fin);
+
+        $data = [];
+
+        foreach ($resultado['data'] as $value) {
+            $notes_id = $value->getId();
+
+            $notes = $value->getNotes();
+            $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
+
+            $data[] = [
+                'id' => $notes_id,
+                'notes' => $notes,
+                'date' => $value->getDate()->format('m/d/Y'),
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'total' => $resultado['total'],
+        ];
+    }
+
+    /**
+     * CargarDatosPayment: Carga los datos de un invoice.
+     *
+     * @param int $invoice_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosPayment($invoice_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
+
+        $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+        /** @var Invoice $entity */
+        if (null != $entity) {
+            $project = $entity->getProject();
+            $project_id = $project->getProjectId();
+            // Recalcular bond y retainage antes de cargar datos (para tomar cambios en R o bonded)
+            $this->invoiceService->RecalcularRetainageYBonPorProyecto($project_id);
+            $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
+            $company_id = $project->getCompany()->getCompanyId();
+
+            // ... (asignación de datos básicos igual que antes) ...
+            $arreglo_resultado['project_id'] = $project->getProjectId();
+            $arreglo_resultado['project_number'] = $project->getProjectNumber();
+            $arreglo_resultado['company_id'] = $company_id;
+            $arreglo_resultado['number'] = $entity->getNumber();
+            $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');
+            $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
+            $arreglo_resultado['notes'] = $entity->getNotes();
+            $arreglo_resultado['paid'] = $entity->getPaid();
+
+            // --- REGLA 1: CALCULAR CONTRATO REAL ---
+            $contract_amount_retainage_base = 0;
+            $projectItems = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class)
+               ->findBy(['project' => $project]);
+
+            foreach ($projectItems as $pItem) {
+                if ($pItem->getApplyRetainage()) {
+                    $contract_amount_retainage_base += ($pItem->getQuantity() * $pItem->getPrice());
+                }
+            }
+
+            $std_retainage = (float) $project->getRetainagePercentage();
+            $red_retainage = (float) $project->getRetainageAdjustmentPercentage();
+            $target_completion = (float) $project->getRetainageAdjustmentCompletion();
+
+            $arreglo_resultado['contract_amount'] = $contract_amount_retainage_base;
+            $arreglo_resultado['retainage_adjustment_percentage'] = $red_retainage;
+            $arreglo_resultado['retainage_adjustment_completion'] = $target_completion;
+
+            // --- REGLA 2: HISTORIAL CRONOLÓGICO (SOLO ANTERIORES) ---
+            /** @var InvoiceRepository $invoiceRepo */
+            $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+            //  Usamos la nueva función que filtra por fecha/ID
+            $historial_previo = $invoiceRepo->ObtenerTotalPagadoAnterior(
+                $project->getProjectId(),
+                $entity->getStartDate(),
+                $entity->getInvoiceId()
+            );
+
+            // Enviamos al JS el historial puro
+            $arreglo_resultado['total_work_completed'] = $historial_previo;
+
+            // --- CALCULAR DEUDA DE ESTA FACTURA (LO ACTUAL) ---
+            $pagado_esta_factura = 0;
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $current_items = $invoiceItemRepo->findBy(['invoice' => $entity]);
+
+            foreach ($current_items as $item) {
+                if ($item->getProjectItem()->getApplyRetainage()) {
+                    $pagado_esta_factura += $item->getPaidAmount();
+                }
+            }
+
+            // --- DECIDIR PORCENTAJE INICIAL ---
+            // Sumamos: (Lo pagado ANTES de esta factura) + (Lo pagado EN esta factura)
+            $total_al_momento = $historial_previo + $pagado_esta_factura;
+
+            $porciento_retainage = $std_retainage; // 10%
+
+            if ($contract_amount_retainage_base > 0 && $target_completion > 0) {
+                $threshold = $contract_amount_retainage_base * ($target_completion / 100);
+
+                if ($total_al_momento >= $threshold) {
+                    $porciento_retainage = $red_retainage; // 5%
+                }
+            }
+
+            $arreglo_resultado['retainage_percentage'] = $porciento_retainage;
+            $projects = $this->ListarProjectsDeCompany($company_id);
+            $arreglo_resultado['projects'] = $projects;
+
+            $items = $this->ListarItemsDeInvoice($invoice_id);
+            $arreglo_resultado['items'] = $items;
+
+            // 1. Obtenemos los pagos
+            $payments = $this->ListarPaymentsDeInvoice($invoice_id);
+
+            // Calcular Bond ---
+            /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+            $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+            $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
+               ? $projectItemRepo->TotalBondedProjectItems($project->getProjectId())
+               : 0;
+
+            $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
+               ? $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId())
+               : 0;
+            $bond_general = method_exists($projectItemRepo, 'TotalBondAmountProjectItems')
+               ? $projectItemRepo->TotalBondAmountProjectItems($project->getProjectId())
+               : 0;
+            foreach ($payments as &$p) {
+                $p['sum_bonded_project'] = $sum_bonded_project;
+                $p['bond_price'] = $bond_price;
+            }
+            unset($p);
+
+            // Bond en Payments: fórmula distinta a Invoice. Bond Qty = Σ Paid Amt (Bonded) / Σ Contract Amt (Bonded)
+            $contract_amount_bonded = $sum_bonded_project;
+            $paid_amount_bonded = 0.0;
+            foreach ($payments as $p) {
+                if (!empty($p['bonded'])) {
+                    $paid_amount_bonded += (float) ($p['paid_amount'] ?? 0);
+                }
+            }
+            $bond_qty_payments = 0.0;
+            $bond_amount_payments = 0.0;
+            if ($contract_amount_bonded > 0) {
+                $bond_qty_payments = round($paid_amount_bonded / $contract_amount_bonded, 5);
+                $bond_amount_payments = round($bond_general * $bond_qty_payments, 2);
+            }
+            // Actualizar fila Bond en payments con los valores calculados
+            foreach ($payments as &$p) {
+                if (!empty($p['bond'])) {
+                    $p['paid_qty'] = $bond_qty_payments;
+                    $p['unpaid_qty'] = max(0.0, 1.0 - $bond_qty_payments);
+                    $p['paid_amount'] = $bond_amount_payments;
+                    $p['paid_amount_total'] = $bond_amount_payments;
+                    break;
+                }
+            }
+            unset($p);
+
+            $arreglo_resultado['payments'] = $payments;
+
+            $arreglo_resultado['retainage_reimbursed'] = $entity->getRetainageReimbursed() ? 1 : 0;
+            $arreglo_resultado['retainage_reimbursed_amount'] = $entity->getRetainageReimbursedAmount();
+
+            // Bond en Payments: datos para cálculo en tiempo real (contract_amount_bonded, bond_general)
+            $arreglo_resultado['contract_amount_bonded'] = $contract_amount_bonded;
+            $arreglo_resultado['bond_general'] = $bond_general;
+            $arreglo_resultado['bon_quantity'] = $bond_qty_payments;
+            $arreglo_resultado['bon_amount'] = $bond_amount_payments;
+
+            // Recalcular el monto visual inicial
+            $total_retainage_calc = 0;
+            foreach ($payments as $payItem) {
+                $apply_ret = isset($payItem['apply_retainage']) ? $payItem['apply_retainage'] : false;
+                $paid_amount = isset($payItem['paid_amount']) ? (float) $payItem['paid_amount'] : 0;
+
+                if ((1 == $apply_ret || true === $apply_ret) && $paid_amount > 0) {
+                    $monto_ret = $paid_amount * ($porciento_retainage / 100);
+                    $total_retainage_calc += $monto_ret;
+                }
+            }
+
+            $arreglo_resultado['total_retainage_amount'] = round($total_retainage_calc, 2);
+            // -----------------------------------------------------
+
+            $archivos = $this->ListarArchivosDeInvoice($invoice_id);
+            $arreglo_resultado['archivos'] = $archivos;
+
+            $resultado['success'] = true;
+            $resultado['payment'] = $arreglo_resultado;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Calcula el porcentaje de retainage.
+     */
+    private function CalcularPorcientoRetainage($project_entity)
+    {
+        $porciento = 0;
+        if ($project_entity->getRetainage()) {
+            $porciento = $project_entity->getRetainagePercentage();
+        }
+
+        return $porciento;
+    }
+
+    /**
+     * ListarArchivosDeInvoice.
+     *
+     * @return array
+     */
+    public function ListarArchivosDeInvoice($invoice_id)
+    {
+        $archivos = [];
+
+        /** @var InvoiceAttachmentRepository $invoiceAttachmentRepo */
+        $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
+        $project_archivos = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
+        foreach ($project_archivos as $key => $project_archivo) {
+            $archivos[] = [
+                'id' => $project_archivo->getId(),
+                'name' => $project_archivo->getName(),
+                'file' => $project_archivo->getFile(),
+                'posicion' => $key,
+            ];
+        }
+
+        return $archivos;
+    }
+
+    /**
+     * ListarItemsDeInvoice.
+     *
+     * @return array
+     */
+    public function ListarItemsDeInvoice($invoice_id)
+    {
+        $items = [];
+
+        /** @var InvoiceItemRepository $invoiceItemRepo */
+        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+        $lista = $invoiceItemRepo->ListarItems($invoice_id);
+        foreach ($lista as $key => $value) {
+            $contract_qty = $value->getProjectItem()->getQuantity();
+            $price = $value->getPrice();
+            $contract_amount = $contract_qty * $price;
+
+            $quantity_from_previous = $value->getQuantityFromPrevious();
+            $unpaid_from_previous = $value->getUnpaidFromPrevious();
+
+            $quantity = $value->getQuantity();
+
+            $quantity_completed = $quantity + $quantity_from_previous;
+
+            $amount = $quantity * $price;
+
+            $total_amount = $quantity_completed * $price;
+
+            // Verificar si hay historial de cantidad y precio
+            $project_item_id = $value->getProjectItem()->getId();
+            /** @var ProjectItemHistoryRepository $historyRepo */
+            $historyRepo = $this->getDoctrine()->getRepository(ProjectItemHistory::class);
+            $has_quantity_history = $historyRepo->TieneHistorialCantidad($project_item_id);
+            $has_price_history = $historyRepo->TieneHistorialPrecio($project_item_id);
+
+            $items[] = [
+                'invoice_item_id' => $value->getId(),
+                'project_item_id' => $project_item_id,
+                'apply_retainage' => $value->getProjectItem()->getApplyRetainage(),
+                'bonded' => $value->getProjectItem()->getBonded() ? 1 : 0,
+                'bond' => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
+                'paid_qty' => $value->getPaidQty(),
+                'unpaid_qty' => $value->getUnpaidQty(),
+                'paid_amount' => $value->getPaidAmount(),
+                'paid_amount_total' => $value->getPaidAmountTotal(),
+                'item_id' => $value->getProjectItem()->getItem()->getItemId(),
+                'code' => $value->getProjectItem()->getCode(),
+                'item' => $value->getProjectItem()->getItem()->getName(),
+                'unit' => null != $value->getProjectItem()->getItem()->getUnit() ? $value->getProjectItem()->getItem()->getUnit()->getDescription() : '',
+                'contract_qty' => $contract_qty,
+                'price' => $price,
+                'contract_amount' => $contract_amount,
+                'quantity_from_previous' => $quantity_from_previous,
+                'unpaid_from_previous' => $unpaid_from_previous,
+                'quantity' => $quantity,
+                'quantity_completed' => $quantity_completed,
+                'amount' => $amount,
+                'total_amount' => $total_amount,
+                'principal' => $value->getProjectItem()->getPrincipal(),
+                'change_order' => $value->getProjectItem()->getChangeOrder(),
+                'change_order_date' => null != $value->getProjectItem()->getChangeOrderDate() ? $value->getProjectItem()->getChangeOrderDate()->format('m/d/Y') : '',
+                'has_quantity_history' => $has_quantity_history,
+                'has_price_history' => $has_price_history,
+                'posicion' => $key,
+                'is_closed_manual' => $value->getIsClosedManual() ? 1 : 0,
+            ];
+        }
+        $currentInvoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
+        if ($currentInvoice) {
+            $project_id = $currentInvoice->getProject()->getProjectId();
+            /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
+            $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
+
+            $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
+               ? $projectItemRepo->TotalBondedProjectItems($project_id)
+               : 0;
+
+            $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
+               ? $projectItemRepo->TotalBondPriceProjectItems($project_id)
+               : 0;
+
+            foreach ($items as &$item) {
+                $item['sum_bonded_project'] = $sum_bonded_project;
+                $item['bond_price'] = $bond_price;
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * ListarProjectsDeCompany.
+     *
+     * @return array
+     */
+    public function ListarProjectsDeCompany($company_id)
+    {
+        $projects = [];
+
+        /** @var ProjectRepository $projectRepo */
+        $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+        $lista = $projectRepo->ListarOrdenados('', $company_id, '');
+        foreach ($lista as $value) {
+            $projects[] = [
+                'project_id' => $value->getProjectId(),
+                'number' => $value->getProjectNumber(),
+                'name' => $value->getName(),
+                'description' => $value->getDescription(),
+            ];
+        }
+
+        return $projects;
+    }
+
+    /**
+     * ActualizarPayment: Actuializa los datos del rol en la BD.
+     *
+     * @param int $invoice_id Id
+     *
+     * @author Marcel
+     */
+    public function ActualizarPayment($invoice_id, $payments, $archivos)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(Invoice::class)
+           ->find($invoice_id);
+        /** @var Invoice $entity */
+        if (null != $entity) {
+            $entity->setUpdatedAt(new \DateTime());
+
+            // items
+            $this->SalvarPayments($entity, $payments);
+
+            // save archivos
+            $this->SalvarArchivos($entity, $archivos);
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Update';
+            $log_categoria = 'Invoice';
+
+            $number = $entity->getNumber();
+            $log_descripcion = "The invoice #$number is modified";
+
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['invoice_id'] = $entity->getInvoiceId();
+
+            return $resultado;
+        }
+    }
+
+    /**
+     * SalvarArchivos.
+     *
+     * @param Project $entity
+     *
+     * @return void
+     */
+    public function SalvarArchivos($entity, $archivos)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($archivos as $value) {
+            $archivo_entity = null;
+
+            if (is_numeric($value->id)) {
+                $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+                   ->find($value->id);
+            }
+
+            $is_new_archivo = false;
+            if (null == $archivo_entity) {
+                $archivo_entity = new InvoiceAttachment();
+                $is_new_archivo = true;
+            }
+
+            $archivo_entity->setName($value->name);
+            $archivo_entity->setFile($value->file);
+
+            if ($is_new_archivo) {
+                $archivo_entity->setInvoice($entity);
+
+                $em->persist($archivo_entity);
+            }
+        }
+    }
+
+    /**
+     * SalvarPayments.
+     *
+     * @param array   $payments
+     * @param Invoice $entity
+     *
+     * @return void
+     */
+    public function SalvarPayments($entity, $payments)
+    {
+        $invoice_id = $entity->getInvoiceId();
+        $project_id = $entity->getProject()->getProjectId();
+
+        // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
+        $updated_project_item_ids = [];
+
+        // Marcar invoice como paid solo cuando TODOS los ítems estén completamente pagados (unpaid_qty <= 0)
+        $allFullyPaid = !empty($payments);
+        $epsilon = 0.0001;
+
+        foreach ($payments as $value) {
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $invoice_item_entity = $invoiceItemRepo->BuscarItem($invoice_id, $value->project_item_id);
+            if (null != $invoice_item_entity) {
+                // Guardar project_item_id para actualizar invoices siguientes
+                $updated_project_item_ids[] = $value->project_item_id;
+
+                // Cantidades y montos vienen del cliente tal cual (abrir/cerrar ítem solo afecta is_closed_manual en UI).
+                // unpaid_qty puede venir sobrescrito desde Notas; persistir tal cual.
+                $invoice_item_entity->setPaidQty((float) $value->paid_qty);
+                $invoice_item_entity->setUnpaidQty(\is_numeric($value->unpaid_qty ?? null) ? (float) $value->unpaid_qty : $invoice_item_entity->getUnpaidQty());
+                $invoice_item_entity->setPaidAmount($value->paid_amount);
+                $invoice_item_entity->setPaidAmountTotal($value->paid_amount_total);
+                $invoice_item_entity->setIsClosedManual((bool) $value->is_closed_manual);
+            }
+
+            // Comprobar si este ítem está completamente pagado (unpaid_qty <= 0)
+            $unpaidQty = isset($value->unpaid_qty) && \is_numeric($value->unpaid_qty) ? (float) $value->unpaid_qty : null;
+            if (null !== $unpaidQty) {
+                if ($unpaidQty > $epsilon) {
+                    $allFullyPaid = false;
+                }
+            } else {
+                // Fallback: comparar paid_qty con quantity (quantity_final)
+                $quantity = isset($value->quantity) && \is_numeric($value->quantity) ? (float) $value->quantity : 0;
+                $paidQty = isset($value->paid_qty) && \is_numeric($value->paid_qty) ? (float) $value->paid_qty : 0;
+                if ($paidQty < $quantity - $epsilon) {
+                    $allFullyPaid = false;
+                }
+            }
+        }
+
+        // paid invoice - solo si TODOS los ítems están completamente pagados
+        if ($allFullyPaid && !$entity->getPaid()) {
+            $entity->setPaid(true);
+        }
+
+        // Actualizar unpaid_from_previous en invoices siguientes
+        if (!empty($updated_project_item_ids)) {
+            $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($entity, $updated_project_item_ids);
+        }
+    }
+
+    /**
+     * ActualizarUnpaidFromPreviousEnInvoicesSiguientes
+     * Actualiza el unpaid_from_previous y unpaid_qty en los invoices siguientes del mismo proyecto
+     * IMPORTANTE: NUNCA afecta al invoice actual, solo a los invoices posteriores.
+     *
+     * Ejemplo: Si se paga en Invoice 3, se actualizan Invoice 4 y 5, pero NUNCA el Invoice 3
+     *
+     * @param Invoice $currentInvoice   El invoice que se está pagando (este NO se afecta)
+     * @param array   $project_item_ids Los project_item_ids que se están pagando
+     *
+     * @return void
+     */
+    private function ActualizarUnpaidFromPreviousEnInvoicesSiguientes($currentInvoice, $project_item_ids)
+    {
+        $project_id = $currentInvoice->getProject()->getProjectId();
+        $current_invoice_id = $currentInvoice->getInvoiceId();
+        $current_invoice_start_date = $currentInvoice->getStartDate();
+
+        /** @var InvoiceRepository $invoiceRepo */
+        $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+
+        // Obtener todos los invoices del proyecto ordenados por fecha de inicio
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+
+        // Filtrar solo los invoices posteriores al actual (por fecha de inicio o ID)
+        // IMPORTANTE: El invoice actual ($current_invoice_id) NUNCA se incluye aquí
+        $followingInvoices = [];
+        foreach ($allInvoices as $invoice) {
+            /** @var Invoice $invoice */
+            // Excluir explícitamente el invoice actual - NUNCA se afecta a sí mismo
+            if ($invoice->getInvoiceId() != $current_invoice_id) {
+                $invoiceDate = $invoice->getStartDate();
+                // Considerar invoice siguiente si la fecha es mayor o igual (y es diferente)
+                if (
+                    $invoiceDate > $current_invoice_start_date
+                    || ($invoiceDate == $current_invoice_start_date && $invoice->getInvoiceId() > $current_invoice_id)
+                ) {
+                    $followingInvoices[] = $invoice;
+                }
+            }
+        }
+
+        // Ordenar por fecha de inicio ascendente, luego por ID
+        usort($followingInvoices, function ($a, $b) {
+            /** @var Invoice $a */
+            /** @var Invoice $b */
+            $dateCompare = $a->getStartDate() <=> $b->getStartDate();
+            if (0 != $dateCompare) {
+                return $dateCompare;
+            }
+
+            return $a->getInvoiceId() <=> $b->getInvoiceId();
+        });
+
+        /** @var InvoiceItemRepository $invoiceItemRepo */
+        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+
+        // Para cada project_item_id actualizado
+        foreach ($project_item_ids as $project_item_id) {
+            // Para cada invoice siguiente, recalcular unpaid_from_previous
+            foreach ($followingInvoices as $followingInvoice) {
+                /** @var Invoice $followingInvoice */
+                $following_invoice_id = $followingInvoice->getInvoiceId();
+
+                // Buscar el item en este invoice siguiente
+                $following_item = $invoiceItemRepo->BuscarItem($following_invoice_id, $project_item_id);
+
+                if (null != $following_item) {
+                    // Obtener todos los invoice items anteriores de este project_item
+                    $allInvoiceItems = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
+
+                    // Calcular unpaid_from_previous: suma del unpaid_qty de todos los invoices anteriores
+                    $unpaid_from_previous = 0;
+
+                    foreach ($allInvoiceItems as $previousItem) {
+                        /** @var InvoiceItem $previousItem */
+                        $previousInvoice = $previousItem->getInvoice();
+                        $previous_invoice_id = $previousInvoice->getInvoiceId();
+                        $previous_invoice_date = $previousInvoice->getStartDate();
+                        $following_invoice_date = $followingInvoice->getStartDate();
+
+                        // Solo considerar invoices anteriores a este invoice siguiente
+                        if (
+                            $previous_invoice_date < $following_invoice_date
+                            || ($previous_invoice_date == $following_invoice_date && $previous_invoice_id < $following_invoice_id)
+                        ) {
+                            // Para calcular unpaid_from_previous, se suman los unpaid_qty de los invoices anteriores
+                            // Cada invoice tiene su propio unpaid_qty = quantity_final - paid_qty
+                            // donde quantity_final = quantity + quantity_brought_forward
+
+                            // SIEMPRE recalcular unpaid_qty para asegurar precisión
+                            // No usar el valor almacenado porque el primer invoice siempre tiene unpaid_qty = 0
+                            // pero para calcular unpaid_from_previous necesitamos quantity_final - paid_qty
+                            $quantity = $previousItem->getQuantity() ?? 0;
+                            $quantity_brought_forward = $previousItem->getQuantityBroughtForward() ?? 0;
+                            $paid_qty = $previousItem->getPaidQty() ?? 0;
+
+                            // quantity_final = quantity + quantity_brought_forward (Invoice Qty)
+                            $quantity_final = $quantity + $quantity_brought_forward;
+
+                            // Calcular el unpaid_qty real: Invoice Qty - Paid Qty
+                            $unpaid_qty = $quantity_final - $paid_qty;
+                            $unpaid_qty = max(0, $unpaid_qty);
+
+                            // Sumar al unpaid_from_previous acumulado (solo valores positivos)
+                            $unpaid_from_previous += $unpaid_qty;
+                        }
+                    }
+
+                    // Actualizar unpaid_from_previous en el item siguiente
+                    // unpaid_from_previous = suma de los unpaid_qty de todos los invoices anteriores
+                    $following_item->setUnpaidFromPrevious($unpaid_from_previous);
+
+                    // Actualizar unpaid_qty del invoice siguiente
+                    // En payments, cuando se actualiza después de un pago, unpaid_qty debe ser
+                    // la suma de todos los unpaid_qty de los invoices anteriores
+                    // Ejemplo: Si se paga invoice 3, invoice 4 debe tener unpaid_qty = suma de unpaid_qty de 1, 2, 3
+                    $following_unpaid_qty = $unpaid_from_previous;
+                    $following_item->setUnpaidQty($following_unpaid_qty);
+                }
+            }
+        }
+    }
+
+    /**
+     * ListarInvoices: Listar los invoices.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarInvoices($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid)
+    {
+        /** @var InvoiceRepository $invoiceRepo */
+        $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
+        $resultado = $invoiceRepo->ListarInvoicesParaPaymentsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $company_id, $project_id, $fecha_inicial, $fecha_fin, $paid);
+
+        $data = [];
+
+        foreach ($resultado['data'] as $value) {
+            $invoice_id = $value->getInvoiceId();
+
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+
+            // Llamada simple (ahora devuelve float directo)
+            $retainage_valor = $this->CalcularRetainageConRegla($invoice_id);
+
+            $data[] = [
+                'id' => $invoice_id,
+                'number' => $value->getNumber(),
+                'company' => $value->getProject()->getCompany()->getName(),
+                'projectNumber' => $value->getProject()->getProjectNumber(),
+                'project' => $value->getProject()->getDescription(),
+                'project_id' => $value->getProject()->getProjectId(),
+                'startDate' => $value->getStartDate()->format('m/d/Y'),
+                'endDate' => $value->getEndDate()->format('m/d/Y'),
+                'notes' => $this->truncate($value->getNotes(), 50),
+                'total' => $total,
+                'retainage_amount' => number_format($retainage_valor, 2),
+                'createdAt' => $value->getCreatedAt()->format('m/d/Y'),
+                'paid' => $value->getPaid() ? 1 : 0,
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'total' => $resultado['total'],
+        ];
+    }
+
+    /**
+     * PaidInvoice: Paga un invoice.
+     *
+     * @param int $invoice_id Id
+     *
+     * @author Marcel
+     */
+    public function PaidInvoice($invoice_id)
+    {
+        $resultado = [];
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice = $this->getDoctrine()->getRepository(Invoice::class)
+           ->find($invoice_id);
+        /** @var Invoice $invoice */
+        if (!is_null($invoice)) {
+            // Verificar si ya está pagado - si está pagado, no hacer nada
+            if ($invoice->getPaid()) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'This invoice is already paid';
+
+                return $resultado;
+            }
+
+            // Marcar como pagado (no toggle, solo pagar)
+            $invoice->setPaid(true);
+
+            // Guardar los project_item_ids que se están actualizando para recalcular invoices siguientes
+            $updated_project_item_ids = [];
+
+            /** @var InvoiceItemRepository $invoiceItemRepo */
+            $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+            $items = $invoiceItemRepo->ListarItems($invoice_id);
+
+            $bon_quantity = null !== $invoice->getBonQuantity() ? (float) $invoice->getBonQuantity() : null;
+            $bon_amount = null !== $invoice->getBonAmount() ? (float) $invoice->getBonAmount() : null;
+
+            foreach ($items as $item) {
+                /** @var InvoiceItem $item */
+                $is_bond_item = $item->getProjectItem()->getItem()->getBond();
+                $price = $item->getPrice();
+                $project_item_id = $item->getProjectItem()->getId();
+
+                // Guardar project_item_id para actualizar invoices siguientes
+                $updated_project_item_ids[] = $project_item_id;
+
+                if ($is_bond_item) {
+                    // Ítem Bond: cantidad y monto vienen del invoice (bon_quantity, bon_amount)
+                    $quantity_final = null !== $bon_quantity ? $bon_quantity : 0.0;
+                    $paidQty = $quantity_final;
+                    $paidAmount = null !== $bon_amount ? $bon_amount : 0.0;
+                    $paidAmountTotal = $paidAmount;
+                    $unpaidQty = 0.0;
+                } else {
+                    $quantity = $item->getQuantity();
+                    $quantity_brought_forward = $item->getQuantityBroughtForward() ?? 0;
+                    $unpaidFromPrevious = $item->getUnpaidFromPrevious();
+                    $quantityFromPrevious = $item->getQuantityFromPrevious();
+
+                    // quantity_final = quantity + quantity_brought_forward (mismo criterio que toggle en tabla items)
+                    $quantity_final = $quantity + $quantity_brought_forward;
+
+                    // Calcular cantidad total completada (incluyendo anteriores)
+                    $quantityCompleted = ($quantity + $quantityFromPrevious) + $unpaidFromPrevious;
+
+                    // Al marcar como pagado: paid_qty = quantity_final, unpaid_qty = 0 (igual que el toggle Status)
+                    $paidQty = $quantity_final;
+                    $paidAmount = $quantity_final * $price;
+                    $paidAmountTotal = $quantityCompleted * $price;
+                    $unpaidQty = 0.0;
+                }
+
+                // Actualizar item como pagado (mismo proceso que SalvarPayments al usar el toggle)
+                $item->setPaidQty($paidQty);
+                $item->setPaidAmount($paidAmount);
+                $item->setPaidAmountTotal($paidAmountTotal);
+                $item->setUnpaidQty($unpaidQty);
+            }
+
+            // Actualizar unpaid_from_previous en invoices siguientes después de marcar como paid
+            if (!empty($updated_project_item_ids)) {
+                $this->ActualizarUnpaidFromPreviousEnInvoicesSiguientes($invoice, $updated_project_item_ids);
+            }
+
+            $em->flush();
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * SalvarRetainageReimbursement.
+     *
+     * @return array
+     */
+    public function SalvarRetainageReimbursement($params)
+    {
+        $resultado = [];
+        $em = $this->getDoctrine()->getManager();
+
+        $invoice_id = isset($params['invoice_id']) ? $params['invoice_id'] : '';
+        $reimbursed = isset($params['retainage_reimbursed']) ? (int) $params['retainage_reimbursed'] : 0;
+
+        // Aseguramos que sea float para cálculos
+        $amount = isset($params['retainage_reimbursed_amount']) ? (float) $params['retainage_reimbursed_amount'] : 0.00;
+
+        /** @var Invoice $entity */
+        $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+
+        if (null != $entity) {
+            if ($amount > 0) {
+                $history = new ReimbursementHistory();
+                $history->setAmount($amount);
+                $history->setCreatedAt(new \DateTime());
+
+                $history->setInvoice($entity);
+
+                $em->persist($history);
+            }
+
+            if (method_exists($entity, 'setRetainageReimbursed')) {
+                $entity->setRetainageReimbursed((bool) $reimbursed);
+            }
+
+            if (method_exists($entity, 'setRetainageReimbursedAmount')) {
+                $entity->setRetainageReimbursedAmount($amount);
+            }
+
+            if (method_exists($entity, 'setRetainageReimbursedDate')) {
+                $fecha = (1 == $reimbursed) ? new \DateTime() : null;
+                $entity->setRetainageReimbursedDate($fecha);
+            }
+
+            $em->persist($entity);
+            $em->flush();
+
+            if ($amount > 0) {
+                $log_operacion = 'Update';
+                $log_categoria = 'Retainage Reimbursement';
+                $log_descripcion = "Retainage reimbursed amount updated to $$amount for invoice #{$entity->getNumber()}";
+                $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+            }
+
+            $resultado['success'] = true;
+            $resultado['message'] = 'Retainage reimbursement updated.';
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'Invoice not found.';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * CambiarEstadoInvoice: Cambia el estado paid (Open/Closed) manualmente.
+     *
+     * @param int $invoice_id
+     * @param int $status     (1 = Closed, 0 = Open)
+     */
+    public function CambiarEstadoInvoice($invoice_id, $status)
+    {
+        $resultado = [];
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(Invoice::class)->find($invoice_id);
+        /** @var Invoice $entity */
+        if (null != $entity) {
+            // Convertir el status numérico a booleano
+            $isPaid = (1 == $status);
+            $entity->setPaid($isPaid);
+
+            $em->flush();
+
+            // Guardar en el Log
+            $statusLabel = $isPaid ? 'Closed' : 'Open';
+            $log_operacion = 'Update';
+            $log_categoria = 'Invoice Status';
+            $log_descripcion = "Invoice #{$entity->getNumber()} status changed to $statusLabel";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'Invoice not found';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * CalcularRetainageConRegla: Calcula el retainage basado en lo PAGADO (Paid Amt).
+     */
+    public function CalcularRetainageConRegla($invoice_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $invoice = $em->getRepository(Invoice::class)->find($invoice_id);
+
+        if (!$invoice) {
+            return 0.00;
+        }
+        $project = $invoice->getProject();
+        if (!$project) {
+            return 0.00;
+        }
+
+        $contract_amount = (float) $project->getContractAmount();
+        $std_retainage = (float) $project->getRetainagePercentage();
+        $completion_target = (float) $project->getRetainageAdjustmentCompletion();
+        $reduced_retainage = (float) $project->getRetainageAdjustmentPercentage();
+
+        /** @var InvoiceRepository $invoiceRepo */
+        $invoiceRepo = $em->getRepository(Invoice::class);
+
+        // CORRECCIÓN AQUÍ: Cambia el nombre del método para que coincida con el repositorio
+        $total_paid_with_retainage = $invoiceRepo->ObtenerTotalPagadoConRetainage($project->getProjectId());
+
+        $final_percent = $std_retainage;
+
+        if ($contract_amount > 0 && $completion_target > 0) {
+            $threshold = $contract_amount * ($completion_target / 100);
+
+            // Comparamos LO COBRADO (Paid Amt) vs el Umbral
+            if ($total_paid_with_retainage >= $threshold) {
+                $final_percent = $reduced_retainage;
+            }
+        }
+
+        $invoice_retainage_base = 0;
+        $items = $em->getRepository(InvoiceItem::class)->findBy(['invoice' => $invoice]);
+
+        foreach ($items as $item) {
+            $pi = $item->getProjectItem();
+            if ($pi && $pi->getApplyRetainage()) {
+                $invoice_retainage_base += ($item->getPrice() * $item->getQuantity());
+            }
+        }
+
+        return $invoice_retainage_base * ($final_percent / 100);
+    }
 }

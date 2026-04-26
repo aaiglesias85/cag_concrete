@@ -14,7 +14,7 @@ class RolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Lista los roles ordenados
+     * Lista los roles ordenados.
      *
      * @return Rol[]
      */
@@ -27,10 +27,7 @@ class RolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Buscar rol por nombre
-     *
-     * @param string $nombre
-     * @return Rol|null
+     * Buscar rol por nombre.
      */
     public function BuscarPorNombre(string $nombre): ?Rol
     {
@@ -38,26 +35,25 @@ class RolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Lista los roles con paginación y filtrado
+     * Lista los roles con paginación y filtrado.
      *
      * @return Rol[]
      */
     public function ListarRoles(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortColumn = 'nombre',
-        string  $sortDirection = 'ASC'
-    ): array
-    {
+        string $sortColumn = 'nombre',
+        string $sortDirection = 'ASC',
+    ): array {
         $qb = $this->createQueryBuilder('r');
 
         if (!empty($sSearch)) {
             $qb->andWhere('r.nombre LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        $qb->orderBy('r.' . $sortColumn, $sortDirection);
+        $qb->orderBy('r.'.$sortColumn, $sortDirection);
 
         if ($limit > 0) {
             $qb->setMaxResults($limit);
@@ -70,9 +66,7 @@ class RolRepository extends ServiceEntityRepository
     }
 
     /**
-     * Total de roles según filtro de búsqueda
-     *
-     * @return int
+     * Total de roles según filtro de búsqueda.
      */
     public function TotalRoles(?string $sSearch = null): int
     {
@@ -81,33 +75,33 @@ class RolRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $qb->andWhere('r.nombre LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarRolesConTotal Lista los roles con total
+     * ListarRolesConTotal Lista los roles con total.
      *
      * @return []
      */
-    public function ListarRolesConTotal(int     $start, int     $limit, ?string $sSearch = null, string  $sortColumn = 'nombre', string  $sortDirection = 'ASC'): array {
-
+    public function ListarRolesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'nombre', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'rolId'  => 'r.rolId',
+            'rolId' => 'r.rolId',
             'nombre' => 'r.nombre',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'r.nombre';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('r');
 
         if (!empty($sSearch)) {
             $baseQb->andWhere('r.nombre LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // 1) Datos
@@ -126,9 +120,8 @@ class RolRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

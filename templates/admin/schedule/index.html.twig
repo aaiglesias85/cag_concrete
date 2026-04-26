@@ -3,9 +3,9 @@
 {% block subtitle %} - Schedules{% endblock %}
 
 {% block stylesheetspecific %}
-    <link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}"
+    <link href="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}"
           rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}"
+    <link href="{{ asset('assets/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}"
           rel="stylesheet">
     <style>
         .fc-slats tr,
@@ -720,19 +720,19 @@
         })
         ({key: "{{ google_maps_api_key }}", v: "weekly"});</script>
 
-    <script src="{{ asset('bundles/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 
     <!-- datatable fixed column -->
-    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
 
     <!-- calendario -->
-    <script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/moment/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
 
-    <script src="{{ asset('bundles/metronic8/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/pages/schedules.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {

@@ -82,6 +82,7 @@ class SyncQueueQbwc
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 }

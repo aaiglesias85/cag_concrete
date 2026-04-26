@@ -3,7 +3,7 @@
 {% block subtitle %} - Project Stages{% endblock %}
 
 {% block stylesheetspecific %}
-    <link href="{{ asset('bundles/metronic8/plugins/jquery-minicolors/jquery.minicolors.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/metronic8/plugins/jquery-minicolors/jquery.minicolors.css') }}" rel="stylesheet">
     <style>
         .dt-color-dot{
             width: 12px;
@@ -294,10 +294,10 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/plugins/jquery-minicolors/jquery.minicolors.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/jquery-minicolors/jquery.minicolors.min.js') }}"></script>
     
-    <script src="{{ asset('bundles/metronic8/js/pages/project-stages.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/pages/project-stages.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
 
         var permiso = {

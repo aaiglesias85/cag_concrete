@@ -14,7 +14,8 @@ class PermisoPerfilRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarPermisosPerfil: Lista los permisos de un perfil
+     * ListarPermisosPerfil: Lista los permisos de un perfil.
+     *
      * @param int $perfil_id
      *
      * @author Marcel
@@ -28,6 +29,7 @@ class PermisoPerfilRepository extends ServiceEntityRepository
             ->getQuery();
 
         $lista = $consulta->getResult();
+
         return $lista;
     }
 }

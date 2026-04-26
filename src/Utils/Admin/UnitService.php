@@ -12,260 +12,265 @@ use App\Utils\Base;
 
 class UnitService extends Base
 {
+    /**
+     * CargarDatosUnit: Carga los datos de un unit.
+     *
+     * @param int $unit_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosUnit($unit_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
 
-   /**
-    * CargarDatosUnit: Carga los datos de un unit
-    *
-    * @param int $unit_id Id
-    *
-    * @author Marcel
-    */
-   public function CargarDatosUnit($unit_id)
-   {
-      $resultado = array();
-      $arreglo_resultado = array();
+        $entity = $this->getDoctrine()->getRepository(Unit::class)
+           ->find($unit_id);
+        /** @var Unit $entity */
+        if (null != $entity) {
+            $arreglo_resultado['descripcion'] = $entity->getDescription();
+            $arreglo_resultado['status'] = $entity->getStatus();
 
-      $entity = $this->getDoctrine()->getRepository(Unit::class)
-         ->find($unit_id);
-      /** @var Unit $entity */
-      if ($entity != null) {
+            $resultado['success'] = true;
+            $resultado['unit'] = $arreglo_resultado;
+        }
 
-         $arreglo_resultado['descripcion'] = $entity->getDescription();
-         $arreglo_resultado['status'] = $entity->getStatus();
+        return $resultado;
+    }
 
-         $resultado['success'] = true;
-         $resultado['unit'] = $arreglo_resultado;
-      }
+    /**
+     * EliminarUnit: Elimina un rol en la BD.
+     *
+     * @param int $unit_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarUnit($unit_id)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-      return $resultado;
-   }
+        $entity = $this->getDoctrine()->getRepository(Unit::class)
+           ->find($unit_id);
+        /** @var Unit $entity */
+        if (null != $entity) {
+            // items
+            /** @var ItemRepository $itemRepo */
+            $itemRepo = $this->getDoctrine()->getRepository(Item::class);
+            $items = $itemRepo->ListarItemsDeUnit($unit_id);
+            if (count($items) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The unit could not be deleted, because it is related to a item';
 
-   /**
-    * EliminarUnit: Elimina un rol en la BD
-    * @param int $unit_id Id
-    * @author Marcel
-    */
-   public function EliminarUnit($unit_id)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      $entity = $this->getDoctrine()->getRepository(Unit::class)
-         ->find($unit_id);
-      /**@var Unit $entity */
-      if ($entity != null) {
-
-         // items
-         /** @var ItemRepository $itemRepo */
-         $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-         $items = $itemRepo->ListarItemsDeUnit($unit_id);
-         if (count($items) > 0) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The unit could not be deleted, because it is related to a item";
-            return $resultado;
-         }
-
-         // materiales
-         /** @var MaterialRepository $materialRepo */
-         $materialRepo = $this->getDoctrine()->getRepository(Material::class);
-         $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
-         if (count($materiales) > 0) {
-            $resultado['success'] = false;
-            $resultado['error'] = "The unit could not be deleted, because it is related to a material";
-            return $resultado;
-         }
-
-         $unit_descripcion = $entity->getDescription();
-
-
-         $em->remove($entity);
-         $em->flush();
-
-         //Salvar log
-         $log_operacion = "Delete";
-         $log_categoria = "Unit";
-         $log_descripcion = "The unit is deleted: $unit_descripcion";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-         $resultado['success'] = true;
-      } else {
-         $resultado['success'] = false;
-         $resultado['error'] = "The requested record does not exist";
-      }
-
-      return $resultado;
-   }
-
-   /**
-    * EliminarUnits: Elimina los units seleccionados en la BD
-    * @param int $ids Ids
-    * @author Marcel
-    */
-   public function EliminarUnits($ids)
-   {
-      $em = $this->getDoctrine()->getManager();
-
-      if ($ids != "") {
-         $ids = explode(',', $ids);
-         $cant_eliminada = 0;
-         $cant_total = 0;
-         foreach ($ids as $unit_id) {
-            if ($unit_id != "") {
-               $cant_total++;
-               $entity = $this->getDoctrine()->getRepository(Unit::class)
-                  ->find($unit_id);
-               /**@var Unit $entity */
-               if ($entity != null) {
-
-                  /** @var ItemRepository $itemRepo */
-                  $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-                  $items = $itemRepo->ListarItemsDeUnit($unit_id);
-
-                  /** @var MaterialRepository $materialRepo */
-                  $materialRepo = $this->getDoctrine()->getRepository(Material::class);
-                  $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
-
-                  if (count($items) == 0 && count($materiales) == 0) {
-
-                     $unit_descripcion = $entity->getDescription();
-
-                     $em->remove($entity);
-                     $cant_eliminada++;
-
-                     //Salvar log
-                     $log_operacion = "Delete";
-                     $log_categoria = "Unit";
-                     $log_descripcion = "The unit is deleted: $unit_descripcion";
-                     $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-                  }
-               }
+                return $resultado;
             }
-         }
-      }
-      $em->flush();
 
-      if ($cant_eliminada == 0) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The units could not be deleted, because they are associated with a item";
-      } else {
-         $resultado['success'] = true;
+            // materiales
+            /** @var MaterialRepository $materialRepo */
+            $materialRepo = $this->getDoctrine()->getRepository(Material::class);
+            $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
+            if (count($materiales) > 0) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The unit could not be deleted, because it is related to a material';
 
-         $mensaje = ($cant_eliminada == $cant_total) ? "The operation was successful" : "The operation was successful. But attention, it was not possible to delete all the selected units because they are associated with a item";
-         $resultado['message'] = $mensaje;
-      }
+                return $resultado;
+            }
 
-      return $resultado;
-   }
+            $unit_descripcion = $entity->getDescription();
 
-   /**
-    * ActualizarUnit: Actuializa los datos del rol en la BD
-    * @param int $unit_id Id
-    * @author Marcel
-    */
-   public function ActualizarUnit($unit_id, $description, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
+            $em->remove($entity);
+            $em->flush();
 
-      $entity = $this->getDoctrine()->getRepository(Unit::class)
-         ->find($unit_id);
-      /** @var Unit $entity */
-      if ($entity != null) {
-         //Verificar description
-         $unit = $this->getDoctrine()->getRepository(Unit::class)
-            ->findOneBy(['description' => $description]);
-         if ($unit != null && $entity->getUnitId() != $unit->getUnitId()) {
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'Unit';
+            $log_descripcion = "The unit is deleted: $unit_descripcion";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
             $resultado['success'] = false;
-            $resultado['error'] = "The unit name is in use, please try entering another one.";
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarUnits: Elimina los units seleccionados en la BD.
+     *
+     * @param int $ids Ids
+     *
+     * @author Marcel
+     */
+    public function EliminarUnits($ids)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        if ('' != $ids) {
+            $ids = explode(',', $ids);
+            $cant_eliminada = 0;
+            $cant_total = 0;
+            foreach ($ids as $unit_id) {
+                if ('' != $unit_id) {
+                    ++$cant_total;
+                    $entity = $this->getDoctrine()->getRepository(Unit::class)
+                       ->find($unit_id);
+                    /** @var Unit $entity */
+                    if (null != $entity) {
+                        /** @var ItemRepository $itemRepo */
+                        $itemRepo = $this->getDoctrine()->getRepository(Item::class);
+                        $items = $itemRepo->ListarItemsDeUnit($unit_id);
+
+                        /** @var MaterialRepository $materialRepo */
+                        $materialRepo = $this->getDoctrine()->getRepository(Material::class);
+                        $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
+
+                        if (0 == count($items) && 0 == count($materiales)) {
+                            $unit_descripcion = $entity->getDescription();
+
+                            $em->remove($entity);
+                            ++$cant_eliminada;
+
+                            // Salvar log
+                            $log_operacion = 'Delete';
+                            $log_categoria = 'Unit';
+                            $log_descripcion = "The unit is deleted: $unit_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
+                    }
+                }
+            }
+        }
+        $em->flush();
+
+        if (0 == $cant_eliminada) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The units could not be deleted, because they are associated with a item';
+        } else {
+            $resultado['success'] = true;
+
+            $mensaje = ($cant_eliminada == $cant_total) ? 'The operation was successful' : 'The operation was successful. But attention, it was not possible to delete all the selected units because they are associated with a item';
+            $resultado['message'] = $mensaje;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * ActualizarUnit: Actuializa los datos del rol en la BD.
+     *
+     * @param int $unit_id Id
+     *
+     * @author Marcel
+     */
+    public function ActualizarUnit($unit_id, $description, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(Unit::class)
+           ->find($unit_id);
+        /** @var Unit $entity */
+        if (null != $entity) {
+            // Verificar description
+            $unit = $this->getDoctrine()->getRepository(Unit::class)
+               ->findOneBy(['description' => $description]);
+            if (null != $unit && $entity->getUnitId() != $unit->getUnitId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The unit name is in use, please try entering another one.';
+
+                return $resultado;
+            }
+
+            $entity->setDescription($description);
+            $entity->setStatus($status);
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Update';
+            $log_categoria = 'Unit';
+            $log_descripcion = "The unit is modified: $description";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['unit_id'] = $unit_id;
+
             return $resultado;
-         }
+        }
+    }
 
-         $entity->setDescription($description);
-         $entity->setStatus($status);
+    /**
+     * SalvarUnit: Guarda los datos de unit en la BD.
+     *
+     * @param string $description Nombre
+     *
+     * @author Marcel
+     */
+    public function SalvarUnit($description, $status)
+    {
+        $em = $this->getDoctrine()->getManager();
 
-         $em->flush();
+        // Verificar description
+        $unit = $this->getDoctrine()->getRepository(Unit::class)
+           ->findOneBy(['description' => $description]);
+        if (null != $unit) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The unit name is in use, please try entering another one.';
 
-         //Salvar log
-         $log_operacion = "Update";
-         $log_categoria = "Unit";
-         $log_descripcion = "The unit is modified: $description";
-         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+            return $resultado;
+        }
 
-         $resultado['success'] = true;
-         $resultado['unit_id'] = $unit_id;
+        $entity = new Unit();
 
-         return $resultado;
-      }
-   }
+        $entity->setDescription($description);
+        $entity->setStatus($status);
 
-   /**
-    * SalvarUnit: Guarda los datos de unit en la BD
-    * @param string $description Nombre
-    * @author Marcel
-    */
-   public function SalvarUnit($description, $status)
-   {
-      $em = $this->getDoctrine()->getManager();
+        $em->persist($entity);
 
-      //Verificar description
-      $unit = $this->getDoctrine()->getRepository(Unit::class)
-         ->findOneBy(['description' => $description]);
-      if ($unit != null) {
-         $resultado['success'] = false;
-         $resultado['error'] = "The unit name is in use, please try entering another one.";
-         return $resultado;
-      }
+        $em->flush();
 
-      $entity = new Unit();
+        // Salvar log
+        $log_operacion = 'Add';
+        $log_categoria = 'Unit';
+        $log_descripcion = "The unit is added: $description";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
-      $entity->setDescription($description);
-      $entity->setStatus($status);
+        $resultado['success'] = true;
+        $resultado['unit_id'] = $entity->getUnitId();
 
-      $em->persist($entity);
+        return $resultado;
+    }
 
-      $em->flush();
+    /**
+     * ListarUnits: Listar los units.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarUnits($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    {
+        /** @var UnitRepository $unitRepo */
+        $unitRepo = $this->getDoctrine()->getRepository(Unit::class);
+        $resultado = $unitRepo->ListarUnitsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
 
-      //Salvar log
-      $log_operacion = "Add";
-      $log_categoria = "Unit";
-      $log_descripcion = "The unit is added: $description";
-      $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+        $data = [];
 
-      $resultado['success'] = true;
-      $resultado['unit_id'] = $entity->getUnitId();
+        foreach ($resultado['data'] as $value) {
+            $unit_id = $value->getUnitId();
 
-      return $resultado;
-   }
+            $data[] = [
+                'id' => $unit_id,
+                'description' => $value->getDescription(),
+                'status' => $value->getStatus() ? 1 : 0,
+            ];
+        }
 
-   /**
-    * ListarUnits: Listar los units
-    *
-    * @param int $start Inicio
-    * @param int $limit Limite
-    * @param string $sSearch Para buscar
-    *
-    * @author Marcel
-    */
-   public function ListarUnits($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-   {
-
-      /** @var UnitRepository $unitRepo */
-      $unitRepo = $this->getDoctrine()->getRepository(Unit::class);
-      $resultado = $unitRepo->ListarUnitsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
-
-      $data = [];
-
-      foreach ($resultado['data'] as $value) {
-         $unit_id = $value->getUnitId();
-
-         $data[] = [
-            "id" => $unit_id,
-            "description" => $value->getDescription(),
-            "status" => $value->getStatus() ? 1 : 0,
-         ];
-      }
-
-      return [
-         'data' => $data,
-         'total' => $resultado['total'], // ya viene con el filtro aplicado
-      ];
-   }
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
 }

@@ -4,9 +4,8 @@ namespace App\Controller;
 
 use App\Soap\QbwcSoapService;
 use App\Utils\QbwcService;
-
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class QbwcController extends AbstractController
@@ -25,7 +24,7 @@ class QbwcController extends AbstractController
         $description = 'Symfony QuickBooks Integration';
 
         $host = $this->qbwcService->ObtenerURL();
-        $appurl = $host . 'qbwc';
+        $appurl = $host.'qbwc';
         $appsupport = $appurl;
 
         $username = 'admin@concrete.com';
@@ -59,8 +58,7 @@ class QbwcController extends AbstractController
     public function qbwc(Request $request): Response
     {
         try {
-
-            $wsdl = $this->getParameter('kernel.project_dir') . '/public/qbwc.wsdl';
+            $wsdl = $this->getParameter('kernel.project_dir').'/public/qbwc.wsdl';
 
             $options = [
                 'uri' => 'http://developer.intuit.com/',
@@ -76,13 +74,11 @@ class QbwcController extends AbstractController
             $response = ob_get_clean();
 
             return new Response($response, 200, ['Content-Type' => 'text/xml; charset=utf-8']);
-
         } catch (\Exception $e) {
             $this->qbwcService->writelog($e->getMessage(), 'errorlog.txt');
 
             return new Response($this->wrapSoapResponse('<unknownResponse>Unknown request</unknownResponse>'), 200, ['Content-Type' => 'text/xml']);
         }
-
     }
 
     private function wrapSoapResponse(string $body): string

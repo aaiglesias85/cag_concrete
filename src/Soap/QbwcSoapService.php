@@ -24,8 +24,8 @@ class QbwcSoapService
         if (!$user) {
             return [
                 'authenticateResult' => [
-                    'string' => ['', 'nvu']
-                ]
+                    'string' => ['', 'nvu'],
+                ],
             ];
         }
 
@@ -38,9 +38,9 @@ class QbwcSoapService
             'authenticateResult' => [
                 'string' => [
                     $ticket, // o '' si no hay acciones
-                    ''       // o 'nvu' si no autorizado
-                ]
-            ]
+                    '',       // o 'nvu' si no autorizado
+                ],
+            ],
         ];
 
         /*
@@ -68,7 +68,8 @@ class QbwcSoapService
 
         $session = $this->qbwcService->BuscarSesion($ticket);
         if (!$session) {
-            $this->qbwcService->writeLog("handleSendRequestXML No hay sesión");
+            $this->qbwcService->writeLog('handleSendRequestXML No hay sesión');
+
             return '';
         }
 
@@ -128,12 +129,14 @@ class QbwcSoapService
     public function serverVersion($params)
     {
         $version = $params->strVersion ?? '';
+
         return ['serverVersionResult' => '1.0.0'];
     }
 
     public function clientVersion($params)
     {
         $strVersion = $params->strVersion ?? '';
+
         return ['clientVersionResult' => ''];
     }
 }

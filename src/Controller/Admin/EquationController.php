@@ -3,17 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\Equation;
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\EquationService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\EquationService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class EquationController extends AbstractAdminController
 {
-
     private $equationService;
 
     public function __construct(AdminAccessService $adminAccess, EquationService $equationService)
@@ -30,14 +28,13 @@ class EquationController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/equation/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/equation/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -59,14 +56,13 @@ class EquationController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -76,8 +72,7 @@ class EquationController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -87,26 +82,23 @@ class EquationController extends AbstractAdminController
         $status = $request->get('status');
 
         try {
-
-            if ($equation_id == "") {
+            if ('' == $equation_id) {
                 $resultado = $this->equationService->SalvarEquation($description, $equation, $status);
             } else {
                 $resultado = $this->equationService->ActualizarEquation($equation_id, $description, $equation, $status);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['equation_id'] = $resultado['equation_id'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -116,8 +108,7 @@ class EquationController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un equation en la BD
-     *
+     * eliminar Acción que elimina un equation en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -127,27 +118,25 @@ class EquationController extends AbstractAdminController
             $resultado = $this->equationService->EliminarEquation($equation_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                $resultadoJson['equation_ids_con_items'] = $resultado['equation_ids_con_items'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+            $resultadoJson['equation_ids_con_items'] = $resultado['equation_ids_con_items'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarEquations Acción que elimina los equationes seleccionados en la BD
-     *
+     * eliminarEquations Acción que elimina los equationes seleccionados en la BD.
      */
     public function eliminarEquations(Request $request)
     {
@@ -157,28 +146,26 @@ class EquationController extends AbstractAdminController
             $resultado = $this->equationService->EliminarEquations($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['equation_ids_con_items'] = $resultado['equation_ids_con_items'];
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                $resultadoJson['equation_ids_con_items'] = $resultado['equation_ids_con_items'];
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+            $resultadoJson['equation_ids_con_items'] = $resultado['equation_ids_con_items'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del equation en la BD
-     *
+     * cargarDatos Acción que carga los datos del equation en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -187,36 +174,31 @@ class EquationController extends AbstractAdminController
         try {
             $resultado = $this->equationService->CargarDatosEquation($equation_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['equation'] = $resultado['equation'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * listarPayItems Acción que lista los pay items de las equations
-     *
+     * listarPayItems Acción que lista los pay items de las equations.
      */
     public function listarPayItems(Request $request)
     {
         $ids = $request->get('ids');
 
         try {
-
             $lista = $this->equationService->ListarPayItems($ids);
 
             $resultadoJson['success'] = true;
@@ -228,20 +210,16 @@ class EquationController extends AbstractAdminController
             $resultadoJson['equations'] = $equations;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * salvarPayItems Acción para salvar los cambios de pay items
-     *
+     * salvarPayItems Acción para salvar los cambios de pay items.
      */
     public function salvarPayItems(Request $request)
     {
@@ -249,21 +227,18 @@ class EquationController extends AbstractAdminController
         $pay_items = json_decode($pay_items);
 
         try {
-
             $resultado = $this->equationService->SalvarPayItems($pay_items);
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -271,5 +246,4 @@ class EquationController extends AbstractAdminController
             return $this->json($resultadoJson);
         }
     }
-
 }

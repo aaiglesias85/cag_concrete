@@ -41,6 +41,7 @@ class PermisoPerfil
     public function setVer(?bool $ver): self
     {
         $this->ver = $ver;
+
         return $this;
     }
 
@@ -52,6 +53,7 @@ class PermisoPerfil
     public function setAgregar(?bool $agregar): self
     {
         $this->agregar = $agregar;
+
         return $this;
     }
 
@@ -63,6 +65,7 @@ class PermisoPerfil
     public function setEditar(?bool $editar): self
     {
         $this->editar = $editar;
+
         return $this;
     }
 
@@ -74,6 +77,7 @@ class PermisoPerfil
     public function setEliminar(?bool $eliminar): self
     {
         $this->eliminar = $eliminar;
+
         return $this;
     }
 

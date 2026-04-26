@@ -14,7 +14,7 @@ class ScheduleEmployeeRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarEmployeesDeSchedule: Lista los employees de un schedule
+     * ListarEmployeesDeSchedule: Lista los employees de un schedule.
      *
      * @return ScheduleEmployee[]
      */
@@ -24,18 +24,18 @@ class ScheduleEmployeeRepository extends ServiceEntityRepository
             ->leftJoin('s_e.schedule', 's')
             ->leftJoin('s_e.employee', 'e');
 
-        if ($schedule_id != '') {
+        if ('' != $schedule_id) {
             $consulta->andWhere('s.scheduleId = :schedule_id')
                 ->setParameter('schedule_id', $schedule_id);
         }
 
-        $consulta->orderBy('e.name', "ASC");
+        $consulta->orderBy('e.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedulesDeEmployee: Lista los schedules de un employee
+     * ListarSchedulesDeEmployee: Lista los schedules de un employee.
      *
      * @return ScheduleEmployee[]
      */
@@ -45,12 +45,12 @@ class ScheduleEmployeeRepository extends ServiceEntityRepository
             ->leftJoin('s_e.schedule', 's')
             ->leftJoin('s_e.employee', 'e');
 
-        if ($employee_id != '') {
+        if ('' != $employee_id) {
             $consulta->andWhere('e.employeeId = :employee_id')
                 ->setParameter('employee_id', $employee_id);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }

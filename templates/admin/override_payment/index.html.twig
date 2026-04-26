@@ -1,7 +1,7 @@
 {% extends 'admin/layout.html.twig' %}
 {% block subtitle %} - Override Payment{% endblock %}
 {% block stylesheetspecific %}
-<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
    .dtfc-fixed-start, .dtfc-fixed-end { background: #fff !important; }
    #form-override-payment .row-secondary > td { background: #e6f2ff !important; }
@@ -472,10 +472,10 @@
 {% endblock %}
 
 {% block javascriptsspecific %}
-<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/js/pages/override-payment.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/js/pages/override-payment.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
    var permiso = {
       agregar: {% if permiso.agregar %}{{ permiso.agregar }}{% else %}0{% endif %},

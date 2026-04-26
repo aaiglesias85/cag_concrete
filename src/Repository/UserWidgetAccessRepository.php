@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\UserWidgetAccess;
 use App\Entity\Usuario;
 use App\Entity\Widget;
-use App\Entity\UserWidgetAccess;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -52,7 +52,7 @@ class UserWidgetAccessRepository extends ServiceEntityRepository
         $usuario = $em->getReference(Usuario::class, $userId);
         $w = $em->getReference(Widget::class, $widgetId);
         $existing = $this->findOneBy(['usuario' => $usuario, 'widget' => $w]);
-        if ($existing !== null) {
+        if (null !== $existing) {
             $existing->setEnabled($enabled);
         } else {
             $e = new UserWidgetAccess();

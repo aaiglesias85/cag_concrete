@@ -4,16 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "rol")]
+#[ORM\Table(name: 'rol')]
 #[ORM\Entity(repositoryClass: "App\Repository\RolRepository")]
 class Rol
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "rol_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'rol_id', type: 'integer', nullable: false)]
     private ?int $rolId;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $nombre;
 
     public function getRolId(): ?int
@@ -24,6 +24,7 @@ class Rol
     public function setNombre(?string $nombre): self
     {
         $this->nombre = $nombre;
+
         return $this;
     }
 

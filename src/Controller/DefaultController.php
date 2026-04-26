@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Utils\ScriptService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
@@ -22,13 +21,13 @@ class DefaultController extends AbstractController
     // test email
     public function testemail()
     {
-        //Enviar email
+        // Enviar email
         $direccion_url = $this->scriptService->ObtenerURL();
         $direccion_from = $this->getParameter('mailer_sender_address');
         $from_name = $this->getParameter('mailer_from_name');
 
-        $asunto = "Test Email";
-        $contenido = "Sending emails is fun again!";
+        $asunto = 'Test Email';
+        $contenido = 'Sending emails is fun again!';
         // symfony mailer
         $mensaje = (new TemplatedEmail())
             ->from(new Address($direccion_from, $from_name))
@@ -37,10 +36,10 @@ class DefaultController extends AbstractController
             ->htmlTemplate('mailing/mail.html.twig')
             ->context([
                 'direccion_url' => $direccion_url,
-               'asunto' => $asunto,
-               'receptor' => "Usuario",
-               'contenido' => $contenido,
-          ])
+                'asunto' => $asunto,
+                'receptor' => 'Usuario',
+                'contenido' => $contenido,
+            ])
             // attach
             // ->attachFromPath('/path/to/documents/terms-of-use.pdf')
             // optionally you can tell email clients to display a custom name for the file
@@ -51,6 +50,6 @@ class DefaultController extends AbstractController
 
         $this->scriptService->mailer->send($mensaje);
 
-        return new Response("OK", 200);
+        return new Response('OK', 200);
     }
 }

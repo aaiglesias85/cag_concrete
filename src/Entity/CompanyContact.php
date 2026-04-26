@@ -46,6 +46,7 @@ class CompanyContact
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -57,6 +58,7 @@ class CompanyContact
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -68,6 +70,7 @@ class CompanyContact
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -79,6 +82,7 @@ class CompanyContact
     public function setRole(?string $role): self
     {
         $this->role = $role;
+
         return $this;
     }
 
@@ -90,6 +94,7 @@ class CompanyContact
     public function setNotes(?string $notes): self
     {
         $this->notes = $notes;
+
         return $this;
     }
 
@@ -101,6 +106,7 @@ class CompanyContact
     public function setCompany(?Company $company): self
     {
         $this->company = $company;
+
         return $this;
     }
 }

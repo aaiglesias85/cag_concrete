@@ -16,8 +16,8 @@ class TaskService extends Base
         if ($entity instanceof Task) {
             $u = $entity->getAssignedUser();
             $assignedLabel = '';
-            if ($u !== null) {
-                $assignedLabel = $u->getNombreCompleto() . '<' . ($u->getEmail() ?? '') . '>';
+            if (null !== $u) {
+                $assignedLabel = $u->getNombreCompleto().'<'.($u->getEmail() ?? '').'>';
             }
             $resultado['success'] = true;
             $resultado['task'] = [
@@ -45,6 +45,7 @@ class TaskService extends Base
             $em->remove($entity);
             $em->flush();
             $this->SalvarLog('Delete', 'Task', "The task is deleted: $desc");
+
             return ['success' => true];
         }
 
@@ -56,24 +57,24 @@ class TaskService extends Base
         $em = $this->getDoctrine()->getManager();
         $cant_eliminada = 0;
         $cant_total = 0;
-        if ($ids !== '' && $ids !== null) {
+        if ('' !== $ids && null !== $ids) {
             foreach (explode(',', (string) $ids) as $task_id) {
-                if ($task_id === '') {
+                if ('' === $task_id) {
                     continue;
                 }
-                $cant_total++;
+                ++$cant_total;
                 $entity = $this->getDoctrine()->getRepository(Task::class)->find($task_id);
                 if ($entity instanceof Task) {
                     $desc = mb_substr((string) $entity->getDescription(), 0, 80);
                     $em->remove($entity);
-                    $cant_eliminada++;
+                    ++$cant_eliminada;
                     $this->SalvarLog('Delete', 'Task', "The task is deleted: $desc");
                 }
             }
         }
         $em->flush();
 
-        if ($cant_eliminada === 0) {
+        if (0 === $cant_eliminada) {
             return ['success' => false, 'error' => 'No tasks could be deleted'];
         }
 
@@ -88,7 +89,7 @@ class TaskService extends Base
     {
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(Task::class)->find($task_id);
-        if (!($entity instanceof Task)) {
+        if (!$entity instanceof Task) {
             return ['success' => false, 'error' => 'The requested record does not exist'];
         }
 
@@ -177,17 +178,17 @@ class TaskService extends Base
     public function resolverRangoFechasPeriodo(string $period, string $customFi, string $customFf): array
     {
         $p = strtolower(trim($period));
-        if ($p === 'all' || $p === 'all_time' || $p === '') {
+        if ('all' === $p || 'all_time' === $p || '' === $p) {
             return ['inicial' => '', 'final' => ''];
         }
-        if ($p === 'custom') {
+        if ('custom' === $p) {
             return [
                 'inicial' => trim($customFi),
                 'final' => trim($customFf),
             ];
         }
         $now = new \DateTime('now', new \DateTimeZone(date_default_timezone_get()));
-        if ($p === 'current_month') {
+        if ('current_month' === $p) {
             $inicio = (clone $now)->modify('first day of this month')->setTime(0, 0, 0);
             $fin = (clone $now)->modify('last day of this month')->setTime(0, 0, 0);
 
@@ -196,7 +197,7 @@ class TaskService extends Base
                 'final' => $fin->format('m/d/Y'),
             ];
         }
-        if ($p === 'last_month') {
+        if ('last_month' === $p) {
             $inicio = (clone $now)->modify('first day of last month')->setTime(0, 0, 0);
             $fin = (clone $now)->modify('last day of last month')->setTime(0, 0, 0);
 
@@ -286,7 +287,7 @@ class TaskService extends Base
     private function normalizarStatus(?string $status): string
     {
         $s = strtolower(trim((string) $status));
-        if ($s === Task::STATUS_COMPLETE || $s === 'completed') {
+        if (Task::STATUS_COMPLETE === $s || 'completed' === $s) {
             return Task::STATUS_COMPLETE;
         }
 
@@ -295,56 +296,56 @@ class TaskService extends Base
 
     private function parseDueDate(?string $due_day): ?\DateTimeInterface
     {
-        if ($due_day === null || $due_day === '') {
+        if (null === $due_day || '' === $due_day) {
             return null;
         }
         $d = \DateTime::createFromFormat('m/d/Y', $due_day);
 
-        return $d !== false ? $d : null;
+        return false !== $d ? $d : null;
     }
 
-   public function elActorPuedeCambiarEstadoTarea(Usuario $actor, array $perm, Task $entity): bool
-   {
-      if (empty($perm['editar'])) {
-         return false;
-      }
-      if ($actor->isAdministrador()) {
-         return true;
-      }
-      $u = $entity->getAssignedUser();
+    public function elActorPuedeCambiarEstadoTarea(Usuario $actor, array $perm, Task $entity): bool
+    {
+        if (empty($perm['editar'])) {
+            return false;
+        }
+        if ($actor->isAdministrador()) {
+            return true;
+        }
+        $u = $entity->getAssignedUser();
 
-      return $u !== null && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId();
-   }
+        return null !== $u && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId();
+    }
 
-   public function CambiarEstadoTask($task_id, string $status, ?Usuario $actor, array $perm = []): array
-   {
-      $nuevo = $this->normalizarStatus($status);
-      $em = $this->getDoctrine()->getManager();
-      $entity = $em->getRepository(Task::class)->find($task_id);
-      if (!($entity instanceof Task)) {
-         return ['success' => false, 'error' => 'The requested record does not exist'];
-      }
-      if ($actor !== null) {
-         if (!$this->elActorPuedeCambiarEstadoTarea($actor, $perm, $entity)) {
-            return ['success' => false, 'error' => 'Not allowed to change this task state'];
-         }
-      }
-      if ($entity->getStatus() === $nuevo) {
-         return ['success' => true, 'message' => 'The operation was successful'];
-      }
-      $entity->setStatus($nuevo);
-      $em->flush();
-      $this->SalvarLog('Update', 'Task', 'The task status is changed: ' . $nuevo);
+    public function CambiarEstadoTask($task_id, string $status, ?Usuario $actor, array $perm = []): array
+    {
+        $nuevo = $this->normalizarStatus($status);
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository(Task::class)->find($task_id);
+        if (!$entity instanceof Task) {
+            return ['success' => false, 'error' => 'The requested record does not exist'];
+        }
+        if (null !== $actor) {
+            if (!$this->elActorPuedeCambiarEstadoTarea($actor, $perm, $entity)) {
+                return ['success' => false, 'error' => 'Not allowed to change this task state'];
+            }
+        }
+        if ($entity->getStatus() === $nuevo) {
+            return ['success' => true, 'message' => 'The operation was successful'];
+        }
+        $entity->setStatus($nuevo);
+        $em->flush();
+        $this->SalvarLog('Update', 'Task', 'The task status is changed: '.$nuevo);
 
-      return ['success' => true, 'message' => 'The operation was successful'];
-   }
+        return ['success' => true, 'message' => 'The operation was successful'];
+    }
 
-   private function resolverUsuario($usuario_id): ?Usuario
-   {
-      if ($usuario_id === null || $usuario_id === '') {
-         return null;
-      }
+    private function resolverUsuario($usuario_id): ?Usuario
+    {
+        if (null === $usuario_id || '' === $usuario_id) {
+            return null;
+        }
 
-      return $this->getDoctrine()->getRepository(Usuario::class)->find((int) $usuario_id);
-   }
+        return $this->getDoctrine()->getRepository(Usuario::class)->find((int) $usuario_id);
+    }
 }

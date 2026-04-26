@@ -14,7 +14,7 @@ class ProjectPriceAdjustmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarAjustesDeProject: Lista los prices adjustments de un proyecto
+     * ListarAjustesDeProject: Lista los prices adjustments de un proyecto.
      *
      * @return ProjectPriceAdjustment[]
      */
@@ -23,20 +23,18 @@ class ProjectPriceAdjustmentRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('p_p_a')
             ->leftJoin('p_p_a.project', 'p');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        $consulta->orderBy('p_p_a.day', "ASC");
-
+        $consulta->orderBy('p_p_a.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
-
     /**
-     * ListarAjustesDeFecha: Lista los prices adjustments de una fecha
+     * ListarAjustesDeFecha: Lista los prices adjustments de una fecha.
      *
      * @return ProjectPriceAdjustment[]
      */
@@ -44,13 +42,12 @@ class ProjectPriceAdjustmentRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('p_p_a');
 
-        if ($day != '') {
+        if ('' != $day) {
             $consulta->andWhere('p_p_a.day = :day')
                 ->setParameter('day', $day);
         }
 
-        $consulta->orderBy('p_p_a.day', "ASC");
-
+        $consulta->orderBy('p_p_a.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }

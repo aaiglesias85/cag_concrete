@@ -4,16 +4,16 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "district")]
+#[ORM\Table(name: 'district')]
 #[ORM\Entity(repositoryClass: "App\Repository\DistrictRepository")]
 class District
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "district_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'district_id', type: 'integer', nullable: false)]
     private ?int $districtId;
 
-    #[ORM\Column(name: "description", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     private ?string $description;
 
     #[ORM\Column(name: 'status', type: 'boolean', nullable: true)]
@@ -42,6 +42,7 @@ class District
     public function setStatus(?bool $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 }

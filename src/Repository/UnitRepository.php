@@ -14,7 +14,7 @@ class UnitRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar las unidades ordenadas por descripción
+     * Listar las unidades ordenadas por descripción.
      *
      * @return Unit[]
      */
@@ -28,17 +28,18 @@ class UnitRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar unidades con filtros de búsqueda, paginación y ordenación
+     * Listar unidades con filtros de búsqueda, paginación y ordenación.
      *
      * @return Unit[]
      */
-    public function ListarUnits(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array {
+    public function ListarUnits(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         $qb = $this->createQueryBuilder('u');
 
         // Filtro por búsqueda
         if ($sSearch) {
             $qb->andWhere('u.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         return $qb->orderBy("u.$sortColumn", $sortDirection)
@@ -49,9 +50,7 @@ class UnitRepository extends ServiceEntityRepository
     }
 
     /**
-     * Obtener el total de unidades según los filtros de búsqueda
-     *
-     * @return int
+     * Obtener el total de unidades según los filtros de búsqueda.
      */
     public function TotalUnits(?string $sSearch = null): int
     {
@@ -61,34 +60,34 @@ class UnitRepository extends ServiceEntityRepository
         // Filtro por búsqueda
         if ($sSearch) {
             $qb->andWhere('u.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarUnitsConTotal Lista los units con total
+     * ListarUnitsConTotal Lista los units con total.
      *
      * @return []
      */
-    public function ListarUnitsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarUnitsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'unitId'  => 'u.unitId',
+            'unitId' => 'u.unitId',
             'description' => 'u.description',
             'status' => 'u.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'u.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('u');
 
         if (!empty($sSearch)) {
             $baseQb->andWhere('u.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // 1) Datos
@@ -107,9 +106,8 @@ class UnitRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

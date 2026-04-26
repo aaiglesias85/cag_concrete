@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
@@ -50,7 +49,7 @@ class CompanyController extends AbstractAdminController
         $usuario_retainage = $usuario->getRetainage() ?? false;
         $usuario_bond = $usuario->getBond() ?? false;
 
-        return $this->render('admin/company/index.html.twig', array(
+        return $this->render('admin/company/index.html.twig', [
             'permiso' => $permiso[0],
             'countys' => $countys,
             'inspectors' => $inspectors,
@@ -63,12 +62,11 @@ class CompanyController extends AbstractAdminController
             'yields_calculation' => $yields_calculation,
             'usuario_retainage' => $usuario_retainage,
             'usuario_bond' => $usuario_bond,
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los companies
-     *
+     * listar Acción que lista los companies.
      */
     public function listar(Request $request)
     {
@@ -90,14 +88,13 @@ class CompanyController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -107,8 +104,7 @@ class CompanyController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -127,26 +123,23 @@ class CompanyController extends AbstractAdminController
         $contacts = json_decode($contacts);
 
         try {
-
-            if ($company_id == "") {
+            if ('' == $company_id) {
                 $resultado = $this->companyService->SalvarCompany($name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts);
             } else {
                 $resultado = $this->companyService->ActualizarCompany($company_id, $name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['company_id'] = $resultado['company_id'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -156,8 +149,7 @@ class CompanyController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un company en la BD
-     *
+     * eliminar Acción que elimina un company en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -167,26 +159,24 @@ class CompanyController extends AbstractAdminController
             $resultado = $this->companyService->EliminarCompany($company_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarCompanies Acción que elimina los companies seleccionados en la BD
-     *
+     * eliminarCompanies Acción que elimina los companies seleccionados en la BD.
      */
     public function eliminarCompanies(Request $request)
     {
@@ -196,26 +186,24 @@ class CompanyController extends AbstractAdminController
             $resultado = $this->companyService->EliminarCompanies($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del company en la BD
-     *
+     * cargarDatos Acción que carga los datos del company en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -224,29 +212,25 @@ class CompanyController extends AbstractAdminController
         try {
             $resultado = $this->companyService->CargarDatosCompany($company_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['company'] = $resultado['company'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * eliminarContact Acción que elimina un contact en la BD
-     *
+     * eliminarContact Acción que elimina un contact en la BD.
      */
     public function eliminarContact(Request $request)
     {
@@ -256,26 +240,24 @@ class CompanyController extends AbstractAdminController
             $resultado = $this->companyService->EliminarContact($contact_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * salvarContact Acción que salvar un contact en la BD
-     *
+     * salvarContact Acción que salvar un contact en la BD.
      */
     public function salvarContact(Request $request)
     {
@@ -291,33 +273,29 @@ class CompanyController extends AbstractAdminController
             $resultado = $this->companyService->SalvarContact($company_id, $name, $phone, $email, $role, $notes);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['contact_id'] = $resultado['contact_id'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * listarContacts Acción que lista los contactos de la empresa en la BD
-     *
+     * listarContacts Acción que lista los contactos de la empresa en la BD.
      */
     public function listarContacts(Request $request)
     {
         $company_id = $request->get('company_id');
-
 
         try {
             $lista = $this->companyService->ListarContactsDeCompany($company_id);
@@ -326,14 +304,11 @@ class CompanyController extends AbstractAdminController
             $resultadoJson['contacts'] = $lista;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 }

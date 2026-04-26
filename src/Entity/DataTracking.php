@@ -2,9 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Inspector;
-use App\Entity\OverheadPrice;
-use App\Entity\Project;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: 'App\Repository\DataTrackingRepository')]

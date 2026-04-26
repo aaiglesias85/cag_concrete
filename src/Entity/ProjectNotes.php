@@ -4,23 +4,23 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "project_notes")]
+#[ORM\Table(name: 'project_notes')]
 #[ORM\Entity(repositoryClass: "App\Repository\ProjectNotesRepository")]
 class ProjectNotes
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "notes", type: "text", nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
     private ?string $notes;
 
-    #[ORM\Column(name: "date", type: "date", nullable: true)]
+    #[ORM\Column(name: 'date', type: 'date', nullable: true)]
     private ?\DateTime $date;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
-    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: true)]
     private ?Project $project;
 
     public function getId(): ?int

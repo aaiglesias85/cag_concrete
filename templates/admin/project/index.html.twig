@@ -1,8 +1,8 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Projects{% endblock %} {% block stylesheetspecific %}
 
-<link href="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
 
-<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 {% endblock %} {% block content %}
 
 <!--begin::Toolbar-->
@@ -3712,16 +3712,16 @@
 {{ render(controller('App\\Controller\\Admin\\DefaultController::renderModalConcreteClass')) }}
 
 {% endblock %} {% block javascriptsspecific %}
-<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 
 <!-- datatable fixed column -->
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
 
-<script src="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
 
-<script src="{{ asset('bundles/metronic8/js/pages/projects.js') }}?{{ 'now' | date('U') }}"></script>
-<script src="{{ asset('bundles/metronic8/js/pages/projects-detalle.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('assets/metronic8/js/pages/projects.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('assets/metronic8/js/pages/projects-detalle.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
 
    var permiso = {

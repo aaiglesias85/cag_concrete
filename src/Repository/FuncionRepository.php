@@ -14,7 +14,7 @@ class FuncionRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista las funciones ordenadas
+     * ListarOrdenados: Lista las funciones ordenadas.
      *
      * @author Marcel
      */
@@ -24,6 +24,7 @@ class FuncionRepository extends ServiceEntityRepository
             ->orderBy('f.funcionId', 'ASC');
 
         $lista = $consulta->getQuery()->getResult();
+
         return $lista;
     }
 }

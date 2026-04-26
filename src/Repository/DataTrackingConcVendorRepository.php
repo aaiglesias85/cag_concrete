@@ -12,8 +12,9 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DataTrackingConcVendor::class);
     }
+
     /**
-     * ListarConcVendor: Lista la conc vendor del data tracking
+     * ListarConcVendor: Lista la conc vendor del data tracking.
      *
      * @return DataTrackingConcVendor[]
      */
@@ -32,7 +33,7 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarDataTrackingsDeConcVendor: Lista la conc vendor del data tracking
+     * ListarDataTrackingsDeConcVendor: Lista la conc vendor del data tracking.
      *
      * @return DataTrackingConcVendor[]
      */
@@ -51,7 +52,7 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarProjectsDeConcVendor: Lista los projects de conc vendor
+     * ListarProjectsDeConcVendor: Lista los projects de conc vendor.
      *
      * @return DataTrackingConcVendor[]
      */
@@ -62,20 +63,20 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
             ->leftJoin('d_t.project', 'p')
             ->leftJoin('d_t_c_v.concreteVendor', 'c_v');
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
         $consulta->groupBy('p.projectId');
 
-        $consulta->orderBy('p.name', "ASC");
+        $consulta->orderBy('p.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * TotalConcUsed: Total de conc used de la BD
+     * TotalConcUsed: Total de conc used de la BD.
      *
      * @param string $data_tracking_id
      * @param string $fecha_inicial
@@ -114,7 +115,7 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalConcPrice: Total de hours * rate de la BD
+     * TotalConcPrice: Total de hours * rate de la BD.
      *
      * @param string $data_tracking_id
      * @param string $project_id
@@ -157,7 +158,7 @@ class DataTrackingConcVendorRepository extends ServiceEntityRepository
             }
         }
 
-        if ($status !== '') {
+        if ('' !== $status) {
             $qb->andWhere('p.status = :status')
                 ->setParameter('status', $status);
         }

@@ -4,23 +4,23 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "estimate_attachment")]
+#[ORM\Table(name: 'estimate_attachment')]
 #[ORM\Entity(repositoryClass: "App\Repository\EstimateAttachmentRepository")]
 class EstimateAttachment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "file", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
     #[ORM\ManyToOne(targetEntity: Estimate::class)]
-    #[ORM\JoinColumn(name: "estimate_id", referencedColumnName: "estimate_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'estimate_id', referencedColumnName: 'estimate_id', nullable: false)]
     private ?Estimate $estimate;
 
     public function getId(): ?int

@@ -14,44 +14,45 @@ class HolidayRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista los holidays ordenados
+     * ListarOrdenados: Lista los holidays ordenados.
      *
      * @return Holiday[]
      */
-    public function ListarOrdenados($sSearch = "", $fecha_inicial = '', $fecha_fin = '')
+    public function ListarOrdenados($sSearch = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('h');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('h.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('h.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('h.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy('h.day', "ASC");
+        $consulta->orderBy('h.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarHolidays: Lista los holidays
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarHolidays: Lista los holidays.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return Holiday[]
@@ -60,22 +61,22 @@ class HolidayRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('h');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('h.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('h.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('h.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
@@ -92,7 +93,8 @@ class HolidayRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalHolidays: Total de holidays de la BD
+     * TotalHolidays: Total de holidays de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -102,70 +104,68 @@ class HolidayRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('h')
             ->select('COUNT(h.holidayId)');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('h.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('h.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('h.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
      * ListarHolidaysConTotal: Lista y cuenta aplicando los mismos filtros.
-     *
      */
     public function ListarHolidaysConTotal(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortField = 'day',
-        string  $sortDir = 'DESC',
+        string $sortField = 'day',
+        string $sortDir = 'DESC',
         ?string $fecha_inicial = '',
-        ?string $fecha_fin = ''
-    ): array
-    {
+        ?string $fecha_fin = '',
+    ): array {
         $sortable = [
             'holidayId' => 'h.holidayId',
             'description' => 'h.description',
-            'day' => 'h.day'
+            'day' => 'h.day',
         ];
         $orderBy = $sortable[$sortField] ?? 'h.day';
-        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
-        
+        $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
+
         $baseQb = $this->createQueryBuilder('h');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $baseQb->andWhere('h.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $baseQb->andWhere('h.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $baseQb->andWhere('h.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
@@ -174,19 +174,21 @@ class HolidayRepository extends ServiceEntityRepository
         // Datos
         $dataQb = clone $baseQb;
         $dataQb->orderBy($orderBy, $dir)->setFirstResult($start);
-        if ($limit > 0) $dataQb->setMaxResults($limit);
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
         $data = $dataQb->getQuery()->getResult();
 
         // Conteo
         $countQb = clone $baseQb;
         $countQb->resetDQLPart('orderBy')->select('COUNT(h.holidayId)');
-        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return ['data' => $data, 'total' => $total];
     }
 
     /**
-     * BuscarHoliday: busca un holiday
+     * BuscarHoliday: busca un holiday.
      *
      * @return Holiday
      */
@@ -194,9 +196,9 @@ class HolidayRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('h');
 
-        if ($day != "") {
-            $day = \DateTime::createFromFormat("m/d/Y", $day);
-            $day = $day->format("Y-m-d");
+        if ('' != $day) {
+            $day = \DateTime::createFromFormat('m/d/Y', $day);
+            $day = $day->format('Y-m-d');
 
             $consulta->andWhere('h.day = :day')
                 ->setParameter('day', $day);
@@ -206,7 +208,7 @@ class HolidayRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarFeriadosDeFecha: Lista los holidays ordenados
+     * ListarFeriadosDeFecha: Lista los holidays ordenados.
      *
      * @return Holiday[]
      */
@@ -220,5 +222,4 @@ class HolidayRepository extends ServiceEntityRepository
 
         return $consulta->getQuery()->getResult();
     }
-
 }

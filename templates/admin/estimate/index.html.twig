@@ -1,8 +1,8 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Estimates{% endblock %} {% block stylesheetspecific %}
-<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
-<link href="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
-<link href="{{ asset('bundles/metronic8/plugins/jquery-tags-input/jquery.tagsinput.css') }}" rel="stylesheet" />
-<link href="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet" />
+<link href="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/jquery-tags-input/jquery.tagsinput.css') }}" rel="stylesheet" />
+<link href="{{ asset('assets/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.css') }}" rel="stylesheet" />
 <style>
    .m-widget4 .m-widget4__item {
       padding-top: 5px;
@@ -1769,17 +1769,17 @@
    })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
 </script>
 
-<script src="{{ asset('bundles/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/jquery-tags-input/jquery.tagsinput.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/moment/moment.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
+<script src="{{ asset('assets/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
+<script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/jquery-tags-input/jquery.tagsinput.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/moment/moment.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/moment-timezone/moment-timezone.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/assets/plugins/custom/fullcalendar/fullcalendar.bundle.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/bootstrap-fileinput/bootstrap-fileinput.js') }}"></script>
 
-<script src="{{ asset('bundles/metronic8/js/pages/estimates.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('assets/metronic8/js/pages/estimates.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
 
    var permiso = {

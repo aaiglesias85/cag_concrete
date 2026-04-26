@@ -14,7 +14,7 @@ class EstimateQuoteItemNoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar por estimate_quote_item_id
+     * Listar por estimate_quote_item_id.
      *
      * @return EstimateQuoteItemNote[]
      */

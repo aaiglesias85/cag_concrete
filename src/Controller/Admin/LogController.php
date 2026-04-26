@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\LogService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\LogService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class LogController extends AbstractAdminController
 {
-
     private $logService;
 
     public function __construct(AdminAccessService $adminAccess, LogService $logService)
@@ -29,14 +27,13 @@ class LogController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/log/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/log/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los usuarios
-     *
+     * listar Acción que lista los usuarios.
      */
     public function listar(Request $request)
     {
@@ -50,7 +47,7 @@ class LogController extends AbstractAdminController
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'fecha', 'usuario', 'operacion', 'categoria', 'descripcion', 'ip' ],
+                allowedOrderFields: ['id', 'fecha', 'usuario', 'operacion', 'categoria', 'descripcion', 'ip'],
                 defaultOrderField: 'fecha'
             );
 
@@ -73,14 +70,13 @@ class LogController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -90,8 +86,7 @@ class LogController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un log en la BD
-     *
+     * eliminar Acción que elimina un log en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -100,18 +95,18 @@ class LogController extends AbstractAdminController
         $resultado = $this->logService->EliminarLog($log_id);
         if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-        } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
+            $resultadoJson['message'] = 'The operation was successful';
+
             return $this->json($resultadoJson);
         }
+        $resultadoJson['success'] = $resultado['success'];
+        $resultadoJson['error'] = $resultado['error'];
+
+        return $this->json($resultadoJson);
     }
 
     /**
-     * eliminarLogs Acción que elimina los loges seleccionados en la BD
-     *
+     * eliminarLogs Acción que elimina los loges seleccionados en la BD.
      */
     public function eliminarLogs(Request $request)
     {
@@ -120,13 +115,13 @@ class LogController extends AbstractAdminController
         $resultado = $this->logService->EliminarLogs($ids);
         if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-        } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
+            $resultadoJson['message'] = 'The operation was successful';
+
             return $this->json($resultadoJson);
         }
-    }
+        $resultadoJson['success'] = $resultado['success'];
+        $resultadoJson['error'] = $resultado['error'];
 
+        return $this->json($resultadoJson);
+    }
 }

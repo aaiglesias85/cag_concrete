@@ -14,7 +14,7 @@ class ConcreteVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los subcontractors ordenados por nombre
+     * Listar los subcontractors ordenados por nombre.
      *
      * @return ConcreteVendor[]
      */
@@ -27,11 +27,11 @@ class ConcreteVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los  con filtros de búsqueda, paginación y ordenación
+     * Listar los  con filtros de búsqueda, paginación y ordenación.
      *
      * @return ConcreteVendor[]
      */
-    public function ListarVendors(int     $start, int     $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array
+    public function ListarVendors(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
     {
         $qb = $this->createQueryBuilder('c_v');
 
@@ -39,7 +39,7 @@ class ConcreteVendorRepository extends ServiceEntityRepository
         if ($sSearch) {
             $qb->andWhere('c_v.address LIKE :search OR c_v.contactEmail LIKE :search OR
              c_v.contactName LIKE :search OR c_v.phone LIKE :search OR c_v.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         return $qb->orderBy("c_v.$sortColumn", $sortDirection)
@@ -50,9 +50,7 @@ class ConcreteVendorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Obtener el total de vendors según los filtros de búsqueda
-     *
-     * @return int
+     * Obtener el total de vendors según los filtros de búsqueda.
      */
     public function TotalVendors(?string $sSearch = null): int
     {
@@ -63,29 +61,29 @@ class ConcreteVendorRepository extends ServiceEntityRepository
         if ($sSearch) {
             $qb->andWhere('c_v.address LIKE :search OR c_v.contactEmail LIKE :search OR
              c_v.contactName LIKE :search OR c_v.phone LIKE :search OR c_v.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarVendorsConTotal Lista los vendors con total
+     * ListarVendorsConTotal Lista los vendors con total.
      *
      * @return []
      */
-    public function ListarVendorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
-
+    public function ListarVendorsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'vendorId'  => 'c_v.vendorId',
+            'vendorId' => 'c_v.vendorId',
             'name' => 'c_v.name',
             'email' => 'c_v.contactEmail',
-            'phone'    => 'c_v.phone',
+            'phone' => 'c_v.phone',
             'address' => 'c_v.address',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'c_v.name';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('c_v');
@@ -93,7 +91,7 @@ class ConcreteVendorRepository extends ServiceEntityRepository
         if (!empty($sSearch)) {
             $baseQb->andWhere('c_v.address LIKE :search OR c_v.contactEmail LIKE :search OR
              c_v.contactName LIKE :search OR c_v.phone LIKE :search OR c_v.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // 1) Datos
@@ -112,9 +110,8 @@ class ConcreteVendorRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

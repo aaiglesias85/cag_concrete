@@ -14,17 +14,19 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '89efb1254ef2d1c5d80096acd12c4098' => __DIR__ . '/..' . '/twig/twig/src/Resources/core.php',
         'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
         'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
+        'ad155f8f1cf0d418fe49e248db8c661b' => __DIR__ . '/..' . '/react/promise/src/functions_include.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
-        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
+        '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
         '4c903e653868d3c4bb9191776b7008a1' => __DIR__ . '/..' . '/eskrano/quickbooks-php-8/QuickBooks.php',
         'db356362850385d08a5381de2638b5fd' => __DIR__ . '/..' . '/mpdf/mpdf/src/functions.php',
@@ -140,6 +142,13 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'R' =>
         array (
             'Rize\\' => 5,
+            'React\\Stream\\' => 13,
+            'React\\Socket\\' => 13,
+            'React\\Promise\\' => 14,
+            'React\\EventLoop\\' => 16,
+            'React\\Dns\\' => 10,
+            'React\\ChildProcess\\' => 19,
+            'React\\Cache\\' => 12,
             'Ramsey\\Uuid\\' => 12,
             'Ramsey\\Collection\\' => 18,
         ),
@@ -156,7 +165,9 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'PhpCsFixer\\' => 11,
             'PHPStan\\PhpDocParser\\' => 21,
+            'PHPStan\\' => 8,
         ),
         'O' =>
         array (
@@ -209,9 +220,12 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'F' =>
         array (
             'Firebase\\JWT\\' => 13,
+            'Fidry\\CpuCoreCounter\\' => 21,
         ),
         'E' =>
         array (
+            'Evenement\\' => 10,
+            'Ergebnis\\AgentDetector\\' => 23,
             'Egulias\\EmailValidator\\' => 23,
         ),
         'D' =>
@@ -233,9 +247,11 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         ),
         'C' =>
         array (
+            'Composer\\XdebugHandler\\' => 23,
             'Composer\\Semver\\' => 16,
             'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
+            'Clue\\React\\NDJson\\' => 18,
         ),
         'B' =>
         array (
@@ -587,6 +603,34 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         array (
             0 => __DIR__ . '/..' . '/rize/uri-template/src/Rize',
         ),
+        'React\\Stream\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/stream/src',
+        ),
+        'React\\Socket\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/socket/src',
+        ),
+        'React\\Promise\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/promise/src',
+        ),
+        'React\\EventLoop\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/event-loop/src',
+        ),
+        'React\\Dns\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/dns/src',
+        ),
+        'React\\ChildProcess\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/child-process/src',
+        ),
+        'React\\Cache\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/react/cache/src',
+        ),
         'Ramsey\\Uuid\\' =>
         array (
             0 => __DIR__ . '/..' . '/ramsey/uuid/src',
@@ -640,9 +684,17 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
+        'PhpCsFixer\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/friendsofphp/php-cs-fixer/src',
+        ),
         'PHPStan\\PhpDocParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
+        'PHPStan\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/phpstan-symfony/src',
         ),
         'OpenApi\\' =>
         array (
@@ -792,6 +844,18 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
+        'Fidry\\CpuCoreCounter\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/fidry/cpu-core-counter/src',
+        ),
+        'Evenement\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/evenement/evenement/src',
+        ),
+        'Ergebnis\\AgentDetector\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/ergebnis/agent-detector/src',
+        ),
         'Egulias\\EmailValidator\\' =>
         array (
             0 => __DIR__ . '/..' . '/egulias/email-validator/src',
@@ -852,6 +916,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         array (
             0 => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy',
         ),
+        'Composer\\XdebugHandler\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/composer/xdebug-handler/src',
+        ),
         'Composer\\Semver\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
@@ -863,6 +931,10 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'Complex\\' =>
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
+        ),
+        'Clue\\React\\NDJson\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/clue/ndjson-react/src',
         ),
         'Brick\\Math\\' =>
         array (

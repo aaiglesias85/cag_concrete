@@ -4,19 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "holiday")]
+#[ORM\Table(name: 'holiday')]
 #[ORM\Entity(repositoryClass: "App\Repository\HolidayRepository")]
 class Holiday
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "holiday_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'holiday_id', type: 'integer', nullable: false)]
     private ?int $holidayId;
 
     #[ORM\Column(name: 'day', type: 'date', nullable: false)]
     private ?\DateTimeInterface $day;
 
-    #[ORM\Column(name: "description", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     private ?string $description;
 
     public function getHolidayId(): ?int

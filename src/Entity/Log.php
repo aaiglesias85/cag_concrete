@@ -40,6 +40,7 @@ class Log
     public function setOperacion(?string $operacion): self
     {
         $this->operacion = $operacion;
+
         return $this;
     }
 
@@ -51,6 +52,7 @@ class Log
     public function setCategoria(?string $categoria): self
     {
         $this->categoria = $categoria;
+
         return $this;
     }
 
@@ -62,6 +64,7 @@ class Log
     public function setDescripcion(?string $descripcion): self
     {
         $this->descripcion = $descripcion;
+
         return $this;
     }
 
@@ -73,6 +76,7 @@ class Log
     public function setIp(?string $ip): self
     {
         $this->ip = $ip;
+
         return $this;
     }
 
@@ -84,6 +88,7 @@ class Log
     public function setFecha(?\DateTime $fecha): self
     {
         $this->fecha = $fecha;
+
         return $this;
     }
 

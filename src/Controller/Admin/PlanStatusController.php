@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\PlanStatusService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\PlanStatusService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,14 +27,13 @@ class PlanStatusController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/plan-status/index.html.twig', array(
+        return $this->render('admin/plan-status/index.html.twig', [
             'permiso' => $permiso[0],
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -57,14 +55,13 @@ class PlanStatusController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -74,37 +71,33 @@ class PlanStatusController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar statuss en la BD
-     *
+     * salvar Acción para agregar statuss en la BD.
      */
     public function salvar(Request $request)
     {
         $status_id = $request->get('status_id');
-        
+
         $description = $request->get('description');
         $status = $request->get('status');
 
         try {
-
-            if ($status_id === "") {
+            if ('' === $status_id) {
                 $resultado = $this->planStatusService->SalvarStatus($description, $status);
             } else {
                 $resultado = $this->planStatusService->ActualizarStatus($status_id, $description, $status);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['status_id'] = $resultado['status_id'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -114,8 +107,7 @@ class PlanStatusController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un status en la BD
-     *
+     * eliminar Acción que elimina un status en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -125,13 +117,14 @@ class PlanStatusController extends AbstractAdminController
             $resultado = $this->planStatusService->EliminarStatus($status_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -141,8 +134,7 @@ class PlanStatusController extends AbstractAdminController
     }
 
     /**
-     * eliminarStatuss Acción que elimina los statuss seleccionados en la BD
-     *
+     * eliminarStatuss Acción que elimina los statuss seleccionados en la BD.
      */
     public function eliminarStatuss(Request $request)
     {
@@ -152,26 +144,24 @@ class PlanStatusController extends AbstractAdminController
             $resultado = $this->planStatusService->EliminarStatuss($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del status en la BD
-     *
+     * cargarDatos Acción que carga los datos del status en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -180,17 +170,15 @@ class PlanStatusController extends AbstractAdminController
         try {
             $resultado = $this->planStatusService->CargarDatosStatus($status_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['status'] = $resultado['status'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

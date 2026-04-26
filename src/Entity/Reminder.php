@@ -4,19 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "reminder")]
+#[ORM\Table(name: 'reminder')]
 #[ORM\Entity(repositoryClass: "App\Repository\ReminderRepository")]
 class Reminder
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "reminder_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'reminder_id', type: 'integer', nullable: false)]
     private ?int $reminderId;
 
-    #[ORM\Column(name: "subject", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'subject', type: 'string', length: 255, nullable: true)]
     private ?string $subject;
 
-    #[ORM\Column(name: "body", type: "text", nullable: true)]
+    #[ORM\Column(name: 'body', type: 'text', nullable: true)]
     private ?string $body;
 
     #[ORM\Column(name: 'day', type: 'date', nullable: false)]
@@ -68,6 +68,7 @@ class Reminder
     public function setStatus(?bool $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 }

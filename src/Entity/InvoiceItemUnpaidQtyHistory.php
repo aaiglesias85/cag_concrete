@@ -4,26 +4,26 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "invoice_item_unpaid_qty_history")]
+#[ORM\Table(name: 'invoice_item_unpaid_qty_history')]
 #[ORM\Entity(repositoryClass: "App\Repository\InvoiceItemUnpaidQtyHistoryRepository")]
 class InvoiceItemUnpaidQtyHistory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\InvoiceItem")]
-    #[ORM\JoinColumn(name: "invoice_item_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
+    #[ORM\JoinColumn(name: 'invoice_item_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?InvoiceItem $invoiceItem;
 
-    #[ORM\Column(name: "old_value", type: "decimal", precision: 18, scale: 6, nullable: true)]
+    #[ORM\Column(name: 'old_value', type: 'decimal', precision: 18, scale: 6, nullable: true)]
     private ?string $oldValue = null;
 
-    #[ORM\Column(name: "new_value", type: "decimal", precision: 18, scale: 6, nullable: true)]
+    #[ORM\Column(name: 'new_value', type: 'decimal', precision: 18, scale: 6, nullable: true)]
     private ?string $newValue = null;
 
-    #[ORM\Column(name: "created_at", type: "datetime", nullable: false)]
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $createdAt;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Usuario')]

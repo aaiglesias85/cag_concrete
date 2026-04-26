@@ -4,23 +4,23 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "project_attachment")]
+#[ORM\Table(name: 'project_attachment')]
 #[ORM\Entity(repositoryClass: "App\Repository\ProjectAttachmentRepository")]
 class ProjectAttachment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "file", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
-    #[ORM\JoinColumn(name: "project_id", referencedColumnName: "project_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: true)]
     private ?Project $project;
 
     public function getId(): ?int
@@ -47,6 +47,7 @@ class ProjectAttachment
     {
         $this->file = $file;
     }
+
     public function getProject(): ?Project
     {
         return $this->project;

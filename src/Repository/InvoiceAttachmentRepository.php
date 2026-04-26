@@ -14,7 +14,7 @@ class InvoiceAttachmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarAttachmentsDeInvoice: Lista los attachments
+     * ListarAttachmentsDeInvoice: Lista los attachments.
      *
      * @return InvoiceAttachment[]
      */
@@ -23,15 +23,13 @@ class InvoiceAttachmentRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('i_a')
             ->leftJoin('i_a.invoice', 'i');
 
-        if ($invoice_id != '') {
+        if ('' != $invoice_id) {
             $consulta->andWhere('i.invoiceId = :invoice_id')
                 ->setParameter('invoice_id', $invoice_id);
         }
 
-        $consulta->orderBy('i_a.name', "ASC");
-
+        $consulta->orderBy('i_a.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
-
 }

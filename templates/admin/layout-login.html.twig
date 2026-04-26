@@ -5,15 +5,15 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
 
     <!--begin::Global Theme Styles -->
-    <link href="{{ asset('bundles/metronic8/assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('bundles/metronic8/assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('assets/metronic8/assets/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('assets/metronic8/assets/css/style.bundle.css') }}" rel="stylesheet" type="text/css"/>
 
     <!--begin::My Styles -->
-    <link href="{{ asset('bundles/metronic8/css/styles.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/metronic8/css/styles.css') }}" rel="stylesheet" type="text/css" />
 
     {% block stylesheetspecific %}  {% endblock %}
 
-    <link href="{{ asset('bundles/metronic8/css/my-components.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/metronic8/css/my-components.css') }}" rel="stylesheet" type="text/css" />
 
 {% endblock %}
 
@@ -30,19 +30,19 @@
 
 {% block javascripts %}
 
-    <script>var hostUrl = "bundles/metronic8/assets/";</script>
+    <script>var hostUrl = "assets/metronic8/assets/";</script>
 
     <!--begin::Global Javascript Bundle(mandatory for all pages)-->
-    <script src="{{ asset('bundles/metronic8/assets/plugins/global/plugins.bundle.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/assets/js/scripts.bundle.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/assets/plugins/global/plugins.bundle.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/assets/js/scripts.bundle.js') }}"></script>
     <!--end::Global Javascript Bundle-->
 
     <!--begin::My plugins-->
-    <script src="{{ asset('bundles/metronic8/plugins/validacion/validacion.min.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/plugins/validacion/validacion.min.js') }}"></script>
     <!--end::My plugins-->
 
-    <script src="{{ asset('bundles/metronic8/js/myapp.js') }}"></script>
-    <script src="{{ asset('bundles/metronic8/js/myutil.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/myapp.js') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/myutil.js') }}"></script>
 
 {% block javascriptsspecific %}  {% endblock %}
 {% endblock %}

@@ -12,6 +12,7 @@ class InspectorRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Inspector::class);
     }
+
     /**
      * ListarOrdenados: Lista los inspectores con estado activo y los ordena por nombre.
      *
@@ -29,11 +30,11 @@ class InspectorRepository extends ServiceEntityRepository
     /**
      * ListarInspectors: Lista los inspectores con filtros, paginación y ordenación.
      *
-     * @param int $start El inicio de la paginación
-     * @param int $limit El límite de resultados
-     * @param string|null $sSearch El término de búsqueda (opcional)
-     * @param string $iSortCol_0 Columna para ordenar
-     * @param string $sSortDir_0 Dirección del orden (ASC/DESC)
+     * @param int         $start      El inicio de la paginación
+     * @param int         $limit      El límite de resultados
+     * @param string|null $sSearch    El término de búsqueda (opcional)
+     * @param string      $iSortCol_0 Columna para ordenar
+     * @param string      $sSortDir_0 Dirección del orden (ASC/DESC)
      *
      * @return Inspector[]
      */
@@ -81,22 +82,22 @@ class InspectorRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarInspectorsConTotal Lista los inspectors con total
+     * ListarInspectorsConTotal Lista los inspectors con total.
      *
      * @return []
      */
-    public function ListarInspectorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
-
+    public function ListarInspectorsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'inspectorId'  => 'i.inspectorId',
+            'inspectorId' => 'i.inspectorId',
             'name' => 'i.name',
             'email' => 'i.email',
             'phone' => 'i.phone',
             'status' => 'i.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'i.name';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('i');
@@ -122,9 +123,8 @@ class InspectorRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

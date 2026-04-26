@@ -14,33 +14,34 @@ class ProjectStageRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista los stages ordenados
+     * ListarOrdenados: Lista los stages ordenados.
      *
      * @return ProjectStage[]
      */
-    public function ListarOrdenados($sSearch = "", $status = "")
+    public function ListarOrdenados($sSearch = '', $status = '')
     {
         $consulta = $this->createQueryBuilder('p_s');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($status !== "") {
+        if ('' !== $status) {
             $consulta->andWhere('p_s.status = :status')
                 ->setParameter('status', $status);
         }
 
-        $consulta->orderBy('p_s.description', "ASC");
+        $consulta->orderBy('p_s.description', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarStages: Lista los stages
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarStages: Lista los stages.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return ProjectStage[]
@@ -49,7 +50,7 @@ class ProjectStageRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('p_s');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -65,7 +66,8 @@ class ProjectStageRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalStages: Total de stages de la BD
+     * TotalStages: Total de stages de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -75,29 +77,29 @@ class ProjectStageRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('p_s')
             ->select('COUNT(p_s.stageId)');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p_s.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarStagesConTotal Lista los stages con total
+     * ListarStagesConTotal Lista los stages con total.
      *
      * @return []
      */
-    public function ListarStagesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarStagesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'stageId'  => 'p_s.stageId',
+            'stageId' => 'p_s.stageId',
             'description' => 'p_s.description',
             'status' => 'p_s.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'p_s.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('p_s');
@@ -123,10 +125,8 @@ class ProjectStageRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
-
 }

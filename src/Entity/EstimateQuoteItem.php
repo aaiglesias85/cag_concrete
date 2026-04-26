@@ -4,40 +4,40 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "estimate_quote_items")]
+#[ORM\Table(name: 'estimate_quote_items')]
 #[ORM\Entity(repositoryClass: "App\Repository\EstimateQuoteItemRepository")]
 class EstimateQuoteItem
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "quantity", type: "float", nullable: true)]
+    #[ORM\Column(name: 'quantity', type: 'float', nullable: true)]
     private ?float $quantity;
 
-    #[ORM\Column(name: "price", type: "float", nullable: true)]
+    #[ORM\Column(name: 'price', type: 'float', nullable: true)]
     private ?float $price;
 
-    #[ORM\Column(name: "yield_calculation", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'yield_calculation', type: 'string', length: 50, nullable: true)]
     private ?string $yieldCalculation;
 
     #[ORM\ManyToOne(targetEntity: EstimateQuote::class)]
-    #[ORM\JoinColumn(name: "estimate_quote_id", referencedColumnName: "id", nullable: true)]
+    #[ORM\JoinColumn(name: 'estimate_quote_id', referencedColumnName: 'id', nullable: true)]
     private ?EstimateQuote $quote;
 
     #[ORM\ManyToOne(targetEntity: Item::class)]
-    #[ORM\JoinColumn(name: "item_id", referencedColumnName: "item_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'item_id', referencedColumnName: 'item_id', nullable: true)]
     private ?Item $item;
 
     #[ORM\ManyToOne(targetEntity: Equation::class)]
-    #[ORM\JoinColumn(name: "equation_id", referencedColumnName: "equation_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'equation_id', referencedColumnName: 'equation_id', nullable: true)]
     private ?Equation $equation = null;
 
-    #[ORM\Column(name: "code", type: "string", length: 100, nullable: true)]
+    #[ORM\Column(name: 'code', type: 'string', length: 100, nullable: true)]
     private ?string $code = null;
 
-    #[ORM\Column(name: "contract_name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'contract_name', type: 'string', length: 255, nullable: true)]
     private ?string $contractName = null;
 
     /** Notas asociadas (many-to-many con estimate_note_item vía estimate_quote_item_note) */
@@ -154,7 +154,7 @@ class EstimateQuoteItem
         if ($this->quoteItemNotes instanceof \Doctrine\ORM\PersistentCollection) {
             $this->quoteItemNotes->removeElement($note);
         } elseif (is_array($this->quoteItemNotes)) {
-            $this->quoteItemNotes = array_values(array_filter($this->quoteItemNotes, fn($n) => $n !== $note));
+            $this->quoteItemNotes = array_values(array_filter($this->quoteItemNotes, fn ($n) => $n !== $note));
         }
     }
 }

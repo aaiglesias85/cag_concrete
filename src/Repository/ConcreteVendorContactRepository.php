@@ -14,7 +14,7 @@ class ConcreteVendorContactRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarContacts: Lista los contacts
+     * ListarContacts: Lista los contacts.
      *
      * @return ConcreteVendorContact[]
      */
@@ -23,16 +23,13 @@ class ConcreteVendorContactRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('c_v_c')
             ->leftJoin('c_v_c.concreteVendor', 'c_v');
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-
-        $consulta->orderBy('c_v_c.name', "ASC");
-
+        $consulta->orderBy('c_v_c.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
-
 }

@@ -15,7 +15,7 @@ class EstimateTemplateNoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar notas template asociadas a un estimate, ordenadas por descripción de la nota
+     * Listar notas template asociadas a un estimate, ordenadas por descripción de la nota.
      *
      * @return EstimateTemplateNote[]
      */

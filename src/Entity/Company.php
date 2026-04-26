@@ -54,6 +54,7 @@ class Company
     public function setName(?string $name): self
     {
         $this->name = $name;
+
         return $this;
     }
 
@@ -65,6 +66,7 @@ class Company
     public function setPhone(?string $phone): self
     {
         $this->phone = $phone;
+
         return $this;
     }
 
@@ -76,6 +78,7 @@ class Company
     public function setAddress(?string $address): self
     {
         $this->address = $address;
+
         return $this;
     }
 
@@ -87,6 +90,7 @@ class Company
     public function setContactName(?string $contactName): self
     {
         $this->contactName = $contactName;
+
         return $this;
     }
 
@@ -98,6 +102,7 @@ class Company
     public function setContactEmail(?string $contactEmail): self
     {
         $this->contactEmail = $contactEmail;
+
         return $this;
     }
 
@@ -109,6 +114,7 @@ class Company
     public function setEmail(?string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -120,6 +126,7 @@ class Company
     public function setWebsite(?string $website): self
     {
         $this->website = $website;
+
         return $this;
     }
 
@@ -131,6 +138,7 @@ class Company
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -142,6 +150,7 @@ class Company
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 }

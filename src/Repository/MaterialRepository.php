@@ -12,23 +12,23 @@ class MaterialRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Material::class);
     }
+
     /**
-     * ListarOrdenados: Lista los materiales ordenados
+     * ListarOrdenados: Lista los materiales ordenados.
      *
      * @return Material[]
      */
     public function ListarOrdenados(): array
     {
         return $this->createQueryBuilder('m')
-            ->orderBy('m.name', "ASC")
+            ->orderBy('m.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * ListarMaterialsDeUnit: Lista los materiales de una unidad
+     * ListarMaterialsDeUnit: Lista los materiales de una unidad.
      *
-     * @param int $unit_id
      * @return Material[]
      */
     public function ListarMaterialsDeUnit(int $unit_id): array
@@ -37,16 +37,17 @@ class MaterialRepository extends ServiceEntityRepository
             ->leftJoin('m.unit', 'u')
             ->where('u.unitId = :unit_id')
             ->setParameter('unit_id', $unit_id)
-            ->orderBy('m.name', "ASC")
+            ->orderBy('m.name', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * ListarMaterials: Lista los materiales con paginación, filtros y ordenación
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * ListarMaterials: Lista los materiales con paginación, filtros y ordenación.
+     *
+     * @param int    $start      Inicio
+     * @param int    $limit      Limite
+     * @param string $sSearch    Para buscar
      * @param string $iSortCol_0 Columna para ordenar
      * @param string $sSortDir_0 Dirección de ordenamiento
      *
@@ -65,8 +66,8 @@ class MaterialRepository extends ServiceEntityRepository
 
         // Ordenar resultados
         switch ($iSortCol_0) {
-            case "unit":
-                $qb->orderBy("u.description", $sSortDir_0);
+            case 'unit':
+                $qb->orderBy('u.description', $sSortDir_0);
                 break;
             default:
                 $qb->orderBy("m.$iSortCol_0", $sSortDir_0);
@@ -84,10 +85,9 @@ class MaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalMaterials: Devuelve el total de materiales en la base de datos con filtros de búsqueda
-     * @param string $sSearch Para buscar
+     * TotalMaterials: Devuelve el total de materiales en la base de datos con filtros de búsqueda.
      *
-     * @return int
+     * @param string $sSearch Para buscar
      */
     public function TotalMaterials(?string $sSearch): int
     {
@@ -105,21 +105,21 @@ class MaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarMaterialsConTotal Lista los materials con total
+     * ListarMaterialsConTotal Lista los materials con total.
      *
      * @return []
      */
-    public function ListarMaterialsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
-
+    public function ListarMaterialsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'materialId'  => 'm.materialId',
+            'materialId' => 'm.materialId',
             'name' => 'm.name',
             'unit' => 'u.description',
             'price' => 'm.price',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'm.name';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('m')
@@ -146,7 +146,7 @@ class MaterialRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }

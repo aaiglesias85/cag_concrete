@@ -3,14 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
-use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ScheduleService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\ScheduleService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -18,7 +16,7 @@ class ScheduleController extends AbstractAdminController
 {
     private $scheduleService;
 
-    public function __construct(AdminAccessService $adminAccess, ScheduleService $scheduleService )
+    public function __construct(AdminAccessService $adminAccess, ScheduleService $scheduleService)
     {
         parent::__construct($adminAccess);
         $this->scheduleService = $scheduleService;
@@ -47,19 +45,17 @@ class ScheduleController extends AbstractAdminController
         $leads = $this->scheduleService->getDoctrine()->getRepository(Employee::class)
             ->ListarOrdenados();
 
-
-        return $this->render('admin/schedule/index.html.twig', array(
+        return $this->render('admin/schedule/index.html.twig', [
             'permiso' => $permiso[0],
             'projects' => $projects,
             'concrete_vendors' => $concrete_vendors,
             'holidays' => $holidays,
             'leads' => $leads,
-        ));
+        ]);
     }
 
     /**
-     * listar
-     *
+     * listar.
      */
     public function listar(Request $request)
     {
@@ -91,14 +87,13 @@ class ScheduleController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -108,17 +103,15 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar schedules en la BD
-     *
+     * salvar Acción para agregar schedules en la BD.
      */
     public function salvar(Request $request)
     {
-
         $project_id = $request->get('project_id');
         $project_contact_id = $request->get('project_contact_id');
         $date_start = $request->get('date_start');
         $date_stop = $request->get('date_stop');
-        
+
         $description = $request->get('description');
         $location = $request->get('location');
         $latitud = $request->get('latitud');
@@ -135,23 +128,20 @@ class ScheduleController extends AbstractAdminController
         $employees_id = $request->get('employees_id');
 
         try {
-
             $resultado = $this->scheduleService->SalvarSchedule($project_id, $project_contact_id, $date_start,
                 $date_stop, $description, $location, $latitud, $longitud, $vendor_id, $concrete_vendor_contacts_id,
                 $hours, $quantity, $notes, $highpriority, $employees_id);
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -161,8 +151,7 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * actualizar Acción para modificar un schedule un menu en la BD
-     *
+     * actualizar Acción para modificar un schedule un menu en la BD.
      */
     public function actualizar(Request $request)
     {
@@ -188,22 +177,19 @@ class ScheduleController extends AbstractAdminController
         $employees_id = $request->get('employees_id');
 
         try {
-
             $resultado = $this->scheduleService->ActualizarSchedule($schedule_id, $project_id, $project_contact_id, $description, $location, $latitud,
                 $longitud, $vendor_id, $concrete_vendor_contacts_id, $day, $hour, $quantity, $notes, $highpriority, $employees_id);
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -213,12 +199,10 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * clonar Acción para clonar schedules en la BD
-     *
+     * clonar Acción para clonar schedules en la BD.
      */
     public function clonar(Request $request)
     {
-
         $schedules_id = $request->get('schedules_id');
         $highpriority = $request->get('highpriority');
 
@@ -226,21 +210,18 @@ class ScheduleController extends AbstractAdminController
         $date_stop = $request->get('date_stop');
 
         try {
-
             $resultado = $this->scheduleService->ClonarSchedule($schedules_id, $highpriority, $date_start, $date_stop);
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -250,8 +231,7 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un schedule en la BD
-     *
+     * eliminar Acción que elimina un schedule en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -261,13 +241,14 @@ class ScheduleController extends AbstractAdminController
             $resultado = $this->scheduleService->EliminarSchedule($schedule_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -277,8 +258,7 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * eliminarSchedules Acción que elimina los schedules seleccionados en la BD
-     *
+     * eliminarSchedules Acción que elimina los schedules seleccionados en la BD.
      */
     public function eliminarSchedules(Request $request)
     {
@@ -288,26 +268,24 @@ class ScheduleController extends AbstractAdminController
             $resultado = $this->scheduleService->EliminarSchedules($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del schedule en la BD
-     *
+     * cargarDatos Acción que carga los datos del schedule en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -316,17 +294,15 @@ class ScheduleController extends AbstractAdminController
         try {
             $resultado = $this->scheduleService->CargarDatosSchedule($schedule_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['schedule'] = $resultado['schedule'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -336,8 +312,7 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * listarParaCalendario Acción que lista el schedule para el calendario en la BD
-     *
+     * listarParaCalendario Acción que lista el schedule para el calendario en la BD.
      */
     public function listarParaCalendario(Request $request)
     {
@@ -354,7 +329,6 @@ class ScheduleController extends AbstractAdminController
             $resultadoJson['schedules'] = $schedules;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -364,12 +338,10 @@ class ScheduleController extends AbstractAdminController
     }
 
     /**
-     * exportarExcel Acción para la exportacion en excel
-     *
+     * exportarExcel Acción para la exportacion en excel.
      */
     public function exportarExcel(Request $request)
     {
-
         $search = $request->get('search');
         $project_id = $request->get('project_id');
         $vendor_id = $request->get('vendor_id');
@@ -380,7 +352,7 @@ class ScheduleController extends AbstractAdminController
             $url = $this->scheduleService->ExportarExcel($search, $project_id, $vendor_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson['success'] = true;
-            $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['message'] = 'The operation was successful';
             $resultadoJson['url'] = $url;
 
             return $this->json($resultadoJson);

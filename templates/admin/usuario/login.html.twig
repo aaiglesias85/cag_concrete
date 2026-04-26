@@ -5,7 +5,7 @@
 {% block stylesheetspecific %}
 <style>
     body {
-        background-image: url('{{ asset('bundles/metronic8/img/bg-login.jpg') }}');
+        background-image: url('{{ asset('assets/metronic8/img/bg-login.jpg') }}');
         background-size: cover;
         background-position: center;
         min-height: 100vh;
@@ -15,7 +15,7 @@
     }
 
     [data-bs-theme="dark"] body {
-        background-image: url('{{ asset('bundles/metronic8/img/bg-login.jpg') }}');
+        background-image: url('{{ asset('assets/metronic8/img/bg-login.jpg') }}');
     }
 </style>
 {% endblock %}
@@ -50,7 +50,7 @@
 
                                 <div class="text-center mb-3">
                                     <a href="javascript:;">
-                                        <img src="{{ asset('bundles/metronic8/img/logo.jpg') }}" width="180">
+                                        <img src="{{ asset('assets/metronic8/img/logo.jpg') }}" width="180">
                                     </a>
                                 </div>
 
@@ -131,7 +131,7 @@
 
 
 {% block javascriptsspecific %}
-    <script src="{{ asset('bundles/metronic8/js/pages/login.js') }}?{{ 'now' | date('U') }}"></script>
+    <script src="{{ asset('assets/metronic8/js/pages/login.js') }}?{{ 'now' | date('U') }}"></script>
     <script>
         jQuery(document).ready(function () {
             Login.init();

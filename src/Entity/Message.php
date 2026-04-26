@@ -4,51 +4,51 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "message")]
+#[ORM\Table(name: 'message')]
 #[ORM\Entity(repositoryClass: "App\Repository\MessageRepository")]
 class Message
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "message_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'message_id', type: 'integer', nullable: false)]
     private ?int $messageId = null;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\MessageConversation")]
-    #[ORM\JoinColumn(name: "conversation_id", referencedColumnName: "conversation_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'conversation_id', referencedColumnName: 'conversation_id', nullable: false)]
     private ?MessageConversation $conversation = null;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Usuario")]
-    #[ORM\JoinColumn(name: "sender_id", referencedColumnName: "user_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'sender_id', referencedColumnName: 'user_id', nullable: false)]
     private ?Usuario $sender = null;
 
-    #[ORM\Column(name: "body_original", type: "text", nullable: false)]
+    #[ORM\Column(name: 'body_original', type: 'text', nullable: false)]
     private ?string $bodyOriginal = null;
 
-    #[ORM\Column(name: "source_lang", type: "string", length: 2, nullable: false)]
+    #[ORM\Column(name: 'source_lang', type: 'string', length: 2, nullable: false)]
     private ?string $sourceLang = 'es';
 
-    #[ORM\Column(name: "body_es", type: "text", nullable: true)]
+    #[ORM\Column(name: 'body_es', type: 'text', nullable: true)]
     private ?string $bodyEs = null;
 
-    #[ORM\Column(name: "body_en", type: "text", nullable: true)]
+    #[ORM\Column(name: 'body_en', type: 'text', nullable: true)]
     private ?string $bodyEn = null;
 
-    #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: "read_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'read_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $readAt = null;
 
     /** Fecha en que se tradujo a petición (para límite 500k/mes). */
-    #[ORM\Column(name: "translated_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'translated_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $translatedAt = null;
 
     /** Mensaje eliminado "para todos": se muestra placeholder. */
-    #[ORM\Column(name: "deleted_for_everyone_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'deleted_for_everyone_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $deletedForEveryoneAt = null;
 
     /** Array de user_id que eliminaron el mensaje "para mí". */
-    #[ORM\Column(name: "deleted_for_user_ids", type: "json", nullable: true)]
+    #[ORM\Column(name: 'deleted_for_user_ids', type: 'json', nullable: true)]
     private ?array $deletedForUserIds = null;
 
     public function getMessageId(): ?int
@@ -59,6 +59,7 @@ class Message
     public function setMessageId(?int $messageId): self
     {
         $this->messageId = $messageId;
+
         return $this;
     }
 
@@ -70,6 +71,7 @@ class Message
     public function setConversation(?MessageConversation $conversation): self
     {
         $this->conversation = $conversation;
+
         return $this;
     }
 
@@ -81,6 +83,7 @@ class Message
     public function setSender(?Usuario $sender): self
     {
         $this->sender = $sender;
+
         return $this;
     }
 
@@ -92,6 +95,7 @@ class Message
     public function setBodyOriginal(?string $bodyOriginal): self
     {
         $this->bodyOriginal = $bodyOriginal;
+
         return $this;
     }
 
@@ -103,6 +107,7 @@ class Message
     public function setSourceLang(?string $sourceLang): self
     {
         $this->sourceLang = $sourceLang;
+
         return $this;
     }
 
@@ -114,6 +119,7 @@ class Message
     public function setBodyEs(?string $bodyEs): self
     {
         $this->bodyEs = $bodyEs;
+
         return $this;
     }
 
@@ -125,6 +131,7 @@ class Message
     public function setBodyEn(?string $bodyEn): self
     {
         $this->bodyEn = $bodyEn;
+
         return $this;
     }
 
@@ -136,6 +143,7 @@ class Message
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -147,6 +155,7 @@ class Message
     public function setReadAt(?\DateTimeInterface $readAt): self
     {
         $this->readAt = $readAt;
+
         return $this;
     }
 
@@ -158,6 +167,7 @@ class Message
     public function setTranslatedAt(?\DateTimeInterface $translatedAt): self
     {
         $this->translatedAt = $translatedAt;
+
         return $this;
     }
 
@@ -166,7 +176,7 @@ class Message
      */
     public function getBodyForLang(string $lang): ?string
     {
-        return $lang === 'en' ? $this->bodyEn : $this->bodyEs;
+        return 'en' === $lang ? $this->bodyEn : $this->bodyEs;
     }
 
     public function getDeletedForEveryoneAt(): ?\DateTimeInterface
@@ -177,6 +187,7 @@ class Message
     public function setDeletedForEveryoneAt(?\DateTimeInterface $deletedForEveryoneAt): self
     {
         $this->deletedForEveryoneAt = $deletedForEveryoneAt;
+
         return $this;
     }
 
@@ -190,6 +201,7 @@ class Message
     public function setDeletedForUserIds(array $ids): self
     {
         $this->deletedForUserIds = $ids ?: null;
+
         return $this;
     }
 
@@ -205,6 +217,7 @@ class Message
             $ids[] = $userId;
             $this->setDeletedForUserIds($ids);
         }
+
         return $this;
     }
 }

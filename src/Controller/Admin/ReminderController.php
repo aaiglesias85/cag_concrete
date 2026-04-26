@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ReminderService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\ReminderService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,23 +27,21 @@ class ReminderController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/reminder/index.html.twig', array(
+        return $this->render('admin/reminder/index.html.twig', [
             'permiso' => $permiso[0],
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los usuarios
-     *
+     * listar Acción que lista los usuarios.
      */
     public function listar(Request $request)
     {
         try {
-
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'subject', 'day', 'destinatarios', 'status' ],
+                allowedOrderFields: ['id', 'subject', 'day', 'destinatarios', 'status'],
                 defaultOrderField: 'day'
             );
 
@@ -64,14 +61,13 @@ class ReminderController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -81,8 +77,7 @@ class ReminderController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar reminders en la BD
-     *
+     * salvar Acción para agregar reminders en la BD.
      */
     public function salvar(Request $request)
     {
@@ -96,26 +91,23 @@ class ReminderController extends AbstractAdminController
         $usuarios_id = $request->get('usuarios_id');
 
         try {
-
-            if ($reminder_id === "") {
+            if ('' === $reminder_id) {
                 $resultado = $this->reminderService->SalvarReminder($day, $subject, $body, $status, $usuarios_id);
             } else {
                 $resultado = $this->reminderService->ActualizarReminder($reminder_id, $day, $subject, $body, $status, $usuarios_id);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['reminder_id'] = $resultado['reminder_id'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -125,8 +117,7 @@ class ReminderController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un reminder en la BD
-     *
+     * eliminar Acción que elimina un reminder en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -136,13 +127,14 @@ class ReminderController extends AbstractAdminController
             $resultado = $this->reminderService->EliminarReminder($reminder_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -152,8 +144,7 @@ class ReminderController extends AbstractAdminController
     }
 
     /**
-     * eliminarReminders Acción que elimina los reminders seleccionados en la BD
-     *
+     * eliminarReminders Acción que elimina los reminders seleccionados en la BD.
      */
     public function eliminarReminders(Request $request)
     {
@@ -163,26 +154,24 @@ class ReminderController extends AbstractAdminController
             $resultado = $this->reminderService->EliminarReminders($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del reminder en la BD
-     *
+     * cargarDatos Acción que carga los datos del reminder en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -191,17 +180,15 @@ class ReminderController extends AbstractAdminController
         try {
             $resultado = $this->reminderService->CargarDatosReminder($reminder_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['reminder'] = $resultado['reminder'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

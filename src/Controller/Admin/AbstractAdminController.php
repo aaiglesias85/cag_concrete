@@ -12,8 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
  */
 abstract class AbstractAdminController extends AbstractController
 {
-   public function __construct(
-      protected AdminAccessService $adminAccess
-   ) {
-   }
+    public function __construct(
+        protected AdminAccessService $adminAccess,
+    ) {
+    }
 }

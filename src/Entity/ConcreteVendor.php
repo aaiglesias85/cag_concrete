@@ -4,28 +4,28 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "concrete_vendor")]
+#[ORM\Table(name: 'concrete_vendor')]
 #[ORM\Entity(repositoryClass: "App\Repository\ConcreteVendorRepository")]
 class ConcreteVendor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "vendor_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'vendor_id', type: 'integer', nullable: false)]
     private ?int $vendorId;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "phone", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'phone', type: 'string', length: 50, nullable: true)]
     private ?string $phone;
 
-    #[ORM\Column(name: "address", type: "text", nullable: true)]
+    #[ORM\Column(name: 'address', type: 'text', nullable: true)]
     private ?string $address;
 
-    #[ORM\Column(name: "contact_name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'contact_name', type: 'string', length: 255, nullable: true)]
     private ?string $contactName;
 
-    #[ORM\Column(name: "contact_email", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'contact_email', type: 'string', length: 255, nullable: true)]
     private ?string $contactEmail;
 
     public function getVendorId(): ?int

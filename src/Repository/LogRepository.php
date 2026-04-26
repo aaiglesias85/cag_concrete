@@ -12,8 +12,10 @@ class LogRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Log::class);
     }
+
     /**
-     * ListarLogsDeUsuario: Lista los logs de un usuario de la BD
+     * ListarLogsDeUsuario: Lista los logs de un usuario de la BD.
+     *
      * @param int $usuario_id Id del usuario
      *
      * @return Log[]
@@ -30,15 +32,16 @@ class LogRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarLogs: Lista los logs con paginación y filtros
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
-     * @param string $iSortCol_0 Columna para ordenar
-     * @param string $sSortDir_0 Dirección de ordenamiento
+     * ListarLogs: Lista los logs con paginación y filtros.
+     *
+     * @param int    $start         Inicio
+     * @param int    $limit         Limite
+     * @param string $sSearch       Para buscar
+     * @param string $iSortCol_0    Columna para ordenar
+     * @param string $sSortDir_0    Dirección de ordenamiento
      * @param string $fecha_inicial Fecha inicial
-     * @param string $fecha_fin Fecha final
-     * @param string $usuario_id Id del usuario
+     * @param string $fecha_fin     Fecha final
+     * @param string $usuario_id    Id del usuario
      *
      * @return Log[]
      */
@@ -60,22 +63,22 @@ class LogRepository extends ServiceEntityRepository
         }
 
         if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00")->format("Y-m-d H:i:s");
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00')->format('Y-m-d H:i:s');
             $qb->andWhere('l.fecha >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59")->format("Y-m-d H:i:s");
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59')->format('Y-m-d H:i:s');
             $qb->andWhere('l.fecha <= :fecha_fin')
                 ->setParameter('fecha_fin', $fecha_fin);
         }
 
         // Ordenar resultados
-        if ($iSortCol_0 === 'nombre') {
-            $qb->orderBy('u.' . $iSortCol_0, $sSortDir_0);
+        if ('nombre' === $iSortCol_0) {
+            $qb->orderBy('u.'.$iSortCol_0, $sSortDir_0);
         } else {
-            $qb->orderBy('l.' . $iSortCol_0, $sSortDir_0);
+            $qb->orderBy('l.'.$iSortCol_0, $sSortDir_0);
         }
 
         // Paginación
@@ -88,13 +91,12 @@ class LogRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalLogs: Devuelve el total de logs con filtros aplicados
-     * @param string $sSearch Para buscar
-     * @param string $fecha_inicial Fecha inicial
-     * @param string $fecha_fin Fecha final
-     * @param string $usuario_id Id del usuario
+     * TotalLogs: Devuelve el total de logs con filtros aplicados.
      *
-     * @return int
+     * @param string $sSearch       Para buscar
+     * @param string $fecha_inicial Fecha inicial
+     * @param string $fecha_fin     Fecha final
+     * @param string $usuario_id    Id del usuario
      */
     public function TotalLogs(?string $sSearch, ?string $fecha_inicial, ?string $fecha_fin, ?string $usuario_id): int
     {
@@ -115,13 +117,13 @@ class LogRepository extends ServiceEntityRepository
         }
 
         if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00")->format("Y-m-d H:i:s");
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00')->format('Y-m-d H:i:s');
             $qb->andWhere('l.fecha >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59")->format("Y-m-d H:i:s");
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59')->format('Y-m-d H:i:s');
             $qb->andWhere('l.fecha <= :fecha_fin')
                 ->setParameter('fecha_fin', $fecha_fin);
         }
@@ -131,12 +133,11 @@ class LogRepository extends ServiceEntityRepository
 
     /**
      * ListarLogsConTotal: Lista y cuenta notificaciones aplicando los mismos filtros.
-     *
      */
     public function ListarLogsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'createdAt',
-                                                 string $sortDir = 'DESC', ?string $fecha_inicial = '', ?string $fecha_fin = '',
-                                                 ?string $usuario_id = null): array {
-
+        string $sortDir = 'DESC', ?string $fecha_inicial = '', ?string $fecha_fin = '',
+        ?string $usuario_id = null): array
+    {
         // Whitelist de campos ordenables
         $sortable = [
             'id' => 'l.id',
@@ -148,7 +149,7 @@ class LogRepository extends ServiceEntityRepository
             'usuario' => 'u.nombre',   // map 'usuario' -> nombre del usuario
         ];
         $orderBy = $sortable[$sortField] ?? 'l.fecha';
-        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
 
         // QB base con JOIN y filtros
         $baseQb = $this->createQueryBuilder('l')
@@ -167,13 +168,13 @@ class LogRepository extends ServiceEntityRepository
         }
 
         if (!empty($fecha_inicial)) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00")->format("Y-m-d H:i:s");
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00')->format('Y-m-d H:i:s');
             $baseQb->andWhere('l.fecha >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
         if (!empty($fecha_fin)) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59")->format("Y-m-d H:i:s");
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59')->format('Y-m-d H:i:s');
             $baseQb->andWhere('l.fecha <= :fecha_fin')
                 ->setParameter('fecha_fin', $fecha_fin);
         }
@@ -197,19 +198,19 @@ class LogRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,
+            'data' => $data,
             'total' => $total, // total con el MISMO filtro aplicado
         ];
     }
 
     /**
-     * ListarLogsRangoFecha: Lista los logs por un rango de fecha
+     * ListarLogsRangoFecha: Lista los logs por un rango de fecha.
      *
      * @param string $fecha_inicial Fecha inicial
-     * @param string $fecha_fin Fecha final
-     * @param int $limit Limite
-     * @param string $usuario_id Id del usuario
-     * @param string $order Dirección de orden
+     * @param string $fecha_fin     Fecha final
+     * @param int    $limit         Limite
+     * @param string $usuario_id    Id del usuario
+     * @param string $order         Dirección de orden
      *
      * @return Log[]
      */

@@ -14,9 +14,11 @@ class PermisoUsuarioRepository extends ServiceEntityRepository
     }
 
     /**
-     * BuscarPermisoUsuario: Devuelve el permiso usuario
+     * BuscarPermisoUsuario: Devuelve el permiso usuario.
+     *
      * @param int $usuario_id
      * @param int $funcion_id
+     *
      * @author Marcel
      */
     public function BuscarPermisoUsuario($usuario_id, $funcion_id)
@@ -35,7 +37,8 @@ class PermisoUsuarioRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarPermisosUsuario: Lista los permisos de un usuario
+     * ListarPermisosUsuario: Lista los permisos de un usuario.
+     *
      * @param int $usuario_id
      *
      * @return PermisoUsuario[]
@@ -51,14 +54,16 @@ class PermisoUsuarioRepository extends ServiceEntityRepository
             ->getQuery();
 
         $lista = $consulta->getResult();
+
         return $lista;
     }
 
     /**
-     * ListarPermisosFuncion: Lista los permisos de una funcion
+     * ListarPermisosFuncion: Lista los permisos de una funcion.
+     *
      * @param int $funcion_id
      *
-     * @return  PermisoUsuario[]
+     * @return PermisoUsuario[]
      */
     public function ListarPermisosFuncion($funcion_id)
     {
@@ -69,6 +74,7 @@ class PermisoUsuarioRepository extends ServiceEntityRepository
             ->getQuery();
 
         $lista = $consulta->getResult();
+
         return $lista;
     }
 }

@@ -223,7 +223,7 @@ Si algún invoice no tiene aún `invoice_retainage_calculated`, antes de usar se
 | `src/Repository/InvoiceItemRepository.php` | `TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id)` — suma Final Amount This Period solo ítems R. |
 | `database/cambios_constructora_invoice_retainage_07_02.sql` | ALTER TABLE invoice: `invoice_current_retainage`, `invoice_retainage_calculated`. |
 | Templates (tab Items) | `templates/admin/invoice/index.html.twig`, `templates/admin/block/modal-invoice.html.twig` — cajas Current Retainer y L Retainer. |
-| JS | `public/bundles/metronic8/js/pages/invoices.js` — rellenar y resetear los campos de retainage del invoice. |
+| JS | `public/assets/metronic8/js/pages/invoices.js` — rellenar y resetear los campos de retainage del invoice. |
 
 ### 6.2 Retainage de Payments
 

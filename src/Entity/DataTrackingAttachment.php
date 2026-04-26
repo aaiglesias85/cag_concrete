@@ -4,19 +4,19 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "data_tracking_attachment")]
+#[ORM\Table(name: 'data_tracking_attachment')]
 #[ORM\Entity(repositoryClass: "App\Repository\DataTrackingAttachmentRepository")]
 class DataTrackingAttachment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "file", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
     #[ORM\ManyToOne(targetEntity: DataTracking::class)]

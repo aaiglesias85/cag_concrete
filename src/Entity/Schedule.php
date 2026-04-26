@@ -16,7 +16,6 @@ class Schedule
     #[ORM\Column(name: 'description', type: 'string', length: 255)]
     private ?string $description;
 
-
     #[ORM\Column(name: 'location', type: 'string', length: 255)]
     private ?string $location;
 
@@ -38,7 +37,7 @@ class Schedule
     #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
     private ?string $notes;
 
-    #[ORM\Column(name: "highpriority", type: "boolean", nullable: true)]
+    #[ORM\Column(name: 'highpriority', type: 'boolean', nullable: true)]
     private ?bool $highpriority;
 
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Project')]
@@ -50,7 +49,7 @@ class Schedule
     private ?ProjectContact $contactProject;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\ConcreteVendor")]
-    #[ORM\JoinColumn(name: "vendor_id", referencedColumnName: "vendor_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id', nullable: true)]
     private ?ConcreteVendor $concreteVendor;
 
     #[ORM\ManyToOne(targetEntity: Employee::class)]

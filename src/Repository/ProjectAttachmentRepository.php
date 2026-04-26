@@ -14,7 +14,7 @@ class ProjectAttachmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarAttachmentsDeProject: Lista los attachments
+     * ListarAttachmentsDeProject: Lista los attachments.
      *
      * @return ProjectAttachment[]
      */
@@ -23,15 +23,13 @@ class ProjectAttachmentRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('p_a')
             ->leftJoin('p_a.project', 'p');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        $consulta->orderBy('p_a.name', "ASC");
-
+        $consulta->orderBy('p_a.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
-
 }

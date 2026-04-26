@@ -1,6 +1,6 @@
 {% extends 'admin/layout.html.twig' %} {% block subtitle %} - Employees{% endblock %} {% block stylesheetspecific %}
 
-<link href="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
 <style>
    .dt-color-dot {
       width: 12px;
@@ -481,14 +481,14 @@
    })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
 </script>
 
-<script src="{{ asset('bundles/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
+<script src="{{ asset('assets/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
+<script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 
 <!-- datatable fixed column -->
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
-<script src="{{ asset('bundles/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/dataTables.fixedColumns.min.js') }}"></script>
+<script src="{{ asset('assets/metronic8/plugins/datatable/fixed-column/fixedColumns.bootstrap5.min.js') }}"></script>
 
-<script src="{{ asset('bundles/metronic8/js/pages/employees-rrhh.js') }}?{{ 'now' | date('U') }}"></script>
+<script src="{{ asset('assets/metronic8/js/pages/employees-rrhh.js') }}?{{ 'now' | date('U') }}"></script>
 <script>
 
    var permiso = {

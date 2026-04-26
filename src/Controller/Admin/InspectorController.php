@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\InspectorService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\InspectorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class InspectorController extends AbstractAdminController
 {
-
     private $inspectorService;
 
     public function __construct(AdminAccessService $adminAccess, InspectorService $inspectorService)
@@ -29,14 +27,13 @@ class InspectorController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/inspector/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/inspector/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -58,14 +55,13 @@ class InspectorController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -75,8 +71,7 @@ class InspectorController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -88,26 +83,23 @@ class InspectorController extends AbstractAdminController
         $status = $request->get('status');
 
         try {
-
-            if ($inspector_id == "") {
+            if ('' == $inspector_id) {
                 $resultado = $this->inspectorService->SalvarInspector($name, $email, $phone, $status);
             } else {
                 $resultado = $this->inspectorService->ActualizarInspector($inspector_id, $name, $email, $phone, $status);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['inspector_id'] = $resultado['inspector_id'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -117,8 +109,7 @@ class InspectorController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un inspector en la BD
-     *
+     * eliminar Acción que elimina un inspector en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -128,26 +119,24 @@ class InspectorController extends AbstractAdminController
             $resultado = $this->inspectorService->EliminarInspector($inspector_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarInspectors Acción que elimina los inspectors seleccionados en la BD
-     *
+     * eliminarInspectors Acción que elimina los inspectors seleccionados en la BD.
      */
     public function eliminarInspectors(Request $request)
     {
@@ -157,26 +146,24 @@ class InspectorController extends AbstractAdminController
             $resultado = $this->inspectorService->EliminarInspectors($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del inspector en la BD
-     *
+     * cargarDatos Acción que carga los datos del inspector en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -185,24 +172,20 @@ class InspectorController extends AbstractAdminController
         try {
             $resultado = $this->inspectorService->CargarDatosInspector($inspector_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['inspector'] = $resultado['inspector'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
-
 }

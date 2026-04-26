@@ -8,73 +8,73 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class RaceRepository extends ServiceEntityRepository
 {
-   public function __construct(ManagerRegistry $registry)
-   {
-      parent::__construct($registry, Race::class);
-   }
-   /**
-    * ListarOrdenados: Lista los races ordenados por nombre.
-    *
-    * @return Race[]
-    */
-   public function ListarOrdenados($search = ''): array
-   {
-      $consulta = $this->createQueryBuilder('g');
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Race::class);
+    }
 
-      if ($search != '') {
-         $consulta->andWhere('g.description LIKE :search OR g.code LIKE :search')
-            ->setParameter('search', "%{$search}%");
-      }
+    /**
+     * ListarOrdenados: Lista los races ordenados por nombre.
+     *
+     * @return Race[]
+     */
+    public function ListarOrdenados($search = ''): array
+    {
+        $consulta = $this->createQueryBuilder('g');
 
-      $consulta->orderBy('g.description', 'ASC');
+        if ('' != $search) {
+            $consulta->andWhere('g.description LIKE :search OR g.code LIKE :search')
+               ->setParameter('search', "%{$search}%");
+        }
 
-      return $consulta->getQuery()->getResult();
-   }
+        $consulta->orderBy('g.description', 'ASC');
 
-   /**
-    * ListarRacesConTotal Lista los races con total
-    *
-    * @return []
-    */
-   public function ListarRacesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array
-   {
+        return $consulta->getQuery()->getResult();
+    }
 
-      // Whitelist de columnas ordenables
-      $sortable = [
-         'raceId'  => 'g.raceId',
-         'description' => 'g.description',
-         'code' => 'g.code',
-         'classification' => 'g.classification'
-      ];
-      $orderBy = $sortable[$sortColumn] ?? 'g.description';
-      $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+    /**
+     * ListarRacesConTotal Lista los races con total.
+     *
+     * @return []
+     */
+    public function ListarRacesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'raceId' => 'g.raceId',
+            'description' => 'g.description',
+            'code' => 'g.code',
+            'classification' => 'g.classification',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'g.description';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
-      // QB base con filtros (se reutiliza para datos y conteo)
-      $baseQb = $this->createQueryBuilder('g');
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('g');
 
-      if (!empty($sSearch)) {
-         $baseQb->andWhere('g.description LIKE :search OR g.code LIKE :search')
-            ->setParameter('search', "%{$sSearch}%");
-      }
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('g.description LIKE :search OR g.code LIKE :search')
+               ->setParameter('search', "%{$sSearch}%");
+        }
 
-      // 1) Datos
-      $dataQb = clone $baseQb;
-      $dataQb->orderBy($orderBy, $dir)
-         ->setFirstResult($start)
-         ->setMaxResults($limit > 0 ? $limit : null);
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+           ->setFirstResult($start)
+           ->setMaxResults($limit > 0 ? $limit : null);
 
-      $data = $dataQb->getQuery()->getResult();
+        $data = $dataQb->getQuery()->getResult();
 
-      // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
-      $countQb = clone $baseQb;
-      $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(g.raceId)');
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+           ->select('COUNT(g.raceId)');
 
-      $total = (int) $countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
-      return [
-         'data'  => $data,   // array<Rol>
-         'total' => $total,  // total con el MISMO filtro 'search'
-      ];
-   }
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
 }

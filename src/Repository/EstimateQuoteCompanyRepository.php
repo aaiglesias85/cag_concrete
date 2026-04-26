@@ -14,7 +14,7 @@ class EstimateQuoteCompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarCompaniesDeQuote: Lista las compañías asignadas a una cuota (para envío)
+     * ListarCompaniesDeQuote: Lista las compañías asignadas a una cuota (para envío).
      *
      * @return EstimateQuoteCompany[]
      */
@@ -25,7 +25,7 @@ class EstimateQuoteCompanyRepository extends ServiceEntityRepository
             ->leftJoin('eqc.estimateCompany', 'ec')
             ->leftJoin('ec.company', 'c');
 
-        if ($estimate_quote_id != '') {
+        if ('' != $estimate_quote_id) {
             $consulta->andWhere('q.id = :estimate_quote_id')
                 ->setParameter('estimate_quote_id', $estimate_quote_id);
         }

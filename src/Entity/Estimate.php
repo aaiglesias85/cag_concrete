@@ -4,52 +4,52 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "estimate")]
+#[ORM\Table(name: 'estimate')]
 #[ORM\Entity(repositoryClass: "App\Repository\EstimateRepository")]
 class Estimate
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "estimate_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'estimate_id', type: 'integer', nullable: false)]
     private ?int $estimateId;
 
-    #[ORM\Column(name: "project_id", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'project_id', type: 'string', length: 255, nullable: true)]
     private ?string $projectId;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
     #[ORM\Column(name: 'bid_deadline', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $bidDeadline;
 
-    #[ORM\Column(name: "county", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'county', type: 'string', length: 255, nullable: true)]
     private ?string $county;
 
-    #[ORM\Column(name: "priority", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'priority', type: 'string', length: 50, nullable: true)]
     private ?string $priority;
 
-    #[ORM\Column(name: "bid_no", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'bid_no', type: 'string', length: 50, nullable: true)]
     private ?string $bidNo;
 
-    #[ORM\Column(name: "work_hour", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'work_hour', type: 'string', length: 50, nullable: true)]
     private ?string $workHour;
 
-    #[ORM\Column(name: "phone", type: "text", nullable: true)]
+    #[ORM\Column(name: 'phone', type: 'text', nullable: true)]
     private ?string $phone;
 
-    #[ORM\Column(name: "email", type: "text", nullable: true)]
+    #[ORM\Column(name: 'email', type: 'text', nullable: true)]
     private ?string $email;
 
-    #[ORM\Column(name: "bid_description", type: "text", nullable: true)]
+    #[ORM\Column(name: 'bid_description', type: 'text', nullable: true)]
     private ?string $bidDescription;
 
-    #[ORM\Column(name: "bid_instructions", type: "text", nullable: true)]
+    #[ORM\Column(name: 'bid_instructions', type: 'text', nullable: true)]
     private ?string $bidInstructions;
 
-    #[ORM\Column(name: "plan_link", type: "text", nullable: true)]
+    #[ORM\Column(name: 'plan_link', type: 'text', nullable: true)]
     private ?string $planLink;
 
-    #[ORM\Column(name: "quote_received", type: "boolean", nullable: true)]
+    #[ORM\Column(name: 'quote_received', type: 'boolean', nullable: true)]
     private ?bool $quoteReceived;
 
     #[ORM\Column(name: 'job_walk', type: 'datetime', nullable: false)]
@@ -73,10 +73,10 @@ class Estimate
     #[ORM\Column(name: 'lost_date', type: 'datetime', nullable: false)]
     private ?\DateTimeInterface $lostDate;
 
-    #[ORM\Column(name: "location", type: "text", nullable: true)]
+    #[ORM\Column(name: 'location', type: 'text', nullable: true)]
     private ?string $location;
 
-    #[ORM\Column(name: "sector", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'sector', type: 'string', length: 50, nullable: true)]
     private ?string $sector;
 
     #[ORM\ManyToOne(targetEntity: ProjectStage::class)]
@@ -110,7 +110,6 @@ class Estimate
     #[ORM\ManyToOne(targetEntity: PlanDownloading::class)]
     #[ORM\JoinColumn(name: 'plan_downloading_id', referencedColumnName: 'plan_downloading_id')]
     private ?PlanDownloading $planDownloading = null;
-
 
     public function getEstimateId(): ?int
     {

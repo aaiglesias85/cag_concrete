@@ -12,6 +12,7 @@ class EquationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Equation::class);
     }
+
     /**
      * ListarOrdenados: Lista las ecuaciones con el estado 1 y las ordena por descripción.
      *
@@ -29,11 +30,11 @@ class EquationRepository extends ServiceEntityRepository
     /**
      * ListarEquations: Lista las ecuaciones con filtros, paginación y ordenación.
      *
-     * @param int $start El inicio de la paginación
-     * @param int $limit El límite de resultados
-     * @param string|null $sSearch El término de búsqueda (opcional)
-     * @param string $iSortCol_0 Columna para ordenar
-     * @param string $sSortDir_0 Dirección del orden (ASC/DESC)
+     * @param int         $start      El inicio de la paginación
+     * @param int         $limit      El límite de resultados
+     * @param string|null $sSearch    El término de búsqueda (opcional)
+     * @param string      $iSortCol_0 Columna para ordenar
+     * @param string      $sSortDir_0 Dirección del orden (ASC/DESC)
      *
      * @return Equation[]
      */
@@ -81,21 +82,21 @@ class EquationRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarEquationsConTotal Lista los equations con total
+     * ListarEquationsConTotal Lista los equations con total.
      *
      * @return []
      */
-    public function ListarEquationsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarEquationsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'equationId'  => 'e.equationId',
+            'equationId' => 'e.equationId',
             'description' => 'e.description',
             'equation' => 'e.equation',
             'status' => 'e.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'e.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('e');
@@ -121,9 +122,8 @@ class EquationRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

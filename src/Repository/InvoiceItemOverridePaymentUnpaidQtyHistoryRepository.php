@@ -30,23 +30,24 @@ class InvoiceItemOverridePaymentUnpaidQtyHistoryRepository extends ServiceEntity
 
     public function TieneHistorial(int $invoice_item_override_payment_id): bool
     {
-        return $this->createQueryBuilder('h')
+        return null !== $this->createQueryBuilder('h')
             ->join('h.invoiceItemOverridePayment', 'o')
             ->where('o.id = :override_id')
             ->setParameter('override_id', $invoice_item_override_payment_id)
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult() !== null;
+            ->getOneOrNullResult();
     }
 
     /**
      * @param int[] $override_ids
+     *
      * @return int[]
      */
     public function IdsConHistorial(array $override_ids): array
     {
         $ids = array_values(array_unique(array_map('intval', $override_ids)));
-        if ($ids === []) {
+        if ([] === $ids) {
             return [];
         }
 
@@ -63,7 +64,7 @@ class InvoiceItemOverridePaymentUnpaidQtyHistoryRepository extends ServiceEntity
                 continue;
             }
             $o = $hist->getInvoiceItemOverridePayment();
-            if ($o !== null) {
+            if (null !== $o) {
                 $seen[$o->getId()] = true;
             }
         }

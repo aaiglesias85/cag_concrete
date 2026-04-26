@@ -42,6 +42,7 @@ class Advertisement
     public function setTitle(?string $title): self
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -53,6 +54,7 @@ class Advertisement
     public function setDescription(?string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 
@@ -64,6 +66,7 @@ class Advertisement
     public function setStatus(?bool $status): self
     {
         $this->status = $status;
+
         return $this;
     }
 
@@ -75,6 +78,7 @@ class Advertisement
     public function setStartDate(?\DateTimeInterface $startDate): self
     {
         $this->startDate = $startDate;
+
         return $this;
     }
 
@@ -86,6 +90,7 @@ class Advertisement
     public function setEndDate(?\DateTimeInterface $endDate): self
     {
         $this->endDate = $endDate;
+
         return $this;
     }
 }

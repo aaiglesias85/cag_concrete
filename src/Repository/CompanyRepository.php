@@ -8,142 +8,142 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class CompanyRepository extends ServiceEntityRepository
 {
-   public function __construct(ManagerRegistry $registry)
-   {
-      parent::__construct($registry, Company::class);
-   }
-   /**
-    * ListarOrdenados: Lista los companies
-    *
-    * @return Company[]
-    */
-   public function ListarOrdenados()
-   {
-      return $this->createQueryBuilder('c')
-         ->orderBy('c.name', 'ASC')
-         ->getQuery()
-         ->getResult();
-   }
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Company::class);
+    }
 
-   /**
-    * ListarOrdenadosParaOffline: Lista companies como arrays para trabajo offline.
-    * Usa getArrayResult() para evitar lazy loading (requiere PHP 8.4 en Doctrine ORM 3.4).
-    *
-    * @return array<array<string, mixed>>
-    */
-   public function ListarOrdenadosParaOffline(): array
-   {
-      return $this->createQueryBuilder('c')
-         ->select(
-            'c.companyId AS company_id',
-            'c.name',
-            'c.phone',
-            'c.address',
-            'c.contactName AS contact_name',
-            'c.contactEmail AS contact_email',
-            'c.email',
-            'c.website',
-            'c.createdAt AS created_at',
-            'c.updatedAt AS updated_at'
-         )
-         ->orderBy('c.name', 'ASC')
-         ->getQuery()
-         ->getArrayResult();
-   }
+    /**
+     * ListarOrdenados: Lista los companies.
+     *
+     * @return Company[]
+     */
+    public function ListarOrdenados()
+    {
+        return $this->createQueryBuilder('c')
+           ->orderBy('c.name', 'ASC')
+           ->getQuery()
+           ->getResult();
+    }
 
-   /**
-    * ListarCompanies: Lista los companies
-    *
-    * @param int $start Inicio
-    * @param int $limit Límite
-    * @param string $sSearch Para buscar
-    *
-    * @return Company[]
-    */
-   public function ListarCompanies($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
-   {
-      $qb = $this->createQueryBuilder('c');
+    /**
+     * ListarOrdenadosParaOffline: Lista companies como arrays para trabajo offline.
+     * Usa getArrayResult() para evitar lazy loading (requiere PHP 8.4 en Doctrine ORM 3.4).
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function ListarOrdenadosParaOffline(): array
+    {
+        return $this->createQueryBuilder('c')
+           ->select(
+               'c.companyId AS company_id',
+               'c.name',
+               'c.phone',
+               'c.address',
+               'c.contactName AS contact_name',
+               'c.contactEmail AS contact_email',
+               'c.email',
+               'c.website',
+               'c.createdAt AS created_at',
+               'c.updatedAt AS updated_at'
+           )
+           ->orderBy('c.name', 'ASC')
+           ->getQuery()
+           ->getArrayResult();
+    }
 
-      if (!empty($sSearch)) {
-         $qb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search')
-            ->setParameter('search', '%' . $sSearch . '%');
-      }
+    /**
+     * ListarCompanies: Lista los companies.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Límite
+     * @param string $sSearch Para buscar
+     *
+     * @return Company[]
+     */
+    public function ListarCompanies($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    {
+        $qb = $this->createQueryBuilder('c');
 
-      $qb->orderBy('c.' . $iSortCol_0, $sSortDir_0);
+        if (!empty($sSearch)) {
+            $qb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search')
+               ->setParameter('search', '%'.$sSearch.'%');
+        }
 
-      if ($limit > 0) {
-         $qb->setMaxResults($limit);
-      }
+        $qb->orderBy('c.'.$iSortCol_0, $sSortDir_0);
 
-      return $qb->setFirstResult($start)
-         ->getQuery()
-         ->getResult();
-   }
+        if ($limit > 0) {
+            $qb->setMaxResults($limit);
+        }
 
-   /**
-    * TotalCompanies: Total de companies en la BD
-    *
-    * @param string $sSearch Para buscar
-    *
-    * @return int
-    */
-   public function TotalCompanies($sSearch)
-   {
-      $qb = $this->createQueryBuilder('c')
-         ->select('COUNT(c.companyId)');
+        return $qb->setFirstResult($start)
+           ->getQuery()
+           ->getResult();
+    }
 
-      if (!empty($sSearch)) {
-         $qb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search')
-            ->setParameter('search', '%' . $sSearch . '%');
-      }
+    /**
+     * TotalCompanies: Total de companies en la BD.
+     *
+     * @param string $sSearch Para buscar
+     *
+     * @return int
+     */
+    public function TotalCompanies($sSearch)
+    {
+        $qb = $this->createQueryBuilder('c')
+           ->select('COUNT(c.companyId)');
 
-      return (int) $qb->getQuery()->getSingleScalarResult();
-   }
+        if (!empty($sSearch)) {
+            $qb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search')
+               ->setParameter('search', '%'.$sSearch.'%');
+        }
 
-   /**
-    * ListarCompaniesConTotal Lista los companies con total
-    *
-    * @return []
-    */
-   public function ListarCompaniesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array
-   {
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
 
-      // Whitelist de columnas ordenables
-      $sortable = [
-         'companyId'  => 'c.companyId',
-         'name' => 'c.name',
-         'phone'    => 'c.phone',
-         'address' => 'c.address',
-      ];
-      $orderBy = $sortable[$sortColumn] ?? 'c.name';
-      $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+    /**
+     * ListarCompaniesConTotal Lista los companies con total.
+     *
+     * @return []
+     */
+    public function ListarCompaniesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'companyId' => 'c.companyId',
+            'name' => 'c.name',
+            'phone' => 'c.phone',
+            'address' => 'c.address',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'c.name';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
-      // QB base con filtros (se reutiliza para datos y conteo)
-      $baseQb = $this->createQueryBuilder('c');
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('c');
 
-      if (!empty($sSearch)) {
-         $baseQb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search OR c.address LIKE :search')
-            ->setParameter('search', '%' . $sSearch . '%');
-      }
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('c.contactEmail LIKE :search OR c.contactName LIKE :search OR c.phone LIKE :search OR c.name LIKE :search OR c.address LIKE :search')
+               ->setParameter('search', '%'.$sSearch.'%');
+        }
 
-      // 1) Datos
-      $dataQb = clone $baseQb;
-      $dataQb->orderBy($orderBy, $dir)
-         ->setFirstResult($start)
-         ->setMaxResults($limit > 0 ? $limit : null);
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+           ->setFirstResult($start)
+           ->setMaxResults($limit > 0 ? $limit : null);
 
-      $data = $dataQb->getQuery()->getResult();
+        $data = $dataQb->getQuery()->getResult();
 
-      // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
-      $countQb = clone $baseQb;
-      $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(c.companyId)');
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+           ->select('COUNT(c.companyId)');
 
-      $total = (int) $countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
-      return [
-         'data'  => $data,   // array<Rol>
-         'total' => $total,  // total con el MISMO filtro 'search'
-      ];
-   }
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
 }

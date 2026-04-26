@@ -27,7 +27,7 @@ class PushNotificationService
         private LoggerInterface $logger,
         private string $projectId = '',
         private string $serviceAccountJsonPath = '',
-        private string $projectDir = ''
+        private string $projectDir = '',
     ) {
     }
 
@@ -41,13 +41,14 @@ class PushNotificationService
      */
     public function sendToDevice(string $token, string $title, string $body, array $data = []): bool
     {
-        if ($this->projectId === '' || $this->serviceAccountJsonPath === '' || $token === '') {
+        if ('' === $this->projectId || '' === $this->serviceAccountJsonPath || '' === $token) {
             $this->logger->debug('PushNotificationService: FCM project_id, service account path or token empty, skip send.');
+
             return false;
         }
 
         $accessToken = $this->getAccessToken();
-        if ($accessToken === '') {
+        if ('' === $accessToken) {
             return false;
         }
 
@@ -67,7 +68,7 @@ class PushNotificationService
         try {
             $response = $this->httpClient->request('POST', $url, [
                 'headers' => [
-                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Authorization' => 'Bearer '.$accessToken,
                     'Content-Type' => 'application/json',
                 ],
                 'json' => $payload,
@@ -83,14 +84,16 @@ class PushNotificationService
             $this->logger->warning('PushNotificationService: FCM v1 non-2xx response', [
                 'status' => $statusCode,
                 'response' => $content,
-                'token_preview' => substr($token, 0, 20) . '...',
+                'token_preview' => substr($token, 0, 20).'...',
             ]);
+
             return false;
         } catch (\Throwable $e) {
             $this->logger->error('PushNotificationService: exception sending push', [
                 'message' => $e->getMessage(),
-                'token_preview' => substr($token, 0, 20) . '...',
+                'token_preview' => substr($token, 0, 20).'...',
             ]);
+
             return false;
         }
     }
@@ -102,12 +105,12 @@ class PushNotificationService
     private function getAccessToken(): string
     {
         $cacheKey = $this->projectId;
-        if (self::$tokenCache !== null && self::$tokenCache['key'] === $cacheKey && self::$tokenCache['expires_at'] > time()) {
+        if (null !== self::$tokenCache && self::$tokenCache['key'] === $cacheKey && self::$tokenCache['expires_at'] > time()) {
             return self::$tokenCache['token'];
         }
 
         $credentials = $this->loadServiceAccount();
-        if ($credentials === null) {
+        if (null === $credentials) {
             return '';
         }
 
@@ -129,6 +132,7 @@ class PushNotificationService
             $jwt = JWT::encode($jwtPayload, $privateKey, 'RS256');
         } catch (\Throwable $e) {
             $this->logger->error('PushNotificationService: JWT encode failed', ['message' => $e->getMessage()]);
+
             return '';
         }
 
@@ -145,11 +149,13 @@ class PushNotificationService
             $content = $response->toArray();
         } catch (\Throwable $e) {
             $this->logger->error('PushNotificationService: OAuth2 token request failed', ['message' => $e->getMessage()]);
+
             return '';
         }
 
         if (!isset($content['access_token'])) {
             $this->logger->warning('PushNotificationService: no access_token in OAuth2 response', ['response' => $content]);
+
             return '';
         }
 
@@ -171,26 +177,29 @@ class PushNotificationService
     private function loadServiceAccount(): ?array
     {
         $path = $this->serviceAccountJsonPath;
-        if ($path === '') {
+        if ('' === $path) {
             return null;
         }
-        if (!str_starts_with($path, '/') && $this->projectDir !== '') {
-            $path = rtrim($this->projectDir, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . ltrim($path, \DIRECTORY_SEPARATOR);
+        if (!str_starts_with($path, '/') && '' !== $this->projectDir) {
+            $path = rtrim($this->projectDir, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.ltrim($path, \DIRECTORY_SEPARATOR);
         }
         if (!is_readable($path)) {
             $this->logger->warning('PushNotificationService: service account file not readable', ['path' => $path]);
+
             return null;
         }
 
         $json = file_get_contents($path);
-        if ($json === false) {
+        if (false === $json) {
             $this->logger->warning('PushNotificationService: could not read service account file');
+
             return null;
         }
 
         $data = json_decode($json, true);
         if (!isset($data['client_email'], $data['private_key'])) {
             $this->logger->warning('PushNotificationService: service account JSON missing client_email or private_key');
+
             return null;
         }
 
@@ -209,6 +218,7 @@ class PushNotificationService
         foreach ($data as $k => $v) {
             $out[(string) $k] = (string) $v;
         }
+
         return $out;
     }
 }

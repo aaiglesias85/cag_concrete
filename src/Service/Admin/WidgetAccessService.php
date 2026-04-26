@@ -2,13 +2,13 @@
 
 namespace App\Service\Admin;
 
+use App\Entity\RolWidgetAccess;
+use App\Entity\UserWidgetAccess;
 use App\Entity\Usuario;
+use App\Entity\Widget;
 use App\Repository\RolWidgetAccessRepository;
 use App\Repository\UserWidgetAccessRepository;
 use App\Repository\WidgetRepository;
-use App\Entity\RolWidgetAccess;
-use App\Entity\UserWidgetAccess;
-use App\Entity\Widget;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -28,7 +28,7 @@ final class WidgetAccessService
     public function isWidgetEnabledForUser(int $userId, string $code): bool
     {
         $widget = $this->widgetRepository->findOneByCode($code);
-        if ($widget === null) {
+        if (null === $widget) {
             return false;
         }
 
@@ -45,7 +45,7 @@ final class WidgetAccessService
     public function ensureUserWidgetAccessSeededFromRolIfEmpty(int $userId): void
     {
         $rolId = $this->getRolIdForUser($userId);
-        if ($rolId === null) {
+        if (null === $rolId) {
             return;
         }
         $this->copyRolWidgetsToUserIfEmpty($userId, $rolId);
@@ -58,11 +58,11 @@ final class WidgetAccessService
     public function isWidgetInMyWidgetsScope(int $userId, string $code): bool
     {
         $widget = $this->widgetRepository->findOneByCode($code);
-        if ($widget === null) {
+        if (null === $widget) {
             return false;
         }
         $rolId = $this->getRolIdForUser($userId);
-        if ($rolId === null) {
+        if (null === $rolId) {
             return false;
         }
         $wId = (int) $widget->getWidgetId();
@@ -81,11 +81,11 @@ final class WidgetAccessService
      */
     public function setUserWidgetFromMyWidgetsPage(int $userId, string $code, bool $enabled): void
     {
-        if ($this->getRolIdForUser($userId) === null) {
+        if (null === $this->getRolIdForUser($userId)) {
             throw new \InvalidArgumentException('User has no profile');
         }
         $widget = $this->widgetRepository->findOneByCode($code);
-        if ($widget === null) {
+        if (null === $widget) {
             throw new \InvalidArgumentException('Unknown widget code');
         }
         $this->userWidgetAccessRepository->setEnabledByUserIdAndWidgetId(
@@ -249,7 +249,7 @@ final class WidgetAccessService
     private function getRolIdForUser(int $userId): ?int
     {
         $user = $this->em->find(Usuario::class, $userId);
-        if ($user === null || $user->getRol() === null) {
+        if (null === $user || null === $user->getRol()) {
             return null;
         }
 

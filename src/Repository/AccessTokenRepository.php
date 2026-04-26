@@ -14,9 +14,10 @@ class AccessTokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarAccessTokenDeUsuario: Lista los access token de un usuario
+     * ListarAccessTokenDeUsuario: Lista los access token de un usuario.
      *
      * @param int $usuario_id Id del usuario
+     *
      * @return AccessToken[]
      */
     public function ListarAccessTokenDeUsuario(int $usuario_id): array

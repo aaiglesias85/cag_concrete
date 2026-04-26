@@ -4,23 +4,23 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "user_access_token")]
+#[ORM\Table(name: 'user_access_token')]
 #[ORM\Entity(repositoryClass: "App\Repository\AccessTokenRepository")]
 class AccessToken
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(type: "integer")]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: "token", type: "string", length: 255, nullable: false)]
+    #[ORM\Column(name: 'token', type: 'string', length: 255, nullable: false)]
     private ?string $token = null;
 
-    #[ORM\Column(name: "expires_at", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'expires_at', type: 'integer', nullable: false)]
     private ?int $expiresAt = null;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Usuario")]
-    #[ORM\JoinColumn(name: "user_id", referencedColumnName: "user_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: false)]
     private ?Usuario $user = null;
 
     public function getId(): ?int
@@ -36,6 +36,7 @@ class AccessToken
     public function setToken(?string $token): self
     {
         $this->token = $token;
+
         return $this;
     }
 
@@ -47,6 +48,7 @@ class AccessToken
     public function setExpiresAt(?int $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
+
         return $this;
     }
 
@@ -58,6 +60,7 @@ class AccessToken
     public function setUser(?Usuario $user): self
     {
         $this->user = $user;
+
         return $this;
     }
 }

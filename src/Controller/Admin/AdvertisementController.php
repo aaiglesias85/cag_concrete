@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\AdvertisementService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\AdvertisementService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class AdvertisementController extends AbstractAdminController
 {
-
     private $advertisementService;
 
     public function __construct(AdminAccessService $adminAccess, AdvertisementService $advertisementService)
@@ -29,23 +27,21 @@ class AdvertisementController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/advertisement/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/advertisement/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los usuarios
-     *
+     * listar Acción que lista los usuarios.
      */
     public function listar(Request $request)
     {
         try {
-
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'title', 'startDate', 'endDate', 'status' ],
+                allowedOrderFields: ['id', 'title', 'startDate', 'endDate', 'status'],
                 defaultOrderField: 'startDate'
             );
 
@@ -65,14 +61,13 @@ class AdvertisementController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -82,8 +77,7 @@ class AdvertisementController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -96,25 +90,22 @@ class AdvertisementController extends AbstractAdminController
         $end_date = $request->get('end_date');
 
         try {
-
-            if ($advertisement_id == "") {
+            if ('' == $advertisement_id) {
                 $resultado = $this->advertisementService->SalvarAdvertisement($title, $description, $status, $start_date, $end_date);
             } else {
                 $resultado = $this->advertisementService->ActualizarAdvertisement($advertisement_id, $title, $description, $status, $start_date, $end_date);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -124,8 +115,7 @@ class AdvertisementController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un advertisement en la BD
-     *
+     * eliminar Acción que elimina un advertisement en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -135,26 +125,24 @@ class AdvertisementController extends AbstractAdminController
             $resultado = $this->advertisementService->EliminarAdvertisement($advertisement_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarAdvertisements Acción que elimina los advertisements seleccionados en la BD
-     *
+     * eliminarAdvertisements Acción que elimina los advertisements seleccionados en la BD.
      */
     public function eliminarAdvertisements(Request $request)
     {
@@ -164,26 +152,24 @@ class AdvertisementController extends AbstractAdminController
             $resultado = $this->advertisementService->EliminarAdvertisements($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del advertisement en la BD
-     *
+     * cargarDatos Acción que carga los datos del advertisement en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -192,23 +178,20 @@ class AdvertisementController extends AbstractAdminController
         try {
             $resultado = $this->advertisementService->CargarDatosAdvertisement($advertisement_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['advertisement'] = $resultado['advertisement'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 }

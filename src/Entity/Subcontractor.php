@@ -4,43 +4,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "subcontractor")]
+#[ORM\Table(name: 'subcontractor')]
 #[ORM\Entity(repositoryClass: "App\Repository\SubcontractorRepository")]
 class Subcontractor
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "subcontractor_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'subcontractor_id', type: 'integer', nullable: false)]
     private ?int $subcontractorId;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "phone", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'phone', type: 'string', length: 50, nullable: true)]
     private ?string $phone;
 
-    #[ORM\Column(name: "address", type: "text", nullable: true)]
+    #[ORM\Column(name: 'address', type: 'text', nullable: true)]
     private ?string $address;
 
-    #[ORM\Column(name: "contact_name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'contact_name', type: 'string', length: 255, nullable: true)]
     private ?string $contactName;
 
-    #[ORM\Column(name: "contact_email", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'contact_email', type: 'string', length: 255, nullable: true)]
     private ?string $contactEmail;
 
-    #[ORM\Column(name: "company_name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'company_name', type: 'string', length: 255, nullable: true)]
     private ?string $companyName;
 
-    #[ORM\Column(name: "company_phone", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'company_phone', type: 'string', length: 50, nullable: true)]
     private ?string $companyPhone;
 
-    #[ORM\Column(name: "company_address", type: "text", nullable: true)]
+    #[ORM\Column(name: 'company_address', type: 'text', nullable: true)]
     private ?string $companyAddress;
 
-    #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTime $createdAt;
 
-    #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     private ?\DateTime $updatedAt;
 
     public function getSubcontractorId(): ?int

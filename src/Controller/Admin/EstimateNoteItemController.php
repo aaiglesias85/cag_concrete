@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\EstimateNoteItemService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\EstimateNoteItemService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -27,6 +26,7 @@ class EstimateNoteItemController extends AbstractAdminController
             return $acceso;
         }
         $permiso = $acceso['permisos'];
+
         return $this->render('admin/estimate-note-item/index.html.twig', [
             'permiso' => $permiso[0],
         ]);
@@ -67,7 +67,7 @@ class EstimateNoteItemController extends AbstractAdminController
         $type = $request->get('type', 'item');
 
         try {
-            if ($id === '' || $id === null) {
+            if ('' === $id || null === $id) {
                 $resultado = $this->estimateNoteItemService->Salvar($description, $type);
             } else {
                 $resultado = $this->estimateNoteItemService->Actualizar($id, $description, $type);
@@ -80,6 +80,7 @@ class EstimateNoteItemController extends AbstractAdminController
                     'message' => 'The operation was successful',
                 ]);
             }
+
             return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
         } catch (\Exception $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()]);
@@ -94,6 +95,7 @@ class EstimateNoteItemController extends AbstractAdminController
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => 'The operation was successful']);
             }
+
             return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
         } catch (\Exception $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()]);
@@ -108,6 +110,7 @@ class EstimateNoteItemController extends AbstractAdminController
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => $resultado['message']]);
             }
+
             return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
         } catch (\Exception $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()]);
@@ -122,6 +125,7 @@ class EstimateNoteItemController extends AbstractAdminController
             if (!empty($resultado['success']) && $resultado['success']) {
                 return $this->json(['success' => true, 'item' => $resultado['item']]);
             }
+
             return $this->json(['success' => false, 'error' => 'Record not found']);
         } catch (\Exception $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()]);

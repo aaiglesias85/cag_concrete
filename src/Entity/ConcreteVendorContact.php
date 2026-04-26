@@ -4,32 +4,32 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "concrete_vendor_contact")]
+#[ORM\Table(name: 'concrete_vendor_contact')]
 #[ORM\Entity(repositoryClass: "App\Repository\ConcreteVendorContactRepository")]
 class ConcreteVendorContact
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "contact_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'contact_id', type: 'integer', nullable: false)]
     private ?int $contactId;
 
-    #[ORM\Column(name: "name", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name;
 
-    #[ORM\Column(name: "phone", type: "string", length: 50, nullable: true)]
+    #[ORM\Column(name: 'phone', type: 'string', length: 50, nullable: true)]
     private ?string $phone;
 
-    #[ORM\Column(name: "email", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'email', type: 'string', length: 255, nullable: true)]
     private ?string $email;
 
-    #[ORM\Column(name: "role", type: "string", length: 255, nullable: true)]
+    #[ORM\Column(name: 'role', type: 'string', length: 255, nullable: true)]
     private ?string $role;
 
-    #[ORM\Column(name: "notes", type: "text", nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
     private ?string $notes;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\ConcreteVendor")]
-    #[ORM\JoinColumn(name: "vendor_id", referencedColumnName: "vendor_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id', nullable: true)]
     private ?ConcreteVendor $concreteVendor;
 
     public function getContactId(): ?int

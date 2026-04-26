@@ -122,7 +122,7 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 | Ruta / método | Uso |
 |---------------|-----|
 | `POST project/listarItemsParaInvoice` | `ProjectController::listarItemsParaInvoice` → `ProjectService::ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin)`. |
-| Frontend | `public/bundles/metronic8/js/pages/invoices.js`, `modal-invoice.js` — envían `start_date` / `end_date` del período del invoice en edición. |
+| Frontend | `public/assets/metronic8/js/pages/invoices.js`, `modal-invoice.js` — envían `start_date` / `end_date` del período del invoice en edición. |
 
 Debe cumplirse: los agregados con override usan **las fechas del borrador** (`fecha_inicial` / `fecha_fin`), no “la última override del proyecto” sin filtro de fecha.
 
@@ -163,7 +163,7 @@ Cualquier pantalla que muestre **paid/unpaid** con “effective” debe respetar
 
 ### 4.4 Frontend
 
-- El backend es la fuente de verdad; el JS debe enviar **`fecha_inicial` / `fecha_fin`** coherentes con el período del invoice (p. ej. `public/bundles/metronic8/js/pages/invoices.js`, `modal-invoice.js`).
+- El backend es la fuente de verdad; el JS debe enviar **`fecha_inicial` / `fecha_fin`** coherentes con el período del invoice (p. ej. `public/assets/metronic8/js/pages/invoices.js`, `modal-invoice.js`).
 
 ## 5. Plan de pruebas manuales (validación end-to-end)
 

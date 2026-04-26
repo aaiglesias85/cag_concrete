@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\OverheadPriceService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\OverheadPriceService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class OverheadPriceController extends AbstractAdminController
 {
-
     private $overheadService;
 
     public function __construct(AdminAccessService $adminAccess, OverheadPriceService $overheadService)
@@ -29,14 +27,13 @@ class OverheadPriceController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/overhead-price/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/overhead-price/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -58,14 +55,13 @@ class OverheadPriceController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -75,8 +71,7 @@ class OverheadPriceController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -84,27 +79,24 @@ class OverheadPriceController extends AbstractAdminController
 
         $name = $request->get('name');
         $price = $request->get('price');
-        
-        try {
 
-            if ($overhead_id == "") {
+        try {
+            if ('' == $overhead_id) {
                 $resultado = $this->overheadService->SalvarOverhead($name, $price);
             } else {
                 $resultado = $this->overheadService->ActualizarOverhead($overhead_id, $name, $price);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -114,8 +106,7 @@ class OverheadPriceController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un overhead en la BD
-     *
+     * eliminar Acción que elimina un overhead en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -125,26 +116,24 @@ class OverheadPriceController extends AbstractAdminController
             $resultado = $this->overheadService->EliminarOverhead($overhead_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarOverheads Acción que elimina los overheads seleccionados en la BD
-     *
+     * eliminarOverheads Acción que elimina los overheads seleccionados en la BD.
      */
     public function eliminarOverheads(Request $request)
     {
@@ -154,26 +143,24 @@ class OverheadPriceController extends AbstractAdminController
             $resultado = $this->overheadService->EliminarOverheads($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del overhead en la BD
-     *
+     * cargarDatos Acción que carga los datos del overhead en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -182,23 +169,20 @@ class OverheadPriceController extends AbstractAdminController
         try {
             $resultado = $this->overheadService->CargarDatosOverhead($overhead_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['overhead'] = $resultado['overhead'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 }

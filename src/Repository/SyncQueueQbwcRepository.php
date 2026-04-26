@@ -12,16 +12,17 @@ class SyncQueueQbwcRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, SyncQueueQbwc::class);
     }
+
     /**
-     * ListarOrdenados: Lista la cola
+     * ListarOrdenados: Lista la cola.
      *
      * @return SyncQueueQbwc[]
      */
-    public function ListarOrdenados($estado = "", $order = "ASC")
+    public function ListarOrdenados($estado = '', $order = 'ASC')
     {
         $consulta = $this->createQueryBuilder('s_q_q');
 
-        if ($estado != "") {
+        if ('' != $estado) {
             $consulta->andWhere('s_q_q.estado = :estado')
                 ->setParameter('estado', $estado);
         }
@@ -32,25 +33,25 @@ class SyncQueueQbwcRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarRegistrosDeEntidadId: Lista los registros
+     * ListarRegistrosDeEntidadId: Lista los registros.
      *
      * @return SyncQueueQbwc[]
      */
-    public function ListarRegistrosDeEntidadId($tipo = "", $entidad_id = "", $estado = "", $order = "ASC")
+    public function ListarRegistrosDeEntidadId($tipo = '', $entidad_id = '', $estado = '', $order = 'ASC')
     {
         $consulta = $this->createQueryBuilder('s_q_q');
 
-        if ($tipo != "") {
+        if ('' != $tipo) {
             $consulta->andWhere('s_q_q.tipo = :tipo')
                 ->setParameter('tipo', $tipo);
         }
 
-        if ($entidad_id != "") {
+        if ('' != $entidad_id) {
             $consulta->andWhere('s_q_q.entidadId = :entidad_id')
                 ->setParameter('entidad_id', $entidad_id);
         }
 
-        if ($estado != "") {
+        if ('' != $estado) {
             $consulta->andWhere('s_q_q.estado = :estado')
                 ->setParameter('estado', $estado);
         }

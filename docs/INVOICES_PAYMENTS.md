@@ -1156,9 +1156,9 @@ unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
 
 ### Frontend (JavaScript)
 
--  `public/bundles/metronic8/js/pages/invoices.js`: Lógica de UI de Invoices
--  `public/bundles/metronic8/js/pages/payments.js`: Lógica de UI de Payments
--  `public/bundles/metronic8/js/components/modal-invoice.js`: Modal de Invoice
+-  `public/assets/metronic8/js/pages/invoices.js`: Lógica de UI de Invoices
+-  `public/assets/metronic8/js/pages/payments.js`: Lógica de UI de Payments
+-  `public/assets/metronic8/js/components/modal-invoice.js`: Modal de Invoice
 
 ---
 

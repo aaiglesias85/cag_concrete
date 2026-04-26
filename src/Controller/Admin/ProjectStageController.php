@@ -3,10 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\ProjectStageService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\ProjectStageService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -28,14 +27,13 @@ class ProjectStageController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/project-stage/index.html.twig', array(
+        return $this->render('admin/project-stage/index.html.twig', [
             'permiso' => $permiso[0],
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -57,14 +55,13 @@ class ProjectStageController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -74,38 +71,34 @@ class ProjectStageController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar stages en la BD
-     *
+     * salvar Acción para agregar stages en la BD.
      */
     public function salvar(Request $request)
     {
         $stage_id = $request->get('stage_id');
-        
+
         $description = $request->get('description');
         $color = $request->get('color');
         $status = $request->get('status');
 
         try {
-
-            if ($stage_id === "") {
+            if ('' === $stage_id) {
                 $resultado = $this->projectStageService->SalvarStage($description, $color, $status);
             } else {
                 $resultado = $this->projectStageService->ActualizarStage($stage_id, $description, $color, $status);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['stage_id'] = $resultado['stage_id'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -115,8 +108,7 @@ class ProjectStageController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un stage en la BD
-     *
+     * eliminar Acción que elimina un stage en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -126,13 +118,14 @@ class ProjectStageController extends AbstractAdminController
             $resultado = $this->projectStageService->EliminarStage($stage_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -142,8 +135,7 @@ class ProjectStageController extends AbstractAdminController
     }
 
     /**
-     * eliminarStages Acción que elimina los stages seleccionados en la BD
-     *
+     * eliminarStages Acción que elimina los stages seleccionados en la BD.
      */
     public function eliminarStages(Request $request)
     {
@@ -153,26 +145,24 @@ class ProjectStageController extends AbstractAdminController
             $resultado = $this->projectStageService->EliminarStages($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del stage en la BD
-     *
+     * cargarDatos Acción que carga los datos del stage en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -181,17 +171,15 @@ class ProjectStageController extends AbstractAdminController
         try {
             $resultado = $this->projectStageService->CargarDatosStage($stage_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['stage'] = $resultado['stage'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

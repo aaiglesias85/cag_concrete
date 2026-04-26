@@ -14,7 +14,7 @@ class ScheduleRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarSchedulesRangoFecha: Lista el schedule de un rango de fecha
+     * ListarSchedulesRangoFecha: Lista el schedule de un rango de fecha.
      *
      * @return Schedule[]
      */
@@ -22,29 +22,29 @@ class ScheduleRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('s');
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00');
+            $fecha_inicial = $fecha_inicial->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59');
+            $fecha_fin = $fecha_fin->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedulesDeProject: Lista el schedule de project
+     * ListarSchedulesDeProject: Lista el schedule de project.
      *
      * @return Schedule[]
      */
@@ -53,34 +53,34 @@ class ScheduleRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.project', 'p');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00');
+            $fecha_inicial = $fecha_inicial->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59');
+            $fecha_fin = $fecha_fin->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedulesDeEmployee: Lista el schedule de employee
+     * ListarSchedulesDeEmployee: Lista el schedule de employee.
      *
      * @return Schedule[]
      */
@@ -89,18 +89,18 @@ class ScheduleRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.employee', 'e');
 
-        if ($employee_id != '') {
+        if ('' != $employee_id) {
             $consulta->andWhere('e.employeeId = :employee_id')
                 ->setParameter('employee_id', $employee_id);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * BuscarEmployeeDeSchedule: Lista el lead del schedule
+     * BuscarEmployeeDeSchedule: Lista el lead del schedule.
      *
      * @return Schedule[]
      */
@@ -110,12 +110,12 @@ class ScheduleRepository extends ServiceEntityRepository
             ->leftJoin('s.project', 'p')
             ->where('s.employee is not null');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($day != "") {
+        if ('' != $day) {
             $consulta->andWhere('s.day >= :day')
                 ->setParameter('day', $day);
         }
@@ -124,7 +124,7 @@ class ScheduleRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarSchedulesDeContactProject: Lista el schedule de un contact project
+     * ListarSchedulesDeContactProject: Lista el schedule de un contact project.
      *
      * @return Schedule[]
      */
@@ -133,18 +133,18 @@ class ScheduleRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.contactProject', 'p_c');
 
-        if ($contact_id != '') {
+        if ('' != $contact_id) {
             $consulta->andWhere('p_c.contactId = :contact_id')
                 ->setParameter('contact_id', $contact_id);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedulesDeConcreteVendor: Lista el schedule de un concrete vendor
+     * ListarSchedulesDeConcreteVendor: Lista el schedule de un concrete vendor.
      *
      * @return Schedule[]
      */
@@ -153,73 +153,74 @@ class ScheduleRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.concreteVendor', 'c_v');
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedules: Lista los schedules
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarSchedules: Lista los schedules.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return Schedule[]
      */
     public function ListarSchedules($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0,
-                                    $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
+        $project_id = '', $vendor_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('s')
             ->leftJoin('s.project', 'p')
             ->leftJoin('s.contactProject', 'p_c')
             ->leftJoin('s.concreteVendor', 'c_v');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00');
+            $fecha_inicial = $fecha_inicial->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59');
+            $fecha_fin = $fecha_fin->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
         switch ($iSortCol_0) {
-            case "project":
-                $consulta->orderBy("p.name", $sSortDir_0);
+            case 'project':
+                $consulta->orderBy('p.name', $sSortDir_0);
                 break;
-            case "contactProject":
-                $consulta->orderBy("p_c.name", $sSortDir_0);
+            case 'contactProject':
+                $consulta->orderBy('p_c.name', $sSortDir_0);
                 break;
-            case "concreteVendor":
-                $consulta->orderBy("c_v.name", $sSortDir_0);
+            case 'concreteVendor':
+                $consulta->orderBy('c_v.name', $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("s.$iSortCol_0", $sSortDir_0);
@@ -232,11 +233,13 @@ class ScheduleRepository extends ServiceEntityRepository
 
         $lista = $consulta->setFirstResult($start)
             ->getQuery()->getResult();
+
         return $lista;
     }
 
     /**
-     * TotalSchedules: Total de schedules de la BD
+     * TotalSchedules: Total de schedules de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -249,50 +252,49 @@ class ScheduleRepository extends ServiceEntityRepository
             ->leftJoin('s.contactProject', 'p_c')
             ->leftJoin('s.concreteVendor', 'c_v');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00');
+            $fecha_inicial = $fecha_inicial->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59');
+            $fecha_fin = $fecha_fin->format('Y-m-d H:i:s');
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarSchedulesConTotal Lista los schedules con total
+     * ListarSchedulesConTotal Lista los schedules con total.
      *
      * @return []
      */
     public function ListarSchedulesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'day', string $sortDirection = 'DESC',
-                                            ?string $project_id = null, ?string $vendor_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null): array
+        ?string $project_id = null, ?string $vendor_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null): array
     {
-
         // Whitelist de columnas ordenables
         $sortable = [
             'id' => 's.scheduleId',
@@ -306,7 +308,7 @@ class ScheduleRepository extends ServiceEntityRepository
             'notes' => 's.notes',
         ];
         $orderBy = $sortable[$sortColumn] ?? 's.day';
-        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('s')
@@ -314,33 +316,33 @@ class ScheduleRepository extends ServiceEntityRepository
             ->leftJoin('s.contactProject', 'p_c')
             ->leftJoin('s.concreteVendor', 'c_v');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $baseQb->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $baseQb->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $baseQb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_inicial . " 00:00:00");
-            $fecha_inicial = $fecha_inicial->format("Y-m-d H:i:s");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_inicial.' 00:00:00');
+            $fecha_inicial = $fecha_inicial->format('Y-m-d H:i:s');
 
             $baseQb->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y H:i:s", $fecha_fin . " 23:59:59");
-            $fecha_fin = $fecha_fin->format("Y-m-d H:i:s");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y H:i:s', $fecha_fin.' 23:59:59');
+            $fecha_fin = $fecha_fin->format('Y-m-d H:i:s');
 
             $baseQb->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
@@ -359,7 +361,7 @@ class ScheduleRepository extends ServiceEntityRepository
         $countQb->resetDQLPart('orderBy')
             ->select('COUNT(s.scheduleId)');
 
-        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
             'data' => $data,   // array<Rol>
@@ -367,9 +369,8 @@ class ScheduleRepository extends ServiceEntityRepository
         ];
     }
 
-
     /**
-     * ListarSchedulesParaCalendario: Lista los schedules para el calendario
+     * ListarSchedulesParaCalendario: Lista los schedules para el calendario.
      *
      * @return Schedule[]
      */
@@ -380,41 +381,40 @@ class ScheduleRepository extends ServiceEntityRepository
             ->leftJoin('s.contactProject', 'p_c')
             ->leftJoin('s.concreteVendor', 'c_v');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('s.notes LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             s.description LIKE :search OR s.location LIKE :search OR p_c.name LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($vendor_id != '') {
+        if ('' != $vendor_id) {
             $consulta->andWhere('c_v.vendorId = :vendor_id')
                 ->setParameter('vendor_id', $vendor_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('s.day >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('s.day <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy("p.projectNumber", 'ASC');
+        $consulta->orderBy('p.projectNumber', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
-
 }

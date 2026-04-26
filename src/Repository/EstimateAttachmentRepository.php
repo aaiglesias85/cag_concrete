@@ -21,7 +21,7 @@ class EstimateAttachmentRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('e_a')
             ->leftJoin('e_a.estimate', 'e');
 
-        if ($estimate_id != '') {
+        if ('' != $estimate_id) {
             $consulta->andWhere('e.estimateId = :estimate_id')
                 ->setParameter('estimate_id', $estimate_id);
         }

@@ -14,7 +14,7 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarSubcontracts: Lista los subcontracts del data tracking
+     * ListarSubcontracts: Lista los subcontracts del data tracking.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -23,21 +23,18 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t_s')
             ->leftJoin('d_t_s.dataTracking', 'd_t');
 
-        if ($data_tracking_id != '') {
+        if ('' != $data_tracking_id) {
             $consulta->andWhere('d_t.id = :data_tracking_id')
                 ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-
-        $consulta->orderBy('d_t_s.id', "ASC");
-
+        $consulta->orderBy('d_t_s.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
-
     /**
-     * ListarSubcontractsDeItem: Lista el subcontractors de item
+     * ListarSubcontractsDeItem: Lista el subcontractors de item.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -46,19 +43,18 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t_s')
             ->leftJoin('d_t_s.item', 'i');
 
-        if ($item_id != '') {
+        if ('' != $item_id) {
             $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
         }
 
-
-        $consulta->orderBy('d_t_s.id', "ASC");
+        $consulta->orderBy('d_t_s.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSubcontractsDeItemProject: Lista el subcontractors de item project
+     * ListarSubcontractsDeItemProject: Lista el subcontractors de item project.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -67,19 +63,18 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t_s')
             ->leftJoin('d_t_s.projectItem', 'p_i');
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $consulta->andWhere('p_i.id = :project_item_id')
                 ->setParameter('project_item_id', $project_item_id);
         }
 
-
-        $consulta->orderBy('d_t_s.id', "ASC");
+        $consulta->orderBy('d_t_s.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSubcontractsDeSubcontractor: Lista el subcontractors de subcontractor
+     * ListarSubcontractsDeSubcontractor: Lista el subcontractors de subcontractor.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -88,19 +83,18 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t_s')
             ->leftJoin('d_t_s.subcontractor', 's');
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $consulta->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
-
-        $consulta->orderBy('d_t_s.id', "ASC");
+        $consulta->orderBy('d_t_s.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarProjectsDeSubcontractor: Lista los projects de subcontractor
+     * ListarProjectsDeSubcontractor: Lista los projects de subcontractor.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -111,20 +105,20 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
             ->leftJoin('d_t.project', 'p')
             ->leftJoin('d_t_s.subcontractor', 's');
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $consulta->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
         $consulta->groupBy('p.projectId');
 
-        $consulta->orderBy('p.name', "ASC");
+        $consulta->orderBy('p.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSubcontractorsDeProject: Lista los subcontractors de un project
+     * ListarSubcontractorsDeProject: Lista los subcontractors de un project.
      *
      * @return DataTrackingSubcontract[]
      */
@@ -135,20 +129,21 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
             ->leftJoin('d_t.project', 'p')
             ->leftJoin('d_t_s.subcontractor', 's');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
         $consulta->groupBy('s.subcontractorId');
 
-        $consulta->orderBy('s.name', "ASC");
+        $consulta->orderBy('s.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * TotalPrice: Total de quantity * price items de la BD
+     * TotalPrice: Total de quantity * price items de la BD.
+     *
      * @param string $data_tracking_id
      *
      * @return float
@@ -161,34 +156,34 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
             ->leftJoin('d_t.project', 'p')
             ->leftJoin('d_t_s.projectItem', 'p_i');
 
-        if ($data_tracking_id != '') {
+        if ('' != $data_tracking_id) {
             $qb->andWhere('d_t.id = :data_tracking_id')
                 ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $qb->andWhere('p_i.id = :project_item_id')
                 ->setParameter('project_item_id', $project_item_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $qb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != '') {
+        if ('' != $fecha_inicial) {
             $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $qb->andWhere('d_t.date >= :start')
                 ->setParameter('start', $fecha_inicial);
         }
 
-        if ($fecha_fin != '') {
+        if ('' != $fecha_fin) {
             $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $qb->andWhere('d_t.date <= :end')
                 ->setParameter('end', $fecha_fin);
         }
 
-        if ($status !== '') {
+        if ('' !== $status) {
             $qb->andWhere('p.status = :status')
                 ->setParameter('status', $status);
         }
@@ -197,9 +192,10 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarReporteSubcontractors: Lista el reporte subcontractors
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarReporteSubcontractors: Lista el reporte subcontractors.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return DataTrackingSubcontract[]
@@ -216,51 +212,51 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $qb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $qb->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $qb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $qb->andWhere('p_i.id = :project_item_id')
                 ->setParameter('project_item_id', $project_item_id);
         }
 
-        if ($fecha_inicial != '') {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $qb->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != '') {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $qb->andWhere('d_t.date <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
         switch ($iSortCol_0) {
-            case "subcontractor":
-                $qb->orderBy("s.name", $sSortDir_0);
+            case 'subcontractor':
+                $qb->orderBy('s.name', $sSortDir_0);
                 break;
-            case "project":
-                $qb->orderBy("p.name", $sSortDir_0);
+            case 'project':
+                $qb->orderBy('p.name', $sSortDir_0);
                 break;
-            case "item":
-                $qb->orderBy("i.description", $sSortDir_0);
+            case 'item':
+                $qb->orderBy('i.description', $sSortDir_0);
                 break;
-            case "unit":
-                $qb->orderBy("u.description", $sSortDir_0);
+            case 'unit':
+                $qb->orderBy('u.description', $sSortDir_0);
                 break;
-            case "date":
-                $qb->orderBy("d_t.date", $sSortDir_0);
+            case 'date':
+                $qb->orderBy('d_t.date', $sSortDir_0);
                 break;
             default:
                 $qb->orderBy("d_t_s.$iSortCol_0", $sSortDir_0);
@@ -274,9 +270,9 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         return $qb->setFirstResult($start)->getQuery()->getResult();
     }
 
-
     /**
-     * TotalReporteSubcontractors: Total de reporte subcontractors de la BD
+     * TotalReporteSubcontractors: Total de reporte subcontractors de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @author Marcel
@@ -293,32 +289,32 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $qb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $qb->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $qb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $qb->andWhere('p_i.id = :item_id')
                 ->setParameter('item_id', $project_item_id);
         }
 
-        if ($fecha_inicial != '') {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $qb->andWhere('d_t.date >= :inicio')
                 ->setParameter('inicio', $fecha_inicial);
         }
 
-        if ($fecha_fin != '') {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $qb->andWhere('d_t.date <= :fin')
                 ->setParameter('fin', $fecha_fin);
         }
@@ -326,14 +322,12 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         return $qb->getQuery()->getSingleScalarResult();
     }
 
-
     /**
      * ListarReporteSubcontractorsConTotal: Lista y cuenta aplicando los mismos filtros.
-     *
      */
     public function ListarReporteSubcontractorsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortField = 'date',
-                                       string $sortDir = 'DESC', ?string $subcontractor_id = '', ?string $project_id = '', ?string $project_item_id = '', ?string $fecha_inicial = '', ?string $fecha_fin = ''): array {
-
+        string $sortDir = 'DESC', ?string $subcontractor_id = '', ?string $project_id = '', ?string $project_item_id = '', ?string $fecha_inicial = '', ?string $fecha_fin = ''): array
+    {
         // Whitelist de campos ordenables
         $sortable = [
             'id' => 'd_t_s.id',
@@ -347,7 +341,7 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
             'total' => 'd_t_s.price',
         ];
         $orderBy = $sortable[$sortField] ?? 'd_t_s.date';
-        $dir     = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
 
         // QB base con JOIN y filtros
         $baseQb = $this->createQueryBuilder('d_t_s')
@@ -360,32 +354,32 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $baseQb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $baseQb->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $baseQb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $baseQb->andWhere('p_i.id = :project_item_id')
                 ->setParameter('project_item_id', $project_item_id);
         }
 
-        if ($fecha_inicial != '') {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $baseQb->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != '') {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $baseQb->andWhere('d_t.date <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
@@ -409,16 +403,14 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,
+            'data' => $data,
             'total' => $total, // total con el MISMO filtro aplicado
         ];
     }
 
-
     /**
-     * ListarReporteSubcontractorsParaExcel: Lista el reporte subcontractors
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarReporteSubcontractorsParaExcel: Lista el reporte subcontractors.
+     *
      * @param string $sSearch Para buscar
      *
      * @return DataTrackingSubcontract[]
@@ -435,32 +427,32 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $qb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        if ($subcontractor_id != '') {
+        if ('' != $subcontractor_id) {
             $qb->andWhere('s.subcontractorId = :subcontractor_id')
                 ->setParameter('subcontractor_id', $subcontractor_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $qb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($project_item_id != '') {
+        if ('' != $project_item_id) {
             $qb->andWhere('p_i.id = :project_item_id')
                 ->setParameter('project_item_id', $project_item_id);
         }
 
-        if ($fecha_inicial != '') {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $qb->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != '') {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $qb->andWhere('d_t.date <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
@@ -469,12 +461,14 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
     }
 
     /**
-     * DevolverTotalReporteSubcontractors: Total de reporte subcontractors de la BD
+     * DevolverTotalReporteSubcontractors: Total de reporte subcontractors de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @author Marcel
      */
-    public function DevolverTotalReporteSubcontractors(?string $sSearch = null, ?string $subcontractorId = null, ?string $projectId = null, ?string $projectItemId = null, ?string $fechaInicial = null, ?string $fechaFinal = null): float {
+    public function DevolverTotalReporteSubcontractors(?string $sSearch = null, ?string $subcontractorId = null, ?string $projectId = null, ?string $projectItemId = null, ?string $fechaInicial = null, ?string $fechaFinal = null): float
+    {
         $qb = $this->createQueryBuilder('d_t_s')
             ->select('SUM(d_t_s.quantity * d_t_s.price)')
             ->leftJoin('d_t_s.subcontractor', 's')
@@ -486,7 +480,7 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
         // Filtro de búsqueda
         if (!empty($sSearch)) {
             $qb->andWhere('s.name LIKE :search OR i.description LIKE :search OR p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // Filtro por Subcontractor ID
@@ -523,5 +517,4 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         return (float) $qb->getQuery()->getSingleScalarResult();
     }
-
 }

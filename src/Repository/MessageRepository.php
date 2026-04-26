@@ -17,9 +17,6 @@ class MessageRepository extends ServiceEntityRepository
     /**
      * Listar mensajes de una conversación, ordenados por fecha (más recientes al final).
      *
-     * @param MessageConversation $conversation
-     * @param int|null $limit
-     * @param int $offset
      * @return Message[]
      */
     public function ListarPorConversacion(MessageConversation $conversation, ?int $limit = null, int $offset = 0): array
@@ -31,7 +28,7 @@ class MessageRepository extends ServiceEntityRepository
             ->orderBy('m.createdAt', 'ASC')
             ->setFirstResult($offset);
 
-        if ($limit !== null && $limit > 0) {
+        if (null !== $limit && $limit > 0) {
             $qb->setMaxResults($limit);
         }
 
@@ -41,9 +38,7 @@ class MessageRepository extends ServiceEntityRepository
     /**
      * Contar mensajes no leídos en una conversación para un usuario (mensajes que no envió y read_at es null).
      *
-     * @param MessageConversation $conversation
      * @param int $userId Id del usuario que recibe (destinatario)
-     * @return int
      */
     public function ContarNoLeidosEnConversacion(MessageConversation $conversation, int $userId): int
     {
@@ -63,7 +58,6 @@ class MessageRepository extends ServiceEntityRepository
      * Marcar como leídos todos los mensajes de una conversación recibidos por el usuario dado
      * (mensajes que no envió el usuario: sender_id != userId).
      *
-     * @param MessageConversation $conversation
      * @param int $userId Id del usuario que lee (destinatario)
      */
     public function MarcarComoLeidos(MessageConversation $conversation, int $userId): void
@@ -90,9 +84,6 @@ class MessageRepository extends ServiceEntityRepository
 
     /**
      * Obtener el último mensaje de una conversación (para vista de lista de chats).
-     *
-     * @param MessageConversation $conversation
-     * @return Message|null
      */
     public function ObtenerUltimoMensaje(MessageConversation $conversation): ?Message
     {
@@ -107,10 +98,6 @@ class MessageRepository extends ServiceEntityRepository
 
     /**
      * Obtener el último mensaje visible para un usuario (excluye los eliminados "para mí").
-     *
-     * @param MessageConversation $conversation
-     * @param int $userId
-     * @return Message|null
      */
     public function ObtenerUltimoMensajeVisibleParaUsuario(MessageConversation $conversation, int $userId): ?Message
     {
@@ -126,15 +113,13 @@ class MessageRepository extends ServiceEntityRepository
                 return $m;
             }
         }
+
         return null;
     }
 
     /**
      * Marcar todos los mensajes de una conversación como "eliminados para mí" por un usuario.
      * Se usa al eliminar el chat: borra el historial para ese usuario.
-     *
-     * @param MessageConversation $conversation
-     * @param int $userId
      */
     public function MarcarTodosComoEliminadosParaUsuario(MessageConversation $conversation, int $userId): void
     {
@@ -159,31 +144,27 @@ class MessageRepository extends ServiceEntityRepository
      * Sirve para comprobar el límite free de Google Translate (500k caracteres/mes).
      *
      * @param \DateTimeInterface $start Fecha inicial (ej. primer día del mes en curso 00:00:00)
-     * @param \DateTimeInterface $end Fecha final (ej. fecha actual) o null para no acotar por el final
-     * @return int
+     * @param \DateTimeInterface $end   Fecha final (ej. fecha actual) o null para no acotar por el final
      */
     public function sumBodyOriginalLengthForMonth(\DateTimeInterface $start, ?\DateTimeInterface $end = null): int
     {
         $conn = $this->getEntityManager()->getConnection();
-        if ($end !== null) {
+        if (null !== $end) {
             $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE created_at >= :start AND created_at <= :end';
             $result = $conn->executeQuery($sql, [
                 'start' => $start->format('Y-m-d H:i:s'),
-                'end'   => $end->format('Y-m-d H:i:s'),
+                'end' => $end->format('Y-m-d H:i:s'),
             ]);
         } else {
             $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE created_at >= :start';
             $result = $conn->executeQuery($sql, ['start' => $start->format('Y-m-d H:i:s')]);
         }
+
         return (int) $result->fetchOne();
     }
 
     /**
      * Suma de caracteres (body_original) de mensajes traducidos a petición en el periodo (para límite 500k/mes).
-     *
-     * @param \DateTimeInterface $start
-     * @param \DateTimeInterface $end
-     * @return int
      */
     public function sumTranslatedCharactersForPeriod(\DateTimeInterface $start, \DateTimeInterface $end): int
     {
@@ -191,8 +172,9 @@ class MessageRepository extends ServiceEntityRepository
         $sql = 'SELECT COALESCE(SUM(CHAR_LENGTH(body_original)), 0) FROM message WHERE translated_at >= :start AND translated_at <= :end';
         $result = $conn->executeQuery($sql, [
             'start' => $start->format('Y-m-d H:i:s'),
-            'end'   => $end->format('Y-m-d H:i:s'),
+            'end' => $end->format('Y-m-d H:i:s'),
         ]);
+
         return (int) $result->fetchOne();
     }
 }

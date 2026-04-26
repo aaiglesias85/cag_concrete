@@ -14,7 +14,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los empleados de un subcontratista
+     * Listar los empleados de un subcontratista.
      *
      * @return SubcontractorEmployee[]
      */
@@ -30,26 +30,25 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los empleados con paginación, filtrado y ordenación
+     * Listar los empleados con paginación, filtrado y ordenación.
      *
      * @return SubcontractorEmployee[]
      */
     public function ListarEmployees(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortColumn = 'name',
-        string  $sortDirection = 'ASC',
-        ?int    $subcontractorId = null
-    ): array
-    {
+        string $sortColumn = 'name',
+        string $sortDirection = 'ASC',
+        ?int $subcontractorId = null,
+    ): array {
         $qb = $this->createQueryBuilder('s_e')
             ->leftJoin('s_e.subcontractor', 's');
 
         // Filtrar por búsqueda
         if ($sSearch) {
             $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // Filtrar por subcontratista
@@ -58,7 +57,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
                 ->setParameter('subcontractorId', $subcontractorId);
         }
 
-        return $qb->orderBy('s_e.' . $sortColumn, $sortDirection)
+        return $qb->orderBy('s_e.'.$sortColumn, $sortDirection)
             ->setFirstResult($start)
             ->setMaxResults($limit)
             ->getQuery()
@@ -66,9 +65,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     }
 
     /**
-     * Obtener el total de empleados según filtros
-     *
-     * @return int
+     * Obtener el total de empleados según filtros.
      */
     public function TotalEmployees(?string $sSearch = null, ?int $subcontractorId = null): int
     {
@@ -79,7 +76,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
         // Filtrar por búsqueda
         if ($sSearch) {
             $qb->andWhere('s_e.name LIKE :search OR s_e.position LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // Filtrar por subcontratista
@@ -88,26 +85,25 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
                 ->setParameter('subcontractorId', $subcontractorId);
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarEmployeesConTotal Lista los employees con total
+     * ListarEmployeesConTotal Lista los employees con total.
      *
      * @return []
      */
     public function ListarEmployeesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC', ?int $subcontractorId = null): array
     {
-
         // Whitelist de columnas ordenables
         $sortable = [
             'employeeId' => 's_s_e.employeeId',
             'name' => 's_s_e.name',
             'hourlyRate' => 's_s_e.hourlyRate',
-            'position' => 's_s_e.position'
+            'position' => 's_s_e.position',
         ];
         $orderBy = $sortable[$sortColumn] ?? 's_s_e.name';
-        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('s_s_e')
@@ -116,7 +112,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
         // Filtrar por búsqueda
         if ($sSearch) {
             $baseQb->andWhere('s_s_e.name LIKE :search OR s_s_e.position LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // Filtrar por subcontratista
@@ -138,12 +134,11 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
         $countQb->resetDQLPart('orderBy')
             ->select('COUNT(s_s_e.employeeId)');
 
-        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
             'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }

@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Hook de Git: antes de cada push → formateo (PHP-CS-Fixer) + PHPStan.
+# Activación (una vez por clon): composer install-git-hooks
+#
+# Omitir solo en casos puntuales:
+#   SKIP_PRE_PUSH=1 git push
+#   git push --no-verify
+
+set -euo pipefail
+
+if [[ "${SKIP_PRE_PUSH:-}" == "1" ]]; then
+   echo "SKIP_PRE_PUSH=1: se omite pre-push (cs-fix + phpstan)."
+   exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+# PHPStan (extensión Symfony) necesita el XML del contenedor en dev.
+CONTAINER_XML="var/cache/dev/App_KernelDevDebugContainer.xml"
+if [[ ! -f "${CONTAINER_XML}" ]]; then
+   echo "pre-push: generando caché Symfony (dev) para PHPStan..."
+   php bin/console cache:warmup --env=dev --no-ansi
+fi
+
+echo "pre-push: aplicando PHP-CS-Fixer..."
+composer cs-fix --no-interaction
+
+# Si quedó el árbol de trabajo distinto de HEAD, no empujar: hay que commitear (p. ej. el formateo).
+if [[ -n "$(git status --porcelain)" ]]; then
+   echo ""
+   echo "pre-push: hay cambios sin commitear (p. ej. tras el formateo)."
+   echo "  git status"
+   echo "  git add -u && git commit -m 'style: PHP-CS-Fixer'"
+   echo "Luego vuelve a hacer push."
+   echo "Para saltar este hook (solo si es necesario): SKIP_PRE_PUSH=1 git push  o  git push --no-verify"
+   exit 1
+fi
+
+echo "pre-push: ejecutando PHPStan..."
+composer phpstan --no-interaction
+
+echo "pre-push: OK."
+exit 0

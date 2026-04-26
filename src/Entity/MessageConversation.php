@@ -4,31 +4,31 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "message_conversation")]
+#[ORM\Table(name: 'message_conversation')]
 #[ORM\Entity(repositoryClass: "App\Repository\MessageConversationRepository")]
 class MessageConversation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "conversation_id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'conversation_id', type: 'integer', nullable: false)]
     private ?int $conversationId = null;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Usuario")]
-    #[ORM\JoinColumn(name: "user1_id", referencedColumnName: "user_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'user1_id', referencedColumnName: 'user_id', nullable: false)]
     private ?Usuario $user1 = null;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Usuario")]
-    #[ORM\JoinColumn(name: "user2_id", referencedColumnName: "user_id", nullable: false)]
+    #[ORM\JoinColumn(name: 'user2_id', referencedColumnName: 'user_id', nullable: false)]
     private ?Usuario $user2 = null;
 
-    #[ORM\Column(name: "created_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(name: "updated_at", type: "datetime", nullable: true)]
+    #[ORM\Column(name: 'updated_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
 
     /** Array de user_id que ocultaron el chat de su lista. */
-    #[ORM\Column(name: "hidden_for_user_ids", type: "json", nullable: true)]
+    #[ORM\Column(name: 'hidden_for_user_ids', type: 'json', nullable: true)]
     private ?array $hiddenForUserIds = null;
 
     public function getConversationId(): ?int
@@ -39,6 +39,7 @@ class MessageConversation
     public function setConversationId(?int $conversationId): self
     {
         $this->conversationId = $conversationId;
+
         return $this;
     }
 
@@ -50,6 +51,7 @@ class MessageConversation
     public function setUser1(?Usuario $user1): self
     {
         $this->user1 = $user1;
+
         return $this;
     }
 
@@ -61,6 +63,7 @@ class MessageConversation
     public function setUser2(?Usuario $user2): self
     {
         $this->user2 = $user2;
+
         return $this;
     }
 
@@ -72,6 +75,7 @@ class MessageConversation
     public function setCreatedAt(?\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
         return $this;
     }
 
@@ -83,6 +87,7 @@ class MessageConversation
     public function setUpdatedAt(?\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
+
         return $this;
     }
 
@@ -96,6 +101,7 @@ class MessageConversation
     public function setHiddenForUserIds(array $ids): self
     {
         $this->hiddenForUserIds = $ids ?: null;
+
         return $this;
     }
 
@@ -111,6 +117,7 @@ class MessageConversation
             $ids[] = $userId;
             $this->setHiddenForUserIds($ids);
         }
+
         return $this;
     }
 
@@ -122,6 +129,7 @@ class MessageConversation
             static fn (int $id): bool => $id !== $userId
         ));
         $this->setHiddenForUserIds($ids);
+
         return $this;
     }
 
@@ -136,6 +144,7 @@ class MessageConversation
         if ($this->user2 && $this->user2->getUsuarioId() === $user->getUsuarioId()) {
             return $this->user1;
         }
+
         return null;
     }
 }

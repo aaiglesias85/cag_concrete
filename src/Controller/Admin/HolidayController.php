@@ -3,16 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\HolidayService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\HolidayService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class HolidayController extends AbstractAdminController
 {
-
     private $holidayService;
 
     public function __construct(AdminAccessService $adminAccess, HolidayService $holidayService)
@@ -29,23 +27,21 @@ class HolidayController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/holiday/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/holiday/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los usuarios
-     *
+     * listar Acción que lista los usuarios.
      */
     public function listar(Request $request)
     {
         try {
-
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
-                allowedOrderFields: ['id', 'description', 'day' ],
+                allowedOrderFields: ['id', 'description', 'day'],
                 defaultOrderField: 'day'
             );
 
@@ -65,14 +61,13 @@ class HolidayController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -82,8 +77,7 @@ class HolidayController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -93,25 +87,22 @@ class HolidayController extends AbstractAdminController
         $description = $request->get('description');
 
         try {
-
-            if ($holiday_id == "") {
+            if ('' == $holiday_id) {
                 $resultado = $this->holidayService->SalvarHoliday($day, $description);
             } else {
                 $resultado = $this->holidayService->ActualizarHoliday($holiday_id, $day, $description);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -121,8 +112,7 @@ class HolidayController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un holiday en la BD
-     *
+     * eliminar Acción que elimina un holiday en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -132,26 +122,24 @@ class HolidayController extends AbstractAdminController
             $resultado = $this->holidayService->EliminarHoliday($holiday_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarHolidays Acción que elimina los holidays seleccionados en la BD
-     *
+     * eliminarHolidays Acción que elimina los holidays seleccionados en la BD.
      */
     public function eliminarHolidays(Request $request)
     {
@@ -161,26 +149,24 @@ class HolidayController extends AbstractAdminController
             $resultado = $this->holidayService->EliminarHolidays($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del holiday en la BD
-     *
+     * cargarDatos Acción que carga los datos del holiday en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -189,23 +175,20 @@ class HolidayController extends AbstractAdminController
         try {
             $resultado = $this->holidayService->CargarDatosHoliday($holiday_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['holiday'] = $resultado['holiday'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 }

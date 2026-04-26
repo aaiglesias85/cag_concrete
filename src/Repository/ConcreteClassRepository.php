@@ -8,69 +8,67 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ConcreteClassRepository extends ServiceEntityRepository
 {
-   public function __construct(ManagerRegistry $registry)
-   {
-      parent::__construct($registry, ConcreteClass::class);
-   }
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ConcreteClass::class);
+    }
 
-   /**
-    * Listar los subcontractors ordenados por nombre
-    *
-    * @return ConcreteClass[]
-    */
-   public function ListarOrdenados(): array
-   {
-      return $this->createQueryBuilder('c_c')
-         ->where('c_c.status = 1 OR c_c.status IS NULL')
-         ->orderBy('c_c.name', 'ASC')
-         ->getQuery()
-         ->getResult();
-   }
+    /**
+     * Listar los subcontractors ordenados por nombre.
+     *
+     * @return ConcreteClass[]
+     */
+    public function ListarOrdenados(): array
+    {
+        return $this->createQueryBuilder('c_c')
+           ->where('c_c.status = 1 OR c_c.status IS NULL')
+           ->orderBy('c_c.name', 'ASC')
+           ->getQuery()
+           ->getResult();
+    }
 
+    /**
+     * ListarConcreteClassesConTotal Lista los concrete classes con total.
+     *
+     * @return []
+     */
+    public function ListarConcreteClassesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
+        // Whitelist de columnas ordenables
+        $sortable = [
+            'concreteClassId' => 'c_c.concreteClassId',
+            'name' => 'c_c.name',
+            'status' => 'c_c.status',
+        ];
+        $orderBy = $sortable[$sortColumn] ?? 'c_c.name';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
-   /**
-    * ListarConcreteClassesConTotal Lista los concrete classes con total
-    *
-    * @return []
-    */
-   public function ListarConcreteClassesConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array
-   {
+        // QB base con filtros (se reutiliza para datos y conteo)
+        $baseQb = $this->createQueryBuilder('c_c');
 
-      // Whitelist de columnas ordenables
-      $sortable = [
-         'concreteClassId'  => 'c_c.concreteClassId',
-         'name' => 'c_c.name',
-         'status' => 'c_c.status',
-      ];
-      $orderBy = $sortable[$sortColumn] ?? 'c_c.name';
-      $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        if (!empty($sSearch)) {
+            $baseQb->andWhere('c_c.name LIKE :search')
+               ->setParameter('search', '%'.$sSearch.'%');
+        }
 
-      // QB base con filtros (se reutiliza para datos y conteo)
-      $baseQb = $this->createQueryBuilder('c_c');
+        // 1) Datos
+        $dataQb = clone $baseQb;
+        $dataQb->orderBy($orderBy, $dir)
+           ->setFirstResult($start)
+           ->setMaxResults($limit > 0 ? $limit : null);
 
-      if (!empty($sSearch)) {
-         $baseQb->andWhere('c_c.name LIKE :search')
-            ->setParameter('search', '%' . $sSearch . '%');
-      }
+        $data = $dataQb->getQuery()->getResult();
 
-      // 1) Datos
-      $dataQb = clone $baseQb;
-      $dataQb->orderBy($orderBy, $dir)
-         ->setFirstResult($start)
-         ->setMaxResults($limit > 0 ? $limit : null);
+        // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
+        $countQb = clone $baseQb;
+        $countQb->resetDQLPart('orderBy')
+           ->select('COUNT(c_c.concreteClassId)');
 
-      $data = $dataQb->getQuery()->getResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
-      // 2) Conteo aplicando MISMO filtro (sin order, solo COUNT)
-      $countQb = clone $baseQb;
-      $countQb->resetDQLPart('orderBy')
-         ->select('COUNT(c_c.concreteClassId)');
-
-      $total = (int) $countQb->getQuery()->getSingleScalarResult();
-
-      return [
-         'data'  => $data,   // array<Rol>
-         'total' => $total,  // total con el MISMO filtro 'search'
-      ];
-   }
+        return [
+            'data' => $data,   // array<Rol>
+            'total' => $total,  // total con el MISMO filtro 'search'
+        ];
+    }
 }

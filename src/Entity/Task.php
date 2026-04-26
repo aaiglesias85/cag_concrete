@@ -19,7 +19,7 @@ class Task
     {
         $s = strtolower(trim($status));
 
-        if ($s === self::STATUS_COMPLETE || $s === 'completed') {
+        if (self::STATUS_COMPLETE === $s || 'completed' === $s) {
             return self::STATUS_TEXT_COMPLETE;
         }
 

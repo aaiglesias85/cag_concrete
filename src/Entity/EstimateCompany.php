@@ -4,17 +4,17 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "estimate_company")]
+#[ORM\Table(name: 'estimate_company')]
 #[ORM\Entity(repositoryClass: "App\Repository\EstimateCompanyRepository")]
 class EstimateCompany
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Estimate")]
-    #[ORM\JoinColumn(name: "estimate_id", referencedColumnName: "estimate_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'estimate_id', referencedColumnName: 'estimate_id', nullable: true)]
     private ?Estimate $estimate;
 
     #[ORM\ManyToOne(targetEntity: Company::class)]

@@ -14,7 +14,7 @@ class EstimateQuoteRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarQuotesDeEstimate: Lista las cuotas de un estimate
+     * ListarQuotesDeEstimate: Lista las cuotas de un estimate.
      *
      * @return EstimateQuote[]
      */
@@ -23,12 +23,12 @@ class EstimateQuoteRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('q')
             ->leftJoin('q.estimate', 'e');
 
-        if ($estimate_id != '') {
+        if ('' != $estimate_id) {
             $consulta->andWhere('e.estimateId = :estimate_id')
                 ->setParameter('estimate_id', $estimate_id);
         }
 
-        $consulta->orderBy('q.name', "ASC");
+        $consulta->orderBy('q.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }

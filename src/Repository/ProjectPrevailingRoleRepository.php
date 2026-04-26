@@ -8,64 +8,64 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class ProjectPrevailingRoleRepository extends ServiceEntityRepository
 {
-   public function __construct(ManagerRegistry $registry)
-   {
-      parent::__construct($registry, ProjectPrevailingRole::class);
-   }
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, ProjectPrevailingRole::class);
+    }
 
-   /**
-    * ListarRolesDeProject: Lista los prevailing roles de un project
-    *
-    * @return ProjectPrevailingRole[]
-    */
-   public function ListarRolesDeProject($project_id)
-   {
-      $consulta = $this->createQueryBuilder('p_r')
-         ->leftJoin('p_r.project', 'p')
-         ->leftJoin('p_r.county', 'c')
-         ->leftJoin('p_r.role', 'r');
+    /**
+     * ListarRolesDeProject: Lista los prevailing roles de un project.
+     *
+     * @return ProjectPrevailingRole[]
+     */
+    public function ListarRolesDeProject($project_id)
+    {
+        $consulta = $this->createQueryBuilder('p_r')
+           ->leftJoin('p_r.project', 'p')
+           ->leftJoin('p_r.county', 'c')
+           ->leftJoin('p_r.role', 'r');
 
-      if ($project_id != '') {
-         $consulta->andWhere('p.projectId = :project_id')
-            ->setParameter('project_id', $project_id);
-      }
+        if ('' != $project_id) {
+            $consulta->andWhere('p.projectId = :project_id')
+               ->setParameter('project_id', $project_id);
+        }
 
-      $consulta->orderBy('c.description', 'ASC')->addOrderBy('r.description', 'ASC');
+        $consulta->orderBy('c.description', 'ASC')->addOrderBy('r.description', 'ASC');
 
-      return $consulta->getQuery()->getResult();
-   }
+        return $consulta->getQuery()->getResult();
+    }
 
-   /**
-    * ListarProjectsDeRole: Lista los projects que tienen un role como prevailing
-    *
-    * @return ProjectPrevailingRole[]
-    */
-   public function ListarProjectsDeRole($role_id)
-   {
-      $consulta = $this->createQueryBuilder('p_r')
-         ->leftJoin('p_r.project', 'p')
-         ->leftJoin('p_r.role', 'r');
+    /**
+     * ListarProjectsDeRole: Lista los projects que tienen un role como prevailing.
+     *
+     * @return ProjectPrevailingRole[]
+     */
+    public function ListarProjectsDeRole($role_id)
+    {
+        $consulta = $this->createQueryBuilder('p_r')
+           ->leftJoin('p_r.project', 'p')
+           ->leftJoin('p_r.role', 'r');
 
-      if ($role_id != '') {
-         $consulta->andWhere('r.roleId = :role_id')
-            ->setParameter('role_id', $role_id);
-      }
+        if ('' != $role_id) {
+            $consulta->andWhere('r.roleId = :role_id')
+               ->setParameter('role_id', $role_id);
+        }
 
-      $consulta->orderBy('p.name', "ASC");
+        $consulta->orderBy('p.name', 'ASC');
 
-      return $consulta->getQuery()->getResult();
-   }
+        return $consulta->getQuery()->getResult();
+    }
 
-   /**
-    * EliminarRolesDeProject: Elimina todos los prevailing roles de un project
-    */
-   public function EliminarRolesDeProject($project_id)
-   {
-      $consulta = $this->createQueryBuilder('p_r')
-         ->delete()
-         ->where('p_r.project = :project_id')
-         ->setParameter('project_id', $project_id);
+    /**
+     * EliminarRolesDeProject: Elimina todos los prevailing roles de un project.
+     */
+    public function EliminarRolesDeProject($project_id)
+    {
+        $consulta = $this->createQueryBuilder('p_r')
+           ->delete()
+           ->where('p_r.project = :project_id')
+           ->setParameter('project_id', $project_id);
 
-      return $consulta->getQuery()->execute();
-   }
+        return $consulta->getQuery()->execute();
+    }
 }

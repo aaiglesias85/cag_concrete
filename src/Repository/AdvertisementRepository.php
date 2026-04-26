@@ -14,7 +14,7 @@ class AdvertisementRepository extends ServiceEntityRepository
     }
 
     /**
-     * Lista los advertisements ordenados
+     * Lista los advertisements ordenados.
      *
      * @return Advertisement[]
      */
@@ -46,25 +46,24 @@ class AdvertisementRepository extends ServiceEntityRepository
     }
 
     /**
-     * Lista los advertisements paginados y filtrados
+     * Lista los advertisements paginados y filtrados.
      *
      * @return Advertisement[]
      */
     public function ListarAdvertisements(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortColumn = 'startDate',
-        string  $sortDirection = 'ASC',
+        string $sortColumn = 'startDate',
+        string $sortDirection = 'ASC',
         ?string $fechaInicial = null,
-        ?string $fechaFinal = null
-    ): array
-    {
+        ?string $fechaFinal = null,
+    ): array {
         $qb = $this->createQueryBuilder('a');
 
         if (!empty($sSearch)) {
             $qb->andWhere('a.title LIKE :search OR a.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         if (!empty($fechaInicial)) {
@@ -79,7 +78,7 @@ class AdvertisementRepository extends ServiceEntityRepository
                 ->setParameter('fechaFinal', $fechaFinalDate);
         }
 
-        return $qb->orderBy('a.' . $sortColumn, $sortDirection)
+        return $qb->orderBy('a.'.$sortColumn, $sortDirection)
             ->setFirstResult($start)
             ->setMaxResults($limit)
             ->getQuery()
@@ -87,20 +86,19 @@ class AdvertisementRepository extends ServiceEntityRepository
     }
 
     /**
-     * Total de advertisements según filtros
+     * Total de advertisements según filtros.
      */
     public function TotalAdvertisements(
         ?string $sSearch = null,
         ?string $fechaInicial = null,
-        ?string $fechaFinal = null
-    ): int
-    {
+        ?string $fechaFinal = null,
+    ): int {
         $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.advertisementId)');
 
         if (!empty($sSearch)) {
             $qb->andWhere('a.title LIKE :search OR a.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         if (!empty($fechaInicial)) {
@@ -115,23 +113,21 @@ class AdvertisementRepository extends ServiceEntityRepository
                 ->setParameter('fechaFinal', $fechaFinalDate);
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
      * ListarAdvertisementsConTotal: Lista y cuenta aplicando los mismos filtros.
-     *
      */
     public function ListarAdvertisementsConTotal(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortField = 'startDate',
-        string  $sortDir = 'DESC',
+        string $sortField = 'startDate',
+        string $sortDir = 'DESC',
         ?string $fecha_inicial = '',
-        ?string $fecha_fin = ''
-    ): array
-    {
+        ?string $fecha_fin = '',
+    ): array {
         $sortable = [
             'advertisementId' => 'a.advertisementId',
             'title' => 'a.title',
@@ -140,7 +136,7 @@ class AdvertisementRepository extends ServiceEntityRepository
             'status' => 'a.status',
         ];
         $orderBy = $sortable[$sortField] ?? 'a.startDate';
-        $dir = strtoupper($sortDir) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
 
         // Fechas sin hora (DATE)
         $from = !empty($fecha_inicial) ? \DateTimeImmutable::createFromFormat('m/d/Y', $fecha_inicial) : null;
@@ -150,7 +146,7 @@ class AdvertisementRepository extends ServiceEntityRepository
 
         if (!empty($sSearch)) {
             $baseQb->andWhere('a.title LIKE :search OR a.description LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // Rango por superposición para columnas DATE:
@@ -173,13 +169,15 @@ class AdvertisementRepository extends ServiceEntityRepository
         // Datos
         $dataQb = clone $baseQb;
         $dataQb->orderBy($orderBy, $dir)->setFirstResult($start);
-        if ($limit > 0) $dataQb->setMaxResults($limit);
+        if ($limit > 0) {
+            $dataQb->setMaxResults($limit);
+        }
         $data = $dataQb->getQuery()->getResult();
 
         // Conteo
         $countQb = clone $baseQb;
         $countQb->resetDQLPart('orderBy')->select('COUNT(a.advertisementId)');
-        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return ['data' => $data, 'total' => $total];
     }

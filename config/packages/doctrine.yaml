@@ -1,7 +1,5 @@
 doctrine:
   dbal:
-    options:
-      1002: 'SET sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""))'
     url: '%env(resolve:DATABASE_URL)%'
 
     # IMPORTANT: You MUST configure your server version,
@@ -30,14 +28,24 @@ doctrine:
     controller_resolver:
       auto_mapping: false
 
+when@dev:
+  doctrine:
+    dbal:
+      options:
+        1002: 'SET sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""))'
+
 when@test:
   doctrine:
     dbal:
-      # "TEST_TOKEN" is typically set by ParaTest
-      dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+      # SQLite local para tests: no requiere MySQL en CI ni en máquinas sin BD.
+      url: 'sqlite:///%kernel.project_dir%/var/test.db'
+      dbname_suffix: ''
 
 when@prod:
   doctrine:
+    dbal:
+      options:
+        1002: 'SET sql_mode=(SELECT REPLACE(@@sql_mode, "ONLY_FULL_GROUP_BY", ""))'
     orm:
       auto_generate_proxy_classes: false
       proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'

@@ -3,197 +3,187 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\EmployeeRoleService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\EmployeeRoleService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class EmployeeRoleController extends AbstractAdminController
 {
+    private $employeeRoleService;
 
-   private $employeeRoleService;
+    public function __construct(AdminAccessService $adminAccess, EmployeeRoleService $employeeRoleService)
+    {
+        parent::__construct($adminAccess);
+        $this->employeeRoleService = $employeeRoleService;
+    }
 
-   public function __construct(AdminAccessService $adminAccess, EmployeeRoleService $employeeRoleService)
-   {
-      parent::__construct($adminAccess);
-      $this->employeeRoleService = $employeeRoleService;
-   }
+    public function index()
+    {
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE_ROLE);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
+        }
+        $permiso = $acceso['permisos'];
 
-   public function index()
-   {
-      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE_ROLE);
-      if ($acceso instanceof RedirectResponse) {
-         return $acceso;
-      }
-      $permiso = $acceso['permisos'];
+        return $this->render('admin/employee-role/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
+    }
 
-      return $this->render('admin/employee-role/index.html.twig', array(
-         'permiso' => $permiso[0]
-      ));
-   }
+    /**
+     * listar Acción que lista los companies.
+     */
+    public function listar(Request $request)
+    {
+        try {
+            // parsear los parametros de la tabla
+            $dt = DataTablesHelper::parse(
+                $request,
+                allowedOrderFields: ['id', 'description', 'status'],
+                defaultOrderField: 'description'
+            );
 
-   /**
-    * listar Acción que lista los companies
-    *
-    */
-   public function listar(Request $request)
-   {
-      try {
-         // parsear los parametros de la tabla
-         $dt = DataTablesHelper::parse(
-            $request,
-            allowedOrderFields: ['id', 'description', 'status'],
-            defaultOrderField: 'description'
-         );
+            // total + data en una sola llamada a tu servicio
+            $result = $this->employeeRoleService->Listar(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir']
+            );
 
-         // total + data en una sola llamada a tu servicio
-         $result = $this->employeeRoleService->Listar(
-            $dt['start'],
-            $dt['length'],
-            $dt['search'],
-            $dt['orderField'],
-            $dt['orderDir']
-         );
-
-         $resultadoJson = [
-            'draw'            => $dt['draw'],
-            'data'            => $result['data'],
-            'recordsTotal'    => (int) $result['total'],
-            'recordsFiltered' => (int) $result['total'],
-         ];
-
-         return $this->json($resultadoJson);
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * salvar Acción que inserta un conc vendor en la BD
-    *
-    */
-   public function salvar(Request $request)
-   {
-      $role_id = $request->get('role_id');
-
-      $description = $request->get('description');
-      $status = $request->get('status');
-
-      try {
-
-         if ($role_id == "") {
-            $resultado = $this->employeeRoleService->Salvar($description, $status);
-         } else {
-            $resultado = $this->employeeRoleService->Actualizar($role_id, $description, $status);
-         }
-
-         if ($resultado['success']) {
-
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['role_id'] = $resultado['role_id'];
-            $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson = [
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
+                'recordsFiltered' => (int) $result['total'],
+            ];
 
             return $this->json($resultadoJson);
-         } else {
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * salvar Acción que inserta un conc vendor en la BD.
+     */
+    public function salvar(Request $request)
+    {
+        $role_id = $request->get('role_id');
+
+        $description = $request->get('description');
+        $status = $request->get('status');
+
+        try {
+            if ('' == $role_id) {
+                $resultado = $this->employeeRoleService->Salvar($description, $status);
+            } else {
+                $resultado = $this->employeeRoleService->Actualizar($role_id, $description, $status);
+            }
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['role_id'] = $resultado['role_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
 
             return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminar Acción que elimina un subcontractor en la BD
-    *
-    */
-   public function eliminar(Request $request)
-   {
-      $role_id = $request->get('role_id');
-
-      try {
-         $resultado = $this->employeeRoleService->EliminarRole($role_id);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * eliminarVarios Acción que elimina varios en la BD
-    *
-    */
-   public function eliminarVarios(Request $request)
-   {
-      $ids = $request->get('ids');
-
-      try {
-         $resultado = $this->employeeRoleService->EliminarVarios($ids);
-         if ($resultado['success']) {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['message'] = "The operation was successful";
-            return $this->json($resultadoJson);
-         } else {
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['error'] = $resultado['error'];
-            return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
-
-         return $this->json($resultadoJson);
-      }
-   }
-
-   /**
-    * cargarDatos Acción que carga los datos del subcontractor en la BD
-    *
-    */
-   public function cargarDatos(Request $request)
-   {
-      $role_id = $request->get('role_id');
-
-      try {
-         $resultado = $this->employeeRoleService->CargarDatos($role_id);
-         if ($resultado['success']) {
-
-            $resultadoJson['success'] = $resultado['success'];
-            $resultadoJson['role'] = $resultado['role'];
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
-         } else {
+        }
+    }
+
+    /**
+     * eliminar Acción que elimina un subcontractor en la BD.
+     */
+    public function eliminar(Request $request)
+    {
+        $role_id = $request->get('role_id');
+
+        try {
+            $resultado = $this->employeeRoleService->EliminarRole($role_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['error'] = $resultado['error'];
 
             return $this->json($resultadoJson);
-         }
-      } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
 
-         return $this->json($resultadoJson);
-      }
-   }
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * eliminarVarios Acción que elimina varios en la BD.
+     */
+    public function eliminarVarios(Request $request)
+    {
+        $ids = $request->get('ids');
+
+        try {
+            $resultado = $this->employeeRoleService->EliminarVarios($ids);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * cargarDatos Acción que carga los datos del subcontractor en la BD.
+     */
+    public function cargarDatos(Request $request)
+    {
+        $role_id = $request->get('role_id');
+
+        try {
+            $resultado = $this->employeeRoleService->CargarDatos($role_id);
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['role'] = $resultado['role'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
 }

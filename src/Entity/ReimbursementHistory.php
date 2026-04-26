@@ -9,61 +9,64 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'reimbursement_history')]
 class ReimbursementHistory
 {
-   #[ORM\Id]
-   #[ORM\GeneratedValue]
-   #[ORM\Column(type: 'integer')]
-   private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private $id;
 
-   #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
-   private $amount;
+    #[ORM\Column(type: 'decimal', precision: 10, scale: 2)]
+    private $amount;
 
-   #[ORM\Column(type: 'datetime')]
-   private $createdAt;
+    #[ORM\Column(type: 'datetime')]
+    private $createdAt;
 
-   #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'reimbursementHistories')]
-   #[ORM\JoinColumn(name: "invoice_id", referencedColumnName: "invoice_id", nullable: false)]
-   private $invoice;
+    #[ORM\ManyToOne(targetEntity: Invoice::class, inversedBy: 'reimbursementHistories')]
+    #[ORM\JoinColumn(name: 'invoice_id', referencedColumnName: 'invoice_id', nullable: false)]
+    private $invoice;
 
-   public function __construct()
-   {
-      $this->createdAt = new \DateTime();
-   }
+    public function __construct()
+    {
+        $this->createdAt = new \DateTime();
+    }
 
-   public function getId(): ?int
-   {
-      return $this->id;
-   }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-   public function getAmount(): ?string
-   {
-      return $this->amount;
-   }
+    public function getAmount(): ?string
+    {
+        return $this->amount;
+    }
 
-   public function setAmount(string $amount): self
-   {
-      $this->amount = $amount;
-      return $this;
-   }
+    public function setAmount(string $amount): self
+    {
+        $this->amount = $amount;
 
-   public function getCreatedAt(): ?\DateTimeInterface
-   {
-      return $this->createdAt;
-   }
+        return $this;
+    }
 
-   public function setCreatedAt(\DateTimeInterface $createdAt): self
-   {
-      $this->createdAt = $createdAt;
-      return $this;
-   }
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
 
-   public function getInvoice(): ?Invoice
-   {
-      return $this->invoice;
-   }
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
-   public function setInvoice(?Invoice $invoice): self
-   {
-      $this->invoice = $invoice;
-      return $this;
-   }
+        return $this;
+    }
+
+    public function getInvoice(): ?Invoice
+    {
+        return $this->invoice;
+    }
+
+    public function setInvoice(?Invoice $invoice): self
+    {
+        $this->invoice = $invoice;
+
+        return $this;
+    }
 }

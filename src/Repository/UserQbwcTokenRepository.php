@@ -14,7 +14,7 @@ class UserQbwcTokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * BuscarToken: Buscar un token
+     * BuscarToken: Buscar un token.
      *
      * @return UserQbwcToken
      */
@@ -22,7 +22,7 @@ class UserQbwcTokenRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('u_q_t');
 
-        if ($token != '') {
+        if ('' != $token) {
             $consulta->andWhere('u_q_t.token = :token')
                 ->setParameter('token', $token);
         }
@@ -31,7 +31,7 @@ class UserQbwcTokenRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarTokensDeUsuario: Lista los tokens de un usuario
+     * ListarTokensDeUsuario: Lista los tokens de un usuario.
      *
      * @return UserQbwcToken[]
      */
@@ -40,12 +40,12 @@ class UserQbwcTokenRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('u_q_t')
             ->leftJoin('u_q_t.usuario', 'u');
 
-        if ($usuario_id != '') {
+        if ('' != $usuario_id) {
             $consulta->andWhere('u.usuarioId = :usuario_id')
                 ->setParameter('usuario_id', $usuario_id);
         }
 
-        $consulta->orderBy('u_q_t.id', "DESC");
+        $consulta->orderBy('u_q_t.id', 'DESC');
 
         return $consulta->getQuery()->getResult();
     }

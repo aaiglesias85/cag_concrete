@@ -14,7 +14,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarItemsDeEstimate: Lista los items del estimate (a través de sus cuotas)
+     * ListarItemsDeEstimate: Lista los items del estimate (a través de sus cuotas).
      *
      * @return EstimateQuoteItem[]
      */
@@ -24,18 +24,18 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
             ->leftJoin('e_q.quote', 'q')
             ->leftJoin('q.estimate', 'p');
 
-        if ($estimate_id != '') {
+        if ('' != $estimate_id) {
             $consulta->andWhere('p.estimateId = :estimate_id')
                 ->setParameter('estimate_id', $estimate_id);
         }
 
-        $consulta->orderBy('e_q.id', "ASC");
+        $consulta->orderBy('e_q.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarItemsDeQuote: Lista los items de una cuota
+     * ListarItemsDeQuote: Lista los items de una cuota.
      *
      * @return EstimateQuoteItem[]
      */
@@ -44,18 +44,18 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('e_q')
             ->leftJoin('e_q.quote', 'q');
 
-        if ($estimate_quote_id != '') {
+        if ('' != $estimate_quote_id) {
             $consulta->andWhere('q.id = :estimate_quote_id')
                 ->setParameter('estimate_quote_id', $estimate_quote_id);
         }
 
-        $consulta->orderBy('e_q.id', "ASC");
+        $consulta->orderBy('e_q.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarEstimatesDeItem: Lista los estimate quote items de un item
+     * ListarEstimatesDeItem: Lista los estimate quote items de un item.
      *
      * @return EstimateQuoteItem[]
      */
@@ -64,18 +64,18 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('e_q')
             ->leftJoin('e_q.item', 'i');
 
-        if ($item_id != '') {
+        if ('' != $item_id) {
             $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
         }
 
-        $consulta->orderBy('e_q.id', "ASC");
+        $consulta->orderBy('e_q.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * BuscarItemEstimateEnQuote: busca un item en un estimate dentro de una cuota (mismo estimate + quote + item = duplicado)
+     * BuscarItemEstimateEnQuote: busca un item en un estimate dentro de una cuota (mismo estimate + quote + item = duplicado).
      *
      * @return EstimateQuoteItem[]
      */
@@ -86,28 +86,28 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
             ->leftJoin('q.estimate', 'e')
             ->leftJoin('e_q.item', 'i');
 
-        if ($estimate_id != '') {
+        if ('' != $estimate_id) {
             $consulta->andWhere('e.estimateId = :estimate_id')
                 ->setParameter('estimate_id', $estimate_id);
         }
 
-        if ($quote_id !== '' && $quote_id !== null && is_numeric($quote_id)) {
+        if ('' !== $quote_id && null !== $quote_id && is_numeric($quote_id)) {
             $consulta->andWhere('q.id = :quote_id')
                 ->setParameter('quote_id', $quote_id);
         }
 
-        if ($item_id != '') {
+        if ('' != $item_id) {
             $consulta->andWhere('i.itemId = :item_id')
                 ->setParameter('item_id', $item_id);
         }
 
-        $consulta->orderBy('e_q.id', "ASC");
+        $consulta->orderBy('e_q.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarEstimateQuoteItemsDeEquation: Lista los items de una equation
+     * ListarEstimateQuoteItemsDeEquation: Lista los items de una equation.
      *
      * @return EstimateQuoteItem[]
      */
@@ -118,7 +118,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
             ->andWhere('e.equationId = :equation_id')
             ->setParameter('equation_id', $equation_id);
 
-        $consulta->orderBy('e_q.id', "ASC");
+        $consulta->orderBy('e_q.id', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
@@ -128,7 +128,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
      */
     public function countItemsDeEstimate(int|string $estimate_id): int
     {
-        if ($estimate_id === '' || $estimate_id === null) {
+        if ('' === $estimate_id || null === $estimate_id) {
             return 0;
         }
 
@@ -147,7 +147,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
      */
     public function countItemsDeQuote(int|string $quote_id): int
     {
-        if ($quote_id === '' || $quote_id === null || !is_numeric($quote_id)) {
+        if ('' === $quote_id || null === $quote_id || !is_numeric($quote_id)) {
             return 0;
         }
 

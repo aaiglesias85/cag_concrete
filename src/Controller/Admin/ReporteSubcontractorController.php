@@ -3,23 +3,16 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
-
-use App\Entity\Project;
-use App\Entity\Subcontractor;
-
 use App\Http\DataTablesHelper;
+use App\Service\Admin\AdminAccessService;
 use App\Utils\Admin\ProjectService;
 use App\Utils\Admin\ReporteSubcontractorService;
-
 use App\Utils\Admin\SubcontractorService;
-use App\Service\Admin\AdminAccessService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class ReporteSubcontractorController extends AbstractAdminController
 {
-
     private $reporteService;
     private $projectService;
     private $subcontractorService;
@@ -46,16 +39,15 @@ class ReporteSubcontractorController extends AbstractAdminController
         // projects
         $projects = $this->projectService->ListarOrdenados();
 
-        return $this->render('admin/reportes/subcontractor.html.twig', array(
+        return $this->render('admin/reportes/subcontractor.html.twig', [
             'permiso' => $permiso[0],
             'subcontractors' => $subcontractors,
             'projects' => $projects,
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los companies
-     *
+     * listar Acción que lista los companies.
      */
     public function listar(Request $request)
     {
@@ -88,14 +80,13 @@ class ReporteSubcontractorController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -105,12 +96,10 @@ class ReporteSubcontractorController extends AbstractAdminController
     }
 
     /**
-     * exportarExcel Acción para la exportacion en excel
-     *
+     * exportarExcel Acción para la exportacion en excel.
      */
     public function exportarExcel(Request $request)
     {
-
         $search = $request->get('search');
         $subcontractor_id = $request->get('subcontractor_id');
         $project_id = $request->get('project_id');
@@ -122,7 +111,7 @@ class ReporteSubcontractorController extends AbstractAdminController
             $url = $this->reporteService->ExportarExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
 
             $resultadoJson['success'] = true;
-            $resultadoJson['message'] = "The operation was successful";
+            $resultadoJson['message'] = 'The operation was successful';
             $resultadoJson['url'] = $url;
 
             return $this->json($resultadoJson);
@@ -135,12 +124,10 @@ class ReporteSubcontractorController extends AbstractAdminController
     }
 
     /**
-     * devolverTotal Acción para devolver el total
-     *
+     * devolverTotal Acción para devolver el total.
      */
     public function devolverTotal(Request $request)
     {
-
         $search = $request->get('search');
         $subcontractor_id = $request->get('subcontractor_id');
         $project_id = $request->get('project_id');

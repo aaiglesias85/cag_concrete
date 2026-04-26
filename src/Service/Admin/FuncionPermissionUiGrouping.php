@@ -72,7 +72,7 @@ final class FuncionPermissionUiGrouping
         /** @var array<string, Funcion> $byUrl */
         $byUrl = [];
         foreach ($funciones as $f) {
-            if ($f instanceof Funcion && $f->getUrl() !== null) {
+            if ($f instanceof Funcion && null !== $f->getUrl()) {
                 $byUrl[$f->getUrl()] = $f;
             }
         }
@@ -89,9 +89,9 @@ final class FuncionPermissionUiGrouping
                 $items[] = $byUrl[$url];
                 $assignedUrls[$url] = true;
             }
-            if ($items !== []) {
+            if ([] !== $items) {
                 $grouped[] = [
-                    'grupoId' => 'perm-mod-' . $key,
+                    'grupoId' => 'perm-mod-'.$key,
                     'titulo' => $title,
                     'funciones' => $items,
                 ];
@@ -100,14 +100,14 @@ final class FuncionPermissionUiGrouping
 
         $extras = [];
         foreach ($funciones as $f) {
-            if (!$f instanceof Funcion || $f->getUrl() === null) {
+            if (!$f instanceof Funcion || null === $f->getUrl()) {
                 continue;
             }
             if (!isset($assignedUrls[$f->getUrl()])) {
                 $extras[] = $f;
             }
         }
-        if ($extras !== []) {
+        if ([] !== $extras) {
             usort($extras, static fn (Funcion $a, Funcion $b): int => ($a->getFuncionId() ?? 0) <=> ($b->getFuncionId() ?? 0));
             $grouped[] = [
                 'grupoId' => 'perm-mod-other',

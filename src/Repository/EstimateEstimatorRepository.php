@@ -14,7 +14,7 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarUsuariosDeEstimate: Lista los usuarios de un estimate
+     * ListarUsuariosDeEstimate: Lista los usuarios de un estimate.
      *
      * @return EstimateEstimator[]
      */
@@ -24,12 +24,12 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
             ->leftJoin('e_e.estimate', 'e')
             ->leftJoin('e_e.usuario', 'u');
 
-        if ($estimate_id != '') {
+        if ('' != $estimate_id) {
             $consulta->andWhere('e.estimateId = :estimate_id')
                 ->setParameter('estimate_id', $estimate_id);
         }
 
-        $consulta->orderBy('u.nombre', "ASC");
+        $consulta->orderBy('u.nombre', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
@@ -38,11 +38,12 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
      * Relaciones estimate/estimator para muchos estimate_id a la vez (evita N+1 en el dashboard).
      *
      * @param int[] $estimateIds
+     *
      * @return EstimateEstimator[]
      */
     public function listarByEstimateIds(array $estimateIds): array
     {
-        if ($estimateIds === []) {
+        if ([] === $estimateIds) {
             return [];
         }
         $out = [];
@@ -64,7 +65,7 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarEstimatesDeUsuario: Lista los estimates de un usuario
+     * ListarEstimatesDeUsuario: Lista los estimates de un usuario.
      *
      * @return EstimateEstimator[]
      */
@@ -74,12 +75,12 @@ class EstimateEstimatorRepository extends ServiceEntityRepository
             ->leftJoin('e_e.estimate', 'e')
             ->leftJoin('e_e.usuario', 'u');
 
-        if ($usuario_id != '') {
+        if ('' != $usuario_id) {
             $consulta->andWhere('u.usuarioId = :usuario_id')
                 ->setParameter('usuario_id', $usuario_id);
         }
 
-        $consulta->orderBy('e.name', "DESC");
+        $consulta->orderBy('e.name', 'DESC');
 
         return $consulta->getQuery()->getResult();
     }

@@ -5,10 +5,10 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Entity\Task;
 use App\Http\DataTablesHelper;
+use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\WidgetAccessService;
 use App\Utils\Admin\DefaultService;
 use App\Utils\Admin\TaskService;
-use App\Service\Admin\AdminAccessService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -104,7 +104,7 @@ class TaskController extends AbstractAdminController
         $usuario_id = $request->get('usuario_id');
 
         try {
-            if ($task_id === '' || $task_id === null) {
+            if ('' === $task_id || null === $task_id) {
                 $resultado = $this->taskService->SalvarTask($description, $status, $due_day, $usuario_id);
             } else {
                 $resultado = $this->taskService->ActualizarTask($task_id, $description, $status, $due_day, $usuario_id);

@@ -14,8 +14,9 @@ class DataTrackingRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DataTracking::class);
     }
+
     /**
-     * ListarDataTracking: Lista el data tracking
+     * ListarDataTracking: Lista el data tracking.
      *
      * @return DataTracking[]
      */
@@ -24,34 +25,34 @@ class DataTrackingRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t')
             ->leftJoin('d_t.project', 'p');
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('d_t.date <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        $consulta->orderBy('d_t.date', "ASC");
+        $consulta->orderBy('d_t.date', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarDataTrackingsDeOverhead: Lista el data tracking de un overhead price
+     * ListarDataTrackingsDeOverhead: Lista el data tracking de un overhead price.
      *
      * @return DataTracking[]
      */
@@ -60,18 +61,18 @@ class DataTrackingRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t')
             ->leftJoin('d_t.overhead', 'o_p');
 
-        if ($overhead_id != '') {
+        if ('' != $overhead_id) {
             $consulta->andWhere('o_p.overheadId = :overhead_id')
                 ->setParameter('overhead_id', $overhead_id);
         }
 
-        $consulta->orderBy('d_t.date', "ASC");
+        $consulta->orderBy('d_t.date', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarDataTrackingsDeInspector: Lista el data tracking de un inspector
+     * ListarDataTrackingsDeInspector: Lista el data tracking de un inspector.
      *
      * @return DataTracking[]
      */
@@ -80,18 +81,18 @@ class DataTrackingRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t')
             ->leftJoin('d_t.inspector', 'i');
 
-        if ($inspector_id != '') {
+        if ('' != $inspector_id) {
             $consulta->andWhere('i.inspectorId = :inspector_id')
                 ->setParameter('inspector_id', $inspector_id);
         }
 
-        $consulta->orderBy('d_t.date', "ASC");
+        $consulta->orderBy('d_t.date', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarProjectsDeInspector: Lista los projects de inspector
+     * ListarProjectsDeInspector: Lista los projects de inspector.
      *
      * @return DataTracking[]
      */
@@ -101,14 +102,14 @@ class DataTrackingRepository extends ServiceEntityRepository
             ->leftJoin('d_t.project', 'p')
             ->leftJoin('d_t.inspector', 'i');
 
-        if ($inspector_id != '') {
+        if ('' != $inspector_id) {
             $consulta->andWhere('i.inspectorId = :inspector_id')
                 ->setParameter('inspector_id', $inspector_id);
         }
 
         $consulta->groupBy('p.projectId');
 
-        $consulta->orderBy('p.name', "ASC");
+        $consulta->orderBy('p.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
@@ -117,11 +118,11 @@ class DataTrackingRepository extends ServiceEntityRepository
      * Inspectores distintos que tienen al menos un data tracking en el proyecto.
      * Simétrico a ListarProjectsDeInspector.
      *
-     * @return \App\Entity\Inspector[]
+     * @return Inspector[]
      */
     public function ListarInspectorsDeProject($project_id): array
     {
-        if ($project_id === '' || $project_id === null) {
+        if ('' === $project_id || null === $project_id) {
             return [];
         }
 
@@ -139,9 +140,10 @@ class DataTrackingRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarDataTrackings: Lista los datatrackings
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarDataTrackings: Lista los datatrackings.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return DataTracking[]
@@ -153,48 +155,48 @@ class DataTrackingRepository extends ServiceEntityRepository
             ->leftJoin('p.company', 'c')
             ->leftJoin('d_t.inspector', 'ins');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             d_t.crewLead LIKE :search OR d_t.measuredBy LIKE :search OR d_t.stationNumber LIKE :search OR d_t.notes LIKE :search OR
               d_t.otherMaterials LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('d_t.date <= :fecha_final')
                 ->setParameter('fecha_final', $fecha_fin);
         }
 
-        if ($pending !== '') {
+        if ('' !== $pending) {
             $consulta->andWhere('d_t.pending = :pending')
                 ->setParameter('pending', $pending);
         }
 
         switch ($iSortCol_0) {
-            case "project":
-                $consulta->orderBy("p.name", $sSortDir_0);
+            case 'project':
+                $consulta->orderBy('p.name', $sSortDir_0);
                 break;
-            case "company":
-                $consulta->orderBy("c.name", $sSortDir_0);
+            case 'company':
+                $consulta->orderBy('c.name', $sSortDir_0);
                 break;
-            case "inspector":
-                $consulta->orderBy("ins.name", $sSortDir_0);
+            case 'inspector':
+                $consulta->orderBy('ins.name', $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("d_t.$iSortCol_0", $sSortDir_0);
@@ -207,11 +209,13 @@ class DataTrackingRepository extends ServiceEntityRepository
 
         $lista = $consulta->setFirstResult($start)
             ->getQuery()->getResult();
+
         return $lista;
     }
 
     /**
-     * TotalDataTrackings: Total de data trackings de la BD
+     * TotalDataTrackings: Total de data trackings de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -224,35 +228,35 @@ class DataTrackingRepository extends ServiceEntityRepository
             ->leftJoin('p.company', 'c')
             ->leftJoin('d_t.inspector', 'ins');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             d_t.crewLead LIKE :search OR d_t.measuredBy LIKE :search OR d_t.stationNumber LIKE :search OR d_t.notes LIKE :search OR
               d_t.otherMaterials LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('d_t.date <= :fecha_fin')
                 ->setParameter('fecha_fin', $fecha_fin);
         }
 
-        if ($pending !== '') {
+        if ('' !== $pending) {
             $consulta->andWhere('d_t.pending = :pending')
                 ->setParameter('pending', $pending);
         }
@@ -261,13 +265,12 @@ class DataTrackingRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarDataTrackingsConTotal Lista los data trackings con total
+     * ListarDataTrackingsConTotal Lista los data trackings con total.
      *
      * @return []
      */
     public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = '', ?string $only_punch = ''): array
     {
-
         // Whitelist de columnas ordenables
         $sortable = [
             'id' => 'd_t.id',
@@ -275,7 +278,7 @@ class DataTrackingRepository extends ServiceEntityRepository
             'project' => 'p.name',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'd_t.date';
-        $dir = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('d_t')
@@ -283,42 +286,42 @@ class DataTrackingRepository extends ServiceEntityRepository
             ->leftJoin('p.company', 'c')
             ->leftJoin('d_t.inspector', 'ins');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $baseQb->andWhere('p.projectNumber LIKE :search OR p.name LIKE :search OR p.description LIKE :search OR 
             d_t.crewLead LIKE :search OR d_t.measuredBy LIKE :search OR d_t.stationNumber LIKE :search OR d_t.notes LIKE :search OR
               d_t.otherMaterials LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $baseQb->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $baseQb->andWhere('d_t.date >= :fecha_inicial')
                 ->setParameter('fecha_inicial', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $baseQb->andWhere('d_t.date <= :fecha_fin')
                 ->setParameter('fecha_fin', $fecha_fin);
         }
 
-        if ($pending !== '') {
+        if ('' !== $pending) {
             $baseQb->andWhere('d_t.pending = :pending')
                 ->setParameter('pending', $pending);
         }
 
-        if ($only_punch === '1') {
+        if ('1' === $only_punch) {
             $baseQb->andWhere(
-                'EXISTS (SELECT 1 FROM ' . DataTrackingItem::class . ' dti_pf WHERE dti_pf.dataTracking = d_t AND dti_pf.punchQuantity > 0)'
+                'EXISTS (SELECT 1 FROM '.DataTrackingItem::class.' dti_pf WHERE dti_pf.dataTracking = d_t AND dti_pf.punchQuantity > 0)'
             );
         }
 
@@ -335,7 +338,7 @@ class DataTrackingRepository extends ServiceEntityRepository
         $countQb->resetDQLPart('orderBy')
             ->select('COUNT(d_t.id)');
 
-        $total = (int)$countQb->getQuery()->getSingleScalarResult();
+        $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
             'data' => $data,   // array<Rol>
@@ -343,9 +346,9 @@ class DataTrackingRepository extends ServiceEntityRepository
         ];
     }
 
-
     /**
-     * TotalOverhead: Total de $total_people * $overhead_price
+     * TotalOverhead: Total de $total_people * $overhead_price.
+     *
      * @param string $data_tracking_id
      *
      * @return float
@@ -356,33 +359,33 @@ class DataTrackingRepository extends ServiceEntityRepository
             ->select('SUM(d_t.totalPeople * d_t.overheadPrice)')
             ->leftJoin('d_t.project', 'p');
 
-        if ($data_tracking_id != '') {
+        if ('' != $data_tracking_id) {
             $consulta->andWhere('d_t.id = :data_tracking_id')
                 ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        if ($project_id != '') {
+        if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
                 ->setParameter('project_id', $project_id);
         }
 
-        if ($fecha_inicial != "") {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format("Y-m-d");
+        if ('' != $fecha_inicial) {
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            $fecha_inicial = $fecha_inicial->format('Y-m-d');
 
             $consulta->andWhere('d_t.date >= :start')
                 ->setParameter('start', $fecha_inicial);
         }
 
-        if ($fecha_fin != "") {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin);
-            $fecha_fin = $fecha_fin->format("Y-m-d");
+        if ('' != $fecha_fin) {
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            $fecha_fin = $fecha_fin->format('Y-m-d');
 
             $consulta->andWhere('d_t.date <= :end')
                 ->setParameter('end', $fecha_fin);
         }
 
-        if ($status !== '') {
+        if ('' !== $status) {
             $consulta->andWhere('p.status = :status')
                 ->setParameter('status', $status);
         }

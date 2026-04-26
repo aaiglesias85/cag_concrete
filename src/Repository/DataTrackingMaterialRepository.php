@@ -12,8 +12,9 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, DataTrackingMaterial::class);
     }
+
     /**
-     * ListarMaterials: Lista los materials del data tracking
+     * ListarMaterials: Lista los materials del data tracking.
      *
      * @return DataTrackingMaterial[]
      */
@@ -33,7 +34,7 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarDataTrackingsDeMaterial: Lista el data tracking de material
+     * ListarDataTrackingsDeMaterial: Lista el data tracking de material.
      *
      * @return DataTrackingMaterial[]
      */
@@ -53,13 +54,12 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalQuantity: Total de quantity materials de la BD
-     * @param string $data_tracking_id
+     * TotalQuantity: Total de quantity materials de la BD.
      *
      * @return float
      */
     public function TotalQuantity(?string $data_tracking_id = null, ?string $project_id = null, ?string $material_id = null,
-                                  ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $status = null)
+        ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $status = null)
     {
         $consulta = $this->createQueryBuilder('d_t_m')
             ->select('SUM(d_t_m.quantity)')
@@ -85,13 +85,13 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
         }
 
         if ($fecha_inicial) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $consulta->andWhere('d_t.date >= :start')
                 ->setParameter('start', $fecha_inicial);
         }
 
         if ($fecha_fin) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $consulta->andWhere('d_t.date <= :end')
                 ->setParameter('end', $fecha_fin);
         }
@@ -105,13 +105,12 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalMaterials: Total de quantity * price materials de la BD
-     * @param string $data_tracking_id
+     * TotalMaterials: Total de quantity * price materials de la BD.
      *
      * @return float
      */
     public function TotalMaterials(?string $data_tracking_id = null, ?string $material_id = null, ?string $project_id = null,
-                                   ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $status = null)
+        ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $status = null)
     {
         $consulta = $this->createQueryBuilder('d_t_m')
             ->select('SUM(d_t_m.quantity * d_t_m.price)')
@@ -138,13 +137,13 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
         }
 
         if ($fecha_inicial) {
-            $fecha_inicial = \DateTime::createFromFormat("m/d/Y", $fecha_inicial)->format("Y-m-d");
+            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial)->format('Y-m-d');
             $consulta->andWhere('d_t.date >= :start')
                 ->setParameter('start', $fecha_inicial);
         }
 
         if ($fecha_fin) {
-            $fecha_fin = \DateTime::createFromFormat("m/d/Y", $fecha_fin)->format("Y-m-d");
+            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin)->format('Y-m-d');
             $consulta->andWhere('d_t.date <= :end')
                 ->setParameter('end', $fecha_fin);
         }
@@ -157,65 +156,65 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
         return $consulta->getQuery()->getSingleScalarResult();
     }
 
-   /**
-    * Suma cantidad e importe por material (misma lógica que TotalQuantity + TotalMaterials por fila) en un query.
-    *
-    * @return list<array{material_id: int, total_qty: float, total_amount: float}>
-    */
-   public function aggregateTotalsByMaterialId(
-      string $projectId = '',
-      string $fechaInicial = '',
-      string $fechaFin = '',
-      string $status = ''
-   ): array {
-      $qb = $this->createQueryBuilder('d_t_m')
-         ->select('m.materialId AS material_id')
-         ->addSelect('SUM(d_t_m.quantity) AS total_qty')
-         ->addSelect('SUM(d_t_m.quantity * d_t_m.price) AS total_amount')
-         ->leftJoin('d_t_m.dataTracking', 'd_t')
-         ->leftJoin('d_t_m.material', 'm')
-         ->leftJoin('d_t.project', 'p')
-         ->where('d_t_m.quantity IS NOT NULL')
-         ->andWhere('d_t_m.price IS NOT NULL');
+    /**
+     * Suma cantidad e importe por material (misma lógica que TotalQuantity + TotalMaterials por fila) en un query.
+     *
+     * @return list<array{material_id: int, total_qty: float, total_amount: float}>
+     */
+    public function aggregateTotalsByMaterialId(
+        string $projectId = '',
+        string $fechaInicial = '',
+        string $fechaFin = '',
+        string $status = '',
+    ): array {
+        $qb = $this->createQueryBuilder('d_t_m')
+           ->select('m.materialId AS material_id')
+           ->addSelect('SUM(d_t_m.quantity) AS total_qty')
+           ->addSelect('SUM(d_t_m.quantity * d_t_m.price) AS total_amount')
+           ->leftJoin('d_t_m.dataTracking', 'd_t')
+           ->leftJoin('d_t_m.material', 'm')
+           ->leftJoin('d_t.project', 'p')
+           ->where('d_t_m.quantity IS NOT NULL')
+           ->andWhere('d_t_m.price IS NOT NULL');
 
-      if (!empty($projectId)) {
-         $qb->andWhere('p.projectId = :project_id')
-            ->setParameter('project_id', $projectId);
-      }
+        if (!empty($projectId)) {
+            $qb->andWhere('p.projectId = :project_id')
+               ->setParameter('project_id', $projectId);
+        }
 
-      if (!empty($fechaInicial)) {
-         $d = \DateTime::createFromFormat('m/d/Y', $fechaInicial);
-         if ($d) {
-            $qb->andWhere('d_t.date >= :start')
-               ->setParameter('start', $d->format('Y-m-d'));
-         }
-      }
+        if (!empty($fechaInicial)) {
+            $d = \DateTime::createFromFormat('m/d/Y', $fechaInicial);
+            if ($d) {
+                $qb->andWhere('d_t.date >= :start')
+                   ->setParameter('start', $d->format('Y-m-d'));
+            }
+        }
 
-      if (!empty($fechaFin)) {
-         $d = \DateTime::createFromFormat('m/d/Y', $fechaFin);
-         if ($d) {
-            $qb->andWhere('d_t.date <= :end')
-               ->setParameter('end', $d->format('Y-m-d'));
-         }
-      }
+        if (!empty($fechaFin)) {
+            $d = \DateTime::createFromFormat('m/d/Y', $fechaFin);
+            if ($d) {
+                $qb->andWhere('d_t.date <= :end')
+                   ->setParameter('end', $d->format('Y-m-d'));
+            }
+        }
 
-      if ($status !== '') {
-         $qb->andWhere('p.status = :status')
-            ->setParameter('status', $status);
-      }
+        if ('' !== $status) {
+            $qb->andWhere('p.status = :status')
+               ->setParameter('status', $status);
+        }
 
-      $qb->groupBy('m.materialId')
-         ->having('SUM(d_t_m.quantity) > 0');
+        $qb->groupBy('m.materialId')
+           ->having('SUM(d_t_m.quantity) > 0');
 
-      $out = [];
-      foreach ($qb->getQuery()->getArrayResult() as $row) {
-         $out[] = [
-            'material_id' => (int) $row['material_id'],
-            'total_qty' => (float) ($row['total_qty'] ?? 0),
-            'total_amount' => (float) ($row['total_amount'] ?? 0),
-         ];
-      }
+        $out = [];
+        foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $out[] = [
+                'material_id' => (int) $row['material_id'],
+                'total_qty' => (float) ($row['total_qty'] ?? 0),
+                'total_amount' => (float) ($row['total_amount'] ?? 0),
+            ];
+        }
 
-      return $out;
-   }
+        return $out;
+    }
 }

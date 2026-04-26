@@ -14,33 +14,34 @@ class DistrictRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOrdenados: Lista los districts ordenados
+     * ListarOrdenados: Lista los districts ordenados.
      *
      * @return District[]
      */
-    public function ListarOrdenados($sSearch = "", $status = "")
+    public function ListarOrdenados($sSearch = '', $status = '')
     {
         $consulta = $this->createQueryBuilder('d');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ($status !== "") {
+        if ('' !== $status) {
             $consulta->andWhere('d.status = :status')
                 ->setParameter('status', $status);
         }
 
-        $consulta->orderBy('d.description', "ASC");
+        $consulta->orderBy('d.description', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarDistricts: Lista los districts
-     * @param int $start Inicio
-     * @param int $limit Limite
+     * ListarDistricts: Lista los districts.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
      * @param string $sSearch Para buscar
      *
      * @return District[]
@@ -49,7 +50,7 @@ class DistrictRepository extends ServiceEntityRepository
     {
         $consulta = $this->createQueryBuilder('d');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
@@ -65,7 +66,8 @@ class DistrictRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalDistricts: Total de districts de la BD
+     * TotalDistricts: Total de districts de la BD.
+     *
      * @param string $sSearch Para buscar
      *
      * @return int
@@ -75,29 +77,29 @@ class DistrictRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d')
             ->select('COUNT(d.districtId)');
 
-        if ($sSearch != "") {
+        if ('' != $sSearch) {
             $consulta->andWhere('d.description LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        return (int)$consulta->getQuery()->getSingleScalarResult();
+        return (int) $consulta->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarDistrictsConTotal Lista los districts con total
+     * ListarDistrictsConTotal Lista los districts con total.
      *
      * @return []
      */
-    public function ListarDistrictsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'description', string  $sortDirection = 'ASC'): array {
-
+    public function ListarDistrictsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'districtId'  => 'd.districtId',
+            'districtId' => 'd.districtId',
             'description' => 'd.description',
             'status' => 'd.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'd.description';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('d');
@@ -123,10 +125,8 @@ class DistrictRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
-
 }

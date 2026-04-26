@@ -3,17 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Http\DataTablesHelper;
+use App\Service\Admin\AdminAccessService;
 use App\Utils\Admin\CompanyService;
 use App\Utils\Admin\SubcontractorService;
-use App\Service\Admin\AdminAccessService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class SubcontractorController extends AbstractAdminController
 {
-
     private $subcontractorService;
     private CompanyService $companyService;
 
@@ -32,14 +30,13 @@ class SubcontractorController extends AbstractAdminController
         }
         $permiso = $acceso['permisos'];
 
-        return $this->render('admin/subcontractor/index.html.twig', array(
-            'permiso' => $permiso[0]
-        ));
+        return $this->render('admin/subcontractor/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     /**
-     * listar Acción que lista los companies
-     *
+     * listar Acción que lista los companies.
      */
     public function listar(Request $request)
     {
@@ -61,14 +58,13 @@ class SubcontractorController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -78,8 +74,7 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -96,26 +91,23 @@ class SubcontractorController extends AbstractAdminController
         $companyAddress = $request->get('companyAddress');
 
         try {
-
-            if ($subcontractor_id == "") {
+            if ('' == $subcontractor_id) {
                 $resultado = $this->subcontractorService->SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
             } else {
                 $resultado = $this->subcontractorService->ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['subcontractor_id'] = $resultado['subcontractor_id'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -125,8 +117,7 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un subcontractor en la BD
-     *
+     * eliminar Acción que elimina un subcontractor en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -136,26 +127,24 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->EliminarSubcontractor($subcontractor_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarSubcontractors Acción que elimina los companies seleccionados en la BD
-     *
+     * eliminarSubcontractors Acción que elimina los companies seleccionados en la BD.
      */
     public function eliminarSubcontractors(Request $request)
     {
@@ -165,26 +154,24 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->EliminarSubcontractors($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del subcontractor en la BD
-     *
+     * cargarDatos Acción que carga los datos del subcontractor en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -193,29 +180,25 @@ class SubcontractorController extends AbstractAdminController
         try {
             $resultado = $this->subcontractorService->CargarDatosSubcontractor($subcontractor_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['subcontractor'] = $resultado['subcontractor'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * listarNotes Acción que lista los notes subcontractors
-     *
+     * listarNotes Acción que lista los notes subcontractors.
      */
     public function listarNotes(Request $request)
     {
@@ -233,7 +216,7 @@ class SubcontractorController extends AbstractAdminController
             $fecha_fin = $request->get('fechaFin');
 
             // total + data en una sola llamada a tu servicio
-            $result = $subcontractor_id != "" ? $this->subcontractorService->ListarNotes(
+            $result = '' != $subcontractor_id ? $this->subcontractorService->ListarNotes(
                 $dt['start'],
                 $dt['length'],
                 $dt['search'],
@@ -245,14 +228,13 @@ class SubcontractorController extends AbstractAdminController
             ) : ['data' => [], 'total' => 0];
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -262,8 +244,7 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * salvarNotes Acción que salvar un notes en la BD
-     *
+     * salvarNotes Acción que salvar un notes en la BD.
      */
     public function salvarNotes(Request $request)
     {
@@ -274,21 +255,18 @@ class SubcontractorController extends AbstractAdminController
         $date = $request->get('date');
 
         try {
-
             $resultado = $this->subcontractorService->SalvarNotes($notes_id, $subcontractor_id, $notes, $date);
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -298,8 +276,7 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * cargarDatosNotes Acción que carga los datos del notes subcontractor en la BD
-     *
+     * cargarDatosNotes Acción que carga los datos del notes subcontractor en la BD.
      */
     public function cargarDatosNotes(Request $request)
     {
@@ -308,29 +285,25 @@ class SubcontractorController extends AbstractAdminController
         try {
             $resultado = $this->subcontractorService->CargarDatosNotes($notes_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['notes'] = $resultado['notes'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * eliminarNotes Acción que elimina un notes en la BD
-     *
+     * eliminarNotes Acción que elimina un notes en la BD.
      */
     public function eliminarNotes(Request $request)
     {
@@ -340,25 +313,24 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->EliminarNotes($notes_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * eliminarNotesDate Acción que elimina un notes en la BD
-     *
+     * eliminarNotesDate Acción que elimina un notes en la BD.
      */
     public function eliminarNotesDate(Request $request)
     {
@@ -370,26 +342,24 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->EliminarNotesDate($subcontractor_id, $from, $to);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * listarEmployees Acción que lista los employees subcontractors
-     *
+     * listarEmployees Acción que lista los employees subcontractors.
      */
     public function listarEmployees(Request $request)
     {
@@ -405,7 +375,7 @@ class SubcontractorController extends AbstractAdminController
             $subcontractor_id = $request->get('subcontractor_id');
 
             // total + data en una sola llamada a tu servicio
-            $result = $subcontractor_id != "" ? $this->subcontractorService->ListarEmployees(
+            $result = '' != $subcontractor_id ? $this->subcontractorService->ListarEmployees(
                 $dt['start'],
                 $dt['length'],
                 $dt['search'],
@@ -415,14 +385,13 @@ class SubcontractorController extends AbstractAdminController
             ) : ['data' => [], 'total' => 0];
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -432,8 +401,7 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * eliminarEmployee Acción que elimina un employee en la BD
-     *
+     * eliminarEmployee Acción que elimina un employee en la BD.
      */
     public function eliminarEmployee(Request $request)
     {
@@ -443,8 +411,7 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->EliminarEmployee($employee_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
+                $resultadoJson['message'] = 'The operation was successful';
             } else {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['error'] = $resultado['error'];
@@ -457,12 +424,10 @@ class SubcontractorController extends AbstractAdminController
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * agregarEmployee Acción que agrega un employee en la BD
-     *
+     * agregarEmployee Acción que agrega un employee en la BD.
      */
     public function agregarEmployee(Request $request)
     {
@@ -478,7 +443,7 @@ class SubcontractorController extends AbstractAdminController
             $resultado = $this->subcontractorService->SalvarEmployee($employee_id, $subcontractor_id, $name, $hourly_rate, $position);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
+                $resultadoJson['message'] = 'The operation was successful';
                 $resultadoJson['employee_id'] = $resultado['employee_id'];
             } else {
                 $resultadoJson['success'] = $resultado['success'];
@@ -492,12 +457,10 @@ class SubcontractorController extends AbstractAdminController
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * cargarDatosEmployee Acción que carga los datos del employee subcontractor en la BD
-     *
+     * cargarDatosEmployee Acción que carga los datos del employee subcontractor en la BD.
      */
     public function cargarDatosEmployee(Request $request)
     {
@@ -506,44 +469,37 @@ class SubcontractorController extends AbstractAdminController
         try {
             $resultado = $this->subcontractorService->CargarDatosEmployee($employee_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['employee'] = $resultado['employee'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
 
     /**
-     * listarEmployeesDeSubcontractor Acción que lista los employees subcontractors
-     *
+     * listarEmployeesDeSubcontractor Acción que lista los employees subcontractors.
      */
     public function listarEmployeesDeSubcontractor(Request $request)
     {
-
         $subcontractor_id = $request->get('subcontractor_id');
 
         try {
-
             $employees = $this->subcontractorService->ListarEmployeesDeSubcontractor($subcontractor_id);
 
             $resultadoJson['success'] = true;
             $resultadoJson['employees'] = $employees;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -553,23 +509,19 @@ class SubcontractorController extends AbstractAdminController
     }
 
     /**
-     * listarProjects Acción que lista los projects de subcontractors
-     *
+     * listarProjects Acción que lista los projects de subcontractors.
      */
     public function listarProjects(Request $request)
     {
-
         $subcontractor_id = $request->get('subcontractor_id');
 
         try {
-
             $projects = $this->subcontractorService->ListarProjects($subcontractor_id);
 
             $resultadoJson['success'] = true;
             $resultadoJson['projects'] = $projects;
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();

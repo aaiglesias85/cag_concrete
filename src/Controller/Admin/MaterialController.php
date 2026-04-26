@@ -3,17 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
-use App\Utils\Admin\MaterialService;
 use App\Service\Admin\AdminAccessService;
+use App\Utils\Admin\MaterialService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 class MaterialController extends AbstractAdminController
 {
-
     private $materialService;
 
     public function __construct(AdminAccessService $adminAccess, MaterialService $materialService)
@@ -33,15 +31,14 @@ class MaterialController extends AbstractAdminController
         $units = $this->materialService->getDoctrine()->getRepository(Unit::class)
             ->ListarOrdenados();
 
-        return $this->render('admin/material/index.html.twig', array(
+        return $this->render('admin/material/index.html.twig', [
             'permiso' => $permiso[0],
             'units' => $units,
-        ));
+        ]);
     }
 
     /**
-     * listar Acción que lista los units
-     *
+     * listar Acción que lista los units.
      */
     public function listar(Request $request)
     {
@@ -63,14 +60,13 @@ class MaterialController extends AbstractAdminController
             );
 
             $resultadoJson = [
-                'draw'            => $dt['draw'],
-                'data'            => $result['data'],
-                'recordsTotal'    => (int) $result['total'],
+                'draw' => $dt['draw'],
+                'data' => $result['data'],
+                'recordsTotal' => (int) $result['total'],
                 'recordsFiltered' => (int) $result['total'],
             ];
 
             return $this->json($resultadoJson);
-
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -80,8 +76,7 @@ class MaterialController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD
-     *
+     * salvar Acción que inserta un menu en la BD.
      */
     public function salvar(Request $request)
     {
@@ -93,25 +88,22 @@ class MaterialController extends AbstractAdminController
         $unit_id = $request->get('unit_id');
 
         try {
-
-            if ($material_id == "") {
+            if ('' == $material_id) {
                 $resultado = $this->materialService->SalvarMaterial($unit_id, $name, $price);
             } else {
                 $resultado = $this->materialService->ActualizarMaterial($material_id, $unit_id, $name, $price);
             }
 
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
 
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
@@ -121,8 +113,7 @@ class MaterialController extends AbstractAdminController
     }
 
     /**
-     * eliminar Acción que elimina un material en la BD
-     *
+     * eliminar Acción que elimina un material en la BD.
      */
     public function eliminar(Request $request)
     {
@@ -132,26 +123,24 @@ class MaterialController extends AbstractAdminController
             $resultado = $this->materialService->EliminarMaterial($material_id);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * eliminarMaterials Acción que elimina los materials seleccionados en la BD
-     *
+     * eliminarMaterials Acción que elimina los materials seleccionados en la BD.
      */
     public function eliminarMaterials(Request $request)
     {
@@ -161,26 +150,24 @@ class MaterialController extends AbstractAdminController
             $resultado = $this->materialService->EliminarMaterials($ids);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = "The operation was successful";
-                return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                $resultadoJson['message'] = 'The operation was successful';
+
                 return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
-
     }
 
     /**
-     * cargarDatos Acción que carga los datos del material en la BD
-     *
+     * cargarDatos Acción que carga los datos del material en la BD.
      */
     public function cargarDatos(Request $request)
     {
@@ -189,24 +176,20 @@ class MaterialController extends AbstractAdminController
         try {
             $resultado = $this->materialService->CargarDatosMaterial($material_id);
             if ($resultado['success']) {
-
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['material'] = $resultado['material'];
 
                 return $this->json($resultadoJson);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-
-                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = $e->getMessage();
 
             return $this->json($resultadoJson);
         }
-
     }
-
 }

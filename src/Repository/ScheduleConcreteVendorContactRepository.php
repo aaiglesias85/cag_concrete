@@ -14,7 +14,7 @@ class ScheduleConcreteVendorContactRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarContactosDeSchedule: Lista los contactos de un schedule
+     * ListarContactosDeSchedule: Lista los contactos de un schedule.
      *
      * @return ScheduleConcreteVendorContact[]
      */
@@ -24,18 +24,18 @@ class ScheduleConcreteVendorContactRepository extends ServiceEntityRepository
             ->leftJoin('s_c_v_c.schedule', 's')
             ->leftJoin('s_c_v_c.contact', 'c_v_c');
 
-        if ($schedule_id != '') {
+        if ('' != $schedule_id) {
             $consulta->andWhere('s.scheduleId = :schedule_id')
                 ->setParameter('schedule_id', $schedule_id);
         }
 
-        $consulta->orderBy('c_v_c.name', "ASC");
+        $consulta->orderBy('c_v_c.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
 
     /**
-     * ListarSchedulesDeContact: Lista los schedules de un contact
+     * ListarSchedulesDeContact: Lista los schedules de un contact.
      *
      * @return ScheduleConcreteVendorContact[]
      */
@@ -45,12 +45,12 @@ class ScheduleConcreteVendorContactRepository extends ServiceEntityRepository
             ->leftJoin('s_c_v_c.schedule', 's')
             ->leftJoin('s_c_v_c.contact', 'c_v_c');
 
-        if ($contact_id != '') {
+        if ('' != $contact_id) {
             $consulta->andWhere('c_v_c.contactId = :contact_id')
                 ->setParameter('contact_id', $contact_id);
         }
 
-        $consulta->orderBy('s.day', "ASC");
+        $consulta->orderBy('s.day', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }

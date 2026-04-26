@@ -4,23 +4,23 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Table(name: "invoice_notes")]
+#[ORM\Table(name: 'invoice_notes')]
 #[ORM\Entity(repositoryClass: "App\Repository\InvoiceNotesRepository")]
 class InvoiceNotes
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: "id", type: "integer", nullable: false)]
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
     private ?int $id;
 
-    #[ORM\Column(name: "notes", type: "text", nullable: true)]
+    #[ORM\Column(name: 'notes', type: 'text', nullable: true)]
     private ?string $notes;
 
-    #[ORM\Column(name: "date", type: "date", nullable: true)]
+    #[ORM\Column(name: 'date', type: 'date', nullable: true)]
     private ?\DateTime $date;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\Invoice")]
-    #[ORM\JoinColumn(name: "invoice_id", referencedColumnName: "invoice_id", nullable: true)]
+    #[ORM\JoinColumn(name: 'invoice_id', referencedColumnName: 'invoice_id', nullable: true)]
     private ?Invoice $invoice;
 
     public function getId(): ?int

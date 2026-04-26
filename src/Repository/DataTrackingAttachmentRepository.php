@@ -14,7 +14,7 @@ class DataTrackingAttachmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarAttachmentsDeDataTracking: Lista los attachments
+     * ListarAttachmentsDeDataTracking: Lista los attachments.
      *
      * @return DataTrackingAttachment[]
      */
@@ -23,15 +23,13 @@ class DataTrackingAttachmentRepository extends ServiceEntityRepository
         $consulta = $this->createQueryBuilder('d_t_a')
             ->leftJoin('d_t_a.dataTracking', 'd_t');
 
-        if ($data_tracking_id != '') {
+        if ('' != $data_tracking_id) {
             $consulta->andWhere('d_t.id = :data_tracking_id')
                 ->setParameter('data_tracking_id', $data_tracking_id);
         }
 
-        $consulta->orderBy('d_t_a.name', "ASC");
-
+        $consulta->orderBy('d_t_a.name', 'ASC');
 
         return $consulta->getQuery()->getResult();
     }
-
 }

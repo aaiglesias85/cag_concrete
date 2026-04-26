@@ -12,8 +12,9 @@ class OverheadPriceRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, OverheadPrice::class);
     }
+
     /**
-     * ListarOrdenados: Lista los overheads ordenados por nombre
+     * ListarOrdenados: Lista los overheads ordenados por nombre.
      *
      * @return OverheadPrice[]
      */
@@ -26,10 +27,11 @@ class OverheadPriceRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOverheads: Lista los overheads con filtros, paginación y ordenación
-     * @param int $start Inicio
-     * @param int $limit Limite
-     * @param string $sSearch Para buscar
+     * ListarOverheads: Lista los overheads con filtros, paginación y ordenación.
+     *
+     * @param int    $start      Inicio
+     * @param int    $limit      Limite
+     * @param string $sSearch    Para buscar
      * @param string $iSortCol_0 Columna para ordenar
      * @param string $sSortDir_0 Dirección de ordenamiento
      *
@@ -59,10 +61,9 @@ class OverheadPriceRepository extends ServiceEntityRepository
     }
 
     /**
-     * TotalOverheads: Devuelve el total de overheads según el filtro de búsqueda
-     * @param string $sSearch Para buscar
+     * TotalOverheads: Devuelve el total de overheads según el filtro de búsqueda.
      *
-     * @return int
+     * @param string $sSearch Para buscar
      */
     public function TotalOverheads(?string $sSearch): int
     {
@@ -79,20 +80,20 @@ class OverheadPriceRepository extends ServiceEntityRepository
     }
 
     /**
-     * ListarOverheadsConTotal Lista los overheads con total
+     * ListarOverheadsConTotal Lista los overheads con total.
      *
      * @return []
      */
-    public function ListarOverheadsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
-
+    public function ListarOverheadsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'overheadId'  => 'o.overheadId',
+            'overheadId' => 'o.overheadId',
             'name' => 'o.name',
             'price' => 'o.price',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'o.name';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('o');
@@ -118,7 +119,7 @@ class OverheadPriceRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }

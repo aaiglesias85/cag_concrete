@@ -50,7 +50,10 @@ security:
          lazy: true
          pattern: ^/(admin|check|logout)
          provider: app_user_provider
-         login_throttling: null
+         # Limita intentos fallidos de login (por IP + username). Ajustar en producción si hace falta.
+         login_throttling:
+            max_attempts: 5
+            interval: '15 minutes'
          form_login:
             login_path: /login
             check_path: /check

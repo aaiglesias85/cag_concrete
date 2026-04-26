@@ -14,7 +14,7 @@ class SubcontractorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los subcontractors ordenados por nombre
+     * Listar los subcontractors ordenados por nombre.
      *
      * @return Subcontractor[]
      */
@@ -27,25 +27,24 @@ class SubcontractorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Listar los subcontractors con filtros de búsqueda, paginación y ordenación
+     * Listar los subcontractors con filtros de búsqueda, paginación y ordenación.
      *
      * @return Subcontractor[]
      */
     public function ListarSubcontractors(
-        int     $start,
-        int     $limit,
+        int $start,
+        int $limit,
         ?string $sSearch = null,
-        string  $sortColumn = 'name',
-        string  $sortDirection = 'ASC'
-    ): array
-    {
+        string $sortColumn = 'name',
+        string $sortDirection = 'ASC',
+    ): array {
         $qb = $this->createQueryBuilder('s');
 
         // Filtro por búsqueda
         if ($sSearch) {
             $qb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
                 s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         return $qb->orderBy("s.$sortColumn", $sortDirection)
@@ -56,9 +55,7 @@ class SubcontractorRepository extends ServiceEntityRepository
     }
 
     /**
-     * Obtener el total de subcontractors según los filtros de búsqueda
-     *
-     * @return int
+     * Obtener el total de subcontractors según los filtros de búsqueda.
      */
     public function TotalSubcontractors(?string $sSearch = null): int
     {
@@ -69,28 +66,28 @@ class SubcontractorRepository extends ServiceEntityRepository
         if ($sSearch) {
             $qb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
                 s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
-        return (int)$qb->getQuery()->getSingleScalarResult();
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
-     * ListarSubcontractorsConTotal Lista los subcontractors con total
+     * ListarSubcontractorsConTotal Lista los subcontractors con total.
      *
      * @return []
      */
-    public function ListarSubcontractorsConTotal(int $start, int $limit, ?string $sSearch = null, string  $sortColumn = 'name', string  $sortDirection = 'ASC'): array {
-
+    public function ListarSubcontractorsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
+    {
         // Whitelist de columnas ordenables
         $sortable = [
-            'subcontractorId'  => 's.subcontractorId',
+            'subcontractorId' => 's.subcontractorId',
             'name' => 's.name',
-            'phone'    => 's.phone',
+            'phone' => 's.phone',
             'address' => 's.address',
         ];
         $orderBy = $sortable[$sortColumn] ?? 's.name';
-        $dir     = strtoupper($sortDirection) === 'DESC' ? 'DESC' : 'ASC';
+        $dir = 'DESC' === strtoupper($sortDirection) ? 'DESC' : 'ASC';
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('s');
@@ -98,7 +95,7 @@ class SubcontractorRepository extends ServiceEntityRepository
         if (!empty($sSearch)) {
             $baseQb->andWhere('s.companyPhone LIKE :search OR s.companyAddress LIKE :search OR s.companyName LIKE :search OR
                 s.contactEmail LIKE :search OR s.contactName LIKE :search OR s.phone LIKE :search OR s.name LIKE :search')
-                ->setParameter('search', '%' . $sSearch . '%');
+                ->setParameter('search', '%'.$sSearch.'%');
         }
 
         // 1) Datos
@@ -117,9 +114,8 @@ class SubcontractorRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return [
-            'data'  => $data,   // array<Rol>
+            'data' => $data,   // array<Rol>
             'total' => $total,  // total con el MISMO filtro 'search'
         ];
     }
-
 }
