@@ -96,7 +96,7 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
                 ->setParameter('end', $fecha_fin);
         }
 
-        if ($status !== null) {
+        if (!empty($status)) {
             $consulta->andWhere('p.status = :status')
                 ->setParameter('status', $status);
         }
@@ -149,7 +149,7 @@ class DataTrackingMaterialRepository extends ServiceEntityRepository
                 ->setParameter('end', $fecha_fin);
         }
 
-        if ($status !== null) {
+        if (!empty($status)) {
             $consulta->andWhere('p.status = :status')
                 ->setParameter('status', $status);
         }
