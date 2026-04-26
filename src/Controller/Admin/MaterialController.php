@@ -2,40 +2,41 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\MaterialService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class MaterialController extends AbstractController
+class MaterialController extends AbstractAdminController
 {
 
     private $materialService;
 
-    public function __construct(MaterialService $materialService)
+    public function __construct(AdminAccessService $adminAccess, MaterialService $materialService)
     {
+        parent::__construct($adminAccess);
         $this->materialService = $materialService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->materialService->BuscarPermiso($usuario->getUsuarioId(), 15);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                $units = $this->materialService->getDoctrine()->getRepository(Unit::class)
-                    ->ListarOrdenados();
-
-                return $this->render('admin/material/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'units' => $units,
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::MATERIAL);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        $units = $this->materialService->getDoctrine()->getRepository(Unit::class)
+            ->ListarOrdenados();
+
+        return $this->render('admin/material/index.html.twig', array(
+            'permiso' => $permiso[0],
+            'units' => $units,
+        ));
     }
 
     /**

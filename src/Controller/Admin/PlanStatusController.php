@@ -2,34 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\PlanStatusService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class PlanStatusController extends AbstractController
+class PlanStatusController extends AbstractAdminController
 {
     private $planStatusService;
 
-    public function __construct(PlanStatusService $planStatusService)
+    public function __construct(AdminAccessService $adminAccess, PlanStatusService $planStatusService)
     {
+        parent::__construct($adminAccess);
         $this->planStatusService = $planStatusService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->planStatusService->BuscarPermiso($usuario->getUsuarioId(), 27);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/plan-status/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PLAN_STATUS);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/plan-status/index.html.twig', array(
+            'permiso' => $permiso[0],
+        ));
     }
 
     /**

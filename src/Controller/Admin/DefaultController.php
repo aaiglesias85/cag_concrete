@@ -2,11 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
 use App\Entity\Company;
+use App\Entity\Usuario;
 use App\Entity\Equation;
 use App\Entity\Item;
 use App\Entity\Unit;
-use App\Repository\UserWidgetPreferenceRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Utils\Admin\AdvertisementService;
 use App\Utils\Admin\DefaultService;
 use App\Utils\Admin\EstimateService;
@@ -15,11 +17,12 @@ use App\Utils\Admin\LogService;
 use App\Utils\Admin\NotificationService;
 use App\Utils\Admin\ScheduleService;
 use App\Utils\Admin\TaskService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class DefaultController extends AbstractController
+class DefaultController extends AbstractAdminController
 {
    private $defaultService;
    private $logService;
@@ -29,9 +32,10 @@ class DefaultController extends AbstractController
    private ScheduleService $scheduleService;
    private EstimateService $estimateService;
    private DataTrackingService $dataTrackingService;
-   private UserWidgetPreferenceRepository $widgetPrefRepo;
+   private WidgetAccessService $widgetAccessService;
 
    public function __construct(
+      AdminAccessService $adminAccess,
       DefaultService                  $defaultService,
       LogService                      $logService,
       NotificationService             $notificationService,
@@ -40,8 +44,9 @@ class DefaultController extends AbstractController
       ScheduleService                 $scheduleService,
       EstimateService                 $estimateService,
       DataTrackingService             $dataTrackingService,
-      UserWidgetPreferenceRepository  $widgetPrefRepo
+      WidgetAccessService            $widgetAccessService
    ) {
+      parent::__construct($adminAccess);
       $this->defaultService = $defaultService;
       $this->logService = $logService;
       $this->notificationService = $notificationService;
@@ -50,163 +55,36 @@ class DefaultController extends AbstractController
       $this->scheduleService = $scheduleService;
       $this->estimateService = $estimateService;
       $this->dataTrackingService = $dataTrackingService;
-      $this->widgetPrefRepo = $widgetPrefRepo;
+      $this->widgetAccessService = $widgetAccessService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), 1);
-      if (count($permiso) > 0 && $permiso[0]['ver']) {
-         $dashboardWidgets = $this->defaultService->ObtenerWidgetsDashboardV3(
-            $usuario->getUsuarioId(),
-            $this->widgetPrefRepo
-         );
-
-         $homeTask = null;
-         $homeWorkSchedule = null;
-         $homeBidDeadlines = null;
-         $homeEstimateWinLoss = null;
-         $homeEstimatesSubmittedTotals = null;
-         $homeEstimatorSubmittedShare = null;
-         $homeCurrentMonthDataTracking = null;
-         $homePayItemTotals = null;
-         $homeInvoicedProjects = null;
-         $homeInvoiceProfit = null;
-         $homeCostBreakdown = null;
-         foreach ($dashboardWidgets as $w) {
-            if (!empty($w['id']) && $w['id'] === 'tasks') {
-               $p40 = $this->taskService->BuscarPermiso($usuario->getUsuarioId(), 40);
-               if (is_array($p40) && count($p40) > 0 && !empty($p40[0]['ver'])) {
-                  $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-                  $homeTask = [
-                     'permiso' => $p40[0],
-                     'tasks' => $this->taskService->listarTareasPayloadHome($usuario, $p40[0], $r0['inicial'], $r0['final']),
-                     'range' => $r0,
-                  ];
-               }
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'work_schedule') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeWorkSchedule = $this->scheduleService->listarSchedulesPayloadHome(
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'bid_deadlines') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeBidDeadlines = $this->estimateService->listarUpcomingBidDeadlinesPayloadHome(
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'estimate_win_loss') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeEstimateWinLoss = $this->defaultService->DevolverDataChartEstimateWinLoss(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'estimates_submitted_totals') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeEstimatesSubmittedTotals = $this->defaultService->DevolverDataChartEstimateSubmittedTotals(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'estimator_submitted_share') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeEstimatorSubmittedShare = $this->defaultService->DevolverDataChartEstimatorSubmittedShare(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'current_month_data_tracking') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeCurrentMonthDataTracking = $this->dataTrackingService->listarCurrentMonthProjectsPayloadHome(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'pay_item_totals') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homePayItemTotals = $this->defaultService->ListarItemsConMontos(
-                  '',
-                  $r0['inicial'],
-                  $r0['final'],
-                  ''
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'invoiced_projects') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeInvoicedProjects = $this->defaultService->ListarInvoicedProjectsPayloadHome(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'invoice_profit_share') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeInvoiceProfit = $this->defaultService->DevolverDataChartProfit(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-               continue;
-            }
-            if (!empty($w['id']) && $w['id'] === 'job_cost_breakdown') {
-               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
-               $homeCostBreakdown = $this->defaultService->DevolverDataChartCosts(
-                  '',
-                  $r0['inicial'],
-                  $r0['final']
-               );
-            }
-         }
-
-         return $this->render('admin/default/index.html.twig', [
-            'usuario' => $usuario,
-            'dashboard_widgets' => $dashboardWidgets,
-            'home_task' => $homeTask,
-            'home_work_schedule' => $homeWorkSchedule,
-            'home_bid_deadlines' => $homeBidDeadlines,
-            'home_estimate_win_loss' => $homeEstimateWinLoss,
-            'home_estimates_submitted_totals' => $homeEstimatesSubmittedTotals,
-            'home_estimator_submitted_share' => $homeEstimatorSubmittedShare,
-            'home_current_month_data_tracking' => $homeCurrentMonthDataTracking,
-            'home_pay_item_totals' => $homePayItemTotals,
-            'home_invoiced_projects' => $homeInvoicedProjects,
-            'home_invoice_profit' => $homeInvoiceProfit,
-            'home_cost_breakdown' => $homeCostBreakdown,
-         ]);
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::HOME);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $usuario = $acceso['usuario'];
 
-      return $this->redirectToRoute('denegado');
+      $dashboardWidgets = $this->defaultService->ObtenerWidgetsDashboardV3(
+         $usuario->getUsuarioId()
+      );
+      $homePayloads = $this->defaultService->construirPayloadsWidgetsHome($usuario, $dashboardWidgets);
+
+      return $this->render('admin/default/index.html.twig', \array_merge([
+         'usuario' => $usuario,
+         'dashboard_widgets' => $dashboardWidgets,
+      ], $homePayloads));
    }
 
    public function widgetPreferences(): Response
    {
-      $usuario = $this->getUser();
-      $allWidgets = $this->defaultService->ObtenerWidgetsDashboardV3($usuario->getUsuarioId());
-      $prefMap   = $this->widgetPrefRepo->getPreferenceMapForUser($usuario->getUsuarioId());
-
-      $widgets = array_map(static function (array $w) use ($prefMap): array {
-         $w['user_active'] = $prefMap[$w['id']] ?? true;
-         return $w;
-      }, $allWidgets);
+      $u = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($u instanceof RedirectResponse) {
+         return $u;
+      }
+      $usuario = $u;
+      $widgets = $this->defaultService->ObtenerMyWidgetsTogglesV3($usuario->getUsuarioId());
 
       return $this->render('admin/default/widget_preferences.html.twig', [
          'usuario' => $usuario,
@@ -217,7 +95,11 @@ class DefaultController extends AbstractController
 
    public function saveWidgetPreference(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
    {
-      $usuario   = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'message' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
       $widgetId  = $request->request->get('widget_id', '');
       $isActive  = filter_var($request->request->get('is_active', true), FILTER_VALIDATE_BOOLEAN);
 
@@ -225,7 +107,15 @@ class DefaultController extends AbstractController
          return $this->json(['success' => false, 'message' => 'Missing widget_id'], 400);
       }
 
-      $this->widgetPrefRepo->savePreference($usuario->getUsuarioId(), $widgetId, $isActive);
+      try {
+         $this->widgetAccessService->setUserWidgetFromMyWidgetsPage(
+            $usuario->getUsuarioId(),
+            (string) $widgetId,
+            $isActive
+         );
+      } catch (\InvalidArgumentException $e) {
+         return $this->json(['success' => false, 'message' => $e->getMessage()], 403);
+      }
 
       return $this->json(['success' => true]);
    }
@@ -236,72 +126,134 @@ class DefaultController extends AbstractController
     */
    public function listarStats(Request $request)
    {
-      $usuario = $this->getUser();
-      if ($usuario === null || !method_exists($usuario, 'getUsuarioId')) {
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
          return $this->json([
             'success' => false,
             'error' => 'Unauthenticated',
          ], 401);
       }
-
-      $project_id = $request->get('project_id');
-      $status = $request->get('status');
-      $fecha_inicial = $request->get('fechaInicial');
-      $fecha_fin = $request->get('fechaFin');
+      $usuario = $g;
+      $userId = $usuario->getUsuarioId();
+      $w = $this->widgetAccessService;
+      $projectId = (string) ($request->get('project_id') ?? '');
+      $status = (string) ($request->get('status') ?? '');
+      $fechaInicial = (string) ($request->get('fechaInicial') ?? '');
+      $fechaFin = (string) ($request->get('fechaFin') ?? '');
 
       try {
+         $stats = [];
 
-
-         $stats = $this->defaultService->FiltrarDashboard($project_id, $status, $fecha_inicial, $fecha_fin);
-         $p40 = $this->taskService->BuscarPermiso($usuario->getUsuarioId(), 40);
-         if (is_array($p40) && count($p40) > 0 && !empty($p40[0]['ver'])) {
+         if ($w->isWidgetEnabledForUser($userId, 'tasks')) {
+            $pTaskA = $this->defaultService->BuscarPermiso($userId, FunctionId::TASKS);
+            $pTask = $pTaskA[0] ?? [
+               'ver' => false,
+               'agregar' => false,
+               'editar' => false,
+               'eliminar' => false,
+               'funcion_id' => FunctionId::TASKS,
+               'permiso_id' => 0,
+            ];
             $stats['tasks'] = $this->taskService->listarTareasPayloadHome(
                $usuario,
-               $p40[0],
-               (string) $fecha_inicial,
-               (string) $fecha_fin
+               $pTask,
+               $fechaInicial,
+               $fechaFin
             );
          }
-         $p22 = $this->scheduleService->BuscarPermiso($usuario->getUsuarioId(), 22);
-         if (is_array($p22) && count($p22) > 0 && !empty($p22[0]['ver'])) {
+
+         if ($w->isWidgetEnabledForUser($userId, 'work_schedule')) {
             $stats['work_schedule'] = $this->scheduleService->listarSchedulesPayloadHome(
-               (string) $fecha_inicial,
-               (string) $fecha_fin,
+               $fechaInicial,
+               $fechaFin,
                30,
-               (string) $project_id
+               $projectId
             );
          }
-         $p29 = $this->estimateService->BuscarPermiso($usuario->getUsuarioId(), 29);
-         if (is_array($p29) && count($p29) > 0 && !empty($p29[0]['ver'])) {
+
+         if ($w->isWidgetEnabledForUser($userId, 'bid_deadlines')) {
             $stats['bid_deadlines'] = $this->estimateService->listarUpcomingBidDeadlinesPayloadHome(
-               (string) $fecha_inicial,
-               (string) $fecha_fin,
+               $fechaInicial,
+               $fechaFin,
                0,
                ''
             );
          }
-         $p10 = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
-         if (is_array($p10) && count($p10) > 0 && !empty($p10[0]['ver'])) {
+
+         if ($w->isWidgetEnabledForUser($userId, 'current_month_data_tracking')) {
             $stats['current_month_data_tracking'] = $this->dataTrackingService->listarCurrentMonthProjectsPayloadHome(
-               (string) $project_id,
-               (string) $fecha_inicial,
-               (string) $fecha_fin
-            );
-            $stats['pay_item_totals'] = $this->defaultService->ListarItemsConMontos(
-               (string) $project_id,
-               (string) $fecha_inicial,
-               (string) $fecha_fin,
-               ''
+               $projectId,
+               $fechaInicial,
+               $fechaFin
             );
          }
 
-         $resultadoJson['success'] = true;
-         $resultadoJson['stats'] = $stats;
+         if ($w->isWidgetEnabledForUser($userId, 'pay_item_totals')) {
+            $stats['pay_item_totals'] = $this->defaultService->ListarItemsConMontos(
+               $projectId,
+               $fechaInicial,
+               $fechaFin,
+               $status
+            );
+         }
+
+         if ($w->isWidgetEnabledForUser($userId, 'invoiced_projects')) {
+            $stats['invoiced_projects'] = $this->defaultService->ListarInvoicedProjectsPayloadHome(
+               $projectId,
+               $fechaInicial,
+               $fechaFin
+            );
+         }
+
+         if ($w->isWidgetEnabledForUser($userId, 'estimate_win_loss')) {
+            $stats['chart_estimate_win_loss'] = $this->defaultService->DevolverDataChartEstimateWinLoss(
+               '',
+               $fechaInicial,
+               $fechaFin
+            );
+         }
+         if ($w->isWidgetEnabledForUser($userId, 'estimates_submitted_totals')) {
+            $stats['chart_estimates_submitted_totals'] = $this->defaultService->DevolverDataChartEstimateSubmittedTotals(
+               '',
+               $fechaInicial,
+               $fechaFin
+            );
+         }
+         if ($w->isWidgetEnabledForUser($userId, 'estimator_submitted_share')) {
+            $stats['chart_estimator_submitted_share'] = $this->defaultService->DevolverDataChartEstimatorSubmittedShare(
+               '',
+               $fechaInicial,
+               $fechaFin
+            );
+         }
+         if ($w->isWidgetEnabledForUser($userId, 'invoice_profit_share')) {
+            $stats['chart_profit'] = $this->defaultService->DevolverDataChartProfit(
+               $projectId,
+               $fechaInicial,
+               $fechaFin,
+               $status
+            );
+         }
+         if ($w->isWidgetEnabledForUser($userId, 'job_cost_breakdown')) {
+            $stats['chart_costs'] = $this->defaultService->DevolverDataChartCosts(
+               $projectId,
+               $fechaInicial,
+               $fechaFin,
+               $status
+            );
+         }
+
+         $resultadoJson = [
+            'success' => true,
+            'stats' => $stats,
+         ];
 
          return $this->json($resultadoJson);
       } catch (\Exception $e) {
-         $resultadoJson['success'] = false;
-         $resultadoJson['error'] = $e->getMessage();
+         $resultadoJson = [
+            'success' => false,
+            'error' => $e->getMessage(),
+         ];
 
          return $this->json($resultadoJson);
       }
@@ -340,7 +292,11 @@ class DefaultController extends AbstractController
 
    public function renderMenu(?string $activeRoute = null): Response
    {
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $g;
+      }
+      $usuario = $g;
       $menu = $this->defaultService->DevolverMenu($usuario->getUsuarioId());
 
       return $this->render('admin/layout/menu.html.twig', [
@@ -352,7 +308,11 @@ class DefaultController extends AbstractController
 
    public function renderModalItemProject()
    {
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $g;
+      }
+      $usuario = $g;
 
       // items
       $items = $this->defaultService->getDoctrine()->getRepository(Item::class)

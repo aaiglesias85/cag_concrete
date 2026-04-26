@@ -2,34 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ReminderService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ReminderController extends AbstractController
+class ReminderController extends AbstractAdminController
 {
     private $reminderService;
 
-    public function __construct(ReminderService $reminderService)
+    public function __construct(AdminAccessService $adminAccess, ReminderService $reminderService)
     {
+        parent::__construct($adminAccess);
         $this->reminderService = $reminderService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->reminderService->BuscarPermiso($usuario->getUsuarioId(), 23);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/reminder/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::REMINDER);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/reminder/index.html.twig', array(
+            'permiso' => $permiso[0],
+        ));
     }
 
     /**

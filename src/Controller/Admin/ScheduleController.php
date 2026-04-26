@@ -2,59 +2,59 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
 use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ScheduleService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ScheduleController extends AbstractController
+class ScheduleController extends AbstractAdminController
 {
     private $scheduleService;
 
-    public function __construct(ScheduleService $scheduleService )
+    public function __construct(AdminAccessService $adminAccess, ScheduleService $scheduleService )
     {
+        parent::__construct($adminAccess);
         $this->scheduleService = $scheduleService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->scheduleService->BuscarPermiso($usuario->getUsuarioId(), 22);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                
-                // projects
-                $projects = $this->scheduleService->getDoctrine()->getRepository(Project::class)
-                    ->ListarOrdenados();
-
-                // concrete vendors
-                $concrete_vendors = $this->scheduleService->getDoctrine()->getRepository(ConcreteVendor::class)
-                    ->ListarOrdenados();
-
-                // holidays
-                $holidays = $this->scheduleService->ListarTodosHolidays();
-
-                // leads
-                $leads = $this->scheduleService->getDoctrine()->getRepository(Employee::class)
-                    ->ListarOrdenados();
-
-
-                return $this->render('admin/schedule/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'projects' => $projects,
-                    'concrete_vendors' => $concrete_vendors,
-                    'holidays' => $holidays,
-                    'leads' => $leads,
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::SCHEDULE);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        // projects
+        $projects = $this->scheduleService->getDoctrine()->getRepository(Project::class)
+            ->ListarOrdenados();
+
+        // concrete vendors
+        $concrete_vendors = $this->scheduleService->getDoctrine()->getRepository(ConcreteVendor::class)
+            ->ListarOrdenados();
+
+        // holidays
+        $holidays = $this->scheduleService->ListarTodosHolidays();
+
+        // leads
+        $leads = $this->scheduleService->getDoctrine()->getRepository(Employee::class)
+            ->ListarOrdenados();
+
+
+        return $this->render('admin/schedule/index.html.twig', array(
+            'permiso' => $permiso[0],
+            'projects' => $projects,
+            'concrete_vendors' => $concrete_vendors,
+            'holidays' => $holidays,
+            'leads' => $leads,
+        ));
     }
 
     /**

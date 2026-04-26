@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Estimate;
 use App\Entity\ProjectStage;
 use App\Repository\EstimateRepository;
@@ -275,7 +277,7 @@ class ProjectStageService extends Base
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 24);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT_STAGE);
 
       $acciones = '';
 

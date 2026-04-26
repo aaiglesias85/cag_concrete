@@ -11,11 +11,27 @@ use App\Entity\PermisoUsuario;
 use App\Entity\Usuario;
 use App\Entity\Rol;
 use App\Entity\Cotizacion;
+use App\Service\Admin\WidgetAccessService;
 use App\Utils\Base;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class UsuarioService extends Base
 {
+   public function __construct(
+      ContainerInterface $container,
+      MailerInterface $mailer,
+      ContainerBagInterface $containerBag,
+      Security $security,
+      LoggerInterface $logger,
+      private readonly WidgetAccessService $widgetAccessService,
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+   }
 
    /**
     * ListarOrdenados
@@ -167,6 +183,7 @@ class UsuarioService extends Base
 
          $permisos = $this->ListarPermisos($usuario_id);
          $arreglo_resultado['permisos'] = $permisos;
+         $arreglo_resultado['widgets'] = $this->widgetAccessService->getWidgetStatesForUserForm($usuario_id);
 
          $resultado['success'] = true;
          $resultado['usuario'] = $arreglo_resultado;
@@ -400,7 +417,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat)
+   public function ActualizarUsuario($usuario_id, $rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat, $widgetAccess = null)
    {
       $em = $this->getDoctrine()->getManager();
 
@@ -482,6 +499,10 @@ class UsuarioService extends Base
 
          $em->flush();
 
+         if ($widgetAccess !== null && is_array($widgetAccess)) {
+            $this->widgetAccessService->replaceUserWidgetAccess((int) $usuario_id, $widgetAccess);
+         }
+
          //Salvar log
          $nombreCompleto = $entity->getNombreCompleto();
          $log_operacion = "Update";
@@ -504,7 +525,7 @@ class UsuarioService extends Base
     *
     * @author Marcel
     */
-   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat)
+   public function SalvarUsuario($rol_id, $habilitado, $contrasenna, $nombre, $apellidos, $email, $permisos, $telefono, $estimator, $bond, $retainage, $chat, $widgetAccess = null)
    {
       $resultado = array();
       $em = $this->getDoctrine()->getManager();
@@ -572,6 +593,12 @@ class UsuarioService extends Base
       }
 
       $em->flush();
+      $uid = (int) $entity->getUsuarioId();
+      if ($widgetAccess !== null && is_array($widgetAccess) && $uid > 0) {
+         $this->widgetAccessService->replaceUserWidgetAccess($uid, $widgetAccess);
+      } elseif ($rol_id != '' && $uid > 0) {
+         $this->widgetAccessService->copyRolWidgetsToUserIfEmpty($uid, (int) $rol_id);
+      }
 
       //Salvar log
       $nombreCompleto = $entity->getNombreCompleto();

@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\County;
 use App\Entity\District;
@@ -17,103 +19,101 @@ use App\Entity\Unit;
 use App\Entity\Usuario;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\EstimateService;
+use App\Service\Admin\AdminAccessService;
 use PHPUnit\Framework\Constraint\Count;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class EstimateController extends AbstractController
+class EstimateController extends AbstractAdminController
 {
    private $estimateService;
 
-   public function __construct(EstimateService $estimateService)
+   public function __construct(AdminAccessService $adminAccess, EstimateService $estimateService)
    {
+      parent::__construct($adminAccess);
       $this->estimateService = $estimateService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->estimateService->BuscarPermiso($usuario->getUsuarioId(), 29);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-
-            // companies
-            $companies = $this->estimateService->getDoctrine()->getRepository(Company::class)
-               ->ListarOrdenados();
-
-            // stages
-            $stages = $this->estimateService->getDoctrine()->getRepository(ProjectStage::class)
-               ->ListarOrdenados();
-
-            // project types
-            $project_types = $this->estimateService->getDoctrine()->getRepository(ProjectType::class)
-               ->ListarOrdenados();
-
-            // proposal types
-            $proposal_types = $this->estimateService->getDoctrine()->getRepository(ProposalType::class)
-               ->ListarOrdenados();
-
-            // plan status
-            $plan_status = $this->estimateService->getDoctrine()->getRepository(PlanStatus::class)
-               ->ListarOrdenados();
-
-            // countys
-            $countys = $this->estimateService->getDoctrine()->getRepository(County::class)
-               ->ListarOrdenados();
-
-            // districts
-            $districts = $this->estimateService->getDoctrine()->getRepository(District::class)
-               ->ListarOrdenados();
-
-            // estimators
-            $estimators = $this->estimateService->getDoctrine()->getRepository(Usuario::class)
-               ->ListarOrdenados("", '', 1);
-
-            // plan downloadings
-            $plan_downloadings = $this->estimateService->getDoctrine()->getRepository(PlanDownloading::class)
-               ->ListarOrdenados();
-
-            // items
-            $items = $this->estimateService->getDoctrine()->getRepository(Item::class)
-               ->ListarOrdenados();
-
-            $equations = $this->estimateService->getDoctrine()->getRepository(Equation::class)
-               ->ListarOrdenados();
-
-            $units = $this->estimateService->getDoctrine()->getRepository(Unit::class)
-               ->ListarOrdenados();
-
-            $yields_calculation = $this->estimateService->ListarYieldsCalculation();
-
-            $estimate_note_items = $this->estimateService->getDoctrine()->getRepository(EstimateNoteItem::class)
-               ->ListarOrdenados();
-
-            $holidays = $this->estimateService->ListarTodosHolidays();
-
-            return $this->render('admin/estimate/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'companies' => $companies,
-               'stages' => $stages,
-               'project_types' => $project_types,
-               'proposal_types' => $proposal_types,
-               'plan_status' => $plan_status,
-               'countys' => $countys,
-               'districts' => $districts,
-               'estimators' => $estimators,
-               'plan_downloadings' => $plan_downloadings,
-               'items' => $items,
-               'equations' => $equations,
-               'yields_calculation' => $yields_calculation,
-               'units' => $units,
-               'estimate_note_items' => $estimate_note_items,
-               'holidays' => $holidays,
-               'direccion_url' => $this->estimateService->ObtenerURL(),
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ESTIMATE);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      // companies
+      $companies = $this->estimateService->getDoctrine()->getRepository(Company::class)
+         ->ListarOrdenados();
+
+      // stages
+      $stages = $this->estimateService->getDoctrine()->getRepository(ProjectStage::class)
+         ->ListarOrdenados();
+
+      // project types
+      $project_types = $this->estimateService->getDoctrine()->getRepository(ProjectType::class)
+         ->ListarOrdenados();
+
+      // proposal types
+      $proposal_types = $this->estimateService->getDoctrine()->getRepository(ProposalType::class)
+         ->ListarOrdenados();
+
+      // plan status
+      $plan_status = $this->estimateService->getDoctrine()->getRepository(PlanStatus::class)
+         ->ListarOrdenados();
+
+      // countys
+      $countys = $this->estimateService->getDoctrine()->getRepository(County::class)
+         ->ListarOrdenados();
+
+      // districts
+      $districts = $this->estimateService->getDoctrine()->getRepository(District::class)
+         ->ListarOrdenados();
+
+      // estimators
+      $estimators = $this->estimateService->getDoctrine()->getRepository(Usuario::class)
+         ->ListarOrdenados("", '', 1);
+
+      // plan downloadings
+      $plan_downloadings = $this->estimateService->getDoctrine()->getRepository(PlanDownloading::class)
+         ->ListarOrdenados();
+
+      // items
+      $items = $this->estimateService->getDoctrine()->getRepository(Item::class)
+         ->ListarOrdenados();
+
+      $equations = $this->estimateService->getDoctrine()->getRepository(Equation::class)
+         ->ListarOrdenados();
+
+      $units = $this->estimateService->getDoctrine()->getRepository(Unit::class)
+         ->ListarOrdenados();
+
+      $yields_calculation = $this->estimateService->ListarYieldsCalculation();
+
+      $estimate_note_items = $this->estimateService->getDoctrine()->getRepository(EstimateNoteItem::class)
+         ->ListarOrdenados();
+
+      $holidays = $this->estimateService->ListarTodosHolidays();
+
+      return $this->render('admin/estimate/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'companies' => $companies,
+         'stages' => $stages,
+         'project_types' => $project_types,
+         'proposal_types' => $proposal_types,
+         'plan_status' => $plan_status,
+         'countys' => $countys,
+         'districts' => $districts,
+         'estimators' => $estimators,
+         'plan_downloadings' => $plan_downloadings,
+         'items' => $items,
+         'equations' => $equations,
+         'yields_calculation' => $yields_calculation,
+         'units' => $units,
+         'estimate_note_items' => $estimate_note_items,
+         'holidays' => $holidays,
+         'direccion_url' => $this->estimateService->ObtenerURL(),
+      ));
    }
 
    /**

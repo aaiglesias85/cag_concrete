@@ -314,6 +314,10 @@ var Usuarios = function () {
         permisos = [];
         marcarPermisos();
 
+        // widgets
+        widgetAccess = [];
+        marcarWidgetAccess();
+
         // tooltips selects
         MyApp.resetErrorMessageValidateSelect(KTUtil.get("usuario-form"));
 
@@ -414,7 +418,8 @@ var Usuarios = function () {
 
     //Wizard
     var activeTab = 1;
-    var totalTabs = 2;
+    var totalTabs = 3;
+    var widgetAccess = [];
     var initWizard = function () {
         $(document).off('click', "#form-usuario .wizard-tab");
         $(document).on('click', "#form-usuario .wizard-tab", function (e) {
@@ -488,6 +493,9 @@ var Usuarios = function () {
                 case 2:
                     $('#tab-permisos').tab('show');
                     break;
+                case 3:
+                    $('#tab-widgets').tab('show');
+                    break;
             }
         }, 0);
     }
@@ -517,6 +525,12 @@ var Usuarios = function () {
                 }
             }
 
+        }
+        if (tab == 2) {
+            if (permisos.length == 0) {
+                toastr.error("You must select the user's permissions", "");
+                result = false;
+            }
         }
 
         return result;
@@ -586,6 +600,7 @@ var Usuarios = function () {
         event_change = false;
 
         devolverPermisos();
+        devolverWidgetAccess();
 
         var rol_id = $('#perfil').val();
 
@@ -636,6 +651,7 @@ var Usuarios = function () {
             formData.set("password", password);
 
             formData.set("permisos", JSON.stringify(permisos));
+            formData.set("widget_access", JSON.stringify(widgetAccess));
 
             BlockUtil.block('#form-usuario');
 
@@ -747,6 +763,9 @@ var Usuarios = function () {
 
             permisos = usuario.permisos;
             marcarPermisos();
+
+            widgetAccess = usuario.widgets || [];
+            marcarWidgetAccess();
 
             event_change = false;
         }
@@ -927,29 +946,35 @@ var Usuarios = function () {
         //listar permisos
         permisos = [];
         marcarPermisos();
+        widgetAccess = [];
+        marcarWidgetAccess();
         if (perfil_id != "") {
 
-            var formData = new URLSearchParams();
+            var formDataP = new URLSearchParams();
+            formDataP.set("perfil_id", perfil_id);
+            var formDataW = new URLSearchParams();
+            formDataW.set("perfil_id", perfil_id);
 
-            formData.set("perfil_id", perfil_id);
-
-            axios.post("perfil/listarPermisos", formData, {responseType: "json"})
-                .then(function (res) {
-                    if (res.status === 200 || res.status === 201) {
-                        var response = res.data;
-                        if (response.success) {
-                            permisos = response.permisos;
-                            marcarPermisos();
-                        } else {
-                            toastr.error(response.error, "");
-                        }
-                    } else {
-                        toastr.error("An internal error has occurred, please try again.", "");
-                    }
-                })
-                .catch(MyUtil.catchErrorAxios)
-                .then(function () {
-                });
+            Promise.all([
+                axios.post("perfil/listarPermisos", formDataP, {responseType: "json"}),
+                axios.post("perfil/listarWidgetPreferences", formDataW, {responseType: "json"})
+            ]).then(function (results) {
+                var pr = results[0].data;
+                var wr = results[1].data;
+                if (pr && pr.success) {
+                    permisos = pr.permisos;
+                    marcarPermisos();
+                } else {
+                    toastr.error((pr && pr.error) || "", "");
+                }
+                if (wr && wr.success) {
+                    widgetAccess = wr.widgets;
+                    marcarWidgetAccess();
+                } else {
+                    toastr.error((wr && wr.error) || "Widgets", "");
+                }
+            })
+                .catch(MyUtil.catchErrorAxios);
         }
 
     }
@@ -983,6 +1008,27 @@ var Usuarios = function () {
 
     //Permisos
     var permisos = [];
+    var marcarWidgetAccess = function () {
+        $('.checkbox-widget-access').prop('checked', false);
+        for (var i = 0; i < widgetAccess.length; i++) {
+            var wid = widgetAccess[i].widget_id;
+            var on = widgetAccess[i].is_enabled;
+            $('.checkbox-widget-access').each(function () {
+                if (String($(this).data('widget-id')) === String(wid)) {
+                    $(this).prop('checked', on);
+                }
+            });
+        }
+    }
+    var devolverWidgetAccess = function () {
+        widgetAccess = [];
+        $('.checkbox-widget-access').each(function () {
+            widgetAccess.push({
+                widget_id: parseInt($(this).data('widget-id'), 10),
+                is_enabled: $(this).prop('checked') === true
+            });
+        });
+    }
     var marcarPermisos = function () {
         //Limipiar
         $('.checkbox-permiso').prop('checked', false);

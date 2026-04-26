@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\County;
@@ -2547,7 +2549,7 @@ class EstimateService extends Base
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 29);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::ESTIMATE);
 
       $acciones = '';
 

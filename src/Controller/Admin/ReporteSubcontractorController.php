@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 
 use App\Entity\Project;
 use App\Entity\Subcontractor;
@@ -11,18 +13,20 @@ use App\Utils\Admin\ProjectService;
 use App\Utils\Admin\ReporteSubcontractorService;
 
 use App\Utils\Admin\SubcontractorService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ReporteSubcontractorController extends AbstractController
+class ReporteSubcontractorController extends AbstractAdminController
 {
 
     private $reporteService;
     private $projectService;
     private $subcontractorService;
 
-    public function __construct(ReporteSubcontractorService $reporteService, ProjectService $projectService, SubcontractorService $subcontractorService)
+    public function __construct(AdminAccessService $adminAccess, ReporteSubcontractorService $reporteService, ProjectService $projectService, SubcontractorService $subcontractorService)
     {
+        parent::__construct($adminAccess);
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;
         $this->subcontractorService = $subcontractorService;
@@ -30,26 +34,23 @@ class ReporteSubcontractorController extends AbstractController
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->reporteService->BuscarPermiso($usuario->getUsuarioId(), 19);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                // subcontractors
-                $subcontractors = $this->subcontractorService->ListarOrdenados();
-
-                // projects
-                $projects = $this->projectService->ListarOrdenados();
-
-                return $this->render('admin/reportes/subcontractor.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'subcontractors' => $subcontractors,
-                    'projects' => $projects,
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::REPORTE_SUBCONTRACTOR);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        // subcontractors
+        $subcontractors = $this->subcontractorService->ListarOrdenados();
+
+        // projects
+        $projects = $this->projectService->ListarOrdenados();
+
+        return $this->render('admin/reportes/subcontractor.html.twig', array(
+            'permiso' => $permiso[0],
+            'subcontractors' => $subcontractors,
+            'projects' => $projects,
+        ));
     }
 
     /**

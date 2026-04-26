@@ -2,36 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\LogService;
-use App\Utils\Admin\UsuarioService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class LogController extends AbstractController
+class LogController extends AbstractAdminController
 {
 
     private $logService;
 
-    public function __construct(LogService $logService)
+    public function __construct(AdminAccessService $adminAccess, LogService $logService)
     {
+        parent::__construct($adminAccess);
         $this->logService = $logService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->logService->BuscarPermiso($usuario->getUsuarioId(), 4);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/log/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::LOG);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/log/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**
@@ -41,6 +41,11 @@ class LogController extends AbstractController
     public function listar(Request $request)
     {
         try {
+            $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+            if ($g instanceof RedirectResponse) {
+                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+            }
+            $usuario = $g;
 
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
@@ -53,7 +58,6 @@ class LogController extends AbstractController
             $fecha_inicial = $request->get('fechaInicial');
             $fecha_fin = $request->get('fechaFin');
 
-            $usuario = $this->getUser();
             $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
 
             // total + data en una sola llamada a tu servicio

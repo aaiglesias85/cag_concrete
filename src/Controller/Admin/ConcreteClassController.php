@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ConcreteClassService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ConcreteClassController extends AbstractController
+class ConcreteClassController extends AbstractAdminController
 {
 
    private $concreteClassService;
 
-   public function __construct(ConcreteClassService $concreteClassService)
+   public function __construct(AdminAccessService $adminAccess, ConcreteClassService $concreteClassService)
    {
+      parent::__construct($adminAccess);
       $this->concreteClassService = $concreteClassService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->concreteClassService->BuscarPermiso($usuario->getUsuarioId(), 36);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            return $this->render('admin/concrete-class/index.html.twig', array(
-               'permiso' => $permiso[0]
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::CONCRETE_CLASS);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      return $this->render('admin/concrete-class/index.html.twig', array(
+         'permiso' => $permiso[0]
+      ));
    }
 
    /**

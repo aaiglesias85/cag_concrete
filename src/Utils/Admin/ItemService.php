@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
@@ -514,7 +516,7 @@ class ItemService extends Base
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 6);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::ITEM);
 
       $acciones = "";
 

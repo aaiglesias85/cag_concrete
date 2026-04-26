@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\InspectorService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class InspectorController extends AbstractController
+class InspectorController extends AbstractAdminController
 {
 
     private $inspectorService;
 
-    public function __construct(InspectorService $inspectorService)
+    public function __construct(AdminAccessService $adminAccess, InspectorService $inspectorService)
     {
+        parent::__construct($adminAccess);
         $this->inspectorService = $inspectorService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->inspectorService->BuscarPermiso($usuario->getUsuarioId(), 7);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/inspector/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::INSPECTOR);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/inspector/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

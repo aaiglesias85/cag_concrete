@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\UnitService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class UnitController extends AbstractController
+class UnitController extends AbstractAdminController
 {
 
     private $unitService;
 
-    public function __construct(UnitService $unitService)
+    public function __construct(AdminAccessService $adminAccess, UnitService $unitService)
     {
+        parent::__construct($adminAccess);
         $this->unitService = $unitService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->unitService->BuscarPermiso($usuario->getUsuarioId(), 5);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/unit/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::UNIT);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/unit/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

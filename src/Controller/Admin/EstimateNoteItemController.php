@@ -2,30 +2,34 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\EstimateNoteItemService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class EstimateNoteItemController extends AbstractController
+class EstimateNoteItemController extends AbstractAdminController
 {
     private EstimateNoteItemService $estimateNoteItemService;
 
-    public function __construct(EstimateNoteItemService $estimateNoteItemService)
+    public function __construct(AdminAccessService $adminAccess, EstimateNoteItemService $estimateNoteItemService)
     {
+        parent::__construct($adminAccess);
         $this->estimateNoteItemService = $estimateNoteItemService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->estimateNoteItemService->BuscarPermiso($usuario->getUsuarioId(), 38);
-        if (count($permiso) > 0 && $permiso[0]['ver']) {
-            return $this->render('admin/estimate-note-item/index.html.twig', [
-                'permiso' => $permiso[0],
-            ]);
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ESTIMATE_NOTE_ITEM);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
-        return $this->redirectToRoute('denegado');
+        $permiso = $acceso['permisos'];
+        return $this->render('admin/estimate-note-item/index.html.twig', [
+            'permiso' => $permiso[0],
+        ]);
     }
 
     public function listar(Request $request)

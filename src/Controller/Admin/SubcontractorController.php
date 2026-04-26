@@ -2,38 +2,39 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\CompanyService;
 use App\Utils\Admin\SubcontractorService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class SubcontractorController extends AbstractController
+class SubcontractorController extends AbstractAdminController
 {
 
     private $subcontractorService;
     private CompanyService $companyService;
 
-    public function __construct(SubcontractorService $subcontractorService, CompanyService $companyService)
+    public function __construct(AdminAccessService $adminAccess, SubcontractorService $subcontractorService, CompanyService $companyService)
     {
+        parent::__construct($adminAccess);
         $this->subcontractorService = $subcontractorService;
         $this->companyService = $companyService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->subcontractorService->BuscarPermiso($usuario->getUsuarioId(), 18);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/subcontractor/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::SUBCONTRACTOR);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/subcontractor/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

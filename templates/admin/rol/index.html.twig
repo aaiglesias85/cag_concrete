@@ -201,23 +201,20 @@
                         <h3 class="card-label">New profile:</h3>
                     </div>
                     <div class="card-toolbar">
-                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-perfil me-2" title="Back" data-bs-toggle="tooltip">
-                  <i class="ki-duotone ki-arrow-left fs-1"><span class="path1"></span><span class="path2"></span></i>
-                        </a>
-
+                        <button id="btn-wizard-perfil-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
+                            <i class="la la-arrow-left"></i>
+                        </button>
+                        <button id="btn-wizard-perfil-siguiente" class="btn btn-icon btn-primary me-2" type="button" title="Next" data-bs-toggle="tooltip">
+                            <i class="la la-arrow-right"></i>
+                        </button>
                         {% if permiso.agregar or permiso.editar %}
-                            <button
-                                    type="button"
-                                    id="btn-salvar-perfil"
-                                    class="btn btn-success"
-                            >
-                                <i class="ki-duotone ki-double-check fs-1 me-2">
-                                    <span class="path1"></span>
-                                    <span class="path2"></span>
-                                </i>
-                               
-                            </button>
+                        <button type="button" id="btn-wizard-perfil-finalizar" class="btn btn-icon btn-success me-2 hide" title="Save" data-bs-toggle="tooltip">
+                            <i class="las la-save"></i>
+                        </button>
                         {% endif %}
+                        <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-perfil" title="Exit" data-bs-toggle="tooltip">
+                            <i class="la la-close"></i>
+                        </a>
                     </div>
                 </div>
 
@@ -230,30 +227,90 @@
                 >
                     <input type="hidden" id="perfil_id" name="perfil_id"/>
 
-                    <div class="card-body">
+                    <div id="form-perfil-body" class="card-body">
+                        <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6">
+                            <li class="nav-item">
+                                <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-perfil-general" id="tab-perfil-general">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">1</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">General</div>
+                                            <div class="wizard-desc">Profile name</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link wizard-tab" data-item="2" data-bs-toggle="tab" href="#tab-content-perfil-permisos" id="tab-perfil-permisos">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">2</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">Permissions</div>
+                                            <div class="wizard-desc">Module access for this role</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link wizard-tab" data-item="3" data-bs-toggle="tab" href="#tab-content-perfil-widgets" id="tab-perfil-widgets">
+                                    <div class="wizard-wrapper">
+                                        <span class="wizard-number">
+                                            <i class="wizard-check ki-duotone ki-check"></i>
+                                            <span class="number">3</span>
+                                        </span>
+                                        <div class="wizard-label">
+                                            <div class="wizard-title">Home widgets</div>
+                                            <div class="wizard-desc">Default dashboard cards for this role</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
 
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">1</span>
-                                Name
-                            </label>
-                            <input
-                                    type="text"
-                                    class="form-control form-control-validate form-control-solid"
-                                    id="descripcion" name="descripcion"
-                            />
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active" id="tab-content-perfil-general" role="tabpanel">
+                                <div class="form-group ic-form-group">
+                                    <label class="form-label required">
+                                        <span class="ic-step-number">1</span>
+                                        Name
+                                    </label>
+                                    <input
+                                            type="text"
+                                            class="form-control form-control-validate form-control-solid event-change"
+                                            id="descripcion" name="descripcion"
+                                    />
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-content-perfil-permisos" role="tabpanel">
+                                <div class="form-group ic-form-group">
+                                    <label class="form-label required">
+                                        <span class="ic-step-number">1</span>
+                                        Profile permissions
+                                    </label>
+                                    {% include 'admin/_permisos_accordion.html.twig' %}
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="tab-content-perfil-widgets" role="tabpanel">
+                                <div class="form-group ic-form-group">
+                                    <label class="form-label required">
+                                        <span class="ic-step-number">1</span>
+                                        Home widgets
+                                    </label>
+                                    <p class="text-gray-600 fs-6 mb-6">Which home dashboard cards users with this role can use. You can still refine per user under Users.</p>
+                                    {% if widgets is defined and widgets|length > 0 %}
+                                    {% include 'admin/_widgets_access_switches.html.twig' with { 'widgets': widgets } %}
+                                    {% else %}
+                                    <p class="text-muted">No widget catalog. Run the database migration.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
                         </div>
-
-                        <div class="form-group ic-form-group">
-                            <label class="form-label required">
-                                <span class="ic-step-number">2</span>
-                                Profile permissions
-                            </label>
-
-                            {% include 'admin/_permisos_accordion.html.twig' %}
-                        </div>
-
-
                     </div>
                 </form>
             </div>

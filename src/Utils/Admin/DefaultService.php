@@ -30,10 +30,32 @@ use App\Repository\InvoiceRepository;
 use App\Repository\MaterialRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
+use App\Constants\FunctionId;
+use App\Entity\Usuario;
+use App\Service\Admin\WidgetAccessService;
 use App\Utils\Base;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class DefaultService extends Base
 {
+   public function __construct(
+      ContainerInterface      $container,
+      MailerInterface         $mailer,
+      ContainerBagInterface     $containerBag,
+      Security                $security,
+      LoggerInterface         $logger,
+      private readonly WidgetAccessService $widgetAccessService,
+      private readonly TaskService         $taskService,
+      private readonly ScheduleService  $scheduleService,
+      private readonly EstimateService  $estimateService,
+      private readonly DataTrackingService $dataTrackingService,
+   ) {
+      parent::__construct($container, $mailer, $containerBag, $security, $logger);
+   }
 
    /*
      * FiltrarDashboard
@@ -738,148 +760,137 @@ class DefaultService extends Base
    /**
     * @return list<array<string, mixed>>
     */
-   public function ObtenerWidgetsDashboardV3($usuarioId, ?\App\Repository\UserWidgetPreferenceRepository $prefRepo = null): array
+   protected function getWidgetDefinitionCatalog(): array
    {
-      // widget_funcion_id = Capa 1: permiso dedicado por widget (funcion_ids 40-50)
-      // links[].funcion_id = controla visibilidad de los botones de enlace al módulo
-      $definiciones = [
+      // def['id'] = widgets.code; links[].funcion_id = visibilidad de enlace al módulo
+      return [
          [
             'id' => 'tasks',
-            'widget_funcion_id' => 40,
             'title' => 'Tasks',
             'description' => 'Your assigned work and due dates',
             'layout' => 'table',
             'columns' => ['Status', 'Description', 'Due date', 'Actions'],
             'links' => [
-               ['route' => 'tasks', 'label' => 'Tasks', 'funcion_id' => 40],
+               ['route' => 'tasks', 'label' => 'Tasks', 'funcion_id' => FunctionId::TASKS],
             ],
          ],
          [
             'id' => 'work_schedule',
-            'widget_funcion_id' => 41,
             'title' => 'Work Schedule',
             'description' => 'Weekly view of field operations and priorities.',
             'layout' => 'table',
             'columns' => ['Project #', 'Day', 'Priority'],
             'links' => [
-               ['route' => 'schedule', 'label' => 'Open schedule', 'funcion_id' => 22],
+               ['route' => 'schedule', 'label' => 'Open schedule', 'funcion_id' => FunctionId::SCHEDULE],
             ],
          ],
          [
             'id' => 'bid_deadlines',
-            'widget_funcion_id' => 42,
             'title' => 'Upcoming bid deadlines',
             'description' => 'Projects with critical proposal dates and assigned estimator.',
             'layout' => 'table',
             'columns' => ['Project', 'Bid deadline', 'Estimator'],
             'links' => [
-               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => FunctionId::ESTIMATE],
             ],
          ],
          [
             'id' => 'estimate_win_loss',
-            'widget_funcion_id' => 43,
             'title' => 'Estimate win / loss ratio',
             'description' => 'Submitted estimates won vs. lost.',
             'layout' => 'placeholder',
             'placeholder_hint' => 'Donut chart: won vs. lost (coming soon)',
             'links' => [
-               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => FunctionId::ESTIMATE],
             ],
          ],
          [
             'id' => 'estimates_submitted_totals',
-            'widget_funcion_id' => 44,
             'title' => 'Total estimates — submitted / not submitted',
             'description' => 'Count of submitted vs. draft or pending.',
             'layout' => 'table',
             'columns' => ['Category', 'Count'],
             'links' => [
-               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => FunctionId::ESTIMATE],
             ],
          ],
          [
             'id' => 'estimator_submitted_share',
-            'widget_funcion_id' => 45,
             'title' => 'Estimator submitted share',
             'description' => 'Share of submitted proposals by estimator.',
             'layout' => 'placeholder',
             'placeholder_hint' => 'Donut or bar chart (coming soon)',
             'links' => [
-               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => 29],
+               ['route' => 'estimate', 'label' => 'Estimates', 'funcion_id' => FunctionId::ESTIMATE],
             ],
          ],
          [
             'id' => 'current_month_data_tracking',
-            'widget_funcion_id' => 46,
             'title' => 'Current month projects (data tracking)',
             'description' => 'Aggregates for the current month from data tracking.',
             'layout' => 'table',
             'columns' => ['Date', 'Project #', 'Daily total', 'Profit total', 'Labor total', 'Concrete total'],
             'links' => [
-               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
             ],
          ],
          [
             'id' => 'pay_item_totals',
-            'widget_funcion_id' => 48,
             'title' => 'Pay item totals (period)',
             'description' => 'Sums of pay item quantities and amounts; filter by project later.',
             'layout' => 'table',
             'columns' => ['Item', 'Quantity', 'Amount'],
             'links' => [
-               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
             ],
          ],
          [
             'id' => 'invoiced_projects',
-            'widget_funcion_id' => 47,
             'title' => 'Invoiced projects (period)',
             'description' => 'Billed amount and quick glance of payment total.',
             'layout' => 'table',
             'columns' => ['Project', 'Invoice', 'Amount total'],
             'links' => [
-               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => 11],
-               ['route' => 'payment', 'label' => 'Payments', 'funcion_id' => 33],
+               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => FunctionId::INVOICE],
+               ['route' => 'payment', 'label' => 'Payments', 'funcion_id' => FunctionId::PAYMENT],
             ],
          ],
          [
             'id' => 'invoice_profit_share',
-            'widget_funcion_id' => 49,
             'title' => 'Invoice / profit share',
             'description' => 'Real profitability vs. invoiced amounts.',
             'layout' => 'table',
             'columns' => ['Label', 'Value'],
             'links' => [
-               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => 11],
+               ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => FunctionId::INVOICE],
             ],
          ],
          [
             'id' => 'job_cost_breakdown',
-            'widget_funcion_id' => 50,
             'title' => 'Job Cost Breakdown',
             'description' => 'Labor, materials, and other direct costs.',
             'layout' => 'table',
             'columns' => ['Category', 'Amount'],
             'links' => [
-               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => 10],
+               ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
             ],
          ],
       ];
+   }
 
-      // Capa 2: preferencias del usuario (null = tabla aún no existe, mostrar todo lo permitido)
-      $prefMap = $prefRepo !== null ? $prefRepo->getPreferenceMapForUser($usuarioId) : null;
+   /**
+    * @return list<array<string, mixed>>
+    */
+   public function ObtenerWidgetsDashboardV3($usuarioId): array
+   {
+      $definiciones = $this->getWidgetDefinitionCatalog();
 
       $out = [];
-      foreach ($definiciones as $def) {
-         // Capa 1: el usuario debe tener permiso VIEW sobre el widget_funcion_id dedicado
-         $p = $this->BuscarPermiso($usuarioId, (int) $def['widget_funcion_id']);
-         if (!is_array($p) || count($p) === 0 || empty($p[0]['ver'])) {
-            continue;
-         }
+      $wa = $this->widgetAccessService;
+      $wa->ensureUserWidgetAccessSeededFromRolIfEmpty($usuarioId);
 
-         // Capa 2: si hay preferencias guardadas, respetar la elección del usuario
-         if ($prefMap !== null && isset($prefMap[$def['id']]) && $prefMap[$def['id']] === false) {
+      foreach ($definiciones as $def) {
+         if (!$wa->isWidgetEnabledForUser($usuarioId, (string) $def['id'])) {
             continue;
          }
 
@@ -895,6 +906,180 @@ class DefaultService extends Base
          $out[] = array_merge($def, [
             'links' => $linkViews,
             'canView' => true,
+         ]);
+      }
+
+      return $out;
+   }
+
+   /**
+    * Datos de negocio por widget para el Home: se llama con el resultado de {@see ObtenerWidgetsDashboardV3}.
+    *
+    * @param list<array<string, mixed>> $dashboardWidgets
+    *
+    * @return array<string, mixed>
+    */
+   public function construirPayloadsWidgetsHome(Usuario $usuario, array $dashboardWidgets): array
+   {
+      $uid = $usuario->getUsuarioId();
+
+      $homeTask = null;
+      $homeWorkSchedule = null;
+      $homeBidDeadlines = null;
+      $homeEstimateWinLoss = null;
+      $homeEstimatesSubmittedTotals = null;
+      $homeEstimatorSubmittedShare = null;
+      $homeCurrentMonthDataTracking = null;
+      $homePayItemTotals = null;
+      $homeInvoicedProjects = null;
+      $homeInvoiceProfit = null;
+      $homeCostBreakdown = null;
+
+      foreach ($dashboardWidgets as $w) {
+         if (empty($w['id'])) {
+            continue;
+         }
+         if ($w['id'] === 'tasks') {
+            if ($this->widgetAccessService->isWidgetEnabledForUser($uid, 'tasks')) {
+               $pTaskA = $this->BuscarPermiso($uid, FunctionId::TASKS);
+               $pTask = $pTaskA[0] ?? [
+                  'ver' => false,
+                  'agregar' => false,
+                  'editar' => false,
+                  'eliminar' => false,
+                  'funcion_id' => FunctionId::TASKS,
+                  'permiso_id' => 0,
+               ];
+               $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+               $homeTask = [
+                  'permiso' => $pTask,
+                  'tasks' => $this->taskService->listarTareasPayloadHome($usuario, $pTask, $r0['inicial'], $r0['final']),
+                  'range' => $r0,
+               ];
+            }
+            continue;
+         }
+         if ($w['id'] === 'work_schedule') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeWorkSchedule = $this->scheduleService->listarSchedulesPayloadHome(
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'bid_deadlines') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeBidDeadlines = $this->estimateService->listarUpcomingBidDeadlinesPayloadHome(
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'estimate_win_loss') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeEstimateWinLoss = $this->DevolverDataChartEstimateWinLoss(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'estimates_submitted_totals') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeEstimatesSubmittedTotals = $this->DevolverDataChartEstimateSubmittedTotals(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'estimator_submitted_share') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeEstimatorSubmittedShare = $this->DevolverDataChartEstimatorSubmittedShare(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'current_month_data_tracking') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeCurrentMonthDataTracking = $this->dataTrackingService->listarCurrentMonthProjectsPayloadHome(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'pay_item_totals') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homePayItemTotals = $this->ListarItemsConMontos(
+               '',
+               $r0['inicial'],
+               $r0['final'],
+               ''
+            );
+            continue;
+         }
+         if ($w['id'] === 'invoiced_projects') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeInvoicedProjects = $this->ListarInvoicedProjectsPayloadHome(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'invoice_profit_share') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeInvoiceProfit = $this->DevolverDataChartProfit(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+            continue;
+         }
+         if ($w['id'] === 'job_cost_breakdown') {
+            $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+            $homeCostBreakdown = $this->DevolverDataChartCosts(
+               '',
+               $r0['inicial'],
+               $r0['final']
+            );
+         }
+      }
+
+      return [
+         'home_task' => $homeTask,
+         'home_work_schedule' => $homeWorkSchedule,
+         'home_bid_deadlines' => $homeBidDeadlines,
+         'home_estimate_win_loss' => $homeEstimateWinLoss,
+         'home_estimates_submitted_totals' => $homeEstimatesSubmittedTotals,
+         'home_estimator_submitted_share' => $homeEstimatorSubmittedShare,
+         'home_current_month_data_tracking' => $homeCurrentMonthDataTracking,
+         'home_pay_item_totals' => $homePayItemTotals,
+         'home_invoiced_projects' => $homeInvoicedProjects,
+         'home_invoice_profit' => $homeInvoiceProfit,
+         'home_cost_breakdown' => $homeCostBreakdown,
+      ];
+   }
+
+   /**
+    * "My Widgets": todo el catálogo (mismas tarjetas que en Home) con el estado efectivo; sin filtrar
+    * por "scope" para no dejar la pantalla vacía cuando aún no hay filas en rol/user.
+    *
+    * @return list<array<string, mixed>>
+    */
+   public function ObtenerMyWidgetsTogglesV3(int $usuarioId): array
+   {
+      $wa = $this->widgetAccessService;
+      $wa->ensureUserWidgetAccessSeededFromRolIfEmpty($usuarioId);
+
+      $out = [];
+      foreach ($this->getWidgetDefinitionCatalog() as $def) {
+         $id = (string) $def['id'];
+         $out[] = array_merge($def, [
+            'user_active' => $wa->isWidgetEnabledForUser($usuarioId, $id),
          ]);
       }
 

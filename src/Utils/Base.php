@@ -39,6 +39,8 @@ use App\Entity\Usuario;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Psr\Log\LoggerInterface;
+use App\Constants\FunctionId;
+use App\Service\Admin\WidgetAccessService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
@@ -447,165 +449,146 @@ class Base
       // obtener permisos
       $permisos = $this->ListarPermisosDeUsuario($usuario_id);
       foreach ($permisos as $permiso) {
-         if ($permiso['funcion_id'] == 1 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::HOME && $permiso['ver']) {
             $menuInicio = true;
          }
-         if ($permiso['funcion_id'] == 2 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::ROL && $permiso['ver']) {
             $menuRol = true;
          }
-         if ($permiso['funcion_id'] == 3 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::USUARIO && $permiso['ver']) {
             $menuUsuario = true;
          }
-         if ($permiso['funcion_id'] == 4 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::LOG && $permiso['ver']) {
             $menuLog = true;
          }
-         if ($permiso['funcion_id'] == 5 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::UNIT && $permiso['ver']) {
             $menuUnit = true;
          }
-         if ($permiso['funcion_id'] == 6 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::ITEM && $permiso['ver']) {
             $menuItem = true;
          }
-         if ($permiso['funcion_id'] == 7 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::INSPECTOR && $permiso['ver']) {
             $menuInspector = true;
          }
-         if ($permiso['funcion_id'] == 8 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::COMPANY && $permiso['ver']) {
             $menuCompany = true;
          }
-         if ($permiso['funcion_id'] == 9 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PROJECT && $permiso['ver']) {
             $menuProject = true;
          }
-         if ($permiso['funcion_id'] == 10 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::DATA_TRACKING && $permiso['ver']) {
             $menuDataTracking = true;
          }
-         if ($permiso['funcion_id'] == 11 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::INVOICE && $permiso['ver']) {
             $menuInvoice = true;
          }
-         if ($permiso['funcion_id'] == 12 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::NOTIFICATION && $permiso['ver']) {
             $menuNotification = true;
          }
-         if ($permiso['funcion_id'] == 13 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::EQUATION && $permiso['ver']) {
             $menuEquation = true;
          }
-         if ($permiso['funcion_id'] == 14 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::EMPLOYEE && $permiso['ver']) {
             $menuEmployee = true;
          }
-         if ($permiso['funcion_id'] == 15 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::MATERIAL && $permiso['ver']) {
             $menuMaterial = true;
          }
-         if ($permiso['funcion_id'] == 16 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::OVERHEAD && $permiso['ver']) {
             $menuOverhead = true;
          }
-         if ($permiso['funcion_id'] == 17 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::ADVERTISEMENT && $permiso['ver']) {
             $menuAdvertisement = true;
          }
-         if ($permiso['funcion_id'] == 18 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::SUBCONTRACTOR && $permiso['ver']) {
             $menuSubcontractor = true;
          }
-         if ($permiso['funcion_id'] == 19 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::REPORTE_SUBCONTRACTOR && $permiso['ver']) {
             $menuReporteSubcontractor = true;
          }
-         if ($permiso['funcion_id'] == 20 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::REPORTE_EMPLOYEE && $permiso['ver']) {
             $menuReporteEmployee = true;
          }
-         if ($permiso['funcion_id'] == 21 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::CONCRETE_VENDOR && $permiso['ver']) {
             $menuConcreteVendor = true;
          }
-         if ($permiso['funcion_id'] == 22 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::SCHEDULE && $permiso['ver']) {
             $menuSchedule = true;
          }
-         if ($permiso['funcion_id'] == 23 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::REMINDER && $permiso['ver']) {
             $menuReminder = true;
          }
-         if ($permiso['funcion_id'] == 24 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PROJECT_STAGE && $permiso['ver']) {
             $menuProjectStage = true;
          }
-         if ($permiso['funcion_id'] == 25 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PROJECT_TYPE && $permiso['ver']) {
             $menuProjectType = true;
          }
-         if ($permiso['funcion_id'] == 26 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PROPOSAL_TYPE && $permiso['ver']) {
             $menuProposalType = true;
          }
-         if ($permiso['funcion_id'] == 27 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PLAN_STATUS && $permiso['ver']) {
             $menuPlanStatus = true;
          }
-         if ($permiso['funcion_id'] == 28 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::DISTRICT && $permiso['ver']) {
             $menuDistrict = true;
          }
-         if ($permiso['funcion_id'] == 29 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::ESTIMATE && $permiso['ver']) {
             $menuEstimate = true;
          }
-         if ($permiso['funcion_id'] == 30 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PLAN_DOWNLOADING && $permiso['ver']) {
             $menuPlanDownloading = true;
          }
-         if ($permiso['funcion_id'] == 31 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::HOLIDAY && $permiso['ver']) {
             $menuHoliday = true;
          }
-         if ($permiso['funcion_id'] == 40 && $permiso['ver']) {
-            $menuTasks = true;
-         }
-         if ($permiso['funcion_id'] == 32 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::COUNTY && $permiso['ver']) {
             $menuCounty = true;
          }
-         if ($permiso['funcion_id'] == 33 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::PAYMENT && $permiso['ver']) {
             $menuPayment = true;
          }
-         if ($permiso['funcion_id'] == 39 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::OVERRIDE_PAYMENT && $permiso['ver']) {
             $menuOverridePayment = true;
          }
 
-         if ($permiso['funcion_id'] == 34 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::RACE && $permiso['ver']) {
             $menuRace = true;
          }
 
-         if ($permiso['funcion_id'] == 35 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::EMPLOYEE_RRHH && $permiso['ver']) {
             $menuEmployeeRrhh = true;
          }
 
-         if ($permiso['funcion_id'] == 36 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::CONCRETE_CLASS && $permiso['ver']) {
             $menuConcreteClass = true;
          }
 
-         if ($permiso['funcion_id'] == 37 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::EMPLOYEE_ROLE && $permiso['ver']) {
             $menuEmployeeRole = true;
          }
-         if ($permiso['funcion_id'] == 38 && $permiso['ver']) {
+         if ($permiso['funcion_id'] == FunctionId::ESTIMATE_NOTE_ITEM && $permiso['ver']) {
             $menuEstimateNoteItem = true;
          }
+         if ($permiso['funcion_id'] == FunctionId::TASKS && $permiso['ver']) {
+            $menuTasks = true;
+         }
+      }
 
-         // widgets
-         if ($permiso['funcion_id'] == 40 && $permiso['ver']) {
-            $widgetTasks = true;
-         }
-         if ($permiso['funcion_id'] == 41 && $permiso['ver']) {
-            $widgetWorkSchedule = true;
-         }
-         if ($permiso['funcion_id'] == 42 && $permiso['ver']) {
-            $widgetBidDeadlines = true;
-         }
-         if ($permiso['funcion_id'] == 43 && $permiso['ver']) {
-            $widgetEstimateWinLoss = true;
-         }
-         if ($permiso['funcion_id'] == 44 && $permiso['ver']) {
-            $widgetEstimatesSubmitted = true;
-         }
-         if ($permiso['funcion_id'] == 45 && $permiso['ver']) {
-            $widgetEstimatorShare = true;
-         }
-         if ($permiso['funcion_id'] == 46 && $permiso['ver']) {
-            $widgetCurrentMonthProjects = true;
-         }
-         if ($permiso['funcion_id'] == 47 && $permiso['ver']) {
-            $widgetInvoicedProjects = true;
-         }
-         if ($permiso['funcion_id'] == 48 && $permiso['ver']) {
-            $widgetPayItemTotals = true;
-         }
-         if ($permiso['funcion_id'] == 49 && $permiso['ver']) {
-            $widgetInvoiceProfitShare = true;
-         }
-         if ($permiso['funcion_id'] == 50 && $permiso['ver']) {
-            $widgetJobCostBreakdown = true;
-         }
+      $wSvc = $this->getWidgetAccessService();
+      if ($wSvc !== null) {
+         $wFlags = $wSvc->getLayoutWidgetFlagsForUser($usuario_id);
+         $widgetTasks = $wFlags['widgetTasks'];
+         $widgetWorkSchedule = $wFlags['widgetWorkSchedule'];
+         $widgetBidDeadlines = $wFlags['widgetBidDeadlines'];
+         $widgetEstimateWinLoss = $wFlags['widgetEstimateWinLoss'];
+         $widgetEstimatesSubmitted = $wFlags['widgetEstimatesSubmitted'];
+         $widgetEstimatorShare = $wFlags['widgetEstimatorShare'];
+         $widgetCurrentMonthProjects = $wFlags['widgetCurrentMonthProjects'];
+         $widgetInvoicedProjects = $wFlags['widgetInvoicedProjects'];
+         $widgetPayItemTotals = $wFlags['widgetPayItemTotals'];
+         $widgetInvoiceProfitShare = $wFlags['widgetInvoiceProfitShare'];
+         $widgetJobCostBreakdown = $wFlags['widgetJobCostBreakdown'];
       }
 
       return [
@@ -662,6 +645,17 @@ class Base
          'widgetInvoiceProfitShare' => $widgetInvoiceProfitShare,
          'widgetJobCostBreakdown' => $widgetJobCostBreakdown,
       ];
+   }
+
+   protected function getWidgetAccessService(): ?WidgetAccessService
+   {
+      if (!$this->container->has(WidgetAccessService::class)) {
+         return null;
+      }
+      /** @var WidgetAccessService $s */
+      $s = $this->container->get(WidgetAccessService::class);
+
+      return $s;
    }
 
    //Devolver primera funcion con permiso

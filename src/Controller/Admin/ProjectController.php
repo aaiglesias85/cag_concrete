@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
@@ -17,86 +19,86 @@ use App\Http\DataTablesHelper;
 use App\Entity\EmployeeRole;
 use App\Utils\Admin\InvoiceService;
 use App\Utils\Admin\ProjectService;
+use App\Service\Admin\AdminAccessService;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ProjectController extends AbstractController
+class ProjectController extends AbstractAdminController
 {
 
    private $projectService;
    private $invoiceService;
 
-   public function __construct(ProjectService $projectService, InvoiceService $invoiceService)
+   public function __construct(AdminAccessService $adminAccess, ProjectService $projectService, InvoiceService $invoiceService)
    {
+      parent::__construct($adminAccess);
       $this->projectService = $projectService;
       $this->invoiceService = $invoiceService;
    }
 
    public function index(Request $request)
    {
-      $usuario = $this->getUser();
-      $permiso = $this->projectService->BuscarPermiso($usuario->getUsuarioId(), 9);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // companies
-            $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
-               ->ListarOrdenados();
-
-            // inspectors
-            $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
-               ->ListarOrdenados();
-
-            // items
-            $items = $this->projectService->getDoctrine()->getRepository(Item::class)
-               ->ListarOrdenados();
-
-            $equations = $this->projectService->getDoctrine()->getRepository(Equation::class)
-               ->ListarOrdenados();
-
-            $units = $this->projectService->getDoctrine()->getRepository(Unit::class)
-               ->ListarOrdenados();
-
-            $yields_calculation = $this->projectService->ListarYieldsCalculation();
-
-            // countys
-            $countys = $this->projectService->getDoctrine()->getRepository(County::class)
-               ->ListarOrdenados();
-
-            // concrete vendors
-            $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
-               ->ListarOrdenados();
-
-            // concrete classes
-            $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
-               ->ListarOrdenados();
-
-            // employee roles
-            $employee_roles = $this->projectService->getDoctrine()->getRepository(EmployeeRole::class)
-               ->ListarOrdenados();
-
-            return $this->render('admin/project/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'companies' => $companies,
-               'inspectors' => $inspectors,
-               'items' => $items,
-               'equations' => $equations,
-               'yields_calculation' => $yields_calculation,
-               'units' => $units,
-               'countys' => $countys,
-               'concrete_vendors' => $concrete_vendors,
-               'concrete_classes' => $concrete_classes,
-               'employee_roles' => $employee_roles,
-               'direccion_url' => $this->projectService->ObtenerURL(),
-               'usuario_bond' => $usuario->getBond() ? true : false,
-               'usuario_retainage' => $usuario->getRetainage() ? true : false
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $usuario = $acceso['usuario'];
+      $permiso = $acceso['permisos'];
+
+      // companies
+      $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
+         ->ListarOrdenados();
+
+      // inspectors
+      $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
+         ->ListarOrdenados();
+
+      // items
+      $items = $this->projectService->getDoctrine()->getRepository(Item::class)
+         ->ListarOrdenados();
+
+      $equations = $this->projectService->getDoctrine()->getRepository(Equation::class)
+         ->ListarOrdenados();
+
+      $units = $this->projectService->getDoctrine()->getRepository(Unit::class)
+         ->ListarOrdenados();
+
+      $yields_calculation = $this->projectService->ListarYieldsCalculation();
+
+      // countys
+      $countys = $this->projectService->getDoctrine()->getRepository(County::class)
+         ->ListarOrdenados();
+
+      // concrete vendors
+      $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
+         ->ListarOrdenados();
+
+      // concrete classes
+      $concrete_classes = $this->projectService->getDoctrine()->getRepository(ConcreteClass::class)
+         ->ListarOrdenados();
+
+      // employee roles
+      $employee_roles = $this->projectService->getDoctrine()->getRepository(EmployeeRole::class)
+         ->ListarOrdenados();
+
+      return $this->render('admin/project/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'companies' => $companies,
+         'inspectors' => $inspectors,
+         'items' => $items,
+         'equations' => $equations,
+         'yields_calculation' => $yields_calculation,
+         'units' => $units,
+         'countys' => $countys,
+         'concrete_vendors' => $concrete_vendors,
+         'concrete_classes' => $concrete_classes,
+         'employee_roles' => $employee_roles,
+         'direccion_url' => $this->projectService->ObtenerURL(),
+         'usuario_bond' => $usuario->getBond() ? true : false,
+         'usuario_retainage' => $usuario->getRetainage() ? true : false
+      ));
    }
 
    /**
@@ -827,7 +829,11 @@ class ProjectController extends AbstractController
       $contract_name = $request->get('contract_name');
 
       // Validar que solo usuarios con permiso bond puedan crear items con bond=true
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
       $usuario_bond = $usuario->getBond() ? true : false;
       if ($bond && !$usuario_bond) {
          // Si el usuario intenta crear un item con bond=true pero no tiene permiso, forzar a false
@@ -1260,7 +1266,11 @@ class ProjectController extends AbstractController
     */
    public function bulkRetainageUpdate(Request $request)
    {
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
       $usuario_retainage = $usuario->getRetainage() ? true : false;
       if (!$usuario_retainage) {
          return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
@@ -1300,7 +1310,11 @@ class ProjectController extends AbstractController
    public function bulkBondedUpdate(Request $request)
    {
       // Validar que solo usuarios con permiso bond puedan actualizar bonded
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
       $usuario_bond = $usuario->getBond() ? true : false;
       if (!$usuario_bond) {
          return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);

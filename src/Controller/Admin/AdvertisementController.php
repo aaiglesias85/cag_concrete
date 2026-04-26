@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\AdvertisementService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class AdvertisementController extends AbstractController
+class AdvertisementController extends AbstractAdminController
 {
 
     private $advertisementService;
 
-    public function __construct(AdvertisementService $advertisementService)
+    public function __construct(AdminAccessService $adminAccess, AdvertisementService $advertisementService)
     {
+        parent::__construct($adminAccess);
         $this->advertisementService = $advertisementService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->advertisementService->BuscarPermiso($usuario->getUsuarioId(), 17);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/advertisement/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ADVERTISEMENT);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/advertisement/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

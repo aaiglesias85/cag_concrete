@@ -2,34 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ProposalTypeService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ProposalTypeController extends AbstractController
+class ProposalTypeController extends AbstractAdminController
 {
     private $proposalTypeService;
 
-    public function __construct(ProposalTypeService $proposalTypeService)
+    public function __construct(AdminAccessService $adminAccess, ProposalTypeService $proposalTypeService)
     {
+        parent::__construct($adminAccess);
         $this->proposalTypeService = $proposalTypeService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->proposalTypeService->BuscarPermiso($usuario->getUsuarioId(), 26);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/proposal-type/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROPOSAL_TYPE);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/proposal-type/index.html.twig', array(
+            'permiso' => $permiso[0],
+        ));
     }
 
     /**

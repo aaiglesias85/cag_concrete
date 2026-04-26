@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\HolidayService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class HolidayController extends AbstractController
+class HolidayController extends AbstractAdminController
 {
 
     private $holidayService;
 
-    public function __construct(HolidayService $holidayService)
+    public function __construct(AdminAccessService $adminAccess, HolidayService $holidayService)
     {
+        parent::__construct($adminAccess);
         $this->holidayService = $holidayService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->holidayService->BuscarPermiso($usuario->getUsuarioId(), 31);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/holiday/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::HOLIDAY);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/holiday/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

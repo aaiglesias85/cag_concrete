@@ -2,43 +2,44 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\EmployeeRrhhService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\RaceRepository;
 use App\Entity\Race;
 
-class EmployeeRrhhController extends AbstractController
+class EmployeeRrhhController extends AbstractAdminController
 {
 
    private $employeeService;
 
-   public function __construct(EmployeeRrhhService $employeeService)
+   public function __construct(AdminAccessService $adminAccess, EmployeeRrhhService $employeeService)
    {
+      parent::__construct($adminAccess);
       $this->employeeService = $employeeService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->employeeService->BuscarPermiso($usuario->getUsuarioId(), 35);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // races
-            /** @var RaceRepository $raceRepo */
-            $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
-            $races = $raceRepo->ListarOrdenados();
-
-            return $this->render('admin/employee-rrhh/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'races' => $races
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE_RRHH);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      // races
+      /** @var RaceRepository $raceRepo */
+      $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
+      $races = $raceRepo->ListarOrdenados();
+
+      return $this->render('admin/employee-rrhh/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'races' => $races
+      ));
    }
 
    /**

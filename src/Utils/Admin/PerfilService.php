@@ -8,10 +8,31 @@ use App\Entity\Rol;
 use App\Entity\Usuario;
 use App\Repository\PermisoPerfilRepository;
 use App\Repository\UsuarioRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Utils\Base;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
 
 class PerfilService extends Base
 {
+    public function __construct(
+        ContainerInterface $container,
+        MailerInterface $mailer,
+        ContainerBagInterface $containerBag,
+        Security $security,
+        LoggerInterface $logger,
+        private readonly WidgetAccessService $widgetAccessService,
+    ) {
+        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+    }
+
+    public function listarWidgetPreferencesDePerfil(int $perfilId): array
+    {
+        return $this->widgetAccessService->getWidgetStatesForRol($perfilId);
+    }
 
     /**
      * ListarPermisosDePerfil: Carga todos los permisos de un perfil
@@ -87,6 +108,7 @@ class PerfilService extends Base
                 ));
             }
             $arreglo_resultado['permisos'] = $permisos;
+            $arreglo_resultado['widgets'] = $this->widgetAccessService->getWidgetStatesForRol((int) $perfil_id);
 
             $resultado['success'] = true;
             $resultado['perfil'] = $arreglo_resultado;
@@ -211,7 +233,7 @@ class PerfilService extends Base
      * @param int $rol_id Id
      * @author Marcel
      */
-    public function ActualizarPerfil($rol_id, $nombre, $permisos)
+    public function ActualizarPerfil($rol_id, $nombre, $permisos, $widgetAccess = null)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -270,6 +292,10 @@ class PerfilService extends Base
 
             $em->flush();
 
+            if ($widgetAccess !== null && is_array($widgetAccess)) {
+                $this->widgetAccessService->replaceRolWidgets((int) $rol_id, $widgetAccess);
+            }
+
             //Salvar log
             $log_operacion = "Update";
             $log_categoria = "Rol";
@@ -287,7 +313,7 @@ class PerfilService extends Base
      * @param string $nombre Nombre
      * @author Marcel
      */
-    public function SalvarPerfil($nombre, $permisos)
+    public function SalvarPerfil($nombre, $permisos, $widgetAccess = null)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -337,6 +363,9 @@ class PerfilService extends Base
         }
 
         $em->flush();
+        if ($widgetAccess !== null && is_array($widgetAccess) && $entity->getRolId() !== null) {
+            $this->widgetAccessService->replaceRolWidgets((int) $entity->getRolId(), $widgetAccess);
+        }
 
         //Salvar log
         $log_operacion = "Add";

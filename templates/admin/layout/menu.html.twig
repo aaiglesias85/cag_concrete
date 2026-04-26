@@ -65,10 +65,10 @@
                {% endif %}
 
                <!-- 1. ESTIMATING -->
-               {% if menu.menuEstimate or menu.menuCompany or menu.menuItem or menu.menuEquation or
+               {% if menu.menuEstimate or menu.menuItem or menu.menuEquation or
                      menu.menuUnit or menu.menuProjectStage or menu.menuProjectType or
-                     menu.menuProposalType or menu.menuPlanStatus or menu.menuDistrict or
-                     menu.menuCounty or menu.menuEstimateNoteItem %}
+                     menu.menuProposalType or menu.menuPlanStatus or menu.menuPlanDownloading or
+                     menu.menuDistrict or menu.menuCounty or menu.menuEstimateNoteItem %}
 
                <div class="menu-item pt-5">
                   <div class="menu-content">
@@ -92,15 +92,16 @@
 
                {% if menu.menuItem or menu.menuEquation or menu.menuUnit or menu.menuProjectStage or
                      menu.menuProjectType or menu.menuProposalType or menu.menuPlanStatus or
-                     menu.menuDistrict or menu.menuCounty or menu.menuEstimateNoteItem or menu.menuCompany %}
+                     menu.menuPlanDownloading or menu.menuDistrict or menu.menuCounty or
+                     menu.menuEstimateNoteItem %}
                <div
                   data-kt-menu-trigger="click"
                   class="menu-item menu-accordion
                      {{ activeRoute == 'item' or activeRoute == 'equation' or activeRoute == 'unit' or
                         activeRoute == 'project_stage' or activeRoute == 'project_type' or
                         activeRoute == 'proposal_type' or activeRoute == 'plan_status' or
-                        activeRoute == 'district' or activeRoute == 'county' or
-                        activeRoute == 'estimate_note_item' or activeRoute == 'company' ? 'here show' }}"
+                        activeRoute == 'plan_downloading' or activeRoute == 'district' or
+                        activeRoute == 'county' or activeRoute == 'estimate_note_item' ? 'here show' }}"
                >
                   <span class="menu-link">
                      <span class="menu-icon">
@@ -169,6 +170,14 @@
                         </a>
                      </div>
                      {% endif %}
+                     {% if menu.menuPlanDownloading %}
+                     <div class="menu-item">
+                        <a class="menu-link {{ activeRoute == 'plan_downloading' ? 'active' }}" href="{{ url('plan_downloading') }}">
+                           <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                           <span class="menu-title">Plan Downloading</span>
+                        </a>
+                     </div>
+                     {% endif %}
                      {% if menu.menuDistrict %}
                      <div class="menu-item">
                         <a class="menu-link {{ activeRoute == 'district' ? 'active' }}" href="{{ url('district') }}">
@@ -190,14 +199,6 @@
                         <a class="menu-link {{ activeRoute == 'estimate_note_item' ? 'active' }}" href="{{ url('estimate_note_item') }}">
                            <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                            <span class="menu-title">Notes</span>
-                        </a>
-                     </div>
-                     {% endif %}
-                     {% if menu.menuCompany %}
-                     <div class="menu-item">
-                        <a class="menu-link {{ activeRoute == 'company' ? 'active' }}" href="{{ url('company') }}">
-                           <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                           <span class="menu-title">Companies</span>
                         </a>
                      </div>
                      {% endif %}
@@ -235,7 +236,7 @@
                <div class="menu-item">
                   <a class="menu-link {{ activeRoute == 'company' ? 'active' }}" href="{{ url('company') }}">
                      <span class="menu-icon">
-                        <i class="ki-duotone ki-buildings fs-2">
+                        <i class="ki-duotone ki-briefcase fs-2">
                            <span class="path1"></span>
                            <span class="path2"></span>
                         </i>
@@ -641,7 +642,7 @@
                <!-- end 5. HR -->
 
                <!-- 6. ADMIN -->
-               {% if menu.menuRol or menu.menuUsuario or menu.menuAdvertisement %}
+               {% if menu.menuRol or menu.menuUsuario or menu.menuAdvertisement or menu.menuTasks %}
 
                <div class="menu-item pt-5">
                   <div class="menu-content">
@@ -689,6 +690,20 @@
                         </i>
                      </span>
                      <span class="menu-title">Announcements</span>
+                  </a>
+               </div>
+               {% endif %}
+
+               {% if menu.menuTasks %}
+               <div class="menu-item">
+                  <a class="menu-link {{ activeRoute == 'tasks' ? 'active' }}" href="{{ url('tasks') }}">
+                     <span class="menu-icon">
+                        <i class="ki-duotone ki-check-square fs-2">
+                           <span class="path1"></span>
+                           <span class="path2"></span>
+                        </i>
+                     </span>
+                     <span class="menu-title">Tasks</span>
                   </a>
                </div>
                {% endif %}

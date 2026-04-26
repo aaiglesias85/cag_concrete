@@ -3,44 +3,49 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Funcion;
+use App\Entity\Widget;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Utils\Admin\PerfilService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Http\DataTablesHelper;
+use App\Constants\FunctionId;
 
-class PerfilController extends AbstractController
+class PerfilController extends AbstractAdminController
 {
 
     private $perfilService;
     private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-    public function __construct(PerfilService $perfilService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
+    public function __construct(AdminAccessService $adminAccess, PerfilService $perfilService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
     {
+        parent::__construct($adminAccess);
         $this->perfilService = $perfilService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->perfilService->BuscarPermiso($usuario->getUsuarioId(), 2);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                $funciones = $this->perfilService->getDoctrine()->getRepository(Funcion::class)
-                    ->ListarOrdenados();
-                $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
-
-                return $this->render('admin/rol/index.html.twig', array(
-                    'funciones' => $funciones,
-                    'funcionesAgrupadas' => $funcionesAgrupadas,
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ROL);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        $funciones = $this->perfilService->getDoctrine()->getRepository(Funcion::class)
+            ->ListarOrdenados();
+        $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
+
+        $widgets = $this->perfilService->getDoctrine()->getRepository(Widget::class)
+            ->findAllOrdered();
+
+        return $this->render('admin/rol/index.html.twig', array(
+            'funciones' => $funciones,
+            'funcionesAgrupadas' => $funcionesAgrupadas,
+            'widgets' => $widgets,
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**
@@ -95,13 +100,15 @@ class PerfilController extends AbstractController
 
         $permisos = $request->get('permisos');
         $permisos = json_decode($permisos);
+        $waRaw = $request->get('widget_access');
+        $widgetAccess = is_string($waRaw) && $waRaw !== '' ? json_decode($waRaw, true) : null;
 
         try {
 
             if ($perfil_id == "") {
-                $resultado = $this->perfilService->SalvarPerfil($descripcion, $permisos);
+                $resultado = $this->perfilService->SalvarPerfil($descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
             } else {
-                $resultado = $this->perfilService->ActualizarPerfil($perfil_id, $descripcion, $permisos);
+                $resultado = $this->perfilService->ActualizarPerfil($perfil_id, $descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
             }
 
             if ($resultado['success']) {
@@ -233,6 +240,21 @@ class PerfilController extends AbstractController
             return $this->json($resultadoJson);
         }
 
+    }
+
+    public function listarWidgetPreferences(Request $request)
+    {
+        $perfil_id = (int) $request->get('perfil_id');
+        if ($perfil_id <= 0) {
+            return $this->json(['success' => false, 'error' => 'perfil_id'], 400);
+        }
+        try {
+            $widgets = $this->perfilService->listarWidgetPreferencesDePerfil($perfil_id);
+
+            return $this->json(['success' => true, 'widgets' => $widgets]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
 
 }

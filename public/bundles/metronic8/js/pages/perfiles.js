@@ -234,7 +234,11 @@ var Perfiles = function () {
         //Permisos
         permisos = [];
         marcarPermisos();
+        widgetAccess = [];
+        marcarWidgetAccess();
 
+        resetWizard();
+        event_change = false;
     };
 
     //Validacion
@@ -264,6 +268,119 @@ var Perfiles = function () {
         return result;
     };
 
+    // Wizard (mismo patrón que usuarios)
+    var activeTab = 1;
+    var totalTabs = 3;
+    var initWizard = function () {
+        $(document).off('click', "#form-perfil .wizard-tab");
+        $(document).on('click', "#form-perfil .wizard-tab", function (e) {
+            e.preventDefault();
+            var item = $(this).data('item');
+            if (item > activeTab && !validWizard(activeTab)) {
+                mostrarTab();
+                return;
+            }
+            activeTab = parseInt(item);
+
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-perfil-finalizar').removeClass('hide').addClass('hide');
+            }
+            if (activeTab == 1) {
+                $('#btn-wizard-perfil-anterior').removeClass('hide').addClass('hide');
+                $('#btn-wizard-perfil-siguiente').removeClass('hide');
+            }
+            if (activeTab > 1) {
+                $('#btn-wizard-perfil-anterior').removeClass('hide');
+                $('#btn-wizard-perfil-siguiente').removeClass('hide');
+            }
+            if (activeTab == totalTabs) {
+                $('#btn-wizard-perfil-finalizar').removeClass('hide');
+                $('#btn-wizard-perfil-siguiente').removeClass('hide').addClass('hide');
+            }
+            marcarPasosValidosWizard();
+        });
+
+        $(document).off('click', "#btn-wizard-perfil-siguiente");
+        $(document).on('click', "#btn-wizard-perfil-siguiente", function (e) {
+            if (validWizard(activeTab)) {
+                activeTab++;
+                $('#btn-wizard-perfil-anterior').removeClass('hide');
+                if (activeTab == totalTabs) {
+                    $('#btn-wizard-perfil-finalizar').removeClass('hide');
+                    $('#btn-wizard-perfil-siguiente').addClass('hide');
+                }
+                mostrarTab();
+            }
+        });
+
+        $(document).off('click', "#btn-wizard-perfil-anterior");
+        $(document).on('click', "#btn-wizard-perfil-anterior", function (e) {
+            activeTab--;
+            if (activeTab == 1) {
+                $('#btn-wizard-perfil-anterior').addClass('hide');
+            }
+            if (activeTab < totalTabs) {
+                $('#btn-wizard-perfil-finalizar').addClass('hide');
+                $('#btn-wizard-perfil-siguiente').removeClass('hide');
+            }
+            mostrarTab();
+        });
+    };
+
+    var mostrarTab = function () {
+        setTimeout(function () {
+            switch (activeTab) {
+                case 1:
+                    $('#tab-perfil-general').tab('show');
+                    break;
+                case 2:
+                    $('#tab-perfil-permisos').tab('show');
+                    break;
+                case 3:
+                    $('#tab-perfil-widgets').tab('show');
+                    break;
+            }
+        }, 0);
+    };
+
+    var resetWizard = function () {
+        activeTab = 1;
+        mostrarTab();
+        $('#btn-wizard-perfil-finalizar').removeClass('hide').addClass('hide');
+        $('#btn-wizard-perfil-anterior').removeClass('hide').addClass('hide');
+        $('#btn-wizard-perfil-siguiente').removeClass('hide');
+        KTUtil.findAll(KTUtil.get("perfil-form"), ".nav-link").forEach(function (element) {
+            KTUtil.removeClass(element, "valid");
+        });
+    };
+
+    var validWizard = function (tab) {
+        if (tab == 1) {
+            return validateForm();
+        }
+        if (tab == 2) {
+            if (permisos.length == 0) {
+                toastr.error("You must select the profile permissions", "");
+                return false;
+            }
+        }
+        return true;
+    };
+
+    var marcarPasosValidosWizard = function () {
+        KTUtil.findAll(KTUtil.get("perfil-form"), ".nav-link").forEach(function (element) {
+            KTUtil.removeClass(element, "valid");
+        });
+        KTUtil.findAll(KTUtil.get("perfil-form"), ".nav-link").forEach(function (element, index) {
+            var t = index + 1;
+            if (t < activeTab) {
+                if (validWizard(t)) {
+                    KTUtil.addClass(element, "valid");
+                }
+            }
+        });
+    };
+
     //Nuevo
     var initAccionNuevo = function () {
         $(document).off('click', "#btn-nuevo-perfil");
@@ -283,76 +400,27 @@ var Perfiles = function () {
         KTUtil.addClass(KTUtil.get('lista-perfil'), 'hide');
     }
 
-    //Cerrar form
+    //Cerrar form: mismo flujo que usuarios (modal de guardar o descartar)
+    var cerrarFormsConfirmated = function () {
+        resetForms();
+        KTUtil.removeClass(KTUtil.get('lista-perfil'), 'hide');
+        KTUtil.addClass(KTUtil.get('form-perfil'), 'hide');
+        event_change = false;
+    };
     var initAccionCerrar = function () {
         $(document).off('click', ".cerrar-form-perfil");
         $(document).on('click', ".cerrar-form-perfil", function (e) {
-            cerrarForms();
+            e.preventDefault();
+            ModalUtil.show('modal-salvar-cambios', { backdrop: 'static', keyboard: true });
         });
-    }
-    //Cerrar forms
-    var cerrarForms = function () {
-        resetForms();
-
-        KTUtil.removeClass(KTUtil.get('lista-perfil'), 'hide');
-        KTUtil.addClass(KTUtil.get('form-perfil'), 'hide');
     };
 
     //Salvar
     var initAccionSalvar = function () {
-        $(document).off('click', "#btn-salvar-perfil");
-        $(document).on('click', "#btn-salvar-perfil", function (e) {
+        $(document).off('click', "#btn-wizard-perfil-finalizar");
+        $(document).on('click', "#btn-wizard-perfil-finalizar", function (e) {
             btnClickSalvarForm();
         });
-
-        function btnClickSalvarForm() {
-
-            KTUtil.scrollTop();
-
-            devolverPermisos();
-
-            if (validateForm() && permisos.length > 0) {
-
-                var formData = new URLSearchParams();
-
-                var perfil_id = $('#perfil_id').val();
-                formData.set("perfil_id", perfil_id);
-
-                var descripcion = $('#descripcion').val();
-                formData.set("descripcion", descripcion);
-
-                formData.set("permisos", JSON.stringify(permisos));
-
-                BlockUtil.block('#form-perfil');
-
-                axios.post("perfil/salvarPerfil", formData, {responseType: "json"})
-                    .then(function (res) {
-                        if (res.status === 200 || res.status === 201) {
-                            var response = res.data;
-                            if (response.success) {
-                                toastr.success(response.message, "");
-
-                                cerrarForms();
-
-                                oTable.draw();
-
-                            } else {
-                                toastr.error(response.error, "");
-                            }
-                        } else {
-                            toastr.error("An internal error has occurred, please try again.", "");
-                        }
-                    })
-                    .catch(MyUtil.catchErrorAxios)
-                    .then(function () {
-                        BlockUtil.unblock("#form-perfil");
-                    });
-            } else {
-                if (permisos.length == 0) {
-                    toastr.error("You must select the profile permissions", "");
-                }
-            }
-        };
     }
     //Editar
     var initAccionEditar = function () {
@@ -408,6 +476,9 @@ var Perfiles = function () {
             // permisos
             permisos = perfil.permisos;
             marcarPermisos();
+            widgetAccess = perfil.widgets || [];
+            marcarWidgetAccess();
+            event_change = false;
         }
     };
     //Eliminar
@@ -512,6 +583,29 @@ var Perfiles = function () {
 
     //Permisos
     var permisos = [];
+    var widgetAccess = [];
+    var event_change = false;
+    var marcarWidgetAccess = function () {
+        $('.checkbox-widget-access').prop('checked', false);
+        for (var i = 0; i < widgetAccess.length; i++) {
+            var wid = widgetAccess[i].widget_id;
+            var on = widgetAccess[i].is_enabled;
+            $('.checkbox-widget-access').each(function () {
+                if (String($(this).data('widget-id')) === String(wid)) {
+                    $(this).prop('checked', on);
+                }
+            });
+        }
+    }
+    var devolverWidgetAccess = function () {
+        widgetAccess = [];
+        $('.checkbox-widget-access').each(function () {
+            widgetAccess.push({
+                widget_id: parseInt($(this).data('widget-id'), 10),
+                is_enabled: $(this).prop('checked') === true
+            });
+        });
+    }
     var marcarPermisos = function () {
         //Limipiar
         $('.checkbox-permiso').prop('checked', false);
@@ -602,6 +696,77 @@ var Perfiles = function () {
 
         });
     }
+
+    var btnClickSalvarForm = function () {
+        KTUtil.scrollTop();
+        event_change = false;
+        devolverPermisos();
+        devolverWidgetAccess();
+
+        if (validateForm() && permisos.length > 0) {
+
+            var formData = new URLSearchParams();
+
+            var perfil_id = $('#perfil_id').val();
+            formData.set("perfil_id", perfil_id);
+
+            var descripcion = $('#descripcion').val();
+            formData.set("descripcion", descripcion);
+
+            formData.set("permisos", JSON.stringify(permisos));
+            formData.set("widget_access", JSON.stringify(widgetAccess));
+
+            BlockUtil.block('#form-perfil');
+
+            axios.post("perfil/salvarPerfil", formData, { responseType: "json" })
+                .then(function (res) {
+                    if (res.status === 200 || res.status === 201) {
+                        var response = res.data;
+                        if (response.success) {
+                            toastr.success(response.message, "");
+                            cerrarFormsConfirmated();
+                            oTable.draw();
+                        } else {
+                            toastr.error(response.error, "");
+                        }
+                    } else {
+                        toastr.error("An internal error has occurred, please try again.", "");
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock("#form-perfil");
+                });
+        } else {
+            if (permisos.length == 0) {
+                toastr.error("You must select the profile permissions", "");
+            }
+        }
+    };
+
+    var initAccionChange = function () {
+        $(document).off('change', "#form-perfil .event-change");
+        $(document).on('change', "#form-perfil .event-change", function (e) {
+            event_change = true;
+        });
+        $(document).off('change', "#form-perfil .checkbox-permiso, #form-perfil .checkbox-widget-access");
+        $(document).on('change', "#form-perfil .checkbox-permiso, #form-perfil .checkbox-widget-access", function (e) {
+            event_change = true;
+        });
+        $(document).off('click', "#btn-exit-save-and-close");
+        $(document).on('click', "#btn-exit-save-and-close", function (e) {
+            var modal = document.getElementById('modal-salvar-cambios');
+            if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) { bsModal.hide(); } }
+            btnClickSalvarForm();
+        });
+        $(document).off('click', "#btn-exit-discard-and-close");
+        $(document).on('click', "#btn-exit-discard-and-close", function (e) {
+            var modal = document.getElementById('modal-salvar-cambios');
+            if (modal && window.bootstrap) { var bsModal = bootstrap.Modal.getInstance(modal); if (bsModal) { bsModal.hide(); } }
+            cerrarFormsConfirmated();
+        });
+    };
+
     var initAccionPermiso = function () {
         $(document).off('click', ".checkbox-permiso-todos");
         $(document).on('click', ".checkbox-permiso-todos", function (e) {
@@ -800,8 +965,10 @@ var Perfiles = function () {
             initTable();
 
             initAccionNuevo();
+            initWizard();
             initAccionSalvar();
             initAccionCerrar();
+            initAccionChange();
 
             initAccionPermiso();
         }

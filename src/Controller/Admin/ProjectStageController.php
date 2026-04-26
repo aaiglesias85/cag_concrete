@@ -2,34 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ProjectStageService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ProjectStageController extends AbstractController
+class ProjectStageController extends AbstractAdminController
 {
     private $projectStageService;
 
-    public function __construct(ProjectStageService $projectStageService)
+    public function __construct(AdminAccessService $adminAccess, ProjectStageService $projectStageService)
     {
+        parent::__construct($adminAccess);
         $this->projectStageService = $projectStageService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->projectStageService->BuscarPermiso($usuario->getUsuarioId(), 24);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/project-stage/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT_STAGE);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/project-stage/index.html.twig', array(
+            'permiso' => $permiso[0],
+        ));
     }
 
     /**

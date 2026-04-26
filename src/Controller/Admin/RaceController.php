@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\RaceService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class RaceController extends AbstractController
+class RaceController extends AbstractAdminController
 {
 
    private $raceService;
 
-   public function __construct(RaceService $raceService)
+   public function __construct(AdminAccessService $adminAccess, RaceService $raceService)
    {
+      parent::__construct($adminAccess);
       $this->raceService = $raceService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->raceService->BuscarPermiso($usuario->getUsuarioId(), 34);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            return $this->render('admin/race/index.html.twig', array(
-               'permiso' => $permiso[0]
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::RACE);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      return $this->render('admin/race/index.html.twig', array(
+         'permiso' => $permiso[0]
+      ));
    }
 
    /**

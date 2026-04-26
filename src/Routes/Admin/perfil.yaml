@@ -25,3 +25,7 @@ cargarDatosPerfilAdmin:
 listarPermisosDeRolAdmin:
   path:  /perfil/listarPermisos
   defaults: { _controller: App\Controller\Admin\PerfilController::listarPermisos, _format: json }
+
+listarWidgetPreferences:
+  path:  /perfil/listarWidgetPreferences
+  defaults: { _controller: App\Controller\Admin\PerfilController::listarWidgetPreferences, _format: json }

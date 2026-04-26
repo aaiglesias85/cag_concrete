@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingLabor;
@@ -1265,7 +1267,7 @@ class ScheduleService extends Base
    public function ListarAcciones($id, $highpriority)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 22);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::SCHEDULE);
 
       $acciones = '';
 

@@ -16,18 +16,12 @@ final class FuncionPermissionUiGrouping
     private const GROUP_DEFINITIONS = [
         // 0. Home
         ['home', 'Home', ['home']],
-        ['home_widgets', 'Home - Widgets', [
-            'tasks', 'widget_work_schedule', 'widget_bid_deadlines',
-            'widget_estimate_win_loss', 'widget_estimates_submitted', 'widget_estimator_share',
-            'widget_current_month_projects', 'widget_invoiced_projects', 'widget_pay_item_totals',
-            'widget_invoice_profit_share', 'widget_job_cost_breakdown',
-        ]],
 
-        // 1. Estimating
+        // 1. Estimating (sin company: solo en Project Onboarding; sin duplicar filas)
         ['estimating', 'Estimating', [
             'estimate',
             'item', 'equation', 'unit', 'project_stage', 'project_type', 'proposal_type',
-            'plan_status', 'district', 'county', 'note_estimate_item', 'company',
+            'plan_status', 'plan_downloading', 'district', 'county', 'note_estimate_item',
         ]],
 
         // 2. Project Onboarding
@@ -57,9 +51,9 @@ final class FuncionPermissionUiGrouping
             'race', 'employees', 'employee_role', 'crew',
         ]],
 
-        // 6. Admin
+        // 6. Admin (tasks bajo Anuncios, alineado al menú lateral)
         ['admin', 'Admin', [
-            'rol', 'users', 'advertisement',
+            'rol', 'users', 'advertisement', 'tasks',
         ]],
 
         // User Settings (top right)
@@ -89,10 +83,11 @@ final class FuncionPermissionUiGrouping
         foreach (self::GROUP_DEFINITIONS as [$key, $title, $urls]) {
             $items = [];
             foreach ($urls as $url) {
-                if (isset($byUrl[$url])) {
-                    $items[] = $byUrl[$url];
-                    $assignedUrls[$url] = true;
+                if (!isset($byUrl[$url]) || isset($assignedUrls[$url])) {
+                    continue;
                 }
+                $items[] = $byUrl[$url];
+                $assignedUrls[$url] = true;
             }
             if ($items !== []) {
                 $grouped[] = [

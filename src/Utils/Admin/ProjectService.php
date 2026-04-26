@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\ConcreteClass;
@@ -1508,7 +1510,7 @@ class ProjectService extends Base
    public function ListarAccionesNotes($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 9);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT);
 
       $acciones = "";
 
@@ -4536,7 +4538,7 @@ $headerRepo = $this->getDoctrine()->getRepository(InvoiceOverridePayment::class)
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 9);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT);
 
       $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
 

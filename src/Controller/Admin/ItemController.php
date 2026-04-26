@@ -2,49 +2,51 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Equation;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ItemService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ItemController extends AbstractController
+class ItemController extends AbstractAdminController
 {
 
    private $itemService;
 
-   public function __construct(ItemService $itemService)
+   public function __construct(AdminAccessService $adminAccess, ItemService $itemService)
    {
+      parent::__construct($adminAccess);
       $this->itemService = $itemService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->itemService->BuscarPermiso($usuario->getUsuarioId(), 6);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            $units = $this->itemService->getDoctrine()->getRepository(Unit::class)
-               ->ListarOrdenados();
-
-            $equations = $this->itemService->getDoctrine()->getRepository(Equation::class)
-               ->ListarOrdenados();
-
-            $yields_calculation = $this->itemService->ListarYieldsCalculation();
-
-            return $this->render('admin/item/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'units' => $units,
-               'equations' => $equations,
-               'yields_calculation' => $yields_calculation,
-               'usuario_bond' => $usuario->getBond() ? true : false
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ITEM);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $usuario = $acceso['usuario'];
+      $permiso = $acceso['permisos'];
+
+      $units = $this->itemService->getDoctrine()->getRepository(Unit::class)
+         ->ListarOrdenados();
+
+      $equations = $this->itemService->getDoctrine()->getRepository(Equation::class)
+         ->ListarOrdenados();
+
+      $yields_calculation = $this->itemService->ListarYieldsCalculation();
+
+      return $this->render('admin/item/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'units' => $units,
+         'equations' => $equations,
+         'yields_calculation' => $yields_calculation,
+         'usuario_bond' => $usuario->getBond() ? true : false
+      ));
    }
 
    /**
@@ -104,7 +106,12 @@ class ItemController extends AbstractController
       $equation_id = $request->get('equation_id');
 
       // Validar que solo usuarios con bond activo puedan marcar items como bond
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         $resultadoJson = ['success' => false, 'error' => 'Not authenticated'];
+         return $this->json($resultadoJson, 401);
+      }
+      $usuario = $g;
       if (!$usuario->getBond() && ($bond == 1 || $bond === '1' || $bond === true)) {
          $resultadoJson['success'] = false;
          $resultadoJson['error'] = "You don't have permission to mark items as bond.";

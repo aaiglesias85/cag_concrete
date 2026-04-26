@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
@@ -16,10 +18,11 @@ use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\DataTrackingService;
 use App\Utils\Admin\ProjectService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class DataTrackingController extends AbstractController
+class DataTrackingController extends AbstractAdminController
 {
    private $projectService;
    /**
@@ -27,69 +30,68 @@ class DataTrackingController extends AbstractController
     */
    private $dataTrackingService;
 
-   public function __construct(DataTrackingService $dataTrackingService, ProjectService $projectService,)
+   public function __construct(AdminAccessService $adminAccess, DataTrackingService $dataTrackingService, ProjectService $projectService)
    {
+      parent::__construct($adminAccess);
       $this->projectService = $projectService;
       $this->dataTrackingService = $dataTrackingService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 10);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // items
-            $items = $this->dataTrackingService->ListarTodosItems();
-
-            // projects
-            $projects = $this->dataTrackingService->getDoctrine()->getRepository(Project::class)
-               ->ListarOrdenados();
-
-            // inspectors
-            $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
-               ->ListarOrdenados();
-
-            // employees
-            $employees = $this->dataTrackingService->getDoctrine()->getRepository(Employee::class)
-               ->ListarOrdenados();
-
-            // materials
-            $materials = $this->dataTrackingService->getDoctrine()->getRepository(Material::class)
-               ->ListarOrdenados();
-
-            // overheads
-            $overheads = $this->dataTrackingService->getDoctrine()->getRepository(OverheadPrice::class)
-               ->ListarOrdenados();
-
-            // subcontractors
-            $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
-               ->ListarOrdenados();
-
-            // concrete vendors
-            $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
-               ->ListarOrdenados();
-
-            $permisoInvoice = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), 11);
-
-            return $this->render('admin/data-tracking/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'permisoInvoice' => !empty($permisoInvoice) ? $permisoInvoice[0] : null,
-               'projects' => $projects,
-               'items' => $items,
-               'inspectors' => $inspectors,
-               'employees' => $employees,
-               'materials' => $materials,
-               'overheads' => $overheads,
-               'subcontractors' => $subcontractors,
-               'concrete_vendors' => $concrete_vendors,
-               'direccion_url' => $this->projectService->ObtenerURL()
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::DATA_TRACKING);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $usuario = $acceso['usuario'];
+      $permiso = $acceso['permisos'];
+
+      // items
+      $items = $this->dataTrackingService->ListarTodosItems();
+
+      // projects
+      $projects = $this->dataTrackingService->getDoctrine()->getRepository(Project::class)
+         ->ListarOrdenados();
+
+      // inspectors
+      $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
+         ->ListarOrdenados();
+
+      // employees
+      $employees = $this->dataTrackingService->getDoctrine()->getRepository(Employee::class)
+         ->ListarOrdenados();
+
+      // materials
+      $materials = $this->dataTrackingService->getDoctrine()->getRepository(Material::class)
+         ->ListarOrdenados();
+
+      // overheads
+      $overheads = $this->dataTrackingService->getDoctrine()->getRepository(OverheadPrice::class)
+         ->ListarOrdenados();
+
+      // subcontractors
+      $subcontractors = $this->dataTrackingService->getDoctrine()->getRepository(Subcontractor::class)
+         ->ListarOrdenados();
+
+      // concrete vendors
+      $concrete_vendors = $this->dataTrackingService->getDoctrine()->getRepository(ConcreteVendor::class)
+         ->ListarOrdenados();
+
+      $permisoInvoice = $this->dataTrackingService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::INVOICE);
+
+      return $this->render('admin/data-tracking/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'permisoInvoice' => !empty($permisoInvoice) ? $permisoInvoice[0] : null,
+         'projects' => $projects,
+         'items' => $items,
+         'inspectors' => $inspectors,
+         'employees' => $employees,
+         'materials' => $materials,
+         'overheads' => $overheads,
+         'subcontractors' => $subcontractors,
+         'concrete_vendors' => $concrete_vendors,
+         'direccion_url' => $this->projectService->ObtenerURL()
+      ));
    }
 
    /**

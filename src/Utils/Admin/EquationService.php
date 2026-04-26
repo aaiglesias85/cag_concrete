@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\EstimateQuoteItem;
 use App\Entity\Item;
 use App\Entity\Equation;
@@ -415,7 +417,7 @@ class EquationService extends Base
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 13);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::EQUATION);
 
       $acciones = "";
 

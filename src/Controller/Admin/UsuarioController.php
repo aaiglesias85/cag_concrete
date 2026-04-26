@@ -4,8 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\Funcion;
 use App\Entity\Rol;
+use App\Entity\Widget;
 
 use App\Http\DataTablesHelper;
+use App\Constants\FunctionId;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Utils\Admin\UsuarioService;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,17 +18,19 @@ use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class UsuarioController extends AbstractController
+class UsuarioController extends AbstractAdminController
 {
    private $usuarioService;
    private $funcionRepository;
    private $rolRepository;
    private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-   public function __construct(UsuarioService $usuarioService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
+   public function __construct(AdminAccessService $adminAccess, UsuarioService $usuarioService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
    {
+      parent::__construct($adminAccess);
       $this->usuarioService = $usuarioService;
       $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
 
@@ -121,7 +125,11 @@ class UsuarioController extends AbstractController
     */
    public function denegado()
    {
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $g;
+      }
+      $usuario = $g;
 
       $funcion = $this->usuarioService->DevolverPrimeraFuncionDeUsuario($usuario->getUsuarioId());
 
@@ -136,7 +144,11 @@ class UsuarioController extends AbstractController
     */
    public function perfil()
    {
-      $usuario = $this->getUser();
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $g;
+      }
+      $usuario = $g;
 
       return $this->render('admin/usuario/perfil.html.twig', array(
          'usuario' => $usuario
@@ -149,26 +161,26 @@ class UsuarioController extends AbstractController
     */
    public function index()
    {
-
-      $usuario = $this->getUser();
-      $permiso = $this->usuarioService->BuscarPermiso($usuario->getUsuarioId(), 3);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            $perfiles = $this->rolRepository->ListarOrdenados();
-            $funciones = $this->funcionRepository->ListarOrdenados();
-            $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
-
-            return $this->render('admin/usuario/index.html.twig', array(
-               'perfiles' => $perfiles,
-               'funciones' => $funciones,
-               'funcionesAgrupadas' => $funcionesAgrupadas,
-               'permiso' => $permiso[0]
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::USUARIO);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      $perfiles = $this->rolRepository->ListarOrdenados();
+      $funciones = $this->funcionRepository->ListarOrdenados();
+      $funcionesAgrupadas = $this->funcionPermissionUiGrouping->group($funciones);
+
+      $widgets = $this->usuarioService->getDoctrine()->getRepository(Widget::class)
+         ->findAllOrdered();
+
+      return $this->render('admin/usuario/index.html.twig', array(
+         'perfiles' => $perfiles,
+         'funciones' => $funciones,
+         'funcionesAgrupadas' => $funcionesAgrupadas,
+         'widgets' => $widgets,
+         'permiso' => $permiso[0]
+      ));
    }
 
    /**
@@ -234,6 +246,8 @@ class UsuarioController extends AbstractController
 
       $permisos = $request->get('permisos');
       $permisos = json_decode($permisos);
+      $widgetAccessRaw = $request->get('widget_access');
+      $widgetAccess = is_string($widgetAccessRaw) && $widgetAccessRaw !== '' ? json_decode($widgetAccessRaw, true) : null;
 
       $telefono = $request->get('telefono');
 
@@ -258,7 +272,8 @@ class UsuarioController extends AbstractController
                $estimator,
                $bond,
                $retainage,
-               $chat
+               $chat,
+               is_array($widgetAccess) ? $widgetAccess : null
             );
          } else {
             $resultado = $this->usuarioService->ActualizarUsuario(
@@ -274,7 +289,8 @@ class UsuarioController extends AbstractController
                $estimator,
                $bond,
                $retainage,
-               $chat
+               $chat,
+               is_array($widgetAccess) ? $widgetAccess : null
             );
          }
 

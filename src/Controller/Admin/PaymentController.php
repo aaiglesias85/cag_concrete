@@ -2,44 +2,45 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\Item;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\PaymentService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class PaymentController extends AbstractController
+class PaymentController extends AbstractAdminController
 {
 
    private $paymentService;
 
-   public function __construct(PaymentService $paymentService)
+   public function __construct(AdminAccessService $adminAccess, PaymentService $paymentService)
    {
+      parent::__construct($adminAccess);
       $this->paymentService = $paymentService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->paymentService->BuscarPermiso($usuario->getUsuarioId(), 33);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // companies
-            $companies = $this->paymentService->getDoctrine()->getRepository(Company::class)
-               ->ListarOrdenados();
-
-            return $this->render('admin/payment/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'companies' => $companies,
-               'direccion_url' => $this->paymentService->ObtenerURL()
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PAYMENT);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      // companies
+      $companies = $this->paymentService->getDoctrine()->getRepository(Company::class)
+         ->ListarOrdenados();
+
+      return $this->render('admin/payment/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'companies' => $companies,
+         'direccion_url' => $this->paymentService->ObtenerURL()
+      ));
    }
 
    /**

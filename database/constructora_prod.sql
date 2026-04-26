@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 25-04-2026 a las 02:09:08
+-- Tiempo de generación: 26-04-2026 a las 21:32:31
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -29772,7 +29772,9 @@ INSERT INTO `estimate_estimator` (`id`, `estimate_id`, `user_id`) VALUES
 (64, 200, 11),
 (66, 305, 6),
 (67, 130, 12),
-(71, 231, 11);
+(71, 231, 11),
+(72, 327, 11),
+(73, 327, 12);
 
 -- --------------------------------------------------------
 
@@ -33525,7 +33527,31 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (627, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 00:20:25', 1),
 (628, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:38:14', 1),
 (629, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:40:09', 1),
-(630, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:42:54', 1);
+(630, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-25 01:42:54', 1),
+(631, 'Add', 'Task', 'The task is added', '::1', '2026-04-25 02:11:14', 1),
+(632, 'Update', 'Task', 'The task is modified', '::1', '2026-04-25 02:11:23', 1),
+(633, 'Add', 'Task', 'The task is added', '::1', '2026-04-25 02:12:00', 1),
+(634, 'Update', 'Rol', 'The rol is modified: Accounting', '::1', '2026-04-25 02:18:11', 1),
+(635, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 02:22:26', 1),
+(636, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 02:33:31', 1),
+(637, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 02:33:34', 1),
+(638, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 02:33:37', 1),
+(639, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 02:33:43', 1),
+(640, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 02:33:45', 1),
+(641, 'Delete', 'Task', 'The task is deleted: Tarea de prueba', '::1', '2026-04-25 02:39:24', 1),
+(642, 'Delete', 'Task', 'The task is deleted: Tarea de prueba 2', '::1', '2026-04-25 02:39:32', 1),
+(643, 'Add', 'Task', 'The task is added', '::1', '2026-04-25 02:40:43', 1),
+(644, 'Add', 'Task', 'The task is added', '::1', '2026-04-25 02:41:00', 1),
+(645, 'Add', 'Task', 'The task is added', '::1', '2026-04-25 03:53:04', 1),
+(646, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 14:32:21', 1),
+(647, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 14:35:16', 1),
+(648, 'Update', 'Task', 'The task is modified', '::1', '2026-04-25 14:35:25', 1),
+(649, 'Update', 'Task', 'The task is modified', '::1', '2026-04-25 14:35:39', 1),
+(650, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 15:15:35', 1),
+(651, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 15:22:00', 1),
+(652, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 15:22:06', 1),
+(653, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-25 15:42:25', 1),
+(654, 'Update', 'User', 'The user is modified: Empleado_Prueba_1 Iglesias', '::1', '2026-04-26 20:22:19', 1);
 
 -- --------------------------------------------------------
 
@@ -40908,27 +40934,6 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (322, 1, 1, 1, 1, 1, 28),
 (323, 1, 1, 1, 1, 1, 29),
 (324, 1, 1, 1, 1, 1, 30),
-(325, 1, 1, 1, 1, 4, 1),
-(326, 1, 0, 0, 0, 4, 2),
-(327, 1, 0, 0, 0, 4, 3),
-(328, 1, 0, 0, 0, 4, 4),
-(329, 1, 0, 0, 0, 4, 7),
-(330, 1, 0, 0, 0, 4, 8),
-(331, 1, 0, 0, 0, 4, 9),
-(332, 1, 0, 0, 0, 4, 10),
-(333, 1, 1, 1, 1, 4, 11),
-(334, 1, 1, 1, 1, 4, 12),
-(335, 1, 0, 0, 0, 4, 13),
-(336, 1, 1, 1, 1, 4, 14),
-(337, 1, 0, 0, 0, 4, 15),
-(338, 1, 1, 1, 1, 4, 16),
-(339, 1, 0, 0, 0, 4, 17),
-(340, 1, 1, 1, 0, 4, 18),
-(341, 1, 1, 1, 0, 4, 19),
-(342, 1, 0, 0, 0, 4, 20),
-(343, 1, 0, 0, 0, 4, 21),
-(344, 1, 0, 0, 0, 4, 22),
-(345, 1, 0, 0, 0, 4, 23),
 (421, 1, 0, 0, 0, 8, 1),
 (422, 1, 0, 0, 0, 8, 6),
 (423, 1, 0, 0, 0, 8, 7),
@@ -40991,7 +40996,50 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (490, 1, 1, 1, 1, 1, 37),
 (491, 1, 1, 1, 1, 1, 38),
 (492, 1, 1, 1, 1, 1, 39),
-(493, 1, 1, 1, 1, 1, 40);
+(493, 1, 1, 1, 1, 1, 40),
+(494, 1, 1, 1, 1, 4, 1),
+(495, 1, 0, 0, 0, 4, 8),
+(496, 1, 0, 0, 0, 4, 9),
+(497, 1, 1, 1, 0, 4, 18),
+(498, 1, 0, 0, 0, 4, 21),
+(499, 1, 0, 0, 0, 4, 22),
+(500, 1, 0, 0, 0, 4, 10),
+(501, 1, 1, 1, 1, 4, 11),
+(502, 1, 1, 1, 0, 4, 19),
+(503, 1, 0, 0, 0, 4, 20),
+(504, 1, 0, 0, 0, 4, 13),
+(505, 1, 0, 0, 0, 4, 7),
+(506, 1, 1, 1, 1, 4, 14),
+(507, 1, 0, 0, 0, 4, 15),
+(508, 1, 1, 1, 1, 4, 16),
+(509, 1, 0, 0, 0, 4, 17),
+(510, 1, 0, 0, 0, 4, 23),
+(511, 1, 1, 1, 1, 4, 40),
+(512, 1, 0, 0, 0, 4, 2),
+(513, 1, 0, 0, 0, 4, 3),
+(514, 1, 1, 1, 1, 4, 12),
+(515, 1, 0, 0, 0, 4, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `rol_widget_access`
+--
+
+CREATE TABLE `rol_widget_access` (
+  `id` int(11) NOT NULL,
+  `rol_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_enabled` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `rol_widget_access`
+--
+
+INSERT INTO `rol_widget_access` (`id`, `rol_id`, `widget_id`, `is_enabled`) VALUES
+(1, 1, 1, 1),
+(2, 4, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -45954,6 +46002,15 @@ CREATE TABLE `tasks` (
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Volcado de datos para la tabla `tasks`
+--
+
+INSERT INTO `tasks` (`task_id`, `description`, `status`, `created_at`, `due_date`, `user_id`) VALUES
+(3, 'Tarea de prueba', 'complete', '2026-04-25 02:40:43', '2026-04-30', 1),
+(4, 'Tarea de prueba 2', 'pending', '2026-04-25 02:41:00', '2026-04-29', 1),
+(5, 'Prueba', 'pending', '2026-04-25 03:53:04', '2026-04-30', 1);
+
 -- --------------------------------------------------------
 
 --
@@ -46021,7 +46078,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `chat`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
-(1, 'Empleado_Prueba_1', 'Iglesias', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, 1, '', '2024-04-12 09:24:44', '2026-02-26 03:52:55', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'android', NULL, 'en', 3),
+(1, 'Empleado_Prueba_1', 'Iglesias', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, 1, '', '2024-04-12 09:24:44', '2026-04-26 20:22:19', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'android', NULL, 'en', 3),
 (3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, 1, 1, 0, '', '2024-06-25 18:17:59', '2026-02-23 04:36:23', NULL, NULL, NULL, NULL, 'es', 3),
 (4, 'Empleado_Prueba_4', 'Royster', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:21:43', '2025-10-19 18:46:42', NULL, NULL, NULL, NULL, 'es', 1),
 (6, 'Empleado_Prueba_6', 'Valdez', '', '', 1, 1, 1, 1, 1, '', '2024-06-25 18:33:59', '2026-02-23 04:36:35', NULL, NULL, NULL, NULL, 'es', 10),
@@ -46461,43 +46518,6 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3864, 1, 0, 0, 0, 7, 31),
 (3865, 1, 0, 0, 0, 7, 32),
 (3866, 1, 0, 0, 0, 7, 33),
-(3904, 1, 1, 1, 1, 1, 1),
-(3905, 1, 1, 1, 1, 1, 2),
-(3906, 1, 1, 1, 1, 1, 3),
-(3907, 1, 1, 1, 1, 1, 4),
-(3908, 1, 1, 1, 1, 1, 5),
-(3909, 1, 1, 1, 1, 1, 6),
-(3910, 1, 1, 1, 1, 1, 7),
-(3911, 1, 1, 1, 1, 1, 8),
-(3912, 1, 1, 1, 1, 1, 9),
-(3913, 1, 1, 1, 1, 1, 10),
-(3914, 1, 1, 1, 1, 1, 11),
-(3915, 1, 1, 1, 1, 1, 12),
-(3916, 1, 1, 1, 1, 1, 13),
-(3917, 1, 1, 1, 1, 1, 14),
-(3918, 1, 1, 1, 1, 1, 15),
-(3919, 1, 1, 1, 1, 1, 16),
-(3920, 1, 1, 1, 1, 1, 17),
-(3921, 1, 1, 1, 1, 1, 18),
-(3922, 1, 1, 1, 1, 1, 19),
-(3923, 1, 1, 1, 1, 1, 20),
-(3924, 1, 1, 1, 1, 1, 21),
-(3925, 1, 1, 1, 1, 1, 22),
-(3926, 1, 1, 1, 1, 1, 23),
-(3927, 1, 1, 1, 1, 1, 24),
-(3928, 1, 1, 1, 1, 1, 25),
-(3929, 1, 1, 1, 1, 1, 26),
-(3930, 1, 1, 1, 1, 1, 27),
-(3931, 1, 1, 1, 1, 1, 28),
-(3932, 1, 1, 1, 1, 1, 29),
-(3933, 1, 1, 1, 1, 1, 30),
-(3934, 1, 1, 1, 1, 1, 31),
-(3935, 1, 1, 1, 1, 1, 32),
-(3936, 1, 1, 1, 1, 1, 33),
-(3937, 1, 1, 1, 1, 1, 34),
-(3938, 1, 1, 1, 1, 1, 35),
-(3939, 1, 1, 1, 1, 1, 36),
-(3940, 1, 1, 1, 1, 1, 37),
 (3941, 1, 1, 1, 1, 30, 1),
 (3942, 1, 1, 1, 1, 30, 2),
 (3943, 1, 1, 1, 1, 30, 3),
@@ -46535,9 +46555,47 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3975, 1, 1, 1, 1, 30, 35),
 (3976, 1, 1, 1, 1, 30, 36),
 (3977, 1, 1, 1, 1, 30, 37),
-(3978, 1, 1, 1, 1, 1, 38),
-(3979, 1, 1, 1, 1, 1, 39),
-(3980, 1, 1, 1, 1, 1, 40);
+(3981, 1, 1, 1, 1, 1, 1),
+(3982, 1, 1, 1, 1, 1, 40),
+(3993, 1, 1, 1, 1, 1, 29),
+(3994, 1, 1, 1, 1, 1, 6),
+(3995, 1, 1, 1, 1, 1, 13),
+(3996, 1, 1, 1, 1, 1, 5),
+(3997, 1, 1, 1, 1, 1, 24),
+(3998, 1, 1, 1, 1, 1, 25),
+(3999, 1, 1, 1, 1, 1, 26),
+(4000, 1, 1, 1, 1, 1, 27),
+(4001, 1, 1, 1, 1, 1, 28),
+(4002, 1, 1, 1, 1, 1, 32),
+(4003, 1, 1, 1, 1, 1, 38),
+(4004, 1, 1, 1, 1, 1, 8),
+(4005, 1, 1, 1, 1, 1, 8),
+(4006, 1, 1, 1, 1, 1, 9),
+(4007, 1, 1, 1, 1, 1, 18),
+(4008, 1, 1, 1, 1, 1, 36),
+(4009, 1, 1, 1, 1, 1, 22),
+(4010, 1, 1, 1, 1, 1, 10),
+(4011, 1, 1, 1, 1, 1, 7),
+(4012, 1, 1, 1, 1, 1, 31),
+(4013, 1, 1, 1, 1, 1, 11),
+(4014, 1, 1, 1, 1, 1, 33),
+(4015, 1, 1, 1, 1, 1, 39),
+(4016, 1, 1, 1, 1, 1, 19),
+(4017, 1, 1, 1, 1, 1, 21),
+(4018, 1, 1, 1, 1, 1, 16),
+(4019, 1, 1, 1, 1, 1, 15),
+(4020, 1, 1, 1, 1, 1, 35),
+(4021, 1, 1, 1, 1, 1, 20),
+(4022, 1, 1, 1, 1, 1, 34),
+(4023, 1, 1, 1, 1, 1, 14),
+(4024, 1, 1, 1, 1, 1, 37),
+(4025, 1, 1, 1, 1, 1, 2),
+(4026, 1, 1, 1, 1, 1, 3),
+(4027, 1, 1, 1, 1, 1, 17),
+(4028, 1, 1, 1, 1, 1, 23),
+(4029, 1, 1, 1, 1, 1, 12),
+(4030, 1, 1, 1, 1, 1, 4),
+(4031, 1, 1, 1, 1, 1, 30);
 
 -- --------------------------------------------------------
 
@@ -46550,6 +46608,67 @@ CREATE TABLE `user_qbwc_token` (
   `token` text,
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_widget_access`
+--
+
+CREATE TABLE `user_widget_access` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_enabled` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `user_widget_access`
+--
+
+INSERT INTO `user_widget_access` (`id`, `user_id`, `widget_id`, `is_enabled`) VALUES
+(1, 1, 1, 1),
+(2, 1, 2, 1),
+(3, 1, 3, 1),
+(4, 1, 4, 1),
+(5, 1, 5, 1),
+(6, 1, 6, 1),
+(7, 1, 7, 1),
+(8, 1, 8, 1),
+(9, 1, 9, 1),
+(10, 1, 10, 1),
+(11, 1, 11, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `widgets`
+--
+
+CREATE TABLE `widgets` (
+  `widget_id` int(11) NOT NULL,
+  `code` varchar(64) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(500) NOT NULL DEFAULT '',
+  `sort_order` smallint(6) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `widgets`
+--
+
+INSERT INTO `widgets` (`widget_id`, `code`, `title`, `description`, `sort_order`) VALUES
+(1, 'tasks', 'Tasks', 'Your assigned work and due dates', 0),
+(2, 'work_schedule', 'Work Schedule', 'Weekly view of field operations and priorities.', 10),
+(3, 'bid_deadlines', 'Upcoming bid deadlines', 'Projects with critical proposal dates and assigned estimator.', 20),
+(4, 'estimate_win_loss', 'Estimate win / loss ratio', 'Submitted estimates won vs. lost.', 30),
+(5, 'estimates_submitted_totals', 'Total estimates — submitted / not submitted', 'Count of submitted vs. draft or pending.', 40),
+(6, 'estimator_submitted_share', 'Estimator submitted share', 'Share of submitted proposals by estimator.', 50),
+(7, 'current_month_data_tracking', 'Current month projects (data tracking)', 'Aggregates for the current month from data tracking.', 60),
+(8, 'invoiced_projects', 'Invoiced projects (period)', 'Billed amount and quick glance of payment total.', 70),
+(9, 'pay_item_totals', 'Pay item totals (period)', 'Sums of pay item quantities and amounts.', 80),
+(10, 'invoice_profit_share', 'Invoice / profit share', 'Real profitability vs. invoiced amounts.', 90),
+(11, 'job_cost_breakdown', 'Job Cost Breakdown', 'Labor, materials, and other direct costs.', 100);
 
 --
 -- Índices para tablas volcadas
@@ -47088,6 +47207,14 @@ ALTER TABLE `rol_permission`
   ADD KEY `Ref192` (`function_id`);
 
 --
+-- Indices de la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_profile_widget_access` (`rol_id`,`widget_id`),
+  ADD KEY `fk_pwa_widget` (`widget_id`);
+
+--
 -- Indices de la tabla `schedule`
 --
 ALTER TABLE `schedule`
@@ -47183,6 +47310,21 @@ ALTER TABLE `user_permission`
 ALTER TABLE `user_qbwc_token`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Refuser_qbwc_token1` (`user_id`);
+
+--
+-- Indices de la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_user_widget_access` (`user_id`,`widget_id`),
+  ADD KEY `fk_uwa_widget` (`widget_id`);
+
+--
+-- Indices de la tabla `widgets`
+--
+ALTER TABLE `widgets`
+  ADD PRIMARY KEY (`widget_id`),
+  ADD UNIQUE KEY `uq_widgets_code` (`code`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -47324,7 +47466,7 @@ ALTER TABLE `estimate_county`
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
 --
 ALTER TABLE `estimate_estimator`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_note_item`
@@ -47372,7 +47514,7 @@ ALTER TABLE `estimate_template_note`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -47456,7 +47598,7 @@ ALTER TABLE `item`
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=631;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=655;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -47612,7 +47754,13 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=494;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=516;
+
+--
+-- AUTO_INCREMENT de la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -47660,7 +47808,7 @@ ALTER TABLE `sync_queue_qbwc`
 -- AUTO_INCREMENT de la tabla `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `unit`
@@ -47684,13 +47832,25 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3981;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4032;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
 --
 ALTER TABLE `user_qbwc_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de la tabla `widgets`
+--
+ALTER TABLE `widgets`
+  MODIFY `widget_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Restricciones para tablas volcadas
@@ -48033,6 +48193,13 @@ ALTER TABLE `rol_permission`
   ADD CONSTRAINT `Refrol1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
 
 --
+-- Filtros para la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  ADD CONSTRAINT `fk_pwa_rol` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pwa_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `schedule`
 --
 ALTER TABLE `schedule`
@@ -48097,6 +48264,13 @@ ALTER TABLE `user_permission`
 --
 ALTER TABLE `user_qbwc_token`
   ADD CONSTRAINT `Refuser_qbwc_token1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  ADD CONSTRAINT `fk_uwa_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_uwa_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

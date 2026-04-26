@@ -2,34 +2,35 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\ProjectTypeService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class ProjectTypeController extends AbstractController
+class ProjectTypeController extends AbstractAdminController
 {
     private $projectTypeService;
 
-    public function __construct(ProjectTypeService $projectTypeService)
+    public function __construct(AdminAccessService $adminAccess, ProjectTypeService $projectTypeService)
     {
+        parent::__construct($adminAccess);
         $this->projectTypeService = $projectTypeService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->projectTypeService->BuscarPermiso($usuario->getUsuarioId(), 25);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/project-type/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT_TYPE);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/project-type/index.html.twig', array(
+            'permiso' => $permiso[0],
+        ));
     }
 
     /**

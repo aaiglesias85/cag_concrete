@@ -27,10 +27,11 @@ class PermisoUsuarioRepository extends ServiceEntityRepository
             ->where('u.usuarioId = :usuario_id AND f.funcionId = :funcion_id')
             ->setParameter('usuario_id', $usuario_id)
             ->setParameter('funcion_id', $funcion_id)
+            ->orderBy('p_u.permisoId', 'ASC')
+            ->setMaxResults(1)
             ->getQuery();
 
-        $lista = $consulta->getOneOrNullResult();
-        return $lista;
+        return $consulta->getOneOrNullResult();
     }
 
     /**

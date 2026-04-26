@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\County;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\DistrictService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class DistrictController extends AbstractController
+class DistrictController extends AbstractAdminController
 {
     private $districtService;
 
-    public function __construct(DistrictService $districtService)
+    public function __construct(AdminAccessService $adminAccess, DistrictService $districtService)
     {
+        parent::__construct($adminAccess);
         $this->districtService = $districtService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->districtService->BuscarPermiso($usuario->getUsuarioId(), 28);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/district/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::DISTRICT);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/district/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**

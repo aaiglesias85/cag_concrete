@@ -2,6 +2,8 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
@@ -11,59 +13,57 @@ use App\Entity\Inspector;
 use App\Entity\Item;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
+use App\Service\Admin\AdminAccessService;
 use App\Utils\Admin\CompanyService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CompanyController extends AbstractController
+class CompanyController extends AbstractAdminController
 {
-
     private $companyService;
 
-    public function __construct(CompanyService $companyService)
+    public function __construct(AdminAccessService $adminAccess, CompanyService $companyService)
     {
+        parent::__construct($adminAccess);
         $this->companyService = $companyService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->companyService->BuscarPermiso($usuario->getUsuarioId(), 8);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                $doctrine = $this->companyService->getDoctrine();
-                $countys = $doctrine->getRepository(County::class)->ListarOrdenados('', '', '');
-                $inspectors = $doctrine->getRepository(Inspector::class)->ListarOrdenados();
-                $items = $doctrine->getRepository(Item::class)->ListarOrdenados();
-                $units = $doctrine->getRepository(Unit::class)->ListarOrdenados();
-                $equations = $doctrine->getRepository(Equation::class)->ListarOrdenados();
-                $concrete_vendors = $doctrine->getRepository(ConcreteVendor::class)->ListarOrdenados();
-                $concrete_classes = $doctrine->getRepository(ConcreteClass::class)->ListarOrdenados();
-                $employee_roles = $doctrine->getRepository(EmployeeRole::class)->ListarOrdenados();
-                $yields_calculation = $this->companyService->ListarYieldsCalculation();
-                $usuario = $this->getUser();
-                $usuario_retainage = $usuario && method_exists($usuario, 'getRetainage') ? $usuario->getRetainage() : false;
-                $usuario_bond = $usuario && method_exists($usuario, 'getBond') ? $usuario->getBond() : false;
-
-                return $this->render('admin/company/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'countys' => $countys,
-                    'inspectors' => $inspectors,
-                    'items' => $items,
-                    'units' => $units,
-                    'equations' => $equations,
-                    'concrete_vendors' => $concrete_vendors,
-                    'concrete_classes' => $concrete_classes,
-                    'employee_roles' => $employee_roles,
-                    'yields_calculation' => $yields_calculation,
-                    'usuario_retainage' => $usuario_retainage,
-                    'usuario_bond' => $usuario_bond,
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::COMPANY);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $usuario = $acceso['usuario'];
+        $permiso = $acceso['permisos'];
+
+        $doctrine = $this->companyService->getDoctrine();
+        $countys = $doctrine->getRepository(County::class)->ListarOrdenados('', '', '');
+        $inspectors = $doctrine->getRepository(Inspector::class)->ListarOrdenados();
+        $items = $doctrine->getRepository(Item::class)->ListarOrdenados();
+        $units = $doctrine->getRepository(Unit::class)->ListarOrdenados();
+        $equations = $doctrine->getRepository(Equation::class)->ListarOrdenados();
+        $concrete_vendors = $doctrine->getRepository(ConcreteVendor::class)->ListarOrdenados();
+        $concrete_classes = $doctrine->getRepository(ConcreteClass::class)->ListarOrdenados();
+        $employee_roles = $doctrine->getRepository(EmployeeRole::class)->ListarOrdenados();
+        $yields_calculation = $this->companyService->ListarYieldsCalculation();
+        $usuario_retainage = $usuario->getRetainage() ?? false;
+        $usuario_bond = $usuario->getBond() ?? false;
+
+        return $this->render('admin/company/index.html.twig', array(
+            'permiso' => $permiso[0],
+            'countys' => $countys,
+            'inspectors' => $inspectors,
+            'items' => $items,
+            'units' => $units,
+            'equations' => $equations,
+            'concrete_vendors' => $concrete_vendors,
+            'concrete_classes' => $concrete_classes,
+            'employee_roles' => $employee_roles,
+            'yields_calculation' => $yields_calculation,
+            'usuario_retainage' => $usuario_retainage,
+            'usuario_bond' => $usuario_bond,
+        ));
     }
 
     /**

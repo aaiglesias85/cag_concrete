@@ -2,42 +2,43 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\Item;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\InvoiceService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class InvoiceController extends AbstractController
+class InvoiceController extends AbstractAdminController
 {
 
    private $invoiceService;
 
-   public function __construct(InvoiceService $invoiceService)
+   public function __construct(AdminAccessService $adminAccess, InvoiceService $invoiceService)
    {
+      parent::__construct($adminAccess);
       $this->invoiceService = $invoiceService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->invoiceService->BuscarPermiso($usuario->getUsuarioId(), 11);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // companies
-            $companies = $this->invoiceService->getDoctrine()->getRepository(Company::class)
-               ->ListarOrdenados();
-
-            return $this->render('admin/invoice/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'companies' => $companies
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::INVOICE);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      // companies
+      $companies = $this->invoiceService->getDoctrine()->getRepository(Company::class)
+         ->ListarOrdenados();
+
+      return $this->render('admin/invoice/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'companies' => $companies
+      ));
    }
 
    /**

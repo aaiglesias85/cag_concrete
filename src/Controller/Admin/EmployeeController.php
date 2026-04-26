@@ -2,51 +2,52 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\EmployeeService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Repository\RaceRepository;
 use App\Entity\Race;
 use App\Repository\EmployeeRoleRepository;
 use App\Entity\EmployeeRole;
 
-class EmployeeController extends AbstractController
+class EmployeeController extends AbstractAdminController
 {
 
    private $employeeService;
 
-   public function __construct(EmployeeService $employeeService)
+   public function __construct(AdminAccessService $adminAccess, EmployeeService $employeeService)
    {
+      parent::__construct($adminAccess);
       $this->employeeService = $employeeService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->employeeService->BuscarPermiso($usuario->getUsuarioId(), 14);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            // races
-            /** @var RaceRepository $raceRepo */
-            $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
-            $races = $raceRepo->ListarOrdenados();
-
-            // employee_roles
-            /** @var EmployeeRoleRepository $employeeRoleRepo */
-            $employeeRoleRepo = $this->employeeService->getDoctrine()->getRepository(EmployeeRole::class);
-            $employee_roles = $employeeRoleRepo->ListarOrdenados();
-
-            return $this->render('admin/employee/index.html.twig', array(
-               'permiso' => $permiso[0],
-               'races' => $races,
-               'employee_roles' => $employee_roles
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      // races
+      /** @var RaceRepository $raceRepo */
+      $raceRepo = $this->employeeService->getDoctrine()->getRepository(Race::class);
+      $races = $raceRepo->ListarOrdenados();
+
+      // employee_roles
+      /** @var EmployeeRoleRepository $employeeRoleRepo */
+      $employeeRoleRepo = $this->employeeService->getDoctrine()->getRepository(EmployeeRole::class);
+      $employee_roles = $employeeRoleRepo->ListarOrdenados();
+
+      return $this->render('admin/employee/index.html.twig', array(
+         'permiso' => $permiso[0],
+         'races' => $races,
+         'employee_roles' => $employee_roles
+      ));
    }
 
    /**

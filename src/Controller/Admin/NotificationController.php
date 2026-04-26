@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\NotificationService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class NotificationController extends AbstractController
+class NotificationController extends AbstractAdminController
 {
 
     private $notificationService;
 
-    public function __construct(NotificationService $notificationService)
+    public function __construct(AdminAccessService $adminAccess, NotificationService $notificationService)
     {
+        parent::__construct($adminAccess);
         $this->notificationService = $notificationService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->notificationService->BuscarPermiso($usuario->getUsuarioId(), 12);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                return $this->render('admin/notification/index.html.twig', array(
-                    'permiso' => $permiso[0]
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::NOTIFICATION);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        return $this->render('admin/notification/index.html.twig', array(
+            'permiso' => $permiso[0]
+        ));
     }
 
     /**
@@ -40,6 +41,11 @@ class NotificationController extends AbstractController
     public function listar(Request $request)
     {
         try {
+            $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+            if ($g instanceof RedirectResponse) {
+                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+            }
+            $usuario = $g;
 
             // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
@@ -53,7 +59,6 @@ class NotificationController extends AbstractController
             $fecha_fin = $request->get('fechaFin');
             $leida = $request->get('leida');
 
-            $usuario = $this->getUser();
             $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
 
             // total + data en una sola llamada a tu servicio

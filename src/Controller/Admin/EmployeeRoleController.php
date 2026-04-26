@@ -2,35 +2,36 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\EmployeeRoleService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class EmployeeRoleController extends AbstractController
+class EmployeeRoleController extends AbstractAdminController
 {
 
    private $employeeRoleService;
 
-   public function __construct(EmployeeRoleService $employeeRoleService)
+   public function __construct(AdminAccessService $adminAccess, EmployeeRoleService $employeeRoleService)
    {
+      parent::__construct($adminAccess);
       $this->employeeRoleService = $employeeRoleService;
    }
 
    public function index()
    {
-      $usuario = $this->getUser();
-      $permiso = $this->employeeRoleService->BuscarPermiso($usuario->getUsuarioId(), 37);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-
-            return $this->render('admin/employee-role/index.html.twig', array(
-               'permiso' => $permiso[0]
-            ));
-         }
-      } else {
-         return $this->redirectToRoute('denegado');
+      $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE_ROLE);
+      if ($acceso instanceof RedirectResponse) {
+         return $acceso;
       }
+      $permiso = $acceso['permisos'];
+
+      return $this->render('admin/employee-role/index.html.twig', array(
+         'permiso' => $permiso[0]
+      ));
    }
 
    /**

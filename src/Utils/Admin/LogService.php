@@ -2,6 +2,8 @@
 
 namespace App\Utils\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Log;
 use App\Entity\Usuario;
 use App\Repository\LogRepository;
@@ -170,7 +172,7 @@ class LogService extends Base
    public function ListarAcciones($id)
    {
       $usuario = $this->getUser();
-      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), 4);
+      $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::LOG);
 
       $acciones = "";
 

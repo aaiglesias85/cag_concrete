@@ -2,40 +2,41 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\District;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\CountyService;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-class CountyController extends AbstractController
+class CountyController extends AbstractAdminController
 {
     private $countyService;
 
-    public function __construct(CountyService $countyService)
+    public function __construct(AdminAccessService $adminAccess, CountyService $countyService)
     {
+        parent::__construct($adminAccess);
         $this->countyService = $countyService;
     }
 
     public function index()
     {
-        $usuario = $this->getUser();
-        $permiso = $this->countyService->BuscarPermiso($usuario->getUsuarioId(), 32);
-        if (count($permiso) > 0) {
-            if ($permiso[0]['ver']) {
-
-                // districts
-                $districts = $this->countyService->getDoctrine()->getRepository(District::class)
-                    ->ListarOrdenados();
-
-                return $this->render('admin/county/index.html.twig', array(
-                    'permiso' => $permiso[0],
-                    'districts' => $districts,
-                ));
-            }
-        } else {
-            return $this->redirectToRoute('denegado');
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::COUNTY);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
         }
+        $permiso = $acceso['permisos'];
+
+        // districts
+        $districts = $this->countyService->getDoctrine()->getRepository(District::class)
+            ->ListarOrdenados();
+
+        return $this->render('admin/county/index.html.twig', array(
+            'permiso' => $permiso[0],
+            'districts' => $districts,
+        ));
     }
 
     /**

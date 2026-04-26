@@ -2,42 +2,42 @@
 
 namespace App\Controller\Admin;
 
+use App\Constants\FunctionId;
+
 use App\Entity\Company;
 use App\Entity\Usuario;
 use App\Http\DataTablesHelper;
 use App\Utils\Admin\OverridePaymentService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Service\Admin\AdminAccessService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class OverridePaymentController extends AbstractController
+class OverridePaymentController extends AbstractAdminController
 {
    private $overridePaymentService;
 
-   public function __construct(OverridePaymentService $overridePaymentService)
+   public function __construct(AdminAccessService $adminAccess, OverridePaymentService $overridePaymentService)
    {
+      parent::__construct($adminAccess);
       $this->overridePaymentService = $overridePaymentService;
    }
 
     public function index(): Response
     {
-        /** @var Usuario $usuario */
-        $usuario = $this->getUser();
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
-      if (count($permiso) > 0) {
-         if ($permiso[0]['ver']) {
-            $companies = $this->overridePaymentService->getDoctrine()->getRepository(Company::class)
-               ->ListarOrdenados();
+        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::OVERRIDE_PAYMENT);
+        if ($acceso instanceof RedirectResponse) {
+            return $acceso;
+        }
+        $permiso = $acceso['permisos'];
+        $companies = $this->overridePaymentService->getDoctrine()->getRepository(Company::class)
+            ->ListarOrdenados();
 
-            return $this->render('admin/override_payment/index.html.twig', [
-               'permiso' => $permiso[0],
-               'companies' => $companies,
-               'direccion_url' => $this->overridePaymentService->ObtenerURL(),
-            ]);
-         }
-      }
-
-      return $this->redirectToRoute('denegado');
+        return $this->render('admin/override_payment/index.html.twig', [
+            'permiso' => $permiso[0],
+            'companies' => $companies,
+            'direccion_url' => $this->overridePaymentService->ObtenerURL(),
+        ]);
    }
 
    /**
@@ -101,9 +101,12 @@ class OverridePaymentController extends AbstractController
     */
    public function eliminar(Request $request)
    {
-      /** @var Usuario $usuario */
-      $usuario = $this->getUser();
-      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
       if (count($permiso) === 0 || empty($permiso[0]['eliminar'])) {
          return $this->json(['success' => false, 'error' => 'Access denied']);
       }
@@ -130,9 +133,12 @@ class OverridePaymentController extends AbstractController
     */
    public function eliminarVarios(Request $request)
    {
-      /** @var Usuario $usuario */
-      $usuario = $this->getUser();
-      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
       if (count($permiso) === 0 || empty($permiso[0]['eliminar'])) {
          return $this->json(['success' => false, 'error' => 'Access denied']);
       }
@@ -166,9 +172,12 @@ class OverridePaymentController extends AbstractController
     */
    public function cargarDatos(Request $request)
    {
-      /** @var Usuario $usuario */
-      $usuario = $this->getUser();
-      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
       if (count($permiso) === 0 || empty($permiso[0]['ver'])) {
          return $this->json(['success' => false, 'error' => 'Access denied']);
       }
@@ -237,9 +246,12 @@ class OverridePaymentController extends AbstractController
 
     public function salvar(Request $request)
     {
-        /** @var Usuario $usuario */
-        $usuario = $this->getUser();
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+        if ($g instanceof RedirectResponse) {
+            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+        }
+        $usuario = $g;
+        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
         if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
@@ -293,9 +305,12 @@ class OverridePaymentController extends AbstractController
 
    public function salvarNotaOverrideUnpaid(Request $request)
    {
-      /** @var Usuario $usuario */
-      $usuario = $this->getUser();
-      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
       if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
          return $this->json(['success' => false, 'error' => 'Access denied']);
       }
@@ -388,9 +403,12 @@ class OverridePaymentController extends AbstractController
 
    public function eliminarNotaOverrideUnpaid(Request $request)
    {
-      /** @var Usuario $usuario */
-      $usuario = $this->getUser();
-      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), 39);
+      $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+      if ($g instanceof RedirectResponse) {
+         return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+      }
+      $usuario = $g;
+      $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
       if (count($permiso) === 0 || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
          return $this->json(['success' => false, 'error' => 'Access denied']);
       }

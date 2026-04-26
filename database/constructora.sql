@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 25-04-2026 a las 02:08:59
+-- Tiempo de generación: 26-04-2026 a las 21:32:15
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -1954,6 +1954,26 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `rol_widget_access`
+--
+
+CREATE TABLE `rol_widget_access` (
+  `id` int(11) NOT NULL,
+  `rol_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_enabled` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `rol_widget_access`
+--
+
+INSERT INTO `rol_widget_access` (`id`, `rol_id`, `widget_id`, `is_enabled`) VALUES
+(1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `schedule`
 --
 
@@ -2216,6 +2236,57 @@ CREATE TABLE `user_qbwc_token` (
   `token` text,
   `user_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_widget_access`
+--
+
+CREATE TABLE `user_widget_access` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_enabled` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `user_widget_access`
+--
+
+INSERT INTO `user_widget_access` (`id`, `user_id`, `widget_id`, `is_enabled`) VALUES
+(1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `widgets`
+--
+
+CREATE TABLE `widgets` (
+  `widget_id` int(11) NOT NULL,
+  `code` varchar(64) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(500) NOT NULL DEFAULT '',
+  `sort_order` smallint(6) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `widgets`
+--
+
+INSERT INTO `widgets` (`widget_id`, `code`, `title`, `description`, `sort_order`) VALUES
+(1, 'tasks', 'Tasks', 'Your assigned work and due dates', 0),
+(2, 'work_schedule', 'Work Schedule', 'Weekly view of field operations and priorities.', 10),
+(3, 'bid_deadlines', 'Upcoming bid deadlines', 'Projects with critical proposal dates and assigned estimator.', 20),
+(4, 'estimate_win_loss', 'Estimate win / loss ratio', 'Submitted estimates won vs. lost.', 30),
+(5, 'estimates_submitted_totals', 'Total estimates — submitted / not submitted', 'Count of submitted vs. draft or pending.', 40),
+(6, 'estimator_submitted_share', 'Estimator submitted share', 'Share of submitted proposals by estimator.', 50),
+(7, 'current_month_data_tracking', 'Current month projects (data tracking)', 'Aggregates for the current month from data tracking.', 60),
+(8, 'invoiced_projects', 'Invoiced projects (period)', 'Billed amount and quick glance of payment total.', 70),
+(9, 'pay_item_totals', 'Pay item totals (period)', 'Sums of pay item quantities and amounts.', 80),
+(10, 'invoice_profit_share', 'Invoice / profit share', 'Real profitability vs. invoiced amounts.', 90),
+(11, 'job_cost_breakdown', 'Job Cost Breakdown', 'Labor, materials, and other direct costs.', 100);
 
 --
 -- Índices para tablas volcadas
@@ -2751,6 +2822,14 @@ ALTER TABLE `rol_permission`
   ADD KEY `Ref192` (`function_id`);
 
 --
+-- Indices de la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_profile_widget_access` (`rol_id`,`widget_id`),
+  ADD KEY `fk_pwa_widget` (`widget_id`);
+
+--
 -- Indices de la tabla `schedule`
 --
 ALTER TABLE `schedule`
@@ -2846,6 +2925,21 @@ ALTER TABLE `user_permission`
 ALTER TABLE `user_qbwc_token`
   ADD PRIMARY KEY (`id`),
   ADD KEY `Refuser_qbwc_token1` (`user_id`);
+
+--
+-- Indices de la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_user_widget_access` (`user_id`,`widget_id`),
+  ADD KEY `fk_uwa_widget` (`widget_id`);
+
+--
+-- Indices de la tabla `widgets`
+--
+ALTER TABLE `widgets`
+  ADD PRIMARY KEY (`widget_id`),
+  ADD UNIQUE KEY `uq_widgets_code` (`code`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -3035,7 +3129,7 @@ ALTER TABLE `estimate_template_note`
 -- AUTO_INCREMENT de la tabla `function`
 --
 ALTER TABLE `function`
-  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `function_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT de la tabla `holiday`
@@ -3272,6 +3366,12 @@ ALTER TABLE `rol_permission`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 
 --
+-- AUTO_INCREMENT de la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `schedule`
 --
 ALTER TABLE `schedule`
@@ -3348,6 +3448,18 @@ ALTER TABLE `user_permission`
 --
 ALTER TABLE `user_qbwc_token`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `widgets`
+--
+ALTER TABLE `widgets`
+  MODIFY `widget_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Restricciones para tablas volcadas
@@ -3705,6 +3817,13 @@ ALTER TABLE `rol_permission`
   ADD CONSTRAINT `Refrol1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`);
 
 --
+-- Filtros para la tabla `rol_widget_access`
+--
+ALTER TABLE `rol_widget_access`
+  ADD CONSTRAINT `fk_pwa_rol` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`rol_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_pwa_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
+
+--
 -- Filtros para la tabla `schedule`
 --
 ALTER TABLE `schedule`
@@ -3769,6 +3888,13 @@ ALTER TABLE `user_permission`
 --
 ALTER TABLE `user_qbwc_token`
   ADD CONSTRAINT `Refuser_qbwc_token1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_widget_access`
+--
+ALTER TABLE `user_widget_access`
+  ADD CONSTRAINT `fk_uwa_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_uwa_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

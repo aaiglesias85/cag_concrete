@@ -1,0 +1,22 @@
+{# Reutilizable: perfil, usuario. Requiere `widgets` (entidad App\Entity\Widget[]). #}
+<div class="row g-4">
+   {% for w in widgets %}
+      <div class="col-12 col-md-6 col-xl-4">
+         <div class="card border border-gray-200 h-100">
+            <div class="card-body d-flex align-items-start justify-content-between gap-3 p-5">
+               <div class="min-w-0">
+                  <div class="fw-bold text-gray-800 fs-6 mb-1">{{ w.title }}</div>
+                  <div class="text-gray-500 fs-7">{{ w.description }}</div>
+               </div>
+               <div class="form-check form-switch form-check-custom form-check-solid flex-shrink-0">
+                  <input
+                     class="form-check-input checkbox-widget-access"
+                     type="checkbox"
+                     data-widget-id="{{ w.widgetId }}"
+                  />
+               </div>
+            </div>
+         </div>
+      </div>
+   {% endfor %}
+</div>
