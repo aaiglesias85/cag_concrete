@@ -269,7 +269,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
   - **Aún en `Base` (candidatos futuros §2.2):** helpers HTTP/legacy (`isMobile`, `getIP`, `ObtenerURL`), ordenación de arrays (`ordenarArrayAsc`/`Desc`), `estilizarCelda` (PhpSpreadsheet), y la fachada pública que mantienen los hijos sin tocar firmas.
   - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
-- **E — API (app móvil / JSON):** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar). `App\ProjectController` (listar/cargar) **aún** sin DTO de query — ver **§9.2**. Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
+- **E — API (app móvil / JSON):** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar), `Project` (`ListarProjectsQueryRequest`, `CargarProyectoDatosRequest` — query). Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
 - **E — Admin (panel web):** DTOs bajo `App\Dto\Admin\…` + `AdminValidationResponseTrait` (validación con locale `en`, fallos 400 con el mismo JSON que la API). Controladores ya migrados: **`UsuarioController`**, **`PerfilController`**, **`CountyController`**, **`CompanyController`**. El inventario de lo **pendiente** por controlador está en **§9.2**; ir migrando y actualizar esa subsección al cerrar cada módulo.
 - **F — Seguridad ops:** `config/packages/security.yaml`: `login_throttling` en firewall `main` (5 intentos / 15 min); `access_control` migrado de `IS_AUTHENTICATED_ANONYMOUSLY` a `PUBLIC_ACCESS` (recomendación Symfony 7 / anonimato en `access_control`). `config/packages/rate_limiter.yaml` (`api_login`, `api_forgot_password`) + `symfony/lock`: `LoginController` (API JSON) y `UsuarioController::autenticar` (web `/usuario/autenticar`) comparten `limiter.api_login` por IP (429 + `Retry-After`); olvido contraseña API sigue con `api_forgot_password`. Seguir revisando deprecations de Security en cada subida de Symfony (logs en staging).
 
@@ -277,12 +277,11 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 
 **Criterio:** se considera "cubierto" el uso de `App\Dto\…` y `fromHttpRequest` (o DTOs de *query* equivalentes) para entradas HTTP que hoy mapea el controlador a mano.
 
-**Cobertura actual (8 clases):** `App\LoginController`, `App\UsuarioController`, `App\MessageController`, `App\OfflineController`, `Admin\UsuarioController`, `Admin\PerfilController`, `Admin\CountyController`, `Admin\CompanyController`.  
-`AbstractAdminController` no expone rutas: no aplica. **Pendientes de migrar a DTO:** 40 clases (1 en `App\` + 3 en `src/Controller/` raíz + 36 en `Admin\`).
+**Cobertura actual (9 clases con DTOs):** `App\LoginController`, `App\UsuarioController`, `App\MessageController`, `App\OfflineController`, `App\ProjectController`, `Admin\UsuarioController`, `Admin\PerfilController`, `Admin\CountyController`, `Admin\CompanyController`.  
+`AbstractAdminController` no expone rutas: no aplica. **Pendientes de migrar a DTO:** 39 clases (3 en `src/Controller/` raíz + 36 en `Admin\`).
 
 | Prioridad / tipo | Ruta (clase) | Comentario |
 |------------------|-------------|------------|
-| **API app** | `App\ProjectController` | `listar` / `cargarDatos` leen **query**; candidatos: DTOs de consulta o `fromHttpRequest` leyendo `Request::query` / cuerpo según el caso. |
 | **Integración** | `QbwcController` | SOAP/QuickBooks Web Connector; DTOs JSON clásicos suelen no aplicar salvo que se refactoricen entradas. |
 | **Jobs** | `ScriptController` | Tareas internas; DTOs solo si alguna ruta acepta parámetros a validar. |
 | **Herramienta** | `DefaultController` (raíz `src/Controller/`) | *Test email*; prioridad baja. |

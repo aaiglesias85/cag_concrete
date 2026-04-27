@@ -2,25 +2,35 @@
 
 namespace App\Controller\App;
 
+use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Dto\Api\Project\CargarProyectoDatosRequest;
+use App\Dto\Api\Project\ListarProjectsQueryRequest;
 use App\Service\App\LoginService;
 use App\Service\App\ProjectService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'Project', description: 'Project listing endpoints for mobile app')]
 class ProjectController extends AbstractController
 {
+    use ApiValidationResponseTrait;
     use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private ProjectService $projectService;
     private TranslatorInterface $translator;
 
-    public function __construct(LoginService $loginService, ProjectService $projectService, TranslatorInterface $translator)
-    {
+    public function __construct(
+        LoginService $loginService,
+        ProjectService $projectService,
+        TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+    ) {
         $this->loginService = $loginService;
         $this->projectService = $projectService;
         $this->translator = $translator;
@@ -119,23 +129,23 @@ class ProjectController extends AbstractController
     )]
     public function listar(Request $request, string $lang = 'es'): JsonResponse
     {
+        $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
 
         try {
-            $search = (string) $request->query->get('search', '');
-            $empresa_id = (string) $request->query->get('empresa_id', '');
-            $fecha_inicial = (string) $request->query->get('fecha_inicial', '');
-            $fecha_fin = (string) $request->query->get('fecha_fin', '');
-            $limit = (int) $request->query->get('limit', 100);
-            $offset = (int) $request->query->get('offset', 0);
+            $query = ListarProjectsQueryRequest::fromHttpRequest($request);
+            $violations = $this->validator->validate($query);
+            if (\count($violations) > 0) {
+                return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+            }
 
             $resultado = $this->projectService->ListarProjects(
-                $search,
-                $empresa_id,
-                $fecha_inicial,
-                $fecha_fin,
-                $limit > 0 ? $limit : 100,
-                $offset >= 0 ? $offset : 0
+                $query->search,
+                $query->empresa_id,
+                $query->fecha_inicial,
+                $query->fecha_fin,
+                $query->limit,
+                $query->offset
             );
 
             if ($resultado['success']) {
@@ -210,19 +220,17 @@ class ProjectController extends AbstractController
     )]
     public function cargarDatos(Request $request, string $lang = 'es'): JsonResponse
     {
+        $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
 
-        $project_id = trim((string) ($request->query->get('project_id') ?? ''));
-
-        if ('' === $project_id) {
-            return $this->json([
-                'success' => false,
-                'error' => $this->translator->trans('project.error.project_id_required', [], 'messages', $lang) ?: 'project_id is required',
-            ], 400);
+        $dto = CargarProyectoDatosRequest::fromHttpRequest($request);
+        $violations = $this->validator->validate($dto);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
 
         try {
-            $resultado = $this->projectService->CargarDatosProject($project_id);
+            $resultado = $this->projectService->CargarDatosProject($dto->project_id);
 
             if ($resultado['success']) {
                 return $this->json([

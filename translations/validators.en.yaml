@@ -4,3 +4,4 @@ api:
     profile_offline_required: 'The profile_offline object is required in the JSON body.'
     conversation_id_with_message_id: 'When message_id is set, you must also send a valid conversation_id.'
     imagen_required: 'You must send the base64 image in the imagen field.'
+    project_id_required: 'The project_id query parameter is required.'
