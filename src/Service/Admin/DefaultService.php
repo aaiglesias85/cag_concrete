@@ -31,27 +31,31 @@ use App\Repository\MaterialRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class DefaultService extends Base
 {
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         MailerInterface $mailer,
         ContainerBagInterface $containerBag,
         Security $security,
         LoggerInterface $logger,
-        private readonly WidgetAccessService $widgetAccessService,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         private readonly TaskService $taskService,
         private readonly ScheduleService $scheduleService,
         private readonly EstimateService $estimateService,
         private readonly DataTrackingService $dataTrackingService,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
     }
 
     /*

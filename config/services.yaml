@@ -29,11 +29,9 @@ services:
    kernel.listener.exception_listener:
       class: App\Listener\RedirectExceptionListener
       arguments:
-         $serviceContainer: '@service_container'
+         $urlGenerator: '@router'
       tags:
          - { name: kernel.event_listener, event: kernel.exception, method: checkRedirect }
-
-   Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
 
    # default configuration for services in *this* file
    _defaults:
@@ -55,8 +53,8 @@ services:
       resource: '../src/Controller'
       tags: ['controller.service_arguments']
 
-   # Público para que App\Service\App\ProjectService pueda resolverlo de forma perezosa (container->get)
-   # y así no cargar Doctrine al generar api/doc
+   # Público: Nelmio/api-doc u otras rutas pueden resolver el servicio; el admin ProjectService
+   # se inyecta en App\ProjectService con #[Lazy] para no cargar Doctrine hasta el primer uso.
    App\Service\Admin\ProjectService:
       public: true
 

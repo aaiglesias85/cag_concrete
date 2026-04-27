@@ -12,6 +12,7 @@ Aplicación empresarial para gestión de proyectos de construcción: estimacione
 
 | Documento | Contenido |
 |-----------|-------------|
+| [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) | Roadmap Symfony 7 / PHP 8.2+ (calidad, DI, tests); **§2.1** resume el progreso en reducción del service locator |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura actual, trade-offs (monolito vs microservicios, etc.), complejidad y líneas de evolución recomendadas |
 | [docs/PHASE_A_REDUCIR_COMPLEJIDAD.md](docs/PHASE_A_REDUCIR_COMPLEJIDAD.md) | Guía de implementación de la Fase A: capas, módulos, migraciones y tests (sin Messenger) |
 | [docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md](docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md) | **Override Payment:** reglas por mes, cadena de unpaid (mes de cabecera vs posteriores), flujo, archivos y depuración |

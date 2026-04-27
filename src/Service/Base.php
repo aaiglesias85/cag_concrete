@@ -36,46 +36,35 @@ use App\Entity\Unit;
 use App\Entity\UserQbwcToken;
 use App\Entity\Usuario;
 use App\Service\Admin\WidgetAccessService;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Environment;
 
 class Base
 {
-    private $container;
-    private $containerBag;
-    public $mailer;
-    public $security;
-    public LoggerInterface $logger;
-
     public function __construct(
-        ContainerInterface $container,
-        MailerInterface $mailer,
-        ContainerBagInterface $containerBag,
-        Security $security,
-        LoggerInterface $logger,
+        protected ManagerRegistry $doctrine,
+        public MailerInterface $mailer,
+        protected ContainerBagInterface $containerBag,
+        public Security $security,
+        public LoggerInterface $logger,
+        protected UrlGeneratorInterface $urlGenerator,
+        protected Environment $twig,
+        protected WidgetAccessService $widgetAccessService,
     ) {
-        $this->container = $container;
-        $this->mailer = $mailer;
-        $this->containerBag = $containerBag;
-        $this->security = $security;
-        $this->logger = $logger;
     }
 
     // doctrine manager
-    public function getDoctrine(): Registry
+    public function getDoctrine(): ManagerRegistry
     {
-        if (!$this->container->has('doctrine')) {
-            throw new \LogicException('The DoctrineBundle is not registered in your application. Try running "composer require symfony/orm-pack".');
-        }
-
-        return $this->container->get('doctrine');
+        return $this->doctrine;
     }
 
     /**
@@ -91,21 +80,13 @@ class Base
     // Generates a URL from the given parameters.
     public function generateUrl(string $route, array $parameters = [], int $referenceType = 1): string
     {
-        return $this->container->get('router')->generate($route, $parameters, $referenceType);
+        return $this->urlGenerator->generate($route, $parameters, $referenceType);
     }
 
     // Returns a rendered view.
     public function renderView(string $view, array $parameters = []): string
     {
-        if ($this->container->has('templating')) {
-            return $this->container->get('templating')->render($view, $parameters);
-        }
-
-        if (!$this->container->has('twig')) {
-            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
-        }
-
-        return $this->container->get('twig')->render($view, $parameters);
+        return $this->twig->render($view, $parameters);
     }
 
     // getParameter
@@ -570,21 +551,18 @@ class Base
             }
         }
 
-        $wSvc = $this->getWidgetAccessService();
-        if (null !== $wSvc) {
-            $wFlags = $wSvc->getLayoutWidgetFlagsForUser($usuario_id);
-            $widgetTasks = $wFlags['widgetTasks'];
-            $widgetWorkSchedule = $wFlags['widgetWorkSchedule'];
-            $widgetBidDeadlines = $wFlags['widgetBidDeadlines'];
-            $widgetEstimateWinLoss = $wFlags['widgetEstimateWinLoss'];
-            $widgetEstimatesSubmitted = $wFlags['widgetEstimatesSubmitted'];
-            $widgetEstimatorShare = $wFlags['widgetEstimatorShare'];
-            $widgetCurrentMonthProjects = $wFlags['widgetCurrentMonthProjects'];
-            $widgetInvoicedProjects = $wFlags['widgetInvoicedProjects'];
-            $widgetPayItemTotals = $wFlags['widgetPayItemTotals'];
-            $widgetInvoiceProfitShare = $wFlags['widgetInvoiceProfitShare'];
-            $widgetJobCostBreakdown = $wFlags['widgetJobCostBreakdown'];
-        }
+        $wFlags = $this->getWidgetAccessService()->getLayoutWidgetFlagsForUser($usuario_id);
+        $widgetTasks = $wFlags['widgetTasks'];
+        $widgetWorkSchedule = $wFlags['widgetWorkSchedule'];
+        $widgetBidDeadlines = $wFlags['widgetBidDeadlines'];
+        $widgetEstimateWinLoss = $wFlags['widgetEstimateWinLoss'];
+        $widgetEstimatesSubmitted = $wFlags['widgetEstimatesSubmitted'];
+        $widgetEstimatorShare = $wFlags['widgetEstimatorShare'];
+        $widgetCurrentMonthProjects = $wFlags['widgetCurrentMonthProjects'];
+        $widgetInvoicedProjects = $wFlags['widgetInvoicedProjects'];
+        $widgetPayItemTotals = $wFlags['widgetPayItemTotals'];
+        $widgetInvoiceProfitShare = $wFlags['widgetInvoiceProfitShare'];
+        $widgetJobCostBreakdown = $wFlags['widgetJobCostBreakdown'];
 
         return [
             'menuInicio' => $menuInicio,
@@ -642,15 +620,9 @@ class Base
         ];
     }
 
-    protected function getWidgetAccessService(): ?WidgetAccessService
+    protected function getWidgetAccessService(): WidgetAccessService
     {
-        if (!$this->container->has(WidgetAccessService::class)) {
-            return null;
-        }
-        /** @var WidgetAccessService $s */
-        $s = $this->container->get(WidgetAccessService::class);
-
-        return $s;
+        return $this->widgetAccessService;
     }
 
     // Devolver primera funcion con permiso

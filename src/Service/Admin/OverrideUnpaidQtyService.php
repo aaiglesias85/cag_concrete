@@ -13,24 +13,30 @@ use App\Repository\InvoiceItemOverridePaymentUnpaidQtyHistoryRepository;
 use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\ProjectItemRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class OverrideUnpaidQtyService extends Base
 {
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         MailerInterface $mailer,
         ContainerBagInterface $containerBag,
         Security $security,
         LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
     }
 
     /**

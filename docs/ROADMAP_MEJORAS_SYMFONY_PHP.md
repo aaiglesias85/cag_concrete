@@ -25,8 +25,8 @@ Este documento resume el **análisis del estado actual** del proyecto y propone 
 |------|---------------------------|------------|
 | **Controladores** | Acciones que delegan en `*Service` y componen plantillas/JSON | Coherente con Symfony; se beneficia de más delgadez y menos duplicación. |
 | **Lógica de negocio** | `App\Service\Admin`, `App\Service\App` y `App\Service\Base` | Namespace unificado en `App\Service\*` (antes `App\Utils\*`). |
-| **Clase `Base`** | Muy grande, inyecta el contenedor, `getDoctrine()`, `container->get` puntuales | Típico cuello de botella para tests, refactors y tipado. |
-| **Inyección de dependencias** | Autowire en `config/services.yaml`; algunos usos de `ContainerInterface` y `container->get` | Funciona, pero dificulta el análisis estático y los tests unitarios. |
+| **Clase `Base`** | Muy grande; **ya no** usa el contenedor como localizador para Doctrine, router, Twig ni `WidgetAccessService` (inyección explícita en constructor) | Sigue siendo un “Dios object” por tamaño y responsabilidades; ver §2.2. |
+| **Inyección de dependencias** | Autowire en `config/services.yaml`; en `App\Service\*` **sin** `container->get`; `RedirectExceptionListener` usa `UrlGeneratorInterface`; eliminado alias redundante `ContainerInterface → service_container` | Pendiente solo pulir casos nuevos o bundles; la capa de servicios queda alineada con DI explícita. |
 | **Autorización** | `AdminAccessService` + lógica antigua en `Base::BuscarPermiso` (en migración) | Buen paso: centralizar en un servicio dedicado. |
 | **Pruebas automáticas** | Casi inexistentes más allá del `bootstrap` | Alto riesgo de regresiones al cambiar lógica crítica. |
 
@@ -50,6 +50,8 @@ Este roadmap **no** obliga a reescribir todo; apunta a **mover el código hacia 
 4. Mantener *como excepción* muy acotada el contenedor (p. ej. fábricas realmente dinámicas) y documentar el motivo.
 
 **Ganancias:** Código autodocumentado, tests más simples, menos sorpresas al actualizar Symfony, mejor soporte del IDE y de PHPStan.
+
+**Progreso aplicado en el repo (referencia):** `Base` y servicios que la extienden reciben `ManagerRegistry`, `UrlGeneratorInterface`, `Environment` (Twig) y `WidgetAccessService` por constructor; `App\Service\App\ProjectService` inyecta el `ProjectService` de admin con `#[Lazy]` donde aplica; listener de redirección en 404 inyecta el generador de URLs; `ContainerBagInterface` se mantiene solo para parámetros (`%param%`), no para resolver servicios.
 
 ---
 
@@ -239,15 +241,24 @@ Asegurar documentación mínima de `env` requeridos (puede vivir en `.env` comen
 
 Agrupado en **fases** para tocar poco a poco y poder desplegar entre medias.
 
-| Fase | Acciones | Esfuerzo aprox. | Riesgo |
-|------|----------|-----------------|--------|
-| **A — Fundación** | PHPStan con baseline; CS Fixer en CI; 1er test de humo (kernel o ruta) | Bajo / medio | Bajo |
-| **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental |
-| **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests |
-| **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo |
-| **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio |
-| **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo |
-| **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero |
+La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El detalle concreto del repo está en la lista **§9.1** (mantenerla al día cuando cambie algo).
+
+| Fase | Acciones | Esfuerzo aprox. | Riesgo | Estado |
+|------|----------|-----------------|--------|--------|
+| **A — Fundación** | PHPStan con baseline; CS Fixer en CI; 1er test de humo (kernel o ruta) | Bajo / medio | Bajo | **Hecho** |
+| **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental | **Hecho** |
+| **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Pendiente** |
+| **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo | **Hecho** |
+| **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Pendiente** |
+| **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Parcial** |
+| **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero | **Pendiente** |
+
+### 9.1. Detalle del estado (última revisión documental)
+
+- **A — Fundación:** PHPStan con baseline (`phpstan.neon` / `phpstan-baseline.neon`), `composer phpstan` y `phpstan:full`; PHP-CS-Fixer; hook **pre-push** `.githooks/pre-push` (sustituye o complementa “CI” hasta tener pipeline); smoke `tests/SmokeTest.php` + `composer test`.
+- **B — DI limpia:** Sin `container->get` en `App\Service\*`; `Base` con dependencias explícitas (Doctrine, URL generator, Twig, `WidgetAccessService`); `RedirectExceptionListener` inyecta `UrlGeneratorInterface`; retirado alias redundante `ContainerInterface → service_container` en `config/services.yaml`. Convención: no reintroducir localizador sin justificar.
+- **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
+- **F — Seguridad ops:** Login throttling activo en firewall `main`; falta una revisión explícita de deprecations / ajustes Security en futuras subidas de Symfony (marcar **Hecho** cuando esté auditado y aplicado).
 
 ---
 
@@ -273,4 +284,4 @@ Agrupado en **fases** para tocar poco a poco y poder desplegar entre medias.
 
 ---
 
-*Documento vivo: actualizar fases a medida que se completen, anotar fecha y PR de referencia en cada fase completada.*
+*Documento vivo: mantener la tabla del §9 (columna **Estado**); al cerrar una fase, actualizar la celda y opcionalmente una línea aquí con fecha / PR — p. ej. `B — DI limpia: 2026-04 (PR …)`.*

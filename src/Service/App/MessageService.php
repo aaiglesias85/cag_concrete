@@ -8,11 +8,19 @@ use App\Entity\Usuario;
 use App\Repository\MessageConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UsuarioRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
 use App\Service\PushNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Psr\Log\LoggerInterface;
+use Twig\Environment;
 
 /**
  * Servicio de mensajería interna para la app.
@@ -40,11 +48,14 @@ class MessageService extends Base
     private const GOOGLE_TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
 
     public function __construct(
-        \Symfony\Component\DependencyInjection\ContainerInterface $container,
-        \Symfony\Component\Mailer\MailerInterface $mailer,
-        \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
-        \Symfony\Bundle\SecurityBundle\Security $security,
-        \Psr\Log\LoggerInterface $logger,
+        ManagerRegistry $doctrine,
+        MailerInterface $mailer,
+        ContainerBagInterface $containerBag,
+        Security $security,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         MessageConversationRepository $conversationRepository,
         MessageRepository $messageRepository,
         UsuarioRepository $usuarioRepository,
@@ -54,7 +65,7 @@ class MessageService extends Base
         string $googleTranslateApiKey = '',
         string $projectDir = '',
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
         $this->conversationRepository = $conversationRepository;
         $this->messageRepository = $messageRepository;
         $this->usuarioRepository = $usuarioRepository;

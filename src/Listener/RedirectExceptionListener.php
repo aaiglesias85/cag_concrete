@@ -5,24 +5,20 @@ namespace App\Listener;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class RedirectExceptionListener
 {
-    /**
-     * @var \Symfony\Component\DependencyInjection\ContainerInterface
-     */
-    private $serviceContainer;
-
-    public function __construct($serviceContainer)
-    {
-        $this->serviceContainer = $serviceContainer;
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {
     }
 
-    public function checkRedirect(ExceptionEvent $event)
+    public function checkRedirect(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         if ($exception instanceof NotFoundHttpException) {
-            $response = new RedirectResponse($this->serviceContainer->get('router')->generate('home'));
+            $response = new RedirectResponse($this->urlGenerator->generate('home'));
             $event->setResponse($response);
         }
     }

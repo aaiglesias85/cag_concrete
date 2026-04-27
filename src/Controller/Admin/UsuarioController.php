@@ -13,6 +13,7 @@ use App\Service\Admin\UsuarioService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class UsuarioController extends AbstractAdminController
@@ -22,8 +23,12 @@ class UsuarioController extends AbstractAdminController
     private $rolRepository;
     private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-    public function __construct(AdminAccessService $adminAccess, UsuarioService $usuarioService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        UsuarioService $usuarioService,
+        FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
+        private TokenStorageInterface $tokenStorage,
+    ) {
         parent::__construct($adminAccess);
         $this->usuarioService = $usuarioService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
@@ -71,8 +76,7 @@ class UsuarioController extends AbstractAdminController
                 $token = new UsernamePasswordToken($entity, 'main', $entity->getRoles());
 
                 // Guardar el token en el token storage
-                $tokenStorage = $this->container->get('security.token_storage');
-                $tokenStorage->setToken($token);
+                $this->tokenStorage->setToken($token);
 
                 // Guardar la sesión explícitamente para asegurar que el token persista
                 $session->set('_security_main', serialize($token));

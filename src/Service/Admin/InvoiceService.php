@@ -17,7 +17,9 @@ use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
@@ -27,29 +29,28 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
-use Twig\Environment as TwigEnvironment;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class InvoiceService extends Base
 {
-    private TwigEnvironment $twig;
-
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         MailerInterface $mailer,
         ContainerBagInterface $containerBag,
         Security $security,
         LoggerInterface $logger,
-        TwigEnvironment $twig,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         private InvoicePaidQtyOverrideResolver $paidQtyOverrideResolver,
         private InvoiceUnpaidQtyOverrideResolver $unpaidQtyOverrideResolver,
         #[Autowire(lazy: true)]
         private ProjectService $projectService,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
-        $this->twig = $twig;
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
     }
 
     /**

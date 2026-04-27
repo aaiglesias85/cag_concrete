@@ -3,27 +3,37 @@
 namespace App\Service\App;
 
 use App\Service\Admin\ProjectService as AdminProjectService;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Lazy;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Servicio de proyectos para la API de la app.
  * Lista proyectos con filtros y carga datos completos (delega en el servicio Admin).
- * AdminProjectService se obtiene de forma perezosa para no cargar Doctrine al generar api/doc.
+ * AdminProjectService es lazy: no se instancia hasta el primer uso (útil al generar api/doc).
  */
 class ProjectService extends Base
 {
-    private ContainerInterface $container;
-
     public function __construct(
-        ContainerInterface $container,
-        \Symfony\Component\Mailer\MailerInterface $mailer,
-        \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
-        \Symfony\Bundle\SecurityBundle\Security $security,
-        \Psr\Log\LoggerInterface $logger,
+        ManagerRegistry $doctrine,
+        MailerInterface $mailer,
+        ContainerBagInterface $containerBag,
+        Security $security,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
+        #[Lazy]
+        private AdminProjectService $adminProjectService,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
-        $this->container = $container;
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
     }
 
     /**
@@ -53,9 +63,8 @@ class ProjectService extends Base
             $fecha_inicial = $this->normalizeDate($fecha_inicial);
             $fecha_fin = $this->normalizeDate($fecha_fin);
 
-            $adminProjectService = $this->container->get(AdminProjectService::class);
-            $total = $adminProjectService->TotalProjects($search, $empresa_id, '', $fecha_inicial, $fecha_fin);
-            $data = $adminProjectService->ListarProjects(
+            $total = $this->adminProjectService->TotalProjects($search, $empresa_id, '', $fecha_inicial, $fecha_fin);
+            $data = $this->adminProjectService->ListarProjects(
                 $offset,
                 $limit > 0 ? $limit : 100,
                 $search,
@@ -117,17 +126,16 @@ class ProjectService extends Base
      */
     public function CargarDatosProject($project_id): array
     {
-        $adminProjectService = $this->container->get(AdminProjectService::class);
-        $result = $adminProjectService->CargarDatosProject($project_id);
+        $result = $this->adminProjectService->CargarDatosProject($project_id);
 
         if ($result['success'] && isset($result['project'])) {
-            $listarDt = $adminProjectService->ListarDataTrackings(0, 5000, '', 0, 'asc', (string) $project_id, '', '', '', '');
+            $listarDt = $this->adminProjectService->ListarDataTrackings(0, 5000, '', 0, 'asc', (string) $project_id, '', '', '', '');
             $result['project']['data_tracking'] = $listarDt['data'] ?? [];
 
-            $invoices = $adminProjectService->ListarInvoicesDeProject($project_id);
+            $invoices = $this->adminProjectService->ListarInvoicesDeProject($project_id);
             $result['project']['invoices'] = $invoices;
 
-            $notes = $adminProjectService->ListarNotesDeProject($project_id);
+            $notes = $this->adminProjectService->ListarNotesDeProject($project_id);
             $result['project']['notes'] = $notes;
 
             // Historial por ítem (change order, cantidad, precio) para la app
@@ -135,7 +143,7 @@ class ProjectService extends Base
                 foreach ($result['project']['items'] as $k => $item) {
                     $project_item_id = $item['project_item_id'] ?? $item['id'] ?? null;
                     if ($project_item_id) {
-                        $result['project']['items'][$k]['item_history'] = $adminProjectService->ListarHistorialDeItem($project_item_id);
+                        $result['project']['items'][$k]['item_history'] = $this->adminProjectService->ListarHistorialDeItem($project_item_id);
                     }
                 }
             }

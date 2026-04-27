@@ -30,12 +30,15 @@ use App\Repository\DataTrackingRepository;
 use App\Repository\DataTrackingSubcontractRepository;
 use App\Repository\ProjectConcreteClassRepository;
 use App\Repository\ProjectItemHistoryRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class DataTrackingService extends Base
 {
@@ -43,14 +46,17 @@ class DataTrackingService extends Base
     private $invoiceService;
 
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         MailerInterface $mailer,
         ContainerBagInterface $containerBag,
         Security $security,
         LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         InvoiceService $invoiceService,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
         $this->invoiceService = $invoiceService;
     }
 

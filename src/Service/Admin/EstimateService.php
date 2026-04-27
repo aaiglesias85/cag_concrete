@@ -39,31 +39,37 @@ use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\EstimateQuoteRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\EstimateTemplateNoteRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 class EstimateService extends Base
 {
     private MailerInterface $mailerQuotes;
 
     public function __construct(
-        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         MailerInterface $mailer,
         ContainerBagInterface $containerBag,
         Security $security,
         LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         MailerInterface $mailerQuotes,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
         $this->mailerQuotes = $mailerQuotes;
     }
 

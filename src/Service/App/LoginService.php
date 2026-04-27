@@ -5,11 +5,19 @@ namespace App\Service\App;
 use App\Entity\AccessToken;
 use App\Entity\Usuario;
 use App\Repository\UsuarioRepository;
+use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
+use Doctrine\Persistence\ManagerRegistry;
 use Firebase\JWT\JWT;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class LoginService extends Base
 {
@@ -18,15 +26,18 @@ class LoginService extends Base
     private TranslatorInterface $translator;
 
     public function __construct(
-        \Symfony\Component\DependencyInjection\ContainerInterface $container,
-        \Symfony\Component\Mailer\MailerInterface $mailer,
-        \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
-        \Symfony\Bundle\SecurityBundle\Security $security,
-        \Psr\Log\LoggerInterface $logger,
+        ManagerRegistry $doctrine,
+        MailerInterface $mailer,
+        ContainerBagInterface $containerBag,
+        Security $security,
+        LoggerInterface $logger,
+        UrlGeneratorInterface $urlGenerator,
+        Environment $twig,
+        WidgetAccessService $widgetAccessService,
         RequestStack $requestStack,
         TranslatorInterface $translator,
     ) {
-        parent::__construct($container, $mailer, $containerBag, $security, $logger);
+        parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
         $this->requestStack = $requestStack;
         $this->translator = $translator;
     }
