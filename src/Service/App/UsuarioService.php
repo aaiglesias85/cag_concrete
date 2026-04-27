@@ -5,7 +5,7 @@ namespace App\Service\App;
 use App\Entity\Usuario;
 use App\Service\Admin\UsuarioService as AdminUsuarioService;
 use App\Service\Admin\WidgetAccessService;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

@@ -4,7 +4,7 @@ namespace App\Service\Admin;
 
 use App\Entity\Holiday;
 use App\Repository\HolidayRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class HolidayService extends Base
 {

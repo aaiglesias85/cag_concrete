@@ -20,7 +20,7 @@ use App\Repository\InvoiceItemRepository;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\SyncQueueQbwcRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ItemService extends Base
 {

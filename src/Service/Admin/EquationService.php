@@ -12,7 +12,7 @@ use App\Repository\EquationRepository;
 use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\ItemRepository;
 use App\Repository\ProjectItemRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class EquationService extends Base
 {

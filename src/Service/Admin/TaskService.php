@@ -5,7 +5,7 @@ namespace App\Service\Admin;
 use App\Entity\Task;
 use App\Entity\Usuario;
 use App\Repository\TaskRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class TaskService extends Base
 {

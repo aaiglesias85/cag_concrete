@@ -11,7 +11,7 @@ use App\Repository\CompanyContactRepository;
 use App\Repository\CompanyRepository;
 use App\Repository\EstimateCompanyRepository;
 use App\Repository\ProjectRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class CompanyService extends Base
 {

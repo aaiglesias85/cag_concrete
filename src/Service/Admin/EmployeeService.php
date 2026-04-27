@@ -9,7 +9,7 @@ use App\Entity\ScheduleEmployee;
 use App\Repository\DataTrackingLaborRepository;
 use App\Repository\EmployeeRepository;
 use App\Repository\ScheduleEmployeeRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class EmployeeService extends Base
 {

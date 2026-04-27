@@ -6,7 +6,7 @@ use App\Entity\Estimate;
 use App\Entity\PlanStatus;
 use App\Repository\EstimateRepository;
 use App\Repository\PlanStatusRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class PlanStatusService extends Base
 {

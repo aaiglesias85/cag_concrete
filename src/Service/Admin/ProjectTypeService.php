@@ -6,7 +6,7 @@ use App\Entity\EstimateProjectType;
 use App\Entity\ProjectType;
 use App\Repository\EstimateProjectTypeRepository;
 use App\Repository\ProjectTypeRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ProjectTypeService extends Base
 {

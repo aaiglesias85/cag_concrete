@@ -14,7 +14,7 @@ use App\Repository\DataTrackingConcVendorRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ConcreteVendorService extends Base
 {

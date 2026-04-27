@@ -24,7 +24,7 @@ Este documento resume el **análisis del estado actual** del proyecto y propone 
 | Área | Lo que hoy tenés (patrón) | Comentario |
 |------|---------------------------|------------|
 | **Controladores** | Acciones que delegan en `*Service` y componen plantillas/JSON | Coherente con Symfony; se beneficia de más delgadez y menos duplicación. |
-| **Lógica de negocio** | `App\Service\Admin`, `App\Service\App` y `App\Service\Base` | Namespace unificado en `App\Service\*` (antes `App\Utils\*`). |
+| **Lógica de negocio** | `App\Service\Admin`, `App\Service\App` y carpeta `App\Service\Base\` (`Base` + servicios satélite) | Namespace unificado en `App\Service\*` (antes `App\Utils\*`). |
 | **Clase `Base`** | Muy grande; **ya no** usa el contenedor como localizador para Doctrine, router, Twig ni `WidgetAccessService` (inyección explícita en constructor) | Sigue siendo un “Dios object” por tamaño y responsabilidades; ver §2.2. |
 | **Inyección de dependencias** | Autowire en `config/services.yaml`; en `App\Service\*` **sin** `container->get`; `RedirectExceptionListener` usa `UrlGeneratorInterface`; eliminado alias redundante `ContainerInterface → service_container` | Pendiente solo pulir casos nuevos o bundles; la capa de servicios queda alineada con DI explícita. |
 | **Autorización** | `AdminAccessService` + lógica antigua en `Base::BuscarPermiso` (en migración) | Buen paso: centralizar en un servicio dedicado. |
@@ -247,7 +247,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 |------|----------|-----------------|--------|--------|
 | **A — Fundación** | PHPStan con baseline; CS Fixer en CI; 1er test de humo (kernel o ruta) | Bajo / medio | Bajo | **Hecho** |
 | **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental | **Hecho** |
-| **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Pendiente** |
+| **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Hecho** (fachada + satélites; ver §9.1) |
 | **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo | **Hecho** |
 | **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Pendiente** |
 | **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Parcial** |
@@ -257,6 +257,11 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 
 - **A — Fundación:** PHPStan con baseline (`phpstan.neon` / `phpstan-baseline.neon`), `composer phpstan` y `phpstan:full`; PHP-CS-Fixer; hook **pre-push** `.githooks/pre-push` (sustituye o complementa “CI” hasta tener pipeline); smoke `tests/SmokeTest.php` + `composer test`.
 - **B — DI limpia:** Sin `container->get` en `App\Service\*`; `Base` con dependencias explícitas (Doctrine, URL generator, Twig, `WidgetAccessService`); `RedirectExceptionListener` inyecta `UrlGeneratorInterface`; retirado alias redundante `ContainerInterface → service_container` en `config/services.yaml`. Convención: no reintroducir localizador sin justificar.
+- **C — Base:** Cumplido respecto al criterio de la tabla (“extraer al menos un módulo”): la lógica ya no vive solo en `Base`. `App\Service\Base\Base` actúa como **fachada** con `#[Required]` + fallback defensivo (mismo patrón que el resto de colaboradores) hacia servicios dedicados:
+  - **Admin (no bajo `Base/`):** permisos/menú → `App\Service\Admin\UserPermissionMenuService` (con fallback `new …($doctrine, $widgetAccessService)`).
+  - **Bajo `App\Service\Base\`:** `BaseFileLogService`, `BaseDateFormatService`, `BaseCleanupService`, `BaseInvoicePaymentsDisplayService`, `BaseApplicationLogService`, `BaseTextNormalizationService`, `BasePasswordService`, `BaseCalendarMonthService`, `BaseItemYieldCatalogService`, `BaseYieldExpressionService`, `BaseConcreteYieldMetricsService`, `BaseContactListingService`, `BaseHolidayCountyService`, `BaseProjectNotesWriterService`.
+  - **Aún en `Base` (candidatos futuros §2.2):** helpers HTTP/legacy (`isMobile`, `getIP`, `ObtenerURL`), ordenación de arrays (`ordenarArrayAsc`/`Desc`), `estilizarCelda` (PhpSpreadsheet), y la fachada pública que mantienen los hijos sin tocar firmas.
+  - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
 - **F — Seguridad ops:** Login throttling activo en firewall `main`; falta una revisión explícita de deprecations / ajustes Security en futuras subidas de Symfony (marcar **Hecho** cuando esté auditado y aplicado).
 

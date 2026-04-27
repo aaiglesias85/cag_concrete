@@ -12,7 +12,7 @@ use App\Repository\DataTrackingSubcontractRepository;
 use App\Repository\SubcontractorEmployeeRepository;
 use App\Repository\SubcontractorNotesRepository;
 use App\Repository\SubcontractorRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class SubcontractorService extends Base
 {

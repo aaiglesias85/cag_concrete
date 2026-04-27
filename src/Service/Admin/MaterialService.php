@@ -7,7 +7,7 @@ use App\Entity\Material;
 use App\Entity\Unit;
 use App\Repository\DataTrackingMaterialRepository;
 use App\Repository\MaterialRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class MaterialService extends Base
 {

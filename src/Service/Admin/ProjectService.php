@@ -66,7 +66,7 @@ use App\Repository\ProjectRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 // use App\Service\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;

@@ -6,7 +6,7 @@ use App\Entity\AccessToken;
 use App\Entity\Usuario;
 use App\Repository\UsuarioRepository;
 use App\Service\Admin\WidgetAccessService;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Firebase\JWT\JWT;
 use Psr\Log\LoggerInterface;

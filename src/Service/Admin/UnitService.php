@@ -8,7 +8,7 @@ use App\Entity\Unit;
 use App\Repository\ItemRepository;
 use App\Repository\MaterialRepository;
 use App\Repository\UnitRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class UnitService extends Base
 {

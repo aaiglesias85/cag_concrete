@@ -8,7 +8,7 @@ use App\Entity\Project;
 use App\Repository\DataTrackingRepository;
 use App\Repository\InspectorRepository;
 use App\Repository\ProjectRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class InspectorService extends Base
 {

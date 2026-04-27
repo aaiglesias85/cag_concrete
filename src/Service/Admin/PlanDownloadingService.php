@@ -6,7 +6,7 @@ use App\Entity\Estimate;
 use App\Entity\PlanDownloading;
 use App\Repository\EstimateRepository;
 use App\Repository\PlanDownloadingRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class PlanDownloadingService extends Base
 {

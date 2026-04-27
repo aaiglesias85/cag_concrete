@@ -6,7 +6,7 @@ use App\Entity\Employee;
 use App\Entity\Race;
 use App\Repository\EmployeeRepository;
 use App\Repository\RaceRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class RaceService extends Base
 {

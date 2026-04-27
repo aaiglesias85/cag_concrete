@@ -6,7 +6,7 @@ use App\Constants\FunctionId;
 use App\Entity\Log;
 use App\Entity\Usuario;
 use App\Repository\LogRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class LogService extends Base
 {

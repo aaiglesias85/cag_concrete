@@ -20,7 +20,7 @@ use App\Repository\HolidayRepository;
 use App\Repository\ScheduleConcreteVendorContactRepository;
 use App\Repository\ScheduleEmployeeRepository;
 use App\Repository\ScheduleRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;

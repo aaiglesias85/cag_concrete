@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Acceso reutilizable para el panel /admin: usuario autenticado como entidad Usuario
- * y comprobación de permisos por función (misma lógica que App\Service\Base::BuscarPermiso).
+ * y comprobación de permisos por función (misma lógica que App\Service\Base\Base::BuscarPermiso).
  *
  * Uso: inyectar en el controlador y, al inicio de la acción:
  *  - exigirUsuarioOlogin: rutas que solo requieren sesión válida
@@ -69,7 +69,7 @@ class AdminAccessService
     }
 
     /**
-     * Replica el formato de App\Service\Base::BuscarPermiso (sin acoplar al contenedor de Base).
+     * Replica el formato de App\Service\Base\Base::BuscarPermiso (sin acoplar al contenedor de Base).
      *
      * @return array<int, array<string, mixed>>
      */

@@ -8,7 +8,7 @@ use App\Entity\Estimate;
 use App\Repository\CountyRepository;
 use App\Repository\DistrictRepository;
 use App\Repository\EstimateRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class DistrictService extends Base
 {

@@ -6,7 +6,7 @@ use App\Entity\Employee;
 use App\Entity\EmployeeRole;
 use App\Repository\EmployeeRepository;
 use App\Repository\EmployeeRoleRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class EmployeeRoleService extends Base
 {

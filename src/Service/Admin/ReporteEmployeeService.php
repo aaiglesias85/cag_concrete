@@ -4,7 +4,7 @@ namespace App\Service\Admin;
 
 use App\Entity\DataTrackingLabor;
 use App\Repository\DataTrackingLaborRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;

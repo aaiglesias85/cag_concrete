@@ -122,7 +122,7 @@ Cualquier informe o comparación histórica con números antiguos debe tener en 
 |-----|---------|
 | Cálculo `diff_qty` / `diff_amt` | `src/Service/Admin/ProjectService.php` → `ListarItemsCompletion` |
 | Agregaciones `SUM(...)` | `src/Repository/InvoiceItemRepository.php` |
-| Notas por `invoice_item` | `src/Repository/InvoiceItemNotesRepository.php`; `src/Service/Base.php` → `ListarNotesDeItemInvoice` |
+| Notas por `invoice_item` | `src/Repository/InvoiceItemNotesRepository.php`; `src/Service/Base/BaseInvoicePaymentsDisplayService.php` → `ListarNotesDeItemInvoice` (vía `Base`) |
 | Líneas por `project_item` | `InvoiceItemRepository::ListarInvoicesDeItem` |
 | Tab Completion | `public/assets/metronic8/js/pages/projects.js`, `projects-detalle.js` (`initTableItemsCompletion`) |
 

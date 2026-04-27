@@ -8,7 +8,7 @@ use App\Entity\Rol;
 use App\Entity\Usuario;
 use App\Repository\PermisoUsuarioRepository;
 use App\Repository\UsuarioRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;

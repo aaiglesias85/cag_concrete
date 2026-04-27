@@ -6,7 +6,7 @@ use App\Entity\DataTracking;
 use App\Entity\OverheadPrice;
 use App\Repository\DataTrackingRepository;
 use App\Repository\OverheadPriceRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class OverheadPriceService extends Base
 {

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Service\Base\Base;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\DataTracking;

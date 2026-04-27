@@ -5,7 +5,7 @@ namespace App\Service\Admin;
 use App\Entity\Notification;
 use App\Entity\Usuario;
 use App\Repository\NotificationRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class NotificationService extends Base
 {

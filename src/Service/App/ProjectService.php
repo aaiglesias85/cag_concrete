@@ -4,7 +4,7 @@ namespace App\Service\App;
 
 use App\Service\Admin\ProjectService as AdminProjectService;
 use App\Service\Admin\WidgetAccessService;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

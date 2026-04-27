@@ -4,7 +4,7 @@ namespace App\Service\Admin;
 
 use App\Entity\EstimateNoteItem;
 use App\Repository\EstimateNoteItemRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class EstimateNoteItemService extends Base
 {

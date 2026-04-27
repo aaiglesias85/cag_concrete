@@ -8,7 +8,7 @@ use App\Entity\ProjectStage;
 use App\Entity\Usuario;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectStageRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ProjectStageService extends Base
 {

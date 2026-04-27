@@ -4,7 +4,7 @@ namespace App\Service\Admin;
 
 use App\Entity\DataTrackingSubcontract;
 use App\Repository\DataTrackingSubcontractRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;

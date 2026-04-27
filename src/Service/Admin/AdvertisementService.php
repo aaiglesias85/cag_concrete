@@ -4,7 +4,7 @@ namespace App\Service\Admin;
 
 use App\Entity\Advertisement;
 use App\Repository\AdvertisementRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class AdvertisementService extends Base
 {

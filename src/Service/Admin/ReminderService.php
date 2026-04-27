@@ -7,7 +7,7 @@ use App\Entity\ReminderRecipient;
 use App\Entity\Usuario;
 use App\Repository\ReminderRecipientRepository;
 use App\Repository\ReminderRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ReminderService extends Base
 {

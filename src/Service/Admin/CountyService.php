@@ -9,7 +9,7 @@ use App\Entity\ProjectCounty;
 use App\Repository\CountyRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectCountyRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class CountyService extends Base
 {

@@ -30,7 +30,7 @@ use App\Repository\DataTrackingRepository;
 use App\Repository\DataTrackingSubcontractRepository;
 use App\Repository\ProjectConcreteClassRepository;
 use App\Repository\ProjectItemHistoryRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

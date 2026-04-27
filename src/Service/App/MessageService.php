@@ -9,7 +9,7 @@ use App\Repository\MessageConversationRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UsuarioRepository;
 use App\Service\Admin\WidgetAccessService;
-use App\Service\Base;
+use App\Service\Base\Base;
 use App\Service\PushNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;

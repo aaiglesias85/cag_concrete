@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Service\Base\Base;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;

@@ -6,7 +6,7 @@ use App\Entity\Estimate;
 use App\Entity\ProposalType;
 use App\Repository\EstimateRepository;
 use App\Repository\ProposalTypeRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ProposalTypeService extends Base
 {

@@ -17,7 +17,7 @@ use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;

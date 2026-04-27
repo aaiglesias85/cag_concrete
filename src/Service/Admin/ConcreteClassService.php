@@ -6,7 +6,7 @@ use App\Entity\ConcreteClass;
 use App\Entity\Project;
 use App\Repository\ConcreteClassRepository;
 use App\Repository\ProjectRepository;
-use App\Service\Base;
+use App\Service\Base\Base;
 
 class ConcreteClassService extends Base
 {
