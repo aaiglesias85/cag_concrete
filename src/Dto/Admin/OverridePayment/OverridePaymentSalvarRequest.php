@@ -14,7 +14,7 @@ final class OverridePaymentSalvarRequest
     public ?string $fechaFin = null;
 
     /** Puede ser JSON string, array o null. */
-    public null|string|array $items = null;
+    public string|array|null $items = null;
 
     public ?int $invoice_override_payment_id = null;
 
