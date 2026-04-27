@@ -18,7 +18,6 @@ use App\Repository\InvoiceNotesRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectRepository;
-use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
