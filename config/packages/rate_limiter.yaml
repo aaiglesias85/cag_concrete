@@ -1,0 +1,12 @@
+# Límites para rutas públicas sin form_login (API JSON). Alineado en espíritu con
+# security.firewalls.main.login_throttling (5 intentos / 15 min en panel admin).
+framework:
+    rate_limiter:
+        api_login:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+        api_forgot_password:
+            policy: sliding_window
+            limit: 8
+            interval: '1 hour'

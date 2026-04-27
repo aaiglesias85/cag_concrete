@@ -8,8 +8,11 @@ use App\Service\Admin\UsuarioService as AdminUsuarioService;
 use App\Service\App\LoginService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'Login', description: 'Authentication endpoints for mobile application')]
@@ -21,8 +24,15 @@ class LoginController extends AbstractController
     private AdminUsuarioService $adminUsuarioService;
     private TranslatorInterface $translator;
 
-    public function __construct(LoginService $loginService, AdminUsuarioService $adminUsuarioService, TranslatorInterface $translator)
-    {
+    public function __construct(
+        LoginService $loginService,
+        AdminUsuarioService $adminUsuarioService,
+        TranslatorInterface $translator,
+        #[Autowire(service: 'limiter.api_login')]
+        private RateLimiterFactory $apiLoginLimiter,
+        #[Autowire(service: 'limiter.api_forgot_password')]
+        private RateLimiterFactory $apiForgotPasswordLimiter,
+    ) {
         $this->loginService = $loginService;
         $this->adminUsuarioService = $adminUsuarioService;
         $this->translator = $translator;
@@ -106,9 +116,23 @@ class LoginController extends AbstractController
             $player_id = $data['player_id'] ?? null;
             $push_token = $data['push_token'] ?? null;
             $plataforma = $data['plataforma'] ?? null;
+
+            $clientIp = $request->getClientIp() ?? '0.0.0.0';
+            $loginLimiter = $this->apiLoginLimiter->create($clientIp);
+            $rate = $loginLimiter->consume(1);
+            if (!$rate->isAccepted()) {
+                return $this->json([
+                    'success' => false,
+                    'error' => $this->translator->trans('login.error.rate_limit_login', [], 'messages', $lang),
+                ], Response::HTTP_TOO_MANY_REQUESTS, [
+                    'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
+                ]);
+            }
+
             $resultado = $this->loginService->AutenticarLogin($email, $pass, $player_id, $push_token, $plataforma, $lang);
 
             if ($resultado['success']) {
+                $loginLimiter->reset();
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['access_token'] = $resultado['access_token'];
                 $resultadoJson['expires'] = $resultado['expires'];
@@ -266,6 +290,18 @@ class LoginController extends AbstractController
             // Establecer locale para traducciones
             $request->setLocale($lang);
             $this->setTranslatorLocale($this->translator, $lang);
+
+            $clientIp = $request->getClientIp() ?? '0.0.0.0';
+            $forgotLimiter = $this->apiForgotPasswordLimiter->create($clientIp);
+            $rate = $forgotLimiter->consume(1);
+            if (!$rate->isAccepted()) {
+                return $this->json([
+                    'success' => false,
+                    'error' => $this->translator->trans('login.error.rate_limit_forgot', [], 'messages', $lang),
+                ], Response::HTTP_TOO_MANY_REQUESTS, [
+                    'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
+                ]);
+            }
 
             // Leer parámetros desde JSON solamente
             $data = $this->getRequestData($request);

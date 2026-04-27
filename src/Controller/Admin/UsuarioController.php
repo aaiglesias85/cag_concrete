@@ -10,8 +10,11 @@ use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\UsuarioService;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -28,6 +31,8 @@ class UsuarioController extends AbstractAdminController
         UsuarioService $usuarioService,
         FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
         private TokenStorageInterface $tokenStorage,
+        #[Autowire(service: 'limiter.api_login')]
+        private RateLimiterFactory $apiLoginLimiter,
     ) {
         parent::__construct($adminAccess);
         $this->usuarioService = $usuarioService;
@@ -62,8 +67,21 @@ class UsuarioController extends AbstractAdminController
         $pass = $request->get('password');
         $target_path = 'home';
         try {
+            $clientIp = $request->getClientIp() ?? '0.0.0.0';
+            $loginLimiter = $this->apiLoginLimiter->create($clientIp);
+            $rate = $loginLimiter->consume(1);
+            if (!$rate->isAccepted()) {
+                return $this->json([
+                    'success' => false,
+                    'error' => 'Too many login attempts. Please wait a few minutes and try again.',
+                ], Response::HTTP_TOO_MANY_REQUESTS, [
+                    'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
+                ]);
+            }
+
             $resultado = $this->usuarioService->AutenticarLogin($email, $pass);
             if ($resultado['success']) {
+                $loginLimiter->reset();
                 $entity = $resultado['usuario'];
 
                 // Asegurar que la sesión esté iniciada antes de guardar el token

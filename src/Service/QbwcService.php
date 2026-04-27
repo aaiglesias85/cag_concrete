@@ -2,13 +2,13 @@
 
 namespace App\Service;
 
-use App\Service\Base\Base;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Entity\Item;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\UserQbwcToken;
 use App\Entity\Usuario;
+use App\Service\Base\Base;
 
 class QbwcService extends Base
 {

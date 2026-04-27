@@ -10,6 +10,8 @@ login:
     forgot_pass: The password recovery process has started successfully, in a few moments you will receive an email to the address entered
   error:
     logout: Could not sign out
+    rate_limit_login: Too many login attempts. Please wait a few minutes and try again.
+    rate_limit_forgot: Too many password recovery requests. Please try again later.
   autenticar:
     usuario_bloqueado: Your user has been blocked, please contact your administrator
     error_login: The access data is incorrect

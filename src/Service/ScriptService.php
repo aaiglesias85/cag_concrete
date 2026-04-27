@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Service\Base\Base;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
 use App\Entity\DataTracking;
@@ -22,6 +21,7 @@ use App\Entity\Usuario;
 use App\Repository\NotificationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UsuarioRepository;
+use App\Service\Base\Base;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 

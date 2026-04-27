@@ -20,8 +20,6 @@ class BaseTextNormalizationService
 
     /**
      * Normaliza string opcional (trim; vacío → null).
-     *
-     * @param mixed $value
      */
     public function normalizeNullableTrimmedString($value): ?string
     {

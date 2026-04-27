@@ -120,9 +120,9 @@ Este roadmap **no** obliga a reescribir todo; apunta a **mover el código hacia 
 
 ### 3.3. Activar o endurecer *login throttling* (admin y API)
 
-**En el `security.yaml` se observa `login_throttling: null` en el firewall `main`.** En entornos expuestos a internet, el *throttling* de intentos de login es una defensa básica contra fuerza bruta.
+El firewall `main` usa `login_throttling` (intentos fallidos por IP + usuario). Los endpoints JSON públicos de la app (`/api/{lang}/login/autenticar` y `olvido-Contrasenna`) no pasan por `form_login`; para ellos se aplican **rate limiters** (`framework.rate_limiter` + componente Lock), alineados en límites con el panel admin.
 
-**Cómo implementarlo:** Seguir la [documentación de Login Throttling de Symfony](https://symfony.com/doc/current/security.html#limiting-login-attempts) y ajustar límites a la realidad de usuarios (p. ej. 5 intentos / minuto, con *lock* temporal).
+**Cómo implementarlo:** [Login Throttling](https://symfony.com/doc/current/security.html#limiting-login-attempts) en firewalls con `form_login`; [RateLimiter](https://symfony.com/doc/current/rate_limiter.html) para rutas públicas sin formulario.
 
 **Ganancias:** Mejor postura de seguridad sin tocar lógica de negocio.
 
@@ -250,7 +250,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 | **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Hecho** (fachada + satélites; ver §9.1) |
 | **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo | **Hecho** |
 | **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Pendiente** |
-| **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Parcial** |
+| **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Hecho** (ver §9.1) |
 | **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero | **Pendiente** |
 
 ### 9.1. Detalle del estado (última revisión documental)
@@ -263,7 +263,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
   - **Aún en `Base` (candidatos futuros §2.2):** helpers HTTP/legacy (`isMobile`, `getIP`, `ObtenerURL`), ordenación de arrays (`ordenarArrayAsc`/`Desc`), `estilizarCelda` (PhpSpreadsheet), y la fachada pública que mantienen los hijos sin tocar firmas.
   - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
-- **F — Seguridad ops:** Login throttling activo en firewall `main`; falta una revisión explícita de deprecations / ajustes Security en futuras subidas de Symfony (marcar **Hecho** cuando esté auditado y aplicado).
+- **F — Seguridad ops:** `config/packages/security.yaml`: `login_throttling` en firewall `main` (5 intentos / 15 min); `access_control` migrado de `IS_AUTHENTICATED_ANONYMOUSLY` a `PUBLIC_ACCESS` (recomendación Symfony 7 / anonimato en `access_control`). `config/packages/rate_limiter.yaml` (`api_login`, `api_forgot_password`) + `symfony/lock`: `LoginController` (API JSON) y `UsuarioController::autenticar` (web `/usuario/autenticar`) comparten `limiter.api_login` por IP (429 + `Retry-After`); olvido contraseña API sigue con `api_forgot_password`. Seguir revisando deprecations de Security en cada subida de Symfony (logs en staging).
 
 ---
 

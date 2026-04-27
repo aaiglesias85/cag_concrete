@@ -10,6 +10,8 @@ login:
     forgot_pass: El proceso de recuperación de contraseña se ha iniciado con éxito, en unos momentos recibira un correo a la dirección ingresada
   error:
     logout: No se pudo cerrar la sesión
+    rate_limit_login: Demasiados intentos de acceso. Espera unos minutos e inténtalo de nuevo.
+    rate_limit_forgot: Demasiadas solicitudes de recuperación de contraseña. Intenta más tarde.
   autenticar:
     usuario_bloqueado: Su usuario ha sido bloqueado, por favor contacte con su administrador
     error_login: Los datos de acceso son incorrectos

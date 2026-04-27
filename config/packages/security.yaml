@@ -50,7 +50,7 @@ security:
          lazy: true
          pattern: ^/(admin|check|logout)
          provider: app_user_provider
-         # Limita intentos fallidos de login (por IP + username). Ajustar en producción si hace falta.
+         # Intentos fallidos por IP + username (ver https://symfony.com/doc/current/security.html#limiting-login-attempts)
          login_throttling:
             max_attempts: 5
             interval: '15 minutes'
@@ -70,20 +70,19 @@ security:
             path: /admin
 
    access_control:
-      # Public routes (no authentication required) - must be first
-      - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      # Public routes (Symfony 7: PUBLIC_ACCESS sustituye a IS_AUTHENTICATED_ANONYMOUSLY en access_control)
+      - { path: ^/login, roles: PUBLIC_ACCESS }
       - { path: ^/logout, roles: PUBLIC_ACCESS }
-      - { path: ^/check, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/usuario/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/usuario/olvidoContrasenna, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      - { path: ^/check, roles: PUBLIC_ACCESS }
+      - { path: ^/usuario/autenticar, roles: PUBLIC_ACCESS }
+      - { path: ^/usuario/olvidoContrasenna, roles: PUBLIC_ACCESS }
 
       # Swagger documentation - public access
       - { path: ^/api/doc, roles: PUBLIC_ACCESS }
 
-      # API login autenticar and olvido-Contrasenna routes (public - no authentication required)
-      # Pattern must match /api/{lang}/login/{endpoint} where {lang} can be es|en
-      - { path: ^/api/(es|en)/login/autenticar, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-      - { path: ^/api/(es|en)/login/olvido-Contrasenna, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+      # API login autenticar and olvido-Contrasenna (públicos; throttling vía rate_limiter en LoginController)
+      - { path: ^/api/(es|en)/login/autenticar, roles: PUBLIC_ACCESS }
+      - { path: ^/api/(es|en)/login/olvido-Contrasenna, roles: PUBLIC_ACCESS }
 
       # API login cerrar-sesion route (requires authentication)
       - { path: ^/api/(es|en)/login/cerrar-sesion, roles: [ROLE_ADMIN, ROLE_USER] }

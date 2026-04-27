@@ -7,11 +7,6 @@ namespace App\Service\Base;
  */
 class BaseYieldExpressionService
 {
-    /**
-     * @param mixed $xValue
-     *
-     * @return mixed
-     */
     public function evaluateExpression($expression, $xValue)
     {
         $expression = str_ireplace('x', (string) $xValue, $expression);

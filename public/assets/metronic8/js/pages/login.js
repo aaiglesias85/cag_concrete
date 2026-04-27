@@ -66,27 +66,37 @@ var Login = function () {
                     formData.set('password', password);
 
 
-                    // axios
+                    // axios — 429 y otros cuerpos JSON: mostrar `error` del backend (Admin en inglés)
                     var url = submitButton.closest('form').getAttribute('data-action');
+                    var defaultLoginError = 'Sorry, the email or password is incorrect, please try again.';
+                    var backendMessage = function (payload) {
+                        if (payload && typeof payload === 'object') {
+                            return payload.error || payload.message || null;
+                        }
+                        return null;
+                    };
                     axios
                         .post(url, formData, {
                             responseType: "json",
+                            validateStatus: function (status) {
+                                return status >= 200 && status < 600;
+                            },
                         })
                         .then(function (res) {
-                            if (res.status === 200 || res.status === 201) {
-                                var response = res.data;
-                                if (response.success) {
-                                    form.reset();
-
-                                    location.href = response.url;
-                                } else {
-                                    toastr.error('Sorry, the email or password is incorrect, please try again.', "Error");
-                                }
-                            } else {
-                                toastr.error("Sorry, looks like there are some errors detected, please try again", "Error");
+                            var response = res.data;
+                            if (res.status >= 200 && res.status < 300 && response && response.success) {
+                                form.reset();
+                                location.href = response.url;
+                                return;
                             }
+                            var msg = backendMessage(response) || defaultLoginError;
+                            toastr.error(msg, "Error");
                         })
-                        .catch(MyUtil.catchErrorAxios)
+                        .catch(function (err) {
+                            console.log(err);
+                            var msg = backendMessage(err && err.response ? err.response.data : null) || defaultLoginError;
+                            toastr.error(msg, "Error");
+                        })
                         .then(function () {
                             // Hide loading indication
                             submitButton.removeAttribute('data-kt-indicator');
@@ -96,7 +106,7 @@ var Login = function () {
                         });
                     
                 } else {
-                    toastr.error("Sorry, looks like there are some errors detected, please try again.", "Error");
+                    toastr.error("Please enter a valid email and password.", "Error");
                 }
             });
         });
