@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\PlanStatus\PlanStatusIdRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusIdsRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PlanStatusService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PlanStatusController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $planStatusService;
 
-    public function __construct(AdminAccessService $adminAccess, PlanStatusService $planStatusService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        PlanStatusService $planStatusService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->planStatusService = $planStatusService;
     }
@@ -38,14 +51,12 @@ class PlanStatusController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'description', 'status'],
                 defaultOrderField: 'description'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->planStatusService->ListarStatus(
                 $dt['start'],
                 $dt['length'],
@@ -75,10 +86,14 @@ class PlanStatusController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $status_id = $request->get('status_id');
-
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = PlanStatusSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $status_id = (string) ($d->status_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
             if ('' === $status_id) {
@@ -111,7 +126,12 @@ class PlanStatusController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $status_id = $request->get('status_id');
+        $dto = PlanStatusIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $status_id = $dto->status_id;
 
         try {
             $resultado = $this->planStatusService->EliminarStatus($status_id);
@@ -138,7 +158,12 @@ class PlanStatusController extends AbstractAdminController
      */
     public function eliminarStatuss(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = PlanStatusIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->planStatusService->EliminarStatuss($ids);
@@ -165,7 +190,12 @@ class PlanStatusController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $status_id = $request->get('status_id');
+        $dto = PlanStatusIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $status_id = $dto->status_id;
 
         try {
             $resultado = $this->planStatusService->CargarDatosStatus($status_id);

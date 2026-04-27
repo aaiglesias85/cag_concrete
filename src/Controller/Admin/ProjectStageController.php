@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ProjectStage\ProjectStageIdRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageIdsRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProjectStageService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProjectStageController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $projectStageService;
 
-    public function __construct(AdminAccessService $adminAccess, ProjectStageService $projectStageService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ProjectStageService $projectStageService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->projectStageService = $projectStageService;
     }
@@ -75,11 +88,15 @@ class ProjectStageController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $stage_id = $request->get('stage_id');
-
-        $description = $request->get('description');
-        $color = $request->get('color');
-        $status = $request->get('status');
+        $d = ProjectStageSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $stage_id = (string) ($d->stage_id ?? '');
+        $description = (string) $d->description;
+        $color = (string) ($d->color ?? '');
+        $status = (string) $d->status;
 
         try {
             if ('' === $stage_id) {
@@ -112,7 +129,12 @@ class ProjectStageController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $stage_id = $request->get('stage_id');
+        $dto = ProjectStageIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $stage_id = $dto->stage_id;
 
         try {
             $resultado = $this->projectStageService->EliminarStage($stage_id);
@@ -139,7 +161,12 @@ class ProjectStageController extends AbstractAdminController
      */
     public function eliminarStages(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = ProjectStageIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->projectStageService->EliminarStages($ids);
@@ -166,7 +193,12 @@ class ProjectStageController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $stage_id = $request->get('stage_id');
+        $dto = ProjectStageIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $stage_id = $dto->stage_id;
 
         try {
             $resultado = $this->projectStageService->CargarDatosStage($stage_id);

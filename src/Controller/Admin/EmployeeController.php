@@ -3,6 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Employee\EmployeeIdRequest;
+use App\Dto\Admin\Employee\EmployeeIdsRequest;
+use App\Dto\Admin\Employee\EmployeeSalvarRequest;
 use App\Entity\EmployeeRole;
 use App\Entity\Race;
 use App\Http\DataTablesHelper;
@@ -12,13 +16,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmployeeController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $employeeService;
 
-    public function __construct(AdminAccessService $adminAccess, EmployeeService $employeeService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        EmployeeService $employeeService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->employeeService = $employeeService;
     }
@@ -91,15 +104,19 @@ class EmployeeController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $employee_id = $request->get('employee_id');
-
-        $name = $request->get('name');
-        $hourly_rate = $request->get('hourly_rate');
-        $role_id = $request->get('role_id');
-        $color = $request->get('color');
+        $d = EmployeeSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = (string) ($d->employee_id ?? '');
+        $name = (string) $d->name;
+        $hourly_rate = $d->hourly_rate;
+        $role_id = $d->role_id;
+        $color = $d->color;
 
         try {
-            if ('' == $employee_id) {
+            if ('' === $employee_id) {
                 $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $role_id, $color);
             } else {
                 $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $role_id, $color);
@@ -129,7 +146,12 @@ class EmployeeController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = EmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->employeeService->EliminarEmployee($employee_id);
@@ -156,7 +178,12 @@ class EmployeeController extends AbstractAdminController
      */
     public function eliminarEmployees(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = EmployeeIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->employeeService->EliminarEmployees($ids);
@@ -183,7 +210,12 @@ class EmployeeController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = EmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->employeeService->CargarDatosEmployee($employee_id);
@@ -210,7 +242,12 @@ class EmployeeController extends AbstractAdminController
      */
     public function listarProjects(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = EmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $projects = $this->employeeService->ListarProjects($employee_id);

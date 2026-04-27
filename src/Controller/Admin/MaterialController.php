@@ -3,19 +3,32 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Material\MaterialIdRequest;
+use App\Dto\Admin\Material\MaterialIdsRequest;
+use App\Dto\Admin\Material\MaterialSalvarRequest;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\MaterialService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaterialController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $materialService;
 
-    public function __construct(AdminAccessService $adminAccess, MaterialService $materialService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        MaterialService $materialService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->materialService = $materialService;
     }
@@ -43,14 +56,12 @@ class MaterialController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'name', 'unit', 'price'],
                 defaultOrderField: 'name'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->materialService->ListarMaterials(
                 $dt['start'],
                 $dt['length'],
@@ -80,15 +91,18 @@ class MaterialController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $material_id = $request->get('material_id');
-
-        $name = $request->get('name');
-        $price = $request->get('price');
-
-        $unit_id = $request->get('unit_id');
+        $d = MaterialSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $material_id = (string) ($d->material_id ?? '');
+        $name = (string) $d->name;
+        $price = (string) $d->price;
+        $unit_id = (string) $d->unit_id;
 
         try {
-            if ('' == $material_id) {
+            if ('' === $material_id) {
                 $resultado = $this->materialService->SalvarMaterial($unit_id, $name, $price);
             } else {
                 $resultado = $this->materialService->ActualizarMaterial($material_id, $unit_id, $name, $price);
@@ -117,7 +131,12 @@ class MaterialController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $material_id = $request->get('material_id');
+        $dto = MaterialIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $material_id = $dto->material_id;
 
         try {
             $resultado = $this->materialService->EliminarMaterial($material_id);
@@ -144,7 +163,12 @@ class MaterialController extends AbstractAdminController
      */
     public function eliminarMaterials(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = MaterialIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->materialService->EliminarMaterials($ids);
@@ -171,7 +195,12 @@ class MaterialController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $material_id = $request->get('material_id');
+        $dto = MaterialIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $material_id = $dto->material_id;
 
         try {
             $resultado = $this->materialService->CargarDatosMaterial($material_id);

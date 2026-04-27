@@ -3,18 +3,30 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Log\LogIdRequest;
+use App\Dto\Admin\Log\LogIdsRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\LogService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LogController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $logService;
 
-    public function __construct(AdminAccessService $adminAccess, LogService $logService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        LogService $logService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->logService = $logService;
     }
@@ -90,7 +102,12 @@ class LogController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $log_id = $request->get('log_id');
+        $dto = LogIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $log_id = $dto->log_id;
 
         $resultado = $this->logService->EliminarLog($log_id);
         if ($resultado['success']) {
@@ -110,7 +127,12 @@ class LogController extends AbstractAdminController
      */
     public function eliminarLogs(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = LogIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         $resultado = $this->logService->EliminarLogs($ids);
         if ($resultado['success']) {

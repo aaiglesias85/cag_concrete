@@ -270,57 +270,21 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
   - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
 - **E — API (app móvil / JSON):** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar), `Project` (`ListarProjectsQueryRequest`, `CargarProyectoDatosRequest` — query). Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
-- **E — Admin (panel web):** DTOs bajo `App\Dto\Admin\…` + `AdminValidationResponseTrait` (validación con locale `en`, fallos 400 con el mismo JSON que la API). Controladores ya migrados: **`UsuarioController`**, **`PerfilController`**, **`CountyController`**, **`CompanyController`**. El inventario de lo **pendiente** por controlador está en **§9.2**; ir migrando y actualizar esa subsección al cerrar cada módulo.
+- **E — Admin (panel web):** DTOs bajo `App\Dto\Admin\…` + `AdminValidationResponseTrait` (validación con locale `en`, fallos 400 con el mismo JSON que la API). Controladores ya migrados: **`UsuarioController`**, **`PerfilController`**, **`CountyController`**, **`CompanyController`**, **`DistrictController`**, **`UnitController`**, **`RaceController`**, **`ProposalTypeController`**, **`ProjectTypeController`**, **`PlanStatusController`**, **`InspectorController`**, **`HolidayController`**, **`MaterialController`**, **`ItemController`**, **`ConcreteClassController`**, **`AdvertisementController`**, **`ConcreteVendorController`**, **`EquationController`**, **`ReminderController`**, **`DataTrackingController`**, **`LogController`**, **`NotificationController`**, **`ProjectStageController`**, **`OverheadPriceController`**, **`PlanDownloadingController`**, **`OverridePaymentController`**, **`SubcontractorController`**, **`TaskController`**, **`PaymentController`**, **`ScheduleController`**, **`InvoiceController`**, **`EmployeeController`**, **`EmployeeRoleController`**, **`EmployeeRrhhController`**, **`DefaultController`**, **`EstimateNoteItemController`**, **`ReporteEmployeeController`**, **`ReporteSubcontractorController`**, **`EstimateController`**, **`ProjectController`**. El inventario de lo **pendiente** por controlador está en **§9.2**; ir migrando y actualizar esa subsección al cerrar cada módulo.
 - **F — Seguridad ops:** `config/packages/security.yaml`: `login_throttling` en firewall `main` (5 intentos / 15 min); `access_control` migrado de `IS_AUTHENTICATED_ANONYMOUSLY` a `PUBLIC_ACCESS` (recomendación Symfony 7 / anonimato en `access_control`). `config/packages/rate_limiter.yaml` (`api_login`, `api_forgot_password`) + `symfony/lock`: `LoginController` (API JSON) y `UsuarioController::autenticar` (web `/usuario/autenticar`) comparten `limiter.api_login` por IP (429 + `Retry-After`); olvido contraseña API sigue con `api_forgot_password`. Seguir revisando deprecations de Security en cada subida de Symfony (logs en staging).
 
 ### 9.2. Levantamiento: controladores **sin** patrón DTO aún (abril 2026)
 
 **Criterio:** se considera "cubierto" el uso de `App\Dto\…` y `fromHttpRequest` (o DTOs de *query* equivalentes) para entradas HTTP que hoy mapea el controlador a mano.
 
-**Cobertura actual (9 clases con DTOs):** `App\LoginController`, `App\UsuarioController`, `App\MessageController`, `App\OfflineController`, `App\ProjectController`, `Admin\UsuarioController`, `Admin\PerfilController`, `Admin\CountyController`, `Admin\CompanyController`.  
-`AbstractAdminController` no expone rutas: no aplica. **Pendientes de migrar a DTO:** 39 clases (3 en `src/Controller/` raíz + 36 en `Admin\`).
+**Cobertura actual (45 clases con DTOs):** `App\LoginController`, `App\UsuarioController`, `App\MessageController`, `App\OfflineController`, `App\ProjectController`, `Admin\UsuarioController`, `Admin\PerfilController`, `Admin\CountyController`, `Admin\CompanyController`, `Admin\DistrictController`, `Admin\UnitController`, `Admin\RaceController`, `Admin\ProposalTypeController`, `Admin\ProjectTypeController`, `Admin\PlanStatusController`, `Admin\InspectorController`, `Admin\HolidayController`, `Admin\MaterialController`, `Admin\ItemController`, `Admin\ConcreteClassController`, `Admin\AdvertisementController`, `Admin\ConcreteVendorController`, `Admin\EquationController`, `Admin\ReminderController`, `Admin\DataTrackingController`, `Admin\LogController`, `Admin\NotificationController`, `Admin\ProjectStageController`, `Admin\OverheadPriceController`, `Admin\PlanDownloadingController`, `Admin\OverridePaymentController`, `Admin\SubcontractorController`, `Admin\TaskController`, `Admin\PaymentController`, `Admin\ScheduleController`, `Admin\InvoiceController`, `Admin\EmployeeController`, `Admin\EmployeeRoleController`, `Admin\EmployeeRrhhController`, `Admin\DefaultController`, `Admin\EstimateNoteItemController`, `Admin\ReporteEmployeeController`, `Admin\ReporteSubcontractorController`, `Admin\EstimateController`, `Admin\ProjectController`.  
+`AbstractAdminController` no expone rutas: no aplica. **Pendientes de migrar a DTO:** 3 clases (solo en la raíz de `src/Controller/`, p. ej. prueba de email y jobs; el **panel `Admin\`** queda cubierto en cuanto a DTOs de entradas HTTP, incl. `Estimate` y `Project`).
 
 | Prioridad / tipo | Ruta (clase) | Comentario |
 |------------------|-------------|------------|
 | **Integración** | `QbwcController` | SOAP/QuickBooks Web Connector; DTOs JSON clásicos suelen no aplicar salvo que se refactoricen entradas. |
 | **Jobs** | `ScriptController` | Tareas internas; DTOs solo si alguna ruta acepta parámetros a validar. |
 | **Herramienta** | `DefaultController` (raíz `src/Controller/`) | *Test email*; prioridad baja. |
-| **Panel Admin** | `Admin\AdvertisementController` | Aplicar `App\Dto\Admin\{Módulo}\…` + `AdminValidationResponseTrait` por acción. |
-| | `Admin\ConcreteClassController` | |
-| | `Admin\ConcreteVendorController` | |
-| | `Admin\DataTrackingController` | |
-| | `Admin\DefaultController` | Migrar DTOs en acciones AJAX o guardados; no forzar en solo-HTML. |
-| | `Admin\DistrictController` | |
-| | `Admin\EmployeeController` | |
-| | `Admin\EmployeeRoleController` | |
-| | `Admin\EmployeeRrhhController` | |
-| | `Admin\EquationController` | |
-| | `Admin\EstimateController` | Tamaño/complejidad: conviene dividir en PRs por bloque de acciones. |
-| | `Admin\EstimateNoteItemController` | |
-| | `Admin\HolidayController` | |
-| | `Admin\InspectorController` | |
-| | `Admin\InvoiceController` | |
-| | `Admin\ItemController` | |
-| | `Admin\LogController` | |
-| | `Admin\MaterialController` | |
-| | `Admin\NotificationController` | |
-| | `Admin\OverheadPriceController` | |
-| | `Admin\OverridePaymentController` | |
-| | `Admin\PaymentController` | |
-| | `Admin\PlanDownloadingController` | |
-| | `Admin\PlanStatusController` | |
-| | `Admin\ProjectController` | Varios flujos; afinar por acción o submódulo. |
-| | `Admin\ProjectStageController` | |
-| | `Admin\ProjectTypeController` | |
-| | `Admin\ProposalTypeController` | |
-| | `Admin\RaceController` | |
-| | `Admin\ReminderController` | |
-| | `Admin\ReporteEmployeeController` | Prioridad en acciones con filtros/payload, no en solo listados HTML. |
-| | `Admin\ReporteSubcontractorController` | |
-| | `Admin\ScheduleController` | |
-| | `Admin\SubcontractorController` | |
-| | `Admin\TaskController` | |
-| | `Admin\UnitController` | |
 
 **Uso de la tabla:** ir módulo a módulo; al migrar, añadir la referencia bajo el bullet E del §9.1 o anotar fecha/PR y condensar esta fila para no desalinear el documento.
 

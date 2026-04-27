@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Default\DashboardListarStatsRequest;
+use App\Dto\Admin\Default\SaveWidgetPreferenceRequest;
 use App\Entity\Company;
 use App\Entity\Equation;
 use App\Entity\Item;
@@ -20,9 +23,13 @@ use App\Service\Admin\WidgetAccessService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DefaultController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $defaultService;
     private $logService;
     private $notificationService;
@@ -44,6 +51,8 @@ class DefaultController extends AbstractAdminController
         EstimateService $estimateService,
         DataTrackingService $dataTrackingService,
         WidgetAccessService $widgetAccessService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
     ) {
         parent::__construct($adminAccess);
         $this->defaultService = $defaultService;
@@ -99,17 +108,21 @@ class DefaultController extends AbstractAdminController
             return $this->json(['success' => false, 'message' => 'Not authenticated'], 401);
         }
         $usuario = $g;
-        $widgetId = $request->request->get('widget_id', '');
-        $isActive = filter_var($request->request->get('is_active', true), FILTER_VALIDATE_BOOLEAN);
+        $dto = SaveWidgetPreferenceRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            $payload = $this->formatAdminValidationFailure($viol);
+            $payload['message'] = $payload['error'];
 
-        if ('' === $widgetId) {
-            return $this->json(['success' => false, 'message' => 'Missing widget_id'], 400);
+            return $this->json($payload, Response::HTTP_BAD_REQUEST);
         }
+        $widgetId = (string) $dto->widget_id;
+        $isActive = $dto->is_active;
 
         try {
             $this->widgetAccessService->setUserWidgetFromMyWidgetsPage(
                 $usuario->getUsuarioId(),
-                (string) $widgetId,
+                $widgetId,
                 $isActive
             );
         } catch (\InvalidArgumentException $e) {
@@ -134,10 +147,12 @@ class DefaultController extends AbstractAdminController
         $usuario = $g;
         $userId = $usuario->getUsuarioId();
         $w = $this->widgetAccessService;
-        $projectId = (string) ($request->get('project_id') ?? '');
-        $status = (string) ($request->get('status') ?? '');
-        $fechaInicial = (string) ($request->get('fechaInicial') ?? '');
-        $fechaFin = (string) ($request->get('fechaFin') ?? '');
+        $f = DashboardListarStatsRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        $projectId = (string) ($f->project_id ?? '');
+        $status = (string) ($f->status ?? '');
+        $fechaInicial = (string) ($f->fechaInicial ?? '');
+        $fechaFin = (string) ($f->fechaFin ?? '');
 
         try {
             $stats = [];

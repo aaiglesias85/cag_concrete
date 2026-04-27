@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Race\RaceIdRequest;
+use App\Dto\Admin\Race\RaceIdsRequest;
+use App\Dto\Admin\Race\RaceSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\RaceService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RaceController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $raceService;
 
-    public function __construct(AdminAccessService $adminAccess, RaceService $raceService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        RaceService $raceService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->raceService = $raceService;
     }
@@ -75,14 +88,18 @@ class RaceController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $race_id = $request->get('race_id');
-
-        $code = $request->get('code');
-        $description = $request->get('description');
-        $classification = $request->get('classification');
+        $d = RaceSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $race_id = (string) ($d->race_id ?? '');
+        $code = (string) $d->code;
+        $description = (string) $d->description;
+        $classification = (string) $d->classification;
 
         try {
-            if ('' == $race_id) {
+            if ('' === $race_id) {
                 $resultado = $this->raceService->SalvarRace($code, $description, $classification);
             } else {
                 $resultado = $this->raceService->ActualizarRace($race_id, $code, $description, $classification);
@@ -112,7 +129,12 @@ class RaceController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $race_id = $request->get('race_id');
+        $dto = RaceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $race_id = $dto->race_id;
 
         try {
             $resultado = $this->raceService->EliminarRace($race_id);
@@ -139,7 +161,12 @@ class RaceController extends AbstractAdminController
      */
     public function eliminarRaces(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = RaceIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->raceService->EliminarRaces($ids);
@@ -166,7 +193,12 @@ class RaceController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $race_id = $request->get('race_id');
+        $dto = RaceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $race_id = $dto->race_id;
 
         try {
             $resultado = $this->raceService->CargarDatosRace($race_id);

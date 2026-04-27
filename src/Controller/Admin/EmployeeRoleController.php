@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleIdRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleIdsRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeRoleService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmployeeRoleController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $employeeRoleService;
 
-    public function __construct(AdminAccessService $adminAccess, EmployeeRoleService $employeeRoleService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        EmployeeRoleService $employeeRoleService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->employeeRoleService = $employeeRoleService;
     }
@@ -75,13 +88,17 @@ class EmployeeRoleController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $role_id = $request->get('role_id');
-
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = EmployeeRoleSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $role_id = (string) ($d->role_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
-            if ('' == $role_id) {
+            if ('' === $role_id) {
                 $resultado = $this->employeeRoleService->Salvar($description, $status);
             } else {
                 $resultado = $this->employeeRoleService->Actualizar($role_id, $description, $status);
@@ -111,7 +128,12 @@ class EmployeeRoleController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $role_id = $request->get('role_id');
+        $dto = EmployeeRoleIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $role_id = $dto->role_id;
 
         try {
             $resultado = $this->employeeRoleService->EliminarRole($role_id);
@@ -138,7 +160,12 @@ class EmployeeRoleController extends AbstractAdminController
      */
     public function eliminarVarios(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = EmployeeRoleIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->employeeRoleService->EliminarVarios($ids);
@@ -165,7 +192,12 @@ class EmployeeRoleController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $role_id = $request->get('role_id');
+        $dto = EmployeeRoleIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $role_id = $dto->role_id;
 
         try {
             $resultado = $this->employeeRoleService->CargarDatos($role_id);

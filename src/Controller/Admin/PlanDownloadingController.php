@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingIdRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingIdsRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PlanDownloadingService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PlanDownloadingController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $planDownloadingService;
 
-    public function __construct(AdminAccessService $adminAccess, PlanDownloadingService $planDownloadingService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        PlanDownloadingService $planDownloadingService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->planDownloadingService = $planDownloadingService;
     }
@@ -75,10 +88,14 @@ class PlanDownloadingController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $plan_downloading_id = $request->get('plan_downloading_id');
-
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = PlanDownloadingSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $plan_downloading_id = (string) ($d->plan_downloading_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
             if ('' === $plan_downloading_id) {
@@ -111,7 +128,12 @@ class PlanDownloadingController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $plan_downloading_id = $request->get('plan_downloading_id');
+        $dto = PlanDownloadingIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $plan_downloading_id = $dto->plan_downloading_id;
 
         try {
             $resultado = $this->planDownloadingService->EliminarPlan($plan_downloading_id);
@@ -138,7 +160,12 @@ class PlanDownloadingController extends AbstractAdminController
      */
     public function eliminarPlans(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = PlanDownloadingIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->planDownloadingService->EliminarPlans($ids);
@@ -165,7 +192,12 @@ class PlanDownloadingController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $plan_downloading_id = $request->get('plan_downloading_id');
+        $dto = PlanDownloadingIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $plan_downloading_id = $dto->plan_downloading_id;
 
         try {
             $resultado = $this->planDownloadingService->CargarDatosPlan($plan_downloading_id);

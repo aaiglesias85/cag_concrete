@@ -3,6 +3,17 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Payment\PaymentArchivoRequest;
+use App\Dto\Admin\Payment\PaymentArchivosRequest;
+use App\Dto\Admin\Payment\PaymentCambiarEstadoRequest;
+use App\Dto\Admin\Payment\PaymentInvoiceIdRequest;
+use App\Dto\Admin\Payment\PaymentInvoiceItemIdRequest;
+use App\Dto\Admin\Payment\PaymentNoteIdRequest;
+use App\Dto\Admin\Payment\PaymentNotesDateRangeRequest;
+use App\Dto\Admin\Payment\PaymentNotesSalvarRequest;
+use App\Dto\Admin\Payment\PaymentSalvarRequest;
+use App\Dto\Admin\Payment\PaymentSalvarNotesItemRequest;
 use App\Entity\Company;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
@@ -10,13 +21,22 @@ use App\Service\Admin\PaymentService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PaymentController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $paymentService;
 
-    public function __construct(AdminAccessService $adminAccess, PaymentService $paymentService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        PaymentService $paymentService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->paymentService = $paymentService;
     }
@@ -94,15 +114,14 @@ class PaymentController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-
-        // payments
-        $payments = $request->get('payments');
-        $payments = json_decode($payments);
-
-        // archivos
-        $archivos = $request->get('archivos');
-        $archivos = json_decode($archivos);
+        $d = PaymentSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $d->invoice_id;
+        $payments = (null !== $d->payments && '' !== $d->payments) ? json_decode($d->payments) : null;
+        $archivos = (null !== $d->archivos && '' !== $d->archivos) ? json_decode($d->archivos) : null;
 
         try {
             $resultado = $this->paymentService->ActualizarPayment($invoice_id, $payments, $archivos);
@@ -131,7 +150,12 @@ class PaymentController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
+        $dto = PaymentInvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $dto->invoice_id;
 
         try {
             $resultado = $this->paymentService->CargarDatosPayment($invoice_id);
@@ -204,11 +228,15 @@ class PaymentController extends AbstractAdminController
      */
     public function salvarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
-
-        $invoice_id = $request->get('invoice_id');
-        $notes = $request->get('notes');
-        $date = $request->get('date');
+        $d = PaymentNotesSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = (string) ($d->notes_id ?? '');
+        $invoice_id = (string) $d->invoice_id;
+        $notes = (string) $d->notes;
+        $date = (string) $d->date;
 
         try {
             $resultado = $this->paymentService->SalvarNotes($notes_id, $invoice_id, $notes, $date);
@@ -236,7 +264,12 @@ class PaymentController extends AbstractAdminController
      */
     public function cargarDatosNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->paymentService->CargarDatosNotes($notes_id);
@@ -263,7 +296,12 @@ class PaymentController extends AbstractAdminController
      */
     public function eliminarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->paymentService->EliminarNotes($notes_id);
@@ -290,9 +328,14 @@ class PaymentController extends AbstractAdminController
      */
     public function eliminarNotesDate(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-        $from = $request->get('from');
-        $to = $request->get('to');
+        $d = PaymentNotesDateRangeRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = (string) $d->invoice_id;
+        $from = (string) $d->from;
+        $to = (string) $d->to;
 
         try {
             $resultado = $this->paymentService->EliminarNotesDate($invoice_id, $from, $to);
@@ -353,7 +396,12 @@ class PaymentController extends AbstractAdminController
      */
     public function eliminarArchivo(Request $request)
     {
-        $archivo = $request->get('archivo');
+        $d = PaymentArchivoRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivo = (string) $d->archivo;
 
         try {
             $resultado = $this->paymentService->EliminarArchivo($archivo);
@@ -379,7 +427,12 @@ class PaymentController extends AbstractAdminController
      */
     public function eliminarArchivos(Request $request)
     {
-        $archivos = $request->get('archivos');
+        $d = PaymentArchivosRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivos = (string) $d->archivos;
 
         try {
             $resultado = $this->paymentService->EliminarArchivos($archivos);
@@ -405,11 +458,15 @@ class PaymentController extends AbstractAdminController
      */
     public function salvarNotesItem(Request $request)
     {
-        $notes_id = $request->get('notes_id');
-
-        $invoice_item_id = $request->get('invoice_item_id');
-        $notes = $request->get('notes');
-        $override_unpaid_qty = $request->get('override_unpaid_qty');
+        $d = PaymentSalvarNotesItemRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $d->notes_id;
+        $invoice_item_id = $d->invoice_item_id;
+        $notes = $d->notes;
+        $override_unpaid_qty = $d->override_unpaid_qty;
 
         try {
             $resultado = $this->paymentService->SalvarNotesItem($notes_id, $invoice_item_id, $notes, $override_unpaid_qty);
@@ -438,7 +495,12 @@ class PaymentController extends AbstractAdminController
      */
     public function listarHistorialUnpaidQtyItem(Request $request)
     {
-        $invoice_item_id = $request->get('invoice_item_id');
+        $dto = PaymentInvoiceItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_item_id = $dto->invoice_item_id;
 
         try {
             $historial = $this->paymentService->ListarHistorialUnpaidQtyItem($invoice_item_id);
@@ -459,7 +521,12 @@ class PaymentController extends AbstractAdminController
      */
     public function eliminarNotesItem(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->paymentService->EliminarNotesItem($notes_id);
@@ -486,7 +553,12 @@ class PaymentController extends AbstractAdminController
      */
     public function paid(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
+        $dto = PaymentInvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $dto->invoice_id;
 
         try {
             $resultado = $this->paymentService->PaidInvoice($invoice_id);
@@ -523,8 +595,13 @@ class PaymentController extends AbstractAdminController
      */
     public function cambiarEstado(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-        $status = $request->get('status'); // 1 = Closed, 0 = Open
+        $d = PaymentCambiarEstadoRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $d->invoice_id;
+        $status = $d->status;
 
         try {
             $resultado = $this->paymentService->CambiarEstadoInvoice($invoice_id, $status);

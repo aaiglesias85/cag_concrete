@@ -3,6 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Task\TaskCambiarEstadoRequest;
+use App\Dto\Admin\Task\TaskIdRequest;
+use App\Dto\Admin\Task\TaskIdsRequest;
+use App\Dto\Admin\Task\TaskSalvarRequest;
 use App\Entity\Task;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
@@ -11,14 +16,21 @@ use App\Service\Admin\TaskService;
 use App\Service\Admin\WidgetAccessService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TaskController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     public function __construct(
         AdminAccessService $adminAccess,
         private readonly TaskService $taskService,
         private readonly DefaultService $defaultService,
         private readonly WidgetAccessService $widgetAccessService,
+        private readonly ValidatorInterface $validator,
+        private readonly TranslatorInterface $adminTranslator,
     ) {
         parent::__construct($adminAccess);
     }
@@ -97,11 +109,16 @@ class TaskController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
         }
         $u = $g;
-        $task_id = $request->get('task_id');
-        $description = $request->get('description');
-        $status = $request->get('status');
-        $due_day = $request->get('due_day');
-        $usuario_id = $request->get('usuario_id');
+        $d = TaskSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $task_id = $d->task_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+        $due_day = (string) ($d->due_day ?? '');
+        $usuario_id = (string) ($d->usuario_id ?? '');
 
         try {
             if ('' === $task_id || null === $task_id) {
@@ -137,7 +154,12 @@ class TaskController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
         }
         $u = $g;
-        $task_id = $request->get('task_id');
+        $dto = TaskIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $task_id = $dto->task_id;
         try {
             $resultado = $this->taskService->EliminarTask($task_id);
             if ($resultado['success']) {
@@ -160,7 +182,12 @@ class TaskController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
         }
         $u = $g;
-        $ids = $request->get('ids');
+        $idsDto = TaskIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
         try {
             $resultado = $this->taskService->EliminarTasks($ids);
             if ($resultado['success']) {
@@ -186,7 +213,12 @@ class TaskController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
         }
         $u = $g;
-        $task_id = $request->get('task_id');
+        $dto = TaskIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $task_id = $dto->task_id;
         try {
             $resultado = $this->taskService->CargarDatosTask($task_id);
             if (isset($resultado['success']) && $resultado['success']) {
@@ -236,8 +268,13 @@ class TaskController extends AbstractAdminController
 
     public function cambiarEstado(Request $request)
     {
-        $task_id = $request->get('task_id');
-        $status = (string) $request->get('status', '');
+        $d = TaskCambiarEstadoRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $task_id = $d->task_id;
+        $status = (string) $d->status;
         try {
             $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
             if ($g instanceof RedirectResponse) {

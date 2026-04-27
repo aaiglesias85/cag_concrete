@@ -3,18 +3,36 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Subcontractor\SubcontractorAgregarEmployeeRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorEmployeeIdRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorIdRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorIdsRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNoteIdRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesDateRangeRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesSalvarRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\SubcontractorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubcontractorController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $subcontractorService;
 
-    public function __construct(AdminAccessService $adminAccess, SubcontractorService $subcontractorService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        SubcontractorService $subcontractorService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->subcontractorService = $subcontractorService;
     }
@@ -75,17 +93,20 @@ class SubcontractorController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
-
-        $name = $request->get('name');
-        $phone = $request->get('phone');
-        $address = $request->get('address');
-        $contactName = $request->get('contactName');
-        $contactEmail = $request->get('contactEmail');
-
-        $companyName = $request->get('companyName');
-        $companyPhone = $request->get('companyPhone');
-        $companyAddress = $request->get('companyAddress');
+        $d = SubcontractorSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = (string) ($d->subcontractor_id ?? '');
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $companyName = (string) ($d->companyName ?? '');
+        $companyPhone = (string) ($d->companyPhone ?? '');
+        $companyAddress = (string) ($d->companyAddress ?? '');
 
         try {
             if ('' == $subcontractor_id) {
@@ -118,7 +139,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
+        $dto = SubcontractorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = $dto->subcontractor_id;
 
         try {
             $resultado = $this->subcontractorService->EliminarSubcontractor($subcontractor_id);
@@ -145,7 +171,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function eliminarSubcontractors(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = SubcontractorIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->subcontractorService->EliminarSubcontractors($ids);
@@ -172,7 +203,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
+        $dto = SubcontractorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = $dto->subcontractor_id;
 
         try {
             $resultado = $this->subcontractorService->CargarDatosSubcontractor($subcontractor_id);
@@ -245,11 +281,15 @@ class SubcontractorController extends AbstractAdminController
      */
     public function salvarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
-
-        $subcontractor_id = $request->get('subcontractor_id');
-        $notes = $request->get('notes');
-        $date = $request->get('date');
+        $d = SubcontractorNotesSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = (string) ($d->notes_id ?? '');
+        $subcontractor_id = (string) $d->subcontractor_id;
+        $notes = (string) $d->notes;
+        $date = (string) $d->date;
 
         try {
             $resultado = $this->subcontractorService->SalvarNotes($notes_id, $subcontractor_id, $notes, $date);
@@ -277,7 +317,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function cargarDatosNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = SubcontractorNoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->subcontractorService->CargarDatosNotes($notes_id);
@@ -304,7 +349,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function eliminarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = SubcontractorNoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->subcontractorService->EliminarNotes($notes_id);
@@ -331,9 +381,14 @@ class SubcontractorController extends AbstractAdminController
      */
     public function eliminarNotesDate(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
-        $from = $request->get('from');
-        $to = $request->get('to');
+        $d = SubcontractorNotesDateRangeRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = (string) $d->subcontractor_id;
+        $from = (string) $d->from;
+        $to = (string) $d->to;
 
         try {
             $resultado = $this->subcontractorService->EliminarNotesDate($subcontractor_id, $from, $to);
@@ -402,7 +457,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function eliminarEmployee(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = SubcontractorEmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->subcontractorService->EliminarEmployee($employee_id);
@@ -428,13 +488,16 @@ class SubcontractorController extends AbstractAdminController
      */
     public function agregarEmployee(Request $request)
     {
-        $employee_id = $request->get('employee_id');
-
-        $subcontractor_id = $request->get('subcontractor_id');
-
-        $name = $request->get('name');
-        $hourly_rate = $request->get('hourly_rate');
-        $position = $request->get('position');
+        $d = SubcontractorAgregarEmployeeRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = (string) ($d->employee_id ?? '');
+        $subcontractor_id = (string) $d->subcontractor_id;
+        $name = (string) $d->name;
+        $hourly_rate = (string) ($d->hourly_rate ?? '');
+        $position = (string) ($d->position ?? '');
 
         try {
             $resultado = $this->subcontractorService->SalvarEmployee($employee_id, $subcontractor_id, $name, $hourly_rate, $position);
@@ -461,7 +524,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function cargarDatosEmployee(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = SubcontractorEmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->subcontractorService->CargarDatosEmployee($employee_id);
@@ -488,7 +556,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function listarEmployeesDeSubcontractor(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
+        $dto = SubcontractorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = $dto->subcontractor_id;
 
         try {
             $employees = $this->subcontractorService->ListarEmployeesDeSubcontractor($subcontractor_id);
@@ -510,7 +583,12 @@ class SubcontractorController extends AbstractAdminController
      */
     public function listarProjects(Request $request)
     {
-        $subcontractor_id = $request->get('subcontractor_id');
+        $dto = SubcontractorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontractor_id = $dto->subcontractor_id;
 
         try {
             $projects = $this->subcontractorService->ListarProjects($subcontractor_id);

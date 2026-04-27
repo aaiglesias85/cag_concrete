@@ -3,6 +3,23 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Estimate\EstimateAgregarItemRequest;
+use App\Dto\Admin\Estimate\EstimateArchivoNombreRequest;
+use App\Dto\Admin\Estimate\EstimateArchivosStringRequest;
+use App\Dto\Admin\Estimate\EstimateCalendarioFiltroRequest;
+use App\Dto\Admin\Estimate\EstimateCambiarStageRequest;
+use App\Dto\Admin\Estimate\EstimateEnviarQuotesRequest;
+use App\Dto\Admin\Estimate\EstimateEstimateItemIdRequest;
+use App\Dto\Admin\Estimate\EstimateIdRequest;
+use App\Dto\Admin\Estimate\EstimateIdsRequest;
+use App\Dto\Admin\Estimate\EstimateListarFiltroRequest;
+use App\Dto\Admin\Estimate\EstimateQuoteIdRequest;
+use App\Dto\Admin\Estimate\EstimateRowIdRequest;
+use App\Dto\Admin\Estimate\EstimateSalvarQuoteCompaniesRequest;
+use App\Dto\Admin\Estimate\EstimateSalvarQuoteRequest;
+use App\Dto\Admin\Estimate\EstimateSalvarRequest;
+use App\Dto\Admin\Estimate\EstimateTemplateNoteRequest;
 use App\Entity\Company;
 use App\Entity\County;
 use App\Entity\District;
@@ -21,13 +38,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EstimateService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EstimateController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $estimateService;
 
-    public function __construct(AdminAccessService $adminAccess, EstimateService $estimateService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        EstimateService $estimateService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->estimateService = $estimateService;
     }
@@ -127,15 +153,16 @@ class EstimateController extends AbstractAdminController
                 defaultOrderField: 'name'
             );
 
-            // filtros
-            $stage_id = $request->get('stage_id');
-            $project_type_id = $request->get('project_type_id');
-            $proposal_type_id = $request->get('proposal_type_id');
-            $status_id = $request->get('status_id');
-            $county_id = $request->get('county_id');
-            $district_id = $request->get('district_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $f = EstimateListarFiltroRequest::fromHttpRequest($request);
+            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+            $stage_id = $f->stage_id;
+            $project_type_id = $f->project_type_id;
+            $proposal_type_id = $f->proposal_type_id;
+            $status_id = $f->status_id;
+            $county_id = $f->county_id;
+            $district_id = $f->district_id;
+            $fecha_inicial = $f->fechaInicial;
+            $fecha_fin = $f->fechaFin;
 
             $data = $this->estimateService->ListarEstimates(
                 $dt['start'],
@@ -176,15 +203,17 @@ class EstimateController extends AbstractAdminController
      */
     public function listarParaCalendario(Request $request)
     {
-        $search = $request->get('search');
-        $stage_id = $request->get('stage_id');
-        $project_type_id = $request->get('project_type_id');
-        $proposal_type_id = $request->get('proposal_type_id');
-        $status_id = $request->get('status_id');
-        $county_id = $request->get('county_id');
-        $district_id = $request->get('district_id');
-        $fecha_inicial = $request->get('fecha_inicial');
-        $fecha_fin = $request->get('fecha_fin');
+        $f = EstimateCalendarioFiltroRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        $search = $f->search;
+        $stage_id = $f->stage_id;
+        $project_type_id = $f->project_type_id;
+        $proposal_type_id = $f->proposal_type_id;
+        $status_id = $f->status_id;
+        $county_id = $f->county_id;
+        $district_id = $f->district_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
 
         try {
             $events = $this->estimateService->ListarEstimatesParaCalendario(
@@ -217,52 +246,52 @@ class EstimateController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
-
-        $project_id = $request->get('project_id');
-        $name = $request->get('name');
-        $bidDeadline = $request->get('bidDeadline');
-        $county_ids = $request->get('county_ids');
-        if (null === $county_ids || '' === $county_ids) {
-            $county_ids = $request->get('county_id');
+        $d = EstimateSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
-        $priority = $request->get('priority');
-        $bidNo = $request->get('bidNo');
-        $workHour = $request->get('workHour');
-        $phone = $request->get('phone');
-        $email = $request->get('email');
-        $jobWalk = $request->get('jobWalk');
-        $rfiDueDate = $request->get('rfiDueDate');
-        $projectStart = $request->get('projectStart');
-        $projectEnd = $request->get('projectEnd');
-        $submittedDate = $request->get('submittedDate');
-        $awardedDate = $request->get('awardedDate');
-        $lostDate = $request->get('lostDate');
-        $location = $request->get('location');
-        $sector = $request->get('sector');
+        $estimate_id = (string) ($d->estimate_id ?? '');
 
-        $bidDescription = $request->get('bidDescription');
-        $bidInstructions = $request->get('bidInstructions');
-        $planLink = $request->get('planLink');
-        $quoteReceived = $request->get('quoteReceived');
+        $project_id = $d->project_id;
+        $name = $d->name;
+        $bidDeadline = $d->bidDeadline;
+        $county_ids = $d->county_ids;
+        if (null === $county_ids || '' === $county_ids) {
+            $county_ids = $d->county_id;
+        }
+        $priority = $d->priority;
+        $bidNo = $d->bidNo;
+        $workHour = $d->workHour;
+        $phone = $d->phone;
+        $email = $d->email;
+        $jobWalk = $d->jobWalk;
+        $rfiDueDate = $d->rfiDueDate;
+        $projectStart = $d->projectStart;
+        $projectEnd = $d->projectEnd;
+        $submittedDate = $d->submittedDate;
+        $awardedDate = $d->awardedDate;
+        $lostDate = $d->lostDate;
+        $location = $d->location;
+        $sector = $d->sector;
 
-        $stage_id = $request->get('stage_id');
-        $proposal_type_id = $request->get('proposal_type_id');
-        $status_id = $request->get('status_id');
-        $district_id = $request->get('district_id');
-        $plan_downloading_id = $request->get('plan_downloading_id');
+        $bidDescription = $d->bidDescription;
+        $bidInstructions = $d->bidInstructions;
+        $planLink = $d->planLink;
+        $quoteReceived = $d->quoteReceived;
 
-        // project types
-        $project_types_id = $request->get('project_types_id');
-        // estimators
-        $estimators_id = $request->get('estimators_id');
+        $stage_id = $d->stage_id;
+        $proposal_type_id = $d->proposal_type_id;
+        $status_id = $d->status_id;
+        $district_id = $d->district_id;
+        $plan_downloading_id = $d->plan_downloading_id;
 
-        // companys
-        $companys = $request->get('companys');
-        $companys = json_decode($companys);
+        $project_types_id = $d->project_types_id;
+        $estimators_id = $d->estimators_id;
 
-        $archivos_raw = $request->get('archivos');
-        $archivos = json_decode($archivos_raw ?? '[]');
+        $companys = json_decode($d->companys ?? 'null');
+
+        $archivos = json_decode($d->archivos ?? '[]');
         if (!is_array($archivos)) {
             $archivos = [];
         }
@@ -363,7 +392,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
+        $dto = EstimateIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_id = $dto->estimate_id;
 
         try {
             $resultado = $this->estimateService->EliminarEstimate($estimate_id);
@@ -390,7 +424,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarEstimates(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = EstimateIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->estimateService->EliminarEstimates($ids);
@@ -417,8 +456,13 @@ class EstimateController extends AbstractAdminController
      */
     public function agregarTemplateNote(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
-        $estimate_note_item_id = $request->get('estimate_note_item_id');
+        $t = EstimateTemplateNoteRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $t, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_id = $t->estimate_id;
+        $estimate_note_item_id = $t->estimate_note_item_id;
         try {
             $resultado = $this->estimateService->AgregarTemplateNote($estimate_id, $estimate_note_item_id);
             if ($resultado['success']) {
@@ -441,7 +485,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarTemplateNote(Request $request)
     {
-        $id = $request->get('id');
+        $dto = EstimateRowIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $id = $dto->id;
         try {
             $resultado = $this->estimateService->EliminarTemplateNote($id);
             if ($resultado['success']) {
@@ -459,7 +508,12 @@ class EstimateController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
+        $dto = EstimateIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_id = $dto->estimate_id;
 
         try {
             $resultado = $this->estimateService->CargarDatosEstimate($estimate_id);
@@ -486,8 +540,13 @@ class EstimateController extends AbstractAdminController
      */
     public function cambiarStage(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
-        $stage_id = $request->get('stage_id');
+        $c = EstimateCambiarStageRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $c, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_id = $c->estimate_id;
+        $stage_id = $c->stage_id;
 
         try {
             $resultado = $this->estimateService->CambiarStage($estimate_id, $stage_id);
@@ -515,7 +574,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarItem(Request $request)
     {
-        $estimate_item_id = $request->get('estimate_item_id');
+        $dto = EstimateEstimateItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_item_id = $dto->estimate_item_id;
 
         try {
             $resultado = $this->estimateService->EliminarItem($estimate_item_id);
@@ -544,20 +608,25 @@ class EstimateController extends AbstractAdminController
      */
     public function agregarItem(Request $request)
     {
-        $estimate_item_id = $request->get('estimate_item_id');
-        $estimate_id = $request->get('estimate_id');
-        $quote_id = $request->get('quote_id');
-        $item_id = $request->get('item_id');
-        $item_name = $request->get('item');
-        $unit_id = $request->get('unit_id');
-        $quantity = $request->get('quantity');
-        $price = $request->get('price');
-        $yield_calculation = $request->get('yield_calculation');
-        $equation_id = $request->get('equation_id');
-        $code = $request->get('code');
-        $contract_name = $request->get('contract_name');
-        $new_quote_name = $request->get('new_quote_name');
-        $note_ids = $request->get('note_ids');
+        $a = EstimateAgregarItemRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $a, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_item_id = $a->estimate_item_id;
+        $estimate_id = $a->estimate_id;
+        $quote_id = $a->quote_id;
+        $item_id = $a->item_id;
+        $item_name = $a->item;
+        $unit_id = $a->unit_id;
+        $quantity = $a->quantity;
+        $price = $a->price;
+        $yield_calculation = $a->yield_calculation;
+        $equation_id = $a->equation_id;
+        $code = $a->code;
+        $contract_name = $a->contract_name;
+        $new_quote_name = $a->new_quote_name;
+        $note_ids = $a->note_ids;
         if (is_string($note_ids)) {
             $note_ids = '' === $note_ids ? [] : array_filter(array_map('intval', explode(',', $note_ids)));
         } elseif (!is_array($note_ids)) {
@@ -593,7 +662,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarCompany(Request $request)
     {
-        $id = $request->get('id');
+        $dto = EstimateRowIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $id = $dto->id;
 
         try {
             $resultado = $this->estimateService->EliminarCompany($id);
@@ -620,9 +694,14 @@ class EstimateController extends AbstractAdminController
      */
     public function salvarQuote(Request $request)
     {
-        $estimate_id = $request->get('estimate_id');
-        $quote_id = $request->get('quote_id');
-        $name = $request->get('name');
+        $q = EstimateSalvarQuoteRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $q, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $estimate_id = $q->estimate_id;
+        $quote_id = $q->quote_id;
+        $name = (string) $q->name;
         try {
             $resultado = $this->estimateService->SalvarQuote($estimate_id, $quote_id ?? '', $name);
             if ($resultado['success']) {
@@ -640,7 +719,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarQuote(Request $request)
     {
-        $quote_id = $request->get('quote_id');
+        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->EliminarQuote($quote_id);
             if ($resultado['success']) {
@@ -658,7 +742,12 @@ class EstimateController extends AbstractAdminController
      */
     public function eliminarQuoteCompanies(Request $request)
     {
-        $quote_id = $request->get('quote_id');
+        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->EliminarQuoteCompanies($quote_id);
             if ($resultado['success']) {
@@ -676,7 +765,12 @@ class EstimateController extends AbstractAdminController
      */
     public function cargarDatosQuote(Request $request)
     {
-        $quote_id = $request->get('quote_id');
+        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->CargarDatosQuote($quote_id);
 
@@ -691,13 +785,20 @@ class EstimateController extends AbstractAdminController
      */
     public function salvarQuoteCompanies(Request $request)
     {
-        $quote_id = $request->get('quote_id');
-        $company_ids = $request->get('company_ids');
+        $d = EstimateSalvarQuoteCompaniesRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $quote_id = $d->quote_id;
+        $company_ids = $d->company_ids;
         if (is_string($company_ids)) {
             $company_ids = '' === $company_ids ? [] : explode(',', $company_ids);
+        } elseif (!\is_array($company_ids)) {
+            $company_ids = [];
         }
         try {
-            $resultado = $this->estimateService->SalvarQuoteCompanies($quote_id, $company_ids ?? []);
+            $resultado = $this->estimateService->SalvarQuoteCompanies($quote_id, $company_ids);
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => 'The operation was successful']);
             }
@@ -713,7 +814,9 @@ class EstimateController extends AbstractAdminController
      */
     public function enviarQuotes(Request $request)
     {
-        $quote_ids = $request->get('quote_ids');
+        $d = EstimateEnviarQuotesRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        $quote_ids = $d->quote_ids;
         try {
             $resultado = $this->estimateService->EnviarQuotes($quote_ids ?? '');
 
@@ -733,7 +836,12 @@ class EstimateController extends AbstractAdminController
      */
     public function exportarExcelQuote(Request $request)
     {
-        $quote_id = $request->get('quote_id');
+        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $quote_id = $dto->quote_id;
         try {
             $url = $this->estimateService->ExportarExcelQuote($quote_id);
             if (null === $url) {
@@ -786,7 +894,12 @@ class EstimateController extends AbstractAdminController
 
     public function eliminarArchivo(Request $request)
     {
-        $archivo = $request->get('archivo');
+        $d = EstimateArchivoNombreRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivo = $d->archivo;
 
         try {
             $resultado = $this->estimateService->EliminarArchivo($archivo);
@@ -809,7 +922,12 @@ class EstimateController extends AbstractAdminController
 
     public function eliminarArchivos(Request $request)
     {
-        $archivos = $request->get('archivos');
+        $d = EstimateArchivosStringRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivos = $d->archivos;
 
         try {
             $resultado = $this->estimateService->EliminarArchivos($archivos);

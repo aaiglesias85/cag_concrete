@@ -3,6 +3,17 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidEliminarRequest;
+use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidListarRequest;
+use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidSalvarRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentHistorialUnpaidIdRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentIdRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentIdsRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentInvoiceItemIdRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentListarItemsRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentProyectoIdRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentSalvarRequest;
 use App\Entity\Company;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
@@ -10,13 +21,21 @@ use App\Service\Admin\OverridePaymentService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OverridePaymentController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $overridePaymentService;
 
-    public function __construct(AdminAccessService $adminAccess, OverridePaymentService $overridePaymentService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        OverridePaymentService $overridePaymentService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->overridePaymentService = $overridePaymentService;
     }
@@ -109,10 +128,12 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $id = (int) $request->get('id', 0);
-        if ($id <= 0) {
-            return $this->json(['success' => false, 'error' => 'Invalid id']);
+        $dto = OverridePaymentIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
+        $id = $dto->id;
 
         try {
             $r = $this->overridePaymentService->EliminarCabeceraInvoiceOverridePayment($id);
@@ -141,13 +162,18 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $ids = $request->get('ids', '');
-        if (null === $ids || '' === trim((string) $ids)) {
+        $idsDto = OverridePaymentIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        if ('' === trim((string) $idsDto->ids)) {
             return $this->json(['success' => false, 'error' => 'No records selected']);
         }
+        $ids = (string) $idsDto->ids;
 
         try {
-            $r = $this->overridePaymentService->EliminarCabecerasInvoiceOverridePayment((string) $ids);
+            $r = $this->overridePaymentService->EliminarCabecerasInvoiceOverridePayment($ids);
             if (!empty($r['success'])) {
                 return $this->json([
                     'success' => true,
@@ -180,7 +206,12 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $id = (int) $request->get('id', 0);
+        $dto = OverridePaymentIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $id = $dto->id;
 
         try {
             $resultado = $this->overridePaymentService->CargarDatosInvoiceOverridePayment($id);
@@ -209,24 +240,14 @@ class OverridePaymentController extends AbstractAdminController
      */
     public function listarItems(Request $request)
     {
-        $company_id = $request->get('company_id');
-        $project_id = $request->get('project_id');
-        $fecha_fin = $request->get('fechaFin');
-        $iopHeaderRaw = $request->get('invoice_override_payment_id');
-        $invoice_override_payment_id = null;
-        if (null !== $iopHeaderRaw && '' !== $iopHeaderRaw) {
-            $iopHeaderId = (int) $iopHeaderRaw;
-            if ($iopHeaderId > 0) {
-                $invoice_override_payment_id = $iopHeaderId;
-            }
-        }
+        $q = OverridePaymentListarItemsRequest::fromHttpRequest($request);
 
         try {
             $result = $this->overridePaymentService->ListarItemsParaOverridePayment(
-                null !== $company_id ? (string) $company_id : null,
-                null !== $project_id ? (string) $project_id : null,
-                null !== $fecha_fin ? (string) $fecha_fin : null,
-                $invoice_override_payment_id
+                $q->company_id,
+                $q->project_id,
+                $q->fechaFin,
+                $q->invoice_override_payment_id
             );
 
             return $this->json([
@@ -254,25 +275,23 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $project_id = (string) $request->get('project_id', '');
-        $fecha_fin = (string) $request->get('fechaFin', '');
-        $itemsRaw = $request->get('items');
-        if (is_string($itemsRaw)) {
+        $d = OverridePaymentSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $itemsRaw = $d->items;
+        if (\is_string($itemsRaw)) {
             $itemsDecoded = json_decode($itemsRaw, true);
         } else {
             $itemsDecoded = $itemsRaw;
         }
-        if (!is_array($itemsDecoded)) {
+        if (!\is_array($itemsDecoded)) {
             $itemsDecoded = [];
         }
-        $iopHeaderRaw = $request->get('invoice_override_payment_id');
-        $invoice_override_payment_id = null;
-        if (null !== $iopHeaderRaw && '' !== $iopHeaderRaw) {
-            $hid = (int) $iopHeaderRaw;
-            if ($hid > 0) {
-                $invoice_override_payment_id = $hid;
-            }
-        }
+        $project_id = (string) $d->project_id;
+        $fecha_fin = (string) $d->fechaFin;
+        $invoice_override_payment_id = $d->invoice_override_payment_id;
 
         try {
             $resultado = $this->overridePaymentService->SalvarOverridePayment(
@@ -313,22 +332,18 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $project_id = (string) $request->get('project_id', '');
-        $fecha_fin = (string) $request->get('fechaFin', '');
-        $project_item_id = (int) $request->get('project_item_id', 0);
-        $notes = $request->get('notes');
-        $override_unpaid_qty = $request->get('override_unpaid_qty');
-        $history_id_raw = $request->get('history_id');
-        $history_id = is_numeric($history_id_raw) ? (int) $history_id_raw : null;
-        if (null !== $history_id && $history_id <= 0) {
-            $history_id = null;
+        $d = OverrideNotaUnpaidSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
-
-        if (!is_string($notes)) {
-            $notes = '';
-        }
-
-        $override_unpaid_qty_previous = $request->get('override_unpaid_qty_previous');
+        $project_id = (string) $d->project_id;
+        $fecha_fin = (string) $d->fechaFin;
+        $project_item_id = (int) $d->project_item_id;
+        $notes = $d->notes;
+        $history_id = $d->history_id;
+        $override_unpaid_qty = $d->override_unpaid_qty;
+        $override_unpaid_qty_previous = $d->override_unpaid_qty_previous;
 
         try {
             $resultado = $this->overridePaymentService->SalvarNotaOverrideUnpaidQty(
@@ -336,11 +351,9 @@ class OverridePaymentController extends AbstractAdminController
                 $fecha_fin,
                 $project_item_id,
                 $notes,
-                null !== $override_unpaid_qty && '' !== $override_unpaid_qty ? (string) $override_unpaid_qty : null,
+                $override_unpaid_qty,
                 $history_id,
-                null !== $override_unpaid_qty_previous && '' !== $override_unpaid_qty_previous
-                   ? (string) $override_unpaid_qty_previous
-                   : null
+                $override_unpaid_qty_previous
             );
 
             if (!empty($resultado['success'])) {
@@ -366,15 +379,13 @@ class OverridePaymentController extends AbstractAdminController
 
     public function listarNotasOverrideUnpaid(Request $request)
     {
-        $project_id = (string) $request->get('project_id', '');
-        $fecha_fin = (string) $request->get('fechaFin', '');
-        $project_item_id = (int) $request->get('project_item_id', 0);
+        $d = OverrideNotaUnpaidListarRequest::fromHttpRequest($request);
 
         try {
             $resultado = $this->overridePaymentService->ListarNotasOverrideUnpaidQty(
-                $project_id,
-                $fecha_fin,
-                $project_item_id
+                $d->project_id,
+                $d->fechaFin,
+                $d->project_item_id
             );
 
             if (!empty($resultado['success'])) {
@@ -411,9 +422,14 @@ class OverridePaymentController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'Access denied']);
         }
 
-        $project_id = (string) $request->get('project_id', '');
-        $project_item_id = (int) $request->get('project_item_id', 0);
-        $history_id = (int) $request->get('history_id', 0);
+        $d = OverrideNotaUnpaidEliminarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = (string) $d->project_id;
+        $project_item_id = (int) $d->project_item_id;
+        $history_id = (int) $d->history_id;
 
         try {
             $resultado = $this->overridePaymentService->EliminarNotaOverrideUnpaidQty(
@@ -443,10 +459,15 @@ class OverridePaymentController extends AbstractAdminController
 
     public function listarHistorial(Request $request)
     {
-        $invoice_item_override_payment_id = $request->get('invoice_item_override_payment_id');
+        $d = OverridePaymentInvoiceItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_item_override_payment_id = $d->invoice_item_override_payment_id;
 
         try {
-            $historial = $this->overridePaymentService->ListarHistorialOverridePayment((int) $invoice_item_override_payment_id);
+            $historial = $this->overridePaymentService->ListarHistorialOverridePayment($invoice_item_override_payment_id);
 
             return $this->json([
                 'success' => true,
@@ -462,13 +483,15 @@ class OverridePaymentController extends AbstractAdminController
 
     public function listarHistorialUnpaid(Request $request)
     {
-        $pid = $request->get('invoice_item_override_payment_id');
-        if (null === $pid || '' === $pid) {
-            $pid = $request->get('invoice_item_override_unpaid_qty_id');
+        $d = OverridePaymentHistorialUnpaidIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
+        $pid = $d->id;
 
         try {
-            $historial = $this->overridePaymentService->ListarHistorialOverrideUnpaidQty((int) $pid);
+            $historial = $this->overridePaymentService->ListarHistorialOverrideUnpaidQty($pid);
 
             return $this->json([
                 'success' => true,
@@ -487,10 +510,15 @@ class OverridePaymentController extends AbstractAdminController
      */
     public function listarHistorialProyecto(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $d = OverridePaymentProyectoIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $d->project_id;
 
         try {
-            $rows = $this->overridePaymentService->ListarHistorialOverridePaymentProyecto((int) $project_id);
+            $rows = $this->overridePaymentService->ListarHistorialOverridePaymentProyecto($project_id);
 
             return $this->json([
                 'success' => true,

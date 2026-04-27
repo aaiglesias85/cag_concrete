@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Inspector\InspectorIdRequest;
+use App\Dto\Admin\Inspector\InspectorIdsRequest;
+use App\Dto\Admin\Inspector\InspectorSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InspectorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InspectorController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $inspectorService;
 
-    public function __construct(AdminAccessService $adminAccess, InspectorService $inspectorService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        InspectorService $inspectorService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->inspectorService = $inspectorService;
     }
@@ -38,14 +51,12 @@ class InspectorController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'name', 'email', 'phone', 'status'],
                 defaultOrderField: 'name'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->inspectorService->ListarInspectors(
                 $dt['start'],
                 $dt['length'],
@@ -75,15 +86,19 @@ class InspectorController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $inspector_id = $request->get('inspector_id');
-
-        $name = $request->get('name');
-        $email = $request->get('email');
-        $phone = $request->get('phone');
-        $status = $request->get('status');
+        $d = InspectorSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $inspector_id = (string) ($d->inspector_id ?? '');
+        $name = (string) $d->name;
+        $email = (string) $d->email;
+        $phone = (string) ($d->phone ?? '');
+        $status = (string) $d->status;
 
         try {
-            if ('' == $inspector_id) {
+            if ('' === $inspector_id) {
                 $resultado = $this->inspectorService->SalvarInspector($name, $email, $phone, $status);
             } else {
                 $resultado = $this->inspectorService->ActualizarInspector($inspector_id, $name, $email, $phone, $status);
@@ -113,7 +128,12 @@ class InspectorController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $inspector_id = $request->get('inspector_id');
+        $dto = InspectorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $inspector_id = $dto->inspector_id;
 
         try {
             $resultado = $this->inspectorService->EliminarInspector($inspector_id);
@@ -140,7 +160,12 @@ class InspectorController extends AbstractAdminController
      */
     public function eliminarInspectors(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = InspectorIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->inspectorService->EliminarInspectors($ids);
@@ -167,7 +192,12 @@ class InspectorController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $inspector_id = $request->get('inspector_id');
+        $dto = InspectorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $inspector_id = $dto->inspector_id;
 
         try {
             $resultado = $this->inspectorService->CargarDatosInspector($inspector_id);

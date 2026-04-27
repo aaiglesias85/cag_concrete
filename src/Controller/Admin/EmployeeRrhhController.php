@@ -3,6 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Employee\EmployeeIdRequest;
+use App\Dto\Admin\Employee\EmployeeIdsRequest;
+use App\Dto\Admin\EmployeeRrhh\EmployeeRrhhSalvarRequest;
 use App\Entity\Race;
 use App\Http\DataTablesHelper;
 use App\Repository\RaceRepository;
@@ -10,13 +14,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeRrhhService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmployeeRrhhController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $employeeService;
 
-    public function __construct(AdminAccessService $adminAccess, EmployeeRrhhService $employeeService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        EmployeeRrhhService $employeeService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->employeeService = $employeeService;
     }
@@ -83,32 +96,36 @@ class EmployeeRrhhController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $employee_id = $request->get('employee_id');
-
-        $name = $request->get('name');
-        $address = $request->get('address');
-        $phone = $request->get('phone');
-        $cert_rate_type = $request->get('cert_rate_type');
-        $social_security_number = $request->get('social_security_number');
-        $apprentice_percentage = $request->get('apprentice_percentage');
-        $work_code = $request->get('work_code');
-        $gender = $request->get('gender');
-        $race_id = $request->get('race_id');
-        $date_hired = $request->get('date_hired');
-        $date_terminated = $request->get('date_terminated');
-        $reason_terminated = $request->get('reason_terminated');
-        $time_card_notes = $request->get('time_card_notes');
-        $regular_rate_per_hour = $request->get('regular_rate_per_hour');
-        $overtime_rate_per_hour = $request->get('overtime_rate_per_hour');
-        $special_rate_per_hour = $request->get('special_rate_per_hour');
-        $trade_licenses_info = $request->get('trade_licenses_info');
-        $notes = $request->get('notes');
-        $is_osha_10_certified = $request->get('is_osha_10_certified');
-        $is_veteran = $request->get('is_veteran');
-        $status = $request->get('status');
+        $d = EmployeeRrhhSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = (string) ($d->employee_id ?? '');
+        $name = (string) $d->name;
+        $address = $d->address;
+        $phone = $d->phone;
+        $cert_rate_type = $d->cert_rate_type;
+        $social_security_number = $d->social_security_number;
+        $apprentice_percentage = $d->apprentice_percentage;
+        $work_code = $d->work_code;
+        $gender = $d->gender;
+        $race_id = $d->race_id;
+        $date_hired = $d->date_hired;
+        $date_terminated = $d->date_terminated;
+        $reason_terminated = $d->reason_terminated;
+        $time_card_notes = $d->time_card_notes;
+        $regular_rate_per_hour = $d->regular_rate_per_hour;
+        $overtime_rate_per_hour = $d->overtime_rate_per_hour;
+        $special_rate_per_hour = $d->special_rate_per_hour;
+        $trade_licenses_info = $d->trade_licenses_info;
+        $notes = $d->notes;
+        $is_osha_10_certified = $d->is_osha_10_certified;
+        $is_veteran = $d->is_veteran;
+        $status = (string) $d->status;
 
         try {
-            if ('' == $employee_id) {
+            if ('' === $employee_id) {
                 $resultado = $this->employeeService->SalvarEmployee($name, $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
             } else {
                 $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
@@ -138,7 +155,12 @@ class EmployeeRrhhController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = EmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->employeeService->Eliminar($employee_id);
@@ -165,7 +187,12 @@ class EmployeeRrhhController extends AbstractAdminController
      */
     public function eliminarVarios(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = EmployeeIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->employeeService->EliminarVarios($ids);
@@ -192,7 +219,12 @@ class EmployeeRrhhController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $employee_id = $request->get('employee_id');
+        $dto = EmployeeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $employee_id = $dto->employee_id;
 
         try {
             $resultado = $this->employeeService->CargarDatosEmployee($employee_id);

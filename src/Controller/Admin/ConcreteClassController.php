@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ConcreteClass\ConcreteClassIdRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassIdsRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ConcreteClassService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConcreteClassController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $concreteClassService;
 
-    public function __construct(AdminAccessService $adminAccess, ConcreteClassService $concreteClassService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ConcreteClassService $concreteClassService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->concreteClassService = $concreteClassService;
     }
@@ -38,14 +51,12 @@ class ConcreteClassController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'name', 'status'],
                 defaultOrderField: 'name'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->concreteClassService->Listar(
                 $dt['start'],
                 $dt['length'],
@@ -75,13 +86,17 @@ class ConcreteClassController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $concrete_class_id = $request->get('concrete_class_id');
-
-        $name = $request->get('name');
-        $status = $request->get('status');
+        $d = ConcreteClassSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $concrete_class_id = (string) ($d->concrete_class_id ?? '');
+        $name = (string) $d->name;
+        $status = (string) $d->status;
 
         try {
-            if ('' == $concrete_class_id) {
+            if ('' === $concrete_class_id) {
                 $resultado = $this->concreteClassService->Salvar($name, $status);
             } else {
                 $resultado = $this->concreteClassService->Actualizar($concrete_class_id, $name, $status);
@@ -111,7 +126,12 @@ class ConcreteClassController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $concrete_class_id = $request->get('concrete_class_id');
+        $dto = ConcreteClassIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $concrete_class_id = $dto->concrete_class_id;
 
         try {
             $resultado = $this->concreteClassService->EliminarClass($concrete_class_id);
@@ -138,7 +158,12 @@ class ConcreteClassController extends AbstractAdminController
      */
     public function eliminarVarios(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = ConcreteClassIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->concreteClassService->EliminarVarios($ids);
@@ -165,7 +190,12 @@ class ConcreteClassController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $concrete_class_id = $request->get('concrete_class_id');
+        $dto = ConcreteClassIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $concrete_class_id = $dto->concrete_class_id;
 
         try {
             $resultado = $this->concreteClassService->CargarDatos($concrete_class_id);

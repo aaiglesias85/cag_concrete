@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\OverheadPrice\OverheadPriceIdRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceIdsRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\OverheadPriceService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OverheadPriceController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $overheadService;
 
-    public function __construct(AdminAccessService $adminAccess, OverheadPriceService $overheadService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        OverheadPriceService $overheadService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->overheadService = $overheadService;
     }
@@ -75,10 +88,14 @@ class OverheadPriceController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $overhead_id = $request->get('overhead_id');
-
-        $name = $request->get('name');
-        $price = $request->get('price');
+        $d = OverheadPriceSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $overhead_id = (string) ($d->overhead_id ?? '');
+        $name = (string) $d->name;
+        $price = (string) $d->price;
 
         try {
             if ('' == $overhead_id) {
@@ -110,7 +127,12 @@ class OverheadPriceController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $overhead_id = $request->get('overhead_id');
+        $dto = OverheadPriceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $overhead_id = $dto->overhead_id;
 
         try {
             $resultado = $this->overheadService->EliminarOverhead($overhead_id);
@@ -137,7 +159,12 @@ class OverheadPriceController extends AbstractAdminController
      */
     public function eliminarOverheads(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = OverheadPriceIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->overheadService->EliminarOverheads($ids);
@@ -164,7 +191,12 @@ class OverheadPriceController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $overhead_id = $request->get('overhead_id');
+        $dto = OverheadPriceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $overhead_id = $dto->overhead_id;
 
         try {
             $resultado = $this->overheadService->CargarDatosOverhead($overhead_id);

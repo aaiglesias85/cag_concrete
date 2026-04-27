@@ -3,18 +3,32 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorContactIdRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorIdRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorIdsRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ConcreteVendorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConcreteVendorController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $concreteVendorService;
 
-    public function __construct(AdminAccessService $adminAccess, ConcreteVendorService $concreteVendorService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ConcreteVendorService $concreteVendorService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->concreteVendorService = $concreteVendorService;
     }
@@ -75,17 +89,18 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $vendor_id = $request->get('vendor_id');
-
-        $name = $request->get('name');
-        $phone = $request->get('phone');
-        $address = $request->get('address');
-        $contactName = $request->get('contactName');
-        $contactEmail = $request->get('contactEmail');
-
-        // contacts
-        $contacts = $request->get('contacts');
-        $contacts = json_decode($contacts);
+        $d = ConcreteVendorSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $vendor_id = (string) ($d->vendor_id ?? '');
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $contacts = null !== $d->contacts && '' !== $d->contacts ? json_decode($d->contacts) : null;
 
         try {
             if ('' == $vendor_id) {
@@ -118,7 +133,12 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $vendor_id = $request->get('vendor_id');
+        $dto = ConcreteVendorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $vendor_id = $dto->vendor_id;
 
         try {
             $resultado = $this->concreteVendorService->EliminarVendor($vendor_id);
@@ -145,7 +165,12 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function eliminarVendors(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = ConcreteVendorIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->concreteVendorService->EliminarVendors($ids);
@@ -172,7 +197,12 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $vendor_id = $request->get('vendor_id');
+        $dto = ConcreteVendorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $vendor_id = $dto->vendor_id;
 
         try {
             $resultado = $this->concreteVendorService->CargarDatosVendor($vendor_id);
@@ -199,7 +229,12 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function listarContacts(Request $request)
     {
-        $vendor_id = $request->get('vendor_id');
+        $dto = ConcreteVendorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $vendor_id = $dto->vendor_id;
 
         try {
             $contacts = $this->concreteVendorService->ListarContactsDeConcreteVendor($vendor_id);
@@ -221,7 +256,12 @@ class ConcreteVendorController extends AbstractAdminController
      */
     public function eliminarContact(Request $request)
     {
-        $contact_id = $request->get('contact_id');
+        $dto = ConcreteVendorContactIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $contact_id = $dto->contact_id;
 
         try {
             $resultado = $this->concreteVendorService->EliminarContact($contact_id);

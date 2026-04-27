@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\District\DistrictIdRequest;
+use App\Dto\Admin\District\DistrictIdsRequest;
+use App\Dto\Admin\District\DistrictSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\DistrictService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DistrictController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $districtService;
 
-    public function __construct(AdminAccessService $adminAccess, DistrictService $districtService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        DistrictService $districtService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->districtService = $districtService;
     }
@@ -75,10 +88,14 @@ class DistrictController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $district_id = $request->get('district_id');
-
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = DistrictSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $district_id = (string) ($d->district_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
             if ('' === $district_id) {
@@ -111,7 +128,12 @@ class DistrictController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $district_id = $request->get('district_id');
+        $dto = DistrictIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $district_id = $dto->district_id;
 
         try {
             $resultado = $this->districtService->EliminarDistrict($district_id);
@@ -138,7 +160,12 @@ class DistrictController extends AbstractAdminController
      */
     public function eliminarDistricts(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = DistrictIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->districtService->EliminarDistricts($ids);
@@ -165,7 +192,12 @@ class DistrictController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $district_id = $request->get('district_id');
+        $dto = DistrictIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $district_id = $dto->district_id;
 
         try {
             $resultado = $this->districtService->CargarDatosDistrict($district_id);

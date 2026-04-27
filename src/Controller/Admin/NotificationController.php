@@ -3,18 +3,30 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Notification\NotificationIdRequest;
+use App\Dto\Admin\Notification\NotificationIdsRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\NotificationService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $notificationService;
 
-    public function __construct(AdminAccessService $adminAccess, NotificationService $notificationService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        NotificationService $notificationService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->notificationService = $notificationService;
     }
@@ -92,7 +104,12 @@ class NotificationController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $notification_id = $request->get('notification_id');
+        $dto = NotificationIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notification_id = $dto->notification_id;
 
         try {
             $resultado = $this->notificationService->EliminarNotification($notification_id);
@@ -119,7 +136,12 @@ class NotificationController extends AbstractAdminController
      */
     public function eliminarNotifications(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = NotificationIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->notificationService->EliminarNotifications($ids);

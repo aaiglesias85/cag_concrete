@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Reminder\ReminderIdRequest;
+use App\Dto\Admin\Reminder\ReminderIdsRequest;
+use App\Dto\Admin\Reminder\ReminderSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ReminderService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReminderController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $reminderService;
 
-    public function __construct(AdminAccessService $adminAccess, ReminderService $reminderService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ReminderService $reminderService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->reminderService = $reminderService;
     }
@@ -81,14 +94,17 @@ class ReminderController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $reminder_id = $request->get('reminder_id');
-
-        $day = $request->get('day');
-        $subject = $request->get('subject');
-        $body = $request->get('body');
-        $status = $request->get('status');
-
-        $usuarios_id = $request->get('usuarios_id');
+        $d = ReminderSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $reminder_id = (string) ($d->reminder_id ?? '');
+        $day = (string) $d->day;
+        $subject = (string) $d->subject;
+        $body = (string) ($d->body ?? '');
+        $status = (string) $d->status;
+        $usuarios_id = (string) ($d->usuarios_id ?? '');
 
         try {
             if ('' === $reminder_id) {
@@ -121,7 +137,12 @@ class ReminderController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $reminder_id = $request->get('reminder_id');
+        $dto = ReminderIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $reminder_id = $dto->reminder_id;
 
         try {
             $resultado = $this->reminderService->EliminarReminder($reminder_id);
@@ -148,7 +169,12 @@ class ReminderController extends AbstractAdminController
      */
     public function eliminarReminders(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = ReminderIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->reminderService->EliminarReminders($ids);
@@ -175,7 +201,12 @@ class ReminderController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $reminder_id = $request->get('reminder_id');
+        $dto = ReminderIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $reminder_id = $dto->reminder_id;
 
         try {
             $resultado = $this->reminderService->CargarDatosReminder($reminder_id);

@@ -3,6 +3,19 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\DataTracking\DataTrackingArchivoRequest;
+use App\Dto\Admin\DataTracking\DataTrackingArchivosRequest;
+use App\Dto\Admin\DataTracking\DataTrackingConcVendorIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingIdsRequest;
+use App\Dto\Admin\DataTracking\DataTrackingItemIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingLaborIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingMaterialIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingSalvarItemRequest;
+use App\Dto\Admin\DataTracking\DataTrackingSalvarRequest;
+use App\Dto\Admin\DataTracking\DataTrackingSubcontractIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingValidarSiExisteRequest;
 use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
 use App\Entity\Inspector;
@@ -17,17 +30,27 @@ use App\Service\Admin\DataTrackingService;
 use App\Service\Admin\ProjectService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DataTrackingController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $projectService;
     /**
      * @var DataTrackingService
      */
     private $dataTrackingService;
 
-    public function __construct(AdminAccessService $adminAccess, DataTrackingService $dataTrackingService, ProjectService $projectService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        DataTrackingService $dataTrackingService,
+        ProjectService $projectService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->projectService = $projectService;
         $this->dataTrackingService = $dataTrackingService;
@@ -145,48 +168,42 @@ class DataTrackingController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $data_tracking_id = $request->get('data_tracking_id');
+        $d = DataTrackingSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_id = (string) ($d->data_tracking_id ?? '');
+        $project_id = (string) $d->project_id;
+        $date = (string) $d->date;
+        $inspector_id = (string) ($d->inspector_id ?? '');
+        $station_number = (string) ($d->station_number ?? '');
+        $measured_by = (string) ($d->measured_by ?? '');
+        $conc_vendor = (string) ($d->conc_vendor ?? '');
+        $conc_price = (string) ($d->conc_price ?? '');
+        $crew_lead = (string) ($d->crew_lead ?? '');
+        $notes = (string) ($d->notes ?? '');
+        $other_materials = (string) ($d->other_materials ?? '');
+        $total_conc_used = (string) ($d->total_conc_used ?? '');
+        $total_stamps = (string) ($d->total_stamps ?? '');
+        $total_people = (string) ($d->total_people ?? '');
+        $overhead_price_id = (string) ($d->overhead_price_id ?? '');
+        $color_used = (string) ($d->color_used ?? '');
+        $color_price = (string) ($d->color_price ?? '');
 
-        $project_id = $request->get('project_id');
-        $date = $request->get('date');
-        $inspector_id = $request->get('inspector_id');
-        $station_number = $request->get('station_number');
-        $measured_by = $request->get('measured_by');
-        $conc_vendor = $request->get('conc_vendor');
-        $conc_price = $request->get('conc_price');
-        $crew_lead = $request->get('crew_lead');
-        $notes = $request->get('notes');
-        $other_materials = $request->get('other_materials');
-        $total_conc_used = $request->get('total_conc_used');
-        $total_stamps = $request->get('total_stamps');
-        $total_people = $request->get('total_people');
-        $overhead_price_id = $request->get('overhead_price_id');
-        $color_used = $request->get('color_used');
-        $color_price = $request->get('color_price');
+        $jsonParse = static function (?string $s) {
+            if (null === $s || '' === $s) {
+                return null;
+            }
 
-        // conc_vendors
-        $conc_vendors = $request->get('conc_vendors');
-        $conc_vendors = json_decode($conc_vendors);
-
-        // items
-        $items = $request->get('items');
-        $items = json_decode($items);
-
-        // labor
-        $labor = $request->get('labor');
-        $labor = json_decode($labor);
-
-        // materials
-        $materials = $request->get('materials');
-        $materials = json_decode($materials);
-
-        // subcontracts
-        $subcontracts = $request->get('subcontracts');
-        $subcontracts = json_decode($subcontracts);
-
-        // archivos
-        $archivos = $request->get('archivos');
-        $archivos = json_decode($archivos);
+            return json_decode($s);
+        };
+        $conc_vendors = $jsonParse($d->conc_vendors);
+        $items = $jsonParse($d->items);
+        $labor = $jsonParse($d->labor);
+        $materials = $jsonParse($d->materials);
+        $subcontracts = $jsonParse($d->subcontracts);
+        $archivos = $jsonParse($d->archivos);
 
         try {
             $resultado = $this->dataTrackingService->SalvarDataTracking(
@@ -239,7 +256,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $data_tracking_id = $request->get('data_tracking_id');
+        $dto = DataTrackingIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_id = $dto->data_tracking_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarDataTracking($data_tracking_id);
@@ -266,7 +288,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarDataTrackings(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = DataTrackingIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->dataTrackingService->EliminarDataTrackings($ids);
@@ -293,7 +320,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $data_tracking_id = $request->get('data_tracking_id');
+        $dto = DataTrackingIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_id = $dto->data_tracking_id;
 
         try {
             $resultado = $this->dataTrackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
@@ -320,7 +352,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarItem(Request $request)
     {
-        $data_tracking_item_id = $request->get('data_tracking_item_id');
+        $dto = DataTrackingItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_item_id = $dto->data_tracking_item_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarItemDataTracking($data_tracking_item_id);
@@ -346,17 +383,22 @@ class DataTrackingController extends AbstractAdminController
      */
     public function salvarItem(Request $request)
     {
+        $d = DataTrackingSalvarItemRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
         try {
             $resultado = $this->dataTrackingService->SalvarItemDataTracking(
-                $request->get('data_tracking_id'),
-                $request->get('project_id'),
-                $request->get('date'),
-                $request->get('data_tracking_item_id'),
-                $request->get('item_id'),
-                $request->get('quantity'),
-                $request->get('punch_quantity'),
-                $request->get('notes'),
-                $request->get('price')
+                $d->data_tracking_id,
+                $d->project_id,
+                $d->date,
+                $d->data_tracking_item_id,
+                $d->item_id,
+                $d->quantity,
+                $d->punch_quantity,
+                $d->notes,
+                $d->price
             );
 
             if ($resultado['success']) {
@@ -384,7 +426,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarSubcontract(Request $request)
     {
-        $subcontract_id = $request->get('subcontract_id');
+        $dto = DataTrackingSubcontractIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $subcontract_id = $dto->subcontract_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarItemSubcontract($subcontract_id);
@@ -410,7 +457,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarLabor(Request $request)
     {
-        $data_tracking_labor_id = $request->get('data_tracking_labor_id');
+        $dto = DataTrackingLaborIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_labor_id = $dto->data_tracking_labor_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarLaborDataTracking($data_tracking_labor_id);
@@ -436,7 +488,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarMaterial(Request $request)
     {
-        $data_tracking_material_id = $request->get('data_tracking_material_id');
+        $dto = DataTrackingMaterialIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_material_id = $dto->data_tracking_material_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarMaterialDataTracking($data_tracking_material_id);
@@ -462,7 +519,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarConcVendor(Request $request)
     {
-        $data_tracking_conc_vendor_id = $request->get('data_tracking_conc_vendor_id');
+        $dto = DataTrackingConcVendorIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_conc_vendor_id = $dto->data_tracking_conc_vendor_id;
 
         try {
             $resultado = $this->dataTrackingService->EliminarConcVendorDataTracking($data_tracking_conc_vendor_id);
@@ -488,13 +550,19 @@ class DataTrackingController extends AbstractAdminController
      */
     public function validarSiExiste(Request $request)
     {
-        $data_tracking_id = $request->get('data_tracking_id');
-
-        $project_id = $request->get('project_id');
-        $date = $request->get('date');
+        $d = DataTrackingValidarSiExisteRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $data_tracking_id = (string) ($d->data_tracking_id ?? '');
 
         try {
-            $existe = $this->dataTrackingService->ValidarSiExisteDataTracking($data_tracking_id, $project_id, $date);
+            $existe = $this->dataTrackingService->ValidarSiExisteDataTracking(
+                $data_tracking_id,
+                (string) $d->project_id,
+                (string) $d->date
+            );
 
             $resultadoJson['success'] = true;
             $resultadoJson['existe'] = $existe;
@@ -552,7 +620,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarArchivo(Request $request)
     {
-        $archivo = $request->get('archivo');
+        $d = DataTrackingArchivoRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivo = (string) $d->archivo;
 
         try {
             $resultado = $this->dataTrackingService->EliminarArchivo($archivo);
@@ -578,7 +651,12 @@ class DataTrackingController extends AbstractAdminController
      */
     public function eliminarArchivos(Request $request)
     {
-        $archivos = $request->get('archivos');
+        $d = DataTrackingArchivosRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivos = (string) $d->archivos;
 
         try {
             $resultado = $this->dataTrackingService->EliminarArchivos($archivos);

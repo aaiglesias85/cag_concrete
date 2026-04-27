@@ -3,6 +3,15 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Invoice\InvoiceChangeNumberRequest;
+use App\Dto\Admin\Invoice\InvoiceExportarRequest;
+use App\Dto\Admin\Invoice\InvoiceIdRequest;
+use App\Dto\Admin\Invoice\InvoiceIdsRequest;
+use App\Dto\Admin\Invoice\InvoiceItemIdRequest;
+use App\Dto\Admin\Invoice\InvoiceProyectoIdRequest;
+use App\Dto\Admin\Invoice\InvoiceSalvarRequest;
+use App\Dto\Admin\Invoice\InvoiceValidarRequest;
 use App\Entity\Company;
 use App\Entity\Item;
 use App\Http\DataTablesHelper;
@@ -10,13 +19,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InvoiceService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InvoiceController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $invoiceService;
 
-    public function __construct(AdminAccessService $adminAccess, InvoiceService $invoiceService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        InvoiceService $invoiceService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->invoiceService = $invoiceService;
     }
@@ -91,23 +109,23 @@ class InvoiceController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-
-        $number = $request->get('number');
-        $project_id = $request->get('project_id');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        $notes = $request->get('notes');
-        $paid = $request->get('paid');
-
-        // items
-        $items = $request->get('items');
-        $items = json_decode($items);
-
-        $exportar = $request->get('exportar');
+        $d = InvoiceSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = (string) ($d->invoice_id ?? '');
+        $number = (string) $d->number;
+        $project_id = (string) $d->project_id;
+        $start_date = (string) $d->start_date;
+        $end_date = (string) $d->end_date;
+        $notes = (string) ($d->notes ?? '');
+        $paid = $d->paid;
+        $items = \is_string($d->items) ? json_decode($d->items) : null;
+        $exportar = $d->exportar;
 
         try {
-            if ('' == $invoice_id) {
+            if ('' === $invoice_id) {
                 $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
             } else {
                 $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
@@ -138,7 +156,12 @@ class InvoiceController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
+        $dto = InvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $dto->invoice_id;
 
         try {
             $resultado = $this->invoiceService->EliminarInvoice($invoice_id);
@@ -165,7 +188,12 @@ class InvoiceController extends AbstractAdminController
      */
     public function eliminarInvoices(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = InvoiceIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->invoiceService->EliminarInvoices($ids);
@@ -192,7 +220,12 @@ class InvoiceController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
+        $dto = InvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $dto->invoice_id;
 
         try {
             $resultado = $this->invoiceService->CargarDatosInvoice($invoice_id);
@@ -219,7 +252,12 @@ class InvoiceController extends AbstractAdminController
      */
     public function eliminarItem(Request $request)
     {
-        $invoice_item_id = $request->get('invoice_item_id');
+        $dto = InvoiceItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_item_id = $dto->invoice_item_id;
 
         try {
             $resultado = $this->invoiceService->EliminarItem($invoice_item_id);
@@ -245,8 +283,13 @@ class InvoiceController extends AbstractAdminController
      */
     public function exportarExcel(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-        $format = $request->get('format') ?: 'excel';
+        $d = InvoiceExportarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $d->invoice_id;
+        $format = $d->format ?: 'excel';
 
         try {
             if ('pdf' === $format) {
@@ -281,7 +324,12 @@ class InvoiceController extends AbstractAdminController
      */
     public function paid(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
+        $dto = InvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $dto->invoice_id;
 
         try {
             $resultado = $this->invoiceService->PaidInvoice($invoice_id);
@@ -307,8 +355,13 @@ class InvoiceController extends AbstractAdminController
      */
     public function changeNumber(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-        $number = $request->get('number');
+        $d = InvoiceChangeNumberRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = $d->invoice_id;
+        $number = (string) $d->number;
 
         try {
             $resultado = $this->invoiceService->ChangeNumber($invoice_id, $number);
@@ -335,11 +388,16 @@ class InvoiceController extends AbstractAdminController
      */
     public function validar(Request $request)
     {
-        $invoice_id = $request->get('invoice_id');
-        $project_id = $request->get('project_id');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        $number = $request->get('number');
+        $d = InvoiceValidarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $invoice_id = (string) ($d->invoice_id ?? '');
+        $project_id = (string) $d->project_id;
+        $start_date = (string) $d->start_date;
+        $end_date = (string) $d->end_date;
+        $number = (string) $d->number;
 
         try {
             $resultado = $this->invoiceService->ValidarInvoice($invoice_id, $project_id, $start_date, $end_date, $number);
@@ -361,8 +419,13 @@ class InvoiceController extends AbstractAdminController
      */
     public function obtenerSiguientePeriodoInvoice(Request $request)
     {
+        $dto = InvoiceProyectoIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
         try {
-            $project_id = $request->get('project_id');
+            $project_id = $dto->project_id;
             $resultado = $this->invoiceService->ObtenerSiguientePeriodoInvoice($project_id);
 
             return $this->json($resultado);

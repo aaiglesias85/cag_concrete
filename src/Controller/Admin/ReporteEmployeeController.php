@@ -3,6 +3,9 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ReporteEmployee\ReporteEmployeeExportFiltroRequest;
+use App\Dto\Admin\ReporteEmployee\ReporteEmployeeListarFiltroRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeService;
@@ -10,15 +13,25 @@ use App\Service\Admin\ProjectService;
 use App\Service\Admin\ReporteEmployeeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReporteEmployeeController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $reporteService;
     private $projectService;
     private $employeeService;
 
-    public function __construct(AdminAccessService $adminAccess, ReporteEmployeeService $reporteService, ProjectService $projectService, EmployeeService $employeeService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ReporteEmployeeService $reporteService,
+        ProjectService $projectService,
+        EmployeeService $employeeService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;
@@ -59,10 +72,12 @@ class ReporteEmployeeController extends AbstractAdminController
                 defaultOrderField: 'date'
             );
 
-            $employee_id = $request->get('employee_id');
-            $project_id = $request->get('project_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $f = ReporteEmployeeListarFiltroRequest::fromHttpRequest($request);
+            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+            $employee_id = $f->employee_id;
+            $project_id = $f->project_id;
+            $fecha_inicial = $f->fechaInicial;
+            $fecha_fin = $f->fechaFin;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->reporteService->ListarReporteEmployees(
@@ -98,11 +113,13 @@ class ReporteEmployeeController extends AbstractAdminController
      */
     public function exportarExcel(Request $request)
     {
-        $search = $request->get('search');
-        $employee_id = $request->get('employee_id');
-        $project_id = $request->get('project_id');
-        $fecha_inicial = $request->get('fecha_inicial');
-        $fecha_fin = $request->get('fecha_fin');
+        $f = ReporteEmployeeExportFiltroRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        $search = $f->search;
+        $employee_id = $f->employee_id;
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
 
         try {
             $url = $this->reporteService->ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
@@ -125,11 +142,13 @@ class ReporteEmployeeController extends AbstractAdminController
      */
     public function devolverTotal(Request $request)
     {
-        $search = $request->get('search');
-        $employee_id = $request->get('employee_id');
-        $project_id = $request->get('project_id');
-        $fecha_inicial = $request->get('fecha_inicial');
-        $fecha_fin = $request->get('fecha_fin');
+        $f = ReporteEmployeeExportFiltroRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        $search = $f->search;
+        $employee_id = $f->employee_id;
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
 
         try {
             $total = $this->reporteService->DevolverTotal($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);

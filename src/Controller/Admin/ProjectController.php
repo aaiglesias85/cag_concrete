@@ -3,6 +3,30 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Project\ProjectAgregarItemRequest;
+use App\Dto\Admin\Project\ProjectAjusteRowIdRequest;
+use App\Dto\Admin\Project\ProjectArchivoNombreRequest;
+use App\Dto\Admin\Project\ProjectArchivosStringRequest;
+use App\Dto\Admin\Project\ProjectBulkItemsStatusRequest;
+use App\Dto\Admin\Project\ProjectConcreteClassIdRequest;
+use App\Dto\Admin\Project\ProjectContactIdRequest;
+use App\Dto\Admin\Project\ProjectDataTrackingFiltroRequest;
+use App\Dto\Admin\Project\ProjectEliminarNotesDateRequest;
+use App\Dto\Admin\Project\ProjectIdRequest;
+use App\Dto\Admin\Project\ProjectIdsRequest;
+use App\Dto\Admin\Project\ProjectListarFiltroRequest;
+use App\Dto\Admin\Project\ProjectListarItemsCompletionFiltroRequest;
+use App\Dto\Admin\Project\ProjectListarItemsInvoiceRequest;
+use App\Dto\Admin\Project\ProjectListarNotesFiltroRequest;
+use App\Dto\Admin\Project\ProjectListarOrdenadosRequest;
+use App\Dto\Admin\Project\ProjectNotesIdRequest;
+use App\Dto\Admin\Project\ProjectProjectItemIdRequest;
+use App\Dto\Admin\Project\ProjectReimbursementInvoiceIdRequest;
+use App\Dto\Admin\Project\ProjectSalvarNotesRequest;
+use App\Dto\Admin\Project\ProjectSalvarRequest;
+use App\Dto\Admin\Project\ProjectSaveReimbursementRequest;
+use App\Dto\Admin\Project\ProjectSugerirCodeRequest;
 use App\Entity\Company;
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
@@ -23,14 +47,24 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProjectController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $projectService;
     private $invoiceService;
 
-    public function __construct(AdminAccessService $adminAccess, ProjectService $projectService, InvoiceService $invoiceService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ProjectService $projectService,
+        InvoiceService $invoiceService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->projectService = $projectService;
         $this->invoiceService = $invoiceService;
@@ -112,12 +146,13 @@ class ProjectController extends AbstractAdminController
                 defaultOrderField: 'projectNumber'
             );
 
-            // filtros
-            $company_id = $request->get('company_id');
-            $status = $request->get('status');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-            $missing_info = $request->get('missing_info') ? true : false;
+            $f = ProjectListarFiltroRequest::fromHttpRequest($request);
+            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+            $company_id = $f->company_id;
+            $status = $f->status;
+            $fecha_inicial = $f->fechaInicial;
+            $fecha_fin = $f->fechaFin;
+            $missing_info = $f->missing_info ? true : false;
 
             $data = $this->projectService->ListarProjects(
                 $dt['start'],
@@ -155,75 +190,65 @@ class ProjectController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $d = ProjectSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = (string) ($d->project_id ?? '');
 
-        $company_id = $request->get('company_id');
-        $inspector_id = $request->get('inspector_id');
-        $number = $request->get('number');
-        $name = $request->get('name');
-        $description = $request->get('description');
-        $location = $request->get('location');
-        $po_number = $request->get('po_number');
-        $po_cg = $request->get('po_cg');
-        $contract_amount = $request->get('contract_amount');
-        $proposal_number = $request->get('proposal_number');
-        $project_id_number = $request->get('project_id_number');
+        $company_id = $d->company_id;
+        $inspector_id = $d->inspector_id;
+        $number = $d->number;
+        $name = $d->name;
+        $description = $d->description;
+        $location = $d->location;
+        $po_number = $d->po_number;
+        $po_cg = $d->po_cg;
+        $contract_amount = $d->contract_amount;
+        $proposal_number = $d->proposal_number;
+        $project_id_number = $d->project_id_number;
 
-        $manager = $request->get('manager');
-        $status = $request->get('status');
-        $owner = $request->get('owner');
-        $subcontract = $request->get('subcontract');
-        $federal_funding = $request->get('federal_funding');
-        // county_id puede venir como array o string separado por comas
-        $county_id = $request->get('county_id');
+        $manager = $d->manager;
+        $status = $d->status;
+        $owner = $d->owner;
+        $subcontract = $d->subcontract;
+        $federal_funding = $d->federal_funding;
+        $county_id = $d->county_id;
         if (is_string($county_id) && !empty($county_id)) {
             $county_id = explode(',', $county_id);
         }
         if (!is_array($county_id)) {
             $county_id = [];
         }
-        $resurfacing = $request->get('resurfacing');
-        $invoice_contact = $request->get('invoice_contact');
-        $certified_payrolls = $request->get('certified_payrolls');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
-        $due_date = $request->get('due_date');
+        $resurfacing = $d->resurfacing;
+        $invoice_contact = $d->invoice_contact;
+        $certified_payrolls = $d->certified_payrolls;
+        $start_date = $d->start_date;
+        $end_date = $d->end_date;
+        $due_date = $d->due_date;
 
-        $vendor_id = $request->get('vendor_id');
-        $concrete_class_id = $request->get('concrete_class_id');
-        $concrete_quote_price = $request->get('concrete_quote_price');
-        $concrete_start_date = $request->get('concrete_start_date');
-        $concrete_quote_price_escalator = $request->get('concrete_quote_price_escalator');
-        $concrete_time_period_every_n = $request->get('concrete_time_period_every_n');
-        $concrete_time_period_unit = $request->get('concrete_time_period_unit');
+        $vendor_id = $d->vendor_id;
+        $concrete_class_id = $d->concrete_class_id;
+        $concrete_quote_price = $d->concrete_quote_price;
+        $concrete_start_date = $d->concrete_start_date;
+        $concrete_quote_price_escalator = $d->concrete_quote_price_escalator;
+        $concrete_time_period_every_n = $d->concrete_time_period_every_n;
+        $concrete_time_period_unit = $d->concrete_time_period_unit;
 
-        $retainage = $request->get('retainage');
-        $retainage_percentage = $request->get('retainage_percentage');
-        $retainage_adjustment_percentage = $request->get('retainage_adjustment_percentage');
-        $retainage_adjustment_completion = $request->get('retainage_adjustment_completion');
+        $retainage = $d->retainage;
+        $retainage_percentage = $d->retainage_percentage;
+        $retainage_adjustment_percentage = $d->retainage_adjustment_percentage;
+        $retainage_adjustment_completion = $d->retainage_adjustment_completion;
 
-        $prevailing_wage = $request->get('prevailing_wage');
-        $prevailing_roles = $request->get('prevailing_roles');
+        $prevailing_wage = $d->prevailing_wage;
+        $prevailing_roles = $d->prevailing_roles;
 
-        // items
-        $items = $request->get('items');
-        $items = json_decode($items);
-
-        // contacts
-        $contacts = $request->get('contacts');
-        $contacts = json_decode($contacts);
-
-        // concrete_classes
-        $concrete_classes = $request->get('concrete_classes');
-        $concrete_classes = json_decode($concrete_classes);
-
-        // ajustes_precio
-        $ajustes_precio = $request->get('ajustes_precio');
-        $ajustes_precio = json_decode($ajustes_precio);
-
-        // archivos
-        $archivos = $request->get('archivos');
-        $archivos = json_decode($archivos);
+        $items = json_decode($d->items ?? 'null');
+        $contacts = json_decode($d->contacts ?? 'null');
+        $concrete_classes = json_decode($d->concrete_classes ?? 'null');
+        $ajustes_precio = json_decode($d->ajustes_precio ?? 'null');
+        $archivos = json_decode($d->archivos ?? 'null');
 
         try {
             if ('' == $project_id) {
@@ -342,7 +367,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $resultado = $this->projectService->EliminarProject($project_id);
@@ -369,7 +399,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarProjects(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = ProjectIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->projectService->EliminarProjects($ids);
@@ -396,7 +431,12 @@ class ProjectController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $resultado = $this->projectService->CargarDatosProject($project_id);
@@ -423,12 +463,14 @@ class ProjectController extends AbstractAdminController
      */
     public function listarOrdenados(Request $request)
     {
-        $company_id = $request->get('company_id') ?? '';
-        $inspector_id = $request->get('inspector_id') ?? '';
-        $search = $request->get('search') ?? '';
-        $from = $request->get('from') ?? '';
-        $to = $request->get('to') ?? '';
-        $status = $request->get('status') ?? '';
+        $f = ProjectListarOrdenadosRequest::fromHttpRequest($request);
+        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        $company_id = $f->company_id;
+        $inspector_id = $f->inspector_id;
+        $search = $f->search;
+        $from = $f->from;
+        $to = $f->to;
+        $status = $f->status;
 
         try {
             $projects = $this->projectService->ListarOrdenados($search, $company_id, $inspector_id, $from, $to, $status);
@@ -450,9 +492,14 @@ class ProjectController extends AbstractAdminController
      */
     public function listarItemsParaInvoice(Request $request)
     {
-        $project_id = $request->get('project_id');
-        $fecha_inicial = $request->get('start_date');
-        $fecha_fin = $request->get('end_date');
+        $f = ProjectListarItemsInvoiceRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->start_date;
+        $fecha_fin = $f->end_date;
 
         try {
             $result = $this->projectService->ListarItemsParaInvoice($project_id, $fecha_inicial, $fecha_fin);
@@ -497,10 +544,11 @@ class ProjectController extends AbstractAdminController
                 defaultOrderField: 'date'
             );
 
-            // filtros
-            $project_id = $request->get('project_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $f = ProjectListarNotesFiltroRequest::fromHttpRequest($request);
+            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+            $project_id = $f->project_id;
+            $fecha_inicial = $f->fechaInicial;
+            $fecha_fin = $f->fechaFin;
 
             // total + data en una sola llamada a tu servicio
             $result = '' != $project_id ? $this->projectService->ListarNotes(
@@ -535,11 +583,15 @@ class ProjectController extends AbstractAdminController
      */
     public function salvarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
-
-        $project_id = $request->get('project_id');
-        $notes = $request->get('notes');
-        $date = $request->get('date');
+        $d = ProjectSalvarNotesRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $d->notes_id;
+        $project_id = $d->project_id;
+        $notes = $d->notes;
+        $date = $d->date;
 
         try {
             $resultado = $this->projectService->SalvarNotes($notes_id, $project_id, $notes, $date);
@@ -567,7 +619,12 @@ class ProjectController extends AbstractAdminController
      */
     public function cargarDatosNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = ProjectNotesIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->projectService->CargarDatosNotes($notes_id);
@@ -594,7 +651,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarNotes(Request $request)
     {
-        $notes_id = $request->get('notes_id');
+        $dto = ProjectNotesIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $notes_id = $dto->notes_id;
 
         try {
             $resultado = $this->projectService->EliminarNotes($notes_id);
@@ -621,9 +683,14 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarNotesDate(Request $request)
     {
-        $project_id = $request->get('project_id');
-        $from = $request->get('from');
-        $to = $request->get('to');
+        $d = ProjectEliminarNotesDateRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $d->project_id;
+        $from = $d->from;
+        $to = $d->to;
 
         try {
             $resultado = $this->projectService->EliminarNotesDate($project_id, $from, $to);
@@ -650,7 +717,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarItems(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $items = $this->projectService->ListarItemsDeProject($project_id);
@@ -672,7 +744,12 @@ class ProjectController extends AbstractAdminController
      */
     public function obtenerPorcentajeCompletionItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
+        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $dto->project_item_id;
 
         try {
             $porcentaje = $this->projectService->ObtenerPorcentajeCompletionItem($project_item_id);
@@ -694,7 +771,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarHistorialItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
+        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $dto->project_item_id;
 
         try {
             $historial = $this->projectService->ListarHistorialDeItem($project_item_id);
@@ -716,8 +798,13 @@ class ProjectController extends AbstractAdminController
      */
     public function sugerirCodeContractItemEnProyecto(Request $request): JsonResponse
     {
-        $project_id = $request->get('project_id');
-        $item_id = $request->get('item_id');
+        $s = ProjectSugerirCodeRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $s, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $s->project_id;
+        $item_id = $s->item_id;
 
         try {
             $resultado = $this->projectService->SugerirCodeContractItemEnProyecto($project_id, $item_id);
@@ -738,7 +825,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
+        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $dto->project_item_id;
 
         try {
             $resultado = $this->projectService->EliminarItem($project_item_id);
@@ -764,42 +856,44 @@ class ProjectController extends AbstractAdminController
      */
     public function agregarItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
-        $project_id = $request->get('project_id');
-        $item_id = $request->get('item_id');
-        $item_name = $request->get('item');
-        $unit_id = $request->get('unit_id');
-        $quantity = $request->get('quantity');
-        $price = $request->get('price');
-        $yield_calculation = $request->get('yield_calculation');
-        $equation_id = $request->get('equation_id');
-        $change_order = $request->get('change_order');
-        // Convertir a booleano correctamente
+        $a = ProjectAgregarItemRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $a, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $a->project_item_id;
+        $project_id = $a->project_id;
+        $item_id = $a->item_id;
+        $item_name = $a->item;
+        $unit_id = $a->unit_id;
+        $quantity = $a->quantity;
+        $price = $a->price;
+        $yield_calculation = $a->yield_calculation;
+        $equation_id = $a->equation_id;
+        $change_order = $a->change_order;
         $change_order = filter_var($change_order, FILTER_VALIDATE_BOOLEAN);
-        $change_order_date = $request->get('change_order_date');
-        $apply_retainage = $request->get('apply_retainage') ?? 0;
+        $change_order_date = $a->change_order_date;
+        $apply_retainage = $a->apply_retainage ?? 0;
         $apply_retainage = (int) $apply_retainage;
         if (0 !== $apply_retainage) {
             $apply_retainage = 1;
         }
-        $bond = $request->get('bond') ?? false;
-        // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+        $bond = $a->bond ?? false;
         if (is_string($bond)) {
             $bond = 'true' === strtolower($bond) || '1' === $bond;
         } else {
             $bond = (bool) $bond;
         }
 
-        $bonded = $request->get('bonded') ?? false;
-        // Convertir a booleano correctamente (puede venir como string "true"/"false" o booleano)
+        $bonded = $a->bonded ?? false;
         if (is_string($bonded)) {
             $bonded = 'true' === strtolower($bonded) || '1' === $bonded;
         } else {
             $bonded = (bool) $bonded;
         }
 
-        $code = $request->get('code');
-        $contract_name = $request->get('contract_name');
+        $code = $a->code;
+        $contract_name = $a->contract_name;
 
         // Validar que solo usuarios con permiso bond puedan crear items con bond=true
         $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
@@ -852,7 +946,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarContact(Request $request)
     {
-        $contact_id = $request->get('contact_id');
+        $dto = ProjectContactIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $contact_id = $dto->contact_id;
 
         try {
             $resultado = $this->projectService->EliminarContact($contact_id);
@@ -878,7 +977,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarConcreteClass(Request $request)
     {
-        $concrete_class_id = $request->get('concrete_class_id');
+        $dto = ProjectConcreteClassIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $concrete_class_id = $dto->concrete_class_id;
 
         try {
             $resultado = $this->projectService->EliminarConcreteClass($concrete_class_id);
@@ -904,7 +1008,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarSubcontractors(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $subcontractors = $this->projectService->ListarSubcontractors($project_id);
@@ -926,7 +1035,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarEmployees(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $employees = $this->projectService->ListarEmployees($project_id);
@@ -948,7 +1062,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarContacts(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $contacts = $this->projectService->ListarContactsDeProject($project_id);
@@ -978,12 +1097,13 @@ class ProjectController extends AbstractAdminController
                 defaultOrderField: 'date'
             );
 
-            // filtros
-            $project_id = $request->get('project_id');
-            $pending = $request->get('pending');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-            $only_punch = $request->get('only_punch', '');
+            $f = ProjectDataTrackingFiltroRequest::fromHttpRequest($request);
+            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+            $project_id = $f->project_id;
+            $pending = $f->pending;
+            $fecha_inicial = $f->fechaInicial;
+            $fecha_fin = $f->fechaFin;
+            $only_punch = $f->only_punch ?? '';
 
             // total + data en una sola llamada a tu servicio
             $result = '' != $project_id ? $this->projectService->ListarDataTrackings(
@@ -1020,7 +1140,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarAjustePrecio(Request $request)
     {
-        $id = $request->get('id');
+        $dto = ProjectAjusteRowIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $id = $dto->id;
 
         try {
             $resultado = $this->projectService->EliminarAjustePrecio($id);
@@ -1080,7 +1205,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarArchivo(Request $request)
     {
-        $archivo = $request->get('archivo');
+        $d = ProjectArchivoNombreRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivo = $d->archivo;
 
         try {
             $resultado = $this->projectService->EliminarArchivo($archivo);
@@ -1106,7 +1236,12 @@ class ProjectController extends AbstractAdminController
      */
     public function eliminarArchivos(Request $request)
     {
-        $archivos = $request->get('archivos');
+        $d = ProjectArchivosStringRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $archivos = $d->archivos;
 
         try {
             $resultado = $this->projectService->EliminarArchivos($archivos);
@@ -1132,9 +1267,14 @@ class ProjectController extends AbstractAdminController
      */
     public function listarItemsCompletion(Request $request)
     {
-        $project_id = $request->get('project_id');
-        $fecha_inicial = $request->get('fechaInicial');
-        $fecha_fin = $request->get('fechaFin');
+        $f = ProjectListarItemsCompletionFiltroRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->fechaInicial;
+        $fecha_fin = $f->fechaFin;
 
         try {
             $items = $this->projectService->ListarItemsCompletion($project_id, $fecha_inicial, $fecha_fin);
@@ -1156,7 +1296,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarHistorialUnpaidQtyPorProjectItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
+        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $dto->project_item_id;
 
         try {
             $historial = $this->projectService->ListarHistorialUnpaidQtyPorProjectItem((int) $project_item_id);
@@ -1177,7 +1322,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarHistorialPaidQtyOverridePorProjectItem(Request $request)
     {
-        $project_item_id = $request->get('project_item_id');
+        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_item_id = $dto->project_item_id;
 
         try {
             $historial = $this->projectService->ListarHistorialPaidQtyOverridePorProjectItem((int) $project_item_id);
@@ -1198,7 +1348,12 @@ class ProjectController extends AbstractAdminController
      */
     public function listarInvoicesRetainage(Request $request)
     {
-        $project_id = $request->get('project_id');
+        $dto = ProjectIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $project_id = $dto->project_id;
 
         try {
             $invoices = $this->projectService->ListarInvoicesConRetainage($project_id);
@@ -1230,24 +1385,13 @@ class ProjectController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
         }
 
-        $ids = $request->get('ids');
-        $status = $request->get('status');
-
-        if (empty($ids)) {
-            $content = $request->getContent();
-            if (!empty($content)) {
-                $data = json_decode($content, true);
-                if (is_array($data)) {
-                    $ids = $data['ids'] ?? [];
-                    $status = $data['status'] ?? null;
-                }
-            }
+        $bulk = ProjectBulkItemsStatusRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $bulk, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
-
-        // 3. Validación final
-        if (empty($ids) || !is_array($ids)) {
-            return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
-        }
+        $ids = $bulk->ids;
+        $status = $bulk->status;
 
         try {
             $this->projectService->ActualizarRetainageItems($ids, $status);
@@ -1274,24 +1418,13 @@ class ProjectController extends AbstractAdminController
             return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);
         }
 
-        $ids = $request->get('ids');
-        $status = $request->get('status');
-
-        if (empty($ids)) {
-            $content = $request->getContent();
-            if (!empty($content)) {
-                $data = json_decode($content, true);
-                if (is_array($data)) {
-                    $ids = $data['ids'] ?? [];
-                    $status = $data['status'] ?? null;
-                }
-            }
+        $bulk = ProjectBulkItemsStatusRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $bulk, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
-
-        // 3. Validación final
-        if (empty($ids) || !is_array($ids)) {
-            return $this->json(['success' => false, 'error' => 'No items selected (Data not received)']);
-        }
+        $ids = $bulk->ids;
+        $status = $bulk->status;
 
         try {
             $this->projectService->ActualizarBonedItems($ids, $status);
@@ -1307,7 +1440,12 @@ class ProjectController extends AbstractAdminController
      */
     public function getReimbursementHistory(Request $request, ManagerRegistry $doctrine): JsonResponse
     {
-        $id = $request->request->get('invoice_id');
+        $q = ProjectReimbursementInvoiceIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $q, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return new JsonResponse($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $id = $q->invoice_id;
 
         // IMPORTANTE: 'invoiceId' es el nombre de la propiedad en tu clase Invoice.php
         $invoice = $doctrine->getRepository(Invoice::class)->findOneBy(['invoiceId' => $id]);
@@ -1332,9 +1470,14 @@ class ProjectController extends AbstractAdminController
      */
     public function saveReimbursement(Request $request, ManagerRegistry $doctrine): JsonResponse
     {
+        $d = ProjectSaveReimbursementRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return new JsonResponse($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
         $em = $doctrine->getManager();
-        $invoice_id = $request->request->get('invoice_id');
-        $amount_to_add = (float) $request->request->get('amount');
+        $invoice_id = $d->invoice_id;
+        $amount_to_add = (float) $d->amount;
 
         if ($amount_to_add <= 0) {
             return new JsonResponse(['success' => false, 'error' => 'Amount must be greater than 0']);

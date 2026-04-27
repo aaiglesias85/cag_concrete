@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Holiday\HolidayIdRequest;
+use App\Dto\Admin\Holiday\HolidayIdsRequest;
+use App\Dto\Admin\Holiday\HolidaySalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\HolidayService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class HolidayController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $holidayService;
 
-    public function __construct(AdminAccessService $adminAccess, HolidayService $holidayService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        HolidayService $holidayService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->holidayService = $holidayService;
     }
@@ -38,18 +51,15 @@ class HolidayController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'description', 'day'],
                 defaultOrderField: 'day'
             );
 
-            // filtros
             $fecha_inicial = $request->get('fechaInicial');
             $fecha_fin = $request->get('fechaFin');
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->holidayService->ListarHolidays(
                 $dt['start'],
                 $dt['length'],
@@ -81,13 +91,17 @@ class HolidayController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $holiday_id = $request->get('holiday_id');
-
-        $day = $request->get('day');
-        $description = $request->get('description');
+        $d = HolidaySalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $holiday_id = (string) ($d->holiday_id ?? '');
+        $day = (string) $d->day;
+        $description = (string) $d->description;
 
         try {
-            if ('' == $holiday_id) {
+            if ('' === $holiday_id) {
                 $resultado = $this->holidayService->SalvarHoliday($day, $description);
             } else {
                 $resultado = $this->holidayService->ActualizarHoliday($holiday_id, $day, $description);
@@ -116,7 +130,12 @@ class HolidayController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $holiday_id = $request->get('holiday_id');
+        $dto = HolidayIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $holiday_id = $dto->holiday_id;
 
         try {
             $resultado = $this->holidayService->EliminarHoliday($holiday_id);
@@ -143,7 +162,12 @@ class HolidayController extends AbstractAdminController
      */
     public function eliminarHolidays(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = HolidayIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->holidayService->EliminarHolidays($ids);
@@ -170,7 +194,12 @@ class HolidayController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $holiday_id = $request->get('holiday_id');
+        $dto = HolidayIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $holiday_id = $dto->holiday_id;
 
         try {
             $resultado = $this->holidayService->CargarDatosHoliday($holiday_id);

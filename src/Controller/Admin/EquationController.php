@@ -3,19 +3,33 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Equation\EquationIdRequest;
+use App\Dto\Admin\Equation\EquationIdsRequest;
+use App\Dto\Admin\Equation\EquationSalvarPayItemsRequest;
+use App\Dto\Admin\Equation\EquationSalvarRequest;
 use App\Entity\Equation;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EquationService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EquationController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $equationService;
 
-    public function __construct(AdminAccessService $adminAccess, EquationService $equationService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        EquationService $equationService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->equationService = $equationService;
     }
@@ -76,10 +90,15 @@ class EquationController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $equation_id = $request->get('equation_id');
-        $description = $request->get('description');
-        $equation = $request->get('equation');
-        $status = $request->get('status');
+        $d = EquationSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $equation_id = (string) ($d->equation_id ?? '');
+        $description = (string) $d->description;
+        $equation = (string) $d->equation;
+        $status = (string) $d->status;
 
         try {
             if ('' == $equation_id) {
@@ -112,7 +131,12 @@ class EquationController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $equation_id = $request->get('equation_id');
+        $dto = EquationIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $equation_id = $dto->equation_id;
 
         try {
             $resultado = $this->equationService->EliminarEquation($equation_id);
@@ -140,7 +164,12 @@ class EquationController extends AbstractAdminController
      */
     public function eliminarEquations(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = EquationIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->equationService->EliminarEquations($ids);
@@ -169,7 +198,12 @@ class EquationController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $equation_id = $request->get('equation_id');
+        $dto = EquationIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $equation_id = $dto->equation_id;
 
         try {
             $resultado = $this->equationService->CargarDatosEquation($equation_id);
@@ -196,7 +230,12 @@ class EquationController extends AbstractAdminController
      */
     public function listarPayItems(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = EquationIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $lista = $this->equationService->ListarPayItems($ids);
@@ -223,8 +262,12 @@ class EquationController extends AbstractAdminController
      */
     public function salvarPayItems(Request $request)
     {
-        $pay_items = $request->get('pay_items');
-        $pay_items = json_decode($pay_items);
+        $d = EquationSalvarPayItemsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $pay_items = json_decode((string) $d->pay_items);
 
         try {
             $resultado = $this->equationService->SalvarPayItems($pay_items);

@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ProposalType\ProposalTypeIdRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeIdsRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProposalTypeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProposalTypeController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $proposalTypeService;
 
-    public function __construct(AdminAccessService $adminAccess, ProposalTypeService $proposalTypeService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ProposalTypeService $proposalTypeService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->proposalTypeService = $proposalTypeService;
     }
@@ -38,14 +51,12 @@ class ProposalTypeController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'description', 'status'],
                 defaultOrderField: 'description'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->proposalTypeService->ListarTypes(
                 $dt['start'],
                 $dt['length'],
@@ -75,10 +86,14 @@ class ProposalTypeController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $type_id = $request->get('type_id');
-
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = ProposalTypeSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $type_id = (string) ($d->type_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
             if ('' === $type_id) {
@@ -111,7 +126,12 @@ class ProposalTypeController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $type_id = $request->get('type_id');
+        $dto = ProposalTypeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $type_id = $dto->type_id;
 
         try {
             $resultado = $this->proposalTypeService->EliminarType($type_id);
@@ -138,7 +158,12 @@ class ProposalTypeController extends AbstractAdminController
      */
     public function eliminarTypes(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = ProposalTypeIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->proposalTypeService->EliminarTypes($ids);
@@ -165,7 +190,12 @@ class ProposalTypeController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $type_id = $request->get('type_id');
+        $dto = ProposalTypeIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $type_id = $dto->type_id;
 
         try {
             $resultado = $this->proposalTypeService->CargarDatosType($type_id);

@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Unit\UnitIdRequest;
+use App\Dto\Admin\Unit\UnitIdsRequest;
+use App\Dto\Admin\Unit\UnitSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\UnitService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UnitController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $unitService;
 
-    public function __construct(AdminAccessService $adminAccess, UnitService $unitService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        UnitService $unitService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->unitService = $unitService;
     }
@@ -75,12 +88,17 @@ class UnitController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $unit_id = $request->get('unit_id');
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = UnitSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $unit_id = (string) ($d->unit_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
-            if ('' == $unit_id) {
+            if ('' === $unit_id) {
                 $resultado = $this->unitService->SalvarUnit($description, $status);
             } else {
                 $resultado = $this->unitService->ActualizarUnit($unit_id, $description, $status);
@@ -110,7 +128,12 @@ class UnitController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $unit_id = $request->get('unit_id');
+        $dto = UnitIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $unit_id = $dto->unit_id;
 
         try {
             $resultado = $this->unitService->EliminarUnit($unit_id);
@@ -137,7 +160,12 @@ class UnitController extends AbstractAdminController
      */
     public function eliminarUnits(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = UnitIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->unitService->EliminarUnits($ids);
@@ -164,7 +192,12 @@ class UnitController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $unit_id = $request->get('unit_id');
+        $dto = UnitIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $unit_id = $dto->unit_id;
 
         try {
             $resultado = $this->unitService->CargarDatosUnit($unit_id);

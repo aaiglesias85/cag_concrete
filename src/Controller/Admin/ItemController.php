@@ -3,6 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Item\ItemIdRequest;
+use App\Dto\Admin\Item\ItemIdsRequest;
+use App\Dto\Admin\Item\ItemSalvarRequest;
 use App\Entity\Equation;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
@@ -10,13 +14,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ItemService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ItemController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $itemService;
 
-    public function __construct(AdminAccessService $adminAccess, ItemService $itemService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        ItemService $itemService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->itemService = $itemService;
     }
@@ -53,14 +66,12 @@ class ItemController extends AbstractAdminController
     public function listar(Request $request)
     {
         try {
-            // parsear los parametros de la tabla
             $dt = DataTablesHelper::parse(
                 $request,
                 allowedOrderFields: ['id', 'name', 'unit', 'yieldCalculation', 'status'],
                 defaultOrderField: 'name'
             );
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->itemService->ListarItems(
                 $dt['start'],
                 $dt['length'],
@@ -90,18 +101,12 @@ class ItemController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $item_id = $request->get('item_id');
+        $d = ItemSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
 
-        $unit_id = $request->get('unit_id');
-        $name = $request->get('name');
-        $description = $request->get('description');
-        // $price = $request->get('price');
-        $status = $request->get('status');
-        $bond = $request->get('bond');
-        $yield_calculation = $request->get('yield_calculation');
-        $equation_id = $request->get('equation_id');
-
-        // Validar que solo usuarios con bond activo puedan marcar items como bond
         $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
         if ($g instanceof RedirectResponse) {
             $resultadoJson = ['success' => false, 'error' => 'Not authenticated'];
@@ -109,6 +114,7 @@ class ItemController extends AbstractAdminController
             return $this->json($resultadoJson, 401);
         }
         $usuario = $g;
+        $bond = $d->bond;
         if (!$usuario->getBond() && (1 == $bond || '1' === $bond || true === $bond)) {
             $resultadoJson['success'] = false;
             $resultadoJson['error'] = "You don't have permission to mark items as bond.";
@@ -116,8 +122,16 @@ class ItemController extends AbstractAdminController
             return $this->json($resultadoJson);
         }
 
+        $item_id = (string) ($d->item_id ?? '');
+        $unit_id = $d->unit_id;
+        $name = (string) $d->name;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $yield_calculation = $d->yield_calculation;
+        $equation_id = $d->equation_id;
+
         try {
-            if ('' == $item_id) {
+            if ('' === $item_id) {
                 $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
             } else {
                 $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
@@ -148,7 +162,12 @@ class ItemController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $item_id = $request->get('item_id');
+        $dto = ItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $item_id = $dto->item_id;
 
         try {
             $resultado = $this->itemService->EliminarItem($item_id);
@@ -175,7 +194,12 @@ class ItemController extends AbstractAdminController
      */
     public function eliminarItems(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = ItemIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->itemService->EliminarItems($ids);
@@ -202,7 +226,12 @@ class ItemController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $item_id = $request->get('item_id');
+        $dto = ItemIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $item_id = $dto->item_id;
 
         try {
             $resultado = $this->itemService->CargarDatosItem($item_id);

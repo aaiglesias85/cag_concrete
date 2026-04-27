@@ -986,7 +986,7 @@ class DataTrackingService extends Base
     /**
      * EliminarDataTrackings: Elimina los data trackings.
      *
-     * @param int $ids Ids
+     * @param string $ids Ids en CSV
      *
      * @author Marcel
      */

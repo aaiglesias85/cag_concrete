@@ -3,18 +3,31 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Advertisement\AdvertisementIdRequest;
+use App\Dto\Admin\Advertisement\AdvertisementIdsRequest;
+use App\Dto\Admin\Advertisement\AdvertisementSalvarRequest;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\AdvertisementService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdvertisementController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $advertisementService;
 
-    public function __construct(AdminAccessService $adminAccess, AdvertisementService $advertisementService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        AdvertisementService $advertisementService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->advertisementService = $advertisementService;
     }
@@ -81,13 +94,17 @@ class AdvertisementController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $advertisement_id = $request->get('advertisement_id');
-
-        $title = $request->get('title');
-        $description = $request->get('description');
-        $status = $request->get('status');
-        $start_date = $request->get('start_date');
-        $end_date = $request->get('end_date');
+        $d = AdvertisementSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $advertisement_id = (string) ($d->advertisement_id ?? '');
+        $title = (string) $d->title;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $start_date = (string) ($d->start_date ?? '');
+        $end_date = (string) ($d->end_date ?? '');
 
         try {
             if ('' == $advertisement_id) {
@@ -119,7 +136,12 @@ class AdvertisementController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $advertisement_id = $request->get('advertisement_id');
+        $dto = AdvertisementIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $advertisement_id = $dto->advertisement_id;
 
         try {
             $resultado = $this->advertisementService->EliminarAdvertisement($advertisement_id);
@@ -146,7 +168,12 @@ class AdvertisementController extends AbstractAdminController
      */
     public function eliminarAdvertisements(Request $request)
     {
-        $ids = $request->get('ids');
+        $idsDto = AdvertisementIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $idsDto->ids;
 
         try {
             $resultado = $this->advertisementService->EliminarAdvertisements($ids);
@@ -173,7 +200,12 @@ class AdvertisementController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $advertisement_id = $request->get('advertisement_id');
+        $dto = AdvertisementIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $advertisement_id = $dto->advertisement_id;
 
         try {
             $resultado = $this->advertisementService->CargarDatosAdvertisement($advertisement_id);
