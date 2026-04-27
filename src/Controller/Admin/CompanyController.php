@@ -3,6 +3,12 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Company\CompanyContactIdRequest;
+use App\Dto\Admin\Company\CompanyContactSalvarRequest;
+use App\Dto\Admin\Company\CompanyIdRequest;
+use App\Dto\Admin\Company\CompanyIdsRequest;
+use App\Dto\Admin\Company\CompanySalvarRequest;
 use App\Entity\ConcreteClass;
 use App\Entity\ConcreteVendor;
 use App\Entity\County;
@@ -16,13 +22,22 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\CompanyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CompanyController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $companyService;
 
-    public function __construct(AdminAccessService $adminAccess, CompanyService $companyService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        CompanyService $companyService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->companyService = $companyService;
     }
@@ -108,19 +123,25 @@ class CompanyController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $company_id = $request->get('company_id');
-
-        $name = $request->get('name');
-        $phone = $request->get('phone');
-        $address = $request->get('address');
-        $contactName = $request->get('contactName');
-        $contactEmail = $request->get('contactEmail');
-        $email = $request->get('email');
-        $website = $request->get('website');
-
-        // contacts
-        $contacts = $request->get('contacts');
-        $contacts = json_decode($contacts);
+        $d = CompanySalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $company_id = (string) ($d->company_id ?? '');
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $email = (string) ($d->email ?? '');
+        $website = (string) ($d->website ?? '');
+        $contactsRaw = $d->contacts;
+        $contacts = [];
+        if (null !== $contactsRaw && '' !== (string) $contactsRaw) {
+            $decoded = json_decode((string) $contactsRaw, false);
+            $contacts = \is_array($decoded) ? $decoded : [];
+        }
 
         try {
             if ('' == $company_id) {
@@ -153,7 +174,12 @@ class CompanyController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $company_id = $request->get('company_id');
+        $dto = CompanyIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $company_id = $dto->company_id;
 
         try {
             $resultado = $this->companyService->EliminarCompany($company_id);
@@ -180,7 +206,12 @@ class CompanyController extends AbstractAdminController
      */
     public function eliminarCompanies(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = CompanyIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->companyService->EliminarCompanies($ids);
@@ -207,7 +238,12 @@ class CompanyController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $company_id = $request->get('company_id');
+        $dto = CompanyIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $company_id = $dto->company_id;
 
         try {
             $resultado = $this->companyService->CargarDatosCompany($company_id);
@@ -234,7 +270,12 @@ class CompanyController extends AbstractAdminController
      */
     public function eliminarContact(Request $request)
     {
-        $contact_id = $request->get('contact_id');
+        $dto = CompanyContactIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $contact_id = $dto->contact_id;
 
         try {
             $resultado = $this->companyService->EliminarContact($contact_id);
@@ -261,16 +302,21 @@ class CompanyController extends AbstractAdminController
      */
     public function salvarContact(Request $request)
     {
-        $company_id = $request->get('company_id');
-
-        $name = $request->get('name');
-        $phone = $request->get('phone');
-        $email = $request->get('email');
-        $role = $request->get('role');
-        $notes = $request->get('notes');
+        $d = CompanyContactSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
 
         try {
-            $resultado = $this->companyService->SalvarContact($company_id, $name, $phone, $email, $role, $notes);
+            $resultado = $this->companyService->SalvarContact(
+                $d->company_id,
+                (string) $d->name,
+                (string) ($d->phone ?? ''),
+                (string) ($d->email ?? ''),
+                (string) ($d->role ?? ''),
+                (string) ($d->notes ?? '')
+            );
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -295,7 +341,12 @@ class CompanyController extends AbstractAdminController
      */
     public function listarContacts(Request $request)
     {
-        $company_id = $request->get('company_id');
+        $dto = CompanyIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $company_id = $dto->company_id;
 
         try {
             $lista = $this->companyService->ListarContactsDeCompany($company_id);

@@ -6,19 +6,32 @@ use App\Constants\FunctionId;
 use App\Entity\Funcion;
 use App\Entity\Widget;
 use App\Http\DataTablesHelper;
+use App\Dto\Admin\Perfil\PerfilIdsRequest;
+use App\Dto\Admin\Perfil\PerfilIdRequest;
+use App\Dto\Admin\Perfil\PerfilSalvarRequest;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\PerfilService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PerfilController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
     private $perfilService;
     private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
-    public function __construct(AdminAccessService $adminAccess, PerfilService $perfilService, FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        PerfilService $perfilService,
+        FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->perfilService = $perfilService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
@@ -90,12 +103,15 @@ class PerfilController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $perfil_id = $request->get('perfil_id');
-        $descripcion = $request->get('descripcion');
-
-        $permisos = $request->get('permisos');
-        $permisos = json_decode($permisos);
-        $waRaw = $request->get('widget_access');
+        $d = PerfilSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $perfil_id = (string) ($d->perfil_id ?? '');
+        $descripcion = (string) $d->descripcion;
+        $permisos = json_decode((string) $d->permisos);
+        $waRaw = $d->widget_access;
         $widgetAccess = is_string($waRaw) && '' !== $waRaw ? json_decode($waRaw, true) : null;
 
         try {
@@ -128,7 +144,12 @@ class PerfilController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $perfil_id = $request->get('perfil_id');
+        $dto = PerfilIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $perfil_id = $dto->perfil_id;
 
         try {
             $resultado = $this->perfilService->EliminarPerfil($perfil_id);
@@ -155,7 +176,12 @@ class PerfilController extends AbstractAdminController
      */
     public function eliminarPerfiles(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = PerfilIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = $dto->ids;
 
         try {
             $resultado = $this->perfilService->EliminarPerfiles($ids);
@@ -182,7 +208,12 @@ class PerfilController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $perfil_id = $request->get('perfil_id');
+        $dto = PerfilIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $perfil_id = $dto->perfil_id;
 
         try {
             $resultado = $this->perfilService->CargarDatosPerfil($perfil_id);
@@ -209,7 +240,12 @@ class PerfilController extends AbstractAdminController
      */
     public function listarPermisos(Request $request)
     {
-        $perfil_id = $request->get('perfil_id');
+        $dto = PerfilIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $perfil_id = $dto->perfil_id;
 
         try {
             $permisos = $this->perfilService->ListarPermisosDePerfil($perfil_id);
@@ -228,10 +264,12 @@ class PerfilController extends AbstractAdminController
 
     public function listarWidgetPreferences(Request $request)
     {
-        $perfil_id = (int) $request->get('perfil_id');
-        if ($perfil_id <= 0) {
-            return $this->json(['success' => false, 'error' => 'perfil_id'], 400);
+        $dto = PerfilIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
         }
+        $perfil_id = $dto->perfil_id;
         try {
             $widgets = $this->perfilService->listarWidgetPreferencesDePerfil($perfil_id);
 

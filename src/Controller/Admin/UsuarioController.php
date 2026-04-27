@@ -7,6 +7,13 @@ use App\Entity\Funcion;
 use App\Entity\Rol;
 use App\Entity\Widget;
 use App\Http\DataTablesHelper;
+use App\Dto\Admin\Usuario\ActualizarMisDatosAdminRequest;
+use App\Dto\Admin\Usuario\LoginCredentialsRequest;
+use App\Dto\Admin\Usuario\UsuarioIdsRequest;
+use App\Dto\Admin\Usuario\UsuarioIdRequest;
+use App\Dto\Admin\Usuario\UsuarioSalvarRequest;
+use App\Dto\Api\Login\OlvidoContrasennaRequest;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\UsuarioService;
@@ -18,9 +25,12 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UsuarioController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
     private $usuarioService;
     private $funcionRepository;
     private $rolRepository;
@@ -33,6 +43,8 @@ class UsuarioController extends AbstractAdminController
         private TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'limiter.api_login')]
         private RateLimiterFactory $apiLoginLimiter,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
     ) {
         parent::__construct($adminAccess);
         $this->usuarioService = $usuarioService;
@@ -63,9 +75,14 @@ class UsuarioController extends AbstractAdminController
      */
     public function autenticar(Request $request, SessionInterface $session)
     {
-        $email = $request->get('email');
-        $pass = $request->get('password');
         $target_path = 'home';
+        $login = LoginCredentialsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $login, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $email = $login->email;
+        $pass = (string) $login->password;
         try {
             $clientIp = $request->getClientIp() ?? '0.0.0.0';
             $loginLimiter = $this->apiLoginLimiter->create($clientIp);
@@ -244,26 +261,27 @@ class UsuarioController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $usuario_id = $request->get('usuario_id');
+        $p = UsuarioSalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $p, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
 
-        $rol_id = $request->get('rol');
-        $habilitado = $request->get('habilitado');
-        $contrasenna = $request->get('password');
-        $nombre = $request->get('nombre');
-        $apellidos = $request->get('apellidos');
-        $email = $request->get('email');
-
-        $permisos = $request->get('permisos');
-        $permisos = json_decode($permisos);
-        $widgetAccessRaw = $request->get('widget_access');
+        $usuario_id = (string) ($p->usuario_id ?? '');
+        $rol_id = $p->rol;
+        $habilitado = $p->habilitado;
+        $contrasenna = $p->password;
+        $nombre = $p->nombre;
+        $apellidos = $p->apellidos;
+        $email = $p->email;
+        $permisos = json_decode((string) $p->permisos);
+        $widgetAccessRaw = $p->widget_access;
         $widgetAccess = is_string($widgetAccessRaw) && '' !== $widgetAccessRaw ? json_decode($widgetAccessRaw, true) : null;
-
-        $telefono = $request->get('telefono');
-
-        $estimator = $request->get('estimator');
-        $bond = $request->get('bond');
-        $retainage = $request->get('retainage');
-        $chat = $request->get('chat');
+        $telefono = $p->telefono;
+        $estimator = $p->estimator;
+        $bond = $p->bond;
+        $retainage = $p->retainage;
+        $chat = $p->chat;
 
         $resultadoJson = [];
 
@@ -327,7 +345,12 @@ class UsuarioController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $usuario_id = $request->get('usuario_id');
+        $dto = UsuarioIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $usuario_id = $dto->usuario_id;
 
         try {
             $resultado = $this->usuarioService->EliminarUsuario($usuario_id);
@@ -354,7 +377,12 @@ class UsuarioController extends AbstractAdminController
      */
     public function eliminarUsuarios(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = UsuarioIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = $dto->ids;
 
         try {
             $resultado = $this->usuarioService->EliminarUsuarios($ids);
@@ -381,7 +409,12 @@ class UsuarioController extends AbstractAdminController
      */
     public function olvidoContrasenna(Request $request)
     {
-        $email = $request->get('email');
+        $dto = OlvidoContrasennaRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $email = $dto->email;
         try {
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
             $this->usuarioService->RecuperarContrasenna($email);
@@ -407,7 +440,12 @@ class UsuarioController extends AbstractAdminController
      */
     public function activarUsuario(Request $request)
     {
-        $usuario_id = $request->get('usuario_id');
+        $dto = UsuarioIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $usuario_id = $dto->usuario_id;
 
         try {
             $resultado = $this->usuarioService->ActivarDesactivarUsuario($usuario_id);
@@ -433,7 +471,12 @@ class UsuarioController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $usuario_id = $request->get('usuario_id');
+        $dto = UsuarioIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $usuario_id = $dto->usuario_id;
 
         try {
             $resultado = $this->usuarioService->CargarDatosUsuario($usuario_id);
@@ -460,14 +503,18 @@ class UsuarioController extends AbstractAdminController
      */
     public function actualizarMisDatos(Request $request)
     {
-        $usuario_id = $request->get('usuario_id');
-
-        $contrasenna_actual = $request->get('password_actual');
-        $contrasenna = $request->get('password');
-        $nombre = $request->get('nombre');
-        $apellidos = $request->get('apellidos');
-        $email = $request->get('email');
-        $telefono = $request->get('telefono');
+        $d = ActualizarMisDatosAdminRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $usuario_id = $d->usuario_id;
+        $contrasenna_actual = $d->contrasenna_actual;
+        $contrasenna = $d->contrasenna;
+        $nombre = $d->nombre;
+        $apellidos = $d->apellidos;
+        $email = $d->email;
+        $telefono = $d->telefono;
 
         try {
             $resultado = $this->usuarioService->ActualizarMisDatos($usuario_id, $contrasenna, $contrasenna_actual, $nombre, $apellidos, $email, $telefono);

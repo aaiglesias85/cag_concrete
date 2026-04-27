@@ -3,19 +3,32 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\County\CountyIdRequest;
+use App\Dto\Admin\County\CountyIdsRequest;
+use App\Dto\Admin\County\CountySalvarRequest;
 use App\Entity\District;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\CountyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CountyController extends AbstractAdminController
 {
+    use AdminValidationResponseTrait;
+
     private $countyService;
 
-    public function __construct(AdminAccessService $adminAccess, CountyService $countyService)
-    {
+    public function __construct(
+        AdminAccessService $adminAccess,
+        CountyService $countyService,
+        private ValidatorInterface $validator,
+        private TranslatorInterface $adminTranslator,
+    ) {
         parent::__construct($adminAccess);
         $this->countyService = $countyService;
     }
@@ -85,11 +98,15 @@ class CountyController extends AbstractAdminController
      */
     public function salvar(Request $request)
     {
-        $county_id = $request->get('county_id');
-
-        $district_id = $request->get('district_id');
-        $description = $request->get('description');
-        $status = $request->get('status');
+        $d = CountySalvarRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $county_id = (string) ($d->county_id ?? '');
+        $district_id = (string) ($d->district_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         try {
             if ('' === $county_id) {
@@ -122,7 +139,12 @@ class CountyController extends AbstractAdminController
      */
     public function eliminar(Request $request)
     {
-        $county_id = $request->get('county_id');
+        $dto = CountyIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $county_id = $dto->county_id;
 
         try {
             $resultado = $this->countyService->EliminarCounty($county_id);
@@ -149,7 +171,12 @@ class CountyController extends AbstractAdminController
      */
     public function eliminarCountys(Request $request)
     {
-        $ids = $request->get('ids');
+        $dto = CountyIdsRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $ids = (string) $dto->ids;
 
         try {
             $resultado = $this->countyService->EliminarCountys($ids);
@@ -176,7 +203,12 @@ class CountyController extends AbstractAdminController
      */
     public function cargarDatos(Request $request)
     {
-        $county_id = $request->get('county_id');
+        $dto = CountyIdRequest::fromHttpRequest($request);
+        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
+        if (\count($viol) > 0) {
+            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        }
+        $county_id = $dto->county_id;
 
         try {
             $resultado = $this->countyService->CargarDatosCounty($county_id);

@@ -152,7 +152,13 @@ El firewall `main` usa `login_throttling` (intentos fallidos por IP + usuario). 
 2. Usar `#[MapRequestPayload]` (Symfony 6.3+) o resolver manual + `$request->getPayload()` con validación explícita.
 3. Reutilizar el DTO en la acción: si falla, respuesta 422 unificada.
 
-**Ganancias:** Validación centralizada, API más predecible, menos *if* anidados en controladores.
+**Panel Admin (`/admin`):** el mismo enfoque aplica a acciones JSON del backoffice (DataTables, formularios AJAX). Convención del repo:
+
+- DTOs en `App\Dto\Admin\{Módulo}\…` (p. ej. `Usuario`, `Perfil`, `County`, `Company`).
+- Trait `App\Controller\Admin\Traits\AdminValidationResponseTrait`: `validateAdminDto()` fuerza locale **`en`** durante la validación (mensajes de constraint alineados con el UI en inglés) y `formatAdminValidationFailure()` devuelve el mismo shape que la API pública: `success`, `error`, `violations` → respuesta **400**.
+- Los controladores inyectan `ValidatorInterface` y `TranslatorInterface` (como `adminTranslator`); el mapeo **Request → DTO** puede ser una **fábrica estática** en el propio DTO, p. ej. `CountySalvarRequest::fromHttpRequest(Request $request): self` (convención documentada en el README del repo), en sustitución de métodos `map*` privados en el controlador.
+
+**Ganancias:** Validación centralizada, API y admin más predecibles, menos *if* anidados en controladores.
 
 ---
 
@@ -249,7 +255,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 | **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental | **Hecho** |
 | **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Hecho** (fachada + satélites; ver §9.1) |
 | **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo | **Hecho** |
-| **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Hecho** |
+| **E — Entradas HTTP** | DTO + validación en API JSON; extender al panel Admin por controladores | Medio | Medio | **Hecho** (API + Admin parcial; ver §9.1) |
 | **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Hecho** (ver §9.1) |
 | **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero | **Pendiente** |
 
@@ -263,7 +269,8 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
   - **Aún en `Base` (candidatos futuros §2.2):** helpers HTTP/legacy (`isMobile`, `getIP`, `ObtenerURL`), ordenación de arrays (`ordenarArrayAsc`/`Desc`), `estilizarCelda` (PhpSpreadsheet), y la fachada pública que mantienen los hijos sin tocar firmas.
   - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
-- **E — API:** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar). Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
+- **E — API (app móvil / JSON):** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar). Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
+- **E — Admin (panel web):** DTOs bajo `App\Dto\Admin\…` + `AdminValidationResponseTrait` (validación con locale `en`, fallos 400 con el mismo JSON que la API). Controladores ya migrados: **`UsuarioController`**, **`PerfilController`**, **`CountyController`**, **`CompanyController`**. El resto de controladores en `src/Controller/Admin/` pueden adoptar el mismo patrón de forma incremental.
 - **F — Seguridad ops:** `config/packages/security.yaml`: `login_throttling` en firewall `main` (5 intentos / 15 min); `access_control` migrado de `IS_AUTHENTICATED_ANONYMOUSLY` a `PUBLIC_ACCESS` (recomendación Symfony 7 / anonimato en `access_control`). `config/packages/rate_limiter.yaml` (`api_login`, `api_forgot_password`) + `symfony/lock`: `LoginController` (API JSON) y `UsuarioController::autenticar` (web `/usuario/autenticar`) comparten `limiter.api_login` por IP (429 + `Retry-After`); olvido contraseña API sigue con `api_forgot_password`. Seguir revisando deprecations de Security en cada subida de Symfony (logs en staging).
 
 ---
@@ -274,7 +281,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 - **Base:** Tamaño o complejidad *no* crece en un merge que su propósito no sea justamente refactor.
 - **PHPStan:** Nivel acordado verde en CI, sin *baseline* nuevo salvo aprobado.
 - **Test:** Nuevo código crítico cubierto o “justificación en PR” (spike documentado).
-- **API:** Respuestas y validaciones alineadas con DTOs o *groups* de serialización.
+- **API / acciones JSON del admin:** Respuestas y validaciones alineadas con DTOs o *groups* de serialización.
 
 ---
 

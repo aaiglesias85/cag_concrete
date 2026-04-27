@@ -408,5 +408,4 @@ class LoginController extends AbstractController
 
         return $dto;
     }
-
 }
