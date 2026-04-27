@@ -2,7 +2,7 @@
 
 Documentación de la columna **Diff Qty** y **Diff Amt** en la pestaña **Completion** (vista de proyecto admin): origen de datos, reglas de negocio, fórmulas, integración con Payments/notas y cambios respecto a versiones anteriores del cálculo.
 
-**Implementación principal:** `App\Utils\Admin\ProjectService::ListarItemsCompletion`  
+**Implementación principal:** `App\Service\Admin\ProjectService::ListarItemsCompletion`  
 **UI:** tabla `#items-completion-table-editable` en `public/assets/metronic8/js/pages/projects.js` y `projects-detalle.js`.
 
 **Relacionado:** [README_INVOICES_PAYMENTS.md](./README_INVOICES_PAYMENTS.md) (`override_unpaid_qty` en notas).  
@@ -120,9 +120,9 @@ Cualquier informe o comparación histórica con números antiguos debe tener en 
 
 | Rol | Archivo |
 |-----|---------|
-| Cálculo `diff_qty` / `diff_amt` | `src/Utils/Admin/ProjectService.php` → `ListarItemsCompletion` |
+| Cálculo `diff_qty` / `diff_amt` | `src/Service/Admin/ProjectService.php` → `ListarItemsCompletion` |
 | Agregaciones `SUM(...)` | `src/Repository/InvoiceItemRepository.php` |
-| Notas por `invoice_item` | `src/Repository/InvoiceItemNotesRepository.php`; `src/Utils/Base.php` → `ListarNotesDeItemInvoice` |
+| Notas por `invoice_item` | `src/Repository/InvoiceItemNotesRepository.php`; `src/Service/Base.php` → `ListarNotesDeItemInvoice` |
 | Líneas por `project_item` | `InvoiceItemRepository::ListarInvoicesDeItem` |
 | Tab Completion | `public/assets/metronic8/js/pages/projects.js`, `projects-detalle.js` (`initTableItemsCompletion`) |
 

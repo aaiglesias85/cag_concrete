@@ -5,9 +5,9 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\ProjectService;
-use App\Utils\Admin\ReporteSubcontractorService;
-use App\Utils\Admin\SubcontractorService;
+use App\Service\Admin\ProjectService;
+use App\Service\Admin\ReporteSubcontractorService;
+use App\Service\Admin\SubcontractorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -13,7 +13,7 @@ use App\Entity\Item;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\CompanyService;
+use App\Service\Admin\CompanyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

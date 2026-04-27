@@ -3,7 +3,7 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Utils\App\MessageService;
+use App\Service\App\MessageService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

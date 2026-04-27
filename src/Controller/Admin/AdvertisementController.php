@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\AdvertisementService;
+use App\Service\Admin\AdvertisementService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

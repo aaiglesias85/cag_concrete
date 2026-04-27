@@ -7,7 +7,7 @@ use App\Entity\Equation;
 use App\Entity\Unit;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\ItemService;
+use App\Service\Admin\ItemService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\InvoiceItemOverridePayment;
-// use App\Utils\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
+// use App\Service\OverridePaymentWritelog; // debug override payment (descomentar para trazas)
 use App\Entity\Project;
 use App\Entity\ProjectItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -119,8 +119,8 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
      *
      * En negocio `date` en cabecera no es nula; si faltara, la fila se omite (defensa).
      *
-     * @see \App\Utils\Admin\InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod
-     * @see \App\Utils\Admin\ProjectService::findPostOverrideRowForInvoicePeriod
+     * @see \App\Service\Admin\InvoicePaidQtyOverrideResolver::selectOverrideRowForInvoicePeriod
+     * @see \App\Service\Admin\ProjectService::findPostOverrideRowForInvoicePeriod
      */
     public function findLatestNullStartForInvoicePeriodAfterEndDate(int $project_item_id, \DateTimeInterface $invStart, ?\DateTimeInterface $invEnd = null): ?InvoiceItemOverridePayment
     {

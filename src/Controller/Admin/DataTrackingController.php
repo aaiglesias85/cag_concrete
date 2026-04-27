@@ -13,8 +13,8 @@ use App\Entity\Project;
 use App\Entity\Subcontractor;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\DataTrackingService;
-use App\Utils\Admin\ProjectService;
+use App\Service\Admin\DataTrackingService;
+use App\Service\Admin\ProjectService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

@@ -9,7 +9,7 @@ use App\Http\DataTablesHelper;
 use App\Repository\EmployeeRoleRepository;
 use App\Repository\RaceRepository;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\EmployeeService;
+use App\Service\Admin\EmployeeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

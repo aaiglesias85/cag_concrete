@@ -5,7 +5,7 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\ProposalTypeService;
+use App\Service\Admin\ProposalTypeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

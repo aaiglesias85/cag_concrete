@@ -1,0 +1,22 @@
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# PHP / Symfony / PHP-CS-Fixer (@Symfony) → 4 espacios
+[*.{php,neon}]
+indent_style = space
+indent_size = 4
+
+# Front y configs alineados con Prettier del repo (tabWidth 3)
+[*.{js,cjs,mjs,ts,tsx,css,scss,html,json,yml,yaml,twig}]
+indent_style = space
+indent_size = 3
+
+[composer.json]
+indent_style = space
+indent_size = 4

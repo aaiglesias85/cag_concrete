@@ -125,7 +125,7 @@ Los siguientes módulos son **nuevos** y aún no tienen `funcion_id` en `Base.ph
 | `menu.menuCertifiedPayroll` | Certified Payrolls (HR Reports) | Media |
 | `menu.menuCrew` | Crews library (HR Libraries) | Media |
 
-Para activar cada uno, agregar en `src/Utils/Base.php::DevolverMenu()`:
+Para activar cada uno, agregar en `src/Service/Base.php::DevolverMenu()`:
 1. Inicializar variable: `$menuContract = false;`
 2. Agregar bloque `if ($permiso['funcion_id'] == XX && $permiso['ver']) { $menuContract = true; }`
 3. Incluir en el array de retorno: `'menuContract' => $menuContract`

@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Utils\ScriptService;
+use App\Service\ScriptService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

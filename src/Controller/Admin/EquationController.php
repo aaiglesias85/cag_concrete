@@ -6,7 +6,7 @@ use App\Constants\FunctionId;
 use App\Entity\Equation;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\EquationService;
+use App\Service\Admin\EquationService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

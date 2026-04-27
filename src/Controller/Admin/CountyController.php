@@ -6,7 +6,7 @@ use App\Constants\FunctionId;
 use App\Entity\District;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\CountyService;
+use App\Service\Admin\CountyService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

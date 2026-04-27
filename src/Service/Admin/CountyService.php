@@ -1,0 +1,323 @@
+<?php
+
+namespace App\Service\Admin;
+
+use App\Entity\County;
+use App\Entity\District;
+use App\Entity\Estimate;
+use App\Entity\ProjectCounty;
+use App\Repository\CountyRepository;
+use App\Repository\EstimateRepository;
+use App\Repository\ProjectCountyRepository;
+use App\Service\Base;
+
+class CountyService extends Base
+{
+    /**
+     * CargarDatosCounty: Carga los datos de un county.
+     *
+     * @param int $county_id Id
+     *
+     * @author Marcel
+     */
+    public function CargarDatosCounty($county_id)
+    {
+        $resultado = [];
+        $arreglo_resultado = [];
+
+        $entity = $this->getDoctrine()->getRepository(County::class)
+           ->find($county_id);
+        /** @var County $entity */
+        if (null != $entity) {
+            $arreglo_resultado['description'] = $entity->getDescription();
+            $arreglo_resultado['status'] = $entity->getStatus();
+            $arreglo_resultado['district_id'] = $entity->getDistrict() ? $entity->getDistrict()->getDistrictId() : '';
+
+            $resultado['success'] = true;
+            $resultado['county'] = $arreglo_resultado;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarCounty: Elimina un county en la BD.
+     *
+     * @param int $county_id Id
+     *
+     * @author Marcel
+     */
+    public function EliminarCounty($county_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(County::class)
+           ->find($county_id);
+        /** @var County $entity */
+        if (null != $entity) {
+            // verificar si se puede eliminar
+            $se_puede_eliminar = $this->SePuedeEliminarCounty($county_id);
+            if ('' != $se_puede_eliminar) {
+                $resultado['success'] = false;
+                $resultado['error'] = $se_puede_eliminar;
+
+                return $resultado;
+            }
+
+            // eliminar informacion relacionada
+            $this->EliminarInformacionDeCounty($county_id);
+
+            $county_descripcion = $entity->getDescription();
+
+            $em->remove($entity);
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Delete';
+            $log_categoria = 'County';
+            $log_descripcion = "The county is deleted: $county_descripcion";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarCountys: Elimina los countys seleccionados en la BD.
+     *
+     * @param int $ids Ids
+     *
+     * @author Marcel
+     */
+    public function EliminarCountys($ids)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $cant_eliminada = 0;
+        $cant_total = 0;
+        if ('' != $ids) {
+            $ids = explode(',', (string) $ids);
+
+            foreach ($ids as $county_id) {
+                if ('' != $county_id) {
+                    ++$cant_total;
+                    $entity = $this->getDoctrine()->getRepository(County::class)
+                       ->find($county_id);
+                    /** @var County $entity */
+                    if (null != $entity) {
+                        // verificar si se puede eliminar
+                        $se_puede_eliminar = $this->SePuedeEliminarCounty($county_id);
+                        if ('' === $se_puede_eliminar) {
+                            // eliminar informacion relacionada
+                            $this->EliminarInformacionDeCounty((int) $county_id);
+
+                            $county_descripcion = $entity->getDescription();
+
+                            $em->remove($entity);
+                            ++$cant_eliminada;
+
+                            // Salvar log
+                            $log_operacion = 'Delete';
+                            $log_categoria = 'County';
+                            $log_descripcion = "The county was deleted: $county_descripcion";
+                            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+                        }
+                    }
+                }
+            }
+        }
+
+        $em->flush();
+
+        if (0 == $cant_eliminada) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The counties could not be deleted because they are associated with projects or districts.';
+        } else {
+            $resultado['success'] = true;
+
+            $mensaje = ($cant_eliminada == $cant_total)
+               ? 'The operation was successful.'
+               : 'The operation was partially successful. Some counties could not be deleted because they are associated with projects or districts.';
+            $resultado['message'] = $mensaje;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * EliminarInformacionDeCounty: Elimina la informacion relacionada con un county.
+     *
+     * @param int $county_id Id
+     *
+     * @return void
+     */
+    private function EliminarInformacionDeCounty($county_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // projects county
+        /** @var ProjectCountyRepository $projectCountyRepository */
+        $projectCountyRepository = $this->getDoctrine()->getRepository(ProjectCounty::class);
+        $projectCounties = $projectCountyRepository->ListarProjectsDeCounty($county_id);
+        foreach ($projectCounties as $projectCounty) {
+            $em->remove($projectCounty);
+        }
+
+        // project_prevailing_role con county_id se eliminan por ON DELETE CASCADE al borrar el county
+    }
+
+    /**
+     * SePuedeEliminarCounty.
+     *
+     * @return string
+     */
+    private function SePuedeEliminarCounty($county_id)
+    {
+        $texto_error = '';
+
+        // estimates
+        /** @var EstimateRepository $estimateRepo */
+        $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+        $estimates = $estimateRepo->ListarEstimatesDeCounty($county_id);
+        if (count($estimates) > 0) {
+            $texto_error = 'The county could not be deleted because it is related to one or more project estimates.';
+        }
+
+        return $texto_error;
+    }
+
+    /**
+     * ActualizarCounty: Actuializa los datos del rol en la BD.
+     *
+     * @param int $county_id Id
+     *
+     * @author Marcel
+     */
+    public function ActualizarCounty($county_id, $description, $status, $district_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(County::class)
+           ->find($county_id);
+        /** @var County $entity */
+        if (null != $entity) {
+            // Verificar name
+            $county = $this->getDoctrine()->getRepository(County::class)
+               ->findOneBy(['description' => $description, 'district' => $district_id]);
+            if (null != $county && $entity->getCountyId() != $county->getCountyId()) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The county name is in use, please try entering another one.';
+
+                return $resultado;
+            }
+
+            $entity->setDescription($description);
+            $entity->setStatus($status);
+
+            $entity->setDistrict(null);
+            if ('' !== $district_id) {
+                $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
+                $entity->setDistrict($district);
+            }
+
+            $em->flush();
+
+            // Salvar log
+            $log_operacion = 'Update';
+            $log_categoria = 'County';
+            $log_descripcion = "The county is modified: $description";
+            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+            $resultado['success'] = true;
+            $resultado['county_id'] = $entity->getCountyId();
+
+            return $resultado;
+        }
+    }
+
+    /**
+     * SalvarCounty: Guarda los datos de county en la BD.
+     *
+     * @param string $description Nombre
+     *
+     * @author Marcel
+     */
+    public function SalvarCounty($description, $status, $district_id)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        // Verificar name
+        $county = $this->getDoctrine()->getRepository(County::class)
+           ->findOneBy(['description' => $description, 'district' => $district_id]);
+        if (null != $county) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The county name is in use, please try entering another one.';
+
+            return $resultado;
+        }
+
+        $entity = new County();
+
+        $entity->setDescription($description);
+        $entity->setStatus($status);
+
+        if ('' !== $district_id) {
+            $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
+            $entity->setDistrict($district);
+        }
+
+        $em->persist($entity);
+
+        $em->flush();
+
+        // Salvar log
+        $log_operacion = 'Add';
+        $log_categoria = 'County';
+        $log_descripcion = "The county is added: $description";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+        $resultado['success'] = true;
+        $resultado['county_id'] = $entity->getCountyId();
+
+        return $resultado;
+    }
+
+    /**
+     * ListarCountys: Listar los countys.
+     *
+     * @param int    $start   Inicio
+     * @param int    $limit   Limite
+     * @param string $sSearch Para buscar
+     *
+     * @author Marcel
+     */
+    public function ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id)
+    {
+        /** @var CountyRepository $countyRepo */
+        $countyRepo = $this->getDoctrine()->getRepository(County::class);
+        $resultado = $countyRepo->ListarCountysConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
+
+        $data = [];
+
+        foreach ($resultado['data'] as $value) {
+            $county_id = $value->getCountyId();
+
+            $data[] = [
+                'id' => $county_id,
+                'description' => $value->getDescription(),
+                'district' => $value->getDistrict() ? $value->getDistrict()->getDescription() : '',
+                'status' => $value->getStatus() ? 1 : 0,
+            ];
+        }
+
+        return [
+            'data' => $data,
+            'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
+}

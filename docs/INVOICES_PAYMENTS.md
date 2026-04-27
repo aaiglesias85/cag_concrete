@@ -1148,11 +1148,11 @@ unpaid_qty = (SUM(quantity prev) - SUM(paid_qty prev)) - QBF(actual)
 ### Backend (PHP)
 
 -  `src/Entity/InvoiceItem.php`: Entidad de InvoiceItem
--  `src/Utils/Admin/InvoiceService.php`: Lógica de negocio de Invoices
--  `src/Utils/Admin/PaymentService.php`: Lógica de negocio de Payments
--  `src/Utils/Admin/ProjectService.php`: Métodos auxiliares de cálculo
+-  `src/Service/Admin/InvoiceService.php`: Lógica de negocio de Invoices
+-  `src/Service/Admin/PaymentService.php`: Lógica de negocio de Payments
+-  `src/Service/Admin/ProjectService.php`: Métodos auxiliares de cálculo
 -  `src/Repository/InvoiceItemRepository.php`: Consultas a la base de datos
--  `src/Utils/Base.php`: Métodos compartidos (ListarPaymentsDeInvoice)
+-  `src/Service/Base.php`: Métodos compartidos (ListarPaymentsDeInvoice)
 
 ### Frontend (JavaScript)
 

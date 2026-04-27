@@ -2,7 +2,7 @@
 
 namespace App\Soap;
 
-use App\Utils\QbwcService;
+use App\Service\QbwcService;
 
 class QbwcSoapService
 {

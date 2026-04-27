@@ -8,7 +8,7 @@ use App\Entity\Widget;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
-use App\Utils\Admin\PerfilService;
+use App\Service\Admin\PerfilService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

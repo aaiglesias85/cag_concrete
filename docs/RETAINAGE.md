@@ -219,7 +219,7 @@ Si algún invoice no tiene aún `invoice_retainage_calculated`, antes de usar se
 | Archivo | Uso |
 |---------|-----|
 | `src/Entity/Invoice.php` | Propiedades `invoiceCurrentRetainage`, `invoiceRetainageCalculated` y getters/setters. |
-| `src/Utils/Admin/InvoiceService.php` | `CalcularYGuardarRetainageInvoice()`, uso en `ExportarExcel()`, llamadas desde `SalvarInvoice`, `ActualizarInvoice`, `EliminarItem`, `ActualizarInvoicesPorCambioDataTracking`, `CargarDatosInvoice`. |
+| `src/Service/Admin/InvoiceService.php` | `CalcularYGuardarRetainageInvoice()`, uso en `ExportarExcel()`, llamadas desde `SalvarInvoice`, `ActualizarInvoice`, `EliminarItem`, `ActualizarInvoicesPorCambioDataTracking`, `CargarDatosInvoice`. |
 | `src/Repository/InvoiceItemRepository.php` | `TotalInvoiceFinalAmountThisPeriodRetainageOnly($invoice_id)` — suma Final Amount This Period solo ítems R. |
 | `database/cambios_constructora_invoice_retainage_07_02.sql` | ALTER TABLE invoice: `invoice_current_retainage`, `invoice_retainage_calculated`. |
 | Templates (tab Items) | `templates/admin/invoice/index.html.twig`, `templates/admin/block/modal-invoice.html.twig` — cajas Current Retainer y L Retainer. |
@@ -229,7 +229,7 @@ Si algún invoice no tiene aún `invoice_retainage_calculated`, antes de usar se
 
 | Archivo | Uso |
 |---------|-----|
-| `src/Utils/Admin/PaymentService.php` | Cálculo de contract amount, historial pagado, porcentaje y montos de retainage para la pantalla de Payments. |
+| `src/Service/Admin/PaymentService.php` | Cálculo de contract amount, historial pagado, porcentaje y montos de retainage para la pantalla de Payments. |
 | `src/Repository/InvoiceRepository.php` | `ObtenerTotalPagadoAnterior`, `ObtenerTotalPagadoConRetainage` (base pagada para retainage de payments). |
 
 ### 6.3 Documentación relacionada

@@ -5,9 +5,9 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\EmployeeService;
-use App\Utils\Admin\ProjectService;
-use App\Utils\Admin\ReporteEmployeeService;
+use App\Service\Admin\EmployeeService;
+use App\Service\Admin\ProjectService;
+use App\Service\Admin\ReporteEmployeeService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

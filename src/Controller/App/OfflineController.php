@@ -4,8 +4,8 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Utils\App\LoginService;
-use App\Utils\App\OfflineService;
+use App\Service\App\LoginService;
+use App\Service\App\OfflineService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;

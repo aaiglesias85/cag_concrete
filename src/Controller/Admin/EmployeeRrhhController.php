@@ -7,7 +7,7 @@ use App\Entity\Race;
 use App\Http\DataTablesHelper;
 use App\Repository\RaceRepository;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\EmployeeRrhhService;
+use App\Service\Admin\EmployeeRrhhService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

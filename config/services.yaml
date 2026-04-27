@@ -55,9 +55,9 @@ services:
       resource: '../src/Controller'
       tags: ['controller.service_arguments']
 
-   # Público para que App\Utils\App\ProjectService pueda resolverlo de forma perezosa (container->get)
+   # Público para que App\Service\App\ProjectService pueda resolverlo de forma perezosa (container->get)
    # y así no cargar Doctrine al generar api/doc
-   App\Utils\Admin\ProjectService:
+   App\Service\Admin\ProjectService:
       public: true
 
    App\Service\PushNotificationService:
@@ -66,14 +66,14 @@ services:
          $serviceAccountJsonPath: '%firebase_service_account_json%'
          $projectDir: '%kernel.project_dir%'
 
-   App\Utils\App\MessageService:
+   App\Service\App\MessageService:
       arguments:
          $googleTranslateApiKey: '%google_translate_api_key%'
          $pushNotificationService: '@App\Service\PushNotificationService'
          $httpClient: '@http_client'
          $projectDir: '%kernel.project_dir%'
 
-   App\Utils\Admin\EstimateService:
+   App\Service\Admin\EstimateService:
       arguments:
          $mailerQuotes: '@mailer.quotes'
 

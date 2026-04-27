@@ -28,7 +28,7 @@ Este documento es el **plan de trabajo** para aplicar la *Fase A* descrita en [A
 | **Repositorio** | Consultas DQL/SQL, `find`, persistencia repetible | Reglas de negocio que deban reutilizarse fuera del listado |
 | **Entidad** | Estado, invariantes simples, métodos de dominio pequeños si aportan claridad | Lógica que requiera muchos servicios inyectados |
 
-*Nota:* Hoy gran parte de la lógica vive en `App\Utils\Admin\*Service`. **No es obligatorio renombrar todo de golpe**; sí conviene que **el código nuevo** y los refactors **sigan** la separación anterior, aunque el namespace siga siendo `Utils` temporalmente.
+*Nota:* Hoy gran parte de la lógica vive en `App\Service\Admin\*Service`. **No es obligatorio renombrar todo de golpe**; sí conviene que **el código nuevo** y los refactors **sigan** la separación anterior, aunque el namespace siga siendo `Utils` temporalmente.
 
 ### 2.2 Refactor incremental (regla de oro)
 

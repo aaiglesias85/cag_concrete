@@ -24,7 +24,7 @@ Este documento resume el **análisis del estado actual** del proyecto y propone 
 | Área | Lo que hoy tenés (patrón) | Comentario |
 |------|---------------------------|------------|
 | **Controladores** | Acciones que delegan en `*Service` y componen plantillas/JSON | Coherente con Symfony; se beneficia de más delgadez y menos duplicación. |
-| **Lógica de negocio** | Mayormente en `App\Utils\Admin` y `App\Utils\App`; parte nueva en `App\Service\Admin` | `Utils` como nombre no refleja “dominio / aplicación”; mezcla legado y código nuevo. |
+| **Lógica de negocio** | `App\Service\Admin`, `App\Service\App` y `App\Service\Base` | Namespace unificado en `App\Service\*` (antes `App\Utils\*`). |
 | **Clase `Base`** | Muy grande, inyecta el contenedor, `getDoctrine()`, `container->get` puntuales | Típico cuello de botella para tests, refactors y tipado. |
 | **Inyección de dependencias** | Autowire en `config/services.yaml`; algunos usos de `ContainerInterface` y `container->get` | Funciona, pero dificulta el análisis estático y los tests unitarios. |
 | **Autorización** | `AdminAccessService` + lógica antigua en `Base::BuscarPermiso` (en migración) | Buen paso: centralizar en un servicio dedicado. |
@@ -72,7 +72,7 @@ Este roadmap **no** obliga a reescribir todo; apunta a **mover el código hacia 
 
 ### 2.3. Unificar nomenclatura: de `Utils` a `Service` (y subdominios)
 
-**Qué es:** Tener lógica de negocio en `App\Utils\...` mientras Symfony documenta y la comunidad usa `App\Service\...` o capas de dominio explícitas.
+**Qué es:** Alinear el namespace con la convención Symfony (`App\Service\...`) en lugar de `App\Utils\...` para servicios de aplicación.
 
 **Por qué importa:** Onboarding, convención del ecosistema y búsqueda en el IDE; `Utils` suele reservarse para funciones realmente técnicas sin negocio.
 
@@ -221,7 +221,7 @@ Este roadmap **no** obliga a reescribir todo; apunta a **mover el código hacia 
 
 ### 8.1. Servicio público solo cuando sea inevitable
 
-Hoy `App\Utils\Admin\ProjectService` está marcado `public: true` “para no cargar Doctrine al generar `api/doc`”.
+Hoy `App\Service\Admin\ProjectService` está marcado `public: true` “para no cargar Doctrine al generar `api/doc`”.
 
 **Mejor enfoque a largo plazo:** Que la generación de documentación no instancie servicios pesados (lazy proxies, o separar *doc* de la lógica de negocio). El objetivo es **no** depender de `public: true` como default.
 
@@ -244,7 +244,7 @@ Agrupado en **fases** para tocar poco a poco y poder desplegar entre medias.
 | **A — Fundación** | PHPStan con baseline; CS Fixer en CI; 1er test de humo (kernel o ruta) | Bajo / medio | Bajo |
 | **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental |
 | **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests |
-| **D — Nombres** | Renombrar `Utils` → `Service` en un módulo piloto | Bajo / medio | Bajo |
+| **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo |
 | **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio |
 | **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo |
 | **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero |

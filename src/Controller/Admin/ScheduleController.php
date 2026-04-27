@@ -8,7 +8,7 @@ use App\Entity\Employee;
 use App\Entity\Project;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\ScheduleService;
+use App\Service\Admin\ScheduleService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

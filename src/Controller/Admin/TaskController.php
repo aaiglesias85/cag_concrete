@@ -7,8 +7,8 @@ use App\Entity\Task;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\WidgetAccessService;
-use App\Utils\Admin\DefaultService;
-use App\Utils\Admin\TaskService;
+use App\Service\Admin\DefaultService;
+use App\Service\Admin\TaskService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 

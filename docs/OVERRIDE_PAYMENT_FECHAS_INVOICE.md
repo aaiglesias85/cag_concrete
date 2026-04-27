@@ -107,15 +107,15 @@ Para **cada** `InvoiceItem` ligado a un `Invoice` con `start_date` / `end_date`:
 
 | Archivo | Responsabilidad |
 |--------|------------------|
-| `src/Utils/Admin/InvoicePaidQtyOverrideResolver.php` | `resolvePaidQtyDetails()`, `selectOverrideRowForInvoicePeriod()`, `getEffectivePaidQty()`. |
+| `src/Service/Admin/InvoicePaidQtyOverrideResolver.php` | `resolvePaidQtyDetails()`, `selectOverrideRowForInvoicePeriod()`, `getEffectivePaidQty()`. |
 | `src/Repository/InvoiceItemOverridePaymentRepository.php` | `findLatestNullStartForInvoicePeriodAfterEndDate()` — cabeceras con **`mes(invoice) ≥ mes(h.date)`**; entre ellas, la fecha de cabecera **más reciente**. `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth()` — unpaid/ancla: **`mes(h.date) ≤ mes(invoice)`**. |
 
 ### 3.2 Unpaid efectivo
 
 | Archivo | Responsabilidad |
 |--------|------------------|
-| `src/Utils/Admin/InvoiceUnpaidQtyOverrideResolver.php` | Ancla por `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth`; valor desde columna `unpaid_qty` o historial de notas; `findEarliestUnpaidOverrideHeaderDate` para particionar la línea de tiempo en `ListarItemsDeInvoice`. **No** es la misma semántica que “solo paid”: mismo **criterio de mes** para elegir cabecera, distinto **campo** y encadenado con otras facturas del ítem. |
-| `src/Utils/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findInvoiceItemByProjectItemAndDate()`, `findOverrideRowForUnpaidChaining()`, `findPostOverrideRowForInvoicePeriod()` (este último solo paid / cortes de agregado), `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. Cadena unpaid: §0.4 (`paidToSubtract = 0` en mes de cabecera). |
+| `src/Service/Admin/InvoiceUnpaidQtyOverrideResolver.php` | Ancla por `findLatestOverrideWithHeaderOnOrBeforeInvoiceMonth`; valor desde columna `unpaid_qty` o historial de notas; `findEarliestUnpaidOverrideHeaderDate` para particionar la línea de tiempo en `ListarItemsDeInvoice`. **No** es la misma semántica que “solo paid”: mismo **criterio de mes** para elegir cabecera, distinto **campo** y encadenado con otras facturas del ítem. |
+| `src/Service/Admin/ProjectService.php` | `calcularUnpaidQuantityFromPreviusInvoice()`, `computeUnpaidChainingAfterOverride()`, `findInvoiceItemByProjectItemAndDate()`, `findOverrideRowForUnpaidChaining()`, `findPostOverrideRowForInvoicePeriod()` (este último solo paid / cortes de agregado), `previousInvoiceTotalsMergedForPeriod()` — listado de ítems para **nuevo** invoice. Cadena unpaid: §0.4 (`paidToSubtract = 0` en mes de cabecera). |
 
 ### 3.3 Listado de ítems para nuevo invoice (borrador)
 
