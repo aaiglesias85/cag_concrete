@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Api;
+namespace App\Dto\Api\Request\Common;
 
 /**
  * Helpers de coerción para cuerpos JSON (tipos sueltos de clientes móviles).

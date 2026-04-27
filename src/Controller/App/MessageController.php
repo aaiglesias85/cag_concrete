@@ -4,12 +4,14 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Messaging\EliminarMensajeRequest;
-use App\Dto\Api\Messaging\EnviarMensajeRequest;
-use App\Dto\Api\Messaging\EnviarPrimerMensajeRequest;
-use App\Dto\Api\Messaging\MarcarLeidosRequest;
-use App\Dto\Api\Messaging\OcultarConversacionRequest;
-use App\Dto\Api\Messaging\TraducirMensajeRequest;
+use App\Dto\Api\Request\Messaging\EliminarMensajeRequest;
+use App\Dto\Api\Request\Messaging\EnviarMensajeRequest;
+use App\Dto\Api\Request\Messaging\EnviarPrimerMensajeRequest;
+use App\Dto\Api\Request\Messaging\MarcarLeidosRequest;
+use App\Dto\Api\Request\Messaging\OcultarConversacionRequest;
+use App\Dto\Api\Request\Messaging\TraducirMensajeRequest;
+use App\Dto\Api\Response\Common\ApiJsonPayload;
+use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Service\App\MessageService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -76,10 +78,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -109,10 +111,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -143,16 +145,16 @@ class MessageController extends AbstractController
         $this->setTranslatorLocale($this->translator, $lang);
         $otherUserId = (int) $request->query->get('other_user_id', 0);
         if ($otherUserId <= 0) {
-            return $this->json(['success' => false, 'error' => 'other_user_id is required'], 400);
+            return $this->json(new ApiSimpleFailureResponse('other_user_id is required'), 400);
         }
         $result = $this->messageService->ObtenerOcrearConversacion($otherUserId, $lang);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -185,7 +187,7 @@ class MessageController extends AbstractController
         $this->setTranslatorLocale($this->translator, $lang);
         $conversationId = (int) $request->query->get('conversation_id', 0);
         if ($conversationId <= 0) {
-            return $this->json(['success' => false, 'error' => 'conversation_id is required'], 400);
+            return $this->json(new ApiSimpleFailureResponse('conversation_id is required'), 400);
         }
         $limit = (int) $request->query->get('limit', 100);
         $offset = (int) $request->query->get('offset', 0);
@@ -193,10 +195,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -243,10 +245,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -295,10 +297,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -341,10 +343,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -396,10 +398,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -444,10 +446,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     /**
@@ -488,16 +490,16 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json($result, $status);
+            return $this->json(new ApiJsonPayload($result), $status);
         }
 
-        return $this->json($result);
+        return $this->json(new ApiJsonPayload($result));
     }
 
     private function jsonJsonInputError(\Exception $e): JsonResponse
     {
         if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
-            return $this->json(['success' => false, 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+            return $this->json(new ApiSimpleFailureResponse($e->getMessage()), Response::HTTP_BAD_REQUEST);
         }
 
         throw $e;

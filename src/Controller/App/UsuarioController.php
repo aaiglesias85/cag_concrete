@@ -4,8 +4,15 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Usuario\ActualizarUsuarioDatosRequest;
-use App\Dto\Api\Usuario\SalvarImagenUsuarioRequest;
+use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
+use App\Dto\Api\Response\Common\ApiSimpleSuccessMessageResponse;
+use App\Dto\Api\Response\Usuario\UsuarioActualizarDatosResponse;
+use App\Dto\Api\Response\Usuario\UsuarioCargarDatosFailureResponse;
+use App\Dto\Api\Response\Usuario\UsuarioCargarDatosSuccessResponse;
+use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenFailureResponse;
+use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenSuccessResponse;
+use App\Dto\Api\Request\Usuario\ActualizarUsuarioDatosRequest;
+use App\Dto\Api\Request\Usuario\SalvarImagenUsuarioRequest;
 use App\Entity\Usuario;
 use App\Service\App\LoginService;
 use App\Service\App\UsuarioService;
@@ -95,20 +102,19 @@ class UsuarioController extends AbstractController
             $resultado = $this->usuarioService->CargarDatosUsuario();
 
             if ($resultado['success']) {
-                $resultadoJson['success'] = true;
-                $resultadoJson['usuario'] = $resultado['usuario'];
-            } else {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.cargar_datos', [], 'messages', $lang);
+                return $this->json(new UsuarioCargarDatosSuccessResponse($resultado['usuario']));
             }
 
-            return $this->json($resultadoJson);
+            return $this->json(new UsuarioCargarDatosFailureResponse(
+                $resultado['error'] ?? $this->translator->trans('usuario.error.cargar_datos', [], 'messages', $lang)
+            ));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -174,7 +180,7 @@ class UsuarioController extends AbstractController
 
             $user = $this->getUser();
             if (!$user instanceof Usuario) {
-                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+                return $this->json(new ApiSimpleFailureResponse('Not authenticated'), 401);
             }
             // Si solo se envía preferred_lang, mantener el resto de datos del usuario
             $nombre = null !== $payload->nombre ? $payload->nombre : $user->getNombre();
@@ -198,29 +204,23 @@ class UsuarioController extends AbstractController
                 $preferred_lang
             );
 
-            if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = $this->translator->trans('usuario.message.actualizado', [], 'messages', $lang);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
-            }
-
-            return $this->json($resultadoJson);
+            return $this->json(new UsuarioActualizarDatosResponse(
+                (bool) $resultado['success'],
+                $resultado['success'] ? $this->translator->trans('usuario.message.actualizado', [], 'messages', $lang) : null,
+                $resultado['success'] ? null : (string) ($resultado['error'] ?? ''),
+            ));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-
             // Si es error de formato JSON, retornar 400
             if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
-                $resultadoJson['error'] = $e->getMessage();
-
-                return $this->json($resultadoJson, 400);
+                return $this->json(new ApiSimpleFailureResponse($e->getMessage()), 400);
             }
 
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -281,10 +281,9 @@ class UsuarioController extends AbstractController
         try {
             $usuario = $this->getUser();
             if (null == $usuario) {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages', $lang);
-
-                return $this->json($resultadoJson);
+                return $this->json(new UsuarioSalvarImagenFailureResponse(
+                    $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages', $lang)
+                ));
             }
 
             $payload = SalvarImagenUsuarioRequest::fromHttpRequest($request);
@@ -297,10 +296,9 @@ class UsuarioController extends AbstractController
 
             $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen), true);
             if (false === $binary || '' === $binary) {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages', $lang);
-
-                return $this->json($resultadoJson);
+                return $this->json(new UsuarioSalvarImagenFailureResponse(
+                    $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages', $lang)
+                ));
             }
 
             // Crear directorio si no existe
@@ -319,21 +317,22 @@ class UsuarioController extends AbstractController
             $resultado = $this->usuarioService->ActualizarImagenPerfil($foto);
 
             if ($resultado['success']) {
-                $resultadoJson['success'] = true;
-                $resultadoJson['imagen'] = $foto;
-                $resultadoJson['message'] = $this->translator->trans('usuario.message.imagen_guardada', [], 'messages', $lang);
-            } else {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.actualizar_imagen', [], 'messages', $lang);
+                return $this->json(new UsuarioSalvarImagenSuccessResponse(
+                    $foto,
+                    $this->translator->trans('usuario.message.imagen_guardada', [], 'messages', $lang)
+                ));
             }
 
-            return $this->json($resultadoJson);
+            return $this->json(new UsuarioSalvarImagenFailureResponse(
+                $resultado['error'] ?? $this->translator->trans('usuario.error.actualizar_imagen', [], 'messages', $lang)
+            ));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -379,28 +378,26 @@ class UsuarioController extends AbstractController
             $resultado = $this->usuarioService->EliminarImagenPerfil();
 
             if ($resultado['success']) {
-                $resultadoJson['success'] = true;
-                $resultadoJson['message'] = $this->translator->trans('usuario.message.imagen_eliminada', [], 'messages', $lang);
-            } else {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $resultado['error'] ?? $this->translator->trans('usuario.error.eliminar_imagen', [], 'messages', $lang);
+                return $this->json(new ApiSimpleSuccessMessageResponse(
+                    $this->translator->trans('usuario.message.imagen_eliminada', [], 'messages', $lang)
+                ));
             }
 
-            return $this->json($resultadoJson);
+            return $this->json(new ApiSimpleFailureResponse(
+                $resultado['error'] ?? $this->translator->trans('usuario.error.eliminar_imagen', [], 'messages', $lang)
+            ));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-
             // Si es error de formato JSON, retornar 400
             if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
-                $resultadoJson['error'] = $e->getMessage();
-
-                return $this->json($resultadoJson, 400);
+                return $this->json(new ApiSimpleFailureResponse($e->getMessage()), 400);
             }
 
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 }

@@ -9,7 +9,7 @@ use App\Dto\Admin\Usuario\LoginCredentialsRequest;
 use App\Dto\Admin\Usuario\UsuarioIdRequest;
 use App\Dto\Admin\Usuario\UsuarioIdsRequest;
 use App\Dto\Admin\Usuario\UsuarioSalvarRequest;
-use App\Dto\Api\Login\OlvidoContrasennaRequest;
+use App\Dto\Api\Request\Login\OlvidoContrasennaRequest;
 use App\Entity\Funcion;
 use App\Entity\Rol;
 use App\Entity\Widget;

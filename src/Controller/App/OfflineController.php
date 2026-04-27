@@ -4,7 +4,9 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Offline\OfflineSincronizarRequest;
+use App\Dto\Api\Request\Offline\OfflineSincronizarRequest;
+use App\Dto\Api\Response\Common\ApiJsonPayload;
+use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Service\App\LoginService;
 use App\Service\App\OfflineService;
 use OpenApi\Attributes as OA;
@@ -92,16 +94,17 @@ class OfflineController extends AbstractController
             $resultado = $this->offlineService->ListarInformacionRequerida();
 
             if ($resultado['success']) {
-                return $this->json($resultado);
+                return $this->json(new ApiJsonPayload($resultado));
             }
 
-            return $this->json($resultado, 400);
+            return $this->json(new ApiJsonPayload($resultado), 400);
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -212,17 +215,18 @@ class OfflineController extends AbstractController
             if ($resultado['success']) {
                 $resultado['message'] = $this->translator->trans('offline.message.sincronizado', [], 'messages', $lang);
 
-                return $this->json($resultado);
+                return $this->json(new ApiJsonPayload($resultado));
             }
             $resultado['error'] = $resultado['error'] ?? $this->translator->trans('offline.error.sincronizar_perfil', [], 'messages', $lang);
 
-            return $this->json($resultado, 400);
+            return $this->json(new ApiJsonPayload($resultado), 400);
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 }

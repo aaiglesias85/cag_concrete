@@ -53,11 +53,6 @@ services:
       resource: '../src/Controller'
       tags: ['controller.service_arguments']
 
-   # Público: Nelmio/api-doc u otras rutas pueden resolver el servicio; el admin ProjectService
-   # se inyecta en App\ProjectService con #[Lazy] para no cargar Doctrine hasta el primer uso.
-   App\Service\Admin\ProjectService:
-      public: true
-
    App\Service\PushNotificationService:
       arguments:
          $projectId: '%firebase_project_id%'

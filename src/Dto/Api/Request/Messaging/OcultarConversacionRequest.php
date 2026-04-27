@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Dto\Api\Messaging;
+namespace App\Dto\Api\Request\Messaging;
 
-use App\Dto\Api\JsonRequestBody;
-use App\Dto\Api\JsonValue;
+use App\Dto\Api\Request\Common\JsonRequestBody;
+use App\Dto\Api\Request\Common\JsonValue;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class MarcarLeidosRequest
+final class OcultarConversacionRequest
 {
     #[Assert\NotNull]
     #[Assert\Positive]

@@ -4,8 +4,13 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Login\AutenticarRequest;
-use App\Dto\Api\Login\OlvidoContrasennaRequest;
+use App\Dto\Api\Request\Login\AutenticarRequest;
+use App\Dto\Api\Request\Login\OlvidoContrasennaRequest;
+use App\Dto\Api\Response\Common\ApiRateLimitedResponse;
+use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
+use App\Dto\Api\Response\Common\ApiSimpleSuccessMessageResponse;
+use App\Dto\Api\Response\Login\AutenticarFailureResponse;
+use App\Dto\Api\Response\Login\AutenticarSuccessResponse;
 use App\Service\Admin\UsuarioService as AdminUsuarioService;
 use App\Service\App\LoginService;
 use OpenApi\Attributes as OA;
@@ -146,12 +151,13 @@ class LoginController extends AbstractController
             $loginLimiter = $this->apiLoginLimiter->create($clientIp);
             $rate = $loginLimiter->consume(1);
             if (!$rate->isAccepted()) {
-                return $this->json([
-                    'success' => false,
-                    'error' => $this->translator->trans('login.error.rate_limit_login', [], 'messages', $lang),
-                ], Response::HTTP_TOO_MANY_REQUESTS, [
-                    'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
-                ]);
+                return $this->json(
+                    new ApiRateLimitedResponse($this->translator->trans('login.error.rate_limit_login', [], 'messages', $lang)),
+                    Response::HTTP_TOO_MANY_REQUESTS,
+                    [
+                        'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
+                    ]
+                );
             }
 
             $resultado = $this->loginService->AutenticarLogin(
@@ -165,35 +171,24 @@ class LoginController extends AbstractController
 
             if ($resultado['success']) {
                 $loginLimiter->reset();
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['access_token'] = $resultado['access_token'];
-                $resultadoJson['expires'] = $resultado['expires'];
-                $resultadoJson['usuario'] = $resultado['usuario'];
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
 
-                if (isset($resultado['intento_login'])) {
-                    $resultadoJson['intento_login'] = $resultado['intento_login'];
-                }
+                return $this->json(AutenticarSuccessResponse::fromServiceResult($resultado));
             }
 
-            return $this->json($resultadoJson);
+            return $this->json(AutenticarFailureResponse::fromServiceResult($resultado));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-
             // Si es error de formato JSON, retornar 400
             if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
-                $resultadoJson['error'] = $e->getMessage();
-
-                return $this->json($resultadoJson, 400);
+                return $this->json(new ApiSimpleFailureResponse($e->getMessage()), 400);
             }
 
             $this->setTranslatorLocale($this->translator, $lang);
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -249,21 +244,18 @@ class LoginController extends AbstractController
             $resultado = $this->loginService->CerrarSesion();
 
             if ($resultado['success']) {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['message'] = $this->translator->trans('message.success', [], 'messages', $lang);
-            } else {
-                $resultadoJson['success'] = $resultado['success'];
-                $resultadoJson['error'] = $resultado['error'];
+                return $this->json(new ApiSimpleSuccessMessageResponse($this->translator->trans('message.success', [], 'messages', $lang)));
             }
 
-            return $this->json($resultadoJson);
+            return $this->json(new ApiSimpleFailureResponse($resultado['error'] ?? ''));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
             $this->setTranslatorLocale($this->translator, $lang);
-            $resultadoJson['error'] = $this->translator->trans('login.error.logout', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('login.error.logout', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -348,12 +340,13 @@ class LoginController extends AbstractController
             $forgotLimiter = $this->apiForgotPasswordLimiter->create($clientIp);
             $rate = $forgotLimiter->consume(1);
             if (!$rate->isAccepted()) {
-                return $this->json([
-                    'success' => false,
-                    'error' => $this->translator->trans('login.error.rate_limit_forgot', [], 'messages', $lang),
-                ], Response::HTTP_TOO_MANY_REQUESTS, [
-                    'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
-                ]);
+                return $this->json(
+                    new ApiRateLimitedResponse($this->translator->trans('login.error.rate_limit_forgot', [], 'messages', $lang)),
+                    Response::HTTP_TOO_MANY_REQUESTS,
+                    [
+                        'Retry-After' => (string) max(1, $rate->getRetryAfter()->getTimestamp() - time()),
+                    ]
+                );
             }
 
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
@@ -361,25 +354,22 @@ class LoginController extends AbstractController
 
             // Siempre devolver éxito independientemente de si el email existe o no
             // Esto previene que usuarios maliciosos descubran emails registrados
-            $resultadoJson['success'] = true;
-            $resultadoJson['message'] = $this->translator->trans('login.message.forgot_pass', [], 'messages', $lang);
-
-            return $this->json($resultadoJson);
+            return $this->json(new ApiSimpleSuccessMessageResponse(
+                $this->translator->trans('login.message.forgot_pass', [], 'messages', $lang)
+            ));
         } catch (\Exception $e) {
-            $resultadoJson['success'] = false;
-
             // Si es error de formato JSON, retornar 400
             if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
-                $resultadoJson['error'] = $e->getMessage();
-
-                return $this->json($resultadoJson, 400);
+                return $this->json(new ApiSimpleFailureResponse($e->getMessage()), 400);
             }
 
             $this->setTranslatorLocale($this->translator, $lang);
-            $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 }

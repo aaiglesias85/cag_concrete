@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Dto\Api\Usuario;
+namespace App\Dto\Api\Request\Usuario;
 
-use App\Dto\Api\JsonRequestBody;
+use App\Dto\Api\Request\Common\JsonRequestBody;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;

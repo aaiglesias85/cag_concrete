@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Api;
+namespace App\Dto\Api\Request\Common;
 
 use Symfony\Component\HttpFoundation\Request;
 

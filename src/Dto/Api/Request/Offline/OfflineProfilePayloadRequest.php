@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Dto\Api\Offline;
+namespace App\Dto\Api\Request\Offline;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;

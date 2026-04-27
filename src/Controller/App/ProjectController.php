@@ -4,8 +4,10 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Project\CargarProyectoDatosRequest;
-use App\Dto\Api\Project\ListarProjectsQueryRequest;
+use App\Dto\Api\Request\Project\CargarProyectoDatosRequest;
+use App\Dto\Api\Request\Project\ListarProjectsQueryRequest;
+use App\Dto\Api\Response\Common\ApiJsonPayload;
+use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Service\App\LoginService;
 use App\Service\App\ProjectService;
 use OpenApi\Attributes as OA;
@@ -149,18 +151,17 @@ class ProjectController extends AbstractController
             );
 
             if ($resultado['success']) {
-                return $this->json($resultado);
+                return $this->json(new ApiJsonPayload($resultado));
             }
 
-            return $this->json($resultado, 400);
+            return $this->json(new ApiJsonPayload($resultado), 400);
         } catch (\Exception $e) {
-            $resultadoJson = [
-                'success' => false,
-                'error' => $this->translator->trans('message.exception', [], 'messages', $lang),
-            ];
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json($resultadoJson, 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 
@@ -233,23 +234,23 @@ class ProjectController extends AbstractController
             $resultado = $this->projectService->CargarDatosProject($dto->project_id);
 
             if ($resultado['success']) {
-                return $this->json([
+                return $this->json(new ApiJsonPayload([
                     'success' => true,
                     'project' => $resultado['project'],
-                ]);
+                ]));
             }
 
-            return $this->json([
+            return $this->json(new ApiJsonPayload([
                 'success' => false,
                 'error' => $resultado['error'] ?? $this->translator->trans('project.error.not_found', [], 'messages', $lang) ?: 'Project not found',
-            ], 400);
+            ]), 400);
         } catch (\Exception $e) {
             $this->loginService->writelogerror($e->getMessage());
 
-            return $this->json([
-                'success' => false,
-                'error' => $this->translator->trans('message.exception', [], 'messages', $lang),
-            ], 500);
+            return $this->json(
+                new ApiSimpleFailureResponse($this->translator->trans('message.exception', [], 'messages', $lang)),
+                500
+            );
         }
     }
 }
