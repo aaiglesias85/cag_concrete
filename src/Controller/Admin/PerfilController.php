@@ -3,13 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Perfil\PerfilIdRequest;
+use App\Dto\Admin\Perfil\PerfilIdsRequest;
+use App\Dto\Admin\Perfil\PerfilSalvarRequest;
 use App\Entity\Funcion;
 use App\Entity\Widget;
 use App\Http\DataTablesHelper;
-use App\Dto\Admin\Perfil\PerfilIdsRequest;
-use App\Dto\Admin\Perfil\PerfilIdRequest;
-use App\Dto\Admin\Perfil\PerfilSalvarRequest;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\PerfilService;

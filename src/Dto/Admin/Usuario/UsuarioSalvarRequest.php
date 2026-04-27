@@ -95,7 +95,7 @@ final class UsuarioSalvarRequest
         $uid = $request->get('usuario_id');
         $d->usuario_id = \is_string($uid) || is_numeric($uid) ? (string) $uid : null;
         $d->rol = \is_string($r = $request->get('rol')) ? $r : (null === $r ? null : (string) $r);
-        $d->habilitado = $request->get('habilitado') !== null && $request->get('habilitado') !== false
+        $d->habilitado = null !== $request->get('habilitado') && false !== $request->get('habilitado')
             ? (string) $request->get('habilitado') : null;
         $d->password = \is_string($p = $request->get('password')) ? $p : null;
         $d->nombre = \is_string($n = $request->get('nombre')) ? $n : null;
@@ -103,14 +103,13 @@ final class UsuarioSalvarRequest
         $d->email = \is_string($e = $request->get('email')) ? $e : null;
         $d->permisos = \is_string($pe = $request->get('permisos')) ? $pe : null;
         $d->telefono = \is_string($t = $request->get('telefono')) ? $t : null;
-        $d->estimator = $request->get('estimator') !== null ? (string) $request->get('estimator') : null;
-        $d->bond = $request->get('bond') !== null ? (string) $request->get('bond') : null;
-        $d->retainage = $request->get('retainage') !== null ? (string) $request->get('retainage') : null;
-        $d->chat = $request->get('chat') !== null ? (string) $request->get('chat') : null;
+        $d->estimator = null !== $request->get('estimator') ? (string) $request->get('estimator') : null;
+        $d->bond = null !== $request->get('bond') ? (string) $request->get('bond') : null;
+        $d->retainage = null !== $request->get('retainage') ? (string) $request->get('retainage') : null;
+        $d->chat = null !== $request->get('chat') ? (string) $request->get('chat') : null;
         $wa = $request->get('widget_access');
         $d->widget_access = \is_string($wa) ? $wa : null;
 
         return $d;
     }
 }
-
