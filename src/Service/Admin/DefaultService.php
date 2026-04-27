@@ -30,7 +30,6 @@ use App\Repository\InvoiceRepository;
 use App\Repository\MaterialRepository;
 use App\Repository\ProjectItemRepository;
 use App\Repository\ProjectRepository;
-use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;

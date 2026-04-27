@@ -8,7 +8,6 @@ use App\Entity\Rol;
 use App\Entity\Usuario;
 use App\Repository\PermisoPerfilRepository;
 use App\Repository\UsuarioRepository;
-use App\Service\Admin\WidgetAccessService;
 use App\Service\Base;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
