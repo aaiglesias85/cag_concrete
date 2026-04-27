@@ -382,5 +382,4 @@ class LoginController extends AbstractController
             return $this->json($resultadoJson, 500);
         }
     }
-
 }

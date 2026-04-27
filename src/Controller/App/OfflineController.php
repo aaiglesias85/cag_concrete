@@ -225,5 +225,4 @@ class OfflineController extends AbstractController
             return $this->json($resultadoJson, 500);
         }
     }
-
 }
