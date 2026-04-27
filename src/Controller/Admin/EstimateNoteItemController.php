@@ -122,7 +122,7 @@ class EstimateNoteItemController extends AbstractAdminController
         $id = $request->get('id');
         try {
             $resultado = $this->estimateNoteItemService->CargarDatos($id);
-            if (!empty($resultado['success']) && $resultado['success']) {
+            if (!empty($resultado['success'])) {
                 return $this->json(['success' => true, 'item' => $resultado['item']]);
             }
 

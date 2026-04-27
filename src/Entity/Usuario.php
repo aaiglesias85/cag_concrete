@@ -205,7 +205,7 @@ class Usuario implements UserInterface, EquatableInterface
 
     public function equals(UserInterface $user): bool
     {
-        return $user->getUsername() === $this->getEmail();
+        return $user->getUserIdentifier() === $this->getEmail();
     }
 
     public function eraseCredentials(): void
@@ -251,7 +251,7 @@ class Usuario implements UserInterface, EquatableInterface
 
     public function isEqualTo(UserInterface $user): bool
     {
-        return $user->getUsername() === $this->getEmail();
+        return $user->getUserIdentifier() === $this->getEmail();
     }
 
     public function setPassword(?string $password): self

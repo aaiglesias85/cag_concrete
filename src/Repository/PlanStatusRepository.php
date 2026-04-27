@@ -88,7 +88,7 @@ class PlanStatusRepository extends ServiceEntityRepository
     /**
      * ListarStatusConTotal Lista los status con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarStatusConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

@@ -84,7 +84,7 @@ class RolRepository extends ServiceEntityRepository
     /**
      * ListarRolesConTotal Lista los roles con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarRolesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'nombre', string $sortDirection = 'ASC'): array
     {

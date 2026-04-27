@@ -22,7 +22,7 @@ class Notification
     #[ORM\Column(name: 'created_at', type: 'datetime', nullable: false)]
     private ?\DateTime $createdAt;
 
-    #[ORM\ManyToOne(targetEntity: 'Usuario')]
+    #[ORM\ManyToOne(targetEntity: Usuario::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id')]
     private ?Usuario $usuario;
 

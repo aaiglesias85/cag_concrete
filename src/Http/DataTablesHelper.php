@@ -78,11 +78,10 @@ final class DataTablesHelper
         $orderField = $defaultOrderField;
         if (isset($columns[$orderColIndex])) {
             $candidate = $columns[$orderColIndex]['name'];
-            if (null === $candidate || '' === $candidate) {
+            if (null === $candidate) {
                 $candidate = $columns[$orderColIndex]['data'];
             }
-
-            if (is_string($candidate) && '' !== $candidate) {
+            if (null !== $candidate) {
                 $orderField = $candidate;
             }
         }

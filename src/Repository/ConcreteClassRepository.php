@@ -30,7 +30,7 @@ class ConcreteClassRepository extends ServiceEntityRepository
     /**
      * ListarConcreteClassesConTotal Lista los concrete classes con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarConcreteClassesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
     {

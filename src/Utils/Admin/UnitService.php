@@ -56,7 +56,7 @@ class UnitService extends Base
             // items
             /** @var ItemRepository $itemRepo */
             $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-            $items = $itemRepo->ListarItemsDeUnit($unit_id);
+            $items = $itemRepo->ListarItemsDeUnit((string) $unit_id);
             if (count($items) > 0) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'The unit could not be deleted, because it is related to a item';
@@ -67,7 +67,7 @@ class UnitService extends Base
             // materiales
             /** @var MaterialRepository $materialRepo */
             $materialRepo = $this->getDoctrine()->getRepository(Material::class);
-            $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
+            $materiales = $materialRepo->ListarMaterialsDeUnit((int) $unit_id);
             if (count($materiales) > 0) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'The unit could not be deleted, because it is related to a material';
@@ -106,10 +106,10 @@ class UnitService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $unit_id) {
                 if ('' != $unit_id) {
                     ++$cant_total;
@@ -119,11 +119,11 @@ class UnitService extends Base
                     if (null != $entity) {
                         /** @var ItemRepository $itemRepo */
                         $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-                        $items = $itemRepo->ListarItemsDeUnit($unit_id);
+                        $items = $itemRepo->ListarItemsDeUnit((string) $unit_id);
 
                         /** @var MaterialRepository $materialRepo */
                         $materialRepo = $this->getDoctrine()->getRepository(Material::class);
-                        $materiales = $materialRepo->ListarMaterialsDeUnit($unit_id);
+                        $materiales = $materialRepo->ListarMaterialsDeUnit((int) $unit_id);
 
                         if (0 == count($items) && 0 == count($materiales)) {
                             $unit_descripcion = $entity->getDescription();

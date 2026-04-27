@@ -11,6 +11,7 @@ use App\Entity\Holiday;
 use App\Entity\Project;
 use App\Entity\ProjectContact;
 use App\Entity\Schedule;
+use App\Entity\Usuario;
 use App\Entity\ScheduleConcreteVendorContact;
 use App\Entity\ScheduleEmployee;
 use App\Repository\DataTrackingLaborRepository;
@@ -222,9 +223,6 @@ class ScheduleService extends Base
                 );
 
                 foreach ($filaDatos as $i => $valor) {
-                    if (!isset($columnas[$i])) {
-                        continue;
-                    }
                     $coord = "{$columnas[$i]}{$fila}";
                     $estiloFila = $styleArray;
 
@@ -237,7 +235,8 @@ class ScheduleService extends Base
 
                     if ($i >= 3 && $i <= 9) {
                         $dia = $semana->dias[$i - 3];
-                        $fechaDia = \DateTime::createFromFormat('m/d/Y', $dia)?->format('Y-m-d');
+                        $fechaDiaObj = \DateTime::createFromFormat('m/d/Y', $dia);
+                        $fechaDia = $fechaDiaObj instanceof \DateTimeInterface ? $fechaDiaObj->format('Y-m-d') : '';
 
                         if (isset($feriados[$fechaDia])) {
                             $valor = $feriados[$fechaDia];
@@ -653,10 +652,10 @@ class ScheduleService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $schedule_id) {
                 if ('' != $schedule_id) {
                     ++$cant_total;
@@ -729,7 +728,7 @@ class ScheduleService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
-        $schedules_id = explode(',', $schedules_id);
+        $schedules_id = explode(',', (string) $schedules_id);
         $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
         $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
 
@@ -915,10 +914,9 @@ class ScheduleService extends Base
     ) {
         $em = $this->getDoctrine()->getManager();
 
-        $hours = explode(',', $hours);
-        if (empty($hours)) {
-            $hour = '';
-
+        $hours = array_map('trim', explode(',', (string) $hours));
+        $resultado = [];
+        foreach ($hours as $hour) {
             // validar
             $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
             if ($validar_fecha_error) {
@@ -935,10 +933,10 @@ class ScheduleService extends Base
             $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
             foreach ($periodo as $dia) {
                 /*
-                    if ($dia->format('w') === '0') {
-                        continue; // Saltar domingos
-                    }
-                    */
+                     if ($dia->format('w') === '0') {
+                         continue; // Saltar domingos
+                     }
+                     */
 
                 $this->Salvar(
                     $project_id,
@@ -957,47 +955,6 @@ class ScheduleService extends Base
                     $employees_id
                 );
             }
-        } else {
-            foreach ($hours as $hour) {
-                // validar
-                $validar_fecha_error = $this->ValidarFechasYHora($date_start_param, $date_stop_param, $hour);
-                if ($validar_fecha_error) {
-                    $resultado['success'] = false;
-                    $resultado['error'] = $validar_fecha_error;
-
-                    return $resultado;
-                }
-
-                $date_start = \DateTime::createFromFormat('m/d/Y', $date_start_param);
-                $date_stop = \DateTime::createFromFormat('m/d/Y', $date_stop_param);
-
-                $intervalo = new \DateInterval('P1D');
-                $periodo = new \DatePeriod($date_start, $intervalo, $date_stop->modify('+1 day'));
-                foreach ($periodo as $dia) {
-                    /*
-                         if ($dia->format('w') === '0') {
-                             continue; // Saltar domingos
-                         }
-                         */
-
-                    $this->Salvar(
-                        $project_id,
-                        $project_contact_id,
-                        $dia,
-                        $description,
-                        $location,
-                        $latitud,
-                        $longitud,
-                        $vendor_id,
-                        $concrete_vendor_contacts_id,
-                        $hour,
-                        $quantity,
-                        $notes,
-                        $highpriority,
-                        $employees_id
-                    );
-                }
-            }
         }
 
         $em->flush();
@@ -1005,7 +962,7 @@ class ScheduleService extends Base
         // Salvar log
         $log_operacion = 'Add';
         $log_categoria = 'Schedule';
-        $log_descripcion = "The schedule is added: $description, Start date: ".$date_start->format('m/d/Y').' Stop date: '.$date_stop->format('m/d/Y');
+        $log_descripcion = "The schedule is added: $description, Start date: {$date_start_param} Stop date: {$date_stop_param}";
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
@@ -1061,9 +1018,7 @@ class ScheduleService extends Base
             $entity->setConcreteVendor($concrete_vendor);
         }
 
-        if (empty($lista)) {
-            $em->persist($entity);
-        }
+        $em->persist($entity);
 
         // salvar contactos
         $this->SalvarConcreteVendorContacts($entity, $concrete_vendor_contacts_id);
@@ -1120,7 +1075,7 @@ class ScheduleService extends Base
         }
 
         if ('' !== $concrete_vendor_contacts_id) {
-            $concrete_vendor_contacts_id = explode(',', $concrete_vendor_contacts_id);
+            $concrete_vendor_contacts_id = explode(',', (string) $concrete_vendor_contacts_id);
             foreach ($concrete_vendor_contacts_id as $contact_id) {
                 $contact_entity = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
                    ->find($contact_id);
@@ -1152,7 +1107,7 @@ class ScheduleService extends Base
         }
 
         if ('' !== $employees_id) {
-            $employees_id = explode(',', $employees_id);
+            $employees_id = explode(',', (string) $employees_id);
             foreach ($employees_id as $employee_id) {
                 $employee_entity = $this->getDoctrine()->getRepository(Employee::class)
                    ->find($employee_id);
@@ -1269,6 +1224,9 @@ class ScheduleService extends Base
     public function ListarAcciones($id, $highpriority)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::SCHEDULE);
 
         $acciones = '';

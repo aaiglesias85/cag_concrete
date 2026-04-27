@@ -1,0 +1,917 @@
+Instructions for interpreting errors
+---------
+
+Each error has an associated identifier, like `argument.type`
+or `return.missing`.
+
+Each error identifier has documentation at URL https://phpstan.org/error-identifiers/<identifier>
+This page contains code example, explanation why is this an error
+and instruction how to fix it.
+Before fixing the error, fetch the documentation page for its identifier.
+
+The error usually indicates a real bug or incorrect type in the code. Fix the underlying cause, do not just make the error go away.
+Do not add `@phpstan-ignore` comments, `@phpstan-ignore-next-line` comments, or baseline entries to suppress the error.
+Do not use assert() or inline @var PHPDoc tag to override PHPStan's inferred type.
+Do not add type casts just to silence errors.
+Do not widen parameter or return types just to make the error go away.
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/DataTrackingService.php                                    
+ ------ ----------------------------------------------------------------------- 
+  1723   Offset 0 on non-empty-list<string> in isset() always exists and is no  
+         t nullable.                                                            
+         🪪  isset.offset                                                       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/DefaultService.php                                         
+ ------ ----------------------------------------------------------------------- 
+  551    Instanceof between App\Entity\Invoice and App\Entity\Invoice will      
+         always evaluate to true.                                               
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  557    Instanceof between App\Entity\Invoice and App\Entity\Invoice will      
+         always evaluate to true.                                               
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/EstimateService.php                                        
+ ------ ----------------------------------------------------------------------- 
+  613    Call to function method_exists() with                                  
+         PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf and 'setTempDir' will always  
+         evaluate to true.                                                      
+         🪪  function.alreadyNarrowedType                                       
+  670    Loose comparison using == between '' and '' will always evaluate to    
+         true.                                                                  
+         🪪  equal.alwaysTrue                                                   
+  756    Strict comparison using !== between null and object will always        
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+  791    Strict comparison using !== between null and object will always        
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+  1243   Call to function method_exists() with App\Entity\Estimate and          
+         'getCountyObj' will always evaluate to true.                           
+         🪪  function.alreadyNarrowedType                                       
+         💡  If App\Entity\Estimate::getEstimateId() is impure, add @phpstan-im  
+         pure PHPDoc tag above its declaration. Learn more: https://phpstan.or  
+         g/blog/remembering-and-forgetting-returned-values                      
+  1246   Call to function method_exists() with App\Entity\Estimate and          
+         'getCounty' will always evaluate to true.                              
+         🪪  function.alreadyNarrowedType                                       
+         💡  If App\Entity\Estimate::getEstimateId() is impure, add @phpstan-im  
+         pure PHPDoc tag above its declaration. Learn more: https://phpstan.or  
+         g/blog/remembering-and-forgetting-returned-values                      
+         💡  If App\Entity\Estimate::getCountyObj() is impure, add @phpstan-imp  
+         ure PHPDoc tag above its declaration. Learn more: https://phpstan.org  
+         /blog/remembering-and-forgetting-returned-values                       
+  1656   Strict comparison using !== between null and mixed will always         
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Type ''|null has already been eliminated from mixed.               
+  1874   Strict comparison using === between '' and iterable<int, object> will  
+          always evaluate to false.                                             
+         🪪  identical.alwaysFalse                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  2428   Instanceof between App\Entity\Estimate and App\Entity\Estimate will    
+         always evaluate to true.                                               
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  2517   Instanceof between App\Entity\Estimate and App\Entity\Estimate will    
+         always evaluate to true.                                               
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  2542   Offset 'bid_deadline' on array{estimate_id: int, project_name:         
+         string, bid_deadline: non-falsy-string, estimator_html: mixed} on      
+         left side of ?? always exists and is not nullable.                     
+         🪪  nullCoalesce.offset                                                
+  2543   Offset 'bid_deadline' on array{estimate_id: int, project_name:         
+         string, bid_deadline: non-falsy-string, estimator_html: mixed} on      
+         left side of ?? always exists and is not nullable.                     
+         🪪  nullCoalesce.offset                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/InvoiceService.php                                         
+ ------ ----------------------------------------------------------------------- 
+  247    Method                                                                 
+         App\Utils\Admin\InvoiceService::buildInvoiceItemSeriesForInvoices()    
+         is unused.                                                             
+         🪪  method.unused                                                      
+  388    Call to function is_null() with App\Entity\Invoice will always         
+         evaluate to false.                                                     
+         🪪  function.impossibleType                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  666    If condition is always false.                                          
+         🪪  if.alwaysFalse                                                     
+  1207   Strict comparison using !== between null and mixed will always         
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Type null has already been eliminated from mixed.                  
+  1569   Offset 'contract_amount' on array{contract_amount: float, retainage:   
+         bool, retainage_percentage: float, retainage_adjustment_percentage:    
+         float, retainage_adjustment_completion: float,                         
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1570   Offset 'total_billed…' on array{contract_amount: float, retainage:     
+         bool, retainage_percentage: float, retainage_adjustment_percentage:    
+         float, retainage_adjustment_completion: float,                         
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1575   Offset 'accumulated…' on array{contract_amount: float, retainage:      
+         bool, retainage_percentage: float, retainage_adjustment_percentage:    
+         float, retainage_adjustment_completion: float,                         
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1576   Offset 'accumulated_base…' on array{contract_amount: float,            
+         retainage: bool, retainage_percentage: float,                          
+         retainage_adjustment_percentage: float,                                
+         retainage_adjustment_completion: float,                                
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1577   Offset 'retainage' on array{contract_amount: float, retainage: bool,   
+         retainage_percentage: float, retainage_adjustment_percentage: float,   
+         retainage_adjustment_completion: float,                                
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1578   Offset 'retainage_percentage' on array{contract_amount: float,         
+         retainage: bool, retainage_percentage: float,                          
+         retainage_adjustment_percentage: float,                                
+         retainage_adjustment_completion: float,                                
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1579   Offset 'retainage…' on array{contract_amount: float, retainage: bool,  
+         retainage_percentage: float, retainage_adjustment_percentage: float,   
+         retainage_adjustment_completion: float,                                
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1580   Offset 'retainage…' on array{contract_amount: float, retainage: bool,  
+         retainage_percentage: float, retainage_adjustment_percentage: float,   
+         retainage_adjustment_completion: float,                                
+         accumulated_retainage_amount_previous: float,                          
+         accumulated_base_retainage_previous: float, total_billed_previous:     
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  1608   Method App\Utils\Admin\InvoiceService::CalcularPorcientoRetainage()    
+         is unused.                                                             
+         🪪  method.unused                                                      
+  1626   Method App\Utils\Admin\InvoiceService::CalcularCurrentRetainage() is   
+         unused.                                                                
+         🪪  method.unused                                                      
+  1918   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+  2000   Right side of && is always true.                                       
+         🪪  booleanAnd.rightAlwaysTrue                                         
+         💡  Remove remaining cases below this one and this error will          
+         disappear too.                                                         
+  2081   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+  2181   Offset 'effective' on array{effective: float, base: float,             
+         override_id: int|null, invoice_item_id: int|null, invoice_id:          
+         int|null, project_item_id: int|null, invoice_period: string|null} on   
+         left side of ?? always exists and is not nullable.                     
+         🪪  nullCoalesce.offset                                                
+  2186   Offset 'base' on array{effective: float, base: float, override_id:     
+         int|null, invoice_item_id: int|null, invoice_id: int|null,             
+         project_item_id: int|null, invoice_period: string|null} on left side   
+         of ?? always exists and is not nullable.                               
+         🪪  nullCoalesce.offset                                                
+  2233   Ternary operator condition is always false.                            
+         🪪  ternary.alwaysFalse                                                
+         💡  If App\Entity\Item::getBond() is impure, add @phpstan-impure PHPDo  
+         c tag above its declaration. Learn more: https://phpstan.org/blog/rem  
+         embering-and-forgetting-returned-values                                
+  2282   Offset '_debug' on list<array{invoice_item_id: int|null, project_item  
+         _id: int|null, apply_retainage: bool|null, bonded: 0|1, bond: 0,       
+         item_id: int|null, code: string|null, item: string|null, ...}> in iss  
+         et() does not exist.                                                   
+         🪪  isset.offset                                                       
+  3025   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/InvoiceUnpaidQtyOverrideResolver.php                       
+ ------ ----------------------------------------------------------------------- 
+  45     Instanceof between App\Entity\InvoiceItemOverridePayment and           
+         App\Entity\InvoiceItemOverridePayment will always evaluate to true.    
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Utils/Admin/ItemService.php                                           
+ ------ ---------------------------------------------------------------------- 
+  207    Method App\Utils\Admin\ItemService::SePuedeEliminarItem() is unused.  
+         🪪  method.unused                                                     
+ ------ ---------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------- 
+  Line   Utils/Admin/LogService.php                                    
+ ------ -------------------------------------------------------------- 
+  88     Parameter #4 $usuario_id of method                            
+         App\Repository\LogRepository::ListarLogsRangoFecha() expects  
+         string|null, int|null given.                                  
+         🪪  argument.type                                             
+ ------ -------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/MaterialService.php                                        
+ ------ ----------------------------------------------------------------------- 
+  59     Parameter #1 $material_id of method                                    
+         App\Repository\DataTrackingMaterialRepository::ListarDataTrackingsDeM  
+         aterial() expects string|null, int given.                              
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/NotificationService.php                                    
+ ------ ----------------------------------------------------------------------- 
+  31     Parameter #1 $readed of method App\Entity\Notification::setReaded()    
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  116    Parameter #4 $usuario_id of method                                     
+         App\Repository\NotificationRepository::ListarNotificationsRangoFecha(  
+         ) expects string|null, int|null given.                                 
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/OverridePaymentService.php                                 
+ ------ ----------------------------------------------------------------------- 
+  522    Dead catch - Throwable is never thrown in the try block.               
+         🪪  catch.neverThrown                                                  
+  544    Call to function is_array() with array<string, mixed> will always eva  
+         luate to true.                                                         
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  617    Dead catch - Throwable is never thrown in the try block.               
+         🪪  catch.neverThrown                                                  
+  673    Instanceof between                                                     
+         App\Entity\InvoiceItemOverridePaymentUnpaidQtyHistory and              
+         App\Entity\InvoiceItemOverridePaymentUnpaidQtyHistory will always      
+         evaluate to true.                                                      
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  721    Variable $notesHtml on left side of ?? always exists and is not        
+         nullable.                                                              
+         🪪  nullCoalesce.variable                                              
+  1117   Offset 'total_paid_effective' on array{total_paid_effective: float,    
+         paid_amount_total: float} on left side of ?? always exists and is not  
+         nullable.                                                              
+         🪪  nullCoalesce.offset                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/OverrideUnpaidQtyService.php                               
+ ------ ----------------------------------------------------------------------- 
+  211    Offset 'sum_paid_lines' on array{sum_qty_final: float,                 
+         sum_paid_lines: float} on left side of ?? always exists and is not     
+         nullable.                                                              
+         🪪  nullCoalesce.offset                                                
+  211    Offset 'sum_qty_final' on array{sum_qty_final: float, sum_paid_lines:  
+         float} on left side of ?? always exists and is not nullable.           
+         🪪  nullCoalesce.offset                                                
+  247    Dead catch - Throwable is never thrown in the try block.               
+         🪪  catch.neverThrown                                                  
+  294    Method                                                                 
+         App\Utils\Admin\OverrideUnpaidQtyService::isUniqueConstraintViolation  
+         ForUnpaid() is unused.                                                 
+         🪪  method.unused                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/PaymentService.php                                         
+ ------ ----------------------------------------------------------------------- 
+  116    Strict comparison using !== between '' and float will always evaluate  
+         to true.                                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  169    Strict comparison using !== between null and mixed will always         
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Type null has already been eliminated from mixed.                  
+  193    Parameter #1 $user of method                                           
+         App\Entity\InvoiceItemUnpaidQtyHistory::setUser() expects              
+         App\Entity\Usuario|null,                                               
+         Symfony\Component\Security\Core\User\UserInterface|null given.         
+         🪪  argument.type                                                      
+  601    Call to function method_exists() with                                  
+         App\Repository\ProjectItemRepository and 'TotalBondedProjectI…' will   
+         always evaluate to true.                                               
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  605    Call to function method_exists() with                                  
+         App\Repository\ProjectItemRepository and 'TotalBondPriceProje…' will   
+         always evaluate to true.                                               
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Repository\ProjectItemRepository::TotalBondedProjectItems()  
+         is impure, add @phpstan-impure PHPDoc tag above its declaration. Lear  
+         n more: https://phpstan.org/blog/remembering-and-forgetting-returned-  
+         values                                                                 
+  608    Call to function method_exists() with                                  
+         App\Repository\ProjectItemRepository and 'TotalBondAmountProj…' will   
+         always evaluate to true.                                               
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Repository\ProjectItemRepository::TotalBondedProjectItems()  
+         is impure, add @phpstan-impure PHPDoc tag above its declaration. Lear  
+         n more: https://phpstan.org/blog/remembering-and-forgetting-returned-  
+         values                                                                 
+         💡  If                                                                 
+         App\Repository\ProjectItemRepository::TotalBondPriceProjectItems() is  
+         impure, add @phpstan-impure PHPDoc tag above its declaration. Learn m  
+         ore: https://phpstan.org/blog/remembering-and-forgetting-returned-val  
+         ues                                                                    
+  682    Method App\Utils\Admin\PaymentService::CalcularPorcientoRetainage()    
+         is unused.                                                             
+         🪪  method.unused                                                      
+  790    Call to function method_exists() with                                  
+         App\Repository\ProjectItemRepository and 'TotalBondedProjectI…' will   
+         always evaluate to true.                                               
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  794    Call to function method_exists() with                                  
+         App\Repository\ProjectItemRepository and 'TotalBondPriceProje…' will   
+         always evaluate to true.                                               
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Repository\ProjectItemRepository::TotalBondedProjectItems()  
+         is impure, add @phpstan-impure PHPDoc tag above its declaration. Lear  
+         n more: https://phpstan.org/blog/remembering-and-forgetting-returned-  
+         values                                                                 
+  852    Parameter #1 $entity of method                                         
+         App\Utils\Admin\PaymentService::SalvarArchivos() expects               
+         App\Entity\Project, App\Entity\Invoice given.                          
+         🪪  argument.type                                                      
+  994    Parameter #2 $project_id of method                                     
+         App\Repository\InvoiceRepository::ListarInvoicesRangoFecha() expects   
+         string, int|null given.                                                
+         🪪  argument.type                                                      
+  1161   Call to function is_null() with App\Entity\Invoice will always         
+         evaluate to false.                                                     
+         🪪  function.impossibleType                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1263   Parameter #1 $amount of method                                         
+         App\Entity\ReimbursementHistory::setAmount() expects string, float     
+         given.                                                                 
+         🪪  argument.type                                                      
+  1271   Call to function method_exists() with App\Entity\Invoice and           
+         'setRetainageReimbur…' will always evaluate to true.                   
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1275   Call to function method_exists() with App\Entity\Invoice and           
+         'setRetainageReimbur…' will always evaluate to true.                   
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Entity\Invoice::setRetainageReimbursed() is impure, add @ph  
+         pstan-impure PHPDoc tag above its declaration. Learn more: https://ph  
+         pstan.org/blog/remembering-and-forgetting-returned-values              
+  1279   Call to function method_exists() with App\Entity\Invoice and           
+         'setRetainageReimbur…' will always evaluate to true.                   
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Entity\Invoice::setRetainageReimbursed() is impure, add @ph  
+         pstan-impure PHPDoc tag above its declaration. Learn more: https://ph  
+         pstan.org/blog/remembering-and-forgetting-returned-values              
+         💡  If App\Entity\Invoice::setRetainageReimbursedAmount() is impure,   
+         add @phpstan-impure PHPDoc tag above its declaration. Learn more: htt  
+         ps://phpstan.org/blog/remembering-and-forgetting-returned-values       
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/PerfilService.php                                          
+ ------ ----------------------------------------------------------------------- 
+  192    Parameter #1 $rol_id of method                                         
+         App\Repository\UsuarioRepository::ListarUsuariosRol() expects int,     
+         string given.                                                          
+         🪪  argument.type                                                      
+  198    Parameter #1 $perfil_id of method                                      
+         App\Repository\PermisoPerfilRepository::ListarPermisosPerfil()         
+         expects int, string given.                                             
+         🪪  argument.type                                                      
+  280    Parameter #1 $ver of method App\Entity\PermisoPerfil::setVer()         
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  281    Parameter #1 $agregar of method                                        
+         App\Entity\PermisoPerfil::setAgregar() expects bool|null, int given.   
+         🪪  argument.type                                                      
+  282    Parameter #1 $editar of method App\Entity\PermisoPerfil::setEditar()   
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  283    Parameter #1 $eliminar of method                                       
+         App\Entity\PermisoPerfil::setEliminar() expects bool|null, int given.  
+         🪪  argument.type                                                      
+  353    Parameter #1 $ver of method App\Entity\PermisoPerfil::setVer()         
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  354    Parameter #1 $agregar of method                                        
+         App\Entity\PermisoPerfil::setAgregar() expects bool|null, int given.   
+         🪪  argument.type                                                      
+  355    Parameter #1 $editar of method App\Entity\PermisoPerfil::setEditar()   
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  356    Parameter #1 $eliminar of method                                       
+         App\Entity\PermisoPerfil::setEliminar() expects bool|null, int given.  
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/ProjectService.php                                         
+ ------ ----------------------------------------------------------------------- 
+  754    Method App\Utils\Admin\ProjectService::ListarLeadsDeDataTracking()     
+         should return array but returns string.                                
+         🪪  return.type                                                        
+  916    Loose comparison using == between '' and '' will always evaluate to    
+         true.                                                                  
+         🪪  equal.alwaysTrue                                                   
+  1058   Right side of && is always true.                                       
+         🪪  booleanAnd.rightAlwaysTrue                                         
+  1256   Method App\Utils\Admin\ProjectService::SePuedeEliminarItem() is        
+         unused.                                                                
+         🪪  method.unused                                                      
+  1663   Ternary operator condition is always false.                            
+         🪪  ternary.alwaysFalse                                                
+         💡  If App\Entity\Item::getBond() is impure, add @phpstan-impure PHPDo  
+         c tag above its declaration. Learn more: https://phpstan.org/blog/rem  
+         embering-and-forgetting-returned-values                                
+  1671   Variable $quantity_from_previous on left side of ?? always exists and  
+         is not nullable.                                                       
+         🪪  nullCoalesce.variable                                              
+  1718   Offset 'quantity' on array{project_item_id: int|null,                  
+         apply_retainage: bool|null, bonded: 1, bond: 0, item_id: int|null,     
+         code: string|null, item: string|null, unit: string|null, ...} on left  
+         side of ?? always exists and is not nullable.                          
+         🪪  nullCoalesce.offset                                                
+  1719   Offset 'quantity_brought…' on array{project_item_id: int|null,         
+         apply_retainage: bool|null, bonded: 1, bond: 0, item_id: int|null,     
+         code: string|null, item: string|null, unit: string|null, ...} on left  
+         side of ?? always exists and is not nullable.                          
+         🪪  nullCoalesce.offset                                                
+  1792   Instanceof between App\Entity\InvoiceItemOverridePayment and           
+         App\Entity\InvoiceItemOverridePayment will always evaluate to true.    
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1837   If condition is always false.                                          
+         🪪  if.alwaysFalse                                                     
+  1855   If condition is always false.                                          
+         🪪  if.alwaysFalse                                                     
+  1863   Instanceof between App\Entity\InvoiceItemOverridePayment and           
+         App\Entity\InvoiceItemOverridePayment will always evaluate to true.    
+         🪪  instanceof.alwaysTrue                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1903   Left side of && is always false.                                       
+         🪪  booleanAnd.leftAlwaysFalse                                         
+  1939   Strict comparison using !== between null and DateTimeImmutable will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1941   If condition is always false.                                          
+         🪪  if.alwaysFalse                                                     
+  1954   If condition is always false.                                          
+         🪪  if.alwaysFalse                                                     
+  1975   Strict comparison using !== between null and DateTimeImmutable will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  2011   Strict comparison using !== between null and DateTimeImmutable will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  2184   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+  2235   Offset 'total_paid_effective' on array{total_quantity: float,          
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2235   Offset 'total_quantity' on array{total_quantity: float,                
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2238   Offset 'total_quantity' on array{total_quantity: float,                
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2239   Offset 'total_paid_effective' on array{total_quantity: float,          
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2240   Offset 'line_count' on array{total_quantity: float,                    
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2339   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Entity\Project::getCompany() is impure, add @phpstan-impure  
+         PHPDoc tag above its declaration. Learn more: https://phpstan.org/blo  
+         g/remembering-and-forgetting-returned-values                           
+         💡  If App\Entity\Project::getInspector() is impure, add @phpstan-impu  
+         re PHPDoc tag above its declaration. Learn more: https://phpstan.org/  
+         blog/remembering-and-forgetting-returned-values                        
+         💡  If App\Entity\Project::getProjectId() is impure, add @phpstan-impu  
+         re PHPDoc tag above its declaration. Learn more: https://phpstan.org/  
+         blog/remembering-and-forgetting-returned-values                        
+         💡  If App\Entity\Project::getProjectNumber() is impure, add @phpstan-  
+         impure PHPDoc tag above its declaration. Learn more: https://phpstan.  
+         org/blog/remembering-and-forgetting-returned-values                    
+         💡  If App\Entity\Project::getName() is impure, add @phpstan-impure PH  
+         PDoc tag above its declaration. Learn more: https://phpstan.org/blog/  
+         remembering-and-forgetting-returned-values                             
+         💡  If App\Entity\Project::getDescription() is impure, add @phpstan-im  
+         pure PHPDoc tag above its declaration. Learn more: https://phpstan.or  
+         g/blog/remembering-and-forgetting-returned-values                      
+         💡  If App\Entity\Project::getLocation() is impure, add @phpstan-impur  
+         e PHPDoc tag above its declaration. Learn more: https://phpstan.org/b  
+         log/remembering-and-forgetting-returned-values                         
+         💡  If App\Entity\Project::getPoNumber() is impure, add @phpstan-impur  
+         e PHPDoc tag above its declaration. Learn more: https://phpstan.org/b  
+         log/remembering-and-forgetting-returned-values                         
+         💡  If App\Entity\Project::getPoCG() is impure, add @phpstan-impure PH  
+         PDoc tag above its declaration. Learn more: https://phpstan.org/blog/  
+         remembering-and-forgetting-returned-values                             
+         💡  If App\Entity\Project::getManager() is impure, add @phpstan-impure  
+         PHPDoc tag above its declaration. Learn more: https://phpstan.org/blo  
+         g/remembering-and-forgetting-returned-values                           
+         💡  If App\Entity\Project::getStatus() is impure, add @phpstan-impure   
+         PHPDoc tag above its declaration. Learn more: https://phpstan.org/blo  
+         g/remembering-and-forgetting-returned-values                           
+         💡  If App\Entity\Project::getOwner() is impure, add @phpstan-impure P  
+         HPDoc tag above its declaration. Learn more: https://phpstan.org/blog  
+         /remembering-and-forgetting-returned-values                            
+         💡  If App\Entity\Project::getSubcontract() is impure, add @phpstan-im  
+         pure PHPDoc tag above its declaration. Learn more: https://phpstan.or  
+         g/blog/remembering-and-forgetting-returned-values                      
+         💡  If App\Entity\Project::getFederalFunding() is impure, add @phpstan  
+         -impure PHPDoc tag above its declaration. Learn more: https://phpstan  
+         .org/blog/remembering-and-forgetting-returned-values                   
+         💡  If App\Entity\Project::getResurfacing() is impure, add @phpstan-im  
+         pure PHPDoc tag above its declaration. Learn more: https://phpstan.or  
+         g/blog/remembering-and-forgetting-returned-values                      
+         💡  If App\Entity\Project::getInvoiceContact() is impure, add @phpstan  
+         -impure PHPDoc tag above its declaration. Learn more: https://phpstan  
+         .org/blog/remembering-and-forgetting-returned-values                   
+         💡  If App\Entity\Project::getCertifiedPayrolls() is impure, add @phps  
+         tan-impure PHPDoc tag above its declaration. Learn more: https://phps  
+         tan.org/blog/remembering-and-forgetting-returned-values                
+         💡  If App\Entity\Project::getStartDate() is impure, add @phpstan-impu  
+         re PHPDoc tag above its declaration. Learn more: https://phpstan.org/  
+         blog/remembering-and-forgetting-returned-values                        
+         💡  If App\Entity\Project::getEndDate() is impure, add @phpstan-impure  
+         PHPDoc tag above its declaration. Learn more: https://phpstan.org/blo  
+         g/remembering-and-forgetting-returned-values                           
+         💡  If App\Entity\Project::getDueDate() is impure, add @phpstan-impure  
+         PHPDoc tag above its declaration. Learn more: https://phpstan.org/blo  
+         g/remembering-and-forgetting-returned-values                           
+         💡  If App\Entity\Project::getContractAmount() is impure, add @phpstan  
+         -impure PHPDoc tag above its declaration. Learn more: https://phpstan  
+         .org/blog/remembering-and-forgetting-returned-values                   
+         💡  If App\Entity\Project::getProposalNumber() is impure, add @phpstan  
+         -impure PHPDoc tag above its declaration. Learn more: https://phpstan  
+         .org/blog/remembering-and-forgetting-returned-values                   
+         💡  If App\Entity\Project::getProjectIdNumber() is impure, add @phpsta  
+         n-impure PHPDoc tag above its declaration. Learn more: https://phpsta  
+         n.org/blog/remembering-and-forgetting-returned-values                  
+         💡  If App\Entity\Project::getConcreteVendor() is impure, add @phpstan  
+         -impure PHPDoc tag above its declaration. Learn more: https://phpstan  
+         .org/blog/remembering-and-forgetting-returned-values                   
+         💡  If App\Entity\Project::getConcreteClass() is impure, add @phpstan-  
+         impure PHPDoc tag above its declaration. Learn more: https://phpstan.  
+         org/blog/remembering-and-forgetting-returned-values                    
+         💡  If App\Entity\Project::getConcreteQuotePrice() is impure, add @php  
+         stan-impure PHPDoc tag above its declaration. Learn more: https://php  
+         stan.org/blog/remembering-and-forgetting-returned-values               
+  2518   Offset 'total_paid_effective' on array{total_quantity: float,          
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2519   Offset 'paid_amount_total' on array{total_quantity: float,             
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2732   Strict comparison using !== between '' and non-falsy-string will       
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+  2981   Offset 'total_paid_effective' on array{total_quantity: float,          
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  2982   Offset 'paid_amount_total' on array{total_quantity: float,             
+         total_paid_effective: float, paid_amount_total: float, line_count:     
+         int, total_invoiced_amount_from_lines: float} on left side of ??       
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  3554   Strict comparison using !== between null and DateTimeInterface will    
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+         💡  If App\Entity\Project::getConcreteStartDate() is impure, add @phps  
+         tan-impure PHPDoc tag above its declaration. Learn more: https://phps  
+         tan.org/blog/remembering-and-forgetting-returned-values                
+  3800   Parameter #1 $contractAmount of method                                 
+         App\Entity\Project::setContractAmount() expects float|null, (array<st  
+         ring>|string) given.                                                   
+         🪪  argument.type                                                      
+  4026   Call to function is_array() with array will always evaluate to true.   
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  4060   Variable $county_id in empty() always exists and is not falsy.         
+         🪪  empty.variable                                                     
+  4096   Call to function is_string() with array will always evaluate to        
+         false.                                                                 
+         🪪  function.impossibleType                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  4099   Call to function is_array() with array will always evaluate to true.   
+         🪪  function.alreadyNarrowedType                                       
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  4343   Right side of && is always true.                                       
+         🪪  booleanAnd.rightAlwaysTrue                                         
+  4573   Parameter #1 $user of method App\Entity\ProjectItemHistory::setUser()  
+         expects App\Entity\Usuario|null,                                       
+         Symfony\Component\Security\Core\User\UserInterface|null given.         
+         🪪  argument.type                                                      
+  4585   Parameter #1 $user of method App\Entity\ProjectItemHistory::setUser()  
+         expects App\Entity\Usuario|null,                                       
+         Symfony\Component\Security\Core\User\UserInterface|null given.         
+         🪪  argument.type                                                      
+  4597   Parameter #1 $user of method App\Entity\ProjectItemHistory::setUser()  
+         expects App\Entity\Usuario|null,                                       
+         Symfony\Component\Security\Core\User\UserInterface|null given.         
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  Line   Utils/Admin/RaceService.php                                         
+ ------ -------------------------------------------------------------------- 
+  136    Parameter #1 $race_id of method                                     
+         App\Repository\EmployeeRepository::ListarEmployeesDeRace() expects  
+         int, string given.                                                  
+         🪪  argument.type                                                   
+ ------ -------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Utils/Admin/ScheduleService.php                                       
+ ------ ---------------------------------------------------------------------- 
+  226    Offset 0|1|2|3|4|5|6|7|8|9|10 on array{'A', 'B', 'C', 'D', 'E', 'F',  
+         'G', 'H', ...} in isset() always exists and is not nullable.          
+         🪪  isset.offset                                                      
+  241    Using nullsafe method call on non-nullable type DateTime|false. Use   
+         -> instead.                                                           
+         🪪  nullsafe.neverNull                                                
+  920    Variable $hours in empty() always exists and is not falsy.            
+         🪪  empty.variable                                                    
+  1065   Variable $lista in empty() is never defined.                          
+         🪪  empty.variable                                                    
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/TaskService.php                                            
+ ------ ----------------------------------------------------------------------- 
+  266    Offset 'status' on array{id: int|null, description: string, due_date:  
+         string, assigned: string, show_assigned: bool, status: string,         
+         status_label: string, label_pending: string, ...} on left side of ??   
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+  267    Offset 'status' on array{id: int|null, description: string, due_date:  
+         string, assigned: string, show_assigned: bool, status: string,         
+         status_label: string, label_pending: string, ...} on left side of ??   
+         always exists and is not nullable.                                     
+         🪪  nullCoalesce.offset                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ -------------------------------------------------------------------- 
+  Line   Utils/Admin/UnitService.php                                         
+ ------ -------------------------------------------------------------------- 
+  59     Parameter #1 $unit_id of method                                     
+         App\Repository\ItemRepository::ListarItemsDeUnit() expects string,  
+         int given.                                                          
+         🪪  argument.type                                                   
+  126    Parameter #1 $unit_id of method                                     
+         App\Repository\MaterialRepository::ListarMaterialsDeUnit() expects  
+         int, string given.                                                  
+         🪪  argument.type                                                   
+ ------ -------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Admin/UsuarioService.php                                         
+ ------ ----------------------------------------------------------------------- 
+  504    Parameter #1 $ver of method App\Entity\PermisoUsuario::setVer()        
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  505    Parameter #1 $agregar of method                                        
+         App\Entity\PermisoUsuario::setAgregar() expects bool|null, int given.  
+         🪪  argument.type                                                      
+  506    Parameter #1 $editar of method App\Entity\PermisoUsuario::setEditar()  
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  507    Parameter #1 $eliminar of method                                       
+         App\Entity\PermisoUsuario::setEliminar() expects bool|null, int        
+         given.                                                                 
+         🪪  argument.type                                                      
+  599    Parameter #1 $ver of method App\Entity\PermisoUsuario::setVer()        
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  600    Parameter #1 $agregar of method                                        
+         App\Entity\PermisoUsuario::setAgregar() expects bool|null, int given.  
+         🪪  argument.type                                                      
+  601    Parameter #1 $editar of method App\Entity\PermisoUsuario::setEditar()  
+         expects bool|null, int given.                                          
+         🪪  argument.type                                                      
+  602    Parameter #1 $eliminar of method                                       
+         App\Entity\PermisoUsuario::setEliminar() expects bool|null, int        
+         given.                                                                 
+         🪪  argument.type                                                      
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ---------------------------------------------------------------------- 
+  Line   Utils/App/LoginService.php                                            
+ ------ ---------------------------------------------------------------------- 
+  217    Offset 1 on array{non-falsy-string, string} in isset() always exists  
+         and is not nullable.                                                  
+         🪪  isset.offset                                                      
+ ------ ---------------------------------------------------------------------- 
+
+ ------ ------------------------------------------------------------------- 
+  Line   Utils/App/MessageService.php                                       
+ ------ ------------------------------------------------------------------- 
+  327    Instanceof between App\Entity\Usuario and App\Entity\Usuario will  
+         always evaluate to true.                                           
+         🪪  instanceof.alwaysTrue                                          
+ ------ ------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/App/OfflineService.php                                           
+ ------ ----------------------------------------------------------------------- 
+  124    Strict comparison using !== between false and string will always       
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/App/ProjectService.php                                           
+ ------ ----------------------------------------------------------------------- 
+  17     Property App\Utils\App\ProjectService::$projectRepository is never     
+         read, only written.                                                    
+         🪪  property.onlyWritten                                               
+         💡  See:                                                               
+         https://phpstan.org/developing-extensions/always-read-written-propert  
+         ies                                                                    
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/Base.php                                                         
+ ------ ----------------------------------------------------------------------- 
+  873    Parameter #1 $usuario of method App\Entity\Log::setUsuario() expects   
+         App\Entity\Usuario|null,                                               
+         Symfony\Component\Security\Core\User\UserInterface given.              
+         🪪  argument.type                                                      
+  1043   Parameter #1 $status of method App\Entity\Item::setStatus() expects    
+         bool|null, int given.                                                  
+         🪪  argument.type                                                      
+  1425   Parameter #1 $data_tracking_id of method                               
+         App\Repository\DataTrackingConcVendorRepository::TotalConcUsed()       
+         expects string, int|null given.                                        
+         🪪  argument.type                                                      
+  1498   Strict comparison using === between null and App\Entity\Project will   
+         always evaluate to false.                                              
+         🪪  identical.alwaysFalse                                              
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  1626   Strict comparison using !== between null and mixed will always         
+         evaluate to true.                                                      
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Type null has already been eliminated from mixed.                  
+ ------ ----------------------------------------------------------------------- 
+
+ ------ ----------------------------------------------------------------------- 
+  Line   Utils/QbwcService.php                                                  
+ ------ ----------------------------------------------------------------------- 
+  28     Strict comparison using !== between null and App\Entity\UserQbwcToken  
+         will always evaluate to true.                                          
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  75     Expression on left side of ?? is not nullable.                         
+         🪪  nullCoalesce.expr                                                  
+  120    Strict comparison using !== between null and App\Entity\Item will      
+         always evaluate to true.                                               
+         🪪  notIdentical.alwaysTrue                                            
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  173    Parameter #1 $invoiceId of method                                      
+         App\Utils\QbwcService::generateInvoiceQBXML() expects int,             
+         string|null given.                                                     
+         🪪  argument.type                                                      
+  178    Parameter #1 $itemId of method                                         
+         App\Utils\QbwcService::generateItemQBXML() expects int, string|null    
+         given.                                                                 
+         🪪  argument.type                                                      
+  200    Negated boolean expression is always false.                            
+         🪪  booleanNot.alwaysFalse                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+  322    Method App\Utils\QbwcService::generateListarItemsQBXML() is unused.    
+         🪪  method.unused                                                      
+  342    Negated boolean expression is always false.                            
+         🪪  booleanNot.alwaysFalse                                             
+         💡  Because the type is coming from a PHPDoc, you can turn off this    
+         check by setting treatPhpDocTypesAsCertain: false in your phpstan.ful  
+         l.neon.                                                                
+ ------ ----------------------------------------------------------------------- 
+
+ [ERROR] Found 153 errors                                                       
+

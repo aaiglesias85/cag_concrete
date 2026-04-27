@@ -1,22 +1,9 @@
-# Análisis estático: nivel 5 + integración Symfony.
-# Antes de analizar en CI/local: bin/console cache:warmup --env=dev
-# (para generar var/cache/dev/App_KernelDevDebugContainer.xml).
-# Reducir deuda: ir eliminando entradas de phpstan-baseline.neon por módulo.
+# Análisis habitual: mismas reglas + baseline (solo ignoramos lo ya inventariado).
+# PHPStan SIGUE analizando todo src/: cualquier error NUEVO o que cambie de sitio
+# suele hacer fallar el análisis hasta actualizar código o el baseline.
+#
+# Ver TODOS los hallazgos sin ocultar deuda: composer phpstan:full
 
 includes:
-    - vendor/phpstan/phpstan-symfony/extension.neon
+    - phpstan.base.neon
     - phpstan-baseline.neon
-
-parameters:
-    level: 5
-    paths:
-        - src
-    symfony:
-        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
-    excludePaths:
-        # Si alguien ejecuta `phpstan analyse .` o `composer phpstan .`, no tocar vendor.
-        - vendor/*
-        - var/cache/*
-        - var/log/*
-    # No fallar por patrones ignore obsoletos al ir corrigiendo el código
-    reportUnmatchedIgnoredErrors: false

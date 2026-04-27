@@ -269,7 +269,7 @@ class TaskController extends AbstractAdminController
     private function isTasksFunctionGranted(int $userId): bool
     {
         $p = $this->adminAccess->buscarPermisosMismoBase($userId, FunctionId::TASKS);
-        if (!\is_array($p) || \count($p) < 1) {
+        if (\count($p) < 1) {
             return false;
         }
         if (empty($p[0]['ver'])) {

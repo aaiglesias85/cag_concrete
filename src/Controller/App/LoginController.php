@@ -3,6 +3,7 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\JsonRequestTrait;
+use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Utils\Admin\UsuarioService as AdminUsuarioService;
 use App\Utils\App\LoginService;
 use OpenApi\Attributes as OA;
@@ -15,6 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LoginController extends AbstractController
 {
     use JsonRequestTrait;
+    use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private AdminUsuarioService $adminUsuarioService;
     private TranslatorInterface $translator;
@@ -92,7 +94,7 @@ class LoginController extends AbstractController
         try {
             // Establecer locale para traducciones
             $request->setLocale($lang);
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
 
             // Leer parámetros desde JSON solamente
             $data = $this->getRequestData($request);
@@ -131,7 +133,7 @@ class LoginController extends AbstractController
                 return $this->json($resultadoJson, 400);
             }
 
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
             $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
@@ -186,7 +188,7 @@ class LoginController extends AbstractController
         try {
             // Establecer locale para traducciones
             $request->setLocale($lang);
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
 
             $resultado = $this->loginService->CerrarSesion();
 
@@ -201,7 +203,7 @@ class LoginController extends AbstractController
             return $this->json($resultadoJson);
         } catch (\Exception $e) {
             $resultadoJson['success'] = false;
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
             $resultadoJson['error'] = $this->translator->trans('login.error.logout', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 
@@ -263,7 +265,7 @@ class LoginController extends AbstractController
         try {
             // Establecer locale para traducciones
             $request->setLocale($lang);
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
 
             // Leer parámetros desde JSON solamente
             $data = $this->getRequestData($request);
@@ -296,7 +298,7 @@ class LoginController extends AbstractController
                 return $this->json($resultadoJson, 400);
             }
 
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($this->translator, $lang);
             $resultadoJson['error'] = $this->translator->trans('message.exception', [], 'messages', $lang);
             $this->loginService->writelogerror($e->getMessage());
 

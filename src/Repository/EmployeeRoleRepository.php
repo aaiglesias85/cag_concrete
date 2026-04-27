@@ -30,7 +30,7 @@ class EmployeeRoleRepository extends ServiceEntityRepository
     /**
      * ListarEmployeeRolesConTotal Lista los concrete classes con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarEmployeeRolesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

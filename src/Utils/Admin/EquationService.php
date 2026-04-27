@@ -7,6 +7,7 @@ use App\Entity\Equation;
 use App\Entity\EstimateQuoteItem;
 use App\Entity\Item;
 use App\Entity\ProjectItem;
+use App\Entity\Usuario;
 use App\Repository\EquationRepository;
 use App\Repository\EstimateQuoteItemRepository;
 use App\Repository\ItemRepository;
@@ -53,7 +54,7 @@ class EquationService extends Base
     {
         $items = [];
 
-        $ids = explode(',', $ids);
+        $ids = explode(',', (string) $ids);
         foreach ($ids as $id) {
             $project_items = $this->ListarItemsDeProject($id);
             $items = array_merge($items, $project_items);
@@ -161,7 +162,7 @@ class EquationService extends Base
             // items
             /** @var ItemRepository $itemRepo */
             $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-            $items = $itemRepo->ListarItemsDeEquation($equation_id);
+            $items = $itemRepo->ListarItemsDeEquation((string) $equation_id);
             foreach ($items as $item) {
                 $item->setYieldCalculation(null);
                 $item->setEquation(null);
@@ -209,10 +210,10 @@ class EquationService extends Base
 
         $equation_ids_con_items = [];
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $equation_id) {
                 if ('' != $equation_id) {
                     ++$cant_total;
@@ -227,7 +228,7 @@ class EquationService extends Base
                             // items
                             /** @var ItemRepository $itemRepo */
                             $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-                            $items = $itemRepo->ListarItemsDeEquation($equation_id);
+                            $items = $itemRepo->ListarItemsDeEquation((string) $equation_id);
                             foreach ($items as $item) {
                                 $item->setYieldCalculation(null);
                                 $item->setEquation(null);
@@ -424,6 +425,9 @@ class EquationService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::EQUATION);
 
         $acciones = '';

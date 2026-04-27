@@ -6,6 +6,8 @@ use App\Entity\Funcion;
 use App\Entity\PermisoUsuario;
 use App\Entity\Rol;
 use App\Entity\Usuario;
+use App\Repository\PermisoUsuarioRepository;
+use App\Repository\UsuarioRepository;
 use App\Service\Admin\WidgetAccessService;
 use App\Utils\Base;
 use Psr\Log\LoggerInterface;
@@ -238,10 +240,10 @@ class UsuarioService extends Base
            ->find($usuario_id);
 
         if (!is_null($usuario)) {
-            if (1 == $usuario->getHabilitado()) {
-                $usuario->setHabilitado(0);
+            if (true === $usuario->getHabilitado()) {
+                $usuario->setHabilitado(false);
             } else {
-                $usuario->setHabilitado(1);
+                $usuario->setHabilitado(true);
             }
             $em->flush();
             $resultado['success'] = true;
@@ -326,6 +328,12 @@ class UsuarioService extends Base
         if (null != $usuario) {
             // Comprarar el usuario actual
             $user_logued = $this->getUser();
+            if (!$user_logued instanceof Usuario) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'Not authenticated';
+
+                return $resultado;
+            }
             if ($usuario->getUsuarioId() == $user_logued->getUsuarioId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'Cannot delete the current user logged in to the system';
@@ -360,7 +368,7 @@ class UsuarioService extends Base
     /**
      * EliminarUsuarios: Elimina varios usuarios en la BD.
      *
-     * @param array $$ids Ids
+     * @param string $ids Lista de ids separados por coma
      *
      * @author Marcel
      */
@@ -369,10 +377,17 @@ class UsuarioService extends Base
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
+        $user_logued = $this->getUser();
+        if (!$user_logued instanceof Usuario) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'Not authenticated';
+
+            return $resultado;
+        }
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $usuario_id) {
                 if ('' != $usuario_id) {
                     ++$cant_total;
@@ -381,7 +396,6 @@ class UsuarioService extends Base
 
                     if (null != $usuario) {
                         // Comprar el usuario actual
-                        $user_logued = $this->getUser();
                         if ($usuario->getUsuarioId() != $user_logued->getUsuarioId()) {
                             $usuario_nombre = $usuario->getNombreCompleto();
 
@@ -446,7 +460,7 @@ class UsuarioService extends Base
             $entity->setNombre($nombre);
             $entity->setApellidos($apellidos);
             $entity->setEmail($email);
-            $entity->setHabilitado($habilitado);
+            $entity->setHabilitado((bool) $habilitado);
             $entity->setTelefono($telefono);
             $entity->setEstimator($estimator);
             $entity->setBond($bond);
@@ -487,10 +501,10 @@ class UsuarioService extends Base
                         if (1 == $ver || 1 == $agregar || 1 == $editar || 1 == $eliminar) {
                             $permiso_usuario = new PermisoUsuario();
 
-                            $permiso_usuario->setVer($ver);
-                            $permiso_usuario->setAgregar($agregar);
-                            $permiso_usuario->setEditar($editar);
-                            $permiso_usuario->setEliminar($eliminar);
+                            $permiso_usuario->setVer((bool) $ver);
+                            $permiso_usuario->setAgregar((bool) $agregar);
+                            $permiso_usuario->setEditar((bool) $editar);
+                            $permiso_usuario->setEliminar((bool) $eliminar);
 
                             $permiso_usuario->setUsuario($entity);
                             $permiso_usuario->setFuncion($funcion);
@@ -551,7 +565,7 @@ class UsuarioService extends Base
         $entity->setEmail($email);
         $entity->setContrasenna($this->CodificarPassword($contrasenna));
         $entity->setTelefono($telefono);
-        $entity->setHabilitado($habilitado);
+        $entity->setHabilitado((bool) $habilitado);
         $entity->setEstimator($estimator);
         $entity->setBond($bond);
         $entity->setRetainage($retainage);
@@ -582,10 +596,10 @@ class UsuarioService extends Base
                     if (1 == $ver || 1 == $agregar || 1 == $editar || 1 == $eliminar) {
                         $permiso_usuario = new PermisoUsuario();
 
-                        $permiso_usuario->setVer($ver);
-                        $permiso_usuario->setAgregar($agregar);
-                        $permiso_usuario->setEditar($editar);
-                        $permiso_usuario->setEliminar($eliminar);
+                        $permiso_usuario->setVer((bool) $ver);
+                        $permiso_usuario->setAgregar((bool) $agregar);
+                        $permiso_usuario->setEditar((bool) $editar);
+                        $permiso_usuario->setEliminar((bool) $eliminar);
 
                         $permiso_usuario->setUsuario($entity);
                         $permiso_usuario->setFuncion($funcion);

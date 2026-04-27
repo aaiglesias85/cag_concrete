@@ -177,10 +177,10 @@ class PerfilService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $perfil_id) {
                 if ('' != $perfil_id) {
                     ++$cant_total;
@@ -189,13 +189,13 @@ class PerfilService extends Base
                     /** @var Rol $perfil */
                     if (null != $perfil) {
                         $usuarios = $this->getDoctrine()->getRepository(Usuario::class)
-                            ->ListarUsuariosRol($perfil_id);
+                            ->ListarUsuariosRol((int) $perfil_id);
                         if (0 == count($usuarios)) {
                             $perfil_descripcion = $perfil->getNombre();
 
                             // Eliminar permisos
                             $permisos_perfil = $this->getDoctrine()->getRepository(PermisoPerfil::class)
-                                ->ListarPermisosPerfil($perfil_id);
+                                ->ListarPermisosPerfil((int) $perfil_id);
                             foreach ($permisos_perfil as $permiso_perfil) {
                                 $em->remove($permiso_perfil);
                             }
@@ -277,10 +277,10 @@ class PerfilService extends Base
                         if (1 == $ver || 1 == $agregar || 1 == $editar || 1 == $eliminar) {
                             $permiso_perfil = new PermisoPerfil();
 
-                            $permiso_perfil->setVer($ver);
-                            $permiso_perfil->setAgregar($agregar);
-                            $permiso_perfil->setEditar($editar);
-                            $permiso_perfil->setEliminar($eliminar);
+                            $permiso_perfil->setVer((bool) $ver);
+                            $permiso_perfil->setAgregar((bool) $agregar);
+                            $permiso_perfil->setEditar((bool) $editar);
+                            $permiso_perfil->setEliminar((bool) $eliminar);
 
                             $permiso_perfil->setPerfil($entity);
                             $permiso_perfil->setFuncion($funcion);
@@ -350,10 +350,10 @@ class PerfilService extends Base
                     if (1 == $ver || 1 == $agregar || 1 == $editar || 1 == $eliminar) {
                         $permiso_perfil = new PermisoPerfil();
 
-                        $permiso_perfil->setVer($ver);
-                        $permiso_perfil->setAgregar($agregar);
-                        $permiso_perfil->setEditar($editar);
-                        $permiso_perfil->setEliminar($eliminar);
+                        $permiso_perfil->setVer((bool) $ver);
+                        $permiso_perfil->setAgregar((bool) $agregar);
+                        $permiso_perfil->setEditar((bool) $editar);
+                        $permiso_perfil->setEliminar((bool) $eliminar);
 
                         $permiso_perfil->setPerfil($entity);
                         $permiso_perfil->setFuncion($funcion);

@@ -84,7 +84,7 @@ class EquationRepository extends ServiceEntityRepository
     /**
      * ListarEquationsConTotal Lista los equations con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarEquationsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

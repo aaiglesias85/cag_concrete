@@ -2,7 +2,7 @@
 
 namespace App\Controller\App;
 
-use App\Utils\App\LoginService;
+use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Utils\App\MessageService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,13 +24,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Message', description: 'Internal messaging endpoints for mobile app')]
 class MessageController extends AbstractController
 {
-    private LoginService $loginService;
+    use SetsTranslatorLocaleTrait;
     private MessageService $messageService;
     private TranslatorInterface $translator;
 
-    public function __construct(LoginService $loginService, MessageService $messageService, TranslatorInterface $translator)
+    public function __construct(MessageService $messageService, TranslatorInterface $translator)
     {
-        $this->loginService = $loginService;
         $this->messageService = $messageService;
         $this->translator = $translator;
     }
@@ -58,7 +57,7 @@ class MessageController extends AbstractController
     public function listarUsuarios(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $search = (string) $request->query->get('search', '');
         $result = $this->messageService->ListarUsuariosParaChat($search);
         if (!$result['success']) {
@@ -92,7 +91,7 @@ class MessageController extends AbstractController
     public function listarConversaciones(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $result = $this->messageService->ListarConversaciones($lang);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
@@ -128,7 +127,7 @@ class MessageController extends AbstractController
     public function obtenerOcrearConversacion(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $otherUserId = (int) $request->query->get('other_user_id', 0);
         if ($otherUserId <= 0) {
             return $this->json(['success' => false, 'error' => 'other_user_id is required'], 400);
@@ -170,7 +169,7 @@ class MessageController extends AbstractController
     public function listarMensajes(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $conversationId = (int) $request->query->get('conversation_id', 0);
         if ($conversationId <= 0) {
             return $this->json(['success' => false, 'error' => 'conversation_id is required'], 400);
@@ -216,7 +215,7 @@ class MessageController extends AbstractController
     public function enviarMensaje(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $conversationId = (int) ($data['conversation_id'] ?? 0);
         $body = trim((string) ($data['body'] ?? ''));
@@ -268,7 +267,7 @@ class MessageController extends AbstractController
     public function enviarPrimerMensaje(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $otherUserId = (int) ($data['other_user_id'] ?? 0);
         $body = trim((string) ($data['body'] ?? ''));
@@ -315,7 +314,7 @@ class MessageController extends AbstractController
     public function marcarComoLeidos(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $conversationId = (int) ($data['conversation_id'] ?? 0);
         if ($conversationId <= 0) {
@@ -363,7 +362,7 @@ class MessageController extends AbstractController
     public function traducir(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $text = trim((string) ($data['text'] ?? ''));
         $targetLang = isset($data['target_lang']) && 'en' === $data['target_lang'] ? 'en' : 'es';
@@ -408,7 +407,7 @@ class MessageController extends AbstractController
     public function eliminarMensaje(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $messageId = (int) ($data['message_id'] ?? 0);
         $conversationId = (int) ($data['conversation_id'] ?? 0);
@@ -455,7 +454,7 @@ class MessageController extends AbstractController
     public function ocultarConversacion(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
         $data = json_decode($request->getContent(), true) ?? [];
         $conversationId = (int) ($data['conversation_id'] ?? 0);
         if ($conversationId <= 0) {

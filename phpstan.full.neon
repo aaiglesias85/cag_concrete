@@ -1,0 +1,9 @@
+# Misma regla estricta que el proyecto, pero SIN baseline:
+# ves toda la deuda histórica (cientos de avisos). Para auditorías o priorizar fixes.
+#
+#   composer phpstan:full
+#
+# El análisis habitual (hook, CI “verde”) sigue siendo: composer phpstan
+
+includes:
+    - phpstan.base.neon

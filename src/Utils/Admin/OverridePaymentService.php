@@ -18,8 +18,7 @@ use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
 use App\Utils\Base;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -517,18 +516,7 @@ class OverridePaymentService extends Base
         }
 
         if (null !== $editHeader && [] === $itemsDecoded) {
-            try {
-                $em->flush();
-            } catch (\Throwable $e) {
-                if (!$this->isUniqueConstraintViolation($e)) {
-                    throw $e;
-                }
-
-                return [
-                    'success' => false,
-                    'error' => 'Ya existe un override de pago para este proyecto y fecha.',
-                ];
-            }
+            $em->flush();
             $this->SalvarLog(
                 'Update',
                 'Override Payment',
@@ -541,9 +529,6 @@ class OverridePaymentService extends Base
         $invoiceOverrideHeaderCache = [];
 
         foreach ($itemsDecoded as $data) {
-            if (!is_array($data)) {
-                continue;
-            }
             $projectItemId = isset($data['project_item_id']) ? (int) $data['project_item_id'] : 0;
             $hasPaidQty = isset($data['paid_qty']);
             $paidQtyNew = $hasPaidQty ? (float) $data['paid_qty'] : 0.0;
@@ -612,18 +597,7 @@ class OverridePaymentService extends Base
             }
         }
 
-        try {
-            $em->flush();
-        } catch (\Throwable $e) {
-            if (!$this->isUniqueConstraintViolation($e)) {
-                throw $e;
-            }
-
-            return [
-                'success' => false,
-                'error' => 'Ya existe un override de pago para este proyecto y fecha.',
-            ];
-        }
+        $em->flush();
 
         if ([] !== $itemsDecoded) {
             $logMsg = null !== $project
@@ -670,9 +644,6 @@ class OverridePaymentService extends Base
         $lista = $histRepo->ListarHistorialDeOverride((int) $parent->getId());
         $notes = [];
         foreach ($lista as $i => $h) {
-            if (!$h instanceof InvoiceItemOverridePaymentUnpaidQtyHistory) {
-                continue;
-            }
             $nv = $h->getNewValue();
             $notes[] = [
                 'id' => $h->getId(),
@@ -718,7 +689,7 @@ class OverridePaymentService extends Base
             return ['success' => false, 'error' => 'Select invoice end date'];
         }
 
-        $plain = trim(strip_tags($notesHtml ?? ''));
+        $plain = trim(strip_tags($notesHtml));
         if ('' === $plain) {
             return ['success' => false, 'error' => 'The note cannot be empty'];
         }
@@ -752,20 +723,9 @@ class OverridePaymentService extends Base
             }
             $hist->setNote($notesHtml);
             $hist->setNewValue((string) $unpaidQtyNew);
-            try {
-                $em->flush();
-                $this->syncPaymentUnpaidFromLatestHistory($parent, $em);
-                $em->flush();
-            } catch (\Throwable $e) {
-                if (!$this->isUniqueConstraintViolation($e)) {
-                    throw $e;
-                }
-
-                return [
-                    'success' => false,
-                    'error' => 'Ya existe un override de pago para este proyecto y fecha.',
-                ];
-            }
+            $em->flush();
+            $this->syncPaymentUnpaidFromLatestHistory($parent, $em);
+            $em->flush();
 
             $logMsg = 'Unpaid qty override note updated for project #'.$project->getProjectNumber();
             $this->SalvarLog('Update', 'Override Payment', $logMsg);
@@ -824,20 +784,9 @@ class OverridePaymentService extends Base
             $unpaidHist->setUser($user);
         }
         $em->persist($unpaidHist);
-        try {
-            $em->flush();
-            $this->syncPaymentUnpaidFromLatestHistory($parent, $em);
-            $em->flush();
-        } catch (\Throwable $e) {
-            if (!$this->isUniqueConstraintViolation($e)) {
-                throw $e;
-            }
-
-            return [
-                'success' => false,
-                'error' => 'Ya existe un override de pago para este proyecto y fecha.',
-            ];
-        }
+        $em->flush();
+        $this->syncPaymentUnpaidFromLatestHistory($parent, $em);
+        $em->flush();
 
         $logMsg = 'Unpaid qty override note saved for project #'.$project->getProjectNumber();
         $this->SalvarLog('Update', 'Override Payment', $logMsg);
@@ -1012,26 +961,13 @@ class OverridePaymentService extends Base
         return $out;
     }
 
-    private function isUniqueConstraintViolation(\Throwable $e): bool
-    {
-        $cur = $e;
-        for ($i = 0; $i < 6 && null !== $cur; ++$i) {
-            if ($cur instanceof UniqueConstraintViolationException) {
-                return true;
-            }
-            $cur = $cur->getPrevious();
-        }
-
-        return false;
-    }
-
     /**
      * Cabecera única por proyecto y fecha; reutiliza la creada en el mismo request antes del flush.
      *
      * @param array<string, InvoiceOverridePayment> $headerCache
      */
     private function resolveInvoiceOverridePaymentHeader(
-        EntityManagerInterface $em,
+        ObjectManager $em,
         InvoiceOverridePaymentRepository $headerRepo,
         Project $projEntity,
         \DateTimeInterface $endDate,
@@ -1081,7 +1017,7 @@ class OverridePaymentService extends Base
 
     private function syncPaymentUnpaidFromLatestHistory(
         InvoiceItemOverridePayment $payment,
-        EntityManagerInterface $em,
+        ObjectManager $em,
     ): void {
         $pid = $payment->getId();
         if (null === $pid) {
@@ -1114,7 +1050,7 @@ class OverridePaymentService extends Base
         $ymd = null !== $startOverride ? $startOverride->format('Y-m-d') : null;
         $agg = $this->projectService->computeInvoiceStyleCumulativePaidBeforeCutoffExclusive((int) $pi->getId(), $ymd);
 
-        return (float) ($agg['total_paid_effective'] ?? 0);
+        return (float) $agg['total_paid_effective'];
     }
 
     private function parseDateMDY(?string $s): ?\DateTimeInterface

@@ -12,6 +12,7 @@ use App\Entity\ProjectItemHistory;
 use App\Entity\SyncQueueQbwc;
 use App\Repository\DataTrackingItemRepository;
 use App\Repository\InvoiceItemRepository;
+use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\ProjectItemHistoryRepository;
 use App\Repository\ProjectItemRepository;
@@ -217,68 +218,13 @@ class InvoiceService extends Base
         $this->RecalcularBonProyecto($project_id);
         /** @var InvoiceRepository $invoiceRepo */
         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
         $this->sortInvoicesByStartDateAndId($allInvoices);
         $em = $this->getDoctrine()->getManager();
         foreach ($allInvoices as $inv) {
             $this->CalcularYGuardarRetainageInvoice($inv);
         }
         $em->flush();
-    }
-
-    /**
-     * Construye series (quantity/paid/qbf) y prefijos para un project_item
-     * a lo largo de la lista ordenada de invoices del proyecto.
-     *
-     * NOTA: las sumas "previas" para un índice i se leen como prefix[i]
-     * (porque prefix[0]=0 y prefix[i]=SUM(0..i-1)).
-     *
-     * @param Invoice[]               $allInvoices
-     * @param array<int, InvoiceItem> $invoiceItemMap invoice_id => InvoiceItem
-     *
-     * @return array{
-     *   qbf: float[],
-     *   prefixQty: float[],
-     *   prefixPaid: float[],
-     *   prefixQbf: float[]
-     * }
-     */
-    private function buildInvoiceItemSeriesForInvoices(array $allInvoices, array $invoiceItemMap, ?int $overrideInvoiceId = null, ?float $overrideQbf = null): array
-    {
-        $qbf = [];
-        $prefixQty = [0.0];
-        $prefixPaid = [0.0];
-        $prefixQbf = [0.0];
-
-        $seenOverrideIdsForSeries = [];
-        foreach ($allInvoices as $idx => $invoice) {
-            /** @var Invoice $invoice */
-            $invoiceId = (int) $invoice->getInvoiceId();
-            $item = $invoiceItemMap[$invoiceId] ?? null;
-
-            $qty = (float) ($item?->getQuantity() ?? 0);
-            $paid = null !== $item
-               ? $this->paidQtyOverrideResolver->paidIncrementForHistorialTimeline($item, $seenOverrideIdsForSeries)
-               : 0.0;
-            $qbfValue = (float) ($item?->getQuantityBroughtForward() ?? 0);
-
-            if (null !== $overrideInvoiceId && $invoiceId === (int) $overrideInvoiceId) {
-                $qbfValue = (float) ($overrideQbf ?? 0);
-            }
-
-            $qbf[$idx] = $qbfValue;
-
-            $prefixQty[$idx + 1] = $prefixQty[$idx] + $qty;
-            $prefixPaid[$idx + 1] = $prefixPaid[$idx] + $paid;
-            $prefixQbf[$idx + 1] = $prefixQbf[$idx] + $qbfValue;
-        }
-
-        return [
-            'qbf' => $qbf,
-            'prefixQty' => $prefixQty,
-            'prefixPaid' => $prefixPaid,
-            'prefixQbf' => $prefixQbf,
-        ];
     }
 
     /**
@@ -383,8 +329,7 @@ class InvoiceService extends Base
 
         $entity = $this->getDoctrine()->getRepository(Invoice::class)
            ->find($invoice_id);
-        /** @var Invoice $entity */
-        if (!is_null($entity)) {
+        if (null !== $entity) {
             $project_id = $entity->getProject()->getProjectId();
 
             // verificar number
@@ -458,10 +403,10 @@ class InvoiceService extends Base
         // ============================================================
 
         // Fila 1: 10px / 7.50
-        $objWorksheet->getRowDimension('1')->setRowHeight(7.50);
+        $objWorksheet->getRowDimension(1)->setRowHeight(7.50);
 
         // Fila 2: 29px / 21.75
-        $objWorksheet->getRowDimension('2')->setRowHeight(21.75);
+        $objWorksheet->getRowDimension(2)->setRowHeight(21.75);
 
         // Filas 3 a 9: 28px / 21.00 (Donde va el Logo)
         for ($i = 3; $i <= 9; ++$i) {
@@ -469,13 +414,13 @@ class InvoiceService extends Base
         }
 
         // Fila 10: 21px / 15.75
-        $objWorksheet->getRowDimension('10')->setRowHeight(15.75);
+        $objWorksheet->getRowDimension(10)->setRowHeight(15.75);
 
         // Fila 11: 63px / 47.25 (Donde dice "NOTES")
-        $objWorksheet->getRowDimension('11')->setRowHeight(47.25);
+        $objWorksheet->getRowDimension(11)->setRowHeight(47.25);
 
         // Fila 12: 20px / 15.00
-        $objWorksheet->getRowDimension('12')->setRowHeight(15.00);
+        $objWorksheet->getRowDimension(12)->setRowHeight(15.00);
 
         // CALCULO DE ESPACIO
         $start_row_data = 16;
@@ -661,75 +606,11 @@ class InvoiceService extends Base
 
         $objWorksheet->getPageSetup()->setHorizontalCentered(true);
 
-        // GENERACIÓN DEL ARCHIVO (solo Excel; PDF se genera en ExportarPdf)
-        if (false) { // PDF ahora usa plantilla Twig (ver early return al inicio)
-            $fichero = $data['nombre_archivo'].'.pdf';
-
-            try {
-                if (!class_exists('\Mpdf\Mpdf')) {
-                    throw new \Exception('La librería MPDF no está instalada.');
-                }
-
-                // Configuración Visual PDF
-                $objWorksheet->getPageSetup()->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE);
-                $objWorksheet->getPageSetup()->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_LEGAL);
-
-                // [AJUSTE] Márgenes superiores mayores para evitar solapamiento con el logo
-                $objWorksheet->getPageMargins()->setTop(1.0);
-                $objWorksheet->getPageMargins()->setRight(0.2);
-                $objWorksheet->getPageMargins()->setLeft(0.2);
-                $objWorksheet->getPageMargins()->setBottom(0.5);
-
-                // [AJUSTE] Definir área de impresión exacta
-                $objWorksheet->getPageSetup()->setPrintArea("A1:T{$fila_amount_due}");
-
-                // [AJUSTE] Escala para que quepa en 1 página de ancho
-                $objWorksheet->getPageSetup()->setFitToPage(true);
-                $objWorksheet->getPageSetup()->setFitToWidth(1);
-                $objWorksheet->getPageSetup()->setFitToHeight(0);
-
-                // [AJUSTE] Anchos de columna para que el texto "Retainage" no se corte
-                $objWorksheet->getColumnDimension('R')->setWidth(32);
-                $objWorksheet->getColumnDimension('S')->setWidth(25);
-
-                $objWorksheet->setShowGridlines(false);
-                $objWorksheet->getPageSetup()->setHorizontalCentered(true);
-
-                // [FIX] Eliminar filas vacías más allá del contenido para evitar páginas en blanco en el PDF.
-                // El writer Html/PDF usa getHighestDataRow() y NO el print area, por lo que incluye
-                // todas las filas con datos del template; al eliminar las sobrantes el PDF queda en 1 página.
-                $highestRow = $objWorksheet->getHighestDataRow();
-                if ($highestRow > $fila_amount_due) {
-                    $objWorksheet->removeRow($fila_amount_due + 1, $highestRow - $fila_amount_due);
-                }
-
-                while (ob_get_level()) {
-                    ob_end_clean();
-                }
-
-                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Pdf\Mpdf($objPHPExcel);
-                // Fórmulas desactivadas (ya las calculamos manualmente)
-                $writer->setPreCalculateFormulas(false);
-
-                $path_archivo = 'uploads'.DIRECTORY_SEPARATOR.'invoice'.DIRECTORY_SEPARATOR.$fichero;
-                $directorio = dirname($path_archivo);
-                if (!is_dir($directorio)) {
-                    mkdir($directorio, 0777, true);
-                }
-
-                $writer->save($path_archivo);
-            } catch (\Exception $e) {
-                error_log('Error PDF: '.$e->getMessage());
-
-                return null;
-            }
-        } else {
-            // EXCEL NORMAL
-            $fichero = $data['nombre_archivo'].'.xlsx';
-            $path_archivo = 'uploads'.DIRECTORY_SEPARATOR.'invoice'.DIRECTORY_SEPARATOR.$fichero;
-            $writer = IOFactory::createWriter($objPHPExcel, 'Xlsx');
-            $writer->save($path_archivo);
-        }
+        // GENERACIÓN DEL ARCHIVO (solo Excel; PDF vía {@see ExportarPdf} con plantilla Twig)
+        $fichero = $data['nombre_archivo'].'.xlsx';
+        $path_archivo = 'uploads'.DIRECTORY_SEPARATOR.'invoice'.DIRECTORY_SEPARATOR.$fichero;
+        $writer = IOFactory::createWriter($objPHPExcel, 'Xlsx');
+        $writer->save($path_archivo);
 
         $objPHPExcel->disconnectWorksheets();
         unset($objPHPExcel);
@@ -826,7 +707,7 @@ class InvoiceService extends Base
         }
 
         $currentInvoiceId = $invoice_id;
-        $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoicesHistory = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
         $this->sortInvoicesByStartDateAndId($allInvoicesHistory);
 
         $items = $invoiceItemRepo->ListarItems($invoice_id);
@@ -1203,7 +1084,7 @@ class InvoiceService extends Base
             $notes = $this->ListarNotesDeItemInvoice($value->getId());
             $hasNoteOverride = false;
             foreach ($notes as $note) {
-                if (isset($note['override_unpaid_qty']) && null !== $note['override_unpaid_qty'] && '' !== $note['override_unpaid_qty']) {
+                if (isset($note['override_unpaid_qty']) && '' !== (string) $note['override_unpaid_qty']) {
                     $pending_qty_btd = max(0.0, (float) $note['override_unpaid_qty']);
                     $pending_balance_btd = $pending_qty_btd * $price;
                     $hasNoteOverride = true;
@@ -1342,7 +1223,7 @@ class InvoiceService extends Base
         $current_retainage = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriodRetainageOnly((string) $invoice_id);
         $contract_amount = (float) ($project->getContractAmount() ?? 0);
 
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
         $this->sortInvoicesByStartDateAndId($allInvoices);
 
         $accumulated = 0.0;
@@ -1464,7 +1345,7 @@ class InvoiceService extends Base
         $invoiceRepo = $em->getRepository(Invoice::class);
         $total_contract_amount = (float) ($project->getContractAmount() ?? 0);
 
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
         $this->sortInvoicesByStartDateAndId($allInvoices);
 
         $accumulated_previous_retainage = 0.0;
@@ -1565,18 +1446,18 @@ class InvoiceService extends Base
             }
         }
 
-        $contract_amount = (float) ($ctx['contract_amount'] ?? 0);
-        $total_billed_previous = (float) ($ctx['total_billed_previous'] ?? 0);
+        $contract_amount = (float) $ctx['contract_amount'];
+        $total_billed_previous = (float) $ctx['total_billed_previous'];
         if ($contract_amount > 0 && $total_billed_previous + $total_billed_current > $contract_amount) {
             return ['effective_current_retainage' => 0.0, 'total_retainage_accumulated' => 0.0];
         }
 
-        $accumulated_retainage_previous = (float) ($ctx['accumulated_retainage_amount_previous'] ?? 0);
-        $accumulated_base_previous = (float) ($ctx['accumulated_base_retainage_previous'] ?? 0);
-        $retainage_enabled = (bool) ($ctx['retainage'] ?? false);
-        $pct_default = (float) ($ctx['retainage_percentage'] ?? 0);
-        $pct_adjustment = (float) ($ctx['retainage_adjustment_percentage'] ?? 0);
-        $completion_threshold = (float) ($ctx['retainage_adjustment_completion'] ?? 0);
+        $accumulated_retainage_previous = (float) $ctx['accumulated_retainage_amount_previous'];
+        $accumulated_base_previous = (float) $ctx['accumulated_base_retainage_previous'];
+        $retainage_enabled = (bool) $ctx['retainage'];
+        $pct_default = (float) $ctx['retainage_percentage'];
+        $pct_adjustment = (float) $ctx['retainage_adjustment_percentage'];
+        $completion_threshold = (float) $ctx['retainage_adjustment_completion'];
 
         $total_base_retainage = $accumulated_base_previous + $base_current_retainage;
         $completion_pct = $contract_amount > 0 ? ($total_base_retainage / $contract_amount * 100) : 0.0;
@@ -1594,59 +1475,6 @@ class InvoiceService extends Base
             'effective_current_retainage' => round($current_retainage, 2),
             'total_retainage_accumulated' => round($total_accumulated, 2),
         ];
-    }
-
-    /**
-     * Summary of CalcularPorcientoRetainage.
-     *
-     * @param Project $project_entity
-     * @param float   $total_amount_final
-     *
-     * @return float
-     */
-    private function CalcularPorcientoRetainage($project_entity, $total_amount_final)
-    {
-        $porciento = 0;
-
-        if ($project_entity->getRetainage()) {
-            $porciento = $project_entity->getRetainagePercentage();
-            $porciento_adjustment_percentage = $project_entity->getRetainageAdjustmentPercentage();
-            $porciento_adjustment_completion = $project_entity->getRetainageAdjustmentCompletion();
-            $contract_amount = $project_entity->getContractAmount();
-
-            if ($total_amount_final > $contract_amount * ($porciento_adjustment_completion / 100)) {
-                $porciento = $porciento_adjustment_percentage;
-            }
-        }
-
-        return $porciento;
-    }
-
-    private function CalcularCurrentRetainage($project_id, $porciento_retainage)
-    {
-        if (empty($project_id) || empty($porciento_retainage)) {
-            return 0;
-        }
-
-        /** @var InvoiceRepository $invoiceRepo */
-        $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-        /** @var InvoiceItemRepository $invoiceItemRepo */
-        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-
-        $invoices = $invoiceRepo->ListarInvoicesDeProject($project_id);
-        if (empty($invoices)) {
-            return 0;
-        }
-
-        $total_retainage = 0;
-        foreach ($invoices as $invoice) {
-            $invoice_total = $invoiceItemRepo->TotalInvoiceBroughtForward((string) $invoice->getInvoiceId());
-            if ($invoice_total > 0) {
-                $total_retainage += $invoice_total * $porciento_retainage;
-            }
-        }
-
-        return $total_retainage;
     }
 
     /**
@@ -1813,7 +1641,7 @@ class InvoiceService extends Base
 
         /** @var InvoiceRepository $invoiceRepo */
         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
         $this->sortInvoicesByStartDateAndId($allInvoices);
 
         foreach ($lista as $key => $value) {
@@ -1913,9 +1741,8 @@ class InvoiceService extends Base
                 // Aquí: misma fórmula que sin override (qty/paid acumulados + paidIncrementForHistorialTimeline).
                 // $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
                 $isAfterOverride = (null === $overridePartitionDate)
-                    || (null !== $invStart && $invStart >= $overridePartitionDate)
-                    || (null !== $invStart && null !== $overridePartitionDate
-                        && $this->isSameCalendarMonth($invStart, $overridePartitionDate));
+                    || $invStart >= $overridePartitionDate
+                    || $this->isSameCalendarMonth($invStart, $overridePartitionDate);
 
                 $currentQbf = ($invItem) ? (float) $invItem->getQuantityBroughtForward() : 0.0;
                 $iQty = ($invItem) ? (float) $invItem->getQuantity() : 0.0;
@@ -1996,7 +1823,7 @@ class InvoiceService extends Base
                     // de esta línea”; luego max(0, esa − QBF). No depende del mes del override.
                     if (!$isAfterOverride) {
                         $unpaidBeforeQbfForRow = $this->calculateInvoiceUnpaidQty($historialQty, $historialPaid, 0.0, $historialQbf);
-                    } elseif (null !== $latestOverride && null !== $anchorUnpaidEffective && $isAfterOverride) {
+                    } elseif (null !== $latestOverride && null !== $anchorUnpaidEffective) {
                         if (
                             null !== $invStart && null !== $overrideStartDate
                             && $this->isSameCalendarMonth($invStart, $overrideStartDate)
@@ -2077,7 +1904,7 @@ class InvoiceService extends Base
                 // $isAfterOverride = ($overridePartitionDate === null) || ($currentInvStart !== null && $currentInvStart >= $overridePartitionDate);
                 $isAfterOverride = (null === $overridePartitionDate)
                     || (null !== $currentInvStart && $currentInvStart >= $overridePartitionDate)
-                    || (null !== $currentInvStart && null !== $overridePartitionDate
+                    || (null !== $currentInvStart
                         && $this->isSameCalendarMonth($currentInvStart, $overridePartitionDate));
 
                 if ($isAfterOverride && null !== $latestOverride && null !== $anchorUnpaidEffective) {
@@ -2177,12 +2004,12 @@ class InvoiceService extends Base
             $amount = $quantity * $price;
 
             $pd = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($value);
-            $paid_qty = (float) ($pd['effective'] ?? 0);
+            $paid_qty = (float) $pd['effective'];
             $this->logOverrideInvoice('item_paid_resolved', [
                 'invoice_item_id' => $value->getId(),
                 'project_item_id' => $project_item_id,
                 'paid_effective' => $paid_qty,
-                'paid_base_stored' => $pd['base'] ?? null,
+                'paid_base_stored' => $pd['base'],
                 'override_id' => $pd['override_id'] ?? null,
                 'invoice_period' => $pd['invoice_period'] ?? null,
             ]);
@@ -2229,7 +2056,7 @@ class InvoiceService extends Base
                 'project_item_id' => $project_item_id,
                 'apply_retainage' => $value->getProjectItem()->getApplyRetainage(),
                 'bonded' => $value->getProjectItem()->getBonded() ? 1 : 0,
-                'bond' => $value->getProjectItem()->getItem()->getBond() ? 1 : 0,
+                'bond' => (int) !empty($value->getProjectItem()->getItem()->getBond()),
                 'item_id' => $value->getProjectItem()->getItem()->getItemId(),
                 'code' => $value->getProjectItem()->getCode(),
                 'item' => $value->getProjectItem()->getItem()->getName(),
@@ -2274,13 +2101,6 @@ class InvoiceService extends Base
             $item['sum_bonded_project'] = $sum_bonded_project;
             $item['bond_price'] = $bond_price;
             $item['bond_general'] = $bond_general;
-        }
-
-        // Quitar la clave debug para que no rompa el array de items en JavaScript
-        $debugInfo = null;
-        if (isset($items['_debug'])) {
-            $debugInfo = $items['_debug'];
-            unset($items['_debug']);
         }
 
         $this->logOverrideInvoice('listar_items_done', [
@@ -2406,10 +2226,10 @@ class InvoiceService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $invoice_id) {
                 if ('' != $invoice_id) {
                     ++$cant_total;
@@ -2467,7 +2287,7 @@ class InvoiceService extends Base
             // verificar fechas
             /** @var InvoiceRepository $invoiceRepo */
             $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-            $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+            $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, (string) $start_date, (string) $end_date);
             if (!empty($invoices) && $invoices[0]->getInvoiceId() != $entity->getInvoiceId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'An invoice already exists for that date range';
@@ -2580,7 +2400,7 @@ class InvoiceService extends Base
         // verificar fechas
         /** @var InvoiceRepository $invoiceRepo */
         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-        $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $start_date, $end_date);
+        $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, (string) $start_date, (string) $end_date);
         if (!empty($invoices)) {
             $resultado['success'] = false;
             $resultado['error'] = 'An invoice already exists for that date range';
@@ -2944,7 +2764,7 @@ class InvoiceService extends Base
         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
         // Obtener todos los invoices del proyecto ordenados por fecha
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
 
         $this->sortInvoicesByStartDateAndId($allInvoices);
 
@@ -3020,9 +2840,8 @@ class InvoiceService extends Base
                 // Solo tocar unpaid desde la primera cabecera con unpaid efectivo (misma partición que ListarItemsDeInvoice)
                 // $isAfterOverride = ($overridePartitionDate === null) || ($invStart !== null && $invStart >= $overridePartitionDate);
                 $isAfterOverride = (null === $overridePartitionDate)
-                    || (null !== $invStart && $invStart >= $overridePartitionDate)
-                    || (null !== $invStart && null !== $overridePartitionDate
-                        && $this->isSameCalendarMonth($invStart, $overridePartitionDate));
+                    || $invStart >= $overridePartitionDate
+                    || $this->isSameCalendarMonth($invStart, $overridePartitionDate);
 
                 // Si el invoice es anterior al override, NO modificar su unpaid
                 if (!$isAfterOverride && $invItem) {

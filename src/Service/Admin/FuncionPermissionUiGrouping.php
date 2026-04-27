@@ -72,7 +72,7 @@ final class FuncionPermissionUiGrouping
         /** @var array<string, Funcion> $byUrl */
         $byUrl = [];
         foreach ($funciones as $f) {
-            if ($f instanceof Funcion && null !== $f->getUrl()) {
+            if (null !== $f->getUrl()) {
                 $byUrl[$f->getUrl()] = $f;
             }
         }
@@ -100,7 +100,7 @@ final class FuncionPermissionUiGrouping
 
         $extras = [];
         foreach ($funciones as $f) {
-            if (!$f instanceof Funcion || null === $f->getUrl()) {
+            if (null === $f->getUrl()) {
                 continue;
             }
             if (!isset($assignedUrls[$f->getUrl()])) {

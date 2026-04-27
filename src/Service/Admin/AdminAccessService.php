@@ -43,7 +43,7 @@ class AdminAccessService
     /**
      * Misma lógica habitual en controladores: sesión, tipo Usuario y fila de permiso con "ver" activo.
      *
-     * @return array{usuario: Usuario, permisos: array<int, array<string, mixed>}|RedirectResponse
+     * @return array{usuario: Usuario, permisos: array<int, array<string, mixed>>}|RedirectResponse
      */
     public function exigirUsuarioYPermisoVer(?UserInterface $user, int $functionId): array|RedirectResponse
     {

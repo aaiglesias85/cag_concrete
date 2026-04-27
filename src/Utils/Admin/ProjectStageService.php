@@ -5,6 +5,7 @@ namespace App\Utils\Admin;
 use App\Constants\FunctionId;
 use App\Entity\Estimate;
 use App\Entity\ProjectStage;
+use App\Entity\Usuario;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectStageRepository;
 use App\Utils\Base;
@@ -95,10 +96,10 @@ class ProjectStageService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $stage_id) {
                 if ('' != $stage_id) {
                     ++$cant_total;
@@ -285,6 +286,9 @@ class ProjectStageService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT_STAGE);
 
         $acciones = '';

@@ -695,6 +695,7 @@ class ComposerStaticInit74ab73114a599f4a2997b6a284f9e273
         'PHPStan\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpstan-symfony/src',
+            1 => __DIR__ . '/..' . '/phpstan/phpstan-doctrine/src',
         ),
         'OpenApi\\' =>
         array (

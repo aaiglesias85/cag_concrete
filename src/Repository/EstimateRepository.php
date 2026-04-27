@@ -337,9 +337,7 @@ class EstimateRepository extends ServiceEntityRepository
                 $parts[] = 'e.projectId = :project_id_raw';
                 $consulta->setParameter('project_id_raw', $projectIdRaw);
             }
-            if (count($parts) > 0) {
-                $consulta->andWhere('('.implode(' OR ', $parts).')');
-            }
+            $consulta->andWhere('('.implode(' OR ', $parts).')');
         }
 
         if ($mustHaveDate) {
@@ -391,9 +389,7 @@ class EstimateRepository extends ServiceEntityRepository
                 $parts[] = 'e.projectId = :project_id_raw';
                 $consulta->setParameter('project_id_raw', $projectIdRaw);
             }
-            if (count($parts) > 0) {
-                $consulta->andWhere('('.implode(' OR ', $parts).')');
-            }
+            $consulta->andWhere('('.implode(' OR ', $parts).')');
         }
 
         if ('' !== $fecha_inicial) {

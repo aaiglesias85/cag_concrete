@@ -42,7 +42,7 @@ class SubcontractorService extends Base
     /**
      * ListarEmployeesDeSubcontractor.
      *
-     * @return []
+     * @return list<array<string, mixed>>
      */
     public function ListarEmployeesDeSubcontractor($subcontractor_id)
     {
@@ -556,10 +556,10 @@ class SubcontractorService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $subcontractor_id) {
                 if ('' != $subcontractor_id) {
                     ++$cant_total;

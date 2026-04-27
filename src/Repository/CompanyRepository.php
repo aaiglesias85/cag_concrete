@@ -104,7 +104,7 @@ class CompanyRepository extends ServiceEntityRepository
     /**
      * ListarCompaniesConTotal Lista los companies con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarCompaniesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
     {

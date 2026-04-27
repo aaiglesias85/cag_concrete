@@ -1,0 +1,21 @@
+# Configuración compartida de PHPStan (sin baseline).
+# Uso directo:  vendor/bin/phpstan analyse -c phpstan.full.neon
+# Uso diario (con deuda congelada): phpstan.neon incluye esto + phpstan-baseline.neon
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+    doctrine:
+        objectManagerLoader: phpstan-doctrine-bootstrap.php
+    level: 5
+    paths:
+        - src
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    excludePaths:
+        - vendor/*
+        - var/cache/*
+        - var/log/*
+    reportUnmatchedIgnoredErrors: false

@@ -2,6 +2,7 @@
 
 namespace App\Controller\App;
 
+use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Utils\App\LoginService;
 use App\Utils\App\ProjectService;
 use OpenApi\Attributes as OA;
@@ -13,6 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Project', description: 'Project listing endpoints for mobile app')]
 class ProjectController extends AbstractController
 {
+    use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private ProjectService $projectService;
     private TranslatorInterface $translator;
@@ -117,7 +119,7 @@ class ProjectController extends AbstractController
     )]
     public function listar(Request $request, string $lang = 'es'): JsonResponse
     {
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             $search = (string) $request->query->get('search', '');
@@ -208,7 +210,7 @@ class ProjectController extends AbstractController
     )]
     public function cargarDatos(Request $request, string $lang = 'es'): JsonResponse
     {
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         $project_id = trim((string) ($request->query->get('project_id') ?? ''));
 

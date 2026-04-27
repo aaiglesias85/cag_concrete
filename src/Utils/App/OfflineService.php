@@ -119,9 +119,10 @@ class OfflineService extends Base
                 $imagen = $profile_offline['imagen'];
 
                 // Decodificar imagen base64
-                $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+                $rawB64 = preg_replace('#^data:image/\w+;base64,#i', '', $imagen);
+                $data = is_string($rawB64) ? base64_decode($rawB64, true) : false;
 
-                if (false !== $data) {
+                if (false !== $data && '' !== $data) {
                     // Crear directorio si no existe
                     $dir = 'uploads/usuario/';
                     if (!is_dir($dir)) {

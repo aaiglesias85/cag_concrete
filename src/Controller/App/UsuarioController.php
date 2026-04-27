@@ -3,6 +3,8 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\JsonRequestTrait;
+use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Entity\Usuario;
 use App\Utils\App\LoginService;
 use App\Utils\App\UsuarioService;
 use OpenApi\Attributes as OA;
@@ -15,6 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class UsuarioController extends AbstractController
 {
     use JsonRequestTrait;
+    use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private UsuarioService $usuarioService;
     private TranslatorInterface $translator;
@@ -78,7 +81,7 @@ class UsuarioController extends AbstractController
     public function cargarDatos(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             $resultado = $this->usuarioService->CargarDatosUsuario();
@@ -152,17 +155,20 @@ class UsuarioController extends AbstractController
     public function actualizarDatos(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             // Leer parámetros desde JSON body solamente
             $data = $this->getRequestData($request);
             $user = $this->getUser();
+            if (!$user instanceof Usuario) {
+                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
+            }
             // Si solo se envía preferred_lang, mantener el resto de datos del usuario
-            $nombre = $data['nombre'] ?? $user?->getNombre();
-            $apellidos = $data['apellidos'] ?? $user?->getApellidos();
-            $email = $data['email'] ?? $user?->getEmail();
-            $telefono = $data['telefono'] ?? $user?->getTelefono();
+            $nombre = $data['nombre'] ?? $user->getNombre();
+            $apellidos = $data['apellidos'] ?? $user->getApellidos();
+            $email = $data['email'] ?? $user->getEmail();
+            $telefono = $data['telefono'] ?? $user->getTelefono();
 
             // Contraseñas opcionales (solo si se quiere cambiar)
             $password_actual = $data['password_actual'] ?? '';
@@ -258,7 +264,7 @@ class UsuarioController extends AbstractController
     public function salvarImagen(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             $usuario = $this->getUser();
@@ -282,9 +288,8 @@ class UsuarioController extends AbstractController
                 return $this->json($resultadoJson);
             }
 
-            $data = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
-
-            if (false === $data) {
+            $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen), true);
+            if (false === $binary || '' === $binary) {
                 $resultadoJson['success'] = false;
                 $resultadoJson['error'] = $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages', $lang);
 
@@ -301,7 +306,7 @@ class UsuarioController extends AbstractController
             $foto = $this->usuarioService->generarCadenaAleatoria().'.jpeg';
             $ruta_completa = $dir.$foto;
 
-            file_put_contents($ruta_completa, $data);
+            file_put_contents($ruta_completa, $binary);
 
             // Actualizar imagen del usuario en BD (a través del servicio)
             $resultado = $this->usuarioService->ActualizarImagenPerfil($foto);
@@ -361,7 +366,7 @@ class UsuarioController extends AbstractController
     public function eliminarImagen(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             $resultado = $this->usuarioService->EliminarImagenPerfil();

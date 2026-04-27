@@ -7,6 +7,7 @@ use App\Entity\InvoiceItemOverridePayment;
 use App\Entity\Project;
 use App\Entity\ProjectItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Connection;
 use Doctrine\Persistence\ManagerRegistry;
 
 class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
@@ -169,9 +170,6 @@ class InvoiceItemOverridePaymentRepository extends ServiceEntityRepository
         $bestId = 0;
 
         foreach ($rows as $o) {
-            if (!$o instanceof InvoiceItemOverridePayment) {
-                continue;
-            }
             $hd = $o->getInvoiceOverridePayment()?->getDate();
             if (null === $hd) {
                 continue;

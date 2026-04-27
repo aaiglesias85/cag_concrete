@@ -267,7 +267,7 @@ class DataTrackingRepository extends ServiceEntityRepository
     /**
      * ListarDataTrackingsConTotal Lista los data trackings con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarDataTrackingsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?string $project_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null, ?string $pending = '', ?string $only_punch = ''): array
     {

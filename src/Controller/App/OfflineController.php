@@ -3,6 +3,7 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\JsonRequestTrait;
+use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Utils\App\LoginService;
 use App\Utils\App\OfflineService;
 use OpenApi\Attributes as OA;
@@ -15,6 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class OfflineController extends AbstractController
 {
     use JsonRequestTrait;
+    use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private OfflineService $offlineService;
     private TranslatorInterface $translator;
@@ -77,7 +79,7 @@ class OfflineController extends AbstractController
     )]
     public function listarInformacionRequerida(string $lang = 'es'): JsonResponse
     {
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             $resultado = $this->offlineService->ListarInformacionRequerida();
@@ -177,7 +179,7 @@ class OfflineController extends AbstractController
     public function sincronizar(Request $request, string $lang = 'es'): JsonResponse
     {
         $request->setLocale($lang);
-        $this->translator->setLocale($lang);
+        $this->setTranslatorLocale($this->translator, $lang);
 
         try {
             // Leer datos desde JSON body

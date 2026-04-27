@@ -31,13 +31,17 @@ class AdvertisementRepository extends ServiceEntityRepository
         );
 
         if (!empty($fechaInicial)) {
-            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
-            $qb->setParameter('fechaInicial', $fechaInicialDate);
+            $fechaInicialDate = $this->formatMdyToYmdOrNull($fechaInicial);
+            if (null !== $fechaInicialDate) {
+                $qb->setParameter('fechaInicial', $fechaInicialDate);
+            }
         }
 
         if (!empty($fechaFinal)) {
-            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
-            $qb->setParameter('fechaFinal', $fechaFinalDate);
+            $fechaFinalDate = $this->formatMdyToYmdOrNull($fechaFinal);
+            if (null !== $fechaFinalDate) {
+                $qb->setParameter('fechaFinal', $fechaFinalDate);
+            }
         }
 
         return $qb->orderBy('a.startDate', $sort)
@@ -67,15 +71,19 @@ class AdvertisementRepository extends ServiceEntityRepository
         }
 
         if (!empty($fechaInicial)) {
-            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
-            $qb->andWhere('a.startDate <= :fechaInicial')
-                ->setParameter('fechaInicial', $fechaInicialDate);
+            $fechaInicialDate = $this->formatMdyToYmdOrNull($fechaInicial);
+            if (null !== $fechaInicialDate) {
+                $qb->andWhere('a.startDate <= :fechaInicial')
+                    ->setParameter('fechaInicial', $fechaInicialDate);
+            }
         }
 
         if (!empty($fechaFinal)) {
-            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
-            $qb->andWhere('a.endDate >= :fechaFinal')
-                ->setParameter('fechaFinal', $fechaFinalDate);
+            $fechaFinalDate = $this->formatMdyToYmdOrNull($fechaFinal);
+            if (null !== $fechaFinalDate) {
+                $qb->andWhere('a.endDate >= :fechaFinal')
+                    ->setParameter('fechaFinal', $fechaFinalDate);
+            }
         }
 
         return $qb->orderBy('a.'.$sortColumn, $sortDirection)
@@ -102,15 +110,19 @@ class AdvertisementRepository extends ServiceEntityRepository
         }
 
         if (!empty($fechaInicial)) {
-            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
-            $qb->andWhere('a.startDate <= :fechaInicial')
-                ->setParameter('fechaInicial', $fechaInicialDate);
+            $fechaInicialDate = $this->formatMdyToYmdOrNull($fechaInicial);
+            if (null !== $fechaInicialDate) {
+                $qb->andWhere('a.startDate <= :fechaInicial')
+                    ->setParameter('fechaInicial', $fechaInicialDate);
+            }
         }
 
         if (!empty($fechaFinal)) {
-            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
-            $qb->andWhere('a.endDate >= :fechaFinal')
-                ->setParameter('fechaFinal', $fechaFinalDate);
+            $fechaFinalDate = $this->formatMdyToYmdOrNull($fechaFinal);
+            if (null !== $fechaFinalDate) {
+                $qb->andWhere('a.endDate >= :fechaFinal')
+                    ->setParameter('fechaFinal', $fechaFinalDate);
+            }
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
@@ -139,8 +151,16 @@ class AdvertisementRepository extends ServiceEntityRepository
         $dir = 'DESC' === strtoupper($sortDir) ? 'DESC' : 'ASC';
 
         // Fechas sin hora (DATE)
-        $from = !empty($fecha_inicial) ? \DateTimeImmutable::createFromFormat('m/d/Y', $fecha_inicial) : null;
-        $to = !empty($fecha_fin) ? \DateTimeImmutable::createFromFormat('m/d/Y', $fecha_fin) : null;
+        $from = null;
+        $to = null;
+        if (!empty($fecha_inicial)) {
+            $parsed = \DateTimeImmutable::createFromFormat('m/d/Y', $fecha_inicial);
+            $from = $parsed instanceof \DateTimeImmutable ? $parsed : null;
+        }
+        if (!empty($fecha_fin)) {
+            $parsedTo = \DateTimeImmutable::createFromFormat('m/d/Y', $fecha_fin);
+            $to = $parsedTo instanceof \DateTimeImmutable ? $parsedTo : null;
+        }
 
         $baseQb = $this->createQueryBuilder('a');
 
@@ -180,5 +200,12 @@ class AdvertisementRepository extends ServiceEntityRepository
         $total = (int) $countQb->getQuery()->getSingleScalarResult();
 
         return ['data' => $data, 'total' => $total];
+    }
+
+    private function formatMdyToYmdOrNull(string $mdy): ?string
+    {
+        $d = \DateTime::createFromFormat('m/d/Y', $mdy);
+
+        return $d instanceof \DateTimeInterface ? $d->format('Y-m-d') : null;
     }
 }

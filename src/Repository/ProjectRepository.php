@@ -516,14 +516,16 @@ class ProjectRepository extends ServiceEntityRepository
 
         // Fechas (normaliza a día completo)
         if ('' !== $from) {
-            $fromDt = \DateTimeImmutable::createFromFormat('m/d/Y', $from)?->setTime(0, 0, 0);
-            if ($fromDt) {
+            $fromParsed = \DateTimeImmutable::createFromFormat('m/d/Y', $from);
+            if ($fromParsed instanceof \DateTimeImmutable) {
+                $fromDt = $fromParsed->setTime(0, 0, 0);
                 $qb->andWhere('p.startDate >= :from')->setParameter('from', $fromDt->format('Y-m-d H:i:s'));
             }
         }
         if ('' !== $to) {
-            $toDt = \DateTimeImmutable::createFromFormat('m/d/Y', $to)?->setTime(23, 59, 59);
-            if ($toDt) {
+            $toParsed = \DateTimeImmutable::createFromFormat('m/d/Y', $to);
+            if ($toParsed instanceof \DateTimeImmutable) {
+                $toDt = $toParsed->setTime(23, 59, 59);
                 $qb->andWhere('p.endDate <= :to')->setParameter('to', $toDt->format('Y-m-d H:i:s'));
             }
         }

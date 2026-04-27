@@ -324,7 +324,7 @@ class MessageService extends Base
 
             // Notificación push al destinatario (otro usuario de la conversación)
             $recipient = $conv->getOtherUser($usuario);
-            if ($recipient instanceof Usuario && null !== $recipient->getPushToken() && '' !== $recipient->getPushToken()) {
+            if (null !== $recipient->getPushToken() && '' !== $recipient->getPushToken()) {
                 $senderName = $usuario->getNombreCompleto();
                 $preview = mb_strlen($body) > 80 ? mb_substr($body, 0, 77).'...' : $body;
                 $this->pushNotificationService->sendToDevice(

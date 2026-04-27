@@ -41,14 +41,10 @@ class NotificationRepository extends ServiceEntityRepository
     public function ListarNotificacionesDeProject(int $project_id): array
     {
         $qb = $this->createQueryBuilder('n')
-            ->leftJoin('n.project', 'p');
-
-        if ('' !== $project_id) {
-            $qb->andWhere('p.projectId = :project_id')
-                ->setParameter('project_id', $project_id);
-        }
-
-        $qb->orderBy('n.createdAt', 'DESC');
+            ->leftJoin('n.project', 'p')
+            ->andWhere('p.projectId = :project_id')
+            ->setParameter('project_id', $project_id)
+            ->orderBy('n.createdAt', 'DESC');
 
         return $qb->getQuery()->getResult();
     }

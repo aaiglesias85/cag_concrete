@@ -14,8 +14,7 @@ use App\Repository\InvoiceItemRepository;
 use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\ProjectItemRepository;
 use App\Utils\Base;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ObjectManager;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -65,6 +64,7 @@ class OverrideUnpaidQtyService extends Base
             $fecha_fin ?? ''
         );
 
+        /** @var list<array<string, mixed>> $raw */
         $raw = $result['data'];
         if ([] === $raw) {
             return ['data' => [], 'total' => $result['total']];
@@ -119,8 +119,8 @@ class OverrideUnpaidQtyService extends Base
                 'project_item_id' => $pid,
                 'invoice_item_override_payment_id' => $overrideId,
                 'has_override_unpaid_qty_history' => $hasHistory,
-                'item' => $item?->getItem(),
-                'unit' => $pi?->getUnit()?->getAbrev(),
+                'item' => $item?->getName(),
+                'unit' => $item?->getUnit()?->getDescription(),
                 'contract_qty' => $pi?->getQuantity(),
                 'price' => $pi?->getPrice(),
                 'quantity' => $r['quantity'] ?? null,
@@ -136,6 +136,8 @@ class OverrideUnpaidQtyService extends Base
     }
 
     /**
+     * @param array<int, array<string, mixed>> $itemsDecoded
+     *
      * @return array{success: bool, message?: string, error?: string}
      */
     public function SalvarOverrideUnpaidQty(
@@ -167,9 +169,6 @@ class OverrideUnpaidQtyService extends Base
         $invoiceOverrideHeaderCache = [];
 
         foreach ($itemsDecoded as $data) {
-            if (!is_array($data)) {
-                continue;
-            }
             $projectItemId = isset($data['project_item_id']) ? (int) $data['project_item_id'] : 0;
             $unpaidQtyNew = isset($data['unpaid_qty']) ? (float) $data['unpaid_qty'] : 0.0;
 
@@ -207,7 +206,7 @@ class OverrideUnpaidQtyService extends Base
                 $agg = $invoiceItemRepo->aggregateNonBondInvoiceQtyPaidForProjectItem($projectItemId);
                 $baselineUnpaid = max(
                     0.0,
-                    (float) ($agg['sum_qty_final'] ?? 0) - (float) ($agg['sum_paid_lines'] ?? 0)
+                    (float) $agg['sum_qty_final'] - (float) $agg['sum_paid_lines']
                 );
 
                 $hist = new InvoiceItemOverridePaymentUnpaidQtyHistory();
@@ -241,18 +240,7 @@ class OverrideUnpaidQtyService extends Base
             }
         }
 
-        try {
-            $em->flush();
-        } catch (\Throwable $e) {
-            if (!$this->isUniqueConstraintViolationForUnpaid($e)) {
-                throw $e;
-            }
-
-            return [
-                'success' => false,
-                'error' => 'A payment override already exists for this project and date.',
-            ];
-        }
+        $em->flush();
 
         if ([] !== $itemsDecoded) {
             $logMsg = null !== $project
@@ -268,7 +256,7 @@ class OverrideUnpaidQtyService extends Base
      * @param array<string, InvoiceOverridePayment> $headerCache
      */
     private function resolveInvoiceOverridePaymentHeaderForUnpaid(
-        EntityManagerInterface $em,
+        ObjectManager $em,
         InvoiceOverridePaymentRepository $headerRepo,
         Project $projEntity,
         \DateTimeInterface $endDate,
@@ -288,19 +276,6 @@ class OverrideUnpaidQtyService extends Base
         $headerCache[$key] = $header;
 
         return $header;
-    }
-
-    private function isUniqueConstraintViolationForUnpaid(\Throwable $e): bool
-    {
-        $cur = $e;
-        for ($i = 0; $i < 6 && null !== $cur; ++$i) {
-            if ($cur instanceof UniqueConstraintViolationException) {
-                return true;
-            }
-            $cur = $cur->getPrevious();
-        }
-
-        return false;
     }
 
     /**

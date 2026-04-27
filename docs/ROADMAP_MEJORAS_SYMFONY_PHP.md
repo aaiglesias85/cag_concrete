@@ -6,7 +6,10 @@ Este documento resume el **análisis del estado actual** del proyecto y propone 
 
 ### Ya implementado (fase inicial, bajo impacto)
 
-- **PHPStan** (nivel 5 + extensión Symfony): `composer phpstan` (solo `src/`; `vendor/` está en `excludePaths` por si se pasa un path extra). Requiere contenedor de dev generado: `bin/console cache:warmup --env=dev`. La deuda histórica está en `phpstan-baseline.neon` (ir reduciéndola por módulos).
+- **PHPStan** (nivel 5 + extensión Symfony):
+  - **`composer phpstan`**: analiza `src/` con las mismas reglas **siempre**; **`phpstan-baseline.neon` no desactiva el análisis**, solo hace que **no fallen** los avisos *ya inventariados* (deuda vieja). **Código nuevo o cambios que generen un problema nuevo** siguen haciendo fallar el comando hasta corregirlos o actualizar el baseline a conciencia.
+  - **`composer phpstan:full`**: misma configuración **sin** baseline → ves **toda** la deuda (cientos de avisos), útil para auditorías o planificar fixes.
+  - Config: `phpstan.base.neon` (reglas), `phpstan.neon` (base + baseline), `phpstan.full.neon` (solo base). Antes de analizar: `bin/console cache:warmup --env=dev`. Si el equipo acordó regenerar baseline: `vendor/bin/phpstan analyse --memory-limit=512M --generate-baseline phpstan-baseline.neon` (con `phpstan.neon` activo).
 - **PHP-CS-Fixer** (reglas `@Symfony`, ámbito `src/`, `tests/`, `config/`): `composer cs-check` / `composer cs-fix`. No entra en `composer quality` hasta normalizar el estilo del repo por partes.
 - **Hook Git `pre-push`** (`.githooks/pre-push`): antes de cada `git push` ejecuta `composer cs-fix` y, si el árbol queda limpio, `composer phpstan`. Activar una vez por clon: `composer install-git-hooks` (configura `core.hooksPath .githooks`). Omitir si hace falta: `SKIP_PRE_PUSH=1 git push` o `git push --no-verify`.
 - **Metronic (estáticos):** tema y JS propios en `public/assets/metronic8/` (antes `public/bundles/metronic8/`), referencias vía `asset('assets/metronic8/...')` para no ser borrados por `assets:install`.

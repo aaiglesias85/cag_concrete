@@ -1361,7 +1361,7 @@ class ProjectController extends AbstractAdminController
             // 4. GUARDAR HISTORIAL
             $history = new ReimbursementHistory();
             $history->setInvoice($invoice);
-            $history->setAmount($amount_to_add);
+            $history->setAmount(sprintf('%.2f', $amount_to_add));
             $history->setCreatedAt(new \DateTime());
 
             $em->persist($history);

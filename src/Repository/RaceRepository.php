@@ -35,7 +35,7 @@ class RaceRepository extends ServiceEntityRepository
     /**
      * ListarRacesConTotal Lista los races con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarRacesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

@@ -112,7 +112,7 @@ return array(
     'PhpOffice\\PhpSpreadsheet\\' => array($vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet'),
     'PhpCsFixer\\' => array($vendorDir . '/friendsofphp/php-cs-fixer/src'),
     'PHPStan\\PhpDocParser\\' => array($vendorDir . '/phpstan/phpdoc-parser/src'),
-    'PHPStan\\' => array($vendorDir . '/phpstan/phpstan-symfony/src'),
+    'PHPStan\\' => array($vendorDir . '/phpstan/phpstan-symfony/src', $vendorDir . '/phpstan/phpstan-doctrine/src'),
     'OpenApi\\' => array($vendorDir . '/zircote/swagger-php/src'),
     'Nelmio\\CorsBundle\\' => array($vendorDir . '/nelmio/cors-bundle'),
     'Nelmio\\ApiDocBundle\\' => array($vendorDir . '/nelmio/api-doc-bundle/src'),

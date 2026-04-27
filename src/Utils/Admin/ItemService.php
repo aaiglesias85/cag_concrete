@@ -12,6 +12,7 @@ use App\Entity\Item;
 use App\Entity\ProjectItem;
 use App\Entity\SyncQueueQbwc;
 use App\Entity\Unit;
+use App\Entity\Usuario;
 use App\Repository\DataTrackingItemRepository;
 use App\Repository\DataTrackingSubcontractRepository;
 use App\Repository\EstimateQuoteItemRepository;
@@ -199,26 +200,6 @@ class ItemService extends Base
     }
 
     /**
-     * SePuedeEliminarItem.
-     *
-     * @return string
-     */
-    private function SePuedeEliminarItem($item_id)
-    {
-        $texto_error = '';
-
-        // projects
-        /** @var ProjectItemRepository $projectItemRepo */
-        $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
-        $projects = $projectItemRepo->ListarProjectsDeItem($item_id);
-        if (!empty($projects)) {
-            $texto_error = 'The item could not be deleted, because it has associated projects';
-        }
-
-        return $texto_error;
-    }
-
-    /**
      * EliminarItems: Elimina los items seleccionados en la BD.
      *
      * @param int $ids Ids
@@ -229,10 +210,10 @@ class ItemService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $item_id) {
                 if ('' != $item_id) {
                     ++$cant_total;
@@ -522,6 +503,9 @@ class ItemService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::ITEM);
 
         $acciones = '';

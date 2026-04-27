@@ -99,10 +99,10 @@ class EmployeeRoleService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $role_id) {
                 if ('' != $role_id) {
                     ++$cant_total;
@@ -113,10 +113,10 @@ class EmployeeRoleService extends Base
                         // employees
                         /** @var EmployeeRepository $employeeRepo */
                         $employeeRepo = $this->getDoctrine()->getRepository(Employee::class);
-                        $employees = $employeeRepo->ListarEmployeesDeRole($role_id);
+                        $employees = $employeeRepo->ListarEmployeesDeRole((int) $role_id);
                         if (0 === count($employees)) {
                             // eliminar informacion relacionada
-                            $this->EliminarInformacionRelacionada($role_id);
+                            $this->EliminarInformacionRelacionada((int) $role_id);
 
                             $description = $entity->getDescription();
 

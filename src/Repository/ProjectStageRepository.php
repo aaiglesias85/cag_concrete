@@ -88,7 +88,7 @@ class ProjectStageRepository extends ServiceEntityRepository
     /**
      * ListarStagesConTotal Lista los stages con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarStagesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

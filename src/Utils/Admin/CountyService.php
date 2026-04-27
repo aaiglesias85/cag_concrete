@@ -98,10 +98,10 @@ class CountyService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
 
             foreach ($ids as $county_id) {
                 if ('' != $county_id) {
@@ -114,7 +114,7 @@ class CountyService extends Base
                         $se_puede_eliminar = $this->SePuedeEliminarCounty($county_id);
                         if ('' === $se_puede_eliminar) {
                             // eliminar informacion relacionada
-                            $this->EliminarInformacionDeCounty($county_id);
+                            $this->EliminarInformacionDeCounty((int) $county_id);
 
                             $county_descripcion = $entity->getDescription();
 

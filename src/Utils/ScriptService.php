@@ -200,7 +200,7 @@ class ScriptService extends Base
             // Obtener items_id del ajuste (puede estar vacío para todos los items)
             $items_id_str = $ajuste->getItemsId();
             $items_id_array = [];
-            if ($items_id_str && '' !== $items_id_str) {
+            if (null !== $items_id_str && '' !== $items_id_str) {
                 $items_id_array = array_map('trim', explode(',', $items_id_str));
             }
 
@@ -314,7 +314,7 @@ class ScriptService extends Base
         if (null == $county) {
             $county = new County();
             $county->setDescription($descripcion);
-            $county->setStatus(1);
+            $county->setStatus(true);
             $em->persist($county);
             $em->flush();
         }

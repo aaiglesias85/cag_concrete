@@ -134,7 +134,7 @@ class CountyRepository extends ServiceEntityRepository
     /**
      * ListarCountysConTotal Lista los countys con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarCountysConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC', $district_id = ''): array
     {

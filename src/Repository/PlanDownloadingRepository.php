@@ -88,7 +88,7 @@ class PlanDownloadingRepository extends ServiceEntityRepository
     /**
      * ListarPlansConTotal Lista los plans con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarPlansConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

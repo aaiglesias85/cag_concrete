@@ -58,7 +58,7 @@ class EstimateNoteItemService extends Base
         $cant_total = 0;
 
         if ('' !== $ids) {
-            $ids = explode(',', $ids);
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $id) {
                 $id = trim($id);
                 if ('' === $id) {

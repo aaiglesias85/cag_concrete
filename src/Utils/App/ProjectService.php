@@ -2,7 +2,6 @@
 
 namespace App\Utils\App;
 
-use App\Repository\ProjectRepository;
 use App\Utils\Admin\ProjectService as AdminProjectService;
 use App\Utils\Base;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -14,8 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProjectService extends Base
 {
-    private ProjectRepository $projectRepository;
-
     private ContainerInterface $container;
 
     public function __construct(
@@ -24,10 +21,8 @@ class ProjectService extends Base
         \Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface $containerBag,
         \Symfony\Bundle\SecurityBundle\Security $security,
         \Psr\Log\LoggerInterface $logger,
-        ProjectRepository $projectRepository,
     ) {
         parent::__construct($container, $mailer, $containerBag, $security, $logger);
-        $this->projectRepository = $projectRepository;
         $this->container = $container;
     }
 

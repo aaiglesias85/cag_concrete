@@ -16,7 +16,7 @@ class UserQbwcTokenRepository extends ServiceEntityRepository
     /**
      * BuscarToken: Buscar un token.
      *
-     * @return UserQbwcToken
+     * @return UserQbwcToken|null
      */
     public function BuscarToken($token)
     {

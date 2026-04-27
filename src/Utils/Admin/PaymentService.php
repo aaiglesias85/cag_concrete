@@ -83,7 +83,7 @@ class PaymentService extends Base
     /**
      * SalvarNotesItem.
      *
-     * @param float|null $override_unpaid_qty
+     * @param string|float|null $override_unpaid_qty
      *
      * @return array
      */
@@ -113,7 +113,7 @@ class PaymentService extends Base
             }
 
             $entity->setNotes($notes);
-            if (null !== $override_unpaid_qty && '' !== $override_unpaid_qty) {
+            if (null !== $override_unpaid_qty && '' !== (string) $override_unpaid_qty) {
                 $entity->setOverrideUnpaidQty((float) $override_unpaid_qty);
                 // Registrar historial de cambio de unpaid qty (cantidad anterior -> nueva)
                 $this->RegistrarHistorialUnpaidQty($invoice_item_entity, (float) $override_unpaid_qty);
@@ -166,7 +166,7 @@ class PaymentService extends Base
 
         $notes = $this->ListarNotesDeItemInvoice($invoice_item_entity->getId());
         foreach ($notes as $note) {
-            if (isset($note['override_unpaid_qty']) && null !== $note['override_unpaid_qty'] && '' !== $note['override_unpaid_qty']) {
+            if (isset($note['override_unpaid_qty']) && '' !== (string) $note['override_unpaid_qty']) {
                 $unpaid_effective = (float) $note['override_unpaid_qty'];
                 break;
             }
@@ -190,7 +190,8 @@ class PaymentService extends Base
         $history->setOldValue((string) $old_value);
         $history->setNewValue((string) $new_value);
         $history->setCreatedAt(new \DateTime());
-        $history->setUser($this->getUser());
+        $user = $this->getUser();
+        $history->setUser($user instanceof \App\Entity\Usuario ? $user : null);
         $em->persist($history);
     }
 
@@ -237,7 +238,7 @@ class PaymentService extends Base
     {
         $resultado = [];
 
-        $archivos = explode(',', $archivos);
+        $archivos = explode(',', (string) $archivos);
         foreach ($archivos as $archivo) {
             // Eliminar archivo
             $dir = 'uploads/invoice/';
@@ -598,16 +599,9 @@ class PaymentService extends Base
             /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
             $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-            $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
-               ? $projectItemRepo->TotalBondedProjectItems($project->getProjectId())
-               : 0;
-
-            $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
-               ? $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId())
-               : 0;
-            $bond_general = method_exists($projectItemRepo, 'TotalBondAmountProjectItems')
-               ? $projectItemRepo->TotalBondAmountProjectItems($project->getProjectId())
-               : 0;
+            $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project->getProjectId());
+            $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project->getProjectId());
+            $bond_general = $projectItemRepo->TotalBondAmountProjectItems($project->getProjectId());
             foreach ($payments as &$p) {
                 $p['sum_bonded_project'] = $sum_bonded_project;
                 $p['bond_price'] = $bond_price;
@@ -674,19 +668,6 @@ class PaymentService extends Base
         }
 
         return $resultado;
-    }
-
-    /**
-     * Calcula el porcentaje de retainage.
-     */
-    private function CalcularPorcientoRetainage($project_entity)
-    {
-        $porciento = 0;
-        if ($project_entity->getRetainage()) {
-            $porciento = $project_entity->getRetainagePercentage();
-        }
-
-        return $porciento;
     }
 
     /**
@@ -787,13 +768,8 @@ class PaymentService extends Base
             /** @var \App\Repository\ProjectItemRepository $projectItemRepo */
             $projectItemRepo = $this->getDoctrine()->getRepository(\App\Entity\ProjectItem::class);
 
-            $sum_bonded_project = method_exists($projectItemRepo, 'TotalBondedProjectItems')
-               ? $projectItemRepo->TotalBondedProjectItems($project_id)
-               : 0;
-
-            $bond_price = method_exists($projectItemRepo, 'TotalBondPriceProjectItems')
-               ? $projectItemRepo->TotalBondPriceProjectItems($project_id)
-               : 0;
+            $sum_bonded_project = $projectItemRepo->TotalBondedProjectItems($project_id);
+            $bond_price = $projectItemRepo->TotalBondPriceProjectItems($project_id);
 
             foreach ($items as &$item) {
                 $item['sum_bonded_project'] = $sum_bonded_project;
@@ -872,7 +848,7 @@ class PaymentService extends Base
     /**
      * SalvarArchivos.
      *
-     * @param Project $entity
+     * @param Invoice $entity
      *
      * @return void
      */
@@ -991,7 +967,7 @@ class PaymentService extends Base
         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
 
         // Obtener todos los invoices del proyecto ordenados por fecha de inicio
-        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, '', '', '');
+        $allInvoices = $invoiceRepo->ListarInvoicesRangoFecha('', (string) $project_id, '', '', '');
 
         // Filtrar solo los invoices posteriores al actual (por fecha de inicio o ID)
         // IMPORTANTE: El invoice actual ($current_invoice_id) NUNCA se incluye aquí
@@ -1157,8 +1133,7 @@ class PaymentService extends Base
 
         $invoice = $this->getDoctrine()->getRepository(Invoice::class)
            ->find($invoice_id);
-        /** @var Invoice $invoice */
-        if (!is_null($invoice)) {
+        if (null !== $invoice) {
             // Verificar si ya está pagado - si está pagado, no hacer nada
             if ($invoice->getPaid()) {
                 $resultado['success'] = false;
@@ -1260,7 +1235,7 @@ class PaymentService extends Base
         if (null != $entity) {
             if ($amount > 0) {
                 $history = new ReimbursementHistory();
-                $history->setAmount($amount);
+                $history->setAmount(number_format($amount, 2, '.', ''));
                 $history->setCreatedAt(new \DateTime());
 
                 $history->setInvoice($entity);
@@ -1268,18 +1243,10 @@ class PaymentService extends Base
                 $em->persist($history);
             }
 
-            if (method_exists($entity, 'setRetainageReimbursed')) {
-                $entity->setRetainageReimbursed((bool) $reimbursed);
-            }
-
-            if (method_exists($entity, 'setRetainageReimbursedAmount')) {
-                $entity->setRetainageReimbursedAmount($amount);
-            }
-
-            if (method_exists($entity, 'setRetainageReimbursedDate')) {
-                $fecha = (1 == $reimbursed) ? new \DateTime() : null;
-                $entity->setRetainageReimbursedDate($fecha);
-            }
+            $entity->setRetainageReimbursed((bool) $reimbursed);
+            $entity->setRetainageReimbursedAmount($amount);
+            $fecha = (1 == $reimbursed) ? new \DateTime() : null;
+            $entity->setRetainageReimbursedDate($fecha);
 
             $em->persist($entity);
             $em->flush();

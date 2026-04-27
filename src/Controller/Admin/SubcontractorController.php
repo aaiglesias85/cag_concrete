@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Constants\FunctionId;
 use App\Http\DataTablesHelper;
 use App\Service\Admin\AdminAccessService;
-use App\Utils\Admin\CompanyService;
 use App\Utils\Admin\SubcontractorService;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,13 +12,11 @@ use Symfony\Component\HttpFoundation\Request;
 class SubcontractorController extends AbstractAdminController
 {
     private $subcontractorService;
-    private CompanyService $companyService;
 
-    public function __construct(AdminAccessService $adminAccess, SubcontractorService $subcontractorService, CompanyService $companyService)
+    public function __construct(AdminAccessService $adminAccess, SubcontractorService $subcontractorService)
     {
         parent::__construct($adminAccess);
         $this->subcontractorService = $subcontractorService;
-        $this->companyService = $companyService;
     }
 
     public function index()

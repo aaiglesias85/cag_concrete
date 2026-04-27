@@ -120,7 +120,7 @@ class ItemRepository extends ServiceEntityRepository
     /**
      * ListarItemsConTotal Lista los items con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarItemsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
     {

@@ -870,7 +870,7 @@ class Base
             $ip = $this->getIP();
             $entity->setIp($ip);
 
-            $entity->setUsuario($usuario);
+            $entity->setUsuario($usuario instanceof \App\Entity\Usuario ? $usuario : null);
 
             $entity->setFecha(new \DateTime());
 
@@ -1040,7 +1040,7 @@ class Base
         $item_entity->setName($value->item);
         $item_entity->setDescription((string) ($value->item ?? ''));
         $item_entity->setPrice($value->price);
-        $item_entity->setStatus(1);
+        $item_entity->setStatus(true);
         $item_entity->setYieldCalculation($value->yield_calculation);
 
         if (isset($value->bond)) {
@@ -1422,7 +1422,7 @@ class Base
 
         /** @var \App\Repository\DataTrackingConcVendorRepository $dataTrackingConcVendorRepo */
         $dataTrackingConcVendorRepo = $this->getDoctrine()->getRepository(DataTrackingConcVendor::class);
-        $total_conc_used = $dataTrackingConcVendorRepo->TotalConcUsed($data_tracking_id);
+        $total_conc_used = $dataTrackingConcVendorRepo->TotalConcUsed((string) $data_tracking_id);
 
         /** @var \App\Repository\DataTrackingItemRepository $dataTrackingItemRepo */
         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
@@ -1489,13 +1489,11 @@ class Base
     /**
      * getCountiesDescriptionForProject: Obtiene la descripción de los counties de un project desde la tabla intermedia.
      *
-     * @param Project $project
-     *
      * @return string
      */
-    public function getCountiesDescriptionForProject($project)
+    public function getCountiesDescriptionForProject(Project $project)
     {
-        if (null === $project || null === $project->getProjectId()) {
+        if (null === $project->getProjectId()) {
             return '';
         }
 
@@ -1623,7 +1621,7 @@ class Base
         }
         if (!$is_bond_item) {
             foreach ($notes as $note) {
-                if (isset($note['override_unpaid_qty']) && null !== $note['override_unpaid_qty'] && '' !== $note['override_unpaid_qty']) {
+                if (isset($note['override_unpaid_qty']) && '' !== (string) $note['override_unpaid_qty']) {
                     $unpaid_qty = (float) $note['override_unpaid_qty'];
                     break;
                 }

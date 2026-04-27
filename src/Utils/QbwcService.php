@@ -72,7 +72,7 @@ class QbwcService extends Base
 
                     foreach ($ret->InvoiceLineRet as $lineRet) {
                         $txnLineId = (string) $lineRet->TxnLineID;
-                        $itemFullName = (string) $lineRet->ItemRef->FullName ?? null;
+                        $itemFullName = isset($lineRet->ItemRef) ? (string) $lineRet->ItemRef->FullName : '';
 
                         /** @var \App\Repository\InvoiceItemRepository $invoiceItemRepo */
                         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
@@ -115,7 +115,6 @@ class QbwcService extends Base
                 $syncItem = $queueItems[0];
                 $syncItem->setEstado('sincronizado');
 
-                /** @var Item $item */
                 $item = $this->getDoctrine()->getRepository(Item::class)->find($syncItem->getEntidadId());
                 if (null !== $item) {
                     $item->setTxnId($listId);
@@ -170,12 +169,12 @@ class QbwcService extends Base
             switch ($tipo) {
                 case 'invoice':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
-                    $qbxml = $this->generateInvoiceQBXML($entidadId);
+                    $qbxml = $this->generateInvoiceQBXML((int) $entidadId);
                     $this->writeLog($qbxml);
                     break;
                 case 'item':
                     $this->writeLog("Generando XML para tipo: {$tipo} ID: {$entidadId}");
-                    $qbxml = $this->generateItemQBXML($entidadId);
+                    $qbxml = $this->generateItemQBXML((int) $entidadId);
                     $this->writeLog($qbxml);
                     break;
             }
@@ -196,8 +195,7 @@ class QbwcService extends Base
     private function generateItemQBXML(int $itemId): string
     {
         $item = $this->getDoctrine()->getRepository(Item::class)->find($itemId);
-        /** @var Item $item */
-        if (!$item) {
+        if (!$item instanceof Item) {
             return '';
         }
 
@@ -319,27 +317,10 @@ class QbwcService extends Base
           */
     }
 
-    private function generateListarItemsQBXML()
-    {
-        $xml = '<?xml version="1.0" encoding="utf-8"?>'."\n";
-        $xml .= '<?qbxml version="16.0"?>'."\n";
-        $xml .= '<QBXML>';
-        $xml .= '<QBXMLMsgsRq onError="stopOnError">';
-        $xml .= '  <ItemQueryRq>';
-        $xml .= '    <MaxReturned>1000</MaxReturned>';
-        $xml .= '    <ActiveStatus>All</ActiveStatus>';
-        $xml .= '  </ItemQueryRq>';
-        $xml .= '</QBXMLMsgsRq>';
-        $xml .= '</QBXML>';
-
-        return $xml;
-    }
-
     private function generateInvoiceQBXML(int $invoiceId): string
     {
         $invoice = $this->getDoctrine()->getRepository(Invoice::class)->find($invoiceId);
-        /** @var Invoice $invoice */
-        if (!$invoice) {
+        if (!$invoice instanceof Invoice) {
             return '';
         }
 

@@ -125,7 +125,7 @@ class SubcontractorNotesRepository extends ServiceEntityRepository
     /**
      * ListarNotesConTotal Lista los notes con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarNotesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'date', string $sortDirection = 'DESC', ?int $subcontractorId = null, ?string $fechaInicial = null, ?string $fechaFinal = null): array
     {

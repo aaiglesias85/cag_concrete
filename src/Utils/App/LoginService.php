@@ -8,11 +8,13 @@ use App\Repository\UsuarioRepository;
 use App\Utils\Base;
 use Firebase\JWT\JWT;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginService extends Base
 {
     private RequestStack $requestStack;
+
     private TranslatorInterface $translator;
 
     public function __construct(
@@ -27,6 +29,13 @@ class LoginService extends Base
         parent::__construct($container, $mailer, $containerBag, $security, $logger);
         $this->requestStack = $requestStack;
         $this->translator = $translator;
+    }
+
+    private function setTranslatorLocale(string $locale): void
+    {
+        if ($this->translator instanceof LocaleAwareInterface) {
+            $this->translator->setLocale($locale);
+        }
     }
 
     /**
@@ -106,13 +115,13 @@ class LoginService extends Base
             } else {
                 // Usuario bloqueado
                 $resultado['success'] = false;
-                $this->translator->setLocale($lang);
+                $this->setTranslatorLocale($lang);
                 $resultado['error'] = $this->translator->trans('login.autenticar.usuario_bloqueado', [], 'messages', $lang);
             }
         } else {
             // Credenciales incorrectas
             $resultado['success'] = false;
-            $this->translator->setLocale($lang);
+            $this->setTranslatorLocale($lang);
             $resultado['error'] = $this->translator->trans('login.autenticar.error_login', [], 'messages', $lang);
         }
 
@@ -205,7 +214,7 @@ class LoginService extends Base
 
         // Extract token from "Bearer <token>" format
         $matches = [];
-        if (preg_match('/Bearer\s+(.*)$/i', $authorizationHeader, $matches) && isset($matches[1])) {
+        if (preg_match('/Bearer\s+(.*)$/i', $authorizationHeader, $matches)) {
             return $matches[1];
         }
 

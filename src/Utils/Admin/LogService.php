@@ -50,7 +50,7 @@ class LogService extends Base
         $em = $this->getDoctrine()->getManager();
 
         if ('' != $ids) {
-            $ids = explode(',', $ids);
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $log_id) {
                 if ('' != $log_id) {
                     $log = $this->getDoctrine()->getRepository(Log::class)
@@ -85,7 +85,7 @@ class LogService extends Base
 
         /** @var LogRepository $logRepo */
         $logRepo = $this->getDoctrine()->getRepository(Log::class);
-        $lista = $logRepo->ListarLogsRangoFecha('', '', 30, $usuario_id, 'DESC');
+        $lista = $logRepo->ListarLogsRangoFecha('', '', 30, (string) $usuario_id, 'DESC');
 
         foreach ($lista as $value) {
             $arreglo_resultado[$cont]['log_id'] = $value->getLogId();
@@ -175,6 +175,9 @@ class LogService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::LOG);
 
         $acciones = '';

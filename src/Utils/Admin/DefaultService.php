@@ -119,17 +119,12 @@ class DefaultService extends Base
         $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
         $ids = [];
         foreach ($resultado['data'] as $invoice) {
-            if ($invoice instanceof Invoice) {
-                $ids[] = (int) $invoice->getInvoiceId();
-            }
+            $ids[] = (int) $invoice->getInvoiceId();
         }
         $amountsById = $invoiceItemRepo->mapTotalInvoiceFinalAmountThisPeriodByInvoiceIds($ids);
 
         $out = [];
         foreach ($resultado['data'] as $invoice) {
-            if (!$invoice instanceof Invoice) {
-                continue;
-            }
             $invoiceId = (int) $invoice->getInvoiceId();
             $amount = (float) ($amountsById[$invoiceId] ?? 0);
             $invoiceNumber = (string) ($invoice->getNumber() ?? '');
@@ -312,7 +307,7 @@ class DefaultService extends Base
                 $uid = (int) $u->getUsuarioId();
                 $key = 'u_'.$uid;
                 if (!isset($acc[$key])) {
-                    $fullName = trim((string) ($u->getNombreCompleto() ?? ''));
+                    $fullName = trim((string) $u->getNombreCompleto());
                     if ('' === $fullName) {
                         $fullName = trim((string) (($u->getNombre() ?? '').' '.($u->getApellidos() ?? '')));
                     }
@@ -548,15 +543,10 @@ class DefaultService extends Base
         $invoices = $invoiceRepo->ListarInvoicesRangoFecha('', $project_id, $fecha_inicial, $fecha_fin, $status);
         $invIds = [];
         foreach ($invoices as $inv) {
-            if ($inv instanceof Invoice) {
-                $invIds[] = (int) $inv->getInvoiceId();
-            }
+            $invIds[] = (int) $inv->getInvoiceId();
         }
         $amountsById = $invoiceItemRepo->mapTotalInvoiceLineAmountByInvoiceIds($invIds);
         foreach ($invoices as $invoice) {
-            if (!$invoice instanceof Invoice) {
-                continue;
-            }
             $amount = (float) ($amountsById[(int) $invoice->getInvoiceId()] ?? 0);
 
             $porciento = $total > 0 ? round($amount / $total * 100) : 0;
@@ -740,7 +730,7 @@ class DefaultService extends Base
 
             /** @var InvoiceItemRepository $invoiceItemRepo */
             $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $amount = $invoiceItemRepo->TotalInvoice('', '', $project_id);
+            $amount = $invoiceItemRepo->TotalInvoice('', '', $project_id !== null ? (string) $project_id : null);
             if ($amount > 0) {
                 $arreglo_resultado[] = [
                     'project_id' => $project_id,

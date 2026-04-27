@@ -56,7 +56,7 @@ class MaterialService extends Base
             // materials
             /** @var DataTrackingMaterialRepository $dataTrackingMaterialRepo */
             $dataTrackingMaterialRepo = $this->getDoctrine()->getRepository(DataTrackingMaterial::class);
-            $data_tracking_materials = $dataTrackingMaterialRepo->ListarDataTrackingsDeMaterial($material_id);
+            $data_tracking_materials = $dataTrackingMaterialRepo->ListarDataTrackingsDeMaterial((string) $material_id);
             foreach ($data_tracking_materials as $data_tracking_material) {
                 $em->remove($data_tracking_material);
             }
@@ -92,10 +92,10 @@ class MaterialService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $material_id) {
                 if ('' != $material_id) {
                     ++$cant_total;
@@ -106,7 +106,7 @@ class MaterialService extends Base
                         // materials
                         /** @var DataTrackingMaterialRepository $dataTrackingMaterialRepo */
                         $dataTrackingMaterialRepo = $this->getDoctrine()->getRepository(DataTrackingMaterial::class);
-                        $data_tracking_materials = $dataTrackingMaterialRepo->ListarDataTrackingsDeMaterial($material_id);
+                        $data_tracking_materials = $dataTrackingMaterialRepo->ListarDataTrackingsDeMaterial((string) $material_id);
                         foreach ($data_tracking_materials as $data_tracking_material) {
                             $em->remove($data_tracking_material);
                         }

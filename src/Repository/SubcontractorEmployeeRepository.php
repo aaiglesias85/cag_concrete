@@ -91,7 +91,7 @@ class SubcontractorEmployeeRepository extends ServiceEntityRepository
     /**
      * ListarEmployeesConTotal Lista los employees con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarEmployeesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC', ?int $subcontractorId = null): array
     {

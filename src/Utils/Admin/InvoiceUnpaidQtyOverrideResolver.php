@@ -42,9 +42,6 @@ class InvoiceUnpaidQtyOverrideResolver
         $rows = $this->overrideRepo->ListarPorProjectItem($projectItemId);
         $best = null;
         foreach ($rows as $o) {
-            if (!$o instanceof InvoiceItemOverridePayment) {
-                continue;
-            }
             if (null === $this->getEffectiveUnpaidFromOverrideRow($o)) {
                 continue;
             }

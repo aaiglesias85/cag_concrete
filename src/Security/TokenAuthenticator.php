@@ -72,7 +72,7 @@ class TokenAuthenticator extends AbstractAuthenticator
 
         // Extract token from "Bearer <token>" format
         $matches = [];
-        if (preg_match('/Bearer\s+(.*)$/i', $authorizationHeader, $matches) && isset($matches[1])) {
+        if (preg_match('/Bearer\s+(.*)$/i', $authorizationHeader, $matches)) {
             return $matches[1];
         }
 

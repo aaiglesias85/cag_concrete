@@ -152,7 +152,7 @@ class UsuarioRepository extends ServiceEntityRepository
     /**
      * Listar usuarios que tienen un roles específico.
      *
-     * @param int $roles array de roles
+     * @param list<int> $roles Ids de rol
      *
      * @return Usuario[]
      */

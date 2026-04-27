@@ -503,16 +503,20 @@ class DataTrackingSubcontractRepository extends ServiceEntityRepository
 
         // Filtro por fecha inicial
         if (!empty($fechaInicial)) {
-            $fechaInicialDate = \DateTime::createFromFormat('m/d/Y', $fechaInicial)?->format('Y-m-d');
-            $qb->andWhere('d_t.date >= :fechaInicial')
-                ->setParameter('fechaInicial', $fechaInicialDate);
+            $dIni = \DateTime::createFromFormat('m/d/Y', $fechaInicial);
+            if ($dIni instanceof \DateTimeInterface) {
+                $qb->andWhere('d_t.date >= :fechaInicial')
+                    ->setParameter('fechaInicial', $dIni->format('Y-m-d'));
+            }
         }
 
         // Filtro por fecha final
         if (!empty($fechaFinal)) {
-            $fechaFinalDate = \DateTime::createFromFormat('m/d/Y', $fechaFinal)?->format('Y-m-d');
-            $qb->andWhere('d_t.date <= :fechaFinal')
-                ->setParameter('fechaFinal', $fechaFinalDate);
+            $dFin = \DateTime::createFromFormat('m/d/Y', $fechaFinal);
+            if ($dFin instanceof \DateTimeInterface) {
+                $qb->andWhere('d_t.date <= :fechaFinal')
+                    ->setParameter('fechaFinal', $dFin->format('Y-m-d'));
+            }
         }
 
         return (float) $qb->getQuery()->getSingleScalarResult();

@@ -50,4 +50,18 @@ class Widget
     {
         return $this->sortOrder;
     }
+
+    public function setCode(string $code): self
+    {
+        $this->code = $code;
+
+        return $this;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+
+        return $this;
+    }
 }

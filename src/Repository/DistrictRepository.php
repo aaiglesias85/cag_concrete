@@ -88,7 +88,7 @@ class DistrictRepository extends ServiceEntityRepository
     /**
      * ListarDistrictsConTotal Lista los districts con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarDistrictsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

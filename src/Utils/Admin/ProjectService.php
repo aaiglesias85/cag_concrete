@@ -27,6 +27,7 @@ use App\Entity\InvoiceOverridePayment;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\Project;
+use App\Entity\Usuario;
 use App\Entity\ProjectAttachment;
 use App\Entity\ProjectConcreteClass;
 use App\Entity\ProjectContact;
@@ -49,6 +50,7 @@ use App\Repository\InvoiceItemOverridePaymentPaidQtyHistoryRepository;
 use App\Repository\InvoiceItemOverridePaymentRepository;
 use App\Repository\InvoiceItemOverridePaymentUnpaidQtyHistoryRepository;
 use App\Repository\InvoiceItemRepository;
+use App\Repository\InvoiceOverridePaymentRepository;
 use App\Repository\InvoiceRepository;
 use App\Repository\NotificationRepository;
 use App\Repository\ProjectAttachmentRepository;
@@ -99,8 +101,6 @@ class ProjectService extends Base
      */
     private array $previousInvoiceTotalsByProjectItem = [];
 
-    private const DEBUG_COMPLETION_PAID_TRACE = false;
-
     private function keyPreviousInvoiceTotals(int $projectItemId, ?string $invoiceStartAfterYmd): string
     {
         return null !== $invoiceStartAfterYmd
@@ -110,11 +110,10 @@ class ProjectService extends Base
 
     /**
      * Depuración Completion: paid efectivo vs override → public/weblog.txt ([completion_paid]).
-     * Control: {@see self::DEBUG_COMPLETION_PAID_TRACE}.
      */
     private function logCompletionPaidTrace(string $line): void
     {
-        // Trazas desactivadas (weblog.txt). Activar también {@see self::DEBUG_COMPLETION_PAID_TRACE}.
+        // Trazas desactivadas (weblog.txt). Descomentar para depurar.
         // $this->writelogPublic('[completion_paid] ' . $line, 'weblog.txt');
     }
 
@@ -520,7 +519,7 @@ class ProjectService extends Base
     {
         $resultado = [];
 
-        $archivos = explode(',', $archivos);
+        $archivos = explode(',', (string) $archivos);
         foreach ($archivos as $archivo) {
             // Eliminar archivo
             $dir = 'uploads/project/';
@@ -733,7 +732,7 @@ class ProjectService extends Base
     /**
      * ListarLeadsDeDataTracking.
      *
-     * @return array
+     * @return string Nombres de leads separados por coma (puede ser cadena vacía).
      */
     private function ListarLeadsDeDataTracking($data_tracking_id)
     {
@@ -911,7 +910,7 @@ class ProjectService extends Base
             // Verificar name
             $item = $this->getDoctrine()->getRepository(Item::class)
                ->findOneBy(['name' => $item_name]);
-            if ('' == $item_id && null != $item) {
+            if (null != $item) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'The item name is in use, please try entering another one.';
 
@@ -1053,7 +1052,7 @@ class ProjectService extends Base
 
             // Registrar historial: para change order (add + cambios), para el resto solo cambios de cantidad/precio
             if (true === $change_order) {
-                $is_first_time_change_order = !$change_order_old && $change_order;
+                $is_first_time_change_order = !$change_order_old;
                 $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $quantity, $price_old, $price);
             } elseif (!$is_new_project_item && ($quantity_old != $quantity || $price_old != $price)) {
                 // Item no es change order: registrar solo historial de cantidad/precio si cambiaron
@@ -1244,34 +1243,6 @@ class ProjectService extends Base
         foreach ($historial as $historial_item) {
             $em->remove($historial_item);
         }
-    }
-
-    /**
-     * SePuedeEliminarItem.
-     *
-     * @return string
-     */
-    private function SePuedeEliminarItem($project_item_id)
-    {
-        $texto_error = '';
-
-        // data tracking
-        /** @var DataTrackingItemRepository $dataTrackingItemRepo */
-        $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
-        $data_tracking = $dataTrackingItemRepo->ListarDataTrackingsDeItem($project_item_id);
-        if (count($data_tracking) > 0) {
-            $texto_error = 'The item could not be deleted, because it is related to a data tracking';
-        }
-
-        // invoices
-        /** @var InvoiceItemRepository $invoiceItemRepo */
-        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-        $invoices = $invoiceItemRepo->ListarInvoicesDeItem($project_item_id);
-        if (count($invoices) > 0) {
-            $texto_error = 'The item could not be deleted, because it is related to a invoice';
-        }
-
-        return $texto_error;
     }
 
     /**
@@ -1497,6 +1468,9 @@ class ProjectService extends Base
     public function ListarAccionesNotes($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT);
 
         $acciones = '';
@@ -1655,7 +1629,7 @@ class ProjectService extends Base
                 'project_item_id' => $project_item_id,
                 'apply_retainage' => $value->getApplyRetainage(),
                 'bonded' => $value->getBonded() ? 1 : 0,
-                'bond' => $value->getItem()->getBond() ? 1 : 0,
+                'bond' => (int) !empty($value->getItem()->getBond()),
                 'item_id' => $value->getItem()->getItemId(),
                 'code' => $value->getCode(),
                 'item' => $value->getItem()->getName(),
@@ -1663,9 +1637,9 @@ class ProjectService extends Base
                 'contract_qty' => $contract_qty,
                 'price' => $price,
                 'contract_amount' => $contract_amount,
-                'quantity_from_previous' => $quantity_from_previous ?? 0,
+                'quantity_from_previous' => $quantity_from_previous,
                 'unpaid_qty' => $unpaid_qty,
-                'quantity' => $quantity ?? 0,
+                'quantity' => $quantity,
                 'quantity_completed' => $quantity_completed,
                 'amount' => $amount,
                 'total_amount' => $total_amount,
@@ -1711,7 +1685,7 @@ class ProjectService extends Base
         foreach ($items as $it) {
             if (!empty($it['bonded'])) {
                 $qty = (float) ($it['quantity'] ?? 0);
-                $qbf = (float) ($it['quantity_brought_forward'] ?? 0);
+                $qbf = (float) $it['quantity_brought_forward'];
                 $pr = (float) ($it['price'] ?? 0);
                 $sum_bonded_invoices += ($qty + $qbf) * $pr;
             }
@@ -1784,7 +1758,7 @@ class ProjectService extends Base
         $bestId = 0;
 
         foreach ($rows as $o) {
-            if (!$o instanceof InvoiceItemOverridePayment || null === $o->getPaidQty()) {
+            if (null === $o->getPaidQty()) {
                 continue;
             }
             $hd = $o->getInvoiceOverridePayment()?->getDate();
@@ -1829,15 +1803,6 @@ class ProjectService extends Base
     {
         $cacheKey = $this->keyPreviousInvoiceTotals($project_item_id, $invoiceStartAfterYmd);
         if (isset($this->previousInvoiceTotalsByProjectItem[$cacheKey])) {
-            if (self::DEBUG_COMPLETION_PAID_TRACE) {
-                $cached = $this->previousInvoiceTotalsByProjectItem[$cacheKey];
-                $this->logCompletionPaidTrace(
-                    'computePreviousInvoiceTotals CACHE_HIT project_item_id='.$project_item_id
-                    .' invoiceStartAfterYmd='.($invoiceStartAfterYmd ?? 'null')
-                    .' cached='.json_encode($cached, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
-                );
-            }
-
             return $this->previousInvoiceTotalsByProjectItem[$cacheKey];
         }
 
@@ -1846,31 +1811,6 @@ class ProjectService extends Base
             .' invoiceStartAfterYmd='.($invoiceStartAfterYmd ?? 'null')
             .' cacheKey='.$cacheKey
         );
-
-        if (self::DEBUG_COMPLETION_PAID_TRACE) {
-            /** @var InvoiceItemOverridePaymentRepository $ovRepo */
-            $ovRepo = $this->getDoctrine()->getRepository(InvoiceItemOverridePayment::class);
-            $ovRows = $ovRepo->ListarPorProjectItem($project_item_id);
-            $this->logCompletionPaidTrace(
-                'override_rows_en_BD project_item_id='.$project_item_id.' count='.count($ovRows)
-            );
-            foreach ($ovRows as $ovRow) {
-                if (!$ovRow instanceof InvoiceItemOverridePayment) {
-                    continue;
-                }
-                $ovId = (int) ($ovRow->getId() ?? 0);
-                $pq = $ovRow->getPaidQty();
-                $hd = $ovRow->getInvoiceOverridePayment()?->getDate();
-                $hid = $ovRow->getInvoiceOverridePayment()?->getInvoiceOverridePaymentId();
-                $this->logCompletionPaidTrace(
-                    'override_row project_item_id='.$project_item_id
-                    .' invoice_item_override_payment_id='.$ovId
-                    .' invoice_override_payment_id='.($hid ?? 'null')
-                    .' paid_qty='.(null !== $pq ? (string) $pq : 'null')
-                    .' header_date='.(null !== $hd ? $hd->format('Y-m-d') : 'null')
-                );
-            }
-        }
 
         $total_quantity = 0.0;
         $total_invoiced_amount_from_lines = 0.0;
@@ -1894,14 +1834,6 @@ class ProjectService extends Base
                        ->modify('first day of this month')
                        ->setTime(0, 0, 0);
                 }
-            }
-            if (self::DEBUG_COMPLETION_PAID_TRACE && null !== $snapshotRow) {
-                $this->logCompletionPaidTrace(
-                    'compute_snapshot_paid_mode project_item_id='.$project_item_id
-                    .' invoice_item_override_payment_id='.(string) ($snapshotRow->getId() ?? '')
-                    .' snapshot_paid_qty='.(string) $snapshotRow->getPaidQty()
-                    .' cutoff_month='.$snapshotCutoffMonth->format('Y-m-d')
-                );
             }
         }
 
@@ -1931,43 +1863,10 @@ class ProjectService extends Base
             $quantity = (null === $quantity) ? 0.0 : (float) $quantity;
             $price = (float) ($invoice_item->getPrice() ?? 0);
 
-            if (null !== $snapshotRow && null !== $snapshotCutoffMonth) {
-                $invStart = null !== $invoice ? $invoice->getStartDate() : null;
-                if (self::DEBUG_COMPLETION_PAID_TRACE) {
-                    $iid = null !== $invoice ? (int) $invoice->getInvoiceId() : 0;
-                    $sd = null !== $invStart ? $invStart->format('Y-m-d') : 'null';
-                    $ed = null !== $invoice && null !== $invoice->getEndDate() ? $invoice->getEndDate()->format('Y-m-d') : 'null';
-                    $this->logCompletionPaidTrace(
-                        'invoice_line_snapshot project_item_id='.$project_item_id
-                        .' invoice_item_id='.($invoice_item->getId() ?? 'null')
-                        .' invoice_id='.$iid
-                        .' inv_start='.$sd.' inv_end='.$ed
-                    );
-                }
-            } else {
-                $details = $this->paidQtyOverrideResolver->resolvePaidQtyDetails($invoice_item);
-                if (self::DEBUG_COMPLETION_PAID_TRACE) {
-                    $iid = null !== $invoice ? (int) $invoice->getInvoiceId() : 0;
-                    $sd = null !== $invoice && null !== $invoice->getStartDate() ? $invoice->getStartDate()->format('Y-m-d') : 'null';
-                    $ed = null !== $invoice && null !== $invoice->getEndDate() ? $invoice->getEndDate()->format('Y-m-d') : 'null';
-                    $this->logCompletionPaidTrace(
-                        'invoice_line project_item_id='.$project_item_id
-                        .' invoice_item_id='.($invoice_item->getId() ?? 'null')
-                        .' invoice_id='.$iid
-                        .' inv_start='.$sd.' inv_end='.$ed
-                        .' qty_line='.$quantity
-                        .' price_line='.$price
-                        .' base_persistido='.$details['base']
-                        .' effective='.$details['effective']
-                        .' override_id='.(null !== $details['override_id'] ? (string) $details['override_id'] : 'null')
-                        .' period='.($details['invoice_period'] ?? 'null')
-                    );
-                }
-            }
             $total_quantity += $quantity;
             $total_invoiced_amount_from_lines += $quantity * $price;
 
-            if (null !== $snapshotRow && null !== $snapshotCutoffMonth) {
+            if (null !== $snapshotRow) {
                 $invStart = null !== $invoice ? $invoice->getStartDate() : null;
                 if (null !== $invStart) {
                     $lineMonth = \DateTimeImmutable::createFromInterface($invStart)
@@ -2003,7 +1902,7 @@ class ProjectService extends Base
             ++$lineIndex;
         }
 
-        if (null !== $snapshotRow && null !== $snapshotCutoffMonth) {
+        if (null !== $snapshotRow) {
             $snapshotPaid = (float) $snapshotRow->getPaidQty();
             $total_paid = $snapshotPaid + $sumStoredPaidNoOverride;
             $paid_amount_total = $snapshotPaid * $projectItemPrice + $sumStoredPaidAmountNoOverride;
@@ -2176,7 +2075,7 @@ class ProjectService extends Base
                     'row_after_effective_unpaid_qty' => $effUnpaidAnchor,
                 ]);
                 if (null !== $rowUnpaidAnchor && null !== $effUnpaidAnchor) {
-                    $limitEndDateYmd = null !== $invEnd ? $invEnd->format('Y-m-d') : null;
+                    $limitEndDateYmd = $invEnd->format('Y-m-d');
                     $u = $this->computeUnpaidChainingAfterOverride($rowUnpaidAnchor, $piId, $exclude_invoice_id, $limitEndDateYmd);
                     $this->logUnpaidQtyCalc('calc_return_chain_after_override', [
                         'project_item_id' => $piId,
@@ -2227,12 +2126,12 @@ class ProjectService extends Base
 
         // Deuda = Σ qty facturada − paid efectivo en todo el historial (sin cutoff). Fallback cuando no hay período.
         $aggDebt = $this->computePreviousInvoiceTotalsForProjectItem($piId, null);
-        $u = max(0.0, (float) ($aggDebt['total_quantity'] ?? 0) - (float) ($aggDebt['total_paid_effective'] ?? 0));
+        $u = max(0.0, (float) $aggDebt['total_quantity'] - (float) $aggDebt['total_paid_effective']);
         $this->logUnpaidQtyCalc('calc_return_aggregate_debt_no_cutoff', [
             'project_item_id' => $piId,
-            'agg_total_quantity' => $aggDebt['total_quantity'] ?? null,
-            'agg_total_paid_effective' => $aggDebt['total_paid_effective'] ?? null,
-            'agg_line_count' => $aggDebt['line_count'] ?? null,
+            'agg_total_quantity' => $aggDebt['total_quantity'],
+            'agg_total_paid_effective' => $aggDebt['total_paid_effective'],
+            'agg_line_count' => $aggDebt['line_count'],
             'result_unpaid_qty' => $u,
         ]);
 
@@ -2331,7 +2230,8 @@ class ProjectService extends Base
             $arreglo_resultado['concrete_class_id'] = null != $entity->getConcreteClass() ? $entity->getConcreteClass()->getConcreteClassId() : '';
             $arreglo_resultado['concrete_vendor'] = null != $entity->getConcreteVendor() ? $entity->getConcreteVendor()->getName() : '';
             $arreglo_resultado['concrete_quote_price'] = $entity->getConcreteQuotePrice() ?? '';
-            $arreglo_resultado['concrete_start_date'] = '' != $entity->getConcreteStartDate() && null !== $entity->getConcreteStartDate() ? $entity->getConcreteStartDate()->format('m/d/Y') : '';
+            $concreteStart = $entity->getConcreteStartDate();
+            $arreglo_resultado['concrete_start_date'] = null !== $concreteStart ? $concreteStart->format('m/d/Y') : '';
             $arreglo_resultado['concrete_quote_price_escalator'] = $entity->getConcreteQuotePriceEscalator() ?? '';
             $arreglo_resultado['concrete_time_period_every_n'] = $entity->getConcreteTimePeriodEveryN() ?? '';
             $arreglo_resultado['concrete_time_period_unit'] = $entity->getConcreteTimePeriodUnit() ?? '';
@@ -2510,8 +2410,8 @@ class ProjectService extends Base
             $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
             // Paid acumulado con override (misma regla que invoice / agregados): no solo SUM(paid_qty) en BD
             $aggPaidCompletion = $this->computePreviousInvoiceTotalsForProjectItem($project_item_id, null);
-            $paid_qty = (float) ($aggPaidCompletion['total_paid_effective'] ?? 0);
-            $total_paid_amount = (float) ($aggPaidCompletion['paid_amount_total'] ?? 0);
+            $paid_qty = (float) $aggPaidCompletion['total_paid_effective'];
+            $total_paid_amount = (float) $aggPaidCompletion['paid_amount_total'];
 
             // Diff Qty / Diff Amt: mismo unpaid que Payments. No-Bond: Σ por línea (qty final − paid, override notas). Bond: fórmula agregada como al cargar Payments (no sumar líneas).
             $diff_qty = 0.0;
@@ -2566,7 +2466,7 @@ class ProjectService extends Base
                 'project_item_id' => $project_item_id,
                 'apply_retainage' => $value->getApplyRetainage(),
                 'bonded' => $value->getBonded() ? 1 : 0,
-                'bond' => $value->getItem()->getBond() ? 1 : 0,
+                'bond' => (int) !empty($value->getItem()->getBond()),
                 'item_id' => $value->getItem()->getItemId(),
                 'item' => $value->getItem()->getName(),
                 'unit' => null != $value->getItem()->getUnit() ? $value->getItem()->getUnit()->getDescription() : '',
@@ -2724,7 +2624,7 @@ class ProjectService extends Base
             $items_id = $project_ajuste->getItemsId();
             $items_names = 'All items';
 
-            if ($items_id && '' !== $items_id) {
+            if ($items_id) {
                 $items_id_array = explode(',', $items_id);
                 $items_names_array = [];
                 foreach ($items_id_array as $item_id) {
@@ -2973,8 +2873,8 @@ class ProjectService extends Base
         $invoiced_qty = $invoiceItemRepo->TotalInvoiceQuantityByProjectItem($project_item_id);
         $total_invoiced_amount = $invoiceItemRepo->TotalInvoiceAmountByProjectItem($project_item_id);
         $aggPaidItem = $this->computePreviousInvoiceTotalsForProjectItem($project_item_id, null);
-        $paid_qty = (float) ($aggPaidItem['total_paid_effective'] ?? 0);
-        $total_paid_amount = (float) ($aggPaidItem['paid_amount_total'] ?? 0);
+        $paid_qty = (float) $aggPaidItem['total_paid_effective'];
+        $total_paid_amount = (float) $aggPaidItem['paid_amount_total'];
 
         // Verificar si hay historial de cantidad y precio
         /** @var ProjectItemHistoryRepository $historyRepo */
@@ -3004,7 +2904,7 @@ class ProjectService extends Base
             'principal' => $value->getPrincipal(),
             'change_order' => $value->getChangeOrder(),
             'change_order_date' => null != $value->getChangeOrderDate() ? $value->getChangeOrderDate()->format('m/d/Y') : '',
-            'bond' => $value->getItem()->getBond() ? 1 : 0,
+            'bond' => (int) !empty($value->getItem()->getBond()),
             'porciento_completion' => $porciento_completion,
             'invoiced_qty' => $invoiced_qty,
             'total_invoiced_amount' => $total_invoiced_amount,
@@ -3226,10 +3126,10 @@ class ProjectService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $project_id) {
                 if ('' != $project_id) {
                     ++$cant_total;
@@ -3546,7 +3446,8 @@ class ProjectService extends Base
             }
 
             // concrete start date
-            $concrete_start_date_old = '' != $entity->getConcreteStartDate() && null !== $entity->getConcreteStartDate() ? $entity->getConcreteStartDate()->format('m/d/Y') : '';
+            $concreteStartPrev = $entity->getConcreteStartDate();
+            $concrete_start_date_old = null !== $concreteStartPrev ? $concreteStartPrev->format('m/d/Y') : '';
             if ('' === $concrete_start_date || null === $concrete_start_date) {
                 if ('' !== $concrete_start_date_old) {
                     $notas[] = [
@@ -3791,8 +3692,8 @@ class ProjectService extends Base
         $entity->setPoCG($po_cg);
         $entity->setManager($manager);
         $entity->setStatus($status);
-        $contract_amount = str_replace(['$', ','], '', $contract_amount);
-        $entity->setContractAmount($contract_amount);
+        $contract_amount = str_replace(['$', ','], '', (string) $contract_amount);
+        $entity->setContractAmount('' === $contract_amount ? null : (float) $contract_amount);
         $entity->setProposalNumber($proposal_number);
         $entity->setProjectIdNumber($project_id_number);
 
@@ -4018,9 +3919,6 @@ class ProjectService extends Base
         if (is_string($county_ids)) {
             $county_ids = !empty($county_ids) ? explode(',', $county_ids) : [];
         }
-        if (!is_array($county_ids)) {
-            $county_ids = [];
-        }
         $county_ids = array_filter(array_map('trim', $county_ids));
 
         // Si check_changes es true, obtener counties antiguos para comparación
@@ -4052,14 +3950,12 @@ class ProjectService extends Base
 
         // Agregar nuevos counties
         foreach ($county_ids as $county_id) {
-            if (!empty($county_id)) {
-                $county = $countyRepo->find($county_id);
-                if (null !== $county) {
-                    $projectCounty = new ProjectCounty();
-                    $projectCounty->setProject($entity);
-                    $projectCounty->setCounty($county);
-                    $em->persist($projectCounty);
-                }
+            $county = $countyRepo->find($county_id);
+            if (null !== $county) {
+                $projectCounty = new ProjectCounty();
+                $projectCounty->setProject($entity);
+                $projectCounty->setCounty($county);
+                $em->persist($projectCounty);
             }
         }
 
@@ -4072,7 +3968,7 @@ class ProjectService extends Base
      * $prevailing_roles: array de objetos con role_id y rate (ej. [ { role_id: 1, rate: 25.50 }, ... ]).
      *
      * @param Project $entity
-     * @param array   $prevailing_roles
+     * @param array|string $prevailing_roles
      * @param bool    $check_changes
      *
      * @return array
@@ -4335,7 +4231,7 @@ class ProjectService extends Base
 
             // Registrar historial: para change order (add + cambios), para el resto solo cambios de cantidad/precio
             if ($value->change_order && $project_item_entity->getId()) {
-                $is_first_time_change_order = !$change_order_old && $value->change_order;
+                $is_first_time_change_order = !$change_order_old;
                 $this->RegistrarHistorialChangeOrder($project_item_entity, $is_new_project_item, $is_first_time_change_order, $quantity_old, $value->quantity, $price_old, $value->price);
             } elseif (!$is_new_project_item && isset($quantity_old, $price_old) && ($quantity_old != $value->quantity || $price_old != $value->price)) {
                 $this->RegistrarHistorialChangeOrder($project_item_entity, false, false, $quantity_old, $value->quantity, $price_old, $value->price);
@@ -4513,6 +4409,9 @@ class ProjectService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT);
 
         $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
@@ -4547,6 +4446,8 @@ class ProjectService extends Base
     private function RegistrarHistorialChangeOrder($project_item_entity, $is_new, $is_first_time_change_order, $quantity_old, $quantity_new, $price_old, $price_new)
     {
         $em = $this->getDoctrine()->getManager();
+        $actor = $this->getUser();
+        $historyUser = $actor instanceof Usuario ? $actor : null;
 
         // Obtener la fecha del change order date, si no existe usar la fecha actual
         $change_order_date = $project_item_entity->getChangeOrderDate();
@@ -4562,7 +4463,7 @@ class ProjectService extends Base
             $history->setOldValue(null);
             $history->setNewValue(null);
             $history->setCreatedAt($change_order_date);
-            $history->setUser($this->getUser());
+            $history->setUser($historyUser);
             $em->persist($history);
         }
 
@@ -4574,7 +4475,7 @@ class ProjectService extends Base
             $history->setOldValue((string) $quantity_old);
             $history->setNewValue((string) $quantity_new);
             $history->setCreatedAt(new \DateTime());
-            $history->setUser($this->getUser());
+            $history->setUser($historyUser);
             $em->persist($history);
         }
 
@@ -4586,7 +4487,7 @@ class ProjectService extends Base
             $history->setOldValue((string) $price_old);
             $history->setNewValue((string) $price_new);
             $history->setCreatedAt(new \DateTime());
-            $history->setUser($this->getUser());
+            $history->setUser($historyUser);
             $em->persist($history);
         }
     }

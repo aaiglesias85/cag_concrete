@@ -128,7 +128,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
      */
     public function countItemsDeEstimate(int|string $estimate_id): int
     {
-        if ('' === $estimate_id || null === $estimate_id) {
+        if ('' === (string) $estimate_id) {
             return 0;
         }
 
@@ -147,7 +147,7 @@ class EstimateQuoteItemRepository extends ServiceEntityRepository
      */
     public function countItemsDeQuote(int|string $quote_id): int
     {
-        if ('' === $quote_id || null === $quote_id || !is_numeric($quote_id)) {
+        if ('' === (string) $quote_id || !is_numeric((string) $quote_id)) {
             return 0;
         }
 

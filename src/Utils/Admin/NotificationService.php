@@ -19,13 +19,16 @@ class NotificationService extends Base
         $em = $this->getDoctrine()->getManager();
 
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return ['success' => false, 'error' => 'Not authenticated'];
+        }
         $usuario_id = $usuario->getUsuarioId();
 
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
         $lista = $notificationRepo->ListarNotificationsDeUsuarioSinLeer($usuario_id);
         foreach ($lista as $value) {
-            $value->setReaded(1);
+            $value->setReaded(true);
         }
 
         $em->flush();
@@ -75,7 +78,7 @@ class NotificationService extends Base
         $em = $this->getDoctrine()->getManager();
 
         if ('' != $ids) {
-            $ids = explode(',', $ids);
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $notification_id) {
                 if ('' != $notification_id) {
                     $notification = $this->getDoctrine()->getRepository(Notification::class)
@@ -110,7 +113,7 @@ class NotificationService extends Base
 
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
-        $lista = $notificationRepo->ListarNotificationsRangoFecha('', '', 30, $usuario_id, 'DESC');
+        $lista = $notificationRepo->ListarNotificationsRangoFecha('', '', 30, (string) $usuario_id, 'DESC');
 
         foreach ($lista as $value) {
             $arreglo_resultado[$cont]['notification_id'] = $value->getId();

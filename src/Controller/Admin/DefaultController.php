@@ -263,13 +263,13 @@ class DefaultController extends AbstractAdminController
 
         $logs = [];
         $notificaciones = [];
+        $sin_leer = 0;
         if (null != $usuario) {
             $logs = $this->logService->ListarLogsUltimosDias($usuario);
 
             $notificaciones = $this->notificationService->ListarNotificationsUltimosDias($usuario);
 
             // contar sin leer
-            $sin_leer = 0;
             foreach ($notificaciones as $value) {
                 if (!$value['leida']) {
                     ++$sin_leer;

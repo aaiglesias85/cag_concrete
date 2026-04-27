@@ -610,7 +610,7 @@ class EstimateService extends Base
         if (!is_dir($tempDir)) {
             @mkdir($tempDir, 0777, true);
         }
-        if (is_dir($tempDir) && method_exists($writer, 'setTempDir')) {
+        if (is_dir($tempDir)) {
             $writer->setTempDir($tempDir);
         }
         $writer->save($path);
@@ -667,7 +667,7 @@ class EstimateService extends Base
             // Verificar description
             $item = $this->getDoctrine()->getRepository(Item::class)
                ->findOneBy(['description' => $item_name]);
-            if ('' == $item_id && null != $item) {
+            if (null != $item) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'The item name is in use, please try entering another one.';
 
@@ -753,7 +753,7 @@ class EstimateService extends Base
             $estimate_item_entity->setCode($codeCatalog);
             $estimate_item_entity->setContractName($contractNameCatalog);
 
-            if ($is_new_estimate_item && null !== $default_quote) {
+            if ($is_new_estimate_item) {
                 $estimate_item_entity->setQuote($default_quote);
                 $em->persist($estimate_item_entity);
             }
@@ -788,7 +788,7 @@ class EstimateService extends Base
             $item = $this->DevolverItemDeEstimate($estimate_item_entity);
             $resultado['item'] = $item;
             $resultado['is_new_item'] = $is_new_item;
-            if ($quote_created_in_request && null !== $default_quote) {
+            if ($quote_created_in_request) {
                 $resultado['quote_created'] = ['id' => $default_quote->getId(), 'name' => $default_quote->getName()];
             }
         } else {
@@ -1240,11 +1240,13 @@ class EstimateService extends Base
         if (count($names) > 0) {
             return implode(', ', $names);
         }
-        if (method_exists($value, 'getCountyObj') && $value->getCountyObj()) {
-            return $value->getCountyObj()->getDescription();
+        $countyObj = $value->getCountyObj();
+        if (null !== $countyObj) {
+            return $countyObj->getDescription();
         }
-        if (method_exists($value, 'getCounty') && $value->getCounty()) {
-            return (string) $value->getCounty();
+        $countyLegacy = $value->getCounty();
+        if (null !== $countyLegacy && '' !== $countyLegacy) {
+            return (string) $countyLegacy;
         }
 
         return '';
@@ -1299,10 +1301,10 @@ class EstimateService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $estimate_id) {
                 if ('' != $estimate_id) {
                     ++$cant_total;
@@ -1653,7 +1655,7 @@ class EstimateService extends Base
 
                 $estimate_company_entity->setBidDeadline(null);
                 $bidDeadlineRaw = $value->bidDeadline ?? '';
-                if ('' !== $bidDeadlineRaw && null !== $bidDeadlineRaw) {
+                if ('' !== $bidDeadlineRaw) {
                     $bidDt = \DateTime::createFromFormat('m/d/Y H:i', (string) $bidDeadlineRaw);
                     if (false !== $bidDt) {
                         $estimate_company_entity->setBidDeadline($bidDt);
@@ -1871,7 +1873,7 @@ class EstimateService extends Base
      */
     public function SalvarArchivos(Estimate $entity, $archivos): void
     {
-        if (null === $archivos || '' === $archivos) {
+        if (null === $archivos) {
             return;
         }
 
@@ -1910,7 +1912,7 @@ class EstimateService extends Base
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
-        $archivos = explode(',', $archivos);
+        $archivos = explode(',', (string) $archivos);
         foreach ($archivos as $archivo) {
             $dir = 'uploads/estimate/';
             if (is_file($dir.$archivo)) {
@@ -2045,7 +2047,7 @@ class EstimateService extends Base
         }
 
         if ('' !== $estimators_id) {
-            $estimators_id = explode(',', $estimators_id);
+            $estimators_id = explode(',', (string) $estimators_id);
 
             foreach ($estimators_id as $estimator_id) {
                 $user_entity = $this->getDoctrine()->getRepository(Usuario::class)
@@ -2078,7 +2080,7 @@ class EstimateService extends Base
         }
 
         if ('' !== $project_types_id) {
-            $project_types_id = explode(',', $project_types_id);
+            $project_types_id = explode(',', (string) $project_types_id);
 
             foreach ($project_types_id as $project_type_id) {
                 $project_type_entity = $this->getDoctrine()->getRepository(ProjectType::class)
@@ -2425,9 +2427,6 @@ class EstimateService extends Base
 
         $events = [];
         foreach ($lista as $entity) {
-            if (!$entity instanceof Estimate) {
-                continue;
-            }
             $bd = $entity->getBidDeadline();
             if (null === $bd) {
                 continue;
@@ -2514,9 +2513,6 @@ class EstimateService extends Base
 
         $out = [];
         foreach ($rows as $entity) {
-            if (!$entity instanceof Estimate) {
-                continue;
-            }
             if ('' !== $project_id) {
                 $estimateProjectId = trim((string) ($entity->getProjectId() ?? ''));
                 $matchesByNumber = ('' !== $projectNumberFilter && $estimateProjectId === $projectNumberFilter);
@@ -2539,8 +2535,8 @@ class EstimateService extends Base
         }
 
         usort($out, static function (array $a, array $b): int {
-            $da = \DateTime::createFromFormat('m/d/Y H:i', (string) ($a['bid_deadline'] ?? ''));
-            $db = \DateTime::createFromFormat('m/d/Y H:i', (string) ($b['bid_deadline'] ?? ''));
+            $da = \DateTime::createFromFormat('m/d/Y H:i', (string) $a['bid_deadline']);
+            $db = \DateTime::createFromFormat('m/d/Y H:i', (string) $b['bid_deadline']);
             $ta = $da ? $da->getTimestamp() : 0;
             $tb = $db ? $db->getTimestamp() : 0;
 
@@ -2579,6 +2575,9 @@ class EstimateService extends Base
     public function ListarAcciones($id)
     {
         $usuario = $this->getUser();
+        if (!$usuario instanceof Usuario) {
+            return '';
+        }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::ESTIMATE);
 
         $acciones = '';

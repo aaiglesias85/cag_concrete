@@ -119,10 +119,10 @@ class RaceService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        $cant_eliminada = 0;
+        $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', $ids);
-            $cant_eliminada = 0;
-            $cant_total = 0;
+            $ids = explode(',', (string) $ids);
             foreach ($ids as $race_id) {
                 if ('' != $race_id) {
                     ++$cant_total;
@@ -133,7 +133,7 @@ class RaceService extends Base
                         // employees
                         /** @var EmployeeRepository $employeeRepo */
                         $employeeRepo = $this->getDoctrine()->getRepository(Employee::class);
-                        $employees = $employeeRepo->ListarEmployeesDeRace($race_id);
+                        $employees = $employeeRepo->ListarEmployeesDeRace((int) $race_id);
                         if (0 === count($employees)) {
                             $race_descripcion = $entity->getDescription();
 

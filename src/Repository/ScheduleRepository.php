@@ -290,7 +290,7 @@ class ScheduleRepository extends ServiceEntityRepository
     /**
      * ListarSchedulesConTotal Lista los schedules con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarSchedulesConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'day', string $sortDirection = 'DESC',
         ?string $project_id = null, ?string $vendor_id = null, ?string $fecha_inicial = null, ?string $fecha_fin = null): array

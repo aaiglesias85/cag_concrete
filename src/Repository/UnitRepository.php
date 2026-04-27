@@ -69,7 +69,7 @@ class UnitRepository extends ServiceEntityRepository
     /**
      * ListarUnitsConTotal Lista los units con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarUnitsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC'): array
     {

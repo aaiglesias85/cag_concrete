@@ -107,7 +107,7 @@ class MaterialRepository extends ServiceEntityRepository
     /**
      * ListarMaterialsConTotal Lista los materials con total.
      *
-     * @return []
+     * @return array{data: array<int, mixed>, total: int}
      */
     public function ListarMaterialsConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'name', string $sortDirection = 'ASC'): array
     {
