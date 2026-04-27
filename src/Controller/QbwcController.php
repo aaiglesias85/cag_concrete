@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Service\QbwcService;
-use App\Soap\QbwcSoapService;
+use App\Service\QbwcSoapService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

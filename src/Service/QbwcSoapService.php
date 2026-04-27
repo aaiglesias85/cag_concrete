@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Soap;
+namespace App\Service;
 
-use App\Service\QbwcService;
-
+/**
+ * Objeto expuesto a PHP SoapServer para QuickBooks Web Connector (QBWC).
+ */
 class QbwcSoapService
 {
     private QbwcService $qbwcService;
