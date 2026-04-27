@@ -1,27 +1,29 @@
 <?php
 
-namespace App\Controller\App\Traits;
+namespace App\Dto\Api;
 
 use Symfony\Component\HttpFoundation\Request;
 
-trait JsonRequestTrait
+/**
+ * Decodifica el cuerpo como JSON: exige Content-Type application/json, body vacío → [],
+ * json_decode con error → \Exception con el mensaje de json_last_error_msg().
+ */
+final class JsonRequestBody
 {
     /**
-     * Helper method to get request data from JSON body only.
+     * @return array<string, mixed>
      *
-     * @throws \Exception if content is not JSON
+     * @throws \Exception
      */
-    private function getRequestData(Request $request): array
+    public static function decodeAssociative(Request $request): array
     {
-        // Verificar que el Content-Type sea application/json
         $contentType = $request->headers->get('Content-Type', '');
         if (!str_contains($contentType, 'application/json')) {
             throw new \Exception('Content-Type must be application/json');
         }
 
-        // Leer del body JSON
         $content = $request->getContent();
-        if (empty($content)) {
+        if ('' === $content) {
             return [];
         }
 
@@ -31,6 +33,6 @@ trait JsonRequestTrait
             throw new \Exception('Invalid JSON format: '.json_last_error_msg());
         }
 
-        return is_array($data) ? $data : [];
+        return \is_array($data) ? $data : [];
     }
 }

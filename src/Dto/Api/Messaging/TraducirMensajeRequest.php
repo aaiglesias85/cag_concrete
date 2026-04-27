@@ -2,6 +2,9 @@
 
 namespace App\Dto\Api\Messaging;
 
+use App\Dto\Api\JsonRequestBody;
+use App\Dto\Api\JsonValue;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -30,5 +33,22 @@ final class TraducirMensajeRequest
                     ->addViolation();
             }
         }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public static function fromHttpRequest(Request $request): self
+    {
+        $data = JsonRequestBody::decodeAssociative($request);
+        $dto = new self();
+        $dto->text = isset($data['text']) && \is_string($data['text']) ? trim($data['text']) : null;
+        if (isset($data['target_lang']) && \is_string($data['target_lang'])) {
+            $dto->target_lang = 'en' === $data['target_lang'] ? 'en' : ('es' === $data['target_lang'] ? 'es' : null);
+        }
+        $dto->message_id = \array_key_exists('message_id', $data) ? JsonValue::optionalPositiveInt($data['message_id']) : null;
+        $dto->conversation_id = \array_key_exists('conversation_id', $data) ? JsonValue::optionalPositiveInt($data['conversation_id']) : null;
+
+        return $dto;
     }
 }

@@ -3,9 +3,7 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
-use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
-use App\Dto\Api\Offline\OfflineProfilePayloadRequest;
 use App\Dto\Api\Offline\OfflineSincronizarRequest;
 use App\Service\App\LoginService;
 use App\Service\App\OfflineService;
@@ -21,7 +19,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class OfflineController extends AbstractController
 {
     use ApiValidationResponseTrait;
-    use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private OfflineService $offlineService;
@@ -192,9 +189,7 @@ class OfflineController extends AbstractController
         $this->setTranslatorLocale($this->translator, $lang);
 
         try {
-            // Leer datos desde JSON body
-            $data = $this->getRequestData($request);
-            $payload = $this->mapOfflineSincronizarRequest($data);
+            $payload = OfflineSincronizarRequest::fromHttpRequest($request);
             $violations = $this->validator->validate($payload);
             if (\count($violations) > 0) {
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -231,25 +226,4 @@ class OfflineController extends AbstractController
         }
     }
 
-    private function mapOfflineSincronizarRequest(array $data): OfflineSincronizarRequest
-    {
-        $dto = new OfflineSincronizarRequest();
-        if (!isset($data['profile_offline']) || !\is_array($data['profile_offline'])) {
-            $dto->profile_offline = null;
-
-            return $dto;
-        }
-        $raw = $data['profile_offline'];
-        $profile = new OfflineProfilePayloadRequest();
-        $profile->nombre = \array_key_exists('nombre', $raw) && \is_string($raw['nombre']) ? trim($raw['nombre']) : null;
-        $profile->apellidos = \array_key_exists('apellidos', $raw) && \is_string($raw['apellidos']) ? trim($raw['apellidos']) : null;
-        $profile->email = \array_key_exists('email', $raw) && \is_string($raw['email']) ? trim($raw['email']) : null;
-        $profile->telefono = \array_key_exists('telefono', $raw) && \is_string($raw['telefono']) ? trim($raw['telefono']) : null;
-        $profile->passwordactual = \array_key_exists('passwordactual', $raw) && \is_string($raw['passwordactual']) ? $raw['passwordactual'] : null;
-        $profile->password = \array_key_exists('password', $raw) && \is_string($raw['password']) ? $raw['password'] : null;
-        $profile->imagen = \array_key_exists('imagen', $raw) && \is_string($raw['imagen']) ? $raw['imagen'] : null;
-        $dto->profile_offline = $profile;
-
-        return $dto;
-    }
 }

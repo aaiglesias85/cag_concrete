@@ -2,6 +2,9 @@
 
 namespace App\Dto\Api\Messaging;
 
+use App\Dto\Api\JsonRequestBody;
+use App\Dto\Api\JsonValue;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class EnviarMensajeRequest
@@ -15,4 +18,20 @@ final class EnviarMensajeRequest
 
     #[Assert\Choice(choices: ['es', 'en'])]
     public ?string $source_lang = null;
+
+    /**
+     * @throws \Exception
+     */
+    public static function fromHttpRequest(Request $request): self
+    {
+        $data = JsonRequestBody::decodeAssociative($request);
+        $dto = new self();
+        $dto->conversation_id = JsonValue::optionalPositiveInt($data['conversation_id'] ?? null);
+        $dto->body = isset($data['body']) && \is_string($data['body']) ? trim($data['body']) : null;
+        if (isset($data['source_lang']) && \is_string($data['source_lang'])) {
+            $dto->source_lang = 'en' === $data['source_lang'] ? 'en' : ('es' === $data['source_lang'] ? 'es' : null);
+        }
+
+        return $dto;
+    }
 }

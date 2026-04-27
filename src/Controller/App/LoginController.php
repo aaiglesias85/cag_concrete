@@ -3,7 +3,6 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
-use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Dto\Api\Login\AutenticarRequest;
 use App\Dto\Api\Login\OlvidoContrasennaRequest;
@@ -23,7 +22,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LoginController extends AbstractController
 {
     use ApiValidationResponseTrait;
-    use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private AdminUsuarioService $adminUsuarioService;
@@ -138,9 +136,7 @@ class LoginController extends AbstractController
             $request->setLocale($lang);
             $this->setTranslatorLocale($this->translator, $lang);
 
-            // Leer parámetros desde JSON solamente
-            $data = $this->getRequestData($request);
-            $payload = $this->mapAutenticarRequest($data);
+            $payload = AutenticarRequest::fromHttpRequest($request);
             $violations = $this->validator->validate($payload);
             if (\count($violations) > 0) {
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -342,9 +338,7 @@ class LoginController extends AbstractController
             $request->setLocale($lang);
             $this->setTranslatorLocale($this->translator, $lang);
 
-            // Leer parámetros desde JSON solamente
-            $data = $this->getRequestData($request);
-            $payload = $this->mapOlvidoContrasennaRequest($data);
+            $payload = OlvidoContrasennaRequest::fromHttpRequest($request);
             $violations = $this->validator->validate($payload);
             if (\count($violations) > 0) {
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -389,23 +383,4 @@ class LoginController extends AbstractController
         }
     }
 
-    private function mapAutenticarRequest(array $data): AutenticarRequest
-    {
-        $dto = new AutenticarRequest();
-        $dto->email = isset($data['email']) && \is_string($data['email']) ? trim($data['email']) : null;
-        $dto->password = isset($data['password']) && \is_string($data['password']) ? $data['password'] : null;
-        $dto->player_id = isset($data['player_id']) && \is_string($data['player_id']) ? $data['player_id'] : null;
-        $dto->push_token = isset($data['push_token']) && \is_string($data['push_token']) ? $data['push_token'] : null;
-        $dto->plataforma = isset($data['plataforma']) && \is_string($data['plataforma']) ? $data['plataforma'] : null;
-
-        return $dto;
-    }
-
-    private function mapOlvidoContrasennaRequest(array $data): OlvidoContrasennaRequest
-    {
-        $dto = new OlvidoContrasennaRequest();
-        $dto->email = isset($data['email']) && \is_string($data['email']) ? trim($data['email']) : null;
-
-        return $dto;
-    }
 }

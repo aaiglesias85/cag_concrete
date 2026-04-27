@@ -2,6 +2,8 @@
 
 namespace App\Dto\Api\Usuario;
 
+use App\Dto\Api\JsonRequestBody;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -11,4 +13,16 @@ final class SalvarImagenUsuarioRequest
 {
     #[Assert\NotBlank(message: 'api.validation.imagen_required')]
     public ?string $imagen = null;
+
+    /**
+     * @throws \Exception
+     */
+    public static function fromHttpRequest(Request $request): self
+    {
+        $data = JsonRequestBody::decodeAssociative($request);
+        $dto = new self();
+        $dto->imagen = isset($data['imagen']) && \is_string($data['imagen']) ? $data['imagen'] : null;
+
+        return $dto;
+    }
 }

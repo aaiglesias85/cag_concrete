@@ -3,7 +3,6 @@
 namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
-use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Dto\Api\Messaging\EliminarMensajeRequest;
 use App\Dto\Api\Messaging\EnviarMensajeRequest;
@@ -35,7 +34,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MessageController extends AbstractController
 {
     use ApiValidationResponseTrait;
-    use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private MessageService $messageService;
     private TranslatorInterface $translator;
@@ -232,11 +230,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = EnviarMensajeRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapEnviarMensajeRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -285,11 +282,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = EnviarPrimerMensajeRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapEnviarPrimerMensajeRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -333,11 +329,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = MarcarLeidosRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapMarcarLeidosRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -386,11 +381,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = TraducirMensajeRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapTraducirMensajeRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -436,11 +430,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = EliminarMensajeRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapEliminarMensajeRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -483,11 +476,10 @@ class MessageController extends AbstractController
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
         try {
-            $data = $this->getRequestData($request);
+            $payload = OcultarConversacionRequest::fromHttpRequest($request);
         } catch (\Exception $e) {
             return $this->jsonJsonInputError($e);
         }
-        $payload = $this->mapOcultarConversacionRequest($data);
         $violations = $this->validator->validate($payload);
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
@@ -509,85 +501,5 @@ class MessageController extends AbstractController
         }
 
         throw $e;
-    }
-
-    private function optionalPositiveInt(mixed $v): ?int
-    {
-        if (null === $v || false === $v || '' === $v) {
-            return null;
-        }
-        if (\is_int($v)) {
-            return $v > 0 ? $v : null;
-        }
-        if (\is_string($v) && is_numeric($v)) {
-            $i = (int) $v;
-
-            return $i > 0 ? $i : null;
-        }
-
-        return null;
-    }
-
-    private function mapEnviarMensajeRequest(array $data): EnviarMensajeRequest
-    {
-        $dto = new EnviarMensajeRequest();
-        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
-        $dto->body = isset($data['body']) && \is_string($data['body']) ? trim($data['body']) : null;
-        if (isset($data['source_lang']) && \is_string($data['source_lang'])) {
-            $dto->source_lang = 'en' === $data['source_lang'] ? 'en' : ('es' === $data['source_lang'] ? 'es' : null);
-        }
-
-        return $dto;
-    }
-
-    private function mapEnviarPrimerMensajeRequest(array $data): EnviarPrimerMensajeRequest
-    {
-        $dto = new EnviarPrimerMensajeRequest();
-        $dto->other_user_id = $this->optionalPositiveInt($data['other_user_id'] ?? null);
-        $dto->body = isset($data['body']) && \is_string($data['body']) ? trim($data['body']) : null;
-        if (isset($data['source_lang']) && \is_string($data['source_lang'])) {
-            $dto->source_lang = 'en' === $data['source_lang'] ? 'en' : ('es' === $data['source_lang'] ? 'es' : null);
-        }
-
-        return $dto;
-    }
-
-    private function mapMarcarLeidosRequest(array $data): MarcarLeidosRequest
-    {
-        $dto = new MarcarLeidosRequest();
-        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
-
-        return $dto;
-    }
-
-    private function mapTraducirMensajeRequest(array $data): TraducirMensajeRequest
-    {
-        $dto = new TraducirMensajeRequest();
-        $dto->text = isset($data['text']) && \is_string($data['text']) ? trim($data['text']) : null;
-        if (isset($data['target_lang']) && \is_string($data['target_lang'])) {
-            $dto->target_lang = 'en' === $data['target_lang'] ? 'en' : ('es' === $data['target_lang'] ? 'es' : null);
-        }
-        $dto->message_id = isset($data['message_id']) ? $this->optionalPositiveInt($data['message_id']) : null;
-        $dto->conversation_id = isset($data['conversation_id']) ? $this->optionalPositiveInt($data['conversation_id']) : null;
-
-        return $dto;
-    }
-
-    private function mapEliminarMensajeRequest(array $data): EliminarMensajeRequest
-    {
-        $dto = new EliminarMensajeRequest();
-        $dto->message_id = $this->optionalPositiveInt($data['message_id'] ?? null);
-        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
-        $dto->scope = isset($data['scope']) && \is_string($data['scope']) ? $data['scope'] : null;
-
-        return $dto;
-    }
-
-    private function mapOcultarConversacionRequest(array $data): OcultarConversacionRequest
-    {
-        $dto = new OcultarConversacionRequest();
-        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
-
-        return $dto;
     }
 }
