@@ -4,6 +4,8 @@ namespace App\Controller\App;
 
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Dto\Api\Request\Usuario\ActualizarUsuarioDatosRequest;
+use App\Dto\Api\Request\Usuario\SalvarImagenUsuarioRequest;
 use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Dto\Api\Response\Common\ApiSimpleSuccessMessageResponse;
 use App\Dto\Api\Response\Usuario\UsuarioActualizarDatosResponse;
@@ -11,8 +13,6 @@ use App\Dto\Api\Response\Usuario\UsuarioCargarDatosFailureResponse;
 use App\Dto\Api\Response\Usuario\UsuarioCargarDatosSuccessResponse;
 use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenFailureResponse;
 use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenSuccessResponse;
-use App\Dto\Api\Request\Usuario\ActualizarUsuarioDatosRequest;
-use App\Dto\Api\Request\Usuario\SalvarImagenUsuarioRequest;
 use App\Entity\Usuario;
 use App\Service\App\LoginService;
 use App\Service\App\UsuarioService;
