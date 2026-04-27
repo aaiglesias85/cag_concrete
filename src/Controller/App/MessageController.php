@@ -2,12 +2,22 @@
 
 namespace App\Controller\App;
 
+use App\Controller\App\Traits\ApiValidationResponseTrait;
+use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Dto\Api\Messaging\EliminarMensajeRequest;
+use App\Dto\Api\Messaging\EnviarMensajeRequest;
+use App\Dto\Api\Messaging\EnviarPrimerMensajeRequest;
+use App\Dto\Api\Messaging\MarcarLeidosRequest;
+use App\Dto\Api\Messaging\OcultarConversacionRequest;
+use App\Dto\Api\Messaging\TraducirMensajeRequest;
 use App\Service\App\MessageService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -24,12 +34,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[OA\Tag(name: 'Message', description: 'Internal messaging endpoints for mobile app')]
 class MessageController extends AbstractController
 {
+    use ApiValidationResponseTrait;
+    use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private MessageService $messageService;
     private TranslatorInterface $translator;
 
-    public function __construct(MessageService $messageService, TranslatorInterface $translator)
-    {
+    public function __construct(
+        MessageService $messageService,
+        TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+    ) {
         $this->messageService = $messageService;
         $this->translator = $translator;
     }
@@ -216,17 +231,18 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $conversationId = (int) ($data['conversation_id'] ?? 0);
-        $body = trim((string) ($data['body'] ?? ''));
-        $sourceLang = isset($data['source_lang']) && 'en' === $data['source_lang'] ? 'en' : 'es';
-        if ($conversationId <= 0) {
-            return $this->json(['success' => false, 'error' => 'conversation_id is required'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        if ('' === $body) {
-            return $this->json(['success' => false, 'error' => 'body is required'], 400);
+        $payload = $this->mapEnviarMensajeRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = $this->messageService->EnviarMensaje($conversationId, $body, $sourceLang);
+        $sourceLang = $payload->source_lang ?? 'es';
+        $result = $this->messageService->EnviarMensaje($payload->conversation_id, (string) $payload->body, $sourceLang);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -268,17 +284,18 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $otherUserId = (int) ($data['other_user_id'] ?? 0);
-        $body = trim((string) ($data['body'] ?? ''));
-        $sourceLang = isset($data['source_lang']) && 'en' === $data['source_lang'] ? 'en' : 'es';
-        if ($otherUserId <= 0) {
-            return $this->json(['success' => false, 'error' => 'other_user_id is required'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        if ('' === $body) {
-            return $this->json(['success' => false, 'error' => 'body is required'], 400);
+        $payload = $this->mapEnviarPrimerMensajeRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = $this->messageService->EnviarPrimerMensaje($otherUserId, $body, $sourceLang);
+        $sourceLang = $payload->source_lang ?? 'es';
+        $result = $this->messageService->EnviarPrimerMensaje($payload->other_user_id, (string) $payload->body, $sourceLang);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -315,12 +332,17 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $conversationId = (int) ($data['conversation_id'] ?? 0);
-        if ($conversationId <= 0) {
-            return $this->json(['success' => false, 'error' => 'conversation_id is required'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        $result = $this->messageService->MarcarComoLeidos($conversationId);
+        $payload = $this->mapMarcarLeidosRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+        }
+        $result = $this->messageService->MarcarComoLeidos($payload->conversation_id);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -363,15 +385,20 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $text = trim((string) ($data['text'] ?? ''));
-        $targetLang = isset($data['target_lang']) && 'en' === $data['target_lang'] ? 'en' : 'es';
-        $messageId = isset($data['message_id']) ? (int) $data['message_id'] : null;
-        $conversationId = isset($data['conversation_id']) ? (int) $data['conversation_id'] : null;
-        if ('' === $text) {
-            return $this->json(['success' => false, 'error' => 'text is required'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        $result = $this->messageService->TraducirOnDemand($text, $targetLang, $messageId, $conversationId);
+        $payload = $this->mapTraducirMensajeRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+        }
+        $targetLang = $payload->target_lang ?? 'es';
+        $messageId = $payload->message_id;
+        $conversationId = $payload->conversation_id;
+        $result = $this->messageService->TraducirOnDemand((string) $payload->text, $targetLang, $messageId, $conversationId);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -408,19 +435,19 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $messageId = (int) ($data['message_id'] ?? 0);
-        $conversationId = (int) ($data['conversation_id'] ?? 0);
-        $scope = (string) ($data['scope'] ?? '');
-        if ($messageId <= 0 || $conversationId <= 0) {
-            return $this->json(['success' => false, 'error' => 'message_id y conversation_id son obligatorios'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        if ('for_me' !== $scope && 'for_everyone' !== $scope) {
-            return $this->json(['success' => false, 'error' => 'scope debe ser for_me o for_everyone'], 400);
+        $payload = $this->mapEliminarMensajeRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = 'for_me' === $scope
-           ? $this->messageService->EliminarMensajeParaMi($messageId, $conversationId)
-           : $this->messageService->EliminarMensajeParaTodos($messageId, $conversationId);
+        $result = 'for_me' === $payload->scope
+           ? $this->messageService->EliminarMensajeParaMi($payload->message_id, $payload->conversation_id)
+           : $this->messageService->EliminarMensajeParaTodos($payload->message_id, $payload->conversation_id);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -455,12 +482,17 @@ class MessageController extends AbstractController
     {
         $request->setLocale($lang);
         $this->setTranslatorLocale($this->translator, $lang);
-        $data = json_decode($request->getContent(), true) ?? [];
-        $conversationId = (int) ($data['conversation_id'] ?? 0);
-        if ($conversationId <= 0) {
-            return $this->json(['success' => false, 'error' => 'conversation_id es obligatorio'], 400);
+        try {
+            $data = $this->getRequestData($request);
+        } catch (\Exception $e) {
+            return $this->jsonJsonInputError($e);
         }
-        $result = $this->messageService->OcultarConversacion($conversationId);
+        $payload = $this->mapOcultarConversacionRequest($data);
+        $violations = $this->validator->validate($payload);
+        if (\count($violations) > 0) {
+            return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+        }
+        $result = $this->messageService->OcultarConversacion($payload->conversation_id);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -468,5 +500,94 @@ class MessageController extends AbstractController
         }
 
         return $this->json($result);
+    }
+
+    private function jsonJsonInputError(\Exception $e): JsonResponse
+    {
+        if (str_contains($e->getMessage(), 'Content-Type') || str_contains($e->getMessage(), 'Invalid JSON')) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
+
+        throw $e;
+    }
+
+    private function optionalPositiveInt(mixed $v): ?int
+    {
+        if (null === $v || false === $v || '' === $v) {
+            return null;
+        }
+        if (\is_int($v)) {
+            return $v > 0 ? $v : null;
+        }
+        if (\is_string($v) && is_numeric($v)) {
+            $i = (int) $v;
+
+            return $i > 0 ? $i : null;
+        }
+
+        return null;
+    }
+
+    private function mapEnviarMensajeRequest(array $data): EnviarMensajeRequest
+    {
+        $dto = new EnviarMensajeRequest();
+        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
+        $dto->body = isset($data['body']) && \is_string($data['body']) ? trim($data['body']) : null;
+        if (isset($data['source_lang']) && \is_string($data['source_lang'])) {
+            $dto->source_lang = 'en' === $data['source_lang'] ? 'en' : ('es' === $data['source_lang'] ? 'es' : null);
+        }
+
+        return $dto;
+    }
+
+    private function mapEnviarPrimerMensajeRequest(array $data): EnviarPrimerMensajeRequest
+    {
+        $dto = new EnviarPrimerMensajeRequest();
+        $dto->other_user_id = $this->optionalPositiveInt($data['other_user_id'] ?? null);
+        $dto->body = isset($data['body']) && \is_string($data['body']) ? trim($data['body']) : null;
+        if (isset($data['source_lang']) && \is_string($data['source_lang'])) {
+            $dto->source_lang = 'en' === $data['source_lang'] ? 'en' : ('es' === $data['source_lang'] ? 'es' : null);
+        }
+
+        return $dto;
+    }
+
+    private function mapMarcarLeidosRequest(array $data): MarcarLeidosRequest
+    {
+        $dto = new MarcarLeidosRequest();
+        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
+
+        return $dto;
+    }
+
+    private function mapTraducirMensajeRequest(array $data): TraducirMensajeRequest
+    {
+        $dto = new TraducirMensajeRequest();
+        $dto->text = isset($data['text']) && \is_string($data['text']) ? trim($data['text']) : null;
+        if (isset($data['target_lang']) && \is_string($data['target_lang'])) {
+            $dto->target_lang = 'en' === $data['target_lang'] ? 'en' : ('es' === $data['target_lang'] ? 'es' : null);
+        }
+        $dto->message_id = isset($data['message_id']) ? $this->optionalPositiveInt($data['message_id']) : null;
+        $dto->conversation_id = isset($data['conversation_id']) ? $this->optionalPositiveInt($data['conversation_id']) : null;
+
+        return $dto;
+    }
+
+    private function mapEliminarMensajeRequest(array $data): EliminarMensajeRequest
+    {
+        $dto = new EliminarMensajeRequest();
+        $dto->message_id = $this->optionalPositiveInt($data['message_id'] ?? null);
+        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
+        $dto->scope = isset($data['scope']) && \is_string($data['scope']) ? $data['scope'] : null;
+
+        return $dto;
+    }
+
+    private function mapOcultarConversacionRequest(array $data): OcultarConversacionRequest
+    {
+        $dto = new OcultarConversacionRequest();
+        $dto->conversation_id = $this->optionalPositiveInt($data['conversation_id'] ?? null);
+
+        return $dto;
     }
 }

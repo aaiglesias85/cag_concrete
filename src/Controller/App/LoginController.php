@@ -2,8 +2,11 @@
 
 namespace App\Controller\App;
 
+use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Dto\Api\Login\AutenticarRequest;
+use App\Dto\Api\Login\OlvidoContrasennaRequest;
 use App\Service\Admin\UsuarioService as AdminUsuarioService;
 use App\Service\App\LoginService;
 use OpenApi\Attributes as OA;
@@ -13,11 +16,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'Login', description: 'Authentication endpoints for mobile application')]
 class LoginController extends AbstractController
 {
+    use ApiValidationResponseTrait;
     use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
@@ -32,6 +37,7 @@ class LoginController extends AbstractController
         private RateLimiterFactory $apiLoginLimiter,
         #[Autowire(service: 'limiter.api_forgot_password')]
         private RateLimiterFactory $apiForgotPasswordLimiter,
+        private ValidatorInterface $validator,
     ) {
         $this->loginService = $loginService;
         $this->adminUsuarioService = $adminUsuarioService;
@@ -96,6 +102,32 @@ class LoginController extends AbstractController
                     ]
                 )
             ),
+            new OA\Response(
+                response: 400,
+                description: 'Invalid JSON body or validation error',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'error', type: 'string', description: 'First validation message'),
+                        new OA\Property(
+                            property: 'violations',
+                            type: 'object',
+                            additionalProperties: new OA\AdditionalProperties(type: 'array', items: new OA\Items(type: 'string')),
+                            example: ['email' => ['This value should not be blank.']],
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 429,
+                description: 'Too many requests — login rate limit per IP',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'error', type: 'string'),
+                    ]
+                )
+            ),
             new OA\Response(response: 500, description: 'Internal server error'),
         ]
     )]
@@ -108,14 +140,11 @@ class LoginController extends AbstractController
 
             // Leer parámetros desde JSON solamente
             $data = $this->getRequestData($request);
-
-            $email = $data['email'] ?? null;
-            $pass = $data['password'] ?? null;
-
-            // Para la app móvil
-            $player_id = $data['player_id'] ?? null;
-            $push_token = $data['push_token'] ?? null;
-            $plataforma = $data['plataforma'] ?? null;
+            $payload = $this->mapAutenticarRequest($data);
+            $violations = $this->validator->validate($payload);
+            if (\count($violations) > 0) {
+                return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+            }
 
             $clientIp = $request->getClientIp() ?? '0.0.0.0';
             $loginLimiter = $this->apiLoginLimiter->create($clientIp);
@@ -129,7 +158,14 @@ class LoginController extends AbstractController
                 ]);
             }
 
-            $resultado = $this->loginService->AutenticarLogin($email, $pass, $player_id, $push_token, $plataforma, $lang);
+            $resultado = $this->loginService->AutenticarLogin(
+                $payload->email,
+                $payload->password,
+                $payload->player_id,
+                $payload->push_token,
+                $payload->plataforma,
+                $lang
+            );
 
             if ($resultado['success']) {
                 $loginLimiter->reset();
@@ -278,6 +314,21 @@ class LoginController extends AbstractController
                     properties: [
                         new OA\Property(property: 'success', type: 'boolean', example: false),
                         new OA\Property(property: 'error', type: 'string', example: 'Invalid JSON format or missing email'),
+                        new OA\Property(
+                            property: 'violations',
+                            type: 'object',
+                            additionalProperties: new OA\AdditionalProperties(type: 'array', items: new OA\Items(type: 'string')),
+                        ),
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 429,
+                description: 'Too many requests — forgot-password rate limit per IP',
+                content: new OA\JsonContent(
+                    properties: [
+                        new OA\Property(property: 'success', type: 'boolean', example: false),
+                        new OA\Property(property: 'error', type: 'string'),
                     ]
                 )
             ),
@@ -291,6 +342,14 @@ class LoginController extends AbstractController
             $request->setLocale($lang);
             $this->setTranslatorLocale($this->translator, $lang);
 
+            // Leer parámetros desde JSON solamente
+            $data = $this->getRequestData($request);
+            $payload = $this->mapOlvidoContrasennaRequest($data);
+            $violations = $this->validator->validate($payload);
+            if (\count($violations) > 0) {
+                return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+            }
+
             $clientIp = $request->getClientIp() ?? '0.0.0.0';
             $forgotLimiter = $this->apiForgotPasswordLimiter->create($clientIp);
             $rate = $forgotLimiter->consume(1);
@@ -303,20 +362,8 @@ class LoginController extends AbstractController
                 ]);
             }
 
-            // Leer parámetros desde JSON solamente
-            $data = $this->getRequestData($request);
-
-            $email = $data['email'] ?? null;
-
-            if (empty($email)) {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $this->translator->trans('error.email_incorrecto', [], 'messages', $lang);
-
-                return $this->json($resultadoJson, 400);
-            }
-
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
-            $this->adminUsuarioService->RecuperarContrasenna($email);
+            $this->adminUsuarioService->RecuperarContrasenna($payload->email);
 
             // Siempre devolver éxito independientemente de si el email existe o no
             // Esto previene que usuarios maliciosos descubran emails registrados
@@ -341,4 +388,25 @@ class LoginController extends AbstractController
             return $this->json($resultadoJson, 500);
         }
     }
+
+    private function mapAutenticarRequest(array $data): AutenticarRequest
+    {
+        $dto = new AutenticarRequest();
+        $dto->email = isset($data['email']) && \is_string($data['email']) ? trim($data['email']) : null;
+        $dto->password = isset($data['password']) && \is_string($data['password']) ? $data['password'] : null;
+        $dto->player_id = isset($data['player_id']) && \is_string($data['player_id']) ? $data['player_id'] : null;
+        $dto->push_token = isset($data['push_token']) && \is_string($data['push_token']) ? $data['push_token'] : null;
+        $dto->plataforma = isset($data['plataforma']) && \is_string($data['plataforma']) ? $data['plataforma'] : null;
+
+        return $dto;
+    }
+
+    private function mapOlvidoContrasennaRequest(array $data): OlvidoContrasennaRequest
+    {
+        $dto = new OlvidoContrasennaRequest();
+        $dto->email = isset($data['email']) && \is_string($data['email']) ? trim($data['email']) : null;
+
+        return $dto;
+    }
+
 }

@@ -1,0 +1,6 @@
+api:
+  validation:
+    password_change_requires_current: 'When setting a new password, you must provide the current password.'
+    profile_offline_required: 'The profile_offline object is required in the JSON body.'
+    conversation_id_with_message_id: 'When message_id is set, you must also send a valid conversation_id.'
+    imagen_required: 'You must send the base64 image in the imagen field.'

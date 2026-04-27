@@ -2,8 +2,11 @@
 
 namespace App\Controller\App;
 
+use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\JsonRequestTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
+use App\Dto\Api\Usuario\ActualizarUsuarioDatosRequest;
+use App\Dto\Api\Usuario\SalvarImagenUsuarioRequest;
 use App\Entity\Usuario;
 use App\Service\App\LoginService;
 use App\Service\App\UsuarioService;
@@ -11,19 +14,26 @@ use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[OA\Tag(name: 'User', description: 'User profile management endpoints')]
 class UsuarioController extends AbstractController
 {
+    use ApiValidationResponseTrait;
     use JsonRequestTrait;
     use SetsTranslatorLocaleTrait;
     private LoginService $loginService;
     private UsuarioService $usuarioService;
     private TranslatorInterface $translator;
 
-    public function __construct(LoginService $loginService, UsuarioService $usuarioService, TranslatorInterface $translator)
-    {
+    public function __construct(
+        LoginService $loginService,
+        UsuarioService $usuarioService,
+        TranslatorInterface $translator,
+        private ValidatorInterface $validator,
+    ) {
         $this->loginService = $loginService;
         $this->usuarioService = $usuarioService;
         $this->translator = $translator;
@@ -160,20 +170,26 @@ class UsuarioController extends AbstractController
         try {
             // Leer parámetros desde JSON body solamente
             $data = $this->getRequestData($request);
+            $payload = $this->mapActualizarUsuarioDatosRequest($data);
+            $violations = $this->validator->validate($payload);
+            if (\count($violations) > 0) {
+                return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
+            }
+
             $user = $this->getUser();
             if (!$user instanceof Usuario) {
                 return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
             }
             // Si solo se envía preferred_lang, mantener el resto de datos del usuario
-            $nombre = $data['nombre'] ?? $user->getNombre();
-            $apellidos = $data['apellidos'] ?? $user->getApellidos();
-            $email = $data['email'] ?? $user->getEmail();
-            $telefono = $data['telefono'] ?? $user->getTelefono();
+            $nombre = null !== $payload->nombre ? $payload->nombre : $user->getNombre();
+            $apellidos = null !== $payload->apellidos ? $payload->apellidos : $user->getApellidos();
+            $email = null !== $payload->email ? $payload->email : $user->getEmail();
+            $telefono = null !== $payload->telefono ? $payload->telefono : $user->getTelefono();
 
             // Contraseñas opcionales (solo si se quiere cambiar)
-            $password_actual = $data['password_actual'] ?? '';
-            $password = $data['password'] ?? '';
-            $preferred_lang = isset($data['preferred_lang']) && 'en' === $data['preferred_lang'] ? 'en' : (isset($data['preferred_lang']) && 'es' === $data['preferred_lang'] ? 'es' : null);
+            $password_actual = $payload->password_actual ?? '';
+            $password = $payload->password ?? '';
+            $preferred_lang = $payload->preferred_lang;
 
             // Actualizar datos (con o sin cambiar contraseña o idioma)
             $resultado = $this->usuarioService->ActualizarMisDatos(
@@ -277,16 +293,13 @@ class UsuarioController extends AbstractController
 
             // Leer parámetros desde JSON body o form data
             $data = $this->getRequestData($request);
-
-            // por base 64
-            $imagen = $data['imagen'] ?? null;
-
-            if (empty($imagen)) {
-                $resultadoJson['success'] = false;
-                $resultadoJson['error'] = $this->translator->trans('usuario.error.no_imagen', [], 'messages', $lang);
-
-                return $this->json($resultadoJson);
+            $payload = $this->mapSalvarImagenUsuarioRequest($data);
+            $violations = $this->validator->validate($payload);
+            if (\count($violations) > 0) {
+                return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
             }
+
+            $imagen = $payload->imagen;
 
             $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen), true);
             if (false === $binary || '' === $binary) {
@@ -395,5 +408,29 @@ class UsuarioController extends AbstractController
 
             return $this->json($resultadoJson, 500);
         }
+    }
+
+    private function mapActualizarUsuarioDatosRequest(array $data): ActualizarUsuarioDatosRequest
+    {
+        $dto = new ActualizarUsuarioDatosRequest();
+        $dto->nombre = \array_key_exists('nombre', $data) && \is_string($data['nombre']) ? trim($data['nombre']) : null;
+        $dto->apellidos = \array_key_exists('apellidos', $data) && \is_string($data['apellidos']) ? trim($data['apellidos']) : null;
+        $dto->email = \array_key_exists('email', $data) && \is_string($data['email']) ? trim($data['email']) : null;
+        $dto->telefono = \array_key_exists('telefono', $data) && \is_string($data['telefono']) ? trim($data['telefono']) : null;
+        $dto->password_actual = \array_key_exists('password_actual', $data) && \is_string($data['password_actual']) ? $data['password_actual'] : null;
+        $dto->password = \array_key_exists('password', $data) && \is_string($data['password']) ? $data['password'] : null;
+        if (\array_key_exists('preferred_lang', $data) && \is_string($data['preferred_lang'])) {
+            $dto->preferred_lang = 'en' === $data['preferred_lang'] ? 'en' : ('es' === $data['preferred_lang'] ? 'es' : null);
+        }
+
+        return $dto;
+    }
+
+    private function mapSalvarImagenUsuarioRequest(array $data): SalvarImagenUsuarioRequest
+    {
+        $dto = new SalvarImagenUsuarioRequest();
+        $dto->imagen = isset($data['imagen']) && \is_string($data['imagen']) ? $data['imagen'] : null;
+
+        return $dto;
     }
 }

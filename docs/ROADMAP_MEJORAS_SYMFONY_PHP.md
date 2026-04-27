@@ -249,7 +249,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
 | **B — DI limpia** | Quitar el próximo `container->get` más usado; inyectar repositorio o servicio; repetir en PRs pequeños | Medio | Bajo si es incremental | **Hecho** |
 | **C — Base** | Extraer *un* módulo de lógica de `Base` a un servicio dedicado; dejar de crecer `Base` | Medio | Medio; mitigar con tests | **Hecho** (fachada + satélites; ver §9.1) |
 | **D — Nombres** | `App\Utils\*` → `App\Service\*` (admin, app API, `Base`, QBWC, etc.) | Hecho (repo completo) | Bajo | **Hecho** |
-| **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Pendiente** |
+| **E — API** | DTO + validación en un endpoint nuevo o refactor de uno existente | Medio | Medio | **Hecho** |
 | **F — Seguridad ops** | Login throttling, revisar deprecations security | Bajo | Bajo | **Hecho** (ver §9.1) |
 | **G — Async** | Un message + handler de caso real (email o reporte) | Medio | Bajo con transport sync primero | **Pendiente** |
 
@@ -263,6 +263,7 @@ La columna **Estado** es la que conviene ir actualizando al cerrar trabajo. El d
   - **Aún en `Base` (candidatos futuros §2.2):** helpers HTTP/legacy (`isMobile`, `getIP`, `ObtenerURL`), ordenación de arrays (`ordenarArrayAsc`/`Desc`), `estilizarCelda` (PhpSpreadsheet), y la fachada pública que mantienen los hijos sin tocar firmas.
   - **Disciplina:** no añadir métodos nuevos a `Base` salvo necesidad; nuevas capacidades → servicio inyectable (roadmap §2.2).
 - **D — Nombres:** Namespace unificado en `App\Service\*` (sin `App\Utils\*` en servicios de aplicación).
+- **E — API:** DTOs + validación en endpoints JSON de la app: `Login` (`AutenticarRequest`, `OlvidoContrasennaRequest`), `Usuario` (`ActualizarUsuarioDatosRequest`, `SalvarImagenUsuarioRequest`), `Offline` (`OfflineSincronizarRequest` + `OfflineProfilePayloadRequest`), `Message` (enviar mensaje, marcar leídos, traducir, eliminar, ocultar). Respuesta 400 unificada: `success`, `error`, `violations`. Trait `App\Controller\App\Traits\ApiValidationResponseTrait`. OpenAPI login: 400/429.
 - **F — Seguridad ops:** `config/packages/security.yaml`: `login_throttling` en firewall `main` (5 intentos / 15 min); `access_control` migrado de `IS_AUTHENTICATED_ANONYMOUSLY` a `PUBLIC_ACCESS` (recomendación Symfony 7 / anonimato en `access_control`). `config/packages/rate_limiter.yaml` (`api_login`, `api_forgot_password`) + `symfony/lock`: `LoginController` (API JSON) y `UsuarioController::autenticar` (web `/usuario/autenticar`) comparten `limiter.api_login` por IP (429 + `Retry-After`); olvido contraseña API sigue con `api_forgot_password`. Seguir revisando deprecations de Security en cada subida de Symfony (logs en staging).
 
 ---
