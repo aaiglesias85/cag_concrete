@@ -263,8 +263,8 @@ class TaskService extends Base
         }
 
         usort($list, static function (array $a, array $b): int {
-            $aDone = $a['status'] === Task::STATUS_COMPLETE ? 1 : 0;
-            $bDone = $b['status'] === Task::STATUS_COMPLETE ? 1 : 0;
+            $aDone = Task::STATUS_COMPLETE === $a['status'] ? 1 : 0;
+            $bDone = Task::STATUS_COMPLETE === $b['status'] ? 1 : 0;
             if ($aDone !== $bDone) {
                 return $aDone - $bDone; // pending first, complete last
             }

@@ -101,7 +101,7 @@ class UsuarioService extends Base
         /** @var Usuario $entity */
         if (null != $entity) {
             // Verificar email
-            /** @var \App\Repository\UsuarioRepository $usuarioRepo */
+            /** @var UsuarioRepository $usuarioRepo */
             $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
             $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
             if (null != $usuario) {
@@ -445,7 +445,7 @@ class UsuarioService extends Base
         /** @var Usuario $entity */
         if (null != $entity) {
             // Verificar email
-            /** @var \App\Repository\UsuarioRepository $usuarioRepo */
+            /** @var UsuarioRepository $usuarioRepo */
             $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
             $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
             if (null != $usuario) {
@@ -481,7 +481,7 @@ class UsuarioService extends Base
 
             // Permisos
             // Eliminar anteriores
-            /** @var \App\Repository\PermisoUsuarioRepository $permisoUsuarioRepo */
+            /** @var PermisoUsuarioRepository $permisoUsuarioRepo */
             $permisoUsuarioRepo = $this->getDoctrine()->getRepository(PermisoUsuario::class);
             $permisos_usuario = $permisoUsuarioRepo->ListarPermisosUsuario($usuario_id);
             foreach ($permisos_usuario as $permiso_usuario) {
@@ -549,7 +549,7 @@ class UsuarioService extends Base
         $em = $this->getDoctrine()->getManager();
 
         // Verificar email
-        /** @var \App\Repository\UsuarioRepository $usuarioRepo */
+        /** @var UsuarioRepository $usuarioRepo */
         $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
         $usuario = $usuarioRepo->BuscarUsuarioPorEmail($email);
         if (null != $usuario) {
@@ -642,7 +642,7 @@ class UsuarioService extends Base
      */
     public function ListarUsuarios(int $start, int $limit, ?string $sSearch, ?string $iSortCol_0, ?string $sSortDir_0, ?string $perfil_id, ?string $estado)
     {
-        /** @var \App\Repository\UsuarioRepository $usuarioRepo */
+        /** @var UsuarioRepository $usuarioRepo */
         $usuarioRepo = $this->getDoctrine()->getRepository(Usuario::class);
         $resultado = $usuarioRepo->ListarUsuariosConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $perfil_id, $estado);
 

@@ -730,7 +730,7 @@ class DefaultService extends Base
 
             /** @var InvoiceItemRepository $invoiceItemRepo */
             $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
-            $amount = $invoiceItemRepo->TotalInvoice('', '', $project_id !== null ? (string) $project_id : null);
+            $amount = $invoiceItemRepo->TotalInvoice('', '', null !== $project_id ? (string) $project_id : null);
             if ($amount > 0) {
                 $arreglo_resultado[] = [
                     'project_id' => $project_id,

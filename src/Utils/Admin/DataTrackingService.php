@@ -1278,8 +1278,6 @@ class DataTrackingService extends Base
      * ModificarStatusProject.
      *
      * @param Project $project_entity
-     *
-     * @return void
      */
     public function ModificarStatusProject($project_entity, \DateTimeInterface $workDate): void
     {

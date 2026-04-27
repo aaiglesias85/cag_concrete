@@ -27,7 +27,6 @@ use App\Entity\InvoiceOverridePayment;
 use App\Entity\Item;
 use App\Entity\Notification;
 use App\Entity\Project;
-use App\Entity\Usuario;
 use App\Entity\ProjectAttachment;
 use App\Entity\ProjectConcreteClass;
 use App\Entity\ProjectContact;
@@ -40,6 +39,7 @@ use App\Entity\ProjectPriceAdjustment;
 use App\Entity\Schedule;
 use App\Entity\ScheduleConcreteVendorContact;
 use App\Entity\ScheduleEmployee;
+use App\Entity\Usuario;
 use App\Repository\DataTrackingConcVendorRepository;
 use App\Repository\DataTrackingItemRepository;
 use App\Repository\DataTrackingLaborRepository;
@@ -732,7 +732,7 @@ class ProjectService extends Base
     /**
      * ListarLeadsDeDataTracking.
      *
-     * @return string Nombres de leads separados por coma (puede ser cadena vacía).
+     * @return string nombres de leads separados por coma (puede ser cadena vacía)
      */
     private function ListarLeadsDeDataTracking($data_tracking_id)
     {
@@ -3967,9 +3967,9 @@ class ProjectService extends Base
      * Guarda los prevailing roles (labor types) con rate en la tabla intermedia
      * $prevailing_roles: array de objetos con role_id y rate (ej. [ { role_id: 1, rate: 25.50 }, ... ]).
      *
-     * @param Project $entity
+     * @param Project      $entity
      * @param array|string $prevailing_roles
-     * @param bool    $check_changes
+     * @param bool         $check_changes
      *
      * @return array
      */

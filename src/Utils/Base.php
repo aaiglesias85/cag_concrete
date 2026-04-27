@@ -870,7 +870,7 @@ class Base
             $ip = $this->getIP();
             $entity->setIp($ip);
 
-            $entity->setUsuario($usuario instanceof \App\Entity\Usuario ? $usuario : null);
+            $entity->setUsuario($usuario instanceof Usuario ? $usuario : null);
 
             $entity->setFecha(new \DateTime());
 
