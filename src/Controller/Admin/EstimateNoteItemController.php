@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EstimateNoteItemService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class EstimateNoteItemController extends AbstractAdminController
 {
     private EstimateNoteItemService $estimateNoteItemService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EstimateNoteItemService $estimateNoteItemService) {
+        EstimateNoteItemService $estimateNoteItemService)
+    {
         parent::__construct($adminAccess);
         $this->estimateNoteItemService = $estimateNoteItemService;
     }

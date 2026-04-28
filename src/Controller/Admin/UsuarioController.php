@@ -4,8 +4,8 @@ namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
 use App\Dto\Admin\Usuario\ActualizarMisDatosAdminRequest;
-use App\Dto\Admin\Usuario\UsuarioActualizarRequest;
 use App\Dto\Admin\Usuario\LoginCredentialsRequest;
+use App\Dto\Admin\Usuario\UsuarioActualizarRequest;
 use App\Dto\Admin\Usuario\UsuarioIdRequest;
 use App\Dto\Admin\Usuario\UsuarioIdsRequest;
 use App\Dto\Admin\Usuario\UsuarioListarRequest;
@@ -42,7 +42,8 @@ class UsuarioController extends AbstractAdminController
         FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
         private TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'limiter.api_login')]
-        private RateLimiterFactory $apiLoginLimiter) {
+        private RateLimiterFactory $apiLoginLimiter)
+    {
         parent::__construct($adminAccess);
         $this->usuarioService = $usuarioService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
@@ -250,7 +251,6 @@ class UsuarioController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(UsuarioSalvarRequest $p): JsonResponse
     {
-
         return $this->persistUsuario('', $p);
     }
 

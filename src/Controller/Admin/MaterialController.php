@@ -14,13 +14,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\MaterialService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class MaterialController extends AbstractAdminController
 {
     private $materialService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        MaterialService $materialService) {
+        MaterialService $materialService)
+    {
         parent::__construct($adminAccess);
         $this->materialService = $materialService;
     }

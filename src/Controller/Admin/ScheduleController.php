@@ -26,7 +26,8 @@ class ScheduleController extends AbstractAdminController
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ScheduleService $scheduleService) {
+        ScheduleService $scheduleService)
+    {
         parent::__construct($adminAccess);
         $this->scheduleService = $scheduleService;
     }

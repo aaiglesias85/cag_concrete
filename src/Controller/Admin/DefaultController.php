@@ -21,9 +21,8 @@ use App\Service\Admin\NotificationService;
 use App\Service\Admin\ScheduleService;
 use App\Service\Admin\TaskService;
 use App\Service\Admin\WidgetAccessService;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends AbstractAdminController
 {
@@ -47,7 +46,8 @@ class DefaultController extends AbstractAdminController
         ScheduleService $scheduleService,
         EstimateService $estimateService,
         DataTrackingService $dataTrackingService,
-        WidgetAccessService $widgetAccessService) {
+        WidgetAccessService $widgetAccessService)
+    {
         parent::__construct($adminAccess);
         $this->defaultService = $defaultService;
         $this->logService = $logService;

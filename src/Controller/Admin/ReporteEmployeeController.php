@@ -12,6 +12,7 @@ use App\Service\Admin\EmployeeService;
 use App\Service\Admin\ProjectService;
 use App\Service\Admin\ReporteEmployeeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ReporteEmployeeController extends AbstractAdminController
 {
     private $reporteService;
@@ -22,7 +23,8 @@ class ReporteEmployeeController extends AbstractAdminController
         AdminAccessService $adminAccess,
         ReporteEmployeeService $reporteService,
         ProjectService $projectService,
-        EmployeeService $employeeService) {
+        EmployeeService $employeeService)
+    {
         parent::__construct($adminAccess);
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;

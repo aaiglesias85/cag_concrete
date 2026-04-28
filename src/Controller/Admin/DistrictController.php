@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\DistrictService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class DistrictController extends AbstractAdminController
 {
     private $districtService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        DistrictService $districtService) {
+        DistrictService $districtService)
+    {
         parent::__construct($adminAccess);
         $this->districtService = $districtService;
     }

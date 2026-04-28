@@ -26,7 +26,8 @@ class TaskController extends AbstractAdminController
         AdminAccessService $adminAccess,
         private readonly TaskService $taskService,
         private readonly DefaultService $defaultService,
-        private readonly WidgetAccessService $widgetAccessService) {
+        private readonly WidgetAccessService $widgetAccessService)
+    {
         parent::__construct($adminAccess);
     }
 

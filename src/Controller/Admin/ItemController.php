@@ -15,13 +15,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ItemService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ItemController extends AbstractAdminController
 {
     private $itemService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ItemService $itemService) {
+        ItemService $itemService)
+    {
         parent::__construct($adminAccess);
         $this->itemService = $itemService;
     }
@@ -83,7 +85,6 @@ class ItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ItemSalvarRequest $d): JsonResponse
     {
-
         $usuario = $this->DevolverUsuario();
         $bond = $d->bond;
         if (!$usuario->getBond() && (1 == $bond || '1' === $bond || true === $bond)) {
@@ -126,7 +127,6 @@ class ItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ItemActualizarRequest $d): JsonResponse
     {
-
         $usuario = $this->DevolverUsuario();
         $bond = $d->bond;
         if (!$usuario->getBond() && (1 == $bond || '1' === $bond || true === $bond)) {

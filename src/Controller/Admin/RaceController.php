@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\RaceService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class RaceController extends AbstractAdminController
 {
     private $raceService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        RaceService $raceService) {
+        RaceService $raceService)
+    {
         parent::__construct($adminAccess);
         $this->raceService = $raceService;
     }

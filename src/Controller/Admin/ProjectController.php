@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Project\ProjectActualizarNotesRequest;
+use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectAgregarItemRequest;
 use App\Dto\Admin\Project\ProjectAjusteRowIdRequest;
 use App\Dto\Admin\Project\ProjectArchivoNombreRequest;
@@ -13,17 +15,15 @@ use App\Dto\Admin\Project\ProjectContactIdRequest;
 use App\Dto\Admin\Project\ProjectEliminarNotesDateRequest;
 use App\Dto\Admin\Project\ProjectIdRequest;
 use App\Dto\Admin\Project\ProjectIdsRequest;
-use App\Dto\Admin\Project\ProjectListarRequest;
+use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
 use App\Dto\Admin\Project\ProjectListarItemsCompletionFiltroRequest;
 use App\Dto\Admin\Project\ProjectListarItemsInvoiceRequest;
 use App\Dto\Admin\Project\ProjectListarNotesRequest;
-use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
 use App\Dto\Admin\Project\ProjectListarOrdenadosRequest;
+use App\Dto\Admin\Project\ProjectListarRequest;
 use App\Dto\Admin\Project\ProjectNotesIdRequest;
 use App\Dto\Admin\Project\ProjectProjectItemIdRequest;
 use App\Dto\Admin\Project\ProjectReimbursementInvoiceIdRequest;
-use App\Dto\Admin\Project\ProjectActualizarNotesRequest;
-use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectSalvarNotesRequest;
 use App\Dto\Admin\Project\ProjectSalvarRequest;
 use App\Dto\Admin\Project\ProjectSaveReimbursementRequest;
@@ -48,7 +48,6 @@ use App\Service\Admin\ProjectService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ProjectController extends AbstractAdminController
 {
@@ -58,7 +57,8 @@ class ProjectController extends AbstractAdminController
     public function __construct(
         AdminAccessService $adminAccess,
         ProjectService $projectService,
-        InvoiceService $invoiceService) {
+        InvoiceService $invoiceService)
+    {
         parent::__construct($adminAccess);
         $this->projectService = $projectService;
         $this->invoiceService = $invoiceService;
@@ -177,7 +177,6 @@ class ProjectController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ProjectSalvarRequest $d): JsonResponse
     {
-
         return $this->persistProject('', $d);
     }
 

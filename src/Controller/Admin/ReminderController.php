@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ReminderService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ReminderController extends AbstractAdminController
 {
     private $reminderService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ReminderService $reminderService) {
+        ReminderService $reminderService)
+    {
         parent::__construct($adminAccess);
         $this->reminderService = $reminderService;
     }

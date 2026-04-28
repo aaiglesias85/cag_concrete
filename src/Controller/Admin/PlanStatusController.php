@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PlanStatusService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class PlanStatusController extends AbstractAdminController
 {
     private $planStatusService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        PlanStatusService $planStatusService) {
+        PlanStatusService $planStatusService)
+    {
         parent::__construct($adminAccess);
         $this->planStatusService = $planStatusService;
     }

@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProjectStageService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ProjectStageController extends AbstractAdminController
 {
     private $projectStageService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ProjectStageService $projectStageService) {
+        ProjectStageService $projectStageService)
+    {
         parent::__construct($adminAccess);
         $this->projectStageService = $projectStageService;
     }

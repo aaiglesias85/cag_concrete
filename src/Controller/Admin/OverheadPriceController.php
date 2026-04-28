@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\OverheadPriceService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class OverheadPriceController extends AbstractAdminController
 {
     private $overheadService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        OverheadPriceService $overheadService) {
+        OverheadPriceService $overheadService)
+    {
         parent::__construct($adminAccess);
         $this->overheadService = $overheadService;
     }

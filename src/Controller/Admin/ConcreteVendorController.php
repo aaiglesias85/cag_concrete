@@ -14,13 +14,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ConcreteVendorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ConcreteVendorController extends AbstractAdminController
 {
     private $concreteVendorService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ConcreteVendorService $concreteVendorService) {
+        ConcreteVendorService $concreteVendorService)
+    {
         parent::__construct($adminAccess);
         $this->concreteVendorService = $concreteVendorService;
     }

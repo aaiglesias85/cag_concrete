@@ -11,6 +11,7 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\HolidayService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+
 class HolidayController extends AbstractAdminController
 {
     private $holidayService;

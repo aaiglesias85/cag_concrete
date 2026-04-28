@@ -3,7 +3,6 @@
 namespace App\Dto\Admin\ConcreteVendor;
 
 use App\Dto\Admin\AdminHttpRequestDtoInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 

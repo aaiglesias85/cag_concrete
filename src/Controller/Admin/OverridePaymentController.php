@@ -31,7 +31,8 @@ class OverridePaymentController extends AbstractAdminController
 
     public function __construct(
         AdminAccessService $adminAccess,
-        OverridePaymentService $overridePaymentService) {
+        OverridePaymentService $overridePaymentService)
+    {
         parent::__construct($adminAccess);
         $this->overridePaymentService = $overridePaymentService;
     }

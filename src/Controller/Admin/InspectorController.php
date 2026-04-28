@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InspectorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class InspectorController extends AbstractAdminController
 {
     private $inspectorService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        InspectorService $inspectorService) {
+        InspectorService $inspectorService)
+    {
         parent::__construct($adminAccess);
         $this->inspectorService = $inspectorService;
     }

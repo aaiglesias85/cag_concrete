@@ -17,13 +17,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class EmployeeController extends AbstractAdminController
 {
     private $employeeService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EmployeeService $employeeService) {
+        EmployeeService $employeeService)
+    {
         parent::__construct($adminAccess);
         $this->employeeService = $employeeService;
     }

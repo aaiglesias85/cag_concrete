@@ -3,7 +3,6 @@
 namespace App\Dto\Admin\ReporteSubcontractor;
 
 use App\Dto\Admin\AdminHttpRequestDtoInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 
 /**

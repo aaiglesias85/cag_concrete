@@ -11,9 +11,9 @@ use App\Dto\Admin\DataTracking\DataTrackingIdRequest;
 use App\Dto\Admin\DataTracking\DataTrackingIdsRequest;
 use App\Dto\Admin\DataTracking\DataTrackingItemIdRequest;
 use App\Dto\Admin\DataTracking\DataTrackingLaborIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingListarRequest;
 use App\Dto\Admin\DataTracking\DataTrackingMaterialIdRequest;
 use App\Dto\Admin\DataTracking\DataTrackingSalvarItemRequest;
-use App\Dto\Admin\DataTracking\DataTrackingListarRequest;
 use App\Dto\Admin\DataTracking\DataTrackingSalvarRequest;
 use App\Dto\Admin\DataTracking\DataTrackingSubcontractIdRequest;
 use App\Dto\Admin\DataTracking\DataTrackingValidarSiExisteRequest;
@@ -45,7 +45,8 @@ class DataTrackingController extends AbstractAdminController
     public function __construct(
         AdminAccessService $adminAccess,
         DataTrackingService $dataTrackingService,
-        ProjectService $projectService) {
+        ProjectService $projectService)
+    {
         parent::__construct($adminAccess);
         $this->projectService = $projectService;
         $this->dataTrackingService = $dataTrackingService;
@@ -157,7 +158,6 @@ class DataTrackingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DATA_TRACKING, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(DataTrackingSalvarRequest $d): JsonResponse
     {
-
         return $this->procesarSalvarDataTracking('', $d);
     }
 
@@ -167,7 +167,6 @@ class DataTrackingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DATA_TRACKING, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(DataTrackingActualizarRequest $dAct): JsonResponse
     {
-
         $d = DataTrackingSalvarRequest::fromActualizarRequest($dAct);
 
         return $this->procesarSalvarDataTracking((string) $dAct->data_tracking_id, $d);

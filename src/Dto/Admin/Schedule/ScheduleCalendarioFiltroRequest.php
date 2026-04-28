@@ -3,7 +3,6 @@
 namespace App\Dto\Admin\Schedule;
 
 use App\Dto\Admin\AdminHttpRequestDtoInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 
 final class ScheduleCalendarioFiltroRequest implements AdminHttpRequestDtoInterface

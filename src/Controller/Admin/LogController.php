@@ -11,13 +11,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\LogService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class LogController extends AbstractAdminController
 {
     private $logService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        LogService $logService) {
+        LogService $logService)
+    {
         parent::__construct($adminAccess);
         $this->logService = $logService;
     }

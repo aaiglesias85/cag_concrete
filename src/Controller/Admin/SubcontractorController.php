@@ -8,26 +8,28 @@ use App\Dto\Admin\Subcontractor\SubcontractorAgregarEmployeeRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorEmployeeIdRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorIdRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorIdsRequest;
-use App\Dto\Admin\Subcontractor\SubcontractorNoteIdRequest;
-use App\Dto\Admin\Subcontractor\SubcontractorNotesDateRangeRequest;
-use App\Dto\Admin\Subcontractor\SubcontractorNotesActualizarRequest;
-use App\Dto\Admin\Subcontractor\SubcontractorNotesSalvarRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorListarEmployeesRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorListarNotesRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorListarRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNoteIdRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesActualizarRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesDateRangeRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesSalvarRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorSalvarRequest;
 use App\Security\AdminPermission;
 use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\SubcontractorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class SubcontractorController extends AbstractAdminController
 {
     private $subcontractorService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        SubcontractorService $subcontractorService) {
+        SubcontractorService $subcontractorService)
+    {
         parent::__construct($adminAccess);
         $this->subcontractorService = $subcontractorService;
     }

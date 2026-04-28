@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\UnitService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class UnitController extends AbstractAdminController
 {
     private $unitService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        UnitService $unitService) {
+        UnitService $unitService)
+    {
         parent::__construct($adminAccess);
         $this->unitService = $unitService;
     }

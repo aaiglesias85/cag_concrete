@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProposalTypeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ProposalTypeController extends AbstractAdminController
 {
     private $proposalTypeService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ProposalTypeService $proposalTypeService) {
+        ProposalTypeService $proposalTypeService)
+    {
         parent::__construct($adminAccess);
         $this->proposalTypeService = $proposalTypeService;
     }

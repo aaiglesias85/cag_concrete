@@ -14,13 +14,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\CountyService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class CountyController extends AbstractAdminController
 {
     private $countyService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        CountyService $countyService) {
+        CountyService $countyService)
+    {
         parent::__construct($adminAccess);
         $this->countyService = $countyService;
     }

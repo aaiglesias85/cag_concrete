@@ -11,13 +11,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\NotificationService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class NotificationController extends AbstractAdminController
 {
     private $notificationService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        NotificationService $notificationService) {
+        NotificationService $notificationService)
+    {
         parent::__construct($adminAccess);
         $this->notificationService = $notificationService;
     }

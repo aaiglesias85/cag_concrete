@@ -6,8 +6,8 @@ use App\Constants\FunctionId;
 use App\Dto\Admin\Equation\EquationActualizarRequest;
 use App\Dto\Admin\Equation\EquationIdRequest;
 use App\Dto\Admin\Equation\EquationIdsRequest;
-use App\Dto\Admin\Equation\EquationSalvarPayItemsRequest;
 use App\Dto\Admin\Equation\EquationListarRequest;
+use App\Dto\Admin\Equation\EquationSalvarPayItemsRequest;
 use App\Dto\Admin\Equation\EquationSalvarRequest;
 use App\Entity\Equation;
 use App\Security\AdminPermission;
@@ -22,7 +22,8 @@ class EquationController extends AbstractAdminController
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EquationService $equationService) {
+        EquationService $equationService)
+    {
         parent::__construct($adminAccess);
         $this->equationService = $equationService;
     }

@@ -13,13 +13,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ConcreteClassService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class ConcreteClassController extends AbstractAdminController
 {
     private $concreteClassService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ConcreteClassService $concreteClassService) {
+        ConcreteClassService $concreteClassService)
+    {
         parent::__construct($adminAccess);
         $this->concreteClassService = $concreteClassService;
     }

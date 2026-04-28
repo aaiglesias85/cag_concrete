@@ -9,8 +9,8 @@ use App\Dto\Admin\Invoice\InvoiceExportarRequest;
 use App\Dto\Admin\Invoice\InvoiceIdRequest;
 use App\Dto\Admin\Invoice\InvoiceIdsRequest;
 use App\Dto\Admin\Invoice\InvoiceItemIdRequest;
-use App\Dto\Admin\Invoice\InvoiceProyectoIdRequest;
 use App\Dto\Admin\Invoice\InvoiceListarRequest;
+use App\Dto\Admin\Invoice\InvoiceProyectoIdRequest;
 use App\Dto\Admin\Invoice\InvoiceSalvarRequest;
 use App\Dto\Admin\Invoice\InvoiceValidarRequest;
 use App\Entity\Company;
@@ -20,13 +20,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InvoiceService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class InvoiceController extends AbstractAdminController
 {
     private $invoiceService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        InvoiceService $invoiceService) {
+        InvoiceService $invoiceService)
+    {
         parent::__construct($adminAccess);
         $this->invoiceService = $invoiceService;
     }

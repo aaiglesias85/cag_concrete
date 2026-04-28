@@ -16,6 +16,7 @@ use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\PerfilService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class PerfilController extends AbstractAdminController
 {
     private $perfilService;
@@ -25,7 +26,8 @@ class PerfilController extends AbstractAdminController
     public function __construct(
         AdminAccessService $adminAccess,
         PerfilService $perfilService,
-        FuncionPermissionUiGrouping $funcionPermissionUiGrouping) {
+        FuncionPermissionUiGrouping $funcionPermissionUiGrouping)
+    {
         parent::__construct($adminAccess);
         $this->perfilService = $perfilService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;

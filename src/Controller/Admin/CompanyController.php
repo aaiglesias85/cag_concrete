@@ -24,13 +24,15 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\CompanyService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+
 class CompanyController extends AbstractAdminController
 {
     private $companyService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        CompanyService $companyService) {
+        CompanyService $companyService)
+    {
         parent::__construct($adminAccess);
         $this->companyService = $companyService;
     }
@@ -308,7 +310,6 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Add, jsonOnDenied: true)]
     public function salvarContact(CompanyContactSalvarRequest $d): JsonResponse
     {
-
         try {
             $resultado = $this->companyService->SalvarContact(
                 $d->company_id,
@@ -343,7 +344,6 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizarContact(CompanyContactActualizarRequest $d): JsonResponse
     {
-
         try {
             $resultado = $this->companyService->ActualizarContact(
                 $d->contact_id,

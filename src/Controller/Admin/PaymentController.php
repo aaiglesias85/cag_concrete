@@ -8,14 +8,14 @@ use App\Dto\Admin\Payment\PaymentArchivosRequest;
 use App\Dto\Admin\Payment\PaymentCambiarEstadoRequest;
 use App\Dto\Admin\Payment\PaymentInvoiceIdRequest;
 use App\Dto\Admin\Payment\PaymentInvoiceItemIdRequest;
+use App\Dto\Admin\Payment\PaymentListarNotesRequest;
+use App\Dto\Admin\Payment\PaymentListarRequest;
 use App\Dto\Admin\Payment\PaymentNoteIdRequest;
 use App\Dto\Admin\Payment\PaymentNotesActualizarRequest;
 use App\Dto\Admin\Payment\PaymentNotesDateRangeRequest;
 use App\Dto\Admin\Payment\PaymentNotesItemActualizarRequest;
 use App\Dto\Admin\Payment\PaymentNotesItemSalvarRequest;
 use App\Dto\Admin\Payment\PaymentNotesSalvarRequest;
-use App\Dto\Admin\Payment\PaymentListarNotesRequest;
-use App\Dto\Admin\Payment\PaymentListarRequest;
 use App\Dto\Admin\Payment\PaymentSalvarRequest;
 use App\Entity\Company;
 use App\Security\AdminPermission;
@@ -31,7 +31,8 @@ class PaymentController extends AbstractAdminController
 
     public function __construct(
         AdminAccessService $adminAccess,
-        PaymentService $paymentService) {
+        PaymentService $paymentService)
+    {
         parent::__construct($adminAccess);
         $this->paymentService = $paymentService;
     }

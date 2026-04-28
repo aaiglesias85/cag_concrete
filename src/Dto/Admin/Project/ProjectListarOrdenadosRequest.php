@@ -3,7 +3,6 @@
 namespace App\Dto\Admin\Project;
 
 use App\Dto\Admin\AdminHttpRequestDtoInterface;
-
 use Symfony\Component\HttpFoundation\Request;
 
 final class ProjectListarOrdenadosRequest implements AdminHttpRequestDtoInterface

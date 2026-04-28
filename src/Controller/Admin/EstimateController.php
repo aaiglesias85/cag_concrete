@@ -47,7 +47,8 @@ class EstimateController extends AbstractAdminController
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EstimateService $estimateService) {
+        EstimateService $estimateService)
+    {
         parent::__construct($adminAccess);
         $this->estimateService = $estimateService;
     }
@@ -233,7 +234,6 @@ class EstimateController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EstimateSalvarRequest $d): JsonResponse
     {
-
         return $this->persistEstimate('', $d);
     }
 
