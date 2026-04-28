@@ -32,51 +32,41 @@
                     <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
                         <thead>
                         <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
-                            <th>Status</th>
-                            <th>Description</th>
                             <th>Due date</th>
-                            <th class="text-end">Actions</th>
+                            <th>Description</th>
+                            <th class="text-end min-w-85px"></th>
                         </tr>
                         </thead>
                         <tbody id="home-tasks-tbody">
                         {% for t in home_task.tasks %}
                             {% set is_complete = t.status|default('') == 'complete' %}
-                            <tr data-task-id="{{ t.id }}">
+                            <tr data-task-id="{{ t.id }}"
+                                data-task-status="{{ t.status|default('pending') }}"
+                                data-label-pending="{{ t.label_pending|default('')|e('html_attr') }}"
+                                data-label-complete="{{ t.label_complete|default('')|e('html_attr') }}">
+                                <td><span class="home-task-due {{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.due_date|default('—') }}</span></td>
                                 <td>
-                                    <span class="{{ is_complete ? 'text-success text-decoration-line-through' : 'text-gray-800' }} home-task-status">{{ t.status_label }}</span>
-                                </td>
-                                <td>
-                                    <div class="{{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.description|default('')|nl2br }}</div>
+                                    <div class="home-task-desc {{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.description|default('')|nl2br }}</div>
                                     {% if t.show_assigned|default(false) and t.assigned|default('') %}
                                         <div class="text-muted fs-8 mt-1">Assigned: {{ t.assigned }}</div>
                                     {% endif %}
                                 </td>
-                                <td><span class="{{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.due_date|default('—') }}</span></td>
-                                <td class="text-end text-nowrap">
-                                    {% if t.can_toggle_status|default(false) %}
-                                        <button type="button"
-                                                class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status"
-                                                data-task-id="{{ t.id }}"
-                                                data-current-status="{{ t.status|default('pending') }}"
-                                                data-next-status="{{ is_complete ? 'pending' : 'complete' }}"
-                                                title="{{ is_complete ? 'Mark as pending' : 'Mark as done' }}"
-                                                data-bs-toggle="tooltip"
-                                                aria-label="{{ is_complete ? 'Mark as pending' : 'Mark as done' }}">
-                                            <i class="ki-duotone {{ is_complete ? 'ki-cross' : 'ki-check' }} fs-3">
-                                                <span class="path1"></span>
-                                                <span class="path2"></span>
-                                            </i>
-                                        </button>
-                                    {% elseif is_complete %}
-                                        <span class="badge badge-light-success">Done</span>
-                                    {% else %}
-                                        <span class="text-muted">—</span>
-                                    {% endif %}
+                                <td class="text-end text-nowrap align-middle" style="overflow: visible;">
+                                    <div class="d-flex align-items-center justify-content-end flex-nowrap" style="overflow: visible;">
+                                        <div class="form-check form-switch form-check-custom form-check-success form-check-solid mb-0">
+                                            <input type="checkbox"
+                                                   role="switch"
+                                                   class="form-check-input status-task-toggle{% if t.can_toggle_status|default(false) %} home-task-status-switch{% endif %}"
+                                                   data-task-id="{{ t.id }}"
+                                                   {% if not t.can_toggle_status|default(false) %}disabled{% endif %}
+                                                   {% if is_complete %}checked{% endif %} />
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
                             <tr id="home-tasks-empty-row">
-                                <td colspan="4" class="text-center text-muted py-5">No tasks in this range.</td>
+                                <td colspan="3" class="text-center text-muted py-5">No tasks in this range.</td>
                             </tr>
                         {% endfor %}
                         </tbody>

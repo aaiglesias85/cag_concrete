@@ -217,7 +217,7 @@ class TaskService extends Base
     }
 
     /**
-     * Tasks for the home widget: admin sees all; other users only rows assigned to them.
+     * Tasks for the home widget: each user only sees tasks assigned to them (perfil administrador no amplía la vista).
      *
      * @return list<array<string, mixed>>
      */
@@ -226,7 +226,7 @@ class TaskService extends Base
         if (empty($perm['ver'])) {
             return [];
         }
-        $only = $viewer->isAdministrador() ? null : (int) $viewer->getUsuarioId();
+        $only = (int) $viewer->getUsuarioId();
 
         /** @var TaskRepository $repo */
         $repo = $this->getDoctrine()->getRepository(Task::class);

@@ -550,12 +550,27 @@ var Index = (function () {
         }, 120);
     };
 
+    var buildHomeTaskActionCell = function (t) {
+        var isComplete = (t.status || '') === 'complete';
+        var canToggle = !!t.can_toggle_status;
+        var checked = isComplete ? ' checked' : '';
+        var disabledAttr = canToggle ? '' : ' disabled';
+        var switchClass = canToggle ? ' home-task-status-switch' : '';
+        return (
+            '<div class="d-flex align-items-center justify-content-end flex-nowrap">' +
+            '<div class="form-check form-switch form-check-custom form-check-success form-check-solid mb-0">' +
+            '<input type="checkbox" role="switch" class="form-check-input status-task-toggle' + switchClass + '"' +
+            ' data-task-id="' + esc(t.id) + '"' + checked + disabledAttr + ' />' +
+            '</div></div>'
+        );
+    };
+
     var renderTbody = function (tasks) {
         var $tb = $('#home-tasks-tbody');
         if (!$tb.length) return;
         if (!tasks || !tasks.length) {
             $tb.html(
-                '<tr id="home-tasks-empty-row"><td colspan="4" class="text-center text-muted py-5">No tasks in this range.</td></tr>'
+                '<tr id="home-tasks-empty-row"><td colspan="3" class="text-center text-muted py-5">No tasks in this range.</td></tr>'
             );
             return;
         }
@@ -572,21 +587,15 @@ var Index = (function () {
             var t = ordered[i];
             var isComplete = t.status === 'complete';
             var textClass = isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800';
-            var statusClass = isComplete ? 'text-success text-decoration-line-through' : 'text-gray-800';
             var assigned = (t.show_assigned && t.assigned) ? ('<div class="text-muted fs-8 mt-1">Assigned: ' + esc(t.assigned) + '</div>') : '';
-            var nextStatus = isComplete ? 'pending' : 'complete';
-            var actionTitle = isComplete ? 'Mark as pending' : 'Mark as done';
-            var actionIcon = isComplete ? 'ki-cross' : 'ki-check';
-            var act = t.can_toggle_status
-                ? '<button type="button" class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status" data-task-id="' + esc(t.id) + '" data-current-status="' + esc(t.status || 'pending') + '" data-next-status="' + esc(nextStatus) + '" title="' + esc(actionTitle) + '" data-bs-toggle="tooltip" aria-label="' + esc(actionTitle) + '">' +
-                    '<i class="ki-duotone ' + actionIcon + ' fs-3"><span class="path1"></span><span class="path2"></span></i></button>'
-                : (isComplete ? '<span class="badge badge-light-success">Done</span>' : '<span class="text-muted">-</span>');
+            var lp = t.label_pending || 'Pending';
+            var lc = t.label_complete || 'Complete';
             rows +=
-                '<tr data-task-id="' + esc(t.id) + '">' +
-                '<td><span class="' + statusClass + ' home-task-status">' + esc(t.status_label) + '</span></td>' +
-                '<td><div class="' + textClass + '">' + esc(t.description).replace(/\n/g, '<br>') + '</div>' + assigned + '</td>' +
-                '<td><span class="' + textClass + '">' + esc(t.due_date || '-') + '</span></td>' +
-                '<td class="text-end text-nowrap">' + act + '</td></tr>';
+                '<tr data-task-id="' + esc(t.id) + '" data-task-status="' + esc(t.status || 'pending') + '"' +
+                ' data-label-pending="' + esc(lp) + '" data-label-complete="' + esc(lc) + '">' +
+                '<td><span class="home-task-due ' + textClass + '">' + esc(t.due_date || '-') + '</span></td>' +
+                '<td><div class="home-task-desc ' + textClass + '">' + esc(t.description).replace(/\n/g, '<br>') + '</div>' + assigned + '</td>' +
+                '<td class="text-end text-nowrap">' + buildHomeTaskActionCell(t) + '</td></tr>';
         }
         $tb.html(rows);
         initTaskTooltips();
@@ -730,47 +739,37 @@ var Index = (function () {
         }
     };
 
-    var markTaskRowAsComplete = function ($btn) {
-        var $row = $btn.closest('tr');
-        if (!$row.length) {
+    var markTaskRowAfterStatusChange = function ($row, newStatus) {
+        if (!$row || !$row.length) {
             return;
         }
-        var nextStatus = String($btn.data('next-status') || '').toLowerCase();
-        if (nextStatus !== 'complete' && nextStatus !== 'pending') {
-            nextStatus = 'complete';
-        }
-        var isComplete = nextStatus === 'complete';
-        var $status = $row.find('.home-task-status');
-        if ($status.length) {
-            $status
-                .text(isComplete ? 'Complete' : 'Pending')
-                .removeClass('text-gray-800 text-success text-muted text-decoration-line-through')
-                .addClass(isComplete ? 'text-success text-decoration-line-through' : 'text-gray-800');
-        }
-        var $cells = $row.children('td');
-        if ($cells.length >= 3) {
-            var $desc = $cells.eq(1).find('div').first();
-            var $due = $cells.eq(2).find('span').first();
-            $desc.removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
-            $due.removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
-        }
-        var $actions = $row.find('td').last();
-        if ($actions.length) {
-            var btnTitle = isComplete ? 'Mark as pending' : 'Mark as done';
-            var icon = isComplete ? 'ki-cross' : 'ki-check';
-            var newNext = isComplete ? 'pending' : 'complete';
-            $actions.html(
-                '<button type="button" class="btn btn-icon btn-sm btn-light btn-active-light-primary btn-home-task-toggle-status" data-task-id="' + esc($btn.data('task-id')) + '" data-current-status="' + esc(nextStatus) + '" data-next-status="' + esc(newNext) + '" title="' + esc(btnTitle) + '" data-bs-toggle="tooltip" aria-label="' + esc(btnTitle) + '">' +
-                '<i class="ki-duotone ' + icon + ' fs-3"><span class="path1"></span><span class="path2"></span></i></button>'
-            );
-        }
+        var isComplete = newStatus === 'complete';
+        var lp = $row.attr('data-label-pending') || 'Pending';
+        var lc = $row.attr('data-label-complete') || 'Complete';
+        var taskId = $row.data('task-id');
+        $row.attr('data-task-status', newStatus);
+
+        $row.find('.home-task-due').removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
+        $row.find('.home-task-desc').removeClass('text-gray-800 text-muted text-decoration-line-through').addClass(isComplete ? 'text-muted text-decoration-line-through' : 'text-gray-800');
+
+        var $actionTd = $row.children('td').eq(2);
+        $actionTd.html(
+            buildHomeTaskActionCell({
+                id: taskId,
+                status: newStatus,
+                label_pending: lp,
+                label_complete: lc,
+                can_toggle_status: true,
+            })
+        );
+
         var $tbody = $('#home-tasks-tbody');
         if ($tbody.length) {
             if (isComplete) {
-                $tbody.append($row); // complete always at bottom
+                $tbody.append($row);
             } else {
                 var $firstComplete = $tbody.find('tr').filter(function () {
-                    return $(this).find('.home-task-status').text().trim().toLowerCase() === 'complete';
+                    return $(this).attr('data-task-status') === 'complete';
                 }).first();
                 if ($firstComplete.length) {
                     $row.insertBefore($firstComplete);
@@ -900,15 +899,28 @@ var Index = (function () {
             });
     };
 
-    var onToggleTaskStatus = function (e) {
-        var $btn = $(e.currentTarget);
-        var id = $btn.data('task-id');
-        if (!id || !C.urlCambioEstado) return;
-        var nextStatus = String($btn.data('next-status') || '').toLowerCase() === 'pending' ? 'pending' : 'complete';
-        var nextLabel = nextStatus === 'complete' ? 'Complete' : 'Pending';
+    var onHomeTaskStatusChange = function (e) {
+        var $cb = $(e.currentTarget);
+        if (!$cb.hasClass('home-task-status-switch') || $cb.prop('disabled')) {
+            return;
+        }
+        var id = $cb.data('task-id');
+        if (!id || !C.urlCambioEstado) {
+            return;
+        }
+        var $row = $cb.closest('tr');
+        var desiredComplete = $cb.prop('checked');
+        var nextStatus = desiredComplete ? 'complete' : 'pending';
+        var nextLabel =
+            nextStatus === 'complete'
+                ? $row.attr('data-label-complete') || 'Complete'
+                : $row.attr('data-label-pending') || 'Pending';
+
+        $cb.prop('checked', !desiredComplete);
 
         var apply = function () {
-            $btn.prop('disabled', true);
+            $cb.prop('checked', desiredComplete);
+            $cb.prop('disabled', true);
             var formData = new URLSearchParams();
             formData.set('task_id', id);
             formData.set('status', nextStatus);
@@ -917,15 +929,15 @@ var Index = (function () {
                 .then(function (res) {
                     if (res.data && res.data.success) {
                         toastr.success(res.data.message || 'Updated', '');
-                        markTaskRowAsComplete($btn);
+                        markTaskRowAfterStatusChange($row, nextStatus);
                     } else {
                         toastr.error((res.data && res.data.error) || 'Error', '');
-                        $btn.prop('disabled', false);
+                        $cb.prop('disabled', false);
                     }
                 })
                 .catch(function (err) {
                     MyUtil.catchErrorAxios(err);
-                    $btn.prop('disabled', false);
+                    $cb.prop('disabled', false);
                 });
         };
 
@@ -1224,8 +1236,8 @@ var Index = (function () {
 
     var initActions = function () {
         $(document)
-            .off('click', '.btn-home-task-toggle-status')
-            .on('click', '.btn-home-task-toggle-status', onToggleTaskStatus);
+            .off('change', '.home-task-status-switch')
+            .on('change', '.home-task-status-switch', onHomeTaskStatusChange);
         $(document)
             .off('click', '#home-work-schedule-tbody a.project-link')
             .on('click', '#home-work-schedule-tbody a.project-link', onOpenProjectFromWorkSchedule);
