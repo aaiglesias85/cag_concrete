@@ -2,12 +2,14 @@
 
 namespace App\Dto\Admin\Default;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Filtros del dashboard (AJAX). Todos opcionales.
  */
-final class DashboardListarStatsRequest
+final class DashboardListarStatsRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $project_id = null;
 
@@ -17,7 +19,7 @@ final class DashboardListarStatsRequest
 
     public ?string $fechaFin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = self::strOrNull($request->get('project_id'));

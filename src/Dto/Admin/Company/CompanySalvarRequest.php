@@ -2,14 +2,14 @@
 
 namespace App\Dto\Admin\Company;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-final class CompanySalvarRequest
+final class CompanySalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $company_id = null;
-
     #[Assert\NotBlank]
     public ?string $name = null;
 
@@ -42,11 +42,9 @@ final class CompanySalvarRequest
         }
     }
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $cid = $request->get('company_id');
-        $d->company_id = \is_string($cid) || is_numeric($cid) ? (string) $cid : null;
         $d->name = \is_string($x = $request->get('name')) ? $x : null;
         $d->phone = \is_string($x = $request->get('phone')) ? $x : null;
         $d->address = \is_string($x = $request->get('address')) ? $x : null;

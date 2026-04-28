@@ -18,6 +18,10 @@ salvarRolAdmin:
   path:  /perfil/salvarPerfil
   defaults: { _controller: App\Controller\Admin\PerfilController::salvar, _format: json }
 
+actualizarPerfilAdmin:
+  path:  /perfil/actualizarPerfil
+  defaults: { _controller: App\Controller\Admin\PerfilController::actualizar, _format: json }
+
 cargarDatosPerfilAdmin:
   path:  /perfil/cargarDatos
   defaults: { _controller: App\Controller\Admin\PerfilController::cargarDatos, _format: json }

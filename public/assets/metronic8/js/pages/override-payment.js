@@ -1346,11 +1346,16 @@ var OverridePayment = (function () {
       var formData = new URLSearchParams();
       formData.set('project_id', $('#filtro-project-op').val());
       formData.set('fechaFin', FlatpickrUtil.getString('op-datetimepicker-fecha-fin'));
-      formData.set('invoice_override_payment_id', $('#invoice-override-payment-id').val() || '');
+      var iopId = $('#invoice-override-payment-id').val() || '';
+      formData.set('invoice_override_payment_id', iopId);
       formData.set('items', JSON.stringify(items));
+      var salvarUrl =
+         !iopId || iopId === ''
+            ? 'override-payment/salvar'
+            : 'override-payment/actualizarOverridePayment';
       BlockUtil.block('#form-override-payment-body');
       axios
-         .post('override-payment/salvar', formData, { responseType: 'json' })
+         .post(salvarUrl, formData, { responseType: 'json' })
          .then(function (res) {
             var response = res.data;
             if (response.success) {

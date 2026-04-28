@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateSalvarRequest
+final class EstimateSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $estimate_id = null;
-
     #[Assert\NotBlank]
     public ?string $project_id = null;
 
@@ -76,10 +76,48 @@ final class EstimateSalvarRequest
 
     public ?string $archivos = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromActualizarRequest(EstimateActualizarRequest $a): self
     {
         $d = new self();
-        $d->mapStr($request, 'estimate_id');
+        $d->project_id = $a->project_id;
+        $d->name = $a->name;
+        $d->bidDeadline = $a->bidDeadline;
+        $d->county_ids = $a->county_ids;
+        $d->county_id = $a->county_id;
+        $d->priority = $a->priority;
+        $d->bidNo = $a->bidNo;
+        $d->workHour = $a->workHour;
+        $d->phone = $a->phone;
+        $d->email = $a->email;
+        $d->jobWalk = $a->jobWalk;
+        $d->rfiDueDate = $a->rfiDueDate;
+        $d->projectStart = $a->projectStart;
+        $d->projectEnd = $a->projectEnd;
+        $d->submittedDate = $a->submittedDate;
+        $d->awardedDate = $a->awardedDate;
+        $d->lostDate = $a->lostDate;
+        $d->location = $a->location;
+        $d->sector = $a->sector;
+        $d->bidDescription = $a->bidDescription;
+        $d->bidInstructions = $a->bidInstructions;
+        $d->planLink = $a->planLink;
+        $d->quoteReceived = $a->quoteReceived;
+        $d->stage_id = $a->stage_id;
+        $d->proposal_type_id = $a->proposal_type_id;
+        $d->status_id = $a->status_id;
+        $d->district_id = $a->district_id;
+        $d->plan_downloading_id = $a->plan_downloading_id;
+        $d->project_types_id = $a->project_types_id;
+        $d->estimators_id = $a->estimators_id;
+        $d->companys = $a->companys;
+        $d->archivos = $a->archivos;
+
+        return $d;
+    }
+
+    public static function fromHttpRequest(Request $request): static
+    {
+        $d = new self();
         $d->mapStr($request, 'project_id');
         $d->mapStr($request, 'name');
         $d->mapStr($request, 'bidDeadline');

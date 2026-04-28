@@ -3,23 +3,17 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\ReporteSubcontractor\ReporteSubcontractorExportFiltroRequest;
-use App\Dto\Admin\ReporteSubcontractor\ReporteSubcontractorListarFiltroRequest;
-use App\Http\DataTablesHelper;
+use App\Dto\Admin\ReporteSubcontractor\ReporteSubcontractorListarRequest;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProjectService;
 use App\Service\Admin\ReporteSubcontractorService;
 use App\Service\Admin\SubcontractorService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ReporteSubcontractorController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $reporteService;
     private $projectService;
     private $subcontractorService;
@@ -28,23 +22,19 @@ class ReporteSubcontractorController extends AbstractAdminController
         AdminAccessService $adminAccess,
         ReporteSubcontractorService $reporteService,
         ProjectService $projectService,
-        SubcontractorService $subcontractorService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        SubcontractorService $subcontractorService) {
         parent::__construct($adminAccess);
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;
         $this->subcontractorService = $subcontractorService;
     }
 
+    #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::REPORTE_SUBCONTRACTOR);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::REPORTE_SUBCONTRACTOR);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso REPORTE_SUBCONTRACTOR esperado tras #[RequireAdminPermission].');
 
         // subcontractors
         $subcontractors = $this->subcontractorService->ListarOrdenados();
@@ -53,7 +43,7 @@ class ReporteSubcontractorController extends AbstractAdminController
         $projects = $this->projectService->ListarOrdenados();
 
         return $this->render('admin/reportes/subcontractor.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'subcontractors' => $subcontractors,
             'projects' => $projects,
         ]);
@@ -62,23 +52,17 @@ class ReporteSubcontractorController extends AbstractAdminController
     /**
      * listar Acción que lista los companies.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ReporteSubcontractorListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'project', 'subcontractor', 'item', 'unit', 'quantity', 'price', 'total'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            $f = ReporteSubcontractorListarFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $subcontractor_id = $f->subcontractor_id;
-            $project_id = $f->project_id;
-            $project_item_id = $f->project_item_id;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
+            $subcontractor_id = $listar->subcontractor_id;
+            $project_id = $listar->project_id;
+            $project_item_id = $listar->project_item_id;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->reporteService->ListarReporteSubcontractors(
@@ -113,10 +97,9 @@ class ReporteSubcontractorController extends AbstractAdminController
     /**
      * exportarExcel Acción para la exportacion en excel.
      */
-    public function exportarExcel(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function exportarExcel(ReporteSubcontractorExportFiltroRequest $f): JsonResponse
     {
-        $f = ReporteSubcontractorExportFiltroRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $search = $f->search;
         $subcontractor_id = $f->subcontractor_id;
         $project_id = $f->project_id;
@@ -143,10 +126,9 @@ class ReporteSubcontractorController extends AbstractAdminController
     /**
      * devolverTotal Acción para devolver el total.
      */
-    public function devolverTotal(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function devolverTotal(ReporteSubcontractorExportFiltroRequest $f): JsonResponse
     {
-        $f = ReporteSubcontractorExportFiltroRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $search = $f->search;
         $subcontractor_id = $f->subcontractor_id;
         $project_id = $f->project_id;

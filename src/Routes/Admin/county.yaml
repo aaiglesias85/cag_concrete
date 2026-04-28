@@ -10,6 +10,10 @@ salvarCountyAdmin:
   path: /county/salvar
   defaults: { _controller: App\Controller\Admin\CountyController::salvar, _format: json }
 
+actualizarCountyAdmin:
+  path: /county/actualizar
+  defaults: { _controller: App\Controller\Admin\CountyController::actualizar, _format: json }
+
 eliminarCountyAdmin:
   path: /county/eliminar
   defaults: { _controller: App\Controller\Admin\CountyController::eliminar, _format: json }

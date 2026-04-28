@@ -3,62 +3,45 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\OverheadPrice\OverheadPriceActualizarRequest;
 use App\Dto\Admin\OverheadPrice\OverheadPriceIdRequest;
 use App\Dto\Admin\OverheadPrice\OverheadPriceIdsRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceListarRequest;
 use App\Dto\Admin\OverheadPrice\OverheadPriceSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\OverheadPriceService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class OverheadPriceController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $overheadService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        OverheadPriceService $overheadService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        OverheadPriceService $overheadService) {
         parent::__construct($adminAccess);
         $this->overheadService = $overheadService;
     }
 
+    #[RequireAdminPermission(FunctionId::OVERHEAD)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::OVERHEAD);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::OVERHEAD);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso OVERHEAD esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/overhead-price/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los units.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(OverheadPriceListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'price'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->overheadService->ListarOverheads(
                 $dt['start'],
                 $dt['length'],
@@ -83,26 +66,14 @@ class OverheadPriceController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(OverheadPriceSalvarRequest $d): JsonResponse
     {
-        $d = OverheadPriceSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $overhead_id = (string) ($d->overhead_id ?? '');
         $name = (string) $d->name;
         $price = (string) $d->price;
 
         try {
-            if ('' == $overhead_id) {
-                $resultado = $this->overheadService->SalvarOverhead($name, $price);
-            } else {
-                $resultado = $this->overheadService->ActualizarOverhead($overhead_id, $name, $price);
-            }
+            $resultado = $this->overheadService->SalvarOverhead($name, $price);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -122,16 +93,37 @@ class OverheadPriceController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un overhead en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(OverheadPriceActualizarRequest $d): JsonResponse
     {
-        $dto = OverheadPriceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $overhead_id = (string) $d->overhead_id;
+        $name = (string) $d->name;
+        $price = (string) $d->price;
+
+        try {
+            $resultado = $this->overheadService->ActualizarOverhead($overhead_id, $name, $price);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(OverheadPriceIdRequest $dto): JsonResponse
+    {
         $overhead_id = $dto->overhead_id;
 
         try {
@@ -154,16 +146,9 @@ class OverheadPriceController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarOverheads Acción que elimina los overheads seleccionados en la BD.
-     */
-    public function eliminarOverheads(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarOverheads(OverheadPriceIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = OverheadPriceIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -186,16 +171,9 @@ class OverheadPriceController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del overhead en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(OverheadPriceIdRequest $dto): JsonResponse
     {
-        $dto = OverheadPriceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $overhead_id = $dto->overhead_id;
 
         try {

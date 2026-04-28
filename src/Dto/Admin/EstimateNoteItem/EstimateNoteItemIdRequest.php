@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\EstimateNoteItem;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateNoteItemIdRequest
+final class EstimateNoteItemIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Id is required.')]
     #[Assert\Positive]
     public ?int $id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->id = self::positiveIntOrNull($request->get('id'));

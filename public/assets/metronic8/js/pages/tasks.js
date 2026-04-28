@@ -337,15 +337,20 @@ var Tasks = function () {
             var usuarioVal = $('#task-usuario').val();
             if (validateForm() && usuarioVal && String(usuarioVal).length > 0) {
                 var formData = new URLSearchParams();
-                formData.set("task_id", $('#task_id').val() || '');
+                var task_id = $('#task_id').val() || '';
+                formData.set("task_id", task_id);
                 formData.set("description", $('#description').val());
                 formData.set("status", $('#task-status').val());
                 var due = FlatpickrUtil.getString('datetimepicker-due');
                 formData.set("due_day", due || '');
                 formData.set("usuario_id", usuarioVal);
 
+                var salvarUrl =
+                    task_id && String(task_id).trim() !== ''
+                        ? "tasks/actualizar"
+                        : "tasks/salvar";
                 BlockUtil.block('#form-task');
-                axios.post("tasks/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

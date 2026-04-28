@@ -288,10 +288,15 @@ var ModalInvoice = (function () {
 
          formData.set('exportar', exportar ? 1 : 0);
 
+         var salvarUrl =
+            !invoice_id || invoice_id === ''
+               ? 'invoice/salvarInvoice'
+               : 'invoice/actualizarInvoice';
+
          BlockUtil.block('#modal-invoice .modal-content');
 
          axios
-            .post('invoice/salvarInvoice', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

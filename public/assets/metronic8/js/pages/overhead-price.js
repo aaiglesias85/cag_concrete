@@ -326,9 +326,13 @@ var OverheadPrice = function () {
                 var price = NumberUtil.getNumericValue('#price');
                 formData.set("price", price);
 
+                var salvarUrl =
+                    overhead_id && String(overhead_id).trim() !== ''
+                        ? "overhead-price/actualizarOverhead"
+                        : "overhead-price/salvarOverhead";
                 BlockUtil.block('#form-overhead');
 
-                axios.post("overhead-price/salvarOverhead", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

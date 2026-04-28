@@ -3,59 +3,44 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Inspector\InspectorActualizarRequest;
 use App\Dto\Admin\Inspector\InspectorIdRequest;
 use App\Dto\Admin\Inspector\InspectorIdsRequest;
+use App\Dto\Admin\Inspector\InspectorListarRequest;
 use App\Dto\Admin\Inspector\InspectorSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InspectorService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class InspectorController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $inspectorService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        InspectorService $inspectorService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        InspectorService $inspectorService) {
         parent::__construct($adminAccess);
         $this->inspectorService = $inspectorService;
     }
 
+    #[RequireAdminPermission(FunctionId::INSPECTOR)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::INSPECTOR);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::INSPECTOR);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso INSPECTOR esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/inspector/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los units.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(InspectorListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'email', 'phone', 'status'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
             $result = $this->inspectorService->ListarInspectors(
                 $dt['start'],
@@ -81,28 +66,16 @@ class InspectorController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(InspectorSalvarRequest $d): JsonResponse
     {
-        $d = InspectorSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $inspector_id = (string) ($d->inspector_id ?? '');
         $name = (string) $d->name;
         $email = (string) $d->email;
         $phone = (string) ($d->phone ?? '');
         $status = (string) $d->status;
 
         try {
-            if ('' === $inspector_id) {
-                $resultado = $this->inspectorService->SalvarInspector($name, $email, $phone, $status);
-            } else {
-                $resultado = $this->inspectorService->ActualizarInspector($inspector_id, $name, $email, $phone, $status);
-            }
+            $resultado = $this->inspectorService->SalvarInspector($name, $email, $phone, $status);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -123,16 +96,40 @@ class InspectorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un inspector en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(InspectorActualizarRequest $d): JsonResponse
     {
-        $dto = InspectorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $inspector_id = (string) $d->inspector_id;
+        $name = (string) $d->name;
+        $email = (string) $d->email;
+        $phone = (string) ($d->phone ?? '');
+        $status = (string) $d->status;
+
+        try {
+            $resultado = $this->inspectorService->ActualizarInspector($inspector_id, $name, $email, $phone, $status);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['inspector_id'] = $resultado['inspector_id'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(InspectorIdRequest $dto): JsonResponse
+    {
         $inspector_id = $dto->inspector_id;
 
         try {
@@ -155,16 +152,9 @@ class InspectorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarInspectors Acción que elimina los inspectors seleccionados en la BD.
-     */
-    public function eliminarInspectors(Request $request)
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarInspectors(InspectorIdsRequest $dto): JsonResponse
     {
-        $dto = InspectorIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -187,16 +177,9 @@ class InspectorController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del inspector en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(InspectorIdRequest $dto): JsonResponse
     {
-        $dto = InspectorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $inspector_id = $dto->inspector_id;
 
         try {

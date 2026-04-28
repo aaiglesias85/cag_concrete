@@ -2,13 +2,15 @@
 
 namespace App\Dto\Admin\Invoice;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * id vacío = alta; en otro caso edición.
  */
-final class InvoiceValidarRequest
+final class InvoiceValidarRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $invoice_id = null;
 
@@ -24,7 +26,7 @@ final class InvoiceValidarRequest
     #[Assert\NotBlank]
     public ?string $number = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $iid = $request->get('invoice_id');

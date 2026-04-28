@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\ProjectType;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectTypeIdRequest
+final class ProjectTypeIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Type id is required.')]
     #[Assert\Positive]
     public ?int $type_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->type_id = self::positiveIntOrNull($request->get('type_id'));

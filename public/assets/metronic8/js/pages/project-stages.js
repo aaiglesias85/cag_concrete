@@ -356,9 +356,13 @@ var ProjectStages = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    stage_id && String(stage_id).trim() !== ''
+                        ? "project-stage/actualizar"
+                        : "project-stage/salvar";
                 BlockUtil.block('#form-project-stage');
 
-                axios.post("project-stage/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

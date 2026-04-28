@@ -2,13 +2,29 @@
 
 namespace App\Dto\Admin\ReporteEmployee;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+use App\Http\DataTablesHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Filtros DataTables: employee_id, project_id, rango (fechaInicial / fechaFin con mayúscula I).
+ * DataTables reporte empleados + filtros.
+ *
+ * @phpstan-type ParsedDt array{
+ *   draw:int,
+ *   start:int,
+ *   length:int,
+ *   search:string,
+ *   orderField:string,
+ *   orderDir:'asc'|'desc',
+ *   columns:array,
+ *   raw:array
+ * }
  */
-final class ReporteEmployeeListarFiltroRequest
+final class ReporteEmployeeListarRequest implements AdminHttpRequestDtoInterface
 {
+    /** @var ParsedDt */
+    public array $dt;
+
     public ?string $employee_id = null;
 
     public ?string $project_id = null;
@@ -17,9 +33,14 @@ final class ReporteEmployeeListarFiltroRequest
 
     public ?string $fechaFin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
+        $d->dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: ['id', 'date', 'project', 'subcontractor', 'item', 'unit', 'quantity', 'price', 'total'],
+            defaultOrderField: 'date'
+        );
         $d->employee_id = self::strOrNull($request->get('employee_id'));
         $d->project_id = self::strOrNull($request->get('project_id'));
         $d->fechaInicial = self::strOrNull($request->get('fechaInicial'));

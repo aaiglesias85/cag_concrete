@@ -3,48 +3,40 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Schedule\ScheduleActualizarRequest;
 use App\Dto\Admin\Schedule\ScheduleCalendarioFiltroRequest;
 use App\Dto\Admin\Schedule\ScheduleClonarRequest;
 use App\Dto\Admin\Schedule\ScheduleIdRequest;
 use App\Dto\Admin\Schedule\ScheduleIdsRequest;
+use App\Dto\Admin\Schedule\ScheduleListarRequest;
 use App\Dto\Admin\Schedule\ScheduleSalvarRequest;
 use App\Entity\ConcreteVendor;
 use App\Entity\Employee;
 use App\Entity\Project;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ScheduleService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ScheduleController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $scheduleService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ScheduleService $scheduleService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        ScheduleService $scheduleService) {
         parent::__construct($adminAccess);
         $this->scheduleService = $scheduleService;
     }
 
+    #[RequireAdminPermission(FunctionId::SCHEDULE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::SCHEDULE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::SCHEDULE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso SCHEDULE esperado tras #[RequireAdminPermission].');
 
         // projects
         $projects = $this->scheduleService->getDoctrine()->getRepository(Project::class)
@@ -62,7 +54,7 @@ class ScheduleController extends AbstractAdminController
             ->ListarOrdenados();
 
         return $this->render('admin/schedule/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'projects' => $projects,
             'concrete_vendors' => $concrete_vendors,
             'holidays' => $holidays,
@@ -73,21 +65,16 @@ class ScheduleController extends AbstractAdminController
     /**
      * listar.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ScheduleListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'project', 'concreteVendor', 'description', 'location', 'day', 'hour', 'quantity', 'notes'],
-                defaultOrderField: 'day'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $project_id = $request->get('project_id');
-            $vendor_id = $request->get('vendor_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $project_id = $listar->project_id;
+            $vendor_id = $listar->vendor_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->scheduleService->ListarSchedules(
@@ -99,8 +86,7 @@ class ScheduleController extends AbstractAdminController
                 $project_id,
                 $vendor_id,
                 $fecha_inicial,
-                $fecha_fin,
-            );
+                $fecha_fin);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -121,13 +107,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * salvar Acción para agregar schedules en la BD.
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(ScheduleSalvarRequest $d): JsonResponse
     {
-        $d = ScheduleSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $d->project_id;
         $project_contact_id = $d->project_contact_id;
         $date_start = $d->date_start;
@@ -170,13 +152,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * actualizar Acción para modificar un schedule un menu en la BD.
      */
-    public function actualizar(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(ScheduleActualizarRequest $d): JsonResponse
     {
-        $d = ScheduleActualizarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $schedule_id = $d->schedule_id;
         $project_id = $d->project_id;
         $project_contact_id = $d->project_contact_id;
@@ -218,13 +196,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * clonar Acción para clonar schedules en la BD.
      */
-    public function clonar(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Add, jsonOnDenied: true)]
+    public function clonar(ScheduleClonarRequest $d): JsonResponse
     {
-        $d = ScheduleClonarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $schedules_id = $d->schedules_id;
         $highpriority = $d->highpriority;
         $date_start = $d->date_start;
@@ -254,13 +228,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un schedule en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(ScheduleIdRequest $dto): JsonResponse
     {
-        $dto = ScheduleIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $schedule_id = $dto->schedule_id;
 
         try {
@@ -286,13 +256,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * eliminarSchedules Acción que elimina los schedules seleccionados en la BD.
      */
-    public function eliminarSchedules(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarSchedules(ScheduleIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = ScheduleIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -318,13 +284,9 @@ class ScheduleController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del schedule en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(ScheduleIdRequest $dto): JsonResponse
     {
-        $dto = ScheduleIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $schedule_id = $dto->schedule_id;
 
         try {
@@ -350,7 +312,8 @@ class ScheduleController extends AbstractAdminController
     /**
      * listarParaCalendario Acción que lista el schedule para el calendario en la BD.
      */
-    public function listarParaCalendario(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::View, jsonOnDenied: true)]
+    public function listarParaCalendario(Request $request): JsonResponse
     {
         $f = ScheduleCalendarioFiltroRequest::fromHttpRequest($request);
 
@@ -372,7 +335,8 @@ class ScheduleController extends AbstractAdminController
     /**
      * exportarExcel Acción para la exportacion en excel.
      */
-    public function exportarExcel(Request $request)
+    #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::View, jsonOnDenied: true)]
+    public function exportarExcel(Request $request): JsonResponse
     {
         $f = ScheduleCalendarioFiltroRequest::fromHttpRequest($request);
 

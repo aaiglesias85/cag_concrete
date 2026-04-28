@@ -3,55 +3,63 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidEliminarRequest;
 use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidListarRequest;
 use App\Dto\Admin\OverridePayment\OverrideNotaUnpaidSalvarRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentActualizarRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentHistorialUnpaidIdRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentIdRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentIdsRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentInvoiceItemIdRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentListarItemsRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentListarRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentProyectoIdRequest;
 use App\Dto\Admin\OverridePayment\OverridePaymentSalvarRequest;
 use App\Entity\Company;
-use App\Http\DataTablesHelper;
+use App\Entity\Usuario;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\OverridePaymentService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OverridePaymentController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $overridePaymentService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        OverridePaymentService $overridePaymentService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        OverridePaymentService $overridePaymentService) {
         parent::__construct($adminAccess);
         $this->overridePaymentService = $overridePaymentService;
     }
 
+    /**
+     * Misma regla que antes del refactor: permitir guardar si tiene "editar" o "agregar".
+     */
+    private function requireEditOrAgregarOverridePaymentJson(): Usuario|JsonResponse
+    {
+        $u = $this->requirePermissionOrJson403(FunctionId::OVERRIDE_PAYMENT, AdminPermission::Edit);
+        if (!$u instanceof JsonResponse) {
+            return $u;
+        }
+
+        return $this->requirePermissionOrJson403(FunctionId::OVERRIDE_PAYMENT, AdminPermission::Add);
+    }
+
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT)]
     public function index(): Response
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::OVERRIDE_PAYMENT);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso OVERRIDE_PAYMENT esperado tras #[RequireAdminPermission].');
         $companies = $this->overridePaymentService->getDoctrine()->getRepository(Company::class)
             ->ListarOrdenados();
 
         return $this->render('admin/override_payment/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'companies' => $companies,
             'direccion_url' => $this->overridePaymentService->ObtenerURL(),
         ]);
@@ -60,29 +68,16 @@ class OverridePaymentController extends AbstractAdminController
     /**
      * Listado server-side invoice_override_payment (DataTables).
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(OverridePaymentListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: [
-                    'id',
-                    'company',
-                    'project',
-                    'projectNumber',
-                    'date',
-                    'overridePaidQty',
-                    'overridePaidAmount',
-                    'overrideUnpaidQty',
-                    'overrideUnpaidAmount',
-                ],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            $company_id = $request->get('company_id');
-            $project_id = $request->get('project_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $company_id = $listar->company_id;
+            $project_id = $listar->project_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
             $result = $this->overridePaymentService->ListarCabecerasInvoiceOverridePayment(
                 $dt['start'],
@@ -104,7 +99,7 @@ class OverridePaymentController extends AbstractAdminController
             ]);
         } catch (\Exception $e) {
             return $this->json([
-                'draw' => (int) $request->get('draw', 0),
+                'draw' => (int) ($listar->dt['draw'] ?? 0),
                 'data' => [],
                 'recordsTotal' => 0,
                 'recordsFiltered' => 0,
@@ -116,23 +111,9 @@ class OverridePaymentController extends AbstractAdminController
     /**
      * Elimina un registro override (cabecera y líneas asociadas en cascada).
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(OverridePaymentIdRequest $dto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || empty($permiso[0]['eliminar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
-        }
-
-        $dto = OverridePaymentIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
 
         try {
@@ -150,23 +131,9 @@ class OverridePaymentController extends AbstractAdminController
     /**
      * Elimina varias cabeceras override (ids separados por coma).
      */
-    public function eliminarVarios(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarVarios(OverridePaymentIdsRequest $idsDto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || empty($permiso[0]['eliminar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
-        }
-
-        $idsDto = OverridePaymentIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         if ('' === trim((string) $idsDto->ids)) {
             return $this->json(['success' => false, 'error' => 'No records selected']);
         }
@@ -194,23 +161,9 @@ class OverridePaymentController extends AbstractAdminController
     /**
      * Carga cabecera por id para editar (misma convención que payment/cargarDatos, project/cargarDatos).
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(OverridePaymentIdRequest $dto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || empty($permiso[0]['ver'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
-        }
-
-        $dto = OverridePaymentIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
 
         try {
@@ -238,7 +191,8 @@ class OverridePaymentController extends AbstractAdminController
      * Lista todos los ítems para Override Payment (sin paginación ni búsqueda en servidor).
      * Respuesta alineada con project/listarItemsParaInvoice: { success, items }.
      */
-    public function listarItems(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarItems(Request $request): JsonResponse
     {
         $q = OverridePaymentListarItemsRequest::fromHttpRequest($request);
 
@@ -263,23 +217,59 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function salvar(Request $request)
+    public function salvar(OverridePaymentSalvarRequest $d): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
+        $auth = $this->requireEditOrAgregarOverridePaymentJson();
+        if ($auth instanceof JsonResponse) {
+            return $auth;
         }
 
-        $d = OverridePaymentSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $itemsRaw = $d->items;
+        if (\is_string($itemsRaw)) {
+            $itemsDecoded = json_decode($itemsRaw, true);
+        } else {
+            $itemsDecoded = $itemsRaw;
         }
+        if (!\is_array($itemsDecoded)) {
+            $itemsDecoded = [];
+        }
+        $project_id = (string) $d->project_id;
+        $fecha_fin = (string) $d->fechaFin;
+
+        try {
+            $resultado = $this->overridePaymentService->SalvarOverridePayment(
+                $project_id,
+                $fecha_fin,
+                $itemsDecoded,
+                null
+            );
+
+            if (!empty($resultado['success'])) {
+                return $this->json([
+                    'success' => true,
+                    'message' => $resultado['message'] ?? 'The operation was successful',
+                ]);
+            }
+
+            return $this->json([
+                'success' => false,
+                'error' => $resultado['error'] ?? 'Unknown error',
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function actualizar(OverridePaymentActualizarRequest $d): JsonResponse
+    {
+        $auth = $this->requireEditOrAgregarOverridePaymentJson();
+        if ($auth instanceof JsonResponse) {
+            return $auth;
+        }
+
         $itemsRaw = $d->items;
         if (\is_string($itemsRaw)) {
             $itemsDecoded = json_decode($itemsRaw, true);
@@ -320,23 +310,13 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function salvarNotaOverrideUnpaid(Request $request)
+    public function salvarNotaOverrideUnpaid(OverrideNotaUnpaidSalvarRequest $d): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
+        $auth = $this->requireEditOrAgregarOverridePaymentJson();
+        if ($auth instanceof JsonResponse) {
+            return $auth;
         }
 
-        $d = OverrideNotaUnpaidSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = (string) $d->project_id;
         $fecha_fin = (string) $d->fechaFin;
         $project_item_id = (int) $d->project_item_id;
@@ -377,7 +357,8 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function listarNotasOverrideUnpaid(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarNotasOverrideUnpaid(Request $request): JsonResponse
     {
         $d = OverrideNotaUnpaidListarRequest::fromHttpRequest($request);
 
@@ -410,23 +391,13 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function eliminarNotaOverrideUnpaid(Request $request)
+    public function eliminarNotaOverrideUnpaid(OverrideNotaUnpaidEliminarRequest $d): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $permiso = $this->overridePaymentService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
-        if (0 === count($permiso) || (!$permiso[0]['editar'] && !$permiso[0]['agregar'])) {
-            return $this->json(['success' => false, 'error' => 'Access denied']);
+        $auth = $this->requireEditOrAgregarOverridePaymentJson();
+        if ($auth instanceof JsonResponse) {
+            return $auth;
         }
 
-        $d = OverrideNotaUnpaidEliminarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = (string) $d->project_id;
         $project_item_id = (int) $d->project_item_id;
         $history_id = (int) $d->history_id;
@@ -457,13 +428,9 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function listarHistorial(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorial(OverridePaymentInvoiceItemIdRequest $d): JsonResponse
     {
-        $d = OverridePaymentInvoiceItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_item_override_payment_id = $d->invoice_item_override_payment_id;
 
         try {
@@ -481,13 +448,9 @@ class OverridePaymentController extends AbstractAdminController
         }
     }
 
-    public function listarHistorialUnpaid(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialUnpaid(OverridePaymentHistorialUnpaidIdRequest $d): JsonResponse
     {
-        $d = OverridePaymentHistorialUnpaidIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $pid = $d->id;
 
         try {
@@ -508,13 +471,9 @@ class OverridePaymentController extends AbstractAdminController
     /**
      * Historial agregado de paid_qty (mismo dataset que el tab Override Payment del proyecto).
      */
-    public function listarHistorialProyecto(Request $request)
+    #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialProyecto(OverridePaymentProyectoIdRequest $d): JsonResponse
     {
-        $d = OverridePaymentProyectoIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $d->project_id;
 
         try {

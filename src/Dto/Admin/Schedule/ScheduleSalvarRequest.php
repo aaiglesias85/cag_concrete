@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Schedule;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ScheduleSalvarRequest
+final class ScheduleSalvarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $project_id = null;
@@ -42,7 +44,7 @@ final class ScheduleSalvarRequest
 
     public ?string $employees_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = self::s($request->get('project_id'));

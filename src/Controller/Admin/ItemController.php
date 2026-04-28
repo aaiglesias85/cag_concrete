@@ -3,45 +3,35 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Item\ItemActualizarRequest;
 use App\Dto\Admin\Item\ItemIdRequest;
 use App\Dto\Admin\Item\ItemIdsRequest;
+use App\Dto\Admin\Item\ItemListarRequest;
 use App\Dto\Admin\Item\ItemSalvarRequest;
 use App\Entity\Equation;
 use App\Entity\Unit;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ItemService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ItemController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $itemService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ItemService $itemService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        ItemService $itemService) {
         parent::__construct($adminAccess);
         $this->itemService = $itemService;
     }
 
+    #[RequireAdminPermission(FunctionId::ITEM)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ITEM);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $usuario = $acceso['usuario'];
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::ITEM);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso ITEM esperado tras #[RequireAdminPermission].');
 
         $units = $this->itemService->getDoctrine()->getRepository(Unit::class)
            ->ListarOrdenados();
@@ -52,7 +42,7 @@ class ItemController extends AbstractAdminController
         $yields_calculation = $this->itemService->ListarYieldsCalculation();
 
         return $this->render('admin/item/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'units' => $units,
             'equations' => $equations,
             'yields_calculation' => $yields_calculation,
@@ -60,17 +50,11 @@ class ItemController extends AbstractAdminController
         ]);
     }
 
-    /**
-     * listar Acción que lista los units.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ItemListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'unit', 'yieldCalculation', 'status'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
             $result = $this->itemService->ListarItems(
                 $dt['start'],
@@ -96,24 +80,11 @@ class ItemController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(ItemSalvarRequest $d): JsonResponse
     {
-        $d = ItemSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
 
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            $resultadoJson = ['success' => false, 'error' => 'Not authenticated'];
-
-            return $this->json($resultadoJson, 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $bond = $d->bond;
         if (!$usuario->getBond() && (1 == $bond || '1' === $bond || true === $bond)) {
             $resultadoJson['success'] = false;
@@ -122,7 +93,6 @@ class ItemController extends AbstractAdminController
             return $this->json($resultadoJson);
         }
 
-        $item_id = (string) ($d->item_id ?? '');
         $unit_id = $d->unit_id;
         $name = (string) $d->name;
         $description = (string) ($d->description ?? '');
@@ -131,11 +101,7 @@ class ItemController extends AbstractAdminController
         $equation_id = $d->equation_id;
 
         try {
-            if ('' === $item_id) {
-                $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
-            } else {
-                $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
-            }
+            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -157,16 +123,53 @@ class ItemController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un item en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(ItemActualizarRequest $d): JsonResponse
     {
-        $dto = ItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+
+        $usuario = $this->DevolverUsuario();
+        $bond = $d->bond;
+        if (!$usuario->getBond() && (1 == $bond || '1' === $bond || true === $bond)) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = "You don't have permission to mark items as bond.";
+
+            return $this->json($resultadoJson);
         }
+
+        $item_id = (string) $d->item_id;
+        $unit_id = $d->unit_id;
+        $name = (string) $d->name;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $yield_calculation = $d->yield_calculation;
+        $equation_id = $d->equation_id;
+
+        try {
+            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['item'] = $resultado['item'];
+                $resultadoJson['item_id'] = $resultado['item']['item_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(ItemIdRequest $dto): JsonResponse
+    {
         $item_id = $dto->item_id;
 
         try {
@@ -189,16 +192,9 @@ class ItemController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarItems Acción que elimina los items seleccionados en la BD.
-     */
-    public function eliminarItems(Request $request)
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarItems(ItemIdsRequest $dto): JsonResponse
     {
-        $dto = ItemIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -221,16 +217,9 @@ class ItemController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del item en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(ItemIdRequest $dto): JsonResponse
     {
-        $dto = ItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $item_id = $dto->item_id;
 
         try {

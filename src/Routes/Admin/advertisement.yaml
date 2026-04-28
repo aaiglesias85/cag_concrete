@@ -18,6 +18,10 @@ salvarAdvertisementAdmin:
   path:  /advertisement/salvarAdvertisement
   defaults: { _controller: App\Controller\Admin\AdvertisementController::salvar, _format: json }
 
+actualizarAdvertisementAdmin:
+  path:  /advertisement/actualizar
+  defaults: { _controller: App\Controller\Admin\AdvertisementController::actualizar, _format: json }
+
 cargarDatosAdvertisementAdmin:
   path:  /advertisement/cargarDatos
   defaults: { _controller: App\Controller\Admin\AdvertisementController::cargarDatos, _format: json }

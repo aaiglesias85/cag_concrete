@@ -2,13 +2,15 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Puede usarse con data tracking nuevo (id vacío) o en edición.
  */
-final class DataTrackingValidarSiExisteRequest
+final class DataTrackingValidarSiExisteRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $data_tracking_id = null;
 
@@ -18,7 +20,7 @@ final class DataTrackingValidarSiExisteRequest
     #[Assert\NotBlank]
     public ?string $date = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $id = $request->get('data_tracking_id');

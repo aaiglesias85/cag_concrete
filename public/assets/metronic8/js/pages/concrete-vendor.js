@@ -492,10 +492,14 @@ var ConcreteVendor = (function () {
 
          formData.set('contacts', JSON.stringify(contacts));
 
+         var salvarUrl =
+            vendor_id && String(vendor_id).trim() !== ''
+               ? 'concrete-vendor/actualizar'
+               : 'concrete-vendor/salvar';
          BlockUtil.block('#form-concrete-vendor');
 
          axios
-            .post('concrete-vendor/salvar', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

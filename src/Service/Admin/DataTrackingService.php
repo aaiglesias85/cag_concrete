@@ -1148,17 +1148,14 @@ class DataTrackingService extends Base
         $entity->setStationNumber($station_number);
         $entity->setMeasuredBy($measured_by);
         $entity->setConcVendor($conc_vendor);
-        $entity->setConcPrice($conc_price);
+        $entity->setConcPrice(self::floatFromRequest($conc_price));
         $entity->setCrewLead($crew_lead);
         $entity->setNotes($notes);
         $entity->setOtherMaterials($other_materials);
-        $entity->setTotalConcUsed($total_conc_used);
+        $entity->setTotalConcUsed(self::floatFromRequest($total_conc_used));
 
-        $total_stamps = '' == $total_stamps ? 0 : $total_stamps;
-        $entity->setTotalStamps($total_stamps);
-
-        $total_people = '' == $total_people ? 0 : $total_people;
-        $entity->setTotalPeople($total_people);
+        $entity->setTotalStamps(self::floatFromRequest($total_stamps));
+        $entity->setTotalPeople(self::floatFromRequest($total_people));
 
         // overhead
         $entity->setOverhead(null);
@@ -1170,15 +1167,12 @@ class DataTrackingService extends Base
             $entity->setOverhead($overhead_entity);
 
             $overhead_price = null != $overhead_entity ? $overhead_entity->getPrice() : 0;
-            $entity->setOverheadPrice($overhead_price);
+            $entity->setOverheadPrice(self::floatFromRequest($overhead_price));
         }
 
         // color
-        $color_used = '' == $color_used ? 0 : $color_used;
-        $entity->setColorUsed($color_used);
-
-        $color_price = '' == $color_price ? 0 : $color_price;
-        $entity->setColorPrice($color_price);
+        $entity->setColorUsed(self::floatFromRequest($color_used));
+        $entity->setColorPrice(self::floatFromRequest($color_price));
 
         if ($is_new) {
             $entity->setProject($project_entity);
@@ -1328,8 +1322,8 @@ class DataTrackingService extends Base
                ->find($value->vendor_id);
             $data_tracking_conc_vendor_entity->setConcreteVendor($concrete_vendor);
 
-            $data_tracking_conc_vendor_entity->setTotalConcUsed($value->total_conc_used);
-            $data_tracking_conc_vendor_entity->setConcPrice($value->conc_price);
+            $data_tracking_conc_vendor_entity->setTotalConcUsed(self::floatFromRequest($value->total_conc_used ?? null));
+            $data_tracking_conc_vendor_entity->setConcPrice(self::floatFromRequest($value->conc_price ?? null));
 
             if ($is_new_data_tracking_conc_vendor) {
                 $data_tracking_conc_vendor_entity->setDataTracking($entity);
@@ -1738,5 +1732,30 @@ class DataTrackingService extends Base
         }
 
         return $out;
+    }
+
+    /**
+     * HTTP/JSON envía números como string, "" o "undefined"; los setters de entidad esperan ?float.
+     */
+    private static function floatFromRequest(mixed $value, float $default = 0.0): float
+    {
+        if (null === $value) {
+            return $default;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+        if (!is_string($value)) {
+            return $default;
+        }
+        $trimmed = trim($value);
+        if ('' === $trimmed || 0 === strcasecmp($trimmed, 'undefined') || 0 === strcasecmp($trimmed, 'null')) {
+            return $default;
+        }
+        if (is_numeric($trimmed)) {
+            return (float) $trimmed;
+        }
+
+        return $default;
     }
 }

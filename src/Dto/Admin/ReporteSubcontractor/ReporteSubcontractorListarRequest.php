@@ -2,13 +2,29 @@
 
 namespace App\Dto\Admin\ReporteSubcontractor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+use App\Http\DataTablesHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Filtros DataTables listar.
+ * DataTables reporte subcontractors + filtros.
+ *
+ * @phpstan-type ParsedDt array{
+ *   draw:int,
+ *   start:int,
+ *   length:int,
+ *   search:string,
+ *   orderField:string,
+ *   orderDir:'asc'|'desc',
+ *   columns:array,
+ *   raw:array
+ * }
  */
-final class ReporteSubcontractorListarFiltroRequest
+final class ReporteSubcontractorListarRequest implements AdminHttpRequestDtoInterface
 {
+    /** @var ParsedDt */
+    public array $dt;
+
     public ?string $subcontractor_id = null;
 
     public ?string $project_id = null;
@@ -19,9 +35,14 @@ final class ReporteSubcontractorListarFiltroRequest
 
     public ?string $fechaFin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
+        $d->dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: ['id', 'date', 'project', 'subcontractor', 'item', 'unit', 'quantity', 'price', 'total'],
+            defaultOrderField: 'date'
+        );
         $d->subcontractor_id = self::strOrNull($request->get('subcontractor_id'));
         $d->project_id = self::strOrNull($request->get('project_id'));
         $d->project_item_id = self::strOrNull($request->get('project_item_id'));

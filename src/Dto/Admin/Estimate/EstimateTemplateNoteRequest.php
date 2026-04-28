@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateTemplateNoteRequest
+final class EstimateTemplateNoteRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
@@ -15,7 +17,7 @@ final class EstimateTemplateNoteRequest
     #[Assert\Positive]
     public ?int $estimate_note_item_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->estimate_id = self::pos($request->get('estimate_id'));

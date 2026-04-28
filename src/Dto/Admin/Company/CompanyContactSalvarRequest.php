@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Company;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class CompanyContactSalvarRequest
+final class CompanyContactSalvarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Company id is required.')]
     #[Assert\Positive]
@@ -22,7 +24,7 @@ final class CompanyContactSalvarRequest
 
     public ?string $notes = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->company_id = self::positiveIntOrNull($request->get('company_id'));

@@ -23,6 +23,10 @@ salvarNotesPaymentAdmin:
    path: /payment/salvarNotes
    defaults: { _controller: App\Controller\Admin\PaymentController::salvarNotes, _format: json }
 
+actualizarNotesPaymentAdmin:
+   path: /payment/actualizarNotes
+   defaults: { _controller: App\Controller\Admin\PaymentController::actualizarNotes, _format: json }
+
 cargarDatosNotesPaymentAdmin:
    path: /payment/cargarDatosNotes
    defaults: { _controller: App\Controller\Admin\PaymentController::cargarDatosNotes, _format: json }
@@ -52,6 +56,10 @@ eliminarArchivosPaymentAdmin:
 salvarNotesItemPaymentAdmin:
    path: /payment/salvarNotesItem
    defaults: { _controller: App\Controller\Admin\PaymentController::salvarNotesItem, _format: json }
+
+actualizarNotesItemPaymentAdmin:
+   path: /payment/actualizarNotesItem
+   defaults: { _controller: App\Controller\Admin\PaymentController::actualizarNotesItem, _format: json }
 
 eliminarNotesItemPaymentAdmin:
    path: /payment/eliminarNotesItem

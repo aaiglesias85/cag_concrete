@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\PlanStatus;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PlanStatusIdRequest
+final class PlanStatusIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Status id is required.')]
     #[Assert\Positive]
     public ?int $status_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->status_id = self::positiveIntOrNull($request->get('status_id'));

@@ -14,6 +14,10 @@ salvarEstimateAdmin:
   path: /estimate/salvar
   defaults: { _controller: App\Controller\Admin\EstimateController::salvar, _format: json }
 
+actualizarEstimateAdmin:
+  path: /estimate/actualizarEstimate
+  defaults: { _controller: App\Controller\Admin\EstimateController::actualizar, _format: json }
+
 eliminarEstimateAdmin:
   path: /estimate/eliminar
   defaults: { _controller: App\Controller\Admin\EstimateController::eliminar, _format: json }
@@ -67,6 +71,10 @@ eliminarTemplateNoteEstimateAdmin:
 salvarQuoteEstimateAdmin:
   path: /estimate/salvarQuote
   defaults: { _controller: App\Controller\Admin\EstimateController::salvarQuote, _format: json }
+
+actualizarQuoteEstimateAdmin:
+  path: /estimate/actualizarQuote
+  defaults: { _controller: App\Controller\Admin\EstimateController::actualizarQuote, _format: json }
 
 eliminarQuoteEstimateAdmin:
   path: /estimate/eliminarQuote

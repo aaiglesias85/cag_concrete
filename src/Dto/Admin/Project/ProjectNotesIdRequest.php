@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectNotesIdRequest
+final class ProjectNotesIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'notes_id is required.')]
     #[Assert\Positive]
     public ?int $notes_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $v = $request->get('notes_id');

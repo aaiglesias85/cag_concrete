@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Reminder;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ReminderSalvarRequest
+final class ReminderSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $reminder_id = null;
-
     #[Assert\NotBlank]
     public ?string $day = null;
 
@@ -22,11 +22,9 @@ final class ReminderSalvarRequest
 
     public ?string $usuarios_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $rid = $request->get('reminder_id');
-        $d->reminder_id = \is_string($rid) || is_numeric($rid) ? (string) $rid : null;
         $d->day = \is_string($x = $request->get('day')) ? $x : null;
         $d->subject = \is_string($x = $request->get('subject')) ? $x : null;
         $d->body = \is_string($x = $request->get('body')) ? $x : null;

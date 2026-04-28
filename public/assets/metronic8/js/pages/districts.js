@@ -321,9 +321,13 @@ var Districts = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    district_id && String(district_id).trim() !== ''
+                        ? "district/actualizar"
+                        : "district/salvar";
                 BlockUtil.block('#form-district');
 
-                axios.post("district/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

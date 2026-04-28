@@ -2,15 +2,17 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectReimbursementInvoiceIdRequest
+final class ProjectReimbursementInvoiceIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $invoice_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $raw = $request->request->get('invoice_id');

@@ -2,26 +2,24 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateSalvarQuoteRequest
+final class EstimateSalvarQuoteRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
     public ?int $estimate_id = null;
 
-    public ?string $quote_id = null;
-
     #[Assert\NotBlank]
     public ?string $name = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->estimate_id = self::pos($request->get('estimate_id'));
-        $q = $request->get('quote_id');
-        $d->quote_id = \is_string($q) || is_numeric($q) ? (string) $q : null;
         $n = $request->get('name');
         $d->name = \is_string($n) ? $n : null;
 

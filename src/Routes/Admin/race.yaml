@@ -18,6 +18,10 @@ salvarRaceAdmin:
    path: /race/salvarRace
    defaults: { _controller: App\Controller\Admin\RaceController::salvar, _format: json }
 
+actualizarRaceAdmin:
+   path: /race/actualizarRace
+   defaults: { _controller: App\Controller\Admin\RaceController::actualizar, _format: json }
+
 cargarDatosRaceAdmin:
    path: /race/cargarDatos
    defaults: { _controller: App\Controller\Admin\RaceController::cargarDatos, _format: json }

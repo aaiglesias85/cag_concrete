@@ -3,7 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Estimate\EstimateActualizarQuoteRequest;
+use App\Dto\Admin\Estimate\EstimateActualizarRequest;
 use App\Dto\Admin\Estimate\EstimateAgregarItemRequest;
 use App\Dto\Admin\Estimate\EstimateArchivoNombreRequest;
 use App\Dto\Admin\Estimate\EstimateArchivosStringRequest;
@@ -13,7 +14,7 @@ use App\Dto\Admin\Estimate\EstimateEnviarQuotesRequest;
 use App\Dto\Admin\Estimate\EstimateEstimateItemIdRequest;
 use App\Dto\Admin\Estimate\EstimateIdRequest;
 use App\Dto\Admin\Estimate\EstimateIdsRequest;
-use App\Dto\Admin\Estimate\EstimateListarFiltroRequest;
+use App\Dto\Admin\Estimate\EstimateListarRequest;
 use App\Dto\Admin\Estimate\EstimateQuoteIdRequest;
 use App\Dto\Admin\Estimate\EstimateRowIdRequest;
 use App\Dto\Admin\Estimate\EstimateSalvarQuoteCompaniesRequest;
@@ -33,38 +34,30 @@ use App\Entity\ProjectType;
 use App\Entity\ProposalType;
 use App\Entity\Unit;
 use App\Entity\Usuario;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EstimateService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EstimateController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $estimateService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EstimateService $estimateService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        EstimateService $estimateService) {
         parent::__construct($adminAccess);
         $this->estimateService = $estimateService;
     }
 
+    #[RequireAdminPermission(FunctionId::ESTIMATE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ESTIMATE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::ESTIMATE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso ESTIMATE esperado tras #[RequireAdminPermission].');
 
         // companies
         $companies = $this->estimateService->getDoctrine()->getRepository(Company::class)
@@ -120,7 +113,7 @@ class EstimateController extends AbstractAdminController
         $holidays = $this->estimateService->ListarTodosHolidays();
 
         return $this->render('admin/estimate/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'companies' => $companies,
             'stages' => $stages,
             'project_types' => $project_types,
@@ -143,26 +136,20 @@ class EstimateController extends AbstractAdminController
     /**
      * listar Acción que lista los usuarios.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(EstimateListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name',  'company', 'bidDeadline', 'estimators', 'stage'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
-            $f = EstimateListarFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $stage_id = $f->stage_id;
-            $project_type_id = $f->project_type_id;
-            $proposal_type_id = $f->proposal_type_id;
-            $status_id = $f->status_id;
-            $county_id = $f->county_id;
-            $district_id = $f->district_id;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
+            $stage_id = $listar->stage_id;
+            $project_type_id = $listar->project_type_id;
+            $proposal_type_id = $listar->proposal_type_id;
+            $status_id = $listar->status_id;
+            $county_id = $listar->county_id;
+            $district_id = $listar->district_id;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
 
             $data = $this->estimateService->ListarEstimates(
                 $dt['start'],
@@ -201,10 +188,9 @@ class EstimateController extends AbstractAdminController
     /**
      * listarParaCalendario: eventos para FullCalendar (bid deadline) con los mismos filtros que el listado.
      */
-    public function listarParaCalendario(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
+    public function listarParaCalendario(EstimateCalendarioFiltroRequest $f): JsonResponse
     {
-        $f = EstimateCalendarioFiltroRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $search = $f->search;
         $stage_id = $f->stage_id;
         $project_type_id = $f->project_type_id;
@@ -242,17 +228,28 @@ class EstimateController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción para agregar estimates en la BD.
+     * salvar Acción para agregar estimates en la BD (alta).
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(EstimateSalvarRequest $d): JsonResponse
     {
-        $d = EstimateSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $estimate_id = (string) ($d->estimate_id ?? '');
 
+        return $this->persistEstimate('', $d);
+    }
+
+    /**
+     * actualizar Acción para editar un estimate existente.
+     */
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(EstimateActualizarRequest $dAct): JsonResponse
+    {
+        $d = EstimateSalvarRequest::fromActualizarRequest($dAct);
+
+        return $this->persistEstimate((string) $dAct->estimate_id, $d);
+    }
+
+    private function persistEstimate(string $estimate_id, EstimateSalvarRequest $d): JsonResponse
+    {
         $project_id = $d->project_id;
         $name = $d->name;
         $bidDeadline = $d->bidDeadline;
@@ -390,13 +387,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un estimate en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(EstimateIdRequest $dto): JsonResponse
     {
-        $dto = EstimateIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_id = $dto->estimate_id;
 
         try {
@@ -422,13 +415,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarEstimates Acción que elimina los estimates seleccionados en la BD.
      */
-    public function eliminarEstimates(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarEstimates(EstimateIdsRequest $dto): JsonResponse
     {
-        $dto = EstimateIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -454,13 +443,9 @@ class EstimateController extends AbstractAdminController
     /**
      * agregarTemplateNote: Asocia una nota tipo template al estimate.
      */
-    public function agregarTemplateNote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function agregarTemplateNote(EstimateTemplateNoteRequest $t): JsonResponse
     {
-        $t = EstimateTemplateNoteRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $t, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_id = $t->estimate_id;
         $estimate_note_item_id = $t->estimate_note_item_id;
         try {
@@ -483,13 +468,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarTemplateNote: Quita una nota template del estimate.
      */
-    public function eliminarTemplateNote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarTemplateNote(EstimateRowIdRequest $dto): JsonResponse
     {
-        $dto = EstimateRowIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
         try {
             $resultado = $this->estimateService->EliminarTemplateNote($id);
@@ -506,13 +487,9 @@ class EstimateController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del estimate en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(EstimateIdRequest $dto): JsonResponse
     {
-        $dto = EstimateIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_id = $dto->estimate_id;
 
         try {
@@ -538,13 +515,9 @@ class EstimateController extends AbstractAdminController
     /**
      * cambiarStage Acción para cambiar el stage del estimates en la BD.
      */
-    public function cambiarStage(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function cambiarStage(EstimateCambiarStageRequest $c): JsonResponse
     {
-        $c = EstimateCambiarStageRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $c, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_id = $c->estimate_id;
         $stage_id = $c->stage_id;
 
@@ -572,13 +545,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarItem Acción que elimina un item en la BD.
      */
-    public function eliminarItem(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarItem(EstimateEstimateItemIdRequest $dto): JsonResponse
     {
-        $dto = EstimateEstimateItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_item_id = $dto->estimate_item_id;
 
         try {
@@ -606,13 +575,9 @@ class EstimateController extends AbstractAdminController
     /**
      * agregarItem Acción que agrega un item en la BD.
      */
-    public function agregarItem(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function agregarItem(EstimateAgregarItemRequest $a): JsonResponse
     {
-        $a = EstimateAgregarItemRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $a, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_item_id = $a->estimate_item_id;
         $estimate_id = $a->estimate_id;
         $quote_id = $a->quote_id;
@@ -660,13 +625,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarCompany Acción que elimina un company en la BD.
      */
-    public function eliminarCompany(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarCompany(EstimateRowIdRequest $dto): JsonResponse
     {
-        $dto = EstimateRowIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
 
         try {
@@ -690,20 +651,36 @@ class EstimateController extends AbstractAdminController
     }
 
     /**
-     * salvarQuote: Crea o actualiza una cuota.
+     * salvarQuote: Crea una cuota (alta).
      */
-    public function salvarQuote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvarQuote(EstimateSalvarQuoteRequest $q): JsonResponse
     {
-        $q = EstimateSalvarQuoteRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $q, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $estimate_id = $q->estimate_id;
-        $quote_id = $q->quote_id;
         $name = (string) $q->name;
         try {
-            $resultado = $this->estimateService->SalvarQuote($estimate_id, $quote_id ?? '', $name);
+            $resultado = $this->estimateService->SalvarQuote($estimate_id, '', $name);
+            if ($resultado['success']) {
+                return $this->json(['success' => true, 'message' => 'The operation was successful', 'quote_id' => $resultado['quote_id']]);
+            }
+
+            return $this->json(['success' => false, 'error' => $resultado['error']]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * actualizarQuote: Edita una cuota existente.
+     */
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizarQuote(EstimateActualizarQuoteRequest $q): JsonResponse
+    {
+        $estimate_id = $q->estimate_id;
+        $quote_id = (string) $q->quote_id;
+        $name = (string) $q->name;
+        try {
+            $resultado = $this->estimateService->SalvarQuote($estimate_id, $quote_id, $name);
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => 'The operation was successful', 'quote_id' => $resultado['quote_id']]);
             }
@@ -717,13 +694,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarQuote: Elimina una cuota.
      */
-    public function eliminarQuote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarQuote(EstimateQuoteIdRequest $dto): JsonResponse
     {
-        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->EliminarQuote($quote_id);
@@ -740,13 +713,9 @@ class EstimateController extends AbstractAdminController
     /**
      * eliminarQuoteCompanies: Elimina los registros estimate_quote_company de una cuota (desasigna empresas).
      */
-    public function eliminarQuoteCompanies(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarQuoteCompanies(EstimateQuoteIdRequest $dto): JsonResponse
     {
-        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->EliminarQuoteCompanies($quote_id);
@@ -763,13 +732,9 @@ class EstimateController extends AbstractAdminController
     /**
      * cargarDatosQuote: Carga una cuota con ítems y compañías.
      */
-    public function cargarDatosQuote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatosQuote(EstimateQuoteIdRequest $dto): JsonResponse
     {
-        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $quote_id = $dto->quote_id;
         try {
             $resultado = $this->estimateService->CargarDatosQuote($quote_id);
@@ -783,13 +748,9 @@ class EstimateController extends AbstractAdminController
     /**
      * salvarQuoteCompanies: Asigna compañías a una cuota.
      */
-    public function salvarQuoteCompanies(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarQuoteCompanies(EstimateSalvarQuoteCompaniesRequest $d): JsonResponse
     {
-        $d = EstimateSalvarQuoteCompaniesRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $quote_id = $d->quote_id;
         $company_ids = $d->company_ids;
         if (is_string($company_ids)) {
@@ -812,10 +773,9 @@ class EstimateController extends AbstractAdminController
     /**
      * enviarQuotes: Genera Excel y envía email por cada cuota a sus compañías asignadas.
      */
-    public function enviarQuotes(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function enviarQuotes(EstimateEnviarQuotesRequest $d): JsonResponse
     {
-        $d = EstimateEnviarQuotesRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
         $quote_ids = $d->quote_ids;
         try {
             $resultado = $this->estimateService->EnviarQuotes($quote_ids ?? '');
@@ -834,13 +794,9 @@ class EstimateController extends AbstractAdminController
     /**
      * exportarExcelQuote: Genera el PDF de una cuota (desde el mismo contenido que el Excel) y devuelve la URL para descarga.
      */
-    public function exportarExcelQuote(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
+    public function exportarExcelQuote(EstimateQuoteIdRequest $dto): JsonResponse
     {
-        $dto = EstimateQuoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $quote_id = $dto->quote_id;
         try {
             $url = $this->estimateService->ExportarExcelQuote($quote_id);
@@ -857,7 +813,8 @@ class EstimateController extends AbstractAdminController
     /**
      * salvarArchivo: sube un fichero al directorio de estimates (mismo flujo que project/payment).
      */
-    public function salvarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarArchivo(Request $request): JsonResponse
     {
         $resultadoJson = [];
 
@@ -892,13 +849,9 @@ class EstimateController extends AbstractAdminController
         }
     }
 
-    public function eliminarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarArchivo(EstimateArchivoNombreRequest $d): JsonResponse
     {
-        $d = EstimateArchivoNombreRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivo = $d->archivo;
 
         try {
@@ -920,13 +873,9 @@ class EstimateController extends AbstractAdminController
         }
     }
 
-    public function eliminarArchivos(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarArchivos(EstimateArchivosStringRequest $d): JsonResponse
     {
-        $d = EstimateArchivosStringRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivos = $d->archivos;
 
         try {

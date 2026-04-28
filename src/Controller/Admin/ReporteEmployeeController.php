@@ -3,23 +3,17 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\ReporteEmployee\ReporteEmployeeExportFiltroRequest;
-use App\Dto\Admin\ReporteEmployee\ReporteEmployeeListarFiltroRequest;
-use App\Http\DataTablesHelper;
+use App\Dto\Admin\ReporteEmployee\ReporteEmployeeListarRequest;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeService;
 use App\Service\Admin\ProjectService;
 use App\Service\Admin\ReporteEmployeeService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ReporteEmployeeController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $reporteService;
     private $projectService;
     private $employeeService;
@@ -28,23 +22,19 @@ class ReporteEmployeeController extends AbstractAdminController
         AdminAccessService $adminAccess,
         ReporteEmployeeService $reporteService,
         ProjectService $projectService,
-        EmployeeService $employeeService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        EmployeeService $employeeService) {
         parent::__construct($adminAccess);
         $this->reporteService = $reporteService;
         $this->projectService = $projectService;
         $this->employeeService = $employeeService;
     }
 
+    #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::REPORTE_EMPLOYEE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::REPORTE_EMPLOYEE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso REPORTE_EMPLOYEE esperado tras #[RequireAdminPermission].');
 
         // employees
         $employees = $this->employeeService->ListarOrdenados();
@@ -53,7 +43,7 @@ class ReporteEmployeeController extends AbstractAdminController
         $projects = $this->projectService->ListarOrdenados();
 
         return $this->render('admin/reportes/employee.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'employees' => $employees,
             'projects' => $projects,
         ]);
@@ -62,22 +52,16 @@ class ReporteEmployeeController extends AbstractAdminController
     /**
      * listar Acción que lista los companies.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ReporteEmployeeListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'project', 'subcontractor', 'item', 'unit', 'quantity', 'price', 'total'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            $f = ReporteEmployeeListarFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $employee_id = $f->employee_id;
-            $project_id = $f->project_id;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
+            $employee_id = $listar->employee_id;
+            $project_id = $listar->project_id;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->reporteService->ListarReporteEmployees(
@@ -111,10 +95,9 @@ class ReporteEmployeeController extends AbstractAdminController
     /**
      * exportarExcel Acción para la exportacion en excel.
      */
-    public function exportarExcel(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function exportarExcel(ReporteEmployeeExportFiltroRequest $f): JsonResponse
     {
-        $f = ReporteEmployeeExportFiltroRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $search = $f->search;
         $employee_id = $f->employee_id;
         $project_id = $f->project_id;
@@ -140,10 +123,9 @@ class ReporteEmployeeController extends AbstractAdminController
     /**
      * devolverTotal Acción para devolver el total.
      */
-    public function devolverTotal(Request $request)
+    #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function devolverTotal(ReporteEmployeeExportFiltroRequest $f): JsonResponse
     {
-        $f = ReporteEmployeeExportFiltroRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $search = $f->search;
         $employee_id = $f->employee_id;
         $project_id = $f->project_id;

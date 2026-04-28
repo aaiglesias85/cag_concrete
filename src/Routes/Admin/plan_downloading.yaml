@@ -10,6 +10,10 @@ salvarPlanDownloadingAdmin:
   path: /plan-downloading/salvar
   defaults: { _controller: App\Controller\Admin\PlanDownloadingController::salvar, _format: json }
 
+actualizarPlanDownloadingAdmin:
+  path: /plan-downloading/actualizar
+  defaults: { _controller: App\Controller\Admin\PlanDownloadingController::actualizar, _format: json }
+
 eliminarPlanDownloadingAdmin:
   path: /plan-downloading/eliminar
   defaults: { _controller: App\Controller\Admin\PlanDownloadingController::eliminar, _format: json }

@@ -3,7 +3,6 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Project\ProjectAgregarItemRequest;
 use App\Dto\Admin\Project\ProjectAjusteRowIdRequest;
 use App\Dto\Admin\Project\ProjectArchivoNombreRequest;
@@ -11,18 +10,20 @@ use App\Dto\Admin\Project\ProjectArchivosStringRequest;
 use App\Dto\Admin\Project\ProjectBulkItemsStatusRequest;
 use App\Dto\Admin\Project\ProjectConcreteClassIdRequest;
 use App\Dto\Admin\Project\ProjectContactIdRequest;
-use App\Dto\Admin\Project\ProjectDataTrackingFiltroRequest;
 use App\Dto\Admin\Project\ProjectEliminarNotesDateRequest;
 use App\Dto\Admin\Project\ProjectIdRequest;
 use App\Dto\Admin\Project\ProjectIdsRequest;
-use App\Dto\Admin\Project\ProjectListarFiltroRequest;
+use App\Dto\Admin\Project\ProjectListarRequest;
 use App\Dto\Admin\Project\ProjectListarItemsCompletionFiltroRequest;
 use App\Dto\Admin\Project\ProjectListarItemsInvoiceRequest;
-use App\Dto\Admin\Project\ProjectListarNotesFiltroRequest;
+use App\Dto\Admin\Project\ProjectListarNotesRequest;
+use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
 use App\Dto\Admin\Project\ProjectListarOrdenadosRequest;
 use App\Dto\Admin\Project\ProjectNotesIdRequest;
 use App\Dto\Admin\Project\ProjectProjectItemIdRequest;
 use App\Dto\Admin\Project\ProjectReimbursementInvoiceIdRequest;
+use App\Dto\Admin\Project\ProjectActualizarNotesRequest;
+use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectSalvarNotesRequest;
 use App\Dto\Admin\Project\ProjectSalvarRequest;
 use App\Dto\Admin\Project\ProjectSaveReimbursementRequest;
@@ -39,45 +40,36 @@ use App\Entity\Item;
 use App\Entity\Project;
 use App\Entity\ReimbursementHistory;
 use App\Entity\Unit;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InvoiceService;
 use App\Service\Admin\ProjectService;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProjectController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $projectService;
     private $invoiceService;
 
     public function __construct(
         AdminAccessService $adminAccess,
         ProjectService $projectService,
-        InvoiceService $invoiceService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        InvoiceService $invoiceService) {
         parent::__construct($adminAccess);
         $this->projectService = $projectService;
         $this->invoiceService = $invoiceService;
     }
 
+    #[RequireAdminPermission(FunctionId::PROJECT)]
     public function index(Request $request)
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $usuario = $acceso['usuario'];
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PROJECT);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso PROJECT esperado tras #[RequireAdminPermission].');
 
         // companies
         $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
@@ -116,7 +108,7 @@ class ProjectController extends AbstractAdminController
            ->ListarOrdenados();
 
         return $this->render('admin/project/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'companies' => $companies,
             'inspectors' => $inspectors,
             'items' => $items,
@@ -136,23 +128,17 @@ class ProjectController extends AbstractAdminController
     /**
      * listar Acción que lista los usuarios.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ProjectListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'projectNumber', 'subcontract', 'status', 'name', 'dueDate', 'company', 'nota'],
-                defaultOrderField: 'projectNumber'
-            );
+            $dt = $listar->dt;
 
-            $f = ProjectListarFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $company_id = $f->company_id;
-            $status = $f->status;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
-            $missing_info = $f->missing_info ? true : false;
+            $company_id = $listar->company_id;
+            $status = $listar->status;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
+            $missing_info = $listar->missing_info ? true : false;
 
             $data = $this->projectService->ListarProjects(
                 $dt['start'],
@@ -186,17 +172,28 @@ class ProjectController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD.
+     * salvar Acción que inserta un proyecto en la BD (alta).
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(ProjectSalvarRequest $d): JsonResponse
     {
-        $d = ProjectSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $project_id = (string) ($d->project_id ?? '');
 
+        return $this->persistProject('', $d);
+    }
+
+    /**
+     * actualizar Acción que actualiza un proyecto existente.
+     */
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(ProjectActualizarRequest $dAct): JsonResponse
+    {
+        $d = ProjectSalvarRequest::fromActualizarRequest($dAct);
+
+        return $this->persistProject((string) $dAct->project_id, $d);
+    }
+
+    private function persistProject(string $project_id, ProjectSalvarRequest $d): JsonResponse
+    {
         $company_id = $d->company_id;
         $inspector_id = $d->inspector_id;
         $number = $d->number;
@@ -365,13 +362,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un project en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -397,13 +390,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarProjects Acción que elimina los projects seleccionados en la BD.
      */
-    public function eliminarProjects(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarProjects(ProjectIdsRequest $dto): JsonResponse
     {
-        $dto = ProjectIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -429,13 +418,9 @@ class ProjectController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del project en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -461,10 +446,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarOrdenados Acción para listar los projects ordenados.
      */
-    public function listarOrdenados(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarOrdenados(ProjectListarOrdenadosRequest $f): JsonResponse
     {
-        $f = ProjectListarOrdenadosRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $company_id = $f->company_id;
         $inspector_id = $f->inspector_id;
         $search = $f->search;
@@ -490,13 +474,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarItemsParaInvoice Acción para listar los items para el invoice.
      */
-    public function listarItemsParaInvoice(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarItemsParaInvoice(ProjectListarItemsInvoiceRequest $f): JsonResponse
     {
-        $f = ProjectListarItemsInvoiceRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $f->project_id;
         $fecha_inicial = $f->start_date;
         $fecha_fin = $f->end_date;
@@ -534,21 +514,15 @@ class ProjectController extends AbstractAdminController
     /**
      * listarNotes Acción que lista los notes subcontractors.
      */
-    public function listarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarNotes(ProjectListarNotesRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'notes'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            $f = ProjectListarNotesFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $project_id = $f->project_id;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
+            $project_id = $listar->project_id;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
 
             // total + data en una sola llamada a tu servicio
             $result = '' != $project_id ? $this->projectService->ListarNotes(
@@ -579,15 +553,42 @@ class ProjectController extends AbstractAdminController
     }
 
     /**
-     * salvarNotes Acción que salvar un notes en la BD.
+     * salvarNotes Acción que crea una nota en la BD (alta).
      */
-    public function salvarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvarNotes(ProjectSalvarNotesRequest $d): JsonResponse
     {
-        $d = ProjectSalvarNotesRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $project_id = $d->project_id;
+        $notes = $d->notes;
+        $date = $d->date;
+
+        try {
+            $resultado = $this->projectService->SalvarNotes('', $project_id, $notes, $date);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    /**
+     * actualizarNotes Acción que actualiza una nota existente.
+     */
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizarNotes(ProjectActualizarNotesRequest $d): JsonResponse
+    {
         $notes_id = $d->notes_id;
         $project_id = $d->project_id;
         $notes = $d->notes;
@@ -617,13 +618,9 @@ class ProjectController extends AbstractAdminController
     /**
      * cargarDatosNotes Acción que carga los datos del notes project en la BD.
      */
-    public function cargarDatosNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatosNotes(ProjectNotesIdRequest $dto): JsonResponse
     {
-        $dto = ProjectNotesIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -649,13 +646,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarNotes Acción que elimina un notes en la BD.
      */
-    public function eliminarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotes(ProjectNotesIdRequest $dto): JsonResponse
     {
-        $dto = ProjectNotesIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -681,13 +674,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarNotesDate Acción que elimina un notes en la BD.
      */
-    public function eliminarNotesDate(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotesDate(ProjectEliminarNotesDateRequest $d): JsonResponse
     {
-        $d = ProjectEliminarNotesDateRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $d->project_id;
         $from = $d->from;
         $to = $d->to;
@@ -715,13 +704,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarItems Acción que lista los item en la BD.
      */
-    public function listarItems(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarItems(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -742,13 +727,9 @@ class ProjectController extends AbstractAdminController
     /**
      * obtenerPorcentajeCompletionItem Acción que obtiene el porcentaje de completion de un item.
      */
-    public function obtenerPorcentajeCompletionItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function obtenerPorcentajeCompletionItem(ProjectProjectItemIdRequest $dto): JsonResponse
     {
-        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $dto->project_item_id;
 
         try {
@@ -769,13 +750,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarHistorialItem Acción que lista el historial de cambios de un item.
      */
-    public function listarHistorialItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialItem(ProjectProjectItemIdRequest $dto): JsonResponse
     {
-        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $dto->project_item_id;
 
         try {
@@ -796,13 +773,9 @@ class ProjectController extends AbstractAdminController
     /**
      * Sugiere code / contract_name desde project_item existente en el mismo proyecto (mismo item_id de catálogo).
      */
-    public function sugerirCodeContractItemEnProyecto(Request $request): JsonResponse
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function sugerirCodeContractItemEnProyecto(ProjectSugerirCodeRequest $s): JsonResponse
     {
-        $s = ProjectSugerirCodeRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $s, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $s->project_id;
         $item_id = $s->item_id;
 
@@ -823,13 +796,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarItem Acción que elimina un item en la BD.
      */
-    public function eliminarItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarItem(ProjectProjectItemIdRequest $dto): JsonResponse
     {
-        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $dto->project_item_id;
 
         try {
@@ -854,13 +823,9 @@ class ProjectController extends AbstractAdminController
     /**
      * agregarItem Acción que agrega un item en la BD.
      */
-    public function agregarItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function agregarItem(ProjectAgregarItemRequest $a): JsonResponse
     {
-        $a = ProjectAgregarItemRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $a, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $a->project_item_id;
         $project_id = $a->project_id;
         $item_id = $a->item_id;
@@ -896,11 +861,7 @@ class ProjectController extends AbstractAdminController
         $contract_name = $a->contract_name;
 
         // Validar que solo usuarios con permiso bond puedan crear items con bond=true
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $usuario_bond = $usuario->getBond() ? true : false;
         if ($bond && !$usuario_bond) {
             // Si el usuario intenta crear un item con bond=true pero no tiene permiso, forzar a false
@@ -944,13 +905,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarContact Acción que elimina un contact en la BD.
      */
-    public function eliminarContact(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarContact(ProjectContactIdRequest $dto): JsonResponse
     {
-        $dto = ProjectContactIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $contact_id = $dto->contact_id;
 
         try {
@@ -975,13 +932,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarConcreteClass Acción que elimina una concrete class en la BD.
      */
-    public function eliminarConcreteClass(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarConcreteClass(ProjectConcreteClassIdRequest $dto): JsonResponse
     {
-        $dto = ProjectConcreteClassIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $concrete_class_id = $dto->concrete_class_id;
 
         try {
@@ -1006,13 +959,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarSubcontractors Acción que lista los subcontractors de un project.
      */
-    public function listarSubcontractors(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarSubcontractors(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -1033,13 +982,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarEmployees Acción que lista los employees de un project.
      */
-    public function listarEmployees(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarEmployees(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -1060,13 +1005,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarContacts Acción que lista los contacts de un project.
      */
-    public function listarContacts(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarContacts(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -1087,23 +1028,17 @@ class ProjectController extends AbstractAdminController
     /**
      * listarDataTracking Acción que lista el datatracking.
      */
-    public function listarDataTracking(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarDataTracking(ProjectListarDataTrackingRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'leads', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            $f = ProjectDataTrackingFiltroRequest::fromHttpRequest($request);
-            $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-            $project_id = $f->project_id;
-            $pending = $f->pending;
-            $fecha_inicial = $f->fechaInicial;
-            $fecha_fin = $f->fechaFin;
-            $only_punch = $f->only_punch ?? '';
+            $project_id = $listar->project_id;
+            $pending = $listar->pending;
+            $fecha_inicial = $listar->fechaInicial;
+            $fecha_fin = $listar->fechaFin;
+            $only_punch = $listar->only_punch ?? '';
 
             // total + data en una sola llamada a tu servicio
             $result = '' != $project_id ? $this->projectService->ListarDataTrackings(
@@ -1138,13 +1073,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarAjustePrecio Acción que elimina un ajuste de precio en la BD.
      */
-    public function eliminarAjustePrecio(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarAjustePrecio(ProjectAjusteRowIdRequest $dto): JsonResponse
     {
-        $dto = ProjectAjusteRowIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
 
         try {
@@ -1169,7 +1100,8 @@ class ProjectController extends AbstractAdminController
     /**
      * salvarArchivo Accion que salva un archivo en la BD.
      */
-    public function salvarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarArchivo(Request $request): JsonResponse
     {
         $resultadoJson = [];
 
@@ -1203,13 +1135,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarArchivo Acción que elimina un archivo en la BD.
      */
-    public function eliminarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarArchivo(ProjectArchivoNombreRequest $d): JsonResponse
     {
-        $d = ProjectArchivoNombreRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivo = $d->archivo;
 
         try {
@@ -1234,13 +1162,9 @@ class ProjectController extends AbstractAdminController
     /**
      * eliminarArchivos Acción que elimina varios archivos en la BD.
      */
-    public function eliminarArchivos(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function eliminarArchivos(ProjectArchivosStringRequest $d): JsonResponse
     {
-        $d = ProjectArchivosStringRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivos = $d->archivos;
 
         try {
@@ -1265,13 +1189,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarItemsCompletion Acción para listar los items completion.
      */
-    public function listarItemsCompletion(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarItemsCompletion(ProjectListarItemsCompletionFiltroRequest $f): JsonResponse
     {
-        $f = ProjectListarItemsCompletionFiltroRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $f->project_id;
         $fecha_inicial = $f->fechaInicial;
         $fecha_fin = $f->fechaFin;
@@ -1294,13 +1214,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarHistorialUnpaidQtyPorProjectItem Lista el historial de cambios de unpaid qty de un project_item (tab Completion).
      */
-    public function listarHistorialUnpaidQtyPorProjectItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialUnpaidQtyPorProjectItem(ProjectProjectItemIdRequest $dto): JsonResponse
     {
-        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $dto->project_item_id;
 
         try {
@@ -1320,13 +1236,9 @@ class ProjectController extends AbstractAdminController
     /**
      * Historial de cambios de paid_qty en invoice_item_override_payment (tab Completion, columna Paid Qty).
      */
-    public function listarHistorialPaidQtyOverridePorProjectItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialPaidQtyOverridePorProjectItem(ProjectProjectItemIdRequest $dto): JsonResponse
     {
-        $dto = ProjectProjectItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_item_id = $dto->project_item_id;
 
         try {
@@ -1346,13 +1258,9 @@ class ProjectController extends AbstractAdminController
     /**
      * listarInvoicesRetainage Acción que lista los invoices con retainage de un proyecto.
      */
-    public function listarInvoicesRetainage(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarInvoicesRetainage(ProjectIdRequest $dto): JsonResponse
     {
-        $dto = ProjectIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $project_id = $dto->project_id;
 
         try {
@@ -1373,23 +1281,15 @@ class ProjectController extends AbstractAdminController
     /**
      * Actualizar los Item con Retainage.
      */
-    public function bulkRetainageUpdate(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function bulkRetainageUpdate(ProjectBulkItemsStatusRequest $bulk): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $usuario_retainage = $usuario->getRetainage() ? true : false;
         if (!$usuario_retainage) {
             return $this->json(['success' => false, 'error' => 'You do not have permission to update retainage items.']);
         }
 
-        $bulk = ProjectBulkItemsStatusRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $bulk, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = $bulk->ids;
         $status = $bulk->status;
 
@@ -1405,24 +1305,16 @@ class ProjectController extends AbstractAdminController
     /**
      * Actualizar los Item con Bonded.
      */
-    public function bulkBondedUpdate(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function bulkBondedUpdate(ProjectBulkItemsStatusRequest $bulk): JsonResponse
     {
         // Validar que solo usuarios con permiso bond puedan actualizar bonded
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $usuario_bond = $usuario->getBond() ? true : false;
         if (!$usuario_bond) {
             return $this->json(['success' => false, 'error' => 'You do not have permission to update bonded items.']);
         }
 
-        $bulk = ProjectBulkItemsStatusRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $bulk, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = $bulk->ids;
         $status = $bulk->status;
 
@@ -1438,13 +1330,9 @@ class ProjectController extends AbstractAdminController
     /**
      * @param ManagerRegistry $doctrine <-- Inyectamos Doctrine aquí
      */
-    public function getReimbursementHistory(Request $request, ManagerRegistry $doctrine): JsonResponse
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
+    public function getReimbursementHistory(Request $request, ProjectReimbursementInvoiceIdRequest $q, ManagerRegistry $doctrine): JsonResponse
     {
-        $q = ProjectReimbursementInvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $q, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return new JsonResponse($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $q->invoice_id;
 
         // IMPORTANTE: 'invoiceId' es el nombre de la propiedad en tu clase Invoice.php
@@ -1468,13 +1356,9 @@ class ProjectController extends AbstractAdminController
     /**
      * saveReimbursement: Guarda un nuevo reembolso sumándolo al anterior.
      */
-    public function saveReimbursement(Request $request, ManagerRegistry $doctrine): JsonResponse
+    #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function saveReimbursement(Request $request, ProjectSaveReimbursementRequest $d, ManagerRegistry $doctrine): JsonResponse
     {
-        $d = ProjectSaveReimbursementRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return new JsonResponse($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $em = $doctrine->getManager();
         $invoice_id = $d->invoice_id;
         $amount_to_add = (float) $d->amount;

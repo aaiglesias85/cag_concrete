@@ -3,67 +3,53 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Subcontractor\SubcontractorActualizarRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorAgregarEmployeeRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorEmployeeIdRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorIdRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorIdsRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorNoteIdRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorNotesDateRangeRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorNotesActualizarRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorNotesSalvarRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorListarEmployeesRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorListarNotesRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorListarRequest;
 use App\Dto\Admin\Subcontractor\SubcontractorSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\SubcontractorService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class SubcontractorController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $subcontractorService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        SubcontractorService $subcontractorService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        SubcontractorService $subcontractorService) {
         parent::__construct($adminAccess);
         $this->subcontractorService = $subcontractorService;
     }
 
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::SUBCONTRACTOR);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::SUBCONTRACTOR);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso SUBCONTRACTOR esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/subcontractor/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los companies.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(SubcontractorListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'phone', 'address'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->subcontractorService->ListarSubcontractors(
                 $dt['start'],
                 $dt['length'],
@@ -88,17 +74,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(SubcontractorSalvarRequest $d): JsonResponse
     {
-        $d = SubcontractorSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $subcontractor_id = (string) ($d->subcontractor_id ?? '');
         $name = (string) $d->name;
         $phone = (string) ($d->phone ?? '');
         $address = (string) ($d->address ?? '');
@@ -109,11 +87,7 @@ class SubcontractorController extends AbstractAdminController
         $companyAddress = (string) ($d->companyAddress ?? '');
 
         try {
-            if ('' == $subcontractor_id) {
-                $resultado = $this->subcontractorService->SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
-            } else {
-                $resultado = $this->subcontractorService->ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
-            }
+            $resultado = $this->subcontractorService->SalvarSubcontractor($name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -134,16 +108,44 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un subcontractor en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(SubcontractorActualizarRequest $d): JsonResponse
     {
-        $dto = SubcontractorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $subcontractor_id = (string) $d->subcontractor_id;
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $companyName = (string) ($d->companyName ?? '');
+        $companyPhone = (string) ($d->companyPhone ?? '');
+        $companyAddress = (string) ($d->companyAddress ?? '');
+
+        try {
+            $resultado = $this->subcontractorService->ActualizarSubcontractor($subcontractor_id, $name, $phone, $address, $contactName, $contactEmail, $companyName, $companyPhone, $companyAddress);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['subcontractor_id'] = $resultado['subcontractor_id'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(SubcontractorIdRequest $dto): JsonResponse
+    {
         $subcontractor_id = $dto->subcontractor_id;
 
         try {
@@ -166,16 +168,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarSubcontractors Acción que elimina los companies seleccionados en la BD.
-     */
-    public function eliminarSubcontractors(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarSubcontractors(SubcontractorIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = SubcontractorIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -198,16 +193,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del subcontractor en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(SubcontractorIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $subcontractor_id = $dto->subcontractor_id;
 
         try {
@@ -230,25 +218,16 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * listarNotes Acción que lista los notes subcontractors.
-     */
-    public function listarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listarNotes(SubcontractorListarNotesRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'notes'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $subcontractor_id = $request->get('subcontractor_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $subcontractor_id = $listar->subcontractor_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
-            // total + data en una sola llamada a tu servicio
             $result = '' != $subcontractor_id ? $this->subcontractorService->ListarNotes(
                 $dt['start'],
                 $dt['length'],
@@ -276,17 +255,38 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvarNotes Acción que salvar un notes en la BD.
-     */
-    public function salvarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvarNotes(SubcontractorNotesSalvarRequest $d): JsonResponse
     {
-        $d = SubcontractorNotesSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $subcontractor_id = (string) $d->subcontractor_id;
+        $notes = (string) $d->notes;
+        $date = (string) $d->date;
+
+        try {
+            $resultado = $this->subcontractorService->SalvarNotes('', $subcontractor_id, $notes, $date);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
-        $notes_id = (string) ($d->notes_id ?? '');
+    }
+
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizarNotes(SubcontractorNotesActualizarRequest $d): JsonResponse
+    {
+        $notes_id = (string) $d->notes_id;
         $subcontractor_id = (string) $d->subcontractor_id;
         $notes = (string) $d->notes;
         $date = (string) $d->date;
@@ -312,16 +312,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatosNotes Acción que carga los datos del notes subcontractor en la BD.
-     */
-    public function cargarDatosNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatosNotes(SubcontractorNoteIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorNoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -344,16 +337,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarNotes Acción que elimina un notes en la BD.
-     */
-    public function eliminarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotes(SubcontractorNoteIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorNoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -376,16 +362,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarNotesDate Acción que elimina un notes en la BD.
-     */
-    public function eliminarNotesDate(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotesDate(SubcontractorNotesDateRangeRequest $d): JsonResponse
     {
-        $d = SubcontractorNotesDateRangeRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $subcontractor_id = (string) $d->subcontractor_id;
         $from = (string) $d->from;
         $to = (string) $d->to;
@@ -410,23 +389,14 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * listarEmployees Acción que lista los employees subcontractors.
-     */
-    public function listarEmployees(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listarEmployees(SubcontractorListarEmployeesRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'hourlyRate', 'position'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $subcontractor_id = $request->get('subcontractor_id');
+            $subcontractor_id = $listar->subcontractor_id;
 
-            // total + data en una sola llamada a tu servicio
             $result = '' != $subcontractor_id ? $this->subcontractorService->ListarEmployees(
                 $dt['start'],
                 $dt['length'],
@@ -452,16 +422,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarEmployee Acción que elimina un employee en la BD.
-     */
-    public function eliminarEmployee(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarEmployee(SubcontractorEmployeeIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorEmployeeIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = $dto->employee_id;
 
         try {
@@ -483,16 +446,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * agregarEmployee Acción que agrega un employee en la BD.
-     */
-    public function agregarEmployee(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Edit, jsonOnDenied: true)]
+    public function agregarEmployee(SubcontractorAgregarEmployeeRequest $d): JsonResponse
     {
-        $d = SubcontractorAgregarEmployeeRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = (string) ($d->employee_id ?? '');
         $subcontractor_id = (string) $d->subcontractor_id;
         $name = (string) $d->name;
@@ -519,16 +475,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatosEmployee Acción que carga los datos del employee subcontractor en la BD.
-     */
-    public function cargarDatosEmployee(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatosEmployee(SubcontractorEmployeeIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorEmployeeIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = $dto->employee_id;
 
         try {
@@ -551,16 +500,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * listarEmployeesDeSubcontractor Acción que lista los employees subcontractors.
-     */
-    public function listarEmployeesDeSubcontractor(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listarEmployeesDeSubcontractor(SubcontractorIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $subcontractor_id = $dto->subcontractor_id;
 
         try {
@@ -578,16 +520,9 @@ class SubcontractorController extends AbstractAdminController
         }
     }
 
-    /**
-     * listarProjects Acción que lista los projects de subcontractors.
-     */
-    public function listarProjects(Request $request)
+    #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
+    public function listarProjects(SubcontractorIdRequest $dto): JsonResponse
     {
-        $dto = SubcontractorIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $subcontractor_id = $dto->subcontractor_id;
 
         try {

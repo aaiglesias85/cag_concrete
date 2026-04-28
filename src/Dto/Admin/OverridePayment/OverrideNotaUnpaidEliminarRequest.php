@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class OverrideNotaUnpaidEliminarRequest
+final class OverrideNotaUnpaidEliminarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $project_id = null;
@@ -16,7 +18,7 @@ final class OverrideNotaUnpaidEliminarRequest
     #[Assert\Positive(message: 'history_id is required.')]
     public ?int $history_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $pid = $request->get('project_id');

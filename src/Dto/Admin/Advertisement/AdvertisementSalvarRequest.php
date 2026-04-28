@@ -2,13 +2,12 @@
 
 namespace App\Dto\Admin\Advertisement;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class AdvertisementSalvarRequest
+final class AdvertisementSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $advertisement_id = null;
-
     #[Assert\NotBlank]
     public ?string $title = null;
 
@@ -21,11 +20,9 @@ final class AdvertisementSalvarRequest
 
     public ?string $end_date = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $id = $request->get('advertisement_id');
-        $d->advertisement_id = \is_string($id) || is_numeric($id) ? (string) $id : null;
         $d->title = \is_string($x = $request->get('title')) ? $x : null;
         $d->description = \is_string($x = $request->get('description')) ? $x : null;
         $st = $request->get('status');

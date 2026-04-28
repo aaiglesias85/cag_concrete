@@ -18,6 +18,10 @@ salvarEmployeeRrhhAdmin:
    path: /employee-rrhh/salvar
    defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::salvar, _format: json }
 
+actualizarEmployeeRrhhAdmin:
+   path: /employee-rrhh/actualizar
+   defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::actualizar, _format: json }
+
 cargarDatosEmployeeRrhhAdmin:
    path: /employee-rrhh/cargarDatos
    defaults: { _controller: App\Controller\Admin\EmployeeRrhhController::cargarDatos, _format: json }

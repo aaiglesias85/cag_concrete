@@ -2,16 +2,16 @@
 
 namespace App\Dto\Admin\EmployeeRrhh;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Todos los campos del formulario HR; mínimo name + status (create/update vía un solo servicio).
  */
-final class EmployeeRrhhSalvarRequest
+final class EmployeeRrhhSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $employee_id = null;
-
     #[Assert\NotBlank]
     public ?string $name = null;
 
@@ -56,11 +56,9 @@ final class EmployeeRrhhSalvarRequest
     #[Assert\NotBlank]
     public ?string $status = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $eid = $request->get('employee_id');
-        $d->employee_id = \is_string($eid) || is_numeric($eid) ? (string) $eid : null;
         $d->name = \is_string($x = $request->get('name')) ? $x : null;
         $d->address = \is_string($x = $request->get('address')) ? $x : null;
         $d->phone = \is_string($x = $request->get('phone')) ? $x : null;

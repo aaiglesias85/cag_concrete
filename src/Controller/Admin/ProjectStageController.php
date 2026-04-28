@@ -3,62 +3,45 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ProjectStage\ProjectStageActualizarRequest;
 use App\Dto\Admin\ProjectStage\ProjectStageIdRequest;
 use App\Dto\Admin\ProjectStage\ProjectStageIdsRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageListarRequest;
 use App\Dto\Admin\ProjectStage\ProjectStageSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ProjectStageService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ProjectStageController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $projectStageService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ProjectStageService $projectStageService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        ProjectStageService $projectStageService) {
         parent::__construct($adminAccess);
         $this->projectStageService = $projectStageService;
     }
 
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PROJECT_STAGE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PROJECT_STAGE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso PROJECT_STAGE esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/project-stage/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los units.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ProjectStageListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'description', 'status'],
-                defaultOrderField: 'description'
-            );
+            $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->projectStageService->ListarStages(
                 $dt['start'],
                 $dt['length'],
@@ -83,27 +66,15 @@ class ProjectStageController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción para agregar stages en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(ProjectStageSalvarRequest $d): JsonResponse
     {
-        $d = ProjectStageSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $stage_id = (string) ($d->stage_id ?? '');
         $description = (string) $d->description;
         $color = (string) ($d->color ?? '');
         $status = (string) $d->status;
 
         try {
-            if ('' === $stage_id) {
-                $resultado = $this->projectStageService->SalvarStage($description, $color, $status);
-            } else {
-                $resultado = $this->projectStageService->ActualizarStage($stage_id, $description, $color, $status);
-            }
+            $resultado = $this->projectStageService->SalvarStage($description, $color, $status);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -124,16 +95,39 @@ class ProjectStageController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un stage en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(ProjectStageActualizarRequest $d): JsonResponse
     {
-        $dto = ProjectStageIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $stage_id = (string) $d->stage_id;
+        $description = (string) $d->description;
+        $color = (string) ($d->color ?? '');
+        $status = (string) $d->status;
+
+        try {
+            $resultado = $this->projectStageService->ActualizarStage($stage_id, $description, $color, $status);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['stage_id'] = $resultado['stage_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(ProjectStageIdRequest $dto): JsonResponse
+    {
         $stage_id = $dto->stage_id;
 
         try {
@@ -156,16 +150,9 @@ class ProjectStageController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarStages Acción que elimina los stages seleccionados en la BD.
-     */
-    public function eliminarStages(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarStages(ProjectStageIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = ProjectStageIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -188,16 +175,9 @@ class ProjectStageController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del stage en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(ProjectStageIdRequest $dto): JsonResponse
     {
-        $dto = ProjectStageIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $stage_id = $dto->stage_id;
 
         try {

@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Schedule;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ScheduleIdRequest
+final class ScheduleIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Schedule id is required.')]
     #[Assert\Positive]
     public ?int $schedule_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->schedule_id = self::positiveIntOrNull($request->get('schedule_id'));

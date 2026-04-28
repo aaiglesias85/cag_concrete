@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectAgregarItemRequest
+final class ProjectAgregarItemRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $project_item_id = null;
 
@@ -40,7 +42,7 @@ final class ProjectAgregarItemRequest
 
     public ?string $contract_name = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_item_id = self::s($request->get('project_item_id'));

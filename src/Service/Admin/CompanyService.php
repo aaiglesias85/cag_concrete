@@ -70,6 +70,58 @@ class CompanyService extends Base
     }
 
     /**
+     * ActualizarContact: actualiza un contacto existente de la empresa.
+     */
+    public function ActualizarContact($contact_id, $company_id, $name, $phone, $email, $role, $notes)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $entity = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->find($contact_id);
+        if (null === $entity) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
+
+            return $resultado;
+        }
+
+        $company_entity = $entity->getCompany();
+        if (null === $company_entity || (int) $company_entity->getCompanyId() !== (int) $company_id) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The company does not match this contact.';
+
+            return $resultado;
+        }
+
+        $otro = $this->getDoctrine()->getRepository(CompanyContact::class)
+            ->findOneBy(['name' => $name, 'company' => $company_id]);
+        if (null !== $otro && (int) $otro->getContactId() !== (int) $contact_id) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The contact name is in use, please try entering another one.';
+
+            return $resultado;
+        }
+
+        $entity->setName($name);
+        $entity->setEmail($email);
+        $entity->setPhone($phone);
+        $entity->setRole($role);
+        $entity->setNotes($notes);
+
+        $em->flush();
+
+        $log_operacion = 'Update';
+        $log_categoria = 'Company Contact';
+        $log_descripcion = "The company contact is updated: $name";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+        $resultado['success'] = true;
+        $resultado['contact_id'] = $entity->getContactId();
+
+        return $resultado;
+    }
+
+    /**
      * EliminarContact: Elimina un contact en la BD.
      *
      * @param int $contact_id Id

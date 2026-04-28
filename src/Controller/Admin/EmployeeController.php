@@ -3,46 +3,37 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Employee\EmployeeActualizarRequest;
 use App\Dto\Admin\Employee\EmployeeIdRequest;
 use App\Dto\Admin\Employee\EmployeeIdsRequest;
+use App\Dto\Admin\Employee\EmployeeListarRequest;
 use App\Dto\Admin\Employee\EmployeeSalvarRequest;
 use App\Entity\EmployeeRole;
 use App\Entity\Race;
-use App\Http\DataTablesHelper;
 use App\Repository\EmployeeRoleRepository;
 use App\Repository\RaceRepository;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EmployeeService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class EmployeeController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $employeeService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EmployeeService $employeeService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        EmployeeService $employeeService) {
         parent::__construct($adminAccess);
         $this->employeeService = $employeeService;
     }
 
+    #[RequireAdminPermission(FunctionId::EMPLOYEE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::EMPLOYEE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::EMPLOYEE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso EMPLOYEE esperado tras #[RequireAdminPermission].');
 
         // races
         /** @var RaceRepository $raceRepo */
@@ -55,7 +46,7 @@ class EmployeeController extends AbstractAdminController
         $employee_roles = $employeeRoleRepo->ListarOrdenados();
 
         return $this->render('admin/employee/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'races' => $races,
             'employee_roles' => $employee_roles,
         ]);
@@ -64,15 +55,11 @@ class EmployeeController extends AbstractAdminController
     /**
      * listar Acción que lista los units.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(EmployeeListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'hourlyRate', 'position'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->employeeService->ListarEmployees(
@@ -100,27 +87,52 @@ class EmployeeController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que inserta un menu en la BD.
+     * salvar Acción que inserta un employee en la BD.
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(EmployeeSalvarRequest $d): JsonResponse
     {
-        $d = EmployeeSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $employee_id = (string) ($d->employee_id ?? '');
         $name = (string) $d->name;
         $hourly_rate = $d->hourly_rate;
         $role_id = $d->role_id;
         $color = $d->color;
 
         try {
-            if ('' === $employee_id) {
-                $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $role_id, $color);
-            } else {
-                $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $role_id, $color);
+            $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $role_id, $color);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['employee_id'] = $resultado['employee_id'];
+
+                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * actualizar Acción que actualiza un employee en la BD.
+     */
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(EmployeeActualizarRequest $d): JsonResponse
+    {
+        $employee_id = (string) $d->employee_id;
+        $name = (string) $d->name;
+        $hourly_rate = $d->hourly_rate;
+        $role_id = $d->role_id;
+        $color = $d->color;
+
+        try {
+            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $role_id, $color);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -144,13 +156,9 @@ class EmployeeController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un employee en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(EmployeeIdRequest $dto): JsonResponse
     {
-        $dto = EmployeeIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = $dto->employee_id;
 
         try {
@@ -176,13 +184,9 @@ class EmployeeController extends AbstractAdminController
     /**
      * eliminarEmployees Acción que elimina los employees seleccionados en la BD.
      */
-    public function eliminarEmployees(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarEmployees(EmployeeIdsRequest $dto): JsonResponse
     {
-        $dto = EmployeeIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -208,13 +212,9 @@ class EmployeeController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del employee en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(EmployeeIdRequest $dto): JsonResponse
     {
-        $dto = EmployeeIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = $dto->employee_id;
 
         try {
@@ -240,13 +240,9 @@ class EmployeeController extends AbstractAdminController
     /**
      * listarProjects Acción que lista los projects de employee.
      */
-    public function listarProjects(Request $request)
+    #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
+    public function listarProjects(EmployeeIdRequest $dto): JsonResponse
     {
-        $dto = EmployeeIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $employee_id = $dto->employee_id;
 
         try {

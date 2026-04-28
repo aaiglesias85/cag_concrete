@@ -386,10 +386,14 @@ var ConcreteClass = (function () {
          var status = $('#estadoactivo').prop('checked') ? 1 : 0;
          formData.set('status', status);
 
+         var salvarUrl =
+            concrete_class_id && String(concrete_class_id).trim() !== ''
+               ? 'concrete-class/actualizar'
+               : 'concrete-class/salvar';
          BlockUtil.block('#form-concrete-class');
 
          axios
-            .post('concrete-class/salvar', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

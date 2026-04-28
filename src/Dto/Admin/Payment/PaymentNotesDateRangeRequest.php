@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Payment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PaymentNotesDateRangeRequest
+final class PaymentNotesDateRangeRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $invoice_id = null;
@@ -16,7 +18,7 @@ final class PaymentNotesDateRangeRequest
     #[Assert\NotBlank]
     public ?string $to = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $iid = $request->get('invoice_id');

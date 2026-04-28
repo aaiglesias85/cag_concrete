@@ -2,12 +2,14 @@
 
 namespace App\Dto\Admin\Usuario;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /** POST user profile update (admin Usuario::actualizarMisDatos) */
-final class ActualizarMisDatosAdminRequest
+final class ActualizarMisDatosAdminRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'User id is required.')]
     #[Assert\Positive]
@@ -41,7 +43,7 @@ final class ActualizarMisDatosAdminRequest
         }
     }
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->usuario_id = self::positiveIntOrNull($request->get('usuario_id'));

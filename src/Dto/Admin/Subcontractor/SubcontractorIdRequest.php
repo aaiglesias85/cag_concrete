@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Subcontractor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class SubcontractorIdRequest
+final class SubcontractorIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Subcontractor id is required.')]
     #[Assert\Positive]
     public ?int $subcontractor_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->subcontractor_id = self::positiveIntOrNull($request->get('subcontractor_id'));

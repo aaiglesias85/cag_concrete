@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Schedule;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ScheduleClonarRequest
+final class ScheduleClonarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $schedules_id = null;
@@ -18,7 +20,7 @@ final class ScheduleClonarRequest
     #[Assert\NotBlank]
     public ?string $date_stop = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $sid = $request->get('schedules_id');

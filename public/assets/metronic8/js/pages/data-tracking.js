@@ -830,20 +830,19 @@ var DataTracking = (function () {
                   var response = res.data;
                   if (response.success) {
                      if (response.existe) {
-                        // mostar modal
                         ModalUtil.show('modal-data-tracking-confirm', { backdrop: 'static', keyboard: true });
-                     } else {
-                        SalvarDataTracking(closeForm);
+                        return;
                      }
-                  } else {
-                     toastr.error(response.error, '');
+                     // Misma sesión de bloqueo que validarSiExiste (evita doble block/unblock en #form-data-tracking)
+                     return SalvarDataTracking(closeForm, { alreadyBlocked: true });
                   }
+                  toastr.error(response.error, '');
                } else {
                   toastr.error('An internal error has occurred, please try again.', '');
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () {
+            .finally(function () {
                BlockUtil.unblock('#form-data-tracking');
             });
       } else {
@@ -853,7 +852,14 @@ var DataTracking = (function () {
       }
    };
 
-   var SalvarDataTracking = function (closeForm) {
+   /**
+    * @param {boolean} closeForm
+    * @param {{ alreadyBlocked?: boolean }} [options] si alreadyBlocked, validarSiExiste ya bloqueó #form-data-tracking (no duplicar block/finally)
+    */
+   var SalvarDataTracking = function (closeForm, options) {
+      options = options || {};
+      var alreadyBlocked = options.alreadyBlocked === true;
+
       var data_tracking_id = $('#data_tracking_id').val();
       var project_id = $('#project').val();
       if (validateForm() && (data_tracking_id != '' || (data_tracking_id == '' && project_id != ''))) {
@@ -915,8 +921,17 @@ var DataTracking = (function () {
          formData.set('conc_vendors', JSON.stringify(conc_vendors));
          formData.set('archivos', JSON.stringify(archivos));
 
-         axios
-            .post('data-tracking/salvarDataTracking', formData, { responseType: 'json' })
+         var salvarUrl =
+            !data_tracking_id || data_tracking_id === ''
+               ? 'data-tracking/salvarDataTracking'
+               : 'data-tracking/actualizarDataTracking';
+
+         if (!alreadyBlocked) {
+            BlockUtil.block('#form-data-tracking');
+         }
+
+         return axios
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
@@ -934,7 +949,8 @@ var DataTracking = (function () {
                      } else {
                         var savedDataTrackingId = response.data_tracking_id;
                         $('#data_tracking_id').val(savedDataTrackingId);
-                        editRow(savedDataTrackingId);
+                        // Devolver la promesa para que el .finally desbloquee #form-data-tracking solo cuando termine cargarDatos
+                        return editRow(savedDataTrackingId);
                      }
                   } else {
                      logDtItemQty('SalvarDataTracking respuesta error', { error: response.error });
@@ -945,10 +961,14 @@ var DataTracking = (function () {
                }
             })
             .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#form-data-tracking');
+            .finally(function () {
+               if (!alreadyBlocked) {
+                  BlockUtil.unblock('#form-data-tracking');
+               }
             });
       }
+
+      return Promise.resolve();
    };
 
    //Cerrar form: mostrar confirmación (guardar y cerrar / descartar y cerrar)
@@ -1020,7 +1040,7 @@ var DataTracking = (function () {
 
       BlockUtil.block('#form-data-tracking-body');
 
-      axios
+      return axios
          .post('data-tracking/cargarDatos', formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
@@ -1036,7 +1056,7 @@ var DataTracking = (function () {
             }
          })
          .catch(MyUtil.catchErrorAxios)
-         .then(function () {
+         .finally(function () {
             BlockUtil.unblock('#form-data-tracking-body');
          });
 
@@ -2222,10 +2242,15 @@ var DataTracking = (function () {
             formData.set('notes', notes != null ? String(notes) : '');
             formData.set('price', String(price));
 
+            var salvarUrl =
+               wasEditing != null && existingLineId !== null && existingLineId !== ''
+                  ? 'data-tracking/actualizarItem'
+                  : 'data-tracking/salvarItem';
+
             BlockUtil.block('#lista-items');
 
             axios
-               .post('data-tracking/salvarItem', formData, { responseType: 'json' })
+               .post(salvarUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;

@@ -2,11 +2,13 @@
 
 namespace App\Dto\Admin\Usuario;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** POST /usuario/autenticar (admin web login) */
-final class LoginCredentialsRequest
+final class LoginCredentialsRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Email]
@@ -15,7 +17,7 @@ final class LoginCredentialsRequest
     #[Assert\NotBlank]
     public ?string $password = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $e = $request->get('email');

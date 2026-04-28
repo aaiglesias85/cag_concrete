@@ -8,15 +8,65 @@ Aplicación empresarial para gestión de proyectos de construcción: estimacione
 - **Persistencia:** Doctrine ORM 3, una base de datos relacional (configuración vía `DATABASE_URL`)
 - **Interfaces:** panel web admin (Twig + sesión), API REST con autenticación por token, endpoints HTTP para tareas programadas (cron) e integración QuickBooks Web Connector (QBWC)
 
+### Panel admin: DTO + validación (`AdminHttpRequestDtoValueResolver`)
+
+Migración aplicada en todos los controladores bajo `src/Controller/Admin/` (excepto `AbstractAdminController`): los argumentos tipados con DTOs que implementan `AdminHttpRequestDtoInterface` se resuelven con validación Symfony y JSON 400 homogéneo. Detalle: [docs/PLAN_DTO_RESOLVER_VALIDACION_ADMIN.md](docs/PLAN_DTO_RESOLVER_VALIDACION_ADMIN.md).
+
+| Controlador | Migrado |
+|-------------|---------|
+| AdvertisementController | sí |
+| CompanyController | sí |
+| ConcreteClassController | sí |
+| ConcreteVendorController | sí |
+| CountyController | sí |
+| DataTrackingController | sí |
+| DefaultController | sí |
+| DistrictController | sí |
+| EmployeeController | sí |
+| EmployeeRoleController | sí |
+| EmployeeRrhhController | sí |
+| EquationController | sí |
+| EstimateController | sí |
+| EstimateNoteItemController | sí |
+| HolidayController | sí |
+| InspectorController | sí |
+| InvoiceController | sí |
+| ItemController | sí |
+| LogController | sí |
+| MaterialController | sí |
+| NotificationController | sí |
+| OverridePaymentController | sí |
+| OverheadPriceController | sí |
+| PaymentController | sí |
+| PerfilController | sí |
+| PlanDownloadingController | sí |
+| PlanStatusController | sí |
+| ProjectController | sí |
+| ProjectStageController | sí |
+| ProjectTypeController | sí |
+| ProposalTypeController | sí |
+| RaceController | sí |
+| ReminderController | sí |
+| ReporteEmployeeController | sí |
+| ReporteSubcontractorController | sí |
+| ScheduleController | sí |
+| SubcontractorController | sí |
+| TaskController | sí |
+| UnitController | sí |
+| UsuarioController | sí |
+
+**Notas:** acciones que solo usan `Request` (p. ej. listados DataTables) siguen con `Request $request`. Varias acciones combinan `Request` + DTO en la misma firma (filtros de tabla + DTO de query). `saveWidgetPreference` ya no duplica el campo `message` en errores de validación (solo `error` estándar del resolver).
+
 ## Documentación
 
 | Documento | Contenido |
 |-----------|-------------|
-| [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) | Roadmap Symfony 7 / PHP 8.2+ (calidad, DI, tests); **§2.1** resume el progreso en reducción del service locator |
+| [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) | Roadmap Symfony 7 / PHP 8.2+ (calidad, DI, DTOs, tests). **Messenger pospuesto.** Pendientes resumidos: tests de integración, serialización/Nelmio, doc de `env`, voters opcionales; §9 tabla de fases |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura actual, trade-offs (monolito vs microservicios, etc.), complejidad y líneas de evolución recomendadas |
 | [docs/PHASE_A_REDUCIR_COMPLEJIDAD.md](docs/PHASE_A_REDUCIR_COMPLEJIDAD.md) | Guía de implementación de la Fase A: capas, módulos, migraciones y tests (sin Messenger) |
 | [docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md](docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md) | **Override Payment:** reglas por mes, cadena de unpaid (mes de cabecera vs posteriores), flujo, archivos y depuración |
 | [docs/OVERRIDE_PAID_QTY.md](docs/OVERRIDE_PAID_QTY.md) | Contexto de negocio del override de cantidades y plan técnico (complementa el doc anterior) |
+| [docs/ADMIN_PERMISOS_Y_RUTAS_ALTA_EDICION.md](docs/ADMIN_PERMISOS_Y_RUTAS_ALTA_EDICION.md) | **Panel admin:** inventario de controladores/acciones/rutas, plan `#[RequireAdminPermission]` y separación rutas **alta vs actualizar** (checklist para ir módulo a módulo) |
 
 Otros README temáticos en la raíz del repositorio documentan funcionalidades concretas (facturación, Firebase, etc.).
 
@@ -39,3 +89,16 @@ Otros README temáticos en la raíz del repositorio documentan funcionalidades c
 4. Consola Symfony: `php bin/console`
 
 Para detalles de despliegue, seguridad y convenciones internas, ver **docs/ARCHITECTURE.md**.
+
+## Calidad en local
+
+| Comando | Uso |
+|---------|-----|
+| `composer phpstan` | Análisis estático (con baseline); antes: `bin/console cache:warmup --env=dev` |
+| `composer phpstan:full` | Misma reglas sin baseline (toda la deuda) |
+| `composer cs-check` / `composer cs-fix` | PHP-CS-Fixer (`src/`, `tests/`, `config/`) |
+| `composer test` | PHPUnit (humo + suite en `tests/`) |
+| `composer quality` | `phpstan` + `test` |
+| `composer install-git-hooks` | Activa `pre-push` (`.githooks/pre-push`) |
+
+Variables de entorno: revisar `.env` / `.env.local` y, para despliegue, documentación pendiente descrita en [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) §8.2.

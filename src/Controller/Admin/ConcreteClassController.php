@@ -3,59 +3,44 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\ConcreteClass\ConcreteClassActualizarRequest;
 use App\Dto\Admin\ConcreteClass\ConcreteClassIdRequest;
 use App\Dto\Admin\ConcreteClass\ConcreteClassIdsRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassListarRequest;
 use App\Dto\Admin\ConcreteClass\ConcreteClassSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\ConcreteClassService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ConcreteClassController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $concreteClassService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        ConcreteClassService $concreteClassService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        ConcreteClassService $concreteClassService) {
         parent::__construct($adminAccess);
         $this->concreteClassService = $concreteClassService;
     }
 
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::CONCRETE_CLASS);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::CONCRETE_CLASS);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso CONCRETE_CLASS esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/concrete-class/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los companies.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(ConcreteClassListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'status'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
             $result = $this->concreteClassService->Listar(
                 $dt['start'],
@@ -81,26 +66,14 @@ class ConcreteClassController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un conc vendor en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(ConcreteClassSalvarRequest $d): JsonResponse
     {
-        $d = ConcreteClassSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $concrete_class_id = (string) ($d->concrete_class_id ?? '');
         $name = (string) $d->name;
         $status = (string) $d->status;
 
         try {
-            if ('' === $concrete_class_id) {
-                $resultado = $this->concreteClassService->Salvar($name, $status);
-            } else {
-                $resultado = $this->concreteClassService->Actualizar($concrete_class_id, $name, $status);
-            }
+            $resultado = $this->concreteClassService->Salvar($name, $status);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -121,16 +94,38 @@ class ConcreteClassController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un subcontractor en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(ConcreteClassActualizarRequest $d): JsonResponse
     {
-        $dto = ConcreteClassIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $concrete_class_id = (string) $d->concrete_class_id;
+        $name = (string) $d->name;
+        $status = (string) $d->status;
+
+        try {
+            $resultado = $this->concreteClassService->Actualizar($concrete_class_id, $name, $status);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['concrete_class_id'] = $resultado['concrete_class_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(ConcreteClassIdRequest $dto): JsonResponse
+    {
         $concrete_class_id = $dto->concrete_class_id;
 
         try {
@@ -153,16 +148,9 @@ class ConcreteClassController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarVarios Acción que elimina varios en la BD.
-     */
-    public function eliminarVarios(Request $request)
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarVarios(ConcreteClassIdsRequest $dto): JsonResponse
     {
-        $dto = ConcreteClassIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -185,16 +173,9 @@ class ConcreteClassController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del subcontractor en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(ConcreteClassIdRequest $dto): JsonResponse
     {
-        $dto = ConcreteClassIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $concrete_class_id = $dto->concrete_class_id;
 
         try {

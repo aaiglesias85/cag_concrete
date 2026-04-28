@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectSalvarRequest
+final class ProjectSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $project_id = null;
-
     #[Assert\NotBlank]
     public ?string $company_id = null;
 
@@ -95,10 +95,36 @@ final class ProjectSalvarRequest
 
     public ?string $archivos = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromActualizarRequest(ProjectActualizarRequest $a): self
     {
         $d = new self();
-        $d->project_id = self::s($request->get('project_id'));
+        $d->company_id = $a->company_id;
+        $d->inspector_id = $a->inspector_id;
+        $d->number = $a->number;
+        $d->name = $a->name;
+        $d->description = $a->description;
+        $d->location = $a->location;
+        $d->po_number = $a->po_number;
+        $d->po_cg = $a->po_cg;
+        $d->contract_amount = $a->contract_amount;
+        $d->proposal_number = $a->proposal_number;
+        $d->project_id_number = $a->project_id_number;
+        $d->manager = $a->manager;
+        $d->status = $a->status;
+        $d->owner = $a->owner;
+        $d->subcontract = $a->subcontract;
+        $d->federal_funding = $a->federal_funding;
+        $d->county_id = $a->county_id;
+        foreach (['resurfacing', 'invoice_contact', 'certified_payrolls', 'start_date', 'end_date', 'due_date', 'vendor_id', 'concrete_class_id', 'concrete_quote_price', 'concrete_start_date', 'concrete_quote_price_escalator', 'concrete_time_period_every_n', 'concrete_time_period_unit', 'retainage', 'retainage_percentage', 'retainage_adjustment_percentage', 'retainage_adjustment_completion', 'prevailing_wage', 'prevailing_roles', 'items', 'contacts', 'concrete_classes', 'ajustes_precio', 'archivos'] as $k) {
+            $d->{$k} = $a->{$k};
+        }
+
+        return $d;
+    }
+
+    public static function fromHttpRequest(Request $request): static
+    {
+        $d = new self();
         $d->company_id = self::s($request->get('company_id'));
         $d->inspector_id = self::s($request->get('inspector_id'));
         $d->number = self::s($request->get('number'));

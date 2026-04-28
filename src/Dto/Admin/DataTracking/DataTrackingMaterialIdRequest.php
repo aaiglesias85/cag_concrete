@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class DataTrackingMaterialIdRequest
+final class DataTrackingMaterialIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Data tracking material id is required.')]
     #[Assert\Positive]
     public ?int $data_tracking_material_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->data_tracking_material_id = self::positiveIntOrNull($request->get('data_tracking_material_id'));

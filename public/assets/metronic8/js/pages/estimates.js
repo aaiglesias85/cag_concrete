@@ -951,9 +951,6 @@ var Estimates = (function () {
    var collectEstimateSalvarFormData = function () {
       var formData = new URLSearchParams();
 
-      var estimate_id = $('#estimate_id').val();
-      formData.set('estimate_id', estimate_id || '');
-
       formData.set('name', $('#name').val());
       formData.set('bidDeadline', FlatpickrUtil.getString('datetimepicker-bidDeadline'));
 
@@ -998,11 +995,17 @@ var Estimates = (function () {
 
    var SalvarEstimate = function (closeForm) {
       var formData = collectEstimateSalvarFormData();
+      var estimateIdVal = $('#estimate_id').val();
+      var hasEstimateId = estimateIdVal !== undefined && estimateIdVal !== null && String(estimateIdVal).trim() !== '';
+      var salvarUrl = hasEstimateId ? 'estimate/actualizarEstimate' : 'estimate/salvar';
+      if (hasEstimateId) {
+         formData.set('estimate_id', String(estimateIdVal));
+      }
 
       BlockUtil.block('#form-estimate');
 
       axios
-         .post('estimate/salvar', formData, { responseType: 'json' })
+         .post(salvarUrl, formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
@@ -1288,10 +1291,17 @@ var Estimates = (function () {
       }
 
       var formData = collectEstimateSalvarFormData();
+      var estimateIdVal = $('#estimate_id').val();
+      var hasEstimateId = estimateIdVal !== undefined && estimateIdVal !== null && String(estimateIdVal).trim() !== '';
+      var salvarUrl = hasEstimateId ? 'estimate/actualizarEstimate' : 'estimate/salvar';
+      if (hasEstimateId) {
+         formData.set('estimate_id', String(estimateIdVal));
+      }
+
       BlockUtil.block('#form-estimate');
 
       axios
-         .post('estimate/salvar', formData, { responseType: 'json' })
+         .post(salvarUrl, formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status !== 200 && res.status !== 201) {
                toastr.error('An internal error has occurred, please try again.', '');
@@ -3934,12 +3944,15 @@ var Estimates = (function () {
             return;
          }
          var editingExisting = quoteId !== '' && quoteId !== null && quoteId !== undefined && String(quoteId).trim() !== '';
+         var salvarQuoteUrl = editingExisting ? 'estimate/actualizarQuote' : 'estimate/salvarQuote';
          var formData = new FormData();
          formData.append('estimate_id', estimateId);
-         formData.append('quote_id', quoteId);
+         if (editingExisting) {
+            formData.append('quote_id', quoteId);
+         }
          formData.append('name', name);
          axios
-            .post('estimate/salvarQuote', formData, { responseType: 'json' })
+            .post(salvarQuoteUrl, formData, { responseType: 'json' })
             .then(function (response) {
                if (response.data.success) {
                   bootstrap.Modal.getInstance(document.getElementById('modal-quote')).hide();

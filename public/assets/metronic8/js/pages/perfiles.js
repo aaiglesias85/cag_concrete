@@ -716,9 +716,13 @@ var Perfiles = function () {
             formData.set("permisos", JSON.stringify(permisos));
             formData.set("widget_access", JSON.stringify(widgetAccess));
 
+            var salvarUrl =
+                perfil_id && String(perfil_id).trim() !== ''
+                    ? "perfil/actualizarPerfil"
+                    : "perfil/salvarPerfil";
             BlockUtil.block('#form-perfil');
 
-            axios.post("perfil/salvarPerfil", formData, { responseType: "json" })
+            axios.post(salvarUrl, formData, { responseType: "json" })
                 .then(function (res) {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;

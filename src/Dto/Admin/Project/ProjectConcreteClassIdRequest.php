@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectConcreteClassIdRequest
+final class ProjectConcreteClassIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'concrete_class_id is required.')]
     #[Assert\Positive]
     public ?int $concrete_class_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $v = $request->get('concrete_class_id');

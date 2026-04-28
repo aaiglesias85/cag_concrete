@@ -2,12 +2,14 @@
 
 namespace App\Dto\Admin\ReporteSubcontractor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * exportarExcel + devolverTotal.
  */
-final class ReporteSubcontractorExportFiltroRequest
+final class ReporteSubcontractorExportFiltroRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $search = null;
 
@@ -21,7 +23,7 @@ final class ReporteSubcontractorExportFiltroRequest
 
     public ?string $fecha_fin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->search = self::strOrNull($request->get('search'));

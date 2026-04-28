@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
 /** Filtros opcionales (listado de ítems). */
-final class OverridePaymentListarItemsRequest
+final class OverridePaymentListarItemsRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $company_id = null;
 
@@ -15,7 +17,7 @@ final class OverridePaymentListarItemsRequest
 
     public ?int $invoice_override_payment_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $c = $request->get('company_id');

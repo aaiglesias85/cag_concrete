@@ -3,56 +3,44 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemActualizarRequest;
 use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemIdRequest;
 use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemIdsRequest;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemListarRequest;
 use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\EstimateNoteItemService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class EstimateNoteItemController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private EstimateNoteItemService $estimateNoteItemService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        EstimateNoteItemService $estimateNoteItemService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        EstimateNoteItemService $estimateNoteItemService) {
         parent::__construct($adminAccess);
         $this->estimateNoteItemService = $estimateNoteItemService;
     }
 
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ESTIMATE_NOTE_ITEM);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::ESTIMATE_NOTE_ITEM);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso ESTIMATE_NOTE_ITEM esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/estimate-note-item/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(EstimateNoteItemListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'description', 'type'],
-                defaultOrderField: 'description'
-            );
+            $dt = $listar->dt;
 
             $result = $this->estimateNoteItemService->ListarItems(
                 $dt['start'],
@@ -73,23 +61,14 @@ class EstimateNoteItemController extends AbstractAdminController
         }
     }
 
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(EstimateNoteItemSalvarRequest $d): JsonResponse
     {
-        $d = EstimateNoteItemSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $id = $d->id;
         $description = (string) $d->description;
         $type = $d->type ?? 'item';
 
         try {
-            if ('' === $id || null === $id) {
-                $resultado = $this->estimateNoteItemService->Salvar($description, $type);
-            } else {
-                $resultado = $this->estimateNoteItemService->Actualizar($id, $description, $type);
-            }
+            $resultado = $this->estimateNoteItemService->Salvar($description, $type);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -105,13 +84,33 @@ class EstimateNoteItemController extends AbstractAdminController
         }
     }
 
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(EstimateNoteItemActualizarRequest $d): JsonResponse
     {
-        $dto = EstimateNoteItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $id = $d->id;
+        $description = (string) $d->description;
+        $type = $d->type ?? 'item';
+
+        try {
+            $resultado = $this->estimateNoteItemService->Actualizar($id, $description, $type);
+
+            if ($resultado['success']) {
+                return $this->json([
+                    'success' => true,
+                    'id' => $resultado['id'],
+                    'message' => 'The operation was successful',
+                ]);
+            }
+
+            return $this->json(['success' => false, 'error' => $resultado['error'] ?? 'Error']);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(EstimateNoteItemIdRequest $dto): JsonResponse
+    {
         $id = $dto->id;
         try {
             $resultado = $this->estimateNoteItemService->Eliminar($id);
@@ -125,13 +124,9 @@ class EstimateNoteItemController extends AbstractAdminController
         }
     }
 
-    public function eliminarVarios(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarVarios(EstimateNoteItemIdsRequest $dto): JsonResponse
     {
-        $dto = EstimateNoteItemIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
         try {
             $resultado = $this->estimateNoteItemService->EliminarVarios($ids);
@@ -145,13 +140,9 @@ class EstimateNoteItemController extends AbstractAdminController
         }
     }
 
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(EstimateNoteItemIdRequest $dto): JsonResponse
     {
-        $dto = EstimateNoteItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $id = $dto->id;
         try {
             $resultado = $this->estimateNoteItemService->CargarDatos($id);

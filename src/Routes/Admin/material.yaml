@@ -18,6 +18,10 @@ salvarMaterialAdmin:
   path:  /material/salvarMaterial
   defaults: { _controller: App\Controller\Admin\MaterialController::salvar, _format: json }
 
+actualizarMaterialAdmin:
+  path:  /material/actualizar
+  defaults: { _controller: App\Controller\Admin\MaterialController::actualizar, _format: json }
+
 cargarDatosMaterialAdmin:
   path:  /material/cargarDatos
   defaults: { _controller: App\Controller\Admin\MaterialController::cargarDatos, _format: json }

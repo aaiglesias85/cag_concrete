@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class DataTrackingConcVendorIdRequest
+final class DataTrackingConcVendorIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Data tracking concrete vendor id is required.')]
     #[Assert\Positive]
     public ?int $data_tracking_conc_vendor_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->data_tracking_conc_vendor_id = self::positiveIntOrNull($request->get('data_tracking_conc_vendor_id'));

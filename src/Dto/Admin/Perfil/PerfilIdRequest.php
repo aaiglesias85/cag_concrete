@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Perfil;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PerfilIdRequest
+final class PerfilIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Profile id is required.')]
     #[Assert\Positive]
     public ?int $perfil_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->perfil_id = self::positiveIntOrNull($request->get('perfil_id'));

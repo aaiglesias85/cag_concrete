@@ -3,74 +3,55 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Advertisement\AdvertisementActualizarRequest;
 use App\Dto\Admin\Advertisement\AdvertisementIdRequest;
 use App\Dto\Admin\Advertisement\AdvertisementIdsRequest;
+use App\Dto\Admin\Advertisement\AdvertisementListarRequest;
 use App\Dto\Admin\Advertisement\AdvertisementSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\AdvertisementService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AdvertisementController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $advertisementService;
 
     public function __construct(
         AdminAccessService $adminAccess,
         AdvertisementService $advertisementService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
     ) {
         parent::__construct($adminAccess);
         $this->advertisementService = $advertisementService;
     }
 
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ADVERTISEMENT);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::ADVERTISEMENT);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso ADVERTISEMENT esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/advertisement/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los usuarios.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(AdvertisementListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'title', 'startDate', 'endDate', 'status'],
-                defaultOrderField: 'startDate'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-
-            // total + data en una sola llamada a tu servicio
             $result = $this->advertisementService->ListarAdvertisements(
                 $dt['start'],
                 $dt['length'],
                 $dt['search'],
                 $dt['orderField'],
                 $dt['orderDir'],
-                $fecha_inicial,
-                $fecha_fin,
+                $listar->fecha_inicial,
+                $listar->fecha_fin,
             );
 
             $resultadoJson = [
@@ -89,17 +70,9 @@ class AdvertisementController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(AdvertisementSalvarRequest $d): JsonResponse
     {
-        $d = AdvertisementSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $advertisement_id = (string) ($d->advertisement_id ?? '');
         $title = (string) $d->title;
         $description = (string) ($d->description ?? '');
         $status = (string) $d->status;
@@ -107,11 +80,7 @@ class AdvertisementController extends AbstractAdminController
         $end_date = (string) ($d->end_date ?? '');
 
         try {
-            if ('' == $advertisement_id) {
-                $resultado = $this->advertisementService->SalvarAdvertisement($title, $description, $status, $start_date, $end_date);
-            } else {
-                $resultado = $this->advertisementService->ActualizarAdvertisement($advertisement_id, $title, $description, $status, $start_date, $end_date);
-            }
+            $resultado = $this->advertisementService->SalvarAdvertisement($title, $description, $status, $start_date, $end_date);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -131,16 +100,40 @@ class AdvertisementController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un advertisement en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(AdvertisementActualizarRequest $d): JsonResponse
     {
-        $dto = AdvertisementIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $advertisement_id = (string) $d->advertisement_id;
+        $title = (string) $d->title;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $start_date = (string) ($d->start_date ?? '');
+        $end_date = (string) ($d->end_date ?? '');
+
+        try {
+            $resultado = $this->advertisementService->ActualizarAdvertisement($advertisement_id, $title, $description, $status, $start_date, $end_date);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(AdvertisementIdRequest $dto): JsonResponse
+    {
         $advertisement_id = $dto->advertisement_id;
 
         try {
@@ -163,16 +156,9 @@ class AdvertisementController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarAdvertisements Acción que elimina los advertisements seleccionados en la BD.
-     */
-    public function eliminarAdvertisements(Request $request)
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarAdvertisements(AdvertisementIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = AdvertisementIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -195,16 +181,9 @@ class AdvertisementController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del advertisement en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(AdvertisementIdRequest $dto): JsonResponse
     {
-        $dto = AdvertisementIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $advertisement_id = $dto->advertisement_id;
 
         try {

@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Material;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class MaterialIdRequest
+final class MaterialIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Material id is required.')]
     #[Assert\Positive]
     public ?int $material_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->material_id = self::positiveIntOrNull($request->get('material_id'));

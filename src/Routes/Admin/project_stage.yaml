@@ -10,6 +10,10 @@ salvarProjectStageAdmin:
   path: /project-stage/salvar
   defaults: { _controller: App\Controller\Admin\ProjectStageController::salvar, _format: json }
 
+actualizarProjectStageAdmin:
+  path: /project-stage/actualizar
+  defaults: { _controller: App\Controller\Admin\ProjectStageController::actualizar, _format: json }
+
 eliminarProjectStageAdmin:
   path: /project-stage/eliminar
   defaults: { _controller: App\Controller\Admin\ProjectStageController::eliminar, _format: json }

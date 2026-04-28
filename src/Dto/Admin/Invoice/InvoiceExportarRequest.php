@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Invoice;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class InvoiceExportarRequest
+final class InvoiceExportarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Invoice id is required.')]
     #[Assert\Positive]
@@ -13,7 +15,7 @@ final class InvoiceExportarRequest
 
     public ?string $format = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->invoice_id = self::positiveIntOrNull($request->get('invoice_id'));

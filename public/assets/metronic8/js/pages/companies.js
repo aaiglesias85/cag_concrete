@@ -496,10 +496,15 @@ var Companies = (function () {
 
          formData.set('contacts', JSON.stringify(contacts));
 
+         var salvarUrl =
+            !company_id || company_id === ''
+               ? 'company/salvarCompany'
+               : 'company/actualizarCompany';
+
          BlockUtil.block('#form-company');
 
          axios
-            .post('company/salvarCompany', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

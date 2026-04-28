@@ -321,9 +321,13 @@ var ProjectTypes = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    type_id && String(type_id).trim() !== ''
+                        ? "project-type/actualizar"
+                        : "project-type/salvar";
                 BlockUtil.block('#form-project-type');
 
-                axios.post("project-type/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

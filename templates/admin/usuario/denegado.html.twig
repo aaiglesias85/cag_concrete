@@ -1,85 +1,132 @@
 {% extends 'admin/layout.html.twig' %}
 
-{% block subtitle %} - Access denied{% endblock %}
+{% block subtitle %} — Access denied{% endblock %}
 
-{% block stylesheetspecific %}{% endblock %}
+{% block stylesheetspecific %}
+<style>
+    .denegado-hero {
+        background: linear-gradient(135deg, rgba(var(--bs-danger-rgb), 0.08) 0%, rgba(var(--bs-primary-rgb), 0.06) 100%);
+        border: 1px dashed rgba(var(--bs-danger-rgb), 0.35);
+        border-radius: 0.75rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
 
-    <!--begin::Toolbar-->
     <div id="kt_app_toolbar" class="app-toolbar py-3 py-lg-6">
-        <!--begin::Toolbar container-->
         <div id="kt_app_toolbar_container" class="app-container container-fluid d-flex flex-stack">
-            <!--begin::Page title-->
             <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
-                <!--begin::Title-->
                 <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">
-                    Welcome
+                    Access denied
                 </h1>
-                <!--end::Title-->
-                <!--begin::Breadcrumb-->
                 <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
-                    <!--begin::company-->
                     <li class="breadcrumb-item text-muted">
-                        <a href="{{ url('home') }}" class="text-muted text-hover-primary">Home</a>
+                        {% if puede_ir_dashboard %}
+                            <a href="{{ path('home') }}" class="text-muted text-hover-primary">Dashboard</a>
+                        {% else %}
+                            <span class="text-muted">Admin</span>
+                        {% endif %}
                     </li>
-                    <!--end::company-->
-                    <!--begin::company-->
                     <li class="breadcrumb-item">
                         <span class="bullet bg-gray-500 w-5px h-2px"></span>
                     </li>
-                    <!--end::company-->
-                    <!--begin::company-->
-                    <li class="breadcrumb-item text-muted">Welcome</li>
-                    <!--end::company-->
+                    <li class="breadcrumb-item text-gray-800">Access denied</li>
                 </ul>
-                <!--end::Breadcrumb-->
             </div>
-            <!--end::Page title-->
-            <!--begin::Actions-->
-            <div class="d-flex align-items-center gap-2 gap-lg-3">
-
-            </div>
-            <!--end::Actions-->
         </div>
-        <!--end::Toolbar container-->
     </div>
-    <!--end::Toolbar-->
-    <!--begin::Content-->
+
     <div id="kt_app_content" class="app-content flex-column-fluid">
-        <!--begin::Content container-->
         <div id="kt_app_content_container" class="app-container container-fluid">
 
-            <div class="card card-flush py-5">
-                <div class="card-body py-15 py-lg-20 text-center">
+            <div class="denegado-hero card shadow-sm mb-6 mb-xl-8 overflow-hidden">
+                <div class="card-body p-8 p-lg-12">
+                    <div class="row align-items-center gy-8">
+                        <div class="col-lg-7">
+                            <div class="d-flex align-items-center gap-3 mb-5">
+                                <span class="symbol symbol-60px">
+                                    <span class="symbol-label bg-light-danger">
+                                        <i class="ki-duotone ki-shield-cross fs-2x text-danger">
+                                            <span class="path1"></span><span class="path2"></span>
+                                            <span class="path3"></span>
+                                        </i>
+                                    </span>
+                                </span>
+                                <div>
+                                    <span class="badge badge-light-danger fw-bold mb-1">403 — Permission</span>
+                                    <h2 class="fw-bold text-gray-900 mb-0">You can’t open this section</h2>
+                                </div>
+                            </div>
 
-                    <!--begin::Title-->
-                    <h1 class="fw-bolder text-gray-900 mb-5">Welcome</h1>
-                    <!--end::Title-->
-                    <!--begin::Text-->
-                    <div class="fw-semibold fs-6 text-gray-500 mb-7">✅ "You’re now logged into the system. Please choose from the available options in the menu."</div>
-                    <!--end::Text-->
-                    <!--begin::Illustration-->
-                    <div class="mb-0">
-                        <img src="{{ asset('assets/metronic8/assets/media/auth/welcome.png') }}" class="mw-100 mh-300px theme-light-show" alt="">
-                        <img src="{{ asset('assets/metronic8/assets/media/auth/welcome-dark.png') }}" class="mw-100 mh-300px theme-dark-show" alt="">
+                            <p class="fs-5 fw-semibold text-gray-800 mb-3">
+                                Your account (<span class="text-gray-900">{{ usuario.email }}</span>) is signed in, but you don’t have access to the page or action you tried to reach.
+                            </p>
+                            <p class="text-gray-600 fs-6 mb-6">
+                                Request access from your administrator if you need this module, or use one of the options below to continue working elsewhere in the app.
+                            </p>
+
+                            {% if funcion is null %}
+                                <div class="alert alert-warning d-flex align-items-center py-4 px-5 mb-6">
+                                    <i class="ki-duotone ki-information-5 fs-2hx text-warning me-4">
+                                        <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                    </i>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">No modules available with “view” permission</span>
+                                        <span class="fs-7 text-gray-700">Contact your administrator to assign at least one module to your user.</span>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="d-flex flex-wrap gap-3">
+                                {% if funcion is not null %}
+                                    <a href="{{ path(funcion.funcion_url) }}" class="btn btn-primary">
+                                        <i class="ki-duotone ki-arrow-right fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                        Go to {{ funcion.funcion_name }}
+                                    </a>
+                                {% endif %}
+                                {% if puede_ir_dashboard %}
+                                    <a href="{{ path('home') }}" class="btn btn-light-primary">
+                                        <i class="ki-duotone ki-home-2 fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                        Dashboard
+                                    </a>
+                                {% endif %}
+                                <a href="{{ path('perfilAdmin') }}" class="btn btn-light">
+                                    <i class="ki-duotone ki-user fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                    My profile
+                                </a>
+                                <button type="button" class="btn btn-light" id="denegado_btn_back">
+                                    <i class="ki-duotone ki-left fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                    Go back
+                                </button>
+                                <a href="{{ path('logout') }}" class="btn btn-outline btn-outline-dashed btn-outline-danger btn-active-light-danger">
+                                    <i class="ki-duotone ki-exit-right fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                    Sign out
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 text-center">
+                            <img src="{{ asset('assets/metronic8/assets/media/auth/404-error.png') }}" class="mw-100 mh-300px theme-light-show w-200px w-lg-auto" alt="">
+                            <img src="{{ asset('assets/metronic8/assets/media/auth/404-error-dark.png') }}" class="mw-100 mh-300px theme-dark-show w-200px w-lg-auto" alt="">
+                            <p class="text-muted fs-7 mt-4 mb-0">Tip: bookmark modules you use often from the sidebar.</p>
+                        </div>
                     </div>
-                    <!--end::Illustration-->
-                    <!--begin::Link-->
-                    <div class="mb-0">
-                        <a href="{{ url(funcion.funcion_url) }}" class="btn btn-sm btn-primary">Go To {{ funcion.funcion_name }}</a>
-                    </div>
-                    <!--end::Link-->
                 </div>
             </div>
 
         </div>
-        <!--end::Content container-->
     </div>
-    <!--end::Content-->
 
 {% endblock %}
 
 {% block javascriptsspecific %}
-
+<script>
+document.getElementById('denegado_btn_back').addEventListener('click', function () {
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = {{ (puede_ir_dashboard ? path('home') : path('perfilAdmin'))|json_encode|raw }};
+    }
+});
+</script>
 {% endblock %}

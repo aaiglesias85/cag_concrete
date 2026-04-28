@@ -2,15 +2,17 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class OverridePaymentIdsRequest
+final class OverridePaymentIdsRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'At least one id is required.')]
     public ?string $ids = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $raw = $request->get('ids', '');

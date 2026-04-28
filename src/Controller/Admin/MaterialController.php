@@ -3,49 +3,40 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Material\MaterialActualizarRequest;
 use App\Dto\Admin\Material\MaterialIdRequest;
 use App\Dto\Admin\Material\MaterialIdsRequest;
+use App\Dto\Admin\Material\MaterialListarRequest;
 use App\Dto\Admin\Material\MaterialSalvarRequest;
 use App\Entity\Unit;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\MaterialService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class MaterialController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $materialService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        MaterialService $materialService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        MaterialService $materialService) {
         parent::__construct($adminAccess);
         $this->materialService = $materialService;
     }
 
+    #[RequireAdminPermission(FunctionId::MATERIAL)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::MATERIAL);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::MATERIAL);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso MATERIAL esperado tras #[RequireAdminPermission].');
 
         $units = $this->materialService->getDoctrine()->getRepository(Unit::class)
             ->ListarOrdenados();
 
         return $this->render('admin/material/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'units' => $units,
         ]);
     }
@@ -53,14 +44,11 @@ class MaterialController extends AbstractAdminController
     /**
      * listar Acción que lista los units.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(MaterialListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'name', 'unit', 'price'],
-                defaultOrderField: 'name'
-            );
+            $dt = $listar->dt;
 
             $result = $this->materialService->ListarMaterials(
                 $dt['start'],
@@ -89,24 +77,47 @@ class MaterialController extends AbstractAdminController
     /**
      * salvar Acción que inserta un menu en la BD.
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(MaterialSalvarRequest $d): JsonResponse
     {
-        $d = MaterialSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $material_id = (string) ($d->material_id ?? '');
         $name = (string) $d->name;
         $price = (string) $d->price;
         $unit_id = (string) $d->unit_id;
 
         try {
-            if ('' === $material_id) {
-                $resultado = $this->materialService->SalvarMaterial($unit_id, $name, $price);
-            } else {
-                $resultado = $this->materialService->ActualizarMaterial($material_id, $unit_id, $name, $price);
+            $resultado = $this->materialService->SalvarMaterial($unit_id, $name, $price);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * actualizar Acción que modifica un material en la BD.
+     */
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(MaterialActualizarRequest $d): JsonResponse
+    {
+        $material_id = (string) $d->material_id;
+        $name = (string) $d->name;
+        $price = (string) $d->price;
+        $unit_id = (string) $d->unit_id;
+
+        try {
+            $resultado = $this->materialService->ActualizarMaterial($material_id, $unit_id, $name, $price);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -129,13 +140,9 @@ class MaterialController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un material en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(MaterialIdRequest $dto): JsonResponse
     {
-        $dto = MaterialIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $material_id = $dto->material_id;
 
         try {
@@ -161,13 +168,9 @@ class MaterialController extends AbstractAdminController
     /**
      * eliminarMaterials Acción que elimina los materials seleccionados en la BD.
      */
-    public function eliminarMaterials(Request $request)
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarMaterials(MaterialIdsRequest $dto): JsonResponse
     {
-        $dto = MaterialIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -193,13 +196,9 @@ class MaterialController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del material en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(MaterialIdRequest $dto): JsonResponse
     {
-        $dto = MaterialIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $material_id = $dto->material_id;
 
         try {

@@ -18,6 +18,10 @@ salvarCompanyAdmin:
   path:  /company/salvarCompany
   defaults: { _controller: App\Controller\Admin\CompanyController::salvar, _format: json }
 
+actualizarCompanyAdmin:
+  path:  /company/actualizarCompany
+  defaults: { _controller: App\Controller\Admin\CompanyController::actualizar, _format: json }
+
 cargarDatosCompanyAdmin:
   path:  /company/cargarDatos
   defaults: { _controller: App\Controller\Admin\CompanyController::cargarDatos, _format: json }
@@ -29,6 +33,10 @@ eliminarContactCompanyAdmin:
 salvarContactCompanyAdmin:
   path:  /company/salvarContact
   defaults: { _controller: App\Controller\Admin\CompanyController::salvarContact, _format: json }
+
+actualizarContactCompanyAdmin:
+  path:  /company/actualizarContact
+  defaults: { _controller: App\Controller\Admin\CompanyController::actualizarContact, _format: json }
 
 listarContactsCompanyAdmin:
   path:  /company/listarContacts

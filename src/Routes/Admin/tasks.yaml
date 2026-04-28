@@ -14,6 +14,10 @@ salvarTaskAdmin:
   path: /tasks/salvar
   defaults: { _controller: App\Controller\Admin\TaskController::salvar, _format: json }
 
+actualizarTaskAdmin:
+  path: /tasks/actualizar
+  defaults: { _controller: App\Controller\Admin\TaskController::actualizar, _format: json }
+
 eliminarTaskAdmin:
   path: /tasks/eliminar
   defaults: { _controller: App\Controller\Admin\TaskController::eliminar, _format: json }

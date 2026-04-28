@@ -18,6 +18,10 @@ salvarItemAdmin:
   path:  /item/salvarItem
   defaults: { _controller: App\Controller\Admin\ItemController::salvar, _format: json }
 
+actualizarItemAdmin:
+  path:  /item/actualizarItem
+  defaults: { _controller: App\Controller\Admin\ItemController::actualizar, _format: json }
+
 cargarDatosItemAdmin:
   path:  /item/cargarDatos
   defaults: { _controller: App\Controller\Admin\ItemController::cargarDatos, _format: json }

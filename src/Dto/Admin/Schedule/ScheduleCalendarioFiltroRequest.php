@@ -2,9 +2,11 @@
 
 namespace App\Dto\Admin\Schedule;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
-final class ScheduleCalendarioFiltroRequest
+final class ScheduleCalendarioFiltroRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $search = null;
 
@@ -16,7 +18,7 @@ final class ScheduleCalendarioFiltroRequest
 
     public ?string $fecha_fin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->search = self::sn($request->get('search'));

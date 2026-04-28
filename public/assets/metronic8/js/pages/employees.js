@@ -349,10 +349,15 @@ var Employees = (function () {
             var color = $('#color').val();
             formData.set('color', color);
 
+            var salvarUrl =
+               !employee_id || employee_id === ''
+                  ? 'employee/salvarEmployee'
+                  : 'employee/actualizarEmployee';
+
             BlockUtil.block('#form-employee');
 
             axios
-               .post('employee/salvarEmployee', formData, { responseType: 'json' })
+               .post(salvarUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;

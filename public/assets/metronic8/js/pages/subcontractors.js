@@ -501,9 +501,13 @@ var Subcontractors = function () {
             var companyAddress = $('#companyAddress').val();
             formData.set("companyAddress", companyAddress);
 
+            var salvarUrl =
+                subcontractor_id && String(subcontractor_id).trim() !== ''
+                    ? "subcontractor/actualizarSubcontractor"
+                    : "subcontractor/salvarSubcontractor";
             BlockUtil.block('#form-subcontractor');
 
-            axios.post("subcontractor/salvarSubcontractor", formData, {responseType: "json"})
+            axios.post(salvarUrl, formData, {responseType: "json"})
                 .then(function (res) {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;
@@ -1283,17 +1287,22 @@ var Subcontractors = function () {
                 var formData = new URLSearchParams();
 
                 var notes_id = $('#notes_id').val();
-                formData.set("notes_id", notes_id);
+                var editingNote = notes_id !== undefined && notes_id !== null && String(notes_id).trim() !== '';
+                var salvarNotesUrl = editingNote ? 'subcontractor/actualizarNotes' : 'subcontractor/salvarNotes';
 
                 var subcontractor_id = $('#subcontractor_id').val();
                 formData.set("subcontractor_id", subcontractor_id);
+
+                if (editingNote) {
+                    formData.set('notes_id', notes_id);
+                }
 
                 formData.set("notes", notes);
                 formData.set("date", date);
 
                 BlockUtil.block('#modal-notes .modal-content');
 
-                axios.post("subcontractor/salvarNotes", formData, {responseType: "json"})
+                axios.post(salvarNotesUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

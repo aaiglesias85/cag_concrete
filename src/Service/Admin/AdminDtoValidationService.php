@@ -1,20 +1,36 @@
 <?php
 
-namespace App\Controller\Admin\Traits;
+namespace App\Service\Admin;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-trait AdminValidationResponseTrait
+/**
+ * Validación del panel admin con locale `en` y formato JSON de errores homogéneo.
+ * Usado por {@see \App\Http\Controller\AdminHttpRequestDtoValueResolver} al validar DTOs del panel admin.
+ */
+final class AdminDtoValidationService
 {
+    public function __construct(
+        private ValidatorInterface $validator,
+        private TranslatorInterface $translator,
+    ) {
+    }
+
     /**
-     * Panel admin: respuestas JSON 400 con el mismo shape que la API; mensajes con locale `en` para validación.
-     *
      * @return array{success: false, error: string, violations: array<string, list<string>>}
      */
-    protected function formatAdminValidationFailure(ConstraintViolationListInterface $violations): array
+    public function formatFailure(ConstraintViolationListInterface $violations): array
+    {
+        return self::formatViolationPayload($violations);
+    }
+
+    /**
+     * @return array{success: false, error: string, violations: array<string, list<string>>}
+     */
+    public static function formatViolationPayload(ConstraintViolationListInterface $violations): array
     {
         $byField = [];
         foreach ($violations as $violation) {
@@ -31,10 +47,15 @@ trait AdminValidationResponseTrait
         ];
     }
 
+    public function validate(object $dto): ConstraintViolationListInterface
+    {
+        return self::validateWithLocale($this->validator, $dto, $this->translator);
+    }
+
     /**
-     * Fuerza locale de traducción `en` durante la validación (textos de constraint por defecto en inglés en el panel).
+     * Fuerza locale de traducción `en` durante la validación (constraints por defecto en inglés en el panel).
      */
-    protected function validateAdminDto(ValidatorInterface $validator, object $dto, ?TranslatorInterface $translator = null): ConstraintViolationListInterface
+    public static function validateWithLocale(ValidatorInterface $validator, object $dto, ?TranslatorInterface $translator = null): ConstraintViolationListInterface
     {
         $previous = null;
         if ($translator instanceof LocaleAwareInterface) {

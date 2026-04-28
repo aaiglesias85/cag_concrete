@@ -3,58 +3,52 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Payment\PaymentArchivoRequest;
 use App\Dto\Admin\Payment\PaymentArchivosRequest;
 use App\Dto\Admin\Payment\PaymentCambiarEstadoRequest;
 use App\Dto\Admin\Payment\PaymentInvoiceIdRequest;
 use App\Dto\Admin\Payment\PaymentInvoiceItemIdRequest;
 use App\Dto\Admin\Payment\PaymentNoteIdRequest;
+use App\Dto\Admin\Payment\PaymentNotesActualizarRequest;
 use App\Dto\Admin\Payment\PaymentNotesDateRangeRequest;
+use App\Dto\Admin\Payment\PaymentNotesItemActualizarRequest;
+use App\Dto\Admin\Payment\PaymentNotesItemSalvarRequest;
 use App\Dto\Admin\Payment\PaymentNotesSalvarRequest;
-use App\Dto\Admin\Payment\PaymentSalvarNotesItemRequest;
+use App\Dto\Admin\Payment\PaymentListarNotesRequest;
+use App\Dto\Admin\Payment\PaymentListarRequest;
 use App\Dto\Admin\Payment\PaymentSalvarRequest;
 use App\Entity\Company;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PaymentService;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PaymentController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $paymentService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        PaymentService $paymentService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        PaymentService $paymentService) {
         parent::__construct($adminAccess);
         $this->paymentService = $paymentService;
     }
 
+    #[RequireAdminPermission(FunctionId::PAYMENT)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PAYMENT);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PAYMENT);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso PAYMENT esperado tras #[RequireAdminPermission].');
 
         // companies
         $companies = $this->paymentService->getDoctrine()->getRepository(Company::class)
            ->ListarOrdenados();
 
         return $this->render('admin/payment/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'companies' => $companies,
             'direccion_url' => $this->paymentService->ObtenerURL(),
         ]);
@@ -63,21 +57,17 @@ class PaymentController extends AbstractAdminController
     /**
      * listar Acción que lista los invoices.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(PaymentListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'number', 'company', 'projectNumber', 'project', 'startDate', 'endDate', 'total', 'notes', 'paid', 'createdAt'],
-                defaultOrderField: 'startDate'
-            );
+            $dt = $listar->dt;
 
-            $company_id = $request->get('company_id');
-            $project_id = $request->get('project_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-            $paid = $request->get('paid');
+            $company_id = $listar->company_id;
+            $project_id = $listar->project_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
+            $paid = $listar->paid;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->paymentService->ListarInvoices(
@@ -110,15 +100,11 @@ class PaymentController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que salva un payment en la BD.
+     * Actualiza líneas de pago del invoice (siempre edición; no hay alta sin invoice).
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvar(PaymentSalvarRequest $d): JsonResponse
     {
-        $d = PaymentSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $d->invoice_id;
         $payments = (null !== $d->payments && '' !== $d->payments) ? json_decode($d->payments) : null;
         $archivos = (null !== $d->archivos && '' !== $d->archivos) ? json_decode($d->archivos) : null;
@@ -148,13 +134,9 @@ class PaymentController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del payment en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(PaymentInvoiceIdRequest $dto): JsonResponse
     {
-        $dto = PaymentInvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $dto->invoice_id;
 
         try {
@@ -180,20 +162,15 @@ class PaymentController extends AbstractAdminController
     /**
      * listarNotes Acción que lista los notes.
      */
-    public function listarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarNotes(PaymentListarNotesRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'date', 'notes'],
-                defaultOrderField: 'date'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $invoice_id = $request->get('invoice_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $invoice_id = $listar->invoice_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
             // total + data en una sola llamada a tu servicio
             $result = '' != $invoice_id ? $this->paymentService->ListarNotes(
@@ -223,17 +200,38 @@ class PaymentController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvarNotes Acción que salvar un notes en la BD.
-     */
-    public function salvarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvarNotes(PaymentNotesSalvarRequest $d): JsonResponse
     {
-        $d = PaymentNotesSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $invoice_id = (string) $d->invoice_id;
+        $notes = (string) $d->notes;
+        $date = (string) $d->date;
+
+        try {
+            $resultado = $this->paymentService->SalvarNotes('', $invoice_id, $notes, $date);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
-        $notes_id = (string) ($d->notes_id ?? '');
+    }
+
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizarNotes(PaymentNotesActualizarRequest $d): JsonResponse
+    {
+        $notes_id = (string) $d->notes_id;
         $invoice_id = (string) $d->invoice_id;
         $notes = (string) $d->notes;
         $date = (string) $d->date;
@@ -262,13 +260,9 @@ class PaymentController extends AbstractAdminController
     /**
      * cargarDatosNotes Acción que carga los datos del notes en la BD.
      */
-    public function cargarDatosNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatosNotes(PaymentNoteIdRequest $dto): JsonResponse
     {
-        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -294,13 +288,9 @@ class PaymentController extends AbstractAdminController
     /**
      * eliminarNotes Acción que elimina un notes en la BD.
      */
-    public function eliminarNotes(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotes(PaymentNoteIdRequest $dto): JsonResponse
     {
-        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -326,13 +316,9 @@ class PaymentController extends AbstractAdminController
     /**
      * eliminarNotesDate Acción que elimina un notes en la BD.
      */
-    public function eliminarNotesDate(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotesDate(PaymentNotesDateRangeRequest $d): JsonResponse
     {
-        $d = PaymentNotesDateRangeRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = (string) $d->invoice_id;
         $from = (string) $d->from;
         $to = (string) $d->to;
@@ -360,7 +346,8 @@ class PaymentController extends AbstractAdminController
     /**
      * salvarArchivo Accion que salva un archivo en la BD.
      */
-    public function salvarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarArchivo(Request $request): JsonResponse
     {
         $resultadoJson = [];
 
@@ -394,13 +381,9 @@ class PaymentController extends AbstractAdminController
     /**
      * eliminarArchivo Acción que elimina un archivo en la BD.
      */
-    public function eliminarArchivo(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarArchivo(PaymentArchivoRequest $d): JsonResponse
     {
-        $d = PaymentArchivoRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivo = (string) $d->archivo;
 
         try {
@@ -425,13 +408,9 @@ class PaymentController extends AbstractAdminController
     /**
      * eliminarArchivos Acción que elimina varios archivos en la BD.
      */
-    public function eliminarArchivos(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarArchivos(PaymentArchivosRequest $d): JsonResponse
     {
-        $d = PaymentArchivosRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $archivos = (string) $d->archivos;
 
         try {
@@ -453,16 +432,38 @@ class PaymentController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvarNotesItem Acción que salvar un notes en la BD.
-     */
-    public function salvarNotesItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvarNotesItem(PaymentNotesItemSalvarRequest $d): JsonResponse
     {
-        $d = PaymentSalvarNotesItemRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $invoice_item_id = $d->invoice_item_id;
+        $notes = $d->notes;
+        $override_unpaid_qty = $d->override_unpaid_qty;
+
+        try {
+            $resultado = $this->paymentService->SalvarNotesItem('', $invoice_item_id, $notes, $override_unpaid_qty);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['note'] = $resultado['note'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizarNotesItem(PaymentNotesItemActualizarRequest $d): JsonResponse
+    {
         $notes_id = $d->notes_id;
         $invoice_item_id = $d->invoice_item_id;
         $notes = $d->notes;
@@ -493,13 +494,9 @@ class PaymentController extends AbstractAdminController
     /**
      * listarHistorialUnpaidQtyItem Lista el historial de cambios de unpaid qty de un ítem (notas con override).
      */
-    public function listarHistorialUnpaidQtyItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHistorialUnpaidQtyItem(PaymentInvoiceItemIdRequest $dto): JsonResponse
     {
-        $dto = PaymentInvoiceItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_item_id = $dto->invoice_item_id;
 
         try {
@@ -519,13 +516,9 @@ class PaymentController extends AbstractAdminController
     /**
      * eliminarNotesItem Acción que elimina un notes en la BD.
      */
-    public function eliminarNotesItem(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotesItem(PaymentNoteIdRequest $dto): JsonResponse
     {
-        $dto = PaymentNoteIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notes_id = $dto->notes_id;
 
         try {
@@ -551,13 +544,9 @@ class PaymentController extends AbstractAdminController
     /**
      * paid Acción para pagar un invoice.
      */
-    public function paid(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function paid(PaymentInvoiceIdRequest $dto): JsonResponse
     {
-        $dto = PaymentInvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $dto->invoice_id;
 
         try {
@@ -582,10 +571,11 @@ class PaymentController extends AbstractAdminController
     /**
      * salvarRetainageReimbursement.
      */
-    public function salvarRetainageReimbursement(Request $request, PaymentService $paymentService)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarRetainageReimbursement(Request $request): JsonResponse
     {
         $params = $request->request->all();
-        $resultado = $paymentService->SalvarRetainageReimbursement($params);
+        $resultado = $this->paymentService->SalvarRetainageReimbursement($params);
 
         return new JsonResponse($resultado);
     }
@@ -593,13 +583,9 @@ class PaymentController extends AbstractAdminController
     /**
      * cambiarEstado Acción para cambiar el estado (Open/Closed) de un invoice.
      */
-    public function cambiarEstado(Request $request)
+    #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::Edit, jsonOnDenied: true)]
+    public function cambiarEstado(PaymentCambiarEstadoRequest $d): JsonResponse
     {
-        $d = PaymentCambiarEstadoRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $d->invoice_id;
         $status = $d->status;
 

@@ -2,20 +2,22 @@
 
 namespace App\Dto\Admin\Default;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Formulario de preferencia de widget (home).
  */
-final class SaveWidgetPreferenceRequest
+final class SaveWidgetPreferenceRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Missing widget_id')]
     public ?string $widget_id = null;
 
     public bool $is_active = true;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $w = $request->get('widget_id');

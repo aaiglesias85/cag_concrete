@@ -2,16 +2,16 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Carga masiva de un registro de data tracking (JSON vía string en conc_vendors, items, etc.).
  */
-final class DataTrackingSalvarRequest
+final class DataTrackingSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $data_tracking_id = null;
-
     #[Assert\NotBlank]
     public ?string $project_id = null;
 
@@ -58,11 +58,9 @@ final class DataTrackingSalvarRequest
 
     public ?string $archivos = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $id = $request->get('data_tracking_id');
-        $d->data_tracking_id = \is_string($id) || is_numeric($id) ? (string) $id : null;
         $d->project_id = self::strOrNull($request->get('project_id'));
         $d->date = self::strOrNull($request->get('date'));
         $d->inspector_id = self::strOrNull($request->get('inspector_id'));
@@ -85,6 +83,35 @@ final class DataTrackingSalvarRequest
         $d->materials = \is_string($x = $request->get('materials')) ? $x : null;
         $d->subcontracts = \is_string($x = $request->get('subcontracts')) ? $x : null;
         $d->archivos = \is_string($x = $request->get('archivos')) ? $x : null;
+
+        return $d;
+    }
+
+    public static function fromActualizarRequest(DataTrackingActualizarRequest $a): self
+    {
+        $d = new self();
+        $d->project_id = $a->project_id;
+        $d->date = $a->date;
+        $d->inspector_id = $a->inspector_id;
+        $d->station_number = $a->station_number;
+        $d->measured_by = $a->measured_by;
+        $d->conc_vendor = $a->conc_vendor;
+        $d->conc_price = $a->conc_price;
+        $d->crew_lead = $a->crew_lead;
+        $d->notes = $a->notes;
+        $d->other_materials = $a->other_materials;
+        $d->total_conc_used = $a->total_conc_used;
+        $d->total_stamps = $a->total_stamps;
+        $d->total_people = $a->total_people;
+        $d->overhead_price_id = $a->overhead_price_id;
+        $d->color_used = $a->color_used;
+        $d->color_price = $a->color_price;
+        $d->conc_vendors = $a->conc_vendors;
+        $d->items = $a->items;
+        $d->labor = $a->labor;
+        $d->materials = $a->materials;
+        $d->subcontracts = $a->subcontracts;
+        $d->archivos = $a->archivos;
 
         return $d;
     }

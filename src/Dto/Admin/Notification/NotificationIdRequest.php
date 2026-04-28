@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Notification;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class NotificationIdRequest
+final class NotificationIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Notification id is required.')]
     #[Assert\Positive]
     public ?int $notification_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->notification_id = self::positiveIntOrNull($request->get('notification_id'));

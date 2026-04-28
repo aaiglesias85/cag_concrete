@@ -389,9 +389,13 @@ var Advertisements = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    advertisement_id && String(advertisement_id).trim() !== ''
+                        ? "advertisement/actualizar"
+                        : "advertisement/salvarAdvertisement";
                 BlockUtil.block('#form-advertisement');
 
-                axios.post("advertisement/salvarAdvertisement", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Payment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PaymentSalvarNotesItemRequest
+final class PaymentNotesItemSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $notes_id = null;
-
     #[Assert\NotBlank]
     public ?string $invoice_item_id = null;
 
@@ -16,10 +16,9 @@ final class PaymentSalvarNotesItemRequest
 
     public ?string $override_unpaid_qty = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $d->notes_id = self::strOrNull($request->get('notes_id'));
         $d->invoice_item_id = self::strOrNull($request->get('invoice_item_id'));
         $d->notes = \is_string($x = $request->get('notes')) ? $x : null;
         $d->override_unpaid_qty = self::strOrNull($request->get('override_unpaid_qty'));

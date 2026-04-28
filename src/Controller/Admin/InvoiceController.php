@@ -3,56 +3,47 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Invoice\InvoiceActualizarRequest;
 use App\Dto\Admin\Invoice\InvoiceChangeNumberRequest;
 use App\Dto\Admin\Invoice\InvoiceExportarRequest;
 use App\Dto\Admin\Invoice\InvoiceIdRequest;
 use App\Dto\Admin\Invoice\InvoiceIdsRequest;
 use App\Dto\Admin\Invoice\InvoiceItemIdRequest;
 use App\Dto\Admin\Invoice\InvoiceProyectoIdRequest;
+use App\Dto\Admin\Invoice\InvoiceListarRequest;
 use App\Dto\Admin\Invoice\InvoiceSalvarRequest;
 use App\Dto\Admin\Invoice\InvoiceValidarRequest;
 use App\Entity\Company;
 use App\Entity\Item;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InvoiceService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class InvoiceController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $invoiceService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        InvoiceService $invoiceService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        InvoiceService $invoiceService) {
         parent::__construct($adminAccess);
         $this->invoiceService = $invoiceService;
     }
 
+    #[RequireAdminPermission(FunctionId::INVOICE)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::INVOICE);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::INVOICE);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso INVOICE esperado tras #[RequireAdminPermission].');
 
         // companies
         $companies = $this->invoiceService->getDoctrine()->getRepository(Company::class)
            ->ListarOrdenados();
 
         return $this->render('admin/invoice/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
             'companies' => $companies,
         ]);
     }
@@ -60,20 +51,16 @@ class InvoiceController extends AbstractAdminController
     /**
      * listar Acción que lista los companies.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(InvoiceListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'number', 'company', 'projectNumber', 'project', 'startDate', 'endDate', 'total', 'notes', 'paid', 'createdAt'],
-                defaultOrderField: 'startDate'
-            );
+            $dt = $listar->dt;
 
-            $company_id = $request->get('company_id');
-            $project_id = $request->get('project_id');
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $company_id = $listar->company_id;
+            $project_id = $listar->project_id;
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->invoiceService->ListarInvoices(
@@ -105,16 +92,11 @@ class InvoiceController extends AbstractAdminController
     }
 
     /**
-     * salvar Acción que salva un invoice en la BD.
+     * salvar Acción que salva un invoice en la BD (alta).
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(InvoiceSalvarRequest $d): JsonResponse
     {
-        $d = InvoiceSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $invoice_id = (string) ($d->invoice_id ?? '');
         $number = (string) $d->number;
         $project_id = (string) $d->project_id;
         $start_date = (string) $d->start_date;
@@ -125,11 +107,46 @@ class InvoiceController extends AbstractAdminController
         $exportar = $d->exportar;
 
         try {
-            if ('' === $invoice_id) {
-                $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
-            } else {
-                $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['url'] = $resultado['url'];
+                $resultadoJson['invoice_id'] = $resultado['invoice_id'];
+
+                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * actualizar Acción que actualiza un invoice en la BD.
+     */
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(InvoiceActualizarRequest $d): JsonResponse
+    {
+        $invoice_id = (string) $d->invoice_id;
+        $number = (string) $d->number;
+        $project_id = (string) $d->project_id;
+        $start_date = (string) $d->start_date;
+        $end_date = (string) $d->end_date;
+        $notes = (string) ($d->notes ?? '');
+        $paid = $d->paid;
+        $items = \is_string($d->items) ? json_decode($d->items) : null;
+        $exportar = $d->exportar;
+
+        try {
+            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -154,13 +171,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un invoice en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(InvoiceIdRequest $dto): JsonResponse
     {
-        $dto = InvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $dto->invoice_id;
 
         try {
@@ -186,13 +199,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * eliminarInvoices Acción que elimina los invoices seleccionados en la BD.
      */
-    public function eliminarInvoices(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarInvoices(InvoiceIdsRequest $dto): JsonResponse
     {
-        $dto = InvoiceIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -218,13 +227,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del invoice en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(InvoiceIdRequest $dto): JsonResponse
     {
-        $dto = InvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $dto->invoice_id;
 
         try {
@@ -250,13 +255,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * eliminarItem Acción que elimina un item en la BD.
      */
-    public function eliminarItem(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarItem(InvoiceItemIdRequest $dto): JsonResponse
     {
-        $dto = InvoiceItemIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_item_id = $dto->invoice_item_id;
 
         try {
@@ -281,13 +282,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * ExportarExcel: Acción para generar Excel o PDF según el parámetro format.
      */
-    public function exportarExcel(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
+    public function exportarExcel(InvoiceExportarRequest $d): JsonResponse
     {
-        $d = InvoiceExportarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $d->invoice_id;
         $format = $d->format ?: 'excel';
 
@@ -322,13 +319,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * paid Acción para pagar un invoice.
      */
-    public function paid(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function paid(InvoiceIdRequest $dto): JsonResponse
     {
-        $dto = InvoiceIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $dto->invoice_id;
 
         try {
@@ -353,13 +346,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * changeNumber Acción para cambiar el number de un invoice.
      */
-    public function changeNumber(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function changeNumber(InvoiceChangeNumberRequest $d): JsonResponse
     {
-        $d = InvoiceChangeNumberRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = $d->invoice_id;
         $number = (string) $d->number;
 
@@ -386,13 +375,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * validarInvoice Acción que valida un invoice en la BD.
      */
-    public function validar(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
+    public function validar(InvoiceValidarRequest $d): JsonResponse
     {
-        $d = InvoiceValidarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $invoice_id = (string) ($d->invoice_id ?? '');
         $project_id = (string) $d->project_id;
         $start_date = (string) $d->start_date;
@@ -417,13 +402,9 @@ class InvoiceController extends AbstractAdminController
     /**
      * obtenerSiguientePeriodoInvoice: Obtiene el siguiente período de invoice basado en el último invoice del proyecto.
      */
-    public function obtenerSiguientePeriodoInvoice(Request $request)
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
+    public function obtenerSiguientePeriodoInvoice(InvoiceProyectoIdRequest $dto): JsonResponse
     {
-        $dto = InvoiceProyectoIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         try {
             $project_id = $dto->project_id;
             $resultado = $this->invoiceService->ObtenerSiguientePeriodoInvoice($project_id);

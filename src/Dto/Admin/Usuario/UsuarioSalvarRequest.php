@@ -2,18 +2,18 @@
 
 namespace App\Dto\Admin\Usuario;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
- * salvar/actualizar usuario (admin). {@see UsuarioController::salvar}
+ * Alta de usuario (admin). Edición: {@see UsuarioActualizarRequest} + `actualizar`.
  * permisos: string JSON (array of permission objects) como envía el front.
  */
-final class UsuarioSalvarRequest
+final class UsuarioSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $usuario_id = null;
-
     /** Campo de formulario `rol` (id de rol) */
     #[Assert\NotBlank(message: 'Role is required.')]
     public ?string $rol = null;
@@ -47,14 +47,11 @@ final class UsuarioSalvarRequest
     #[Assert\Callback]
     public function validate(ExecutionContextInterface $context): void
     {
-        $isNew = null === $this->usuario_id || '' === (string) $this->usuario_id;
-        if ($isNew) {
-            if (null === $this->password || '' === (string) $this->password) {
-                $context->buildViolation('Password is required for a new user.')
-                    ->disableTranslation()
-                    ->atPath('password')
-                    ->addViolation();
-            }
+        if (null === $this->password || '' === (string) $this->password) {
+            $context->buildViolation('Password is required for a new user.')
+                ->disableTranslation()
+                ->atPath('password')
+                ->addViolation();
         }
 
         if (null === $this->permisos || '' === (string) $this->permisos) {
@@ -89,11 +86,29 @@ final class UsuarioSalvarRequest
         }
     }
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromActualizarRequest(UsuarioActualizarRequest $a): self
     {
         $d = new self();
-        $uid = $request->get('usuario_id');
-        $d->usuario_id = \is_string($uid) || is_numeric($uid) ? (string) $uid : null;
+        $d->rol = $a->rol;
+        $d->habilitado = $a->habilitado;
+        $d->password = $a->password;
+        $d->nombre = $a->nombre;
+        $d->apellidos = $a->apellidos;
+        $d->email = $a->email;
+        $d->permisos = $a->permisos;
+        $d->telefono = $a->telefono;
+        $d->estimator = $a->estimator;
+        $d->bond = $a->bond;
+        $d->retainage = $a->retainage;
+        $d->chat = $a->chat;
+        $d->widget_access = $a->widget_access;
+
+        return $d;
+    }
+
+    public static function fromHttpRequest(Request $request): static
+    {
+        $d = new self();
         $d->rol = \is_string($r = $request->get('rol')) ? $r : (null === $r ? null : (string) $r);
         $d->habilitado = null !== $request->get('habilitado') && false !== $request->get('habilitado')
             ? (string) $request->get('habilitado') : null;

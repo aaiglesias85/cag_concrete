@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Employee;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EmployeeSalvarRequest
+final class EmployeeSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $employee_id = null;
-
     #[Assert\NotBlank]
     public ?string $name = null;
 
@@ -18,11 +18,9 @@ final class EmployeeSalvarRequest
 
     public ?string $color = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $eid = $request->get('employee_id');
-        $d->employee_id = \is_string($eid) || is_numeric($eid) ? (string) $eid : null;
         $d->name = \is_string($x = $request->get('name')) ? $x : null;
         $hr = $request->get('hourly_rate');
         $d->hourly_rate = \is_string($hr) || is_numeric($hr) ? (string) $hr : null;

@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\ConcreteVendor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ConcreteVendorSalvarRequest
+final class ConcreteVendorSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $vendor_id = null;
-
     #[Assert\NotBlank]
     public ?string $name = null;
 
@@ -23,11 +23,9 @@ final class ConcreteVendorSalvarRequest
     /** JSON string; se decodifica en el controlador. */
     public ?string $contacts = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $vid = $request->get('vendor_id');
-        $d->vendor_id = \is_string($vid) || is_numeric($vid) ? (string) $vid : null;
         $d->name = \is_string($x = $request->get('name')) ? $x : null;
         $d->phone = \is_string($x = $request->get('phone')) ? $x : null;
         $d->address = \is_string($x = $request->get('address')) ? $x : null;

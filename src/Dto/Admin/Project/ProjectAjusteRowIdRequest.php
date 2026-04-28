@@ -2,17 +2,19 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** eliminarAjustePrecio: id de ajuste */
-final class ProjectAjusteRowIdRequest
+final class ProjectAjusteRowIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
     public ?int $id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $v = $request->get('id');

@@ -2,13 +2,29 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+use App\Http\DataTablesHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Filtros DataTable listar (fechaInicial / fechaFin).
+ * DataTables listar estimates + filtros.
+ *
+ * @phpstan-type ParsedDt array{
+ *   draw:int,
+ *   start:int,
+ *   length:int,
+ *   search:string,
+ *   orderField:string,
+ *   orderDir:'asc'|'desc',
+ *   columns:array,
+ *   raw:array
+ * }
  */
-final class EstimateListarFiltroRequest
+final class EstimateListarRequest implements AdminHttpRequestDtoInterface
 {
+    /** @var ParsedDt */
+    public array $dt;
+
     public ?string $stage_id = null;
 
     public ?string $project_type_id = null;
@@ -25,9 +41,14 @@ final class EstimateListarFiltroRequest
 
     public ?string $fechaFin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
+        $d->dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: ['id', 'name', 'company', 'bidDeadline', 'estimators', 'stage'],
+            defaultOrderField: 'name'
+        );
         foreach (['stage_id', 'project_type_id', 'proposal_type_id', 'status_id', 'county_id', 'district_id', 'fechaInicial', 'fechaFin'] as $k) {
             $d->{$k} = self::s($request->get($k));
         }

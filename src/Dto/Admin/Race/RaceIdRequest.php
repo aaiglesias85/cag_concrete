@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Race;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class RaceIdRequest
+final class RaceIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Race id is required.')]
     #[Assert\Positive]
     public ?int $race_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->race_id = self::positiveIntOrNull($request->get('race_id'));

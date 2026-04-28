@@ -344,9 +344,13 @@ var Holidays = function () {
                 var day = FlatpickrUtil.getString('datetimepicker-day');
                 formData.set("day", day);
 
+                var salvarUrl =
+                    holiday_id && String(holiday_id).trim() !== ''
+                        ? "holiday/actualizar"
+                        : "holiday/salvarHoliday";
                 BlockUtil.block('#form-holiday');
 
-                axios.post("holiday/salvarHoliday", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

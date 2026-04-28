@@ -3,70 +3,51 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Notification\NotificationIdRequest;
 use App\Dto\Admin\Notification\NotificationIdsRequest;
-use App\Http\DataTablesHelper;
+use App\Dto\Admin\Notification\NotificationListarRequest;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\NotificationService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class NotificationController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $notificationService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        NotificationService $notificationService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        NotificationService $notificationService) {
         parent::__construct($adminAccess);
         $this->notificationService = $notificationService;
     }
 
+    #[RequireAdminPermission(FunctionId::NOTIFICATION)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::NOTIFICATION);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::NOTIFICATION);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso NOTIFICATION esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/notification/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
     /**
      * listar Acción que lista los usuarios.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(NotificationListarRequest $listar): JsonResponse
     {
         try {
-            $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-            if ($g instanceof RedirectResponse) {
-                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-            }
-            $usuario = $g;
+            $usuario = $this->DevolverUsuario();
 
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'createdAt', 'usuario', 'content', 'readed'],
-                defaultOrderField: 'createdAt'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-            $leida = $request->get('leida');
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
+            $leida = $listar->leida;
 
             $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
 
@@ -102,13 +83,9 @@ class NotificationController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un notification en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(NotificationIdRequest $dto): JsonResponse
     {
-        $dto = NotificationIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $notification_id = $dto->notification_id;
 
         try {
@@ -134,13 +111,9 @@ class NotificationController extends AbstractAdminController
     /**
      * eliminarNotifications Acción que elimina los notificationes seleccionados en la BD.
      */
-    public function eliminarNotifications(Request $request)
+    #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarNotifications(NotificationIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = NotificationIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -166,7 +139,8 @@ class NotificationController extends AbstractAdminController
     /**
      * leer Acción para leer las notificaciones.
      */
-    public function leer(Request $request)
+    #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::Edit, jsonOnDenied: true)]
+    public function leer(): JsonResponse
     {
         try {
             $resultado = $this->notificationService->LeerNotificaciones();

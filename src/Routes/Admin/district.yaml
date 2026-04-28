@@ -10,6 +10,10 @@ salvarDistrictAdmin:
   path: /district/salvar
   defaults: { _controller: App\Controller\Admin\DistrictController::salvar, _format: json }
 
+actualizarDistrictAdmin:
+  path: /district/actualizar
+  defaults: { _controller: App\Controller\Admin\DistrictController::actualizar, _format: json }
+
 eliminarDistrictAdmin:
   path: /district/eliminar
   defaults: { _controller: App\Controller\Admin\DistrictController::eliminar, _format: json }

@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Task;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class TaskSalvarRequest
+final class TaskSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $task_id = null;
-
     #[Assert\NotBlank]
     public ?string $description = null;
 
@@ -19,11 +19,9 @@ final class TaskSalvarRequest
 
     public ?string $usuario_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $tid = $request->get('task_id');
-        $d->task_id = \is_string($tid) || is_numeric($tid) ? (string) $tid : null;
         $d->description = \is_string($x = $request->get('description')) ? $x : null;
         $st = $request->get('status');
         $d->status = \is_string($st) ? $st : (is_numeric($st) ? (string) $st : null);

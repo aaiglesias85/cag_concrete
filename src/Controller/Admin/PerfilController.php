@@ -3,47 +3,40 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Perfil\PerfilActualizarRequest;
 use App\Dto\Admin\Perfil\PerfilIdRequest;
 use App\Dto\Admin\Perfil\PerfilIdsRequest;
+use App\Dto\Admin\Perfil\PerfilListarRequest;
 use App\Dto\Admin\Perfil\PerfilSalvarRequest;
 use App\Entity\Funcion;
 use App\Entity\Widget;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\PerfilService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class PerfilController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
     private $perfilService;
+
     private FuncionPermissionUiGrouping $funcionPermissionUiGrouping;
 
     public function __construct(
         AdminAccessService $adminAccess,
         PerfilService $perfilService,
-        FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        FuncionPermissionUiGrouping $funcionPermissionUiGrouping) {
         parent::__construct($adminAccess);
         $this->perfilService = $perfilService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
     }
 
+    #[RequireAdminPermission(FunctionId::ROL)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::ROL);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::ROL);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso ROL esperado tras #[RequireAdminPermission].');
 
         $funciones = $this->perfilService->getDoctrine()->getRepository(Funcion::class)
             ->ListarOrdenados();
@@ -56,24 +49,16 @@ class PerfilController extends AbstractAdminController
             'funciones' => $funciones,
             'funcionesAgrupadas' => $funcionesAgrupadas,
             'widgets' => $widgets,
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los perfiles.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(PerfilListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'nombre'],
-                defaultOrderField: 'nombre'
-            );
+            $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->perfilService->ListarPerfiles(
                 $dt['start'],
                 $dt['length'],
@@ -98,28 +83,16 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción que inserta un menu en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(PerfilSalvarRequest $d): JsonResponse
     {
-        $d = PerfilSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $perfil_id = (string) ($d->perfil_id ?? '');
         $descripcion = (string) $d->descripcion;
         $permisos = json_decode((string) $d->permisos);
         $waRaw = $d->widget_access;
         $widgetAccess = is_string($waRaw) && '' !== $waRaw ? json_decode($waRaw, true) : null;
 
         try {
-            if ('' == $perfil_id) {
-                $resultado = $this->perfilService->SalvarPerfil($descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
-            } else {
-                $resultado = $this->perfilService->ActualizarPerfil($perfil_id, $descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
-            }
+            $resultado = $this->perfilService->SalvarPerfil($descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -139,16 +112,39 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un perfil en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(PerfilActualizarRequest $d): JsonResponse
     {
-        $dto = PerfilIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $perfil_id = (string) $d->perfil_id;
+        $descripcion = (string) $d->descripcion;
+        $permisos = json_decode((string) $d->permisos);
+        $waRaw = $d->widget_access;
+        $widgetAccess = is_string($waRaw) && '' !== $waRaw ? json_decode($waRaw, true) : null;
+
+        try {
+            $resultado = $this->perfilService->ActualizarPerfil($perfil_id, $descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(PerfilIdRequest $dto): JsonResponse
+    {
         $perfil_id = $dto->perfil_id;
 
         try {
@@ -171,16 +167,9 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarPerfiles Acción que elimina los perfiles seleccionados en la BD.
-     */
-    public function eliminarPerfiles(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarPerfiles(PerfilIdsRequest $dto): JsonResponse
     {
-        $dto = PerfilIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = $dto->ids;
 
         try {
@@ -203,16 +192,9 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del perfil en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(PerfilIdRequest $dto): JsonResponse
     {
-        $dto = PerfilIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $perfil_id = $dto->perfil_id;
 
         try {
@@ -235,16 +217,9 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    /**
-     * listarPermisos Acción que lista todos los permisos de un perfil.
-     */
-    public function listarPermisos(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
+    public function listarPermisos(PerfilIdRequest $dto): JsonResponse
     {
-        $dto = PerfilIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $perfil_id = $dto->perfil_id;
 
         try {
@@ -262,13 +237,9 @@ class PerfilController extends AbstractAdminController
         }
     }
 
-    public function listarWidgetPreferences(Request $request)
+    #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
+    public function listarWidgetPreferences(PerfilIdRequest $dto): JsonResponse
     {
-        $dto = PerfilIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $perfil_id = $dto->perfil_id;
         try {
             $widgets = $this->perfilService->listarWidgetPreferencesDePerfil($perfil_id);

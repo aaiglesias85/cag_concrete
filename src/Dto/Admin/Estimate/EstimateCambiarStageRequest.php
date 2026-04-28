@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateCambiarStageRequest
+final class EstimateCambiarStageRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
@@ -14,7 +16,7 @@ final class EstimateCambiarStageRequest
     #[Assert\NotBlank]
     public ?string $stage_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->estimate_id = self::posE($request->get('estimate_id'));

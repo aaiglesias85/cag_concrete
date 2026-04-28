@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\EmployeeRole;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EmployeeRoleIdRequest
+final class EmployeeRoleIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Role id is required.')]
     #[Assert\Positive]
     public ?int $role_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->role_id = self::positiveIntOrNull($request->get('role_id'));

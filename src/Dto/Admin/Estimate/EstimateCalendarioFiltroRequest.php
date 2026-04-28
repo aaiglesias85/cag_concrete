@@ -2,12 +2,14 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * listarParaCalendario (fecha_inicial / fecha_fin en minúsculas).
  */
-final class EstimateCalendarioFiltroRequest
+final class EstimateCalendarioFiltroRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $search = null;
 
@@ -27,7 +29,7 @@ final class EstimateCalendarioFiltroRequest
 
     public ?string $fecha_fin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         foreach (['search', 'stage_id', 'project_type_id', 'proposal_type_id', 'status_id', 'county_id', 'district_id', 'fecha_inicial', 'fecha_fin'] as $k) {

@@ -10,6 +10,10 @@ salvarProjectAdmin:
    path: /project/salvarProject
    defaults: { _controller: App\Controller\Admin\ProjectController::salvar, _format: json }
 
+actualizarProjectAdmin:
+   path: /project/actualizarProject
+   defaults: { _controller: App\Controller\Admin\ProjectController::actualizar, _format: json }
+
 eliminarProjectAdmin:
    path: /project/eliminarProject
    defaults: { _controller: App\Controller\Admin\ProjectController::eliminar, _format: json }
@@ -44,6 +48,10 @@ listarInvoicesRetainageProjectAdmin:
 salvarNotesProjectAdmin:
    path: /project/salvarNotes
    defaults: { _controller: App\Controller\Admin\ProjectController::salvarNotes, _format: json }
+
+actualizarNotesProjectAdmin:
+   path: /project/actualizarNotes
+   defaults: { _controller: App\Controller\Admin\ProjectController::actualizarNotes, _format: json }
 
 cargarDatosNotesProjectAdmin:
    path: /project/cargarDatosNotes

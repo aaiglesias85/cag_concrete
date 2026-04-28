@@ -3,59 +3,47 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\PlanStatus\PlanStatusActualizarRequest;
 use App\Dto\Admin\PlanStatus\PlanStatusIdRequest;
 use App\Dto\Admin\PlanStatus\PlanStatusIdsRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusListarRequest;
 use App\Dto\Admin\PlanStatus\PlanStatusSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PlanStatusService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class PlanStatusController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $planStatusService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        PlanStatusService $planStatusService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        PlanStatusService $planStatusService) {
         parent::__construct($adminAccess);
         $this->planStatusService = $planStatusService;
     }
 
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PLAN_STATUS);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PLAN_STATUS);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso PLAN_STATUS esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/plan-status/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
     /**
      * listar Acción que lista los units.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(PlanStatusListarRequest $listar): JsonResponse
     {
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'description', 'status'],
-                defaultOrderField: 'description'
-            );
+            $dt = $listar->dt;
 
             $result = $this->planStatusService->ListarStatus(
                 $dt['start'],
@@ -84,23 +72,46 @@ class PlanStatusController extends AbstractAdminController
     /**
      * salvar Acción para agregar statuss en la BD.
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(PlanStatusSalvarRequest $d): JsonResponse
     {
-        $d = PlanStatusSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $status_id = (string) ($d->status_id ?? '');
         $description = (string) $d->description;
         $status = (string) $d->status;
 
         try {
-            if ('' === $status_id) {
-                $resultado = $this->planStatusService->SalvarStatus($description, $status);
-            } else {
-                $resultado = $this->planStatusService->ActualizarStatus($status_id, $description, $status);
+            $resultado = $this->planStatusService->SalvarStatus($description, $status);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['status_id'] = $resultado['status_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
             }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    /**
+     * actualizar Acción para modificar un status en la BD.
+     */
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(PlanStatusActualizarRequest $d): JsonResponse
+    {
+        $status_id = (string) $d->status_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+
+        try {
+            $resultado = $this->planStatusService->ActualizarStatus($status_id, $description, $status);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -124,13 +135,9 @@ class PlanStatusController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un status en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(PlanStatusIdRequest $dto): JsonResponse
     {
-        $dto = PlanStatusIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $status_id = $dto->status_id;
 
         try {
@@ -156,13 +163,9 @@ class PlanStatusController extends AbstractAdminController
     /**
      * eliminarStatuss Acción que elimina los statuss seleccionados en la BD.
      */
-    public function eliminarStatuss(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarStatuss(PlanStatusIdsRequest $dto): JsonResponse
     {
-        $dto = PlanStatusIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $dto->ids;
 
         try {
@@ -188,13 +191,9 @@ class PlanStatusController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del status en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(PlanStatusIdRequest $dto): JsonResponse
     {
-        $dto = PlanStatusIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $status_id = $dto->status_id;
 
         try {

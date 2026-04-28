@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class OverrideNotaUnpaidSalvarRequest
+final class OverrideNotaUnpaidSalvarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $project_id = null;
@@ -24,7 +26,7 @@ final class OverrideNotaUnpaidSalvarRequest
 
     public ?string $override_unpaid_qty_previous = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = (string) $request->get('project_id', '');

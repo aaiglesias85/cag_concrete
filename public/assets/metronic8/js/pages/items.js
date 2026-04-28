@@ -517,11 +517,14 @@ var Items = (function () {
          var equation_id = $('#equation').val();
          formData.set('equation_id', equation_id);
 
-
+         var salvarUrl =
+            item_id && String(item_id).trim() !== ''
+               ? 'item/actualizarItem'
+               : 'item/salvarItem';
          BlockUtil.block('#form-item');
 
          axios
-            .post('item/salvarItem', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

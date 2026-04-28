@@ -1780,10 +1780,15 @@ var Payments = (function () {
                formData.set('override_unpaid_qty', overrideUnpaidQty);
             }
 
+            var salvarNotesItemUrl =
+               !notes_id || notes_id === ''
+                  ? 'payment/salvarNotesItem'
+                  : 'payment/actualizarNotesItem';
+
             BlockUtil.block('#modal-notes-item .modal-content');
 
             axios
-               .post('payment/salvarNotesItem', formData, { responseType: 'json' })
+               .post(salvarNotesItemUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;
@@ -2067,9 +2072,13 @@ var Payments = (function () {
             formData.set('invoice_id', invoice_id);
             formData.set('notes', notes);
             formData.set('date', date);
+            var salvarNotesUrl =
+               !notes_id || notes_id === ''
+                  ? 'payment/salvarNotes'
+                  : 'payment/actualizarNotes';
             BlockUtil.block('#modal-notes .modal-content');
             axios
-               .post('payment/salvarNotes', formData, { responseType: 'json' })
+               .post(salvarNotesUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;

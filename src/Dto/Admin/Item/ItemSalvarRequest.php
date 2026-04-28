@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Item;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ItemSalvarRequest
+final class ItemSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $item_id = null;
-
     #[Assert\NotBlank]
     public ?string $unit_id = null;
 
@@ -26,11 +26,9 @@ final class ItemSalvarRequest
 
     public ?string $equation_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $iid = $request->get('item_id');
-        $d->item_id = \is_string($iid) || is_numeric($iid) ? (string) $iid : null;
         $uid = $request->get('unit_id');
         $d->unit_id = \is_string($uid) || is_numeric($uid) ? (string) $uid : null;
         $d->name = \is_string($x = $request->get('name')) ? $x : null;

@@ -2,16 +2,17 @@
 
 namespace App\Dto\Admin\Advertisement;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class AdvertisementIdRequest
+final class AdvertisementIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Advertisement id is required.')]
     #[Assert\Positive]
     public ?int $advertisement_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->advertisement_id = self::positiveIntOrNull($request->get('advertisement_id'));

@@ -3,47 +3,39 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\Task\TaskActualizarRequest;
 use App\Dto\Admin\Task\TaskCambiarEstadoRequest;
 use App\Dto\Admin\Task\TaskIdRequest;
 use App\Dto\Admin\Task\TaskIdsRequest;
+use App\Dto\Admin\Task\TaskListarRequest;
 use App\Dto\Admin\Task\TaskSalvarRequest;
 use App\Entity\Task;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\DefaultService;
 use App\Service\Admin\TaskService;
 use App\Service\Admin\WidgetAccessService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TaskController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     public function __construct(
         AdminAccessService $adminAccess,
         private readonly TaskService $taskService,
         private readonly DefaultService $defaultService,
-        private readonly WidgetAccessService $widgetAccessService,
-        private readonly ValidatorInterface $validator,
-        private readonly TranslatorInterface $adminTranslator,
-    ) {
+        private readonly WidgetAccessService $widgetAccessService) {
         parent::__construct($adminAccess);
     }
 
+    #[RequireAdminPermission(FunctionId::TASKS)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::TASKS);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $usuario = $acceso['usuario'];
-        $permisos = $acceso['permisos'];
-        $permiso = $permisos[0] ?? ['ver' => false, 'agregar' => false, 'editar' => false, 'eliminar' => false, 'funcion_id' => FunctionId::TASKS, 'permiso_id' => 0];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::TASKS);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso TASKS esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/task/index.html.twig', [
             'permiso' => $permiso,
@@ -52,26 +44,11 @@ class TaskController extends AbstractAdminController
         ]);
     }
 
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(TaskListarRequest $listar): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        if (!$this->isTasksFunctionGranted($g->getUsuarioId())) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
         try {
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'description', 'due_date', 'status', 'created_at', 'assigned'],
-                defaultOrderField: 'due_date',
-            );
-
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
-            $statusFiltro = (string) $request->get('statusFiltro', '');
-            $usuarioFiltro = (string) $request->get('usuarioFiltro', '');
+            $dt = $listar->dt;
 
             $result = $this->taskService->ListarTasks(
                 $dt['start'],
@@ -79,11 +56,10 @@ class TaskController extends AbstractAdminController
                 $dt['search'],
                 $dt['orderField'],
                 $dt['orderDir'],
-                $fecha_inicial,
-                $fecha_fin,
-                $statusFiltro,
-                $usuarioFiltro,
-            );
+                $listar->fecha_inicial,
+                $listar->fecha_fin,
+                $listar->statusFiltro,
+                $listar->usuarioFiltro);
 
             return $this->json([
                 'draw' => $dt['draw'],
@@ -99,33 +75,16 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(TaskSalvarRequest $d): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        if (!$this->isTasksFunctionGranted($g->getUsuarioId())) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        $u = $g;
-        $d = TaskSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $task_id = $d->task_id;
         $description = (string) $d->description;
         $status = (string) $d->status;
         $due_day = (string) ($d->due_day ?? '');
         $usuario_id = (string) ($d->usuario_id ?? '');
 
         try {
-            if ('' === $task_id || null === $task_id) {
-                $resultado = $this->taskService->SalvarTask($description, $status, $due_day, $usuario_id);
-            } else {
-                $resultado = $this->taskService->ActualizarTask($task_id, $description, $status, $due_day, $usuario_id);
-            }
+            $resultado = $this->taskService->SalvarTask($description, $status, $due_day, $usuario_id);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -144,21 +103,38 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(TaskActualizarRequest $d): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
+        $task_id = (string) $d->task_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+        $due_day = (string) ($d->due_day ?? '');
+        $usuario_id = (string) ($d->usuario_id ?? '');
+
+        try {
+            $resultado = $this->taskService->ActualizarTask($task_id, $description, $status, $due_day, $usuario_id);
+
+            if ($resultado['success']) {
+                return $this->json([
+                    'success' => true,
+                    'message' => 'The operation was successful',
+                    'task_id' => $resultado['task_id'] ?? null,
+                ]);
+            }
+
+            return $this->json([
+                'success' => false,
+                'error' => $resultado['error'] ?? 'Error',
+            ]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
-        if (!$this->isTasksFunctionGranted($g->getUsuarioId())) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        $u = $g;
-        $dto = TaskIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
+    }
+
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(TaskIdRequest $dto): JsonResponse
+    {
         $task_id = $dto->task_id;
         try {
             $resultado = $this->taskService->EliminarTask($task_id);
@@ -172,21 +148,9 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function eliminarTasks(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarTasks(TaskIdsRequest $idsDto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        if (!$this->isTasksFunctionGranted($g->getUsuarioId())) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        $u = $g;
-        $idsDto = TaskIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
         try {
             $resultado = $this->taskService->EliminarTasks($ids);
@@ -203,21 +167,9 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(TaskIdRequest $dto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        if (!$this->isTasksFunctionGranted($g->getUsuarioId())) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-        }
-        $u = $g;
-        $dto = TaskIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $task_id = $dto->task_id;
         try {
             $resultado = $this->taskService->CargarDatosTask($task_id);
@@ -237,15 +189,15 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function listarHome(Request $request)
+    /**
+     * Widget home: `HOME` + usuario; datos filtrados por widget `tasks` y permisos TASKS en payload (sin exigir ver TASKS para ver cabecera vacía).
+     */
+    #[RequireAdminPermission(FunctionId::HOME, AdminPermission::View, jsonOnDenied: true)]
+    public function listarHome(Request $request): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'error' => 'Unauthenticated'], 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         if (!$this->widgetAccessService->isWidgetEnabledForUser($usuario->getUsuarioId(), 'tasks')) {
-            return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
+            return $this->json(['success' => false, 'error' => 'Not allowed'], Response::HTTP_FORBIDDEN);
         }
         $pTask = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::TASKS);
         $perm = $pTask[0] ?? ['ver' => false, 'agregar' => false, 'editar' => false, 'eliminar' => false, 'funcion_id' => FunctionId::TASKS, 'permiso_id' => 0];
@@ -266,24 +218,13 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    public function cambiarEstado(Request $request)
+    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Edit, jsonOnDenied: true)]
+    public function cambiarEstado(TaskCambiarEstadoRequest $d): JsonResponse
     {
-        $d = TaskCambiarEstadoRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $task_id = $d->task_id;
         $status = (string) $d->status;
         try {
-            $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-            if ($g instanceof RedirectResponse) {
-                return $this->json(['success' => false, 'error' => 'Unauthenticated'], 401);
-            }
-            $usuario = $g;
-            if (!$this->isTasksFunctionGranted($usuario->getUsuarioId())) {
-                return $this->json(['success' => false, 'error' => 'Not allowed'], 403);
-            }
+            $usuario = $this->DevolverUsuario();
             $pT = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::TASKS);
             $perm = $pT[0] ?? ['ver' => false, 'agregar' => false, 'editar' => false, 'eliminar' => false, 'funcion_id' => FunctionId::TASKS, 'permiso_id' => 0];
             $resultado = $this->taskService->CambiarEstadoTask($task_id, $status, $usuario, $perm);
@@ -301,18 +242,5 @@ class TaskController extends AbstractAdminController
         } catch (\Exception $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()]);
         }
-    }
-
-    private function isTasksFunctionGranted(int $userId): bool
-    {
-        $p = $this->adminAccess->buscarPermisosMismoBase($userId, FunctionId::TASKS);
-        if (\count($p) < 1) {
-            return false;
-        }
-        if (empty($p[0]['ver'])) {
-            return false;
-        }
-
-        return true;
     }
 }

@@ -18,6 +18,10 @@ salvarInvoiceAdmin:
    path: /invoice/salvarInvoice
    defaults: { _controller: App\Controller\Admin\InvoiceController::salvar, _format: json }
 
+actualizarInvoiceAdmin:
+   path: /invoice/actualizarInvoice
+   defaults: { _controller: App\Controller\Admin\InvoiceController::actualizar, _format: json }
+
 cargarDatosInvoiceAdmin:
    path: /invoice/cargarDatos
    defaults: { _controller: App\Controller\Admin\InvoiceController::cargarDatos, _format: json }

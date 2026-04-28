@@ -5,6 +5,7 @@ namespace App\Service\Admin;
 use App\Entity\PermisoUsuario;
 use App\Entity\Usuario;
 use App\Repository\PermisoUsuarioRepository;
+use App\Security\AdminPermission;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,6 +17,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * Uso: inyectar en el controlador y, al inicio de la acción:
  *  - exigirUsuarioOlogin: rutas que solo requieren sesión válida
  *  - exigirUsuarioYPermisoVer: listados principales (equivalente a "tiene registro y puede ver")
+ *  - requirePermission: login + ver/agregar/editar/eliminar en una llamada (también usado por #[RequireAdminPermission])
  */
 class AdminAccessService
 {
@@ -41,6 +43,30 @@ class AdminAccessService
     }
 
     /**
+     * Sesión válida como Usuario + permiso sobre la función (misma BD que el voter). Devuelve redirect a login o denegado.
+     */
+    public function requirePermission(?UserInterface $user, int $functionId, AdminPermission $permission): Usuario|RedirectResponse
+    {
+        $gate = $this->exigirUsuarioOlogin($user);
+        if ($gate instanceof RedirectResponse) {
+            return $gate;
+        }
+
+        $allowed = match ($permission) {
+            AdminPermission::View => $this->usuarioPuedeVer($gate, $functionId),
+            AdminPermission::Add => $this->usuarioPuedeAgregar($gate, $functionId),
+            AdminPermission::Edit => $this->usuarioPuedeEditar($gate, $functionId),
+            AdminPermission::Delete => $this->usuarioPuedeEliminar($gate, $functionId),
+        };
+
+        if (!$allowed) {
+            return $this->redirect('denegado');
+        }
+
+        return $gate;
+    }
+
+    /**
      * Misma lógica habitual en controladores: sesión, tipo Usuario y fila de permiso con "ver" activo.
      *
      * @return array{usuario: Usuario, permisos: array<int, array<string, mixed>>}|RedirectResponse
@@ -52,12 +78,58 @@ class AdminAccessService
             return $gate;
         }
 
-        $permisos = $this->buscarPermisosMismoBase($gate->getUsuarioId(), $functionId);
-        if (\count($permisos) > 0 && true === $permisos[0]['ver']) {
-            return ['usuario' => $gate, 'permisos' => $permisos];
+        $row = $this->primeraFilaPermiso($gate, $functionId);
+        if (null === $row || true !== $row['ver']) {
+            return $this->redirect('denegado');
         }
 
-        return $this->redirect('denegado');
+        return ['usuario' => $gate, 'permisos' => [$row]];
+    }
+
+    /**
+     * Comprobaciones usadas por AdminFunctionPermissionVoter (misma BD que BuscarPermiso).
+     */
+    public function usuarioPuedeVer(UserInterface $user, int $functionId): bool
+    {
+        $row = $this->primeraFilaPermiso($user, $functionId);
+
+        return null !== $row && true === $row['ver'];
+    }
+
+    public function usuarioPuedeAgregar(UserInterface $user, int $functionId): bool
+    {
+        $row = $this->primeraFilaPermiso($user, $functionId);
+
+        return null !== $row && true === $row['agregar'];
+    }
+
+    public function usuarioPuedeEditar(UserInterface $user, int $functionId): bool
+    {
+        $row = $this->primeraFilaPermiso($user, $functionId);
+
+        return null !== $row && true === $row['editar'];
+    }
+
+    public function usuarioPuedeEliminar(UserInterface $user, int $functionId): bool
+    {
+        $row = $this->primeraFilaPermiso($user, $functionId);
+
+        return null !== $row && true === $row['eliminar'];
+    }
+
+    /**
+     * Primera fila de permiso del usuario para la función, o null si no hay registro.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function primeraFilaPermiso(UserInterface $user, int $functionId): ?array
+    {
+        if (!$user instanceof Usuario) {
+            return null;
+        }
+        $permisos = $this->buscarPermisosMismoBase($user->getUsuarioId(), $functionId);
+
+        return \count($permisos) > 0 ? $permisos[0] : null;
     }
 
     private function redirect(string $route): RedirectResponse

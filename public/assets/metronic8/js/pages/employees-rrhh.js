@@ -583,10 +583,14 @@ var EmployeesRrhh = (function () {
          var status = $('#status').prop('checked') ? 1 : 0;
          formData.set('status', status);
 
+         var salvarUrl =
+            employee_id && String(employee_id).trim() !== ''
+               ? 'employee-rrhh/actualizar'
+               : 'employee-rrhh/salvar';
          BlockUtil.block('#form-employee');
 
          axios
-            .post('employee-rrhh/salvar', formData, { responseType: 'json' })
+            .post(salvarUrl, formData, { responseType: 'json' })
             .then(function (res) {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;

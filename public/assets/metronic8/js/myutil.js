@@ -346,10 +346,67 @@ var MyUtil = function () {
     return movil;
   }
 
-  // catch error axios
+  /**
+   * Mensaje legible desde respuestas JSON del panel admin (Validator 400: success, error, violations).
+   */
+  var formatAxiosResponseErrorMessage = function (data, fallback) {
+    if (data === undefined || data === null) {
+      return fallback;
+    }
+    if (typeof data === 'string') {
+      var trimmed = data.trim();
+      if (trimmed.indexOf("<") === 0) {
+        return fallback;
+      }
+      try {
+        data = JSON.parse(data);
+      } catch (e) {
+        return trimmed.length > 0 && trimmed.length < 800 ? trimmed : fallback;
+      }
+    }
+    if (typeof data !== "object" || data === null) {
+      return fallback;
+    }
+    var lines = [];
+    if (data.violations && typeof data.violations === "object") {
+      Object.keys(data.violations).forEach(function (field) {
+        var msgs = data.violations[field];
+        if (Array.isArray(msgs)) {
+          msgs.forEach(function (m) {
+            var prefix = field === "_global" ? "" : field + ": ";
+            lines.push(prefix + m);
+          });
+        }
+      });
+    }
+    if (lines.length > 0) {
+      return lines.join("; ");
+    }
+    if (typeof data.error === "string" && data.error !== "") {
+      return data.error;
+    }
+    if (typeof data.message === "string" && data.message !== "") {
+      return data.message;
+    }
+    if (typeof data.detail === "string" && data.detail !== "") {
+      return data.detail;
+    }
+    return fallback;
+  };
+
+  // catch error axios (muestra mensajes de validación Symfony / API JSON cuando existen)
   var catchErrorAxios = function (err) {
     console.log(err);
-    toastr.error("Sorry, looks like there are some errors detected, please try again.", "Error !!!");
+    var fallback = "Sorry, looks like there are some errors detected, please try again.";
+    var msg = fallback;
+
+    if (err.response && err.response.data !== undefined) {
+      msg = formatAxiosResponseErrorMessage(err.response.data, fallback);
+    } else if (err.message && typeof err.message === "string") {
+      msg = err.message;
+    }
+
+    toastr.error(msg, "Error");
   }
 
   // Generar id temporal para insertar elemento en el store del datagrid
@@ -516,6 +573,7 @@ var MyUtil = function () {
     validarFile: validarFile,
     isMovil: isMovil,
     catchErrorAxios: catchErrorAxios,
+    formatAxiosResponseErrorMessage: formatAxiosResponseErrorMessage,
     generarCadenaAleatoria: generarCadenaAleatoria,
     cellPreparedActionsEditRow: cellPreparedActionsEditRow,
     // fechas

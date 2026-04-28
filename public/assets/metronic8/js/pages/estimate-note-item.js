@@ -218,7 +218,11 @@ var EstimateNoteItem = function () {
                 var formData = new URLSearchParams();
 
                 var id = $('#id').val();
-                formData.set("id", id);
+                var hasId = id !== undefined && id !== null && String(id).trim() !== '';
+                var salvarUrl = hasId ? 'estimate-note-item/actualizar' : 'estimate-note-item/salvar';
+                if (hasId) {
+                    formData.set('id', id);
+                }
 
                 var description = $('#description').val();
                 formData.set("description", description);
@@ -228,7 +232,7 @@ var EstimateNoteItem = function () {
 
                 BlockUtil.block('#form-estimate-note-item');
 
-                axios.post("estimate-note-item/salvar", formData, { responseType: "json" })
+                axios.post(salvarUrl, formData, { responseType: "json" })
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;
@@ -312,7 +316,7 @@ var EstimateNoteItem = function () {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;
                         if (response.success) {
-                            KTUtil.find(KTUtil.get("form-estimate-note-item"), ".card-label").innerHTML = "Update Estimate Note Item: " + response.item.description;
+                            KTUtil.find(KTUtil.get("form-estimate-note-item"), ".card-label").innerHTML = "Update Estimate Note Item #" + id;
                             $('#type').val(response.item.type || 'item');
                             $('#type').trigger('change');
                             $('#description').val(response.item.description);

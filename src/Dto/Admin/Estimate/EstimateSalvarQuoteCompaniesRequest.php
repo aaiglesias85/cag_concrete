@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateSalvarQuoteCompaniesRequest
+final class EstimateSalvarQuoteCompaniesRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
@@ -14,7 +16,7 @@ final class EstimateSalvarQuoteCompaniesRequest
     /** String CSV, array, o null — el controlador hace `explode` / array como antes. */
     public mixed $company_ids = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->quote_id = self::pos($request->get('quote_id'));

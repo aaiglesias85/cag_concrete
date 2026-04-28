@@ -2,14 +2,14 @@
 
 namespace App\Dto\Admin\Perfil;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-final class PerfilSalvarRequest
+final class PerfilSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $perfil_id = null;
-
     #[Assert\NotBlank]
     public ?string $descripcion = null;
 
@@ -49,11 +49,9 @@ final class PerfilSalvarRequest
         }
     }
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $pid = $request->get('perfil_id');
-        $d->perfil_id = \is_string($pid) || is_numeric($pid) ? (string) $pid : null;
         $d->descripcion = \is_string($x = $request->get('descripcion')) ? $x : null;
         $d->permisos = \is_string($x = $request->get('permisos')) ? $x : null;
         $x = $request->get('widget_access');

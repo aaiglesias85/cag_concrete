@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Reminder;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ReminderIdRequest
+final class ReminderIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Reminder id is required.')]
     #[Assert\Positive]
     public ?int $reminder_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->reminder_id = self::positiveIntOrNull($request->get('reminder_id'));

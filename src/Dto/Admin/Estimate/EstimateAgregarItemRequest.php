@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Estimate;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EstimateAgregarItemRequest
+final class EstimateAgregarItemRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $estimate_item_id = null;
 
@@ -37,7 +39,7 @@ final class EstimateAgregarItemRequest
     /** CSV o array según el front; el controlador normaliza */
     public mixed $note_ids = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         foreach (['estimate_item_id', 'estimate_id', 'quote_id', 'item_id', 'item', 'unit_id', 'quantity', 'price', 'yield_calculation', 'equation_id', 'code', 'contract_name', 'new_quote_name'] as $k) {

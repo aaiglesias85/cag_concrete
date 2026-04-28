@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Unit;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class UnitIdRequest
+final class UnitIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Unit id is required.')]
     #[Assert\Positive]
     public ?int $unit_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->unit_id = self::positiveIntOrNull($request->get('unit_id'));

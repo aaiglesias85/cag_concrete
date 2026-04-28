@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Holiday;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class HolidayIdRequest
+final class HolidayIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Holiday id is required.')]
     #[Assert\Positive]
     public ?int $holiday_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->holiday_id = self::positiveIntOrNull($request->get('holiday_id'));

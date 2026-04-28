@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Equation;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class EquationIdRequest
+final class EquationIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Equation id is required.')]
     #[Assert\Positive]
     public ?int $equation_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->equation_id = self::positiveIntOrNull($request->get('equation_id'));

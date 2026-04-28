@@ -10,6 +10,10 @@ salvarProjectTypeAdmin:
   path: /project-type/salvar
   defaults: { _controller: App\Controller\Admin\ProjectTypeController::salvar, _format: json }
 
+actualizarProjectTypeAdmin:
+  path: /project-type/actualizar
+  defaults: { _controller: App\Controller\Admin\ProjectTypeController::actualizar, _format: json }
+
 eliminarProjectTypeAdmin:
   path: /project-type/eliminar
   defaults: { _controller: App\Controller\Admin\ProjectTypeController::eliminar, _format: json }

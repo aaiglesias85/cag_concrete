@@ -18,6 +18,10 @@ salvarConcreteVendorAdmin:
   path:  /concrete-vendor/salvar
   defaults: { _controller: App\Controller\Admin\ConcreteVendorController::salvar, _format: json }
 
+actualizarConcreteVendorAdmin:
+  path:  /concrete-vendor/actualizar
+  defaults: { _controller: App\Controller\Admin\ConcreteVendorController::actualizar, _format: json }
+
 cargarDatosConcreteVendorAdmin:
   path:  /concrete-vendor/cargarDatos
   defaults: { _controller: App\Controller\Admin\ConcreteVendorController::cargarDatos, _format: json }

@@ -3,69 +3,50 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Log\LogIdRequest;
 use App\Dto\Admin\Log\LogIdsRequest;
-use App\Http\DataTablesHelper;
+use App\Dto\Admin\Log\LogListarRequest;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\LogService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class LogController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $logService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        LogService $logService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        LogService $logService) {
         parent::__construct($adminAccess);
         $this->logService = $logService;
     }
 
+    #[RequireAdminPermission(FunctionId::LOG)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::LOG);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::LOG);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso LOG esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/log/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
     /**
      * listar Acción que lista los usuarios.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::LOG, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(LogListarRequest $listar): JsonResponse
     {
         try {
-            $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-            if ($g instanceof RedirectResponse) {
-                return $this->json(['success' => false, 'error' => 'Not authenticated'], 401);
-            }
-            $usuario = $g;
+            $usuario = $this->DevolverUsuario();
 
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'fecha', 'usuario', 'operacion', 'categoria', 'descripcion', 'ip'],
-                defaultOrderField: 'fecha'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $fecha_inicial = $request->get('fechaInicial');
-            $fecha_fin = $request->get('fechaFin');
+            $fecha_inicial = $listar->fecha_inicial;
+            $fecha_fin = $listar->fecha_fin;
 
             $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
 
@@ -78,8 +59,7 @@ class LogController extends AbstractAdminController
                 $dt['orderDir'],
                 $fecha_inicial,
                 $fecha_fin,
-                $usuario_id,
-            );
+                $usuario_id);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -100,13 +80,9 @@ class LogController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un log en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::LOG, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(LogIdRequest $dto): JsonResponse
     {
-        $dto = LogIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $log_id = $dto->log_id;
 
         $resultado = $this->logService->EliminarLog($log_id);
@@ -125,13 +101,9 @@ class LogController extends AbstractAdminController
     /**
      * eliminarLogs Acción que elimina los loges seleccionados en la BD.
      */
-    public function eliminarLogs(Request $request)
+    #[RequireAdminPermission(FunctionId::LOG, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarLogs(LogIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = LogIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         $resultado = $this->logService->EliminarLogs($ids);

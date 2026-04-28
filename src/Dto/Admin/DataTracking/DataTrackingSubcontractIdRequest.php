@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class DataTrackingSubcontractIdRequest
+final class DataTrackingSubcontractIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Subcontract id is required.')]
     #[Assert\Positive]
     public ?int $subcontract_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->subcontract_id = self::positiveIntOrNull($request->get('subcontract_id'));

@@ -372,9 +372,13 @@ var Counties = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    county_id && String(county_id).trim() !== ''
+                        ? "county/actualizar"
+                        : "county/salvar";
                 BlockUtil.block('#form-county');
 
-                axios.post("county/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

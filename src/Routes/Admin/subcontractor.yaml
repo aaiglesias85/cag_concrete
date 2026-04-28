@@ -18,6 +18,10 @@ salvarSubcontractorAdmin:
   path:  /subcontractor/salvarSubcontractor
   defaults: { _controller: App\Controller\Admin\SubcontractorController::salvar, _format: json }
 
+actualizarSubcontractorAdmin:
+  path:  /subcontractor/actualizarSubcontractor
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::actualizar, _format: json }
+
 cargarDatosSubcontractorAdmin:
   path:  /subcontractor/cargarDatos
   defaults: { _controller: App\Controller\Admin\SubcontractorController::cargarDatos, _format: json }
@@ -51,6 +55,10 @@ listarNotesSubcontractorAdmin:
 salvarNotesSubcontractorAdmin:
   path: /subcontractor/salvarNotes
   defaults: { _controller: App\Controller\Admin\SubcontractorController::salvarNotes, _format: json }
+
+actualizarNotesSubcontractorAdmin:
+  path: /subcontractor/actualizarNotes
+  defaults: { _controller: App\Controller\Admin\SubcontractorController::actualizarNotes, _format: json }
 
 cargarDatosNotesSubcontractorAdmin:
   path: /subcontractor/cargarDatosNotes

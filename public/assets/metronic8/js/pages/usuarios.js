@@ -616,7 +616,11 @@ var Usuarios = function () {
             var formData = new URLSearchParams();
 
             var usuario_id = $('#usuario_id').val();
-            formData.set("usuario_id", usuario_id);
+            var hasUsuarioId = usuario_id !== undefined && usuario_id !== null && String(usuario_id).trim() !== '';
+            var salvarUrl = hasUsuarioId ? 'usuario/actualizarUsuario' : 'usuario/salvarUsuario';
+            if (hasUsuarioId) {
+               formData.set('usuario_id', usuario_id);
+            }
 
             formData.set("rol", rol_id);
 
@@ -655,7 +659,7 @@ var Usuarios = function () {
 
             BlockUtil.block('#form-usuario');
 
-            axios.post("usuario/salvarUsuario", formData, {responseType: "json"})
+            axios.post(salvarUrl, formData, {responseType: "json"})
                 .then(function (res) {
                     if (res.status === 200 || res.status === 201) {
                         var response = res.data;

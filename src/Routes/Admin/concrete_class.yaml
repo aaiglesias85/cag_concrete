@@ -18,6 +18,10 @@ salvarConcreteClassAdmin:
    path: /concrete-class/salvar
    defaults: { _controller: App\Controller\Admin\ConcreteClassController::salvar, _format: json }
 
+actualizarConcreteClassAdmin:
+   path: /concrete-class/actualizar
+   defaults: { _controller: App\Controller\Admin\ConcreteClassController::actualizar, _format: json }
+
 cargarDatosConcreteClassAdmin:
    path: /concrete-class/cargarDatos
    defaults: { _controller: App\Controller\Admin\ConcreteClassController::cargarDatos, _format: json }

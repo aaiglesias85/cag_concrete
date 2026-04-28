@@ -26,6 +26,10 @@ salvarOverridePaymentAdmin:
    path: /override-payment/salvar
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::salvar, _format: json }
 
+actualizarOverridePaymentAdmin:
+   path: /override-payment/actualizarOverridePayment
+   defaults: { _controller: App\Controller\Admin\OverridePaymentController::actualizar, _format: json }
+
 salvarNotaOverrideUnpaidAdmin:
    path: /override-payment/salvarNotaOverrideUnpaid
    defaults: { _controller: App\Controller\Admin\OverridePaymentController::salvarNotaOverrideUnpaid, _format: json }

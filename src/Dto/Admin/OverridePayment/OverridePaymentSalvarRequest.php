@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class OverridePaymentSalvarRequest
+final class OverridePaymentSalvarRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $project_id = null;
@@ -16,9 +18,7 @@ final class OverridePaymentSalvarRequest
     /** Puede ser JSON string, array o null. */
     public string|array|null $items = null;
 
-    public ?int $invoice_override_payment_id = null;
-
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = (string) $request->get('project_id', '');
@@ -34,13 +34,6 @@ final class OverridePaymentSalvarRequest
             $d->items = $itemsRaw;
         } else {
             $d->items = null;
-        }
-        $iop = $request->get('invoice_override_payment_id');
-        if (null !== $iop && '' !== (string) $iop) {
-            $hid = (int) $iop;
-            if ($hid > 0) {
-                $d->invoice_override_payment_id = $hid;
-            }
         }
 
         return $d;

@@ -2,9 +2,11 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
-final class ProjectListarOrdenadosRequest
+final class ProjectListarOrdenadosRequest implements AdminHttpRequestDtoInterface
 {
     public string $company_id = '';
 
@@ -18,7 +20,7 @@ final class ProjectListarOrdenadosRequest
 
     public string $status = '';
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->company_id = self::s($request->get('company_id') ?? '');

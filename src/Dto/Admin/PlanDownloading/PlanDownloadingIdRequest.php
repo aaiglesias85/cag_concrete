@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\PlanDownloading;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PlanDownloadingIdRequest
+final class PlanDownloadingIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Plan id is required.')]
     #[Assert\Positive]
     public ?int $plan_downloading_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->plan_downloading_id = self::positiveIntOrNull($request->get('plan_downloading_id'));

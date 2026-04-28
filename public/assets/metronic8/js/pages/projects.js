@@ -832,7 +832,11 @@ var Projects = (function () {
       var formData = new URLSearchParams();
 
       var project_id = $('#project_id').val();
-      formData.set('project_id', project_id);
+      var hasProjectId = project_id !== undefined && project_id !== null && String(project_id).trim() !== '';
+      var salvarUrl = hasProjectId ? 'project/actualizarProject' : 'project/salvarProject';
+      if (hasProjectId) {
+         formData.set('project_id', project_id);
+      }
 
       var company_id = $('#company').val();
       formData.set('company_id', company_id);
@@ -954,7 +958,7 @@ var Projects = (function () {
       BlockUtil.block('#form-project');
 
       axios
-         .post('project/salvarProject', formData, { responseType: 'json' })
+         .post(salvarUrl, formData, { responseType: 'json' })
          .then(function (res) {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
@@ -2906,10 +2910,15 @@ var Projects = (function () {
             var formData = new URLSearchParams();
 
             var notes_id = $('#notes_id').val();
-            formData.set('notes_id', notes_id);
+            var editingNote = notes_id !== undefined && notes_id !== null && String(notes_id).trim() !== '';
+            var salvarNotesUrl = editingNote ? 'project/actualizarNotes' : 'project/salvarNotes';
 
             var project_id = $('#project_id').val();
             formData.set('project_id', project_id);
+
+            if (editingNote) {
+               formData.set('notes_id', notes_id);
+            }
 
             formData.set('notes', notes);
             formData.set('date', date);
@@ -2917,7 +2926,7 @@ var Projects = (function () {
             BlockUtil.block('#modal-notes .modal-content');
 
             axios
-               .post('project/salvarNotes', formData, { responseType: 'json' })
+               .post(salvarNotesUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;

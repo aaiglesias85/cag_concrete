@@ -18,6 +18,10 @@ salvarHolidayAdmin:
   path:  /holiday/salvarHoliday
   defaults: { _controller: App\Controller\Admin\HolidayController::salvar, _format: json }
 
+actualizarHolidayAdmin:
+  path:  /holiday/actualizar
+  defaults: { _controller: App\Controller\Admin\HolidayController::salvar, _format: json }
+
 cargarDatosHolidayAdmin:
   path:  /holiday/cargarDatos
   defaults: { _controller: App\Controller\Admin\HolidayController::cargarDatos, _format: json }

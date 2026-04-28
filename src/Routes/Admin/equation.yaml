@@ -18,6 +18,10 @@ salvarEquationAdmin:
   path:  /equation/salvarEquation
   defaults: { _controller: App\Controller\Admin\EquationController::salvar, _format: json }
 
+actualizarEquationAdmin:
+  path:  /equation/actualizarEquation
+  defaults: { _controller: App\Controller\Admin\EquationController::actualizar, _format: json }
+
 cargarDatosEquationAdmin:
   path:  /equation/cargarDatos
   defaults: { _controller: App\Controller\Admin\EquationController::cargarDatos, _format: json }

@@ -313,10 +313,14 @@ var EmployeeRole = (function () {
             var status = $('#estadoactivo').prop('checked') ? 1 : 0;
             formData.set('status', status);
 
+            var salvarUrl =
+               role_id && String(role_id).trim() !== ''
+                  ? 'employee-role/actualizar'
+                  : 'employee-role/salvar';
             BlockUtil.block('#form-employee-role');
 
             axios
-               .post('employee-role/salvar', formData, { responseType: 'json' })
+               .post(salvarUrl, formData, { responseType: 'json' })
                .then(function (res) {
                   if (res.status === 200 || res.status === 201) {
                      var response = res.data;

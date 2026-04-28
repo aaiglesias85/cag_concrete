@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\DataTracking;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class DataTrackingSalvarItemRequest
+final class DataTrackingSalvarItemRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $data_tracking_id = null;
 
@@ -29,7 +31,7 @@ final class DataTrackingSalvarItemRequest
 
     public ?string $price = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->data_tracking_id = self::scalarToStr($request->get('data_tracking_id'));

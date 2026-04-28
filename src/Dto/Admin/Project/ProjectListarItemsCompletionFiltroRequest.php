@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectListarItemsCompletionFiltroRequest
+final class ProjectListarItemsCompletionFiltroRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     #[Assert\Positive]
@@ -15,7 +17,7 @@ final class ProjectListarItemsCompletionFiltroRequest
 
     public ?string $fechaFin = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = self::pos($request->get('project_id'));

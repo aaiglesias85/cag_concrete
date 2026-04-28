@@ -3,62 +3,45 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingActualizarRequest;
 use App\Dto\Admin\PlanDownloading\PlanDownloadingIdRequest;
 use App\Dto\Admin\PlanDownloading\PlanDownloadingIdsRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingListarRequest;
 use App\Dto\Admin\PlanDownloading\PlanDownloadingSalvarRequest;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\PlanDownloadingService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
-
+use Symfony\Component\HttpFoundation\JsonResponse;
 class PlanDownloadingController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $planDownloadingService;
 
     public function __construct(
         AdminAccessService $adminAccess,
-        PlanDownloadingService $planDownloadingService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        PlanDownloadingService $planDownloadingService) {
         parent::__construct($adminAccess);
         $this->planDownloadingService = $planDownloadingService;
     }
 
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::PLAN_DOWNLOADING);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PLAN_DOWNLOADING);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso PLAN_DOWNLOADING esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/plan-downloading/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
-    /**
-     * listar Acción que lista los units.
-     */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(PlanDownloadingListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'description', 'status'],
-                defaultOrderField: 'description'
-            );
+            $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
             $result = $this->planDownloadingService->ListarPlans(
                 $dt['start'],
                 $dt['length'],
@@ -83,26 +66,14 @@ class PlanDownloadingController extends AbstractAdminController
         }
     }
 
-    /**
-     * salvar Acción para agregar statuss en la BD.
-     */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(PlanDownloadingSalvarRequest $d): JsonResponse
     {
-        $d = PlanDownloadingSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
-        $plan_downloading_id = (string) ($d->plan_downloading_id ?? '');
         $description = (string) $d->description;
         $status = (string) $d->status;
 
         try {
-            if ('' === $plan_downloading_id) {
-                $resultado = $this->planDownloadingService->SalvarPlan($description, $status);
-            } else {
-                $resultado = $this->planDownloadingService->ActualizarPlan($plan_downloading_id, $description, $status);
-            }
+            $resultado = $this->planDownloadingService->SalvarPlan($description, $status);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -123,16 +94,38 @@ class PlanDownloadingController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminar Acción que elimina un status en la BD.
-     */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(PlanDownloadingActualizarRequest $d): JsonResponse
     {
-        $dto = PlanDownloadingIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
+        $plan_downloading_id = (string) $d->plan_downloading_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+
+        try {
+            $resultado = $this->planDownloadingService->ActualizarPlan($plan_downloading_id, $description, $status);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['plan_downloading_id'] = $resultado['plan_downloading_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
         }
+    }
+
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(PlanDownloadingIdRequest $dto): JsonResponse
+    {
         $plan_downloading_id = $dto->plan_downloading_id;
 
         try {
@@ -155,16 +148,9 @@ class PlanDownloadingController extends AbstractAdminController
         }
     }
 
-    /**
-     * eliminarPlans Acción que elimina los statuss seleccionados en la BD.
-     */
-    public function eliminarPlans(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarPlans(PlanDownloadingIdsRequest $idsDto): JsonResponse
     {
-        $idsDto = PlanDownloadingIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $idsDto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = (string) $idsDto->ids;
 
         try {
@@ -187,16 +173,9 @@ class PlanDownloadingController extends AbstractAdminController
         }
     }
 
-    /**
-     * cargarDatos Acción que carga los datos del status en la BD.
-     */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(PlanDownloadingIdRequest $dto): JsonResponse
     {
-        $dto = PlanDownloadingIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $plan_downloading_id = $dto->plan_downloading_id;
 
         try {

@@ -2,10 +2,29 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+use App\Http\DataTablesHelper;
 use Symfony\Component\HttpFoundation\Request;
 
-final class ProjectDataTrackingFiltroRequest
+/**
+ * DataTables datatracking dentro de la ficha proyecto.
+ *
+ * @phpstan-type ParsedDt array{
+ *   draw:int,
+ *   start:int,
+ *   length:int,
+ *   search:string,
+ *   orderField:string,
+ *   orderDir:'asc'|'desc',
+ *   columns:array,
+ *   raw:array
+ * }
+ */
+final class ProjectListarDataTrackingRequest implements AdminHttpRequestDtoInterface
 {
+    /** @var ParsedDt */
+    public array $dt;
+
     public ?string $project_id = null;
 
     public ?string $pending = null;
@@ -16,9 +35,14 @@ final class ProjectDataTrackingFiltroRequest
 
     public ?string $only_punch = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
+        $d->dt = DataTablesHelper::parse(
+            $request,
+            allowedOrderFields: ['id', 'date', 'leads', 'totalConcUsed', 'total_concrete_yiel', 'lostConcrete', 'total_concrete', 'totalLabor', 'total_daily_today', 'profit'],
+            defaultOrderField: 'date'
+        );
         $d->project_id = self::s($request->get('project_id'));
         $d->pending = self::s($request->get('pending'));
         $d->fechaInicial = self::s($request->get('fechaInicial'));

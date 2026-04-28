@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\OverheadPrice;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class OverheadPriceIdRequest
+final class OverheadPriceIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Overhead id is required.')]
     #[Assert\Positive]
     public ?int $overhead_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->overhead_id = self::positiveIntOrNull($request->get('overhead_id'));

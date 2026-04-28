@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\ProjectStage;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectStageIdRequest
+final class ProjectStageIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Stage id is required.')]
     #[Assert\Positive]
     public ?int $stage_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->stage_id = self::positiveIntOrNull($request->get('stage_id'));

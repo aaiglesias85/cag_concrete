@@ -2,14 +2,14 @@
 
 namespace App\Dto\Admin\County;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-final class CountySalvarRequest
+final class CountySalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $county_id = null;
-
     #[Assert\NotBlank]
     public ?string $description = null;
 
@@ -32,11 +32,9 @@ final class CountySalvarRequest
         }
     }
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $cid = $request->get('county_id');
-        $d->county_id = \is_string($cid) || is_numeric($cid) ? (string) $cid : null;
         $d->description = \is_string($x = $request->get('description')) ? $x : null;
         $st = $request->get('status');
         $d->status = \is_string($st) ? $st : (is_numeric($st) ? (string) $st : null);

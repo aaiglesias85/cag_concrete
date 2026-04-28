@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class ProjectSalvarNotesRequest
+final class ProjectSalvarNotesRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $notes_id = null;
-
     #[Assert\NotBlank]
     public ?string $project_id = null;
 
@@ -16,10 +16,9 @@ final class ProjectSalvarNotesRequest
 
     public ?string $date = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $d->notes_id = self::s($request->get('notes_id'));
         $d->project_id = self::s($request->get('project_id'));
         $d->notes = self::s($request->get('notes'));
         $d->date = self::s($request->get('date'));

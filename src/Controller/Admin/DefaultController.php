@@ -3,13 +3,14 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Default\DashboardListarStatsRequest;
 use App\Dto\Admin\Default\SaveWidgetPreferenceRequest;
 use App\Entity\Company;
 use App\Entity\Equation;
 use App\Entity\Item;
 use App\Entity\Unit;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\AdvertisementService;
 use App\Service\Admin\DataTrackingService;
@@ -20,16 +21,12 @@ use App\Service\Admin\NotificationService;
 use App\Service\Admin\ScheduleService;
 use App\Service\Admin\TaskService;
 use App\Service\Admin\WidgetAccessService;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DefaultController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
-
     private $defaultService;
     private $logService;
     private $notificationService;
@@ -50,10 +47,7 @@ class DefaultController extends AbstractAdminController
         ScheduleService $scheduleService,
         EstimateService $estimateService,
         DataTrackingService $dataTrackingService,
-        WidgetAccessService $widgetAccessService,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        WidgetAccessService $widgetAccessService) {
         parent::__construct($adminAccess);
         $this->defaultService = $defaultService;
         $this->logService = $logService;
@@ -66,13 +60,10 @@ class DefaultController extends AbstractAdminController
         $this->widgetAccessService = $widgetAccessService;
     }
 
+    #[RequireAdminPermission(FunctionId::HOME)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::HOME);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $usuario = $acceso['usuario'];
+        $usuario = $this->DevolverUsuario();
 
         $dashboardWidgets = $this->defaultService->ObtenerWidgetsDashboardV3(
             $usuario->getUsuarioId()
@@ -85,13 +76,10 @@ class DefaultController extends AbstractAdminController
         ], $homePayloads));
     }
 
+    #[RequireAdminPermission(FunctionId::HOME)]
     public function widgetPreferences(): Response
     {
-        $u = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($u instanceof RedirectResponse) {
-            return $u;
-        }
-        $usuario = $u;
+        $usuario = $this->DevolverUsuario();
         $widgets = $this->defaultService->ObtenerMyWidgetsTogglesV3($usuario->getUsuarioId());
 
         return $this->render('admin/default/widget_preferences.html.twig', [
@@ -101,21 +89,10 @@ class DefaultController extends AbstractAdminController
         ]);
     }
 
-    public function saveWidgetPreference(Request $request): \Symfony\Component\HttpFoundation\JsonResponse
+    #[RequireAdminPermission(FunctionId::HOME, AdminPermission::Edit, jsonOnDenied: true)]
+    public function saveWidgetPreference(SaveWidgetPreferenceRequest $dto): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json(['success' => false, 'message' => 'Not authenticated'], 401);
-        }
-        $usuario = $g;
-        $dto = SaveWidgetPreferenceRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            $payload = $this->formatAdminValidationFailure($viol);
-            $payload['message'] = $payload['error'];
-
-            return $this->json($payload, Response::HTTP_BAD_REQUEST);
-        }
+        $usuario = $this->DevolverUsuario();
         $widgetId = (string) $dto->widget_id;
         $isActive = $dto->is_active;
 
@@ -135,20 +112,12 @@ class DefaultController extends AbstractAdminController
     /**
      * listarStats Acción para filtrar el dashboard.
      */
-    public function listarStats(Request $request)
+    #[RequireAdminPermission(FunctionId::HOME, AdminPermission::View, jsonOnDenied: true)]
+    public function listarStats(DashboardListarStatsRequest $f): JsonResponse
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $this->json([
-                'success' => false,
-                'error' => 'Unauthenticated',
-            ], 401);
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $userId = $usuario->getUsuarioId();
         $w = $this->widgetAccessService;
-        $f = DashboardListarStatsRequest::fromHttpRequest($request);
-        $this->validateAdminDto($this->validator, $f, $this->adminTranslator);
         $projectId = (string) ($f->project_id ?? '');
         $status = (string) ($f->status ?? '');
         $fechaInicial = (string) ($f->fechaInicial ?? '');
@@ -303,13 +272,10 @@ class DefaultController extends AbstractAdminController
         ]);
     }
 
+    #[RequireAdminPermission(FunctionId::HOME)]
     public function renderMenu(?string $activeRoute = null): Response
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $g;
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
         $menu = $this->defaultService->DevolverMenu($usuario->getUsuarioId());
 
         return $this->render('admin/layout/menu.html.twig', [
@@ -319,13 +285,10 @@ class DefaultController extends AbstractAdminController
         ]);
     }
 
+    #[RequireAdminPermission(FunctionId::HOME)]
     public function renderModalItemProject()
     {
-        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
-        if ($g instanceof RedirectResponse) {
-            return $g;
-        }
-        $usuario = $g;
+        $usuario = $this->DevolverUsuario();
 
         // items
         $items = $this->defaultService->getDoctrine()->getRepository(Item::class)

@@ -2,13 +2,15 @@
 
 namespace App\Dto\Admin\Project;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Retainage / Bonded: ids desde form o JSON body.
  */
-final class ProjectBulkItemsStatusRequest
+final class ProjectBulkItemsStatusRequest implements AdminHttpRequestDtoInterface
 {
     /**
      * @var list<int|string>|null
@@ -19,7 +21,7 @@ final class ProjectBulkItemsStatusRequest
 
     public mixed $status = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $ids = $request->get('ids');

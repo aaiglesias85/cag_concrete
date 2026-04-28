@@ -10,6 +10,10 @@ saveUserAdmin:
   path:  /usuario/salvarUsuario
   defaults: { _controller: App\Controller\Admin\UsuarioController::salvar, _format: json}
 
+actualizarUsuarioAdmin:
+  path: /usuario/actualizarUsuario
+  defaults: { _controller: App\Controller\Admin\UsuarioController::actualizar, _format: json }
+
 updateMisDatosAdmin:
   path:  /usuario/actualizarMisDatos
   defaults: { _controller: App\Controller\Admin\UsuarioController::actualizarMisDatos, _format: json }

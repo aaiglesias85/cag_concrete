@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Payment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class PaymentCambiarEstadoRequest
+final class PaymentCambiarEstadoRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Invoice id is required.')]
     #[Assert\Positive]
@@ -15,7 +17,7 @@ final class PaymentCambiarEstadoRequest
     #[Assert\NotBlank]
     public ?string $status = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->invoice_id = self::positiveIntOrNull($request->get('invoice_id'));

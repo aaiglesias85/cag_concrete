@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Task;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class TaskIdRequest
+final class TaskIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Task id is required.')]
     #[Assert\Positive]
     public ?int $task_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->task_id = self::positiveIntOrNull($request->get('task_id'));

@@ -3,21 +3,24 @@
 namespace App\Controller\Admin;
 
 use App\Constants\FunctionId;
-use App\Controller\Admin\Traits\AdminValidationResponseTrait;
 use App\Dto\Admin\Usuario\ActualizarMisDatosAdminRequest;
+use App\Dto\Admin\Usuario\UsuarioActualizarRequest;
 use App\Dto\Admin\Usuario\LoginCredentialsRequest;
 use App\Dto\Admin\Usuario\UsuarioIdRequest;
 use App\Dto\Admin\Usuario\UsuarioIdsRequest;
+use App\Dto\Admin\Usuario\UsuarioListarRequest;
 use App\Dto\Admin\Usuario\UsuarioSalvarRequest;
 use App\Dto\Api\Request\Login\OlvidoContrasennaRequest;
 use App\Entity\Funcion;
 use App\Entity\Rol;
 use App\Entity\Widget;
-use App\Http\DataTablesHelper;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\FuncionPermissionUiGrouping;
 use App\Service\Admin\UsuarioService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,12 +28,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UsuarioController extends AbstractAdminController
 {
-    use AdminValidationResponseTrait;
     private $usuarioService;
     private $funcionRepository;
     private $rolRepository;
@@ -42,10 +42,7 @@ class UsuarioController extends AbstractAdminController
         FuncionPermissionUiGrouping $funcionPermissionUiGrouping,
         private TokenStorageInterface $tokenStorage,
         #[Autowire(service: 'limiter.api_login')]
-        private RateLimiterFactory $apiLoginLimiter,
-        private ValidatorInterface $validator,
-        private TranslatorInterface $adminTranslator,
-    ) {
+        private RateLimiterFactory $apiLoginLimiter) {
         parent::__construct($adminAccess);
         $this->usuarioService = $usuarioService;
         $this->funcionPermissionUiGrouping = $funcionPermissionUiGrouping;
@@ -73,14 +70,9 @@ class UsuarioController extends AbstractAdminController
     /**
      * autenticar Acción para el chequear el login.
      */
-    public function autenticar(Request $request, SessionInterface $session)
+    public function autenticar(Request $request, SessionInterface $session, LoginCredentialsRequest $login): JsonResponse
     {
         $target_path = 'home';
-        $login = LoginCredentialsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $login, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $email = $login->email;
         $pass = (string) $login->password;
         try {
@@ -165,7 +157,9 @@ class UsuarioController extends AbstractAdminController
         $funcion = $this->usuarioService->DevolverPrimeraFuncionDeUsuario($usuario->getUsuarioId());
 
         return $this->render('admin/usuario/denegado.html.twig', [
+            'usuario' => $usuario,
             'funcion' => $funcion,
+            'puede_ir_dashboard' => $this->adminAccess->usuarioPuedeVer($usuario, FunctionId::HOME),
         ]);
     }
 
@@ -188,13 +182,12 @@ class UsuarioController extends AbstractAdminController
     /**
      * index Perfil de usuario.
      */
+    #[RequireAdminPermission(FunctionId::USUARIO)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::USUARIO);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::USUARIO);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso USUARIO esperado tras #[RequireAdminPermission].');
 
         $perfiles = $this->rolRepository->ListarOrdenados();
         $funciones = $this->funcionRepository->ListarOrdenados();
@@ -208,26 +201,21 @@ class UsuarioController extends AbstractAdminController
             'funciones' => $funciones,
             'funcionesAgrupadas' => $funcionesAgrupadas,
             'widgets' => $widgets,
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
     /**
      * listar Acciรณn que lista los usuarios.
      */
-    public function listar(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::View, jsonOnDenied: true)]
+    public function listar(UsuarioListarRequest $listar): JsonResponse
     {
         try {
-            // parsear los parametros de la tabla
-            $dt = DataTablesHelper::parse(
-                $request,
-                allowedOrderFields: ['id', 'email', 'nombre', 'apellidos', 'perfil', 'habilitado'],
-                defaultOrderField: 'nombre'
-            );
+            $dt = $listar->dt;
 
-            // filtros
-            $perfil_id = $request->get('perfil_id');
-            $estado = $request->get('estado');
+            $perfil_id = $listar->perfil_id;
+            $estado = $listar->estado;
 
             // total + data en una sola llamada a tu servicio
             $result = $this->usuarioService->ListarUsuarios(
@@ -257,17 +245,28 @@ class UsuarioController extends AbstractAdminController
     }
 
     /**
-     * salvar Acciรณn que inserta un usuario en la BD.
+     * salvar Acciรณn que inserta un usuario en la BD (alta).
      */
-    public function salvar(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Add, jsonOnDenied: true)]
+    public function salvar(UsuarioSalvarRequest $p): JsonResponse
     {
-        $p = UsuarioSalvarRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $p, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
 
-        $usuario_id = (string) ($p->usuario_id ?? '');
+        return $this->persistUsuario('', $p);
+    }
+
+    /**
+     * actualizar Acción que actualiza un usuario existente.
+     */
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Edit, jsonOnDenied: true)]
+    public function actualizar(UsuarioActualizarRequest $dAct): JsonResponse
+    {
+        $p = UsuarioSalvarRequest::fromActualizarRequest($dAct);
+
+        return $this->persistUsuario((string) $dAct->usuario_id, $p);
+    }
+
+    private function persistUsuario(string $usuario_id, UsuarioSalvarRequest $p): JsonResponse
+    {
         $rol_id = $p->rol;
         $habilitado = $p->habilitado;
         $contrasenna = $p->password;
@@ -286,7 +285,7 @@ class UsuarioController extends AbstractAdminController
         $resultadoJson = [];
 
         try {
-            if ('' == $usuario_id) {
+            if ('' === $usuario_id) {
                 $resultado = $this->usuarioService->SalvarUsuario(
                     $rol_id,
                     $habilitado,
@@ -343,13 +342,9 @@ class UsuarioController extends AbstractAdminController
     /**
      * eliminar Acciรณn que elimina un rol en la BD.
      */
-    public function eliminar(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminar(UsuarioIdRequest $dto): JsonResponse
     {
-        $dto = UsuarioIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $usuario_id = $dto->usuario_id;
 
         try {
@@ -375,13 +370,9 @@ class UsuarioController extends AbstractAdminController
     /**
      * eliminarUsuarios Acciรณn que elimina varios usuarios en la BD.
      */
-    public function eliminarUsuarios(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarUsuarios(UsuarioIdsRequest $dto): JsonResponse
     {
-        $dto = UsuarioIdsRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $ids = $dto->ids;
 
         try {
@@ -407,13 +398,8 @@ class UsuarioController extends AbstractAdminController
     /**
      * olvidoContrasenna Acciรณn para recuperar la contraseรฑa de un usuario.
      */
-    public function olvidoContrasenna(Request $request)
+    public function olvidoContrasenna(OlvidoContrasennaRequest $dto): JsonResponse
     {
-        $dto = OlvidoContrasennaRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $email = $dto->email;
         try {
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
@@ -438,13 +424,9 @@ class UsuarioController extends AbstractAdminController
     /**
      * activarUsuario Acciรณn que activa o desactiva un usuario.
      */
-    public function activarUsuario(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Edit, jsonOnDenied: true)]
+    public function activarUsuario(UsuarioIdRequest $dto): JsonResponse
     {
-        $dto = UsuarioIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $usuario_id = $dto->usuario_id;
 
         try {
@@ -469,13 +451,9 @@ class UsuarioController extends AbstractAdminController
     /**
      * cargarDatos Acciรณn que carga los datos del usuario en la BD.
      */
-    public function cargarDatos(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::View, jsonOnDenied: true)]
+    public function cargarDatos(UsuarioIdRequest $dto): JsonResponse
     {
-        $dto = UsuarioIdRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $dto, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $usuario_id = $dto->usuario_id;
 
         try {
@@ -501,13 +479,8 @@ class UsuarioController extends AbstractAdminController
     /**
      * actualizarMisDatos Acciรณn que actualiza el perfil del usuario en la BD.
      */
-    public function actualizarMisDatos(Request $request)
+    public function actualizarMisDatos(ActualizarMisDatosAdminRequest $d): JsonResponse
     {
-        $d = ActualizarMisDatosAdminRequest::fromHttpRequest($request);
-        $viol = $this->validateAdminDto($this->validator, $d, $this->adminTranslator);
-        if (\count($viol) > 0) {
-            return $this->json($this->formatAdminValidationFailure($viol), Response::HTTP_BAD_REQUEST);
-        }
         $usuario_id = $d->usuario_id;
         $contrasenna_actual = $d->contrasenna_actual;
         $contrasenna = $d->contrasenna;
@@ -539,7 +512,8 @@ class UsuarioController extends AbstractAdminController
     /**
      * listarOrdenados Acciรณn que lista los usuarios.
      */
-    public function listarOrdenados(Request $request)
+    #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::View, jsonOnDenied: true)]
+    public function listarOrdenados(Request $request): JsonResponse
     {
         try {
             $search = $request->get('search');

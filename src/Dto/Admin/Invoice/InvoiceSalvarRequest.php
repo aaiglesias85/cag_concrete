@@ -2,13 +2,13 @@
 
 namespace App\Dto\Admin\Invoice;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class InvoiceSalvarRequest
+final class InvoiceSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    public ?string $invoice_id = null;
-
     #[Assert\NotBlank]
     public ?string $number = null;
 
@@ -29,11 +29,9 @@ final class InvoiceSalvarRequest
 
     public ?string $exportar = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
-        $iid = $request->get('invoice_id');
-        $d->invoice_id = \is_string($iid) || is_numeric($iid) ? (string) $iid : null;
         $num = $request->get('number');
         $d->number = \is_string($num) || is_numeric($num) ? (string) $num : null;
         $pid = $request->get('project_id');

@@ -18,6 +18,10 @@ salvarInspectorAdmin:
   path:  /inspector/salvarInspector
   defaults: { _controller: App\Controller\Admin\InspectorController::salvar, _format: json }
 
+actualizarInspectorAdmin:
+  path:  /inspector/actualizarInspector
+  defaults: { _controller: App\Controller\Admin\InspectorController::actualizar, _format: json }
+
 cargarDatosInspectorAdmin:
   path:  /inspector/cargarDatos
   defaults: { _controller: App\Controller\Admin\InspectorController::cargarDatos, _format: json }

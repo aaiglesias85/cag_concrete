@@ -10,6 +10,10 @@ salvarReminderAdmin:
   path: /reminder/salvar
   defaults: { _controller: App\Controller\Admin\ReminderController::salvar, _format: json }
 
+actualizarReminderAdmin:
+  path: /reminder/actualizar
+  defaults: { _controller: App\Controller\Admin\ReminderController::actualizar, _format: json }
+
 eliminarReminderAdmin:
   path: /reminder/eliminar
   defaults: { _controller: App\Controller\Admin\ReminderController::eliminar, _format: json }

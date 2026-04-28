@@ -2,16 +2,18 @@
 
 namespace App\Dto\Admin\Inspector;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class InspectorIdRequest
+final class InspectorIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'Inspector id is required.')]
     #[Assert\Positive]
     public ?int $inspector_id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $dto->inspector_id = self::positiveIntOrNull($request->get('inspector_id'));

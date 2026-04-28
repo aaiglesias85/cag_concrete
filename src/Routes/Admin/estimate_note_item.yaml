@@ -10,6 +10,10 @@ salvarEstimateNoteItemAdmin:
   path: /estimate-note-item/salvar
   defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::salvar, _format: json }
 
+actualizarEstimateNoteItemAdmin:
+  path: /estimate-note-item/actualizar
+  defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::actualizar, _format: json }
+
 eliminarEstimateNoteItemAdmin:
   path: /estimate-note-item/eliminar
   defaults: { _controller: App\Controller\Admin\EstimateNoteItemController::eliminar, _format: json }

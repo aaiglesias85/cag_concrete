@@ -321,9 +321,13 @@ var PlanDownloading = function () {
                 var status = ($('#estadoactivo').prop('checked')) ? 1 : 0;
                 formData.set("status", status);
 
+                var salvarUrl =
+                    plan_downloading_id && String(plan_downloading_id).trim() !== ''
+                        ? "plan-downloading/actualizar"
+                        : "plan-downloading/salvar";
                 BlockUtil.block('#form-plan-downloading');
 
-                axios.post("plan-downloading/salvar", formData, {responseType: "json"})
+                axios.post(salvarUrl, formData, {responseType: "json"})
                     .then(function (res) {
                         if (res.status === 200 || res.status === 201) {
                             var response = res.data;

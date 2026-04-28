@@ -1281,10 +1281,13 @@ var Schedules = (function () {
          position: 'above',
       });
 
-      // fecha inicial = primer día del mes actual
+      // Rango por defecto = mes en curso (inicio + fin). Sin "hasta", el backend solo aplica day >= inicio
+      // y el COUNT/listado incluye todo el futuro → consultas muy lentas.
       const hoy = new Date();
       const fecha_inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const fecha_fin_mes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0);
       FlatpickrUtil.setDate('datetimepicker-desde', fecha_inicio);
+      FlatpickrUtil.setDate('datetimepicker-hasta', fecha_fin_mes);
 
       // day
       FlatpickrUtil.initDate('datetimepicker-day', {

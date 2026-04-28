@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Subcontractor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class SubcontractorAgregarEmployeeRequest
+final class SubcontractorAgregarEmployeeRequest implements AdminHttpRequestDtoInterface
 {
     public ?string $employee_id = null;
 
@@ -19,7 +21,7 @@ final class SubcontractorAgregarEmployeeRequest
 
     public ?string $position = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $eid = $request->get('employee_id');

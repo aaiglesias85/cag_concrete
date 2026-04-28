@@ -2,10 +2,12 @@
 
 namespace App\Dto\Admin\Subcontractor;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
-final class SubcontractorNotesDateRangeRequest
+final class SubcontractorNotesDateRangeRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank]
     public ?string $subcontractor_id = null;
@@ -16,7 +18,7 @@ final class SubcontractorNotesDateRangeRequest
     #[Assert\NotBlank]
     public ?string $to = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $sid = $request->get('subcontractor_id');

@@ -2,17 +2,19 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** Acepta `invoice_item_override_payment_id` o `invoice_item_override_unpaid_qty_id`. */
-final class OverridePaymentHistorialUnpaidIdRequest
+final class OverridePaymentHistorialUnpaidIdRequest implements AdminHttpRequestDtoInterface
 {
     #[Assert\NotBlank(message: 'id is required.')]
     #[Assert\Positive]
     public ?int $id = null;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $dto = new self();
         $pid = $request->get('invoice_item_override_payment_id');

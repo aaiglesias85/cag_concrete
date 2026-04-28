@@ -2,9 +2,11 @@
 
 namespace App\Dto\Admin\OverridePayment;
 
+use App\Dto\Admin\AdminHttpRequestDtoInterface;
+
 use Symfony\Component\HttpFoundation\Request;
 
-final class OverrideNotaUnpaidListarRequest
+final class OverrideNotaUnpaidListarRequest implements AdminHttpRequestDtoInterface
 {
     public string $project_id = '';
 
@@ -12,7 +14,7 @@ final class OverrideNotaUnpaidListarRequest
 
     public int $project_item_id = 0;
 
-    public static function fromHttpRequest(Request $request): self
+    public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->project_id = (string) $request->get('project_id', '');
