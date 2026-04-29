@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 26-04-2026 a las 21:32:46
+-- Tiempo de generación: 29-04-2026 a las 01:09:14
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -42391,6 +42391,26 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `user_preference_widget`
+--
+
+CREATE TABLE `user_preference_widget` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `user_preference_widget`
+--
+
+INSERT INTO `user_preference_widget` (`id`, `user_id`, `widget_id`, `is_visible`) VALUES
+(1, 1, 1, 1);
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `user_qbwc_token`
 --
 
@@ -43087,6 +43107,14 @@ ALTER TABLE `user_permission`
   ADD KEY `Ref194` (`function_id`);
 
 --
+-- Indices de la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_user_preference_widget` (`user_id`,`widget_id`),
+  ADD KEY `fk_upw_widget` (`widget_id`);
+
+--
 -- Indices de la tabla `user_qbwc_token`
 --
 ALTER TABLE `user_qbwc_token`
@@ -43617,6 +43645,12 @@ ALTER TABLE `user_permission`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4020;
 
 --
+-- AUTO_INCREMENT de la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
 --
 ALTER TABLE `user_qbwc_token`
@@ -44048,6 +44082,13 @@ ALTER TABLE `user_access_token`
 ALTER TABLE `user_permission`
   ADD CONSTRAINT `Reffunction4` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refuser3` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  ADD CONSTRAINT `fk_upw_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_upw_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `user_qbwc_token`

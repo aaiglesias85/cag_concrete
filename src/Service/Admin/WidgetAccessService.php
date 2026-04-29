@@ -7,13 +7,16 @@ use App\Entity\UserWidgetAccess;
 use App\Entity\Usuario;
 use App\Entity\Widget;
 use App\Repository\RolWidgetAccessRepository;
+use App\Repository\UserPreferenceWidgetRepository;
 use App\Repository\UserWidgetAccessRepository;
 use App\Repository\WidgetRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Home + My Widgets: el estado mostrado es el de `user_widget_access` (is_enabled).
- * Si el usuario aún no tiene filas, se copian los valores del rol una sola vez (ver ensureUserWidgetAccessSeededFromRolIfEmpty).
+ * `user_widget_access`: asignación administrativa (qué widgets puede usar el usuario).
+ * `user_preference_widget`: qué el usuario elige mostrar en el Home entre los permitidos.
+ * Si el usuario aún no tiene filas en acceso, se copian los valores del rol una sola vez
+ * (ensureUserWidgetAccessSeededFromRolIfEmpty).
  */
 final class WidgetAccessService
 {
@@ -21,10 +24,14 @@ final class WidgetAccessService
         private readonly WidgetRepository $widgetRepository,
         private readonly RolWidgetAccessRepository $rolWidgetAccessRepository,
         private readonly UserWidgetAccessRepository $userWidgetAccessRepository,
+        private readonly UserPreferenceWidgetRepository $userPreferenceWidgetRepository,
         private readonly EntityManagerInterface $em,
     ) {
     }
 
+    /**
+     * Catálogo/admin: el widget está permitido para el usuario (`user_widget_access.is_enabled`).
+     */
     public function isWidgetEnabledForUser(int $userId, string $code): bool
     {
         $widget = $this->widgetRepository->findOneByCode($code);
@@ -36,6 +43,27 @@ final class WidgetAccessService
         $userMap = $this->userWidgetAccessRepository->getEnabledMapByUserId($userId);
 
         return (bool) ($userMap[$wId] ?? false);
+    }
+
+    /**
+     * Home/dashboard: permitido por admin y visible en preferencia (sin fila de preferencia ⇒ visible).
+     */
+    public function isWidgetVisibleOnHome(int $userId, string $code): bool
+    {
+        if (!$this->isWidgetEnabledForUser($userId, $code)) {
+            return false;
+        }
+        $widget = $this->widgetRepository->findOneByCode($code);
+        if (null === $widget) {
+            return false;
+        }
+        $wId = (int) $widget->getWidgetId();
+        $prefMap = $this->userPreferenceWidgetRepository->getVisibleMapByUserId($userId);
+        if (!\array_key_exists($wId, $prefMap)) {
+            return true;
+        }
+
+        return (bool) $prefMap[$wId];
     }
 
     /**
@@ -76,10 +104,9 @@ final class WidgetAccessService
     }
 
     /**
-     * Toggle en My Widgets: escribe en user_widget_access para cualquier widget del catálogo
-     * (código existente y usuario con rol asignado).
+     * Toggle en My Widgets: escribe visibilidad en `user_preference_widget` (solo widgets permitidos en acceso).
      */
-    public function setUserWidgetFromMyWidgetsPage(int $userId, string $code, bool $enabled): void
+    public function setUserWidgetFromMyWidgetsPage(int $userId, string $code, bool $visible): void
     {
         if (null === $this->getRolIdForUser($userId)) {
             throw new \InvalidArgumentException('User has no profile');
@@ -88,10 +115,13 @@ final class WidgetAccessService
         if (null === $widget) {
             throw new \InvalidArgumentException('Unknown widget code');
         }
-        $this->userWidgetAccessRepository->setEnabledByUserIdAndWidgetId(
+        if (!$this->isWidgetEnabledForUser($userId, $code)) {
+            throw new \InvalidArgumentException('Widget is not enabled for your account');
+        }
+        $this->userPreferenceWidgetRepository->setVisibleByUserIdAndWidgetId(
             $userId,
             (int) $widget->getWidgetId(),
-            $enabled
+            $visible
         );
     }
 
@@ -119,7 +149,7 @@ final class WidgetAccessService
         $codeToKey = self::codeToLayoutKeys();
         foreach ($this->widgetRepository->findAllOrdered() as $w) {
             $code = $w->getCode();
-            $enabled = $this->isWidgetEnabledForUser($userId, $code);
+            $enabled = $this->isWidgetVisibleOnHome($userId, $code);
             if (!isset($codeToKey[$code])) {
                 continue;
             }
@@ -227,6 +257,31 @@ final class WidgetAccessService
             $this->em->persist($e);
         }
         $this->em->flush();
+        $this->syncUserPreferenceWithAccessMatrix($userId);
+    }
+
+    /**
+     * Tras guardar la matriz de `user_widget_access`: elimina preferencias de widgets revocados;
+     * para widgets permitidos sin fila en preferencia, inserta visible=true.
+     */
+    public function syncUserPreferenceWithAccessMatrix(int $userId): void
+    {
+        $accessMap = $this->userWidgetAccessRepository->getEnabledMapByUserId($userId);
+        $prefMap = $this->userPreferenceWidgetRepository->getVisibleMapByUserId($userId);
+        foreach ($this->widgetRepository->findAllOrdered() as $w) {
+            $wid = (int) $w->getWidgetId();
+            $allowed = (bool) ($accessMap[$wid] ?? false);
+            if (!$allowed) {
+                $this->userPreferenceWidgetRepository->deleteByUserIdAndWidgetId($userId, $wid);
+                unset($prefMap[$wid]);
+
+                continue;
+            }
+            if (!\array_key_exists($wid, $prefMap)) {
+                $this->userPreferenceWidgetRepository->setVisibleByUserIdAndWidgetId($userId, $wid, true);
+                $prefMap[$wid] = true;
+            }
+        }
     }
 
     public function copyRolWidgetsToUserIfEmpty(int $userId, int $rolId): void

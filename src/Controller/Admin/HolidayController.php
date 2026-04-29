@@ -7,10 +7,11 @@ use App\Dto\Admin\Holiday\HolidayIdRequest;
 use App\Dto\Admin\Holiday\HolidayIdsRequest;
 use App\Dto\Admin\Holiday\HolidayListarRequest;
 use App\Dto\Admin\Holiday\HolidaySalvarRequest;
+use App\Security\AdminPermission;
+use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\HolidayService;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class HolidayController extends AbstractAdminController
 {
@@ -24,22 +25,22 @@ class HolidayController extends AbstractAdminController
         $this->holidayService = $holidayService;
     }
 
+    #[RequireAdminPermission(FunctionId::HOLIDAY)]
     public function index()
     {
-        $acceso = $this->adminAccess->exigirUsuarioYPermisoVer($this->getUser(), FunctionId::HOLIDAY);
-        if ($acceso instanceof RedirectResponse) {
-            return $acceso;
-        }
-        $permiso = $acceso['permisos'];
+        $usuario = $this->DevolverUsuario();
+        $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::HOLIDAY);
+        $permiso = $permisos[0] ?? throw new \LogicException('Permiso HOLIDAY esperado tras #[RequireAdminPermission].');
 
         return $this->render('admin/holiday/index.html.twig', [
-            'permiso' => $permiso[0],
+            'permiso' => $permiso,
         ]);
     }
 
     /**
      * listar Acción que lista los usuarios.
      */
+    #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::View, jsonOnDenied: true)]
     public function listar(HolidayListarRequest $listar): JsonResponse
     {
         try {
@@ -77,6 +78,12 @@ class HolidayController extends AbstractAdminController
     public function salvar(HolidaySalvarRequest $d): JsonResponse
     {
         $holiday_id = (string) ($d->holiday_id ?? '');
+        $permission = '' === $holiday_id ? AdminPermission::Add : AdminPermission::Edit;
+        $auth = $this->requirePermissionOrJson403(FunctionId::HOLIDAY, $permission);
+        if ($auth instanceof JsonResponse) {
+            return $auth;
+        }
+
         $day = (string) $d->day;
         $description = (string) $d->description;
 
@@ -108,6 +115,7 @@ class HolidayController extends AbstractAdminController
     /**
      * eliminar Acción que elimina un holiday en la BD.
      */
+    #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(HolidayIdRequest $dto): JsonResponse
     {
         $holiday_id = $dto->holiday_id;
@@ -135,6 +143,7 @@ class HolidayController extends AbstractAdminController
     /**
      * eliminarHolidays Acción que elimina los holidays seleccionados en la BD.
      */
+    #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarHolidays(HolidayIdsRequest $dto): JsonResponse
     {
         $ids = (string) $dto->ids;
@@ -162,6 +171,7 @@ class HolidayController extends AbstractAdminController
     /**
      * cargarDatos Acción que carga los datos del holiday en la BD.
      */
+    #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(HolidayIdRequest $dto): JsonResponse
     {
         $holiday_id = $dto->holiday_id;

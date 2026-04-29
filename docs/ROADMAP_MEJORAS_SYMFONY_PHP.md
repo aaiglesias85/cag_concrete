@@ -22,6 +22,7 @@ Análisis del proyecto y mejoras alineadas con Symfony/PHP, por fases. **Messeng
 | **Base** | Fachada + satélites (`App\Service\Base\*`, permisos `UserPermissionMenuService`); lista §9.1 |
 | **Seguridad ops** | `PUBLIC_ACCESS` en `access_control`; rate limiters API login / olvido contraseña + Lock (`rate_limiter.yaml`); revisar deprecations en cada subida de Symfony |
 | **DTOs + validación** | API JSON + Admin parcial amplio; trait admin/API; inventario §9.1–9.2 |
+| **Variables de entorno** | [`.env.dist`](../.env.dist) + README «Variables de entorno y despliegue» (§8.2) |
 
 ---
 
@@ -98,9 +99,9 @@ Objetivo incremental: 2–3 tests `KernelTestCase`/`WebTestCase` sobre flujos es
 
 Si la generación de `/api/doc` obligara a marcar servicios `public: true`, preferir lazy o aislar la doc; **en `config/services.yaml` actual no hay `public: true` explícito para `ProjectService`** (revisar tras cambios en Nelmio).
 
-### 8.2 Variables de entorno — **pendiente**
+### 8.2 Variables de entorno — **hecho**
 
-Documentar variables requeridas (README o `.env` comentado), rotación de claves y `APP_ENV=prod` en producción.
+Plantilla versionada [`.env.dist`](../.env.dist); tabla y notas de producción (`APP_ENV`, rotación de `APP_SECRET` / JWT y sesiones) en [README.md](../README.md) «Variables de entorno y despliegue».
 
 ---
 

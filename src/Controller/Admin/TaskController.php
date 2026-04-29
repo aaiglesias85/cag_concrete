@@ -197,7 +197,7 @@ class TaskController extends AbstractAdminController
     public function listarHome(Request $request): JsonResponse
     {
         $usuario = $this->DevolverUsuario();
-        if (!$this->widgetAccessService->isWidgetEnabledForUser($usuario->getUsuarioId(), 'tasks')) {
+        if (!$this->widgetAccessService->isWidgetVisibleOnHome($usuario->getUsuarioId(), 'tasks')) {
             return $this->json(['success' => false, 'error' => 'Not allowed'], Response::HTTP_FORBIDDEN);
         }
         $pTask = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::TASKS);

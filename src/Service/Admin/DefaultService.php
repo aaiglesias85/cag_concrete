@@ -886,7 +886,7 @@ class DefaultService extends Base
         $wa->ensureUserWidgetAccessSeededFromRolIfEmpty($usuarioId);
 
         foreach ($definiciones as $def) {
-            if (!$wa->isWidgetEnabledForUser($usuarioId, (string) $def['id'])) {
+            if (!$wa->isWidgetVisibleOnHome($usuarioId, (string) $def['id'])) {
                 continue;
             }
 
@@ -936,7 +936,7 @@ class DefaultService extends Base
                 continue;
             }
             if ('tasks' === $w['id']) {
-                if ($this->widgetAccessService->isWidgetEnabledForUser($uid, 'tasks')) {
+                if ($this->widgetAccessService->isWidgetVisibleOnHome($uid, 'tasks')) {
                     $pTaskA = $this->BuscarPermiso($uid, FunctionId::TASKS);
                     $pTask = $pTaskA[0] ?? [
                         'ver' => false,
@@ -1061,8 +1061,7 @@ class DefaultService extends Base
     }
 
     /**
-     * "My Widgets": todo el catálogo (mismas tarjetas que en Home) con el estado efectivo; sin filtrar
-     * por "scope" para no dejar la pantalla vacía cuando aún no hay filas en rol/user.
+     * "My Widgets": solo widgets permitidos por admin (`user_widget_access`); el toggle refleja la preferencia de Home.
      *
      * @return list<array<string, mixed>>
      */
@@ -1074,8 +1073,11 @@ class DefaultService extends Base
         $out = [];
         foreach ($this->getWidgetDefinitionCatalog() as $def) {
             $id = (string) $def['id'];
+            if (!$wa->isWidgetEnabledForUser($usuarioId, $id)) {
+                continue;
+            }
             $out[] = array_merge($def, [
-                'user_active' => $wa->isWidgetEnabledForUser($usuarioId, $id),
+                'user_active' => $wa->isWidgetVisibleOnHome($usuarioId, $id),
             ]);
         }
 

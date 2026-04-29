@@ -61,7 +61,7 @@ Migración aplicada en todos los controladores bajo `src/Controller/Admin/` (exc
 
 | Documento | Contenido |
 |-----------|-------------|
-| [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) | Roadmap Symfony 7 / PHP 8.2+ (calidad, DI, DTOs, tests). **Messenger pospuesto.** Pendientes resumidos: tests de integración, serialización/Nelmio, doc de `env`, voters opcionales; §9 tabla de fases |
+| [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) | Roadmap Symfony 7 / PHP 8.2+ (calidad, DI, DTOs, tests). **Messenger pospuesto.** Pendientes resumidos: tests de integración, serialización/Nelmio, voters opcionales; §9 tabla de fases |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitectura actual, trade-offs (monolito vs microservicios, etc.), complejidad y líneas de evolución recomendadas |
 | [docs/PHASE_A_REDUCIR_COMPLEJIDAD.md](docs/PHASE_A_REDUCIR_COMPLEJIDAD.md) | Guía de implementación de la Fase A: capas, módulos, migraciones y tests (sin Messenger) |
 | [docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md](docs/OVERRIDE_PAYMENT_FECHAS_INVOICE.md) | **Override Payment:** reglas por mes, cadena de unpaid (mes de cabecera vs posteriores), flujo, archivos y depuración |
@@ -84,11 +84,39 @@ Otros README temáticos en la raíz del repositorio documentan funcionalidades c
 ## Arranque rápido (desarrollo)
 
 1. `composer install`
-2. Copiar y ajustar variables de entorno (p. ej. `.env.dev` → `.env.local`)
+2. Variables de entorno: copiar [`.env.dist`](.env.dist) a **`.env`** y ajustar valores (Symfony carga `.env` y después `.env.local` si existe). Para secretos solo en tu máquina, usar **`.env.local`** (ignorado por git). Ver **Variables de entorno y despliegue** más abajo.
 3. `symfony server:start` o el vhost que uses hacia `public/`
 4. Consola Symfony: `php bin/console`
 
-Para detalles de despliegue, seguridad y convenciones internas, ver **docs/ARCHITECTURE.md**.
+Para contexto de arquitectura y convenciones internas, ver **docs/ARCHITECTURE.md**.
+
+## Variables de entorno y despliegue
+
+El fichero **`.env`** suele estar solo en máquinas locales y **no se versiona** (`.gitignore`). La plantilla **[`.env.dist`](.env.dist)** lista las variables que usa `config/` y `config/services.yaml`. Flujo habitual: **`.env.dist` → `.env`** en cada entorno; **`.env.local`** opcional para sobrescribir sin tocar `.env`.
+
+### Producción
+
+| Tema | Recomendación |
+|------|----------------|
+| **`APP_ENV`** | `prod`. Mantener `APP_DEBUG=0` (o sin definir debug en prod según plantilla). |
+| **`APP_SECRET`** | Valor aleatorio largo y **único por entorno**. Al **rotarlo**, las sesiones existentes y los **JWT de la API** firmados con el secreto anterior dejan de ser válidos; planificar ventana de mantenimiento o re-login. |
+| **Credenciales** | No commitear `.env.local`. Preferir variables del PaaS/hosting o Symfony Secrets para datos sensibles. |
+| **Integraciones** | Claves de Google, Firebase, correo, etc.: rotar en el proveedor si se filtran; actualizar env en todos los entornos afectados. |
+
+### Variables usadas por la aplicación (resumen)
+
+| Área | Variables | Notas |
+|------|-----------|--------|
+| Symfony core | `APP_ENV`, `APP_DEBUG`, `APP_SECRET` | `APP_SECRET` también firma JWT (`kernel.secret`). |
+| Base de datos | `DATABASE_URL` | Formato Doctrine (véase documentación DoctrineBundle). Tests PHPUnit pueden sobreescribir vía `.env.test`. |
+| Correo | `MAILER_DSN`, `MAILER_SENDER_ADDRESS`, `MAILER_FROM_NAME`, `MAILER_QUOTES_DSN`, `MAILER_QUOTES_*` | Quotes usa DSN y remitentes dedicados en `services.yaml`. |
+| Google | `GOOGLE_RECAPTCHA_*`, `GOOGLE_MAPS_API_KEY`, `GOOGLE_TRANSLATE_API_KEY` | Opcionales según funciones que actives. |
+| Firebase (push) | `FIREBASE_PROJECT_ID`, `FIREBASE_SERVICE_ACCOUNT_JSON` | Ruta al JSON de cuenta de servicio (relativa al proyecto o absoluta). |
+| Dominio / QB | `direccion_url`, `QUICKBOOK_ACCOUNT_NAME` | URL pública y nombre de cuenta QuickBooks si aplica. |
+| Infra Symfony | `LOCK_DSN`, `MESSENGER_TRANSPORT_DSN` | Lock (p. ej. rate limiting); Messenger async (`config/packages/messenger.yaml`). |
+| Solo desarrollo | `VAR_DUMPER_SERVER` | VarDumper server (`when@dev`, `config/packages/debug.yaml`). |
+
+Detalle variable a variable y placeholders: **[`.env.dist`](.env.dist)**.
 
 ## Calidad en local
 
@@ -101,4 +129,4 @@ Para detalles de despliegue, seguridad y convenciones internas, ver **docs/ARCHI
 | `composer quality` | `phpstan` + `test` |
 | `composer install-git-hooks` | Activa `pre-push` (`.githooks/pre-push`) |
 
-Variables de entorno: revisar `.env` / `.env.local` y, para despliegue, documentación pendiente descrita en [docs/ROADMAP_MEJORAS_SYMFONY_PHP.md](docs/ROADMAP_MEJORAS_SYMFONY_PHP.md) §8.2.
+Variables de entorno: ver sección **Variables de entorno y despliegue** arriba y [`.env.dist`](.env.dist).

@@ -126,7 +126,7 @@ class DefaultController extends AbstractAdminController
         try {
             $stats = [];
 
-            if ($w->isWidgetEnabledForUser($userId, 'tasks')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'tasks')) {
                 $pTaskA = $this->defaultService->BuscarPermiso($userId, FunctionId::TASKS);
                 $pTask = $pTaskA[0] ?? [
                     'ver' => false,
@@ -144,7 +144,7 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'work_schedule')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'work_schedule')) {
                 $stats['work_schedule'] = $this->scheduleService->listarSchedulesPayloadHome(
                     $fechaInicial,
                     $fechaFin,
@@ -153,7 +153,7 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'bid_deadlines')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'bid_deadlines')) {
                 $stats['bid_deadlines'] = $this->estimateService->listarUpcomingBidDeadlinesPayloadHome(
                     $fechaInicial,
                     $fechaFin,
@@ -162,7 +162,7 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'current_month_data_tracking')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'current_month_data_tracking')) {
                 $stats['current_month_data_tracking'] = $this->dataTrackingService->listarCurrentMonthProjectsPayloadHome(
                     $projectId,
                     $fechaInicial,
@@ -170,7 +170,7 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'pay_item_totals')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'pay_item_totals')) {
                 $stats['pay_item_totals'] = $this->defaultService->ListarItemsConMontos(
                     $projectId,
                     $fechaInicial,
@@ -179,7 +179,7 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'invoiced_projects')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'invoiced_projects')) {
                 $stats['invoiced_projects'] = $this->defaultService->ListarInvoicedProjectsPayloadHome(
                     $projectId,
                     $fechaInicial,
@@ -187,28 +187,28 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
-            if ($w->isWidgetEnabledForUser($userId, 'estimate_win_loss')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'estimate_win_loss')) {
                 $stats['chart_estimate_win_loss'] = $this->defaultService->DevolverDataChartEstimateWinLoss(
                     '',
                     $fechaInicial,
                     $fechaFin
                 );
             }
-            if ($w->isWidgetEnabledForUser($userId, 'estimates_submitted_totals')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'estimates_submitted_totals')) {
                 $stats['chart_estimates_submitted_totals'] = $this->defaultService->DevolverDataChartEstimateSubmittedTotals(
                     '',
                     $fechaInicial,
                     $fechaFin
                 );
             }
-            if ($w->isWidgetEnabledForUser($userId, 'estimator_submitted_share')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'estimator_submitted_share')) {
                 $stats['chart_estimator_submitted_share'] = $this->defaultService->DevolverDataChartEstimatorSubmittedShare(
                     '',
                     $fechaInicial,
                     $fechaFin
                 );
             }
-            if ($w->isWidgetEnabledForUser($userId, 'invoice_profit_share')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'invoice_profit_share')) {
                 $stats['chart_profit'] = $this->defaultService->DevolverDataChartProfit(
                     $projectId,
                     $fechaInicial,
@@ -216,7 +216,7 @@ class DefaultController extends AbstractAdminController
                     $status
                 );
             }
-            if ($w->isWidgetEnabledForUser($userId, 'job_cost_breakdown')) {
+            if ($w->isWidgetVisibleOnHome($userId, 'job_cost_breakdown')) {
                 $stats['chart_costs'] = $this->defaultService->DevolverDataChartCosts(
                     $projectId,
                     $fechaInicial,

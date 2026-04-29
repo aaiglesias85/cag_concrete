@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 26-04-2026 a las 21:32:31
+-- Tiempo de generación: 29-04-2026 a las 01:09:05
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -173,7 +173,7 @@ INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`,
 (107, 'Strack, inc', '', '', '', '', '2025-07-25 15:41:06', NULL, NULL, NULL),
 (108, 'S.H CREEL CONTRACTING', '', '', '', '', '2025-07-31 14:54:38', NULL, NULL, NULL),
 (109, 'Moye Electric Company, Inc.', '', '', '', '', '2025-08-04 16:15:22', NULL, NULL, NULL),
-(110, 'AMERICAN CONTRACTING & SERVICES, INC', '', '', NULL, NULL, '2025-08-07 13:43:45', '2026-03-13 15:07:21', '', ''),
+(110, 'AMERICAN CONTRACTING & SERVICES, INC', '', '', '', '', '2025-08-07 13:43:45', '2026-04-28 03:26:15', '', ''),
 (111, 'CEKRA, INC.', '', '', '', '', '2025-08-07 13:44:30', NULL, NULL, NULL),
 (112, 'GULF COAST CONTRACTING, LL', '', '', '', '', '2025-08-07 13:45:34', NULL, NULL, NULL),
 (113, 'M & J CONSTRUCTION COMPANY OF PINELLAS COUNTY, INC.', '', '', '', '', '2025-08-07 13:46:16', NULL, NULL, NULL),
@@ -556,7 +556,6 @@ INSERT INTO `county` (`county_id`, `description`, `status`, `district_id`) VALUE
 (60, 'WILKINSON', 1, 2),
 (61, 'BANKS', 1, 1),
 (62, 'FLOYD', 1, 6),
-(63, 'test', 1, NULL),
 (64, 'BURKE', 1, 2),
 (65, 'COWETA, FULTON', 1, NULL),
 (67, 'TALBERT', 1, NULL),
@@ -626,7 +625,7 @@ INSERT INTO `county` (`county_id`, `description`, `status`, `district_id`) VALUE
 (133, 'SOUTH FULTON', 1, NULL),
 (135, 'PEACHTREE CITY', 1, NULL),
 (136, 'WHITFIELD', 1, 6),
-(137, 'ALL COUNTIES', 1, NULL),
+(137, 'ALL COUNTIES', 1, 1),
 (138, 'GREENE, LAURENS, MORGAN, NEWTON, TALIAFERRO', 1, NULL),
 (139, 'MERIWETHER', 1, 3),
 (140, 'UPSON', 1, 3),
@@ -3894,7 +3893,7 @@ INSERT INTO `data_tracking` (`id`, `date`, `station_number`, `measured_by`, `con
 (3192, '2026-02-10', '', 'Empleado_Prueba_3192', NULL, 'Empleado_Prueba_3192', '', '', NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:19:00', NULL, 38, NULL, NULL),
 (3193, '2026-02-11', '', 'Empleado_Prueba_3193', NULL, 'Empleado_Prueba_3193', '', '', NULL, NULL, 0.00, 5.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:20:25', NULL, 38, NULL, NULL),
 (3194, '2026-02-12', '', 'Empleado_Prueba_3194', NULL, 'Empleado_Prueba_3194', '', '', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:21:37', '2026-02-18 16:22:56', 38, NULL, NULL),
-(3195, '2026-02-13', '', 'Empleado_Prueba_3195', NULL, 'undefined', '', '0', NULL, NULL, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:22:39', '2026-03-20 16:41:10', 38, NULL, NULL),
+(3195, '2026-02-13', '', 'Empleado_Prueba_3195', '', 'undefined', '', '0', 0.00, 0.00, 0.00, 4.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:22:39', '2026-04-28 03:38:57', 38, NULL, NULL),
 (3196, '2026-02-04', '', 'Empleado_Prueba_3196', NULL, 'Empleado_Prueba_3196', '', '', NULL, NULL, 0.00, 7.00, 0.00, 0.00, 0.00, 0, '2026-02-18 16:28:37', NULL, 94, NULL, NULL),
 (3197, '2026-02-05', '', 'Empleado_Prueba_3197', NULL, 'Empleado_Prueba_3197', '', '', NULL, NULL, 0.00, 11.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:31:34', NULL, 94, NULL, NULL),
 (3198, '2026-02-06', '', 'Empleado_Prueba_3198', NULL, 'Empleado_Prueba_3198', '', '', NULL, NULL, 0.00, 0.00, 0.00, 0.00, 0.00, 1, '2026-02-18 16:32:20', NULL, 94, NULL, NULL),
@@ -27873,7 +27872,7 @@ CREATE TABLE `employee` (
 --
 
 INSERT INTO `employee` (`employee_id`, `name`, `hourly_rate`, `position`, `role_id`, `color`, `address`, `phone`, `cert_rate_type`, `social_security_number`, `apprentice_percentage`, `work_code`, `gender`, `race_id`, `date_hired`, `date_terminated`, `reason_terminated`, `time_card_notes`, `regular_rate_per_hour`, `overtime_rate_per_hour`, `special_rate_per_hour`, `trade_licenses_info`, `notes`, `is_osha_10_certified`, `is_veteran`, `status`) VALUES
-(1, 'Empleado_Prueba_1', 25.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
+(1, 'Empleado_Prueba_1', 25.00, 'Laborer', 1, '#17C653', '', '', '', '', 0.00, '', '', NULL, NULL, NULL, '', '', 0.00, 0.00, 0.00, '', '', 0, 0, 1),
 (2, 'Empleado_Prueba_2', 25.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (3, 'Empleado_Prueba_3', 25.00, 'Laborer', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
 (4, 'Empleado_Prueba_4', 30.00, 'Lead', 2, '#1F4BED', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1),
@@ -29712,8 +29711,8 @@ INSERT INTO `estimate_county` (`id`, `estimate_id`, `county_id`) VALUES
 (318, 194, 240),
 (319, 283, 247),
 (320, 182, 248),
-(587, 43, 11),
-(588, 43, 20);
+(603, 43, 11),
+(604, 43, 20);
 
 -- --------------------------------------------------------
 
@@ -30063,7 +30062,7 @@ INSERT INTO `estimate_project_type` (`id`, `estimate_id`, `type_id`) VALUES
 (1262, 62, 43),
 (1272, 229, 2),
 (1277, 113, 38),
-(1329, 43, 41);
+(1337, 43, 41);
 
 -- --------------------------------------------------------
 
@@ -31074,7 +31073,7 @@ CREATE TABLE `inspector` (
 --
 
 INSERT INTO `inspector` (`inspector_id`, `name`, `phone`, `email`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Empleado_Prueba_1', '', '', 1, '2024-04-13 00:03:19', '2024-04-13 00:03:50'),
+(1, 'Empleado_Prueba_1', '', '', 1, '2024-04-13 00:03:19', '2026-04-28 03:42:25'),
 (4, 'Empleado_Prueba_4', '', '', 1, '2024-05-18 16:08:15', NULL),
 (7, 'Empleado_Prueba_7', '', '', 1, '2025-01-20 15:36:39', NULL),
 (8, 'Empleado_Prueba_8', '', '', 1, '2025-02-03 20:35:57', NULL),
@@ -31251,7 +31250,7 @@ INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`
 (319, '1', '2025-06-01', '2025-06-30', '', 0, '2026-02-24 01:45:02', '2026-03-22 20:47:27', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
 (320, '3', '2025-10-01', '2025-10-31', '', 0, '2026-02-24 01:47:00', '2026-03-22 20:47:52', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
 (321, '5', '2026-11-01', '2026-11-30', '', 0, '2026-02-24 01:48:14', '2026-03-22 20:48:30', 253, NULL, NULL, NULL, 0.000000, 0.00, 0, 0.00, NULL, 0.00, 0.00),
-(344, '1', '2025-08-01', '2025-08-31', '', 0, '2026-03-27 18:10:08', '2026-03-31 00:42:58', 513, NULL, NULL, NULL, 0.038450, -78.25, 0, 0.00, NULL, 3913.20, 391.32);
+(344, '1', '2025-08-01', '2025-08-31', '', 0, '2026-03-27 18:10:08', '2026-04-28 03:45:34', 513, NULL, NULL, NULL, 0.038450, -78.25, 0, 0.00, NULL, 3913.20, 391.32);
 
 -- --------------------------------------------------------
 
@@ -31892,14 +31891,14 @@ INSERT INTO `invoice_item` (`id`, `quantity_from_previous`, `unpaid_from_previou
 (2955, 0.000000, 0.000000, 0.000000, 185.00, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 321, 2943, NULL),
 (2956, 20.000000, 20.000000, 0.000000, 45.00, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 321, 2958, NULL),
 (3177, 0.000000, 0.000000, 90.000000, 36.68, 100.000000, 0.000000, 0, 0.000000, 3668.000000, 0.000000, 344, 3026, NULL),
-(3178, 0.000000, 0.000000, 300.000000, 2.04, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3027, NULL),
+(3178, 0.000000, 0.000000, 300.000000, 2.04, 0.000000, 300.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3027, NULL),
 (3179, 0.000000, 0.000000, 0.000000, 3.06, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3028, NULL),
 (3180, 0.000000, 0.000000, 0.000000, 2.04, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3029, NULL),
 (3181, 0.000000, 0.000000, 0.000000, 28.53, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3059, NULL),
 (3182, 0.000000, 0.000000, 0.000000, 22.42, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3065, NULL),
 (3183, 0.000000, 0.000000, 0.000000, 50.95, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3069, NULL),
 (3184, 0.000000, 0.000000, 0.000000, 4.08, 0.000000, 0.000000, 0, 0.000000, 0.000000, 0.000000, 344, 3070, NULL),
-(3186, 0.000000, 0.000000, 0.000000, -2035.00, 0.036000, 0.000000, 0, 0.000000, -73.260000, -73.260000, 344, 3129, NULL);
+(3186, 0.000000, 0.000000, 0.000000, -2035.00, 0.036040, 0.963960, 0, 0.000000, -73.340000, -73.340000, 344, 3129, NULL);
 
 -- --------------------------------------------------------
 
@@ -32230,7 +32229,7 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (208, 'CONC SWALE 4 FT W X 6.5 in D. CL A CONC INCL REINFORCED STEEL', 'CONC SWALE 4 FT W X 6.5 in D. CL A CONC INCL REINFORCED STEEL', 100.00, 'equation', 1, NULL, '2025-01-10 13:44:59', '2025-04-15 18:32:41', 12, 64, NULL, NULL),
 (209, 'CONC FLUME', 'CONC FLUME', 5100.00, '', 1, NULL, '2025-01-10 13:55:09', NULL, 15, NULL, NULL, NULL),
 (210, 'C&G 18 IN', 'C&G 18 IN', 18.50, 'equation', 1, NULL, '2025-01-10 13:56:30', '2025-03-20 18:04:24', 12, 60, NULL, NULL),
-(211, '12 IN HEADER CURB', '12 IN HEADER CURB', 23.00, 'equation', 1, 0, '2025-01-10 13:57:03', '2026-04-15 01:06:27', 12, 23, NULL, NULL),
+(211, '12 IN HEADER CURB', '12 IN HEADER CURB', 23.00, 'equation', 1, 0, '2025-01-10 13:57:03', '2026-04-28 03:17:17', 12, 23, NULL, NULL),
 (212, 'VALLEY GUTTER', 'VALLEY GUTTER', 28.00, 'equation', 1, NULL, '2025-01-10 13:58:07', '2025-03-20 17:34:33', 12, 56, NULL, NULL),
 (213, 'HANDICAP RAMPS', 'HANDICAP RAMPS', 1600.00, 'equation', 1, NULL, '2025-01-10 13:58:37', '2025-03-20 18:04:56', 15, 24, NULL, NULL),
 (214, 'CONC SIDEWALK TP 1', 'CONC SIDEWALK TP 1', 2800.00, 'equation', 1, NULL, '2025-01-10 14:52:07', '2025-03-20 17:21:30', 15, 20, NULL, NULL),
@@ -32616,7 +32615,7 @@ INSERT INTO `item` (`item_id`, `name`, `description`, `price`, `yield_calculatio
 (602, '2% BOND', '2% BOND', 10046.20, 'none', 1, NULL, '2025-08-05 13:21:26', NULL, 14, NULL, NULL, NULL),
 (603, 'CONC BRIDGE SIDEWALK 6.5\"', 'CONC BRIDGE SIDEWALK 6.5\"', 49.00, 'same', 1, NULL, '2025-08-05 13:29:59', NULL, 13, NULL, NULL, NULL),
 (604, 'REINF CONC APPROACH SLAB, 9017R', 'REINF CONC APPROACH SLAB, 9017R', 234.00, 'equation', 1, NULL, '2025-08-05 15:20:29', NULL, 13, 31, NULL, NULL),
-(605, 'CONCRETE MEDIAN, 7 1/2 IN', 'CONCRETE MEDIAN, 7 1/2 IN', 84.00, 'equation', 1, NULL, '2025-08-06 18:00:06', NULL, 13, 39, NULL, NULL),
+(605, 'CONCRETE MEDIAN, 7 1/2 IN', 'CONCRETE MEDIAN, 7 1/2 IN', 84.00, 'equation', 1, 0, '2025-08-06 18:00:06', NULL, 13, 39, NULL, NULL),
 (606, 'PLAIN PC CONC PVMT, CL 3 CONC, 10 INCH THICH', 'PLAIN PC CONC PVMT, CL 3 CONC, 10 INCH THICH', 172.00, 'equation', 1, NULL, '2025-08-06 18:04:43', NULL, 13, 38, NULL, NULL),
 (607, 'DRIVEWAY CONC, 6 IN TK', 'DRIVEWAY CONC, 6 IN TK', 64.00, 'equation', 1, NULL, '2025-08-06 18:17:13', NULL, 13, 37, NULL, NULL),
 (608, 'DRIVEWAY CONC, 8 IN TK', 'DRIVEWAY CONC, 8 IN TK', 72.00, 'equation', 1, NULL, '2025-08-06 18:17:49', NULL, 13, 36, NULL, NULL),
@@ -33551,7 +33550,86 @@ INSERT INTO `log` (`log_id`, `operation`, `category`, `description`, `ip`, `crea
 (651, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-25 15:22:00', 1),
 (652, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-25 15:22:06', 1),
 (653, 'Update', 'Estimate', 'The estimate is modified: Prueba Estimado', '::1', '2026-04-25 15:42:25', 1),
-(654, 'Update', 'User', 'The user is modified: Empleado_Prueba_1 Iglesias', '::1', '2026-04-26 20:22:19', 1);
+(654, 'Update', 'User', 'The user is modified: Empleado_Prueba_1 Iglesias', '::1', '2026-04-26 20:22:19', 1),
+(655, 'Update', 'User', 'The user is modified: Empleado_Prueba_3 Garcia', '::1', '2026-04-26 21:34:23', 1),
+(656, 'Update', 'User', 'The user is modified: Empleado_Prueba_3 Garcia', '::1', '2026-04-26 21:51:03', 1),
+(657, 'Update', 'User', 'The user is modified: Empleado_Prueba_3 Garcia', '::1', '2026-04-26 21:51:20', 1),
+(658, 'Update', 'Advertisement', 'The advertisement is modified: Update – Invoices and Payments Ready for Review', '::1', '2026-04-26 23:00:23', 1),
+(659, 'Update', 'User', 'The user is modified: Empleado_Prueba_1 Iglesias', '::1', '2026-04-26 23:11:21', 1),
+(660, 'Update', 'Rol', 'The rol is modified: Administrator', '::1', '2026-04-26 23:12:09', 1),
+(661, 'Update', 'County', 'The county is modified: ALL COUNTIES', '::1', '2026-04-27 03:54:34', 1),
+(662, 'Update', 'County', 'The county is modified: APPLING', '::1', '2026-04-27 03:54:41', 1),
+(663, 'Add', 'County', 'The county is added: Test', '::1', '2026-04-27 03:54:56', 1),
+(664, 'Delete', 'County', 'The county was deleted: test', '::1', '2026-04-27 03:55:04', 1),
+(665, 'Delete', 'County', 'The county was deleted: Test', '::1', '2026-04-27 03:55:04', 1),
+(666, 'Delete', 'Project', 'The project is deleted: WINDSOR PKWY SIDEWALK', '::1', '2026-04-27 23:36:31', 1),
+(667, 'Delete', 'Project', 'The project is deleted: ROGERS BRIDGE @ CHATAHOOCHE RIVER - PEDESTRIAN BRIDGE', '::1', '2026-04-27 23:36:45', 1),
+(668, 'Update', 'Reminder', 'The reminder is modified: test diferte fecha, Date: 11/24/2025', '::1', '2026-04-28 02:27:05', 1),
+(669, 'Add', 'Reminder', 'The reminder is added: Test, Date: 04/27/2026', '::1', '2026-04-28 02:27:20', 1),
+(670, 'Delete', 'Reminder', 'The reminder is deleted: Test', '::1', '2026-04-28 02:27:23', 1),
+(671, 'Delete', 'Reminder', 'The reminder is deleted: tets', '::1', '2026-04-28 02:27:30', 1),
+(672, 'Update', 'Race', 'The race is modified: Asian-Indian', '::1', '2026-04-28 02:30:02', 1),
+(673, 'Update', 'Reminder', 'The reminder is modified: test diferte fecha, Date: 11/24/2025', '::1', '2026-04-28 02:55:42', 1),
+(674, 'Update', 'Race', 'The race is modified: Asian-Indian', '::1', '2026-04-28 02:56:17', 1),
+(675, 'Add', 'Race', 'The race is added: test', '::1', '2026-04-28 03:01:00', 1),
+(676, 'Update', 'Race', 'The race is modified: test', '::1', '2026-04-28 03:01:09', 1),
+(677, 'Delete', 'Race', 'The race is deleted: test', '::1', '2026-04-28 03:01:12', 1),
+(678, 'Update', 'Plan Status', 'The plan status is modified: Downloaded', '::1', '2026-04-28 03:04:19', 1),
+(679, 'Add', 'Plan Status', 'The plan status is added: test', '::1', '2026-04-28 03:04:26', 1),
+(680, 'Delete', 'Plan Status', 'The plan status is deleted: test', '::1', '2026-04-28 03:04:30', 1),
+(681, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:52', 1),
+(682, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:54', 1),
+(683, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:55', 1),
+(684, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:56', 1),
+(685, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:57', 1),
+(686, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:04:58', 1),
+(687, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:05:12', 1),
+(688, 'Update', 'Estimate', 'The estimate is modified: Mill Road Widening', '::1', '2026-04-28 03:17:09', 1),
+(689, 'Update', 'Item', 'The item is modified: 12 IN HEADER CURB', '::1', '2026-04-28 03:17:17', 1),
+(690, 'Add', 'Item', 'The item is added: Test docker', '::1', '2026-04-28 03:17:33', 1),
+(691, 'Update', 'Item', 'The item is modified: Test docker', '::1', '2026-04-28 03:17:37', 1),
+(692, 'Update', 'Item', 'The item is modified: Test docker', '::1', '2026-04-28 03:17:48', 1),
+(693, 'Delete', 'Item', 'The item is deleted: Test docker', '::1', '2026-04-28 03:17:54', 1),
+(694, 'Update', 'Equation', 'The equation is modified: APPROACH SLAB', '::1', '2026-04-28 03:20:46', 1),
+(695, 'Update', 'Unit', 'The unit is modified: BUCKET', '::1', '2026-04-28 03:20:56', 1),
+(696, 'Update', 'Project Stage', 'The project stage is modified: Accepted', '::1', '2026-04-28 03:21:05', 1),
+(697, 'Add', 'Project Stage', 'The project stage is added: test', '::1', '2026-04-28 03:21:10', 1),
+(698, 'Delete', 'Project Stage', 'The project stage is deleted: test', '::1', '2026-04-28 03:21:18', 1),
+(699, 'Update', 'Project Type', 'The project type is modified: Active Slider Repair', '::1', '2026-04-28 03:21:24', 1),
+(700, 'Update', 'Proposal Type', 'The proposal type is modified: Add-On', '::1', '2026-04-28 03:21:31', 1),
+(701, 'Update', 'Plan Status', 'The plan status is modified: Downloaded', '::1', '2026-04-28 03:21:36', 1),
+(702, 'Update', 'Plan Downloading', 'The plan downloading is modified: Done', '::1', '2026-04-28 03:21:43', 1),
+(703, 'Update', 'District', 'The district is modified: District 1', '::1', '2026-04-28 03:21:49', 1),
+(704, 'Update', 'County', 'The county is modified: APPLING', '::1', '2026-04-28 03:22:22', 1),
+(705, 'Update', 'Estimate Note Item', 'The estimate note item is modified: Does not include rebar', '::1', '2026-04-28 03:22:29', 1),
+(706, 'Update', 'Company', 'The company is modified: AMERICAN CONTRACTING & SERVICES, INC', '::1', '2026-04-28 03:24:22', 1),
+(707, 'Update', 'Company', 'The company is modified: AMERICAN CONTRACTING & SERVICES, INC', '::1', '2026-04-28 03:26:15', 1),
+(708, 'Add', 'Company', 'The company is added: Test Metronic 8', '::1', '2026-04-28 03:26:31', 1),
+(709, 'Update', 'Company', 'The company is modified: Test Metronic 8', '::1', '2026-04-28 03:26:35', 1),
+(710, 'Delete', 'Company', 'The company is deleted: Test Metronic 8', '::1', '2026-04-28 03:26:43', 1),
+(711, 'Update', 'Project', 'The project is modified: VILLA RICA BYPASS', '::1', '2026-04-28 03:26:51', 1),
+(712, 'Update', 'Subcontractor', 'The subcontractor is modified: Empleado_Prueba_1', '::1', '2026-04-28 03:27:05', 1),
+(713, 'Update', 'Concrete Class', 'The concrete class is modified: Class 24 HR', '::1', '2026-04-28 03:27:12', 1),
+(714, 'Update', 'Schedule', 'The schedule is modified: 3 PED ISLANDS DOWELED IN', '::1', '2026-04-28 03:28:28', 1),
+(715, 'Update', 'Data Tracking', 'The data tracking is modified, Project: AW42003 - I-285/I-20 EAST INTERCHANGE, Date: 02/13/2026', '::1', '2026-04-28 03:34:01', 1),
+(716, 'Update', 'Data Tracking', 'The data tracking is modified, Project: AW42003 - I-285/I-20 EAST INTERCHANGE, Date: 02/13/2026', '::1', '2026-04-28 03:38:57', 1),
+(717, 'Update', 'Inspector', 'The inspector is modified: Empleado_Prueba_1', '::1', '2026-04-28 03:42:25', 1),
+(718, 'Update', 'Holiday', 'The holiday is modified: WINTER BREAK', '::1', '2026-04-28 03:45:06', 1),
+(719, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-04-28 03:45:20', 1),
+(720, 'Update', 'Invoice', 'The invoice #1 is modified', '::1', '2026-04-28 03:45:34', 1),
+(721, 'Update', 'Concrete Vendor', 'The concrete vendor is modified: 404 CONC', '::1', '2026-04-28 03:46:26', 1),
+(722, 'Update', 'Overhead Price', 'The overhead price is modified: 2025 Q1', '::1', '2026-04-28 03:46:35', 1),
+(723, 'Update', 'Material', 'The material is modified: #4 BARS, LF', '::1', '2026-04-28 03:46:42', 1),
+(724, 'Update', 'Employee', 'The employee is modified: Empleado_Prueba_1', '::1', '2026-04-28 03:46:50', 1),
+(725, 'Update', 'Race', 'The race is modified: Asian-Indian', '::1', '2026-04-28 03:49:01', 1),
+(726, 'Update', 'Employee', 'The employee is modified: Empleado_Prueba_1', '::1', '2026-04-28 03:49:08', 1),
+(727, 'Update', 'Employee Role', 'The employee role is modified: LABOR', '::1', '2026-04-28 03:49:17', 1),
+(728, 'Update', 'Rol', 'The rol is modified: Accounting', '::1', '2026-04-28 03:49:43', 1),
+(729, 'Update', 'Advertisement', 'The advertisement is modified: Update – Invoices and Payments Ready for Review', '::1', '2026-04-28 03:50:06', 1),
+(730, 'Update', 'Task', 'The task is modified', '::1', '2026-04-28 03:50:12', 1),
+(731, 'Update', 'Task', 'The task status is changed: complete', '::1', '2026-04-28 23:42:16', 1),
+(732, 'Update', 'Task', 'The task status is changed: pending', '::1', '2026-04-28 23:42:19', 1),
+(733, 'Update', 'Holiday', 'The holiday is modified: WINTER BREAK', '::1', '2026-04-29 00:49:47', 1);
 
 -- --------------------------------------------------------
 
@@ -34265,9 +34343,7 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (43, '0015432', 'BP02018', 'B3CBA2302700-0', 'SR3 CONNECTOR AT UPPER RIVERDALE ROAD, CLAYTON COUNTY', 'SR3 CONNECTOR AT UPPER RIVERDALE ROAD, CLAYTON COUNTY', 'undefined', 'GDOT', '320087-01', 171369.00, 1, 'CLAYTON', 0, '', 0, '2023-10-26', '2024-08-31', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', NULL, NULL, NULL, NULL, '2024-10-17 14:38:13', '2025-10-13 20:24:17', '2025-10-13 20:24:17', 17, NULL, NULL, NULL, NULL, NULL, NULL),
 (44, '0009967', 'BP02017', 'B1CBA2201350-0', 'SR 14 & SR41 ROUNDABOUT', 'SR 14 & SR41 ROUNDABOUT', NULL, 'GDOT', 'UNKNOWN', 398154.50, 1, 'COWETA', 0, '', 0, '2022-04-26', '2024-03-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-17 15:20:47', '2025-04-22 19:09:45', NULL, 17, NULL, NULL, NULL, NULL, NULL, NULL),
 (45, 'N/A', 'BP02016', '22-09', '22-09 WIDENING OF CP 1344 / VALLEY HILL ROAD', '22-09 WIDENING OF CP 1344 / VALLEY HILL ROAD', NULL, 'Clayton County Board of Commissioners', 'Unknown', 566370.75, 0, 'Clayton', 0, '', 0, '2022-04-26', '2024-11-24', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-17 17:34:47', '2025-04-22 19:09:31', NULL, 17, NULL, NULL, NULL, NULL, NULL, NULL),
-(46, '631490', 'AG01007', 'B1CBA2201629-0', 'VILLA RICA BYPASS', 'VILLA RICA BYPASS', 'undefined', 'GDOT', '24-186-015', 954373.50, 1, 'CARROLL', 0, '', 1, NULL, '2025-09-30', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', NULL, NULL, NULL, NULL, '2024-10-18 17:14:24', '2025-11-19 16:00:11', '2025-11-19 15:59:10', 16, NULL, NULL, NULL, NULL, NULL, NULL),
-(47, '0014160', 'AG01006', '', 'ROGERS BRIDGE @ CHATAHOOCHE RIVER - PEDESTRIAN BRIDGE', 'ROGERS BRIDGE @ CHATAHOOCHE RIVER - PEDESTRIAN BRIDGE', 'undefined', 'CITIES OF DULUTH IN GWINNETT COUNTY AND JOHNS CREEK FULTON COUNTY', '10-217-003', 71911.05, 0, 'GWINNETT & FULTON', 0, '', 0, NULL, '2025-05-18', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-10-18 18:48:06', '2026-02-04 14:37:22', '2026-02-04 14:37:12', 16, NULL, NULL, NULL, NULL, 0, 0.00),
-(48, 'TS-00164', 'AG01005', '', 'WINDSOR PKWY SIDEWALK', 'WINDSOR PKWY SIDEWALK', 'undefined', 'CITY OF SANDY SPRINGS', '20-171-013', 133985.10, 0, 'CITY OF SANDY SPRINGS', 0, '', 0, '0020-04-10', '0024-10-31', NULL, '', 1, 'undefined', 'undefined', NULL, '2026-03-03', 1.00, 1, 'year', 0, 0.00, 0.00, 0.00, '2024-10-18 19:41:22', '2026-03-23 17:00:09', NULL, 16, 13, NULL, 32, NULL, 1, 0.00),
+(46, '631490', 'AG01007', 'B1CBA2201629-0', 'VILLA RICA BYPASS', 'VILLA RICA BYPASS', 'undefined', 'GDOT', '24-186-015', 954373.50, 1, 'CARROLL', 0, '', 1, NULL, '2025-09-30', NULL, '', 1, 'undefined', 'undefined', NULL, NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-10-18 17:14:24', '2026-04-28 03:26:51', '2025-11-19 15:59:10', 16, NULL, NULL, NULL, NULL, 0, NULL),
 (49, '0006700', 'BB27001', 'B3CBA2101501-0', 'COMPLETION OF EFFINGHAM PARKWAY BEGINNING AT SR 30 AND EXTENDING TO BLUE JAY RD', 'COMPLETION OF EFFINGHAM PARKWAY BEGINNING AT SR 30 AND EXTENDING TO BLUE JAY RD', 'undefined', 'GDOT', '20001024-SC-001', 2141477.82, 1, 'CHATHAM, EFFINGHAM', 0, '', 0, '2022-01-12', '2025-04-30', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-10-18 20:30:24', '2025-12-02 21:45:53', '2025-12-02 21:31:34', 18, NULL, NULL, NULL, NULL, NULL, NULL),
 (50, '00077259 & 522790', 'BB27000', 'B3CBA1701600-0', 'JIMMY DELOACH PARKWAY EXTENSION FROM I-16 TO SR/26 US 80', 'JIMMY DELOACH PARKWAY EXTENSION FROM I-16 TO SR/26 US 80', 'undefined', 'GDOT', '2036-SC-002', 503316.80, 1, 'CHATHAM', 0, '', 0, NULL, '2021-10-31', NULL, '', 2, 'undefined', 'undefined', NULL, NULL, 0.00, 0, '', 0, 0.00, 0.00, 0.00, '2024-10-21 14:33:38', '2026-03-17 23:51:42', NULL, 18, NULL, NULL, NULL, NULL, 0, NULL),
 (51, 'PR-IMP-CR710-(65)(32)', 'BAR59011', '21008-1505', 'DALLAS ACWORTH HWY @ FREY ROAD & MT TABOR CHURCH RD INTERSECTION IMPROVEMENT', 'DALLAS ACWORTH HWY @ FREY ROAD & MT TABOR CHURCH RD INTERSECTION IMPROVEMENT', NULL, 'Paulding County Board of Commissioners', '20-7040-S10', 42404.00, 0, 'PAULDING', 0, '', 0, '2024-07-15', '2024-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-10-21 15:29:59', '2025-04-22 18:40:40', NULL, 19, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -34357,10 +34433,10 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (135, 'M006214', 'CWM04077', 'B1CBA2301115-0', 'M006214; GDOT #006- SR 26 MILL & RESURFACING; CHATHAM', 'M006214; GDOT #006- SR 26 MILL & RESURFACING; CHATHAM', NULL, 'GDOT', '32939', 131464.00, 1, 'CHATHAM', 1, '', 1, '2023-03-17', '2023-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:00:15', '2025-04-24 18:35:16', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (136, 'M0063626', 'CWM04076', 'B1CBA2301127-0', 'M0063626 MILL, INLAY, RESURAF SR 120, COBB', 'M0063626 MILL, INLAY, RESURAF SR 120, COBB', NULL, 'GDOT', '32940', 48045.00, 1, 'COBB', 1, '', 1, '2023-03-14', '2023-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:04:26', '2025-04-24 18:33:06', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (137, 'M006102', 'CWM04075', 'B1CBA2202341-0', 'M006102 - SR 219 MILL / INLAY / RESURF - MUSCOGEE COUNTY', 'M006102 - SR 219 MILL / INLAY / RESURF - MUSCOGEE COUNTY', NULL, 'GDOT', '62873', 151525.00, 1, 'MUSCOGEE', 1, '', 1, '2023-01-06', '2023-09-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:09:51', '2025-04-24 18:27:36', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
-(138, 'M006328', 'CWM04074', 'B1CBA2202002-1', 'M006328, SR 139 MILL / INLAY / RESURF - / SHLDR REHAB - COBB COUNTY', 'M006328, SR 139 MILL / INLAY / RESURF - / SHLDR REHAB - COBB COUNTY', NULL, 'GDOT', '32881', 69316.00, 1, 'COBB', 1, '', 1, '2023-01-12', '2023-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:12:58', '2025-04-24 19:18:25', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
+(138, 'M006328', 'CWM04074', 'B1CBA2202002-1', 'M006328, SR 139 MILL / INLAY / RESURF - / SHLDR REHAB - COBB COUNTY', 'M006328, SR 139 MILL / INLAY / RESURF - / SHLDR REHAB - COBB COUNTY', NULL, 'GDOT', '32881', 69316.00, 1, 'COBB', 1, '', 1, '2023-01-12', '2023-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:12:58', '2025-04-24 19:18:25', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (139, 'M004965', 'CWM04072', '', 'M004965, SR 92 MILL / INLAY / RESURF - / SHLDR REHAB - DOUGLAS COUNTY', 'M004965, SR 92 MILL / INLAY / RESURF - / SHLDR REHAB - DOUGLAS COUNTY', NULL, 'GDOT', '32869', 54360.00, 1, 'DOUGLAS', 1, '', 1, '2022-12-14', '2023-12-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:19:38', '2025-04-24 18:13:03', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
-(140, 'M006353', 'CWM04071', 'B1CBA2301118-1', 'M006353, US 27/ SR 1 MILL / INLAY / RESURF - TROUP COUNTY', 'M006353, US 27/ SR 1 MILL / INLAY / RESURF - TROUP COUNTY', NULL, 'GDOT', '32985', 4120.00, 1, 'TROUP', 1, '', 1, NULL, '2024-03-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:34:35', '2025-04-24 18:11:14', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
+(140, 'M006353', 'CWM04071', 'B1CBA2301118-1', 'M006353, US 27/ SR 1 MILL / INLAY / RESURF - TROUP COUNTY', 'M006353, US 27/ SR 1 MILL / INLAY / RESURF - TROUP COUNTY', NULL, 'GDOT', '32985', 4120.00, 1, 'TROUP', 1, '', 1, NULL, '2024-03-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:34:35', '2025-04-24 18:11:14', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
 (141, '0014896', 'CWM04070', 'B1CBA2201358-1', '0014896; BASS ROAD - BRIDGE OVER NSRR; BIBB COUNTY', '0014896; BASS ROAD - BRIDGE OVER NSRR; BIBB COUNTY', NULL, 'GDOT', '52878', 193984.00, 1, 'BIBB', 0, '', 1, '2022-12-12', '2024-07-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 20:37:43', '2025-08-07 22:57:25', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (142, 'M006127', 'CWM04068', 'B1CBA2102153-0', 'M006127 RESURFACING & SHOULDER REHAB, FRANKLIN', 'M006127 RESURFACING & SHOULDER REHAB, FRANKLIN', NULL, 'GDOT', '32579', 48900.00, 1, 'FRANKLIN', 1, '', 1, '2022-10-31', '2023-10-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-04 21:17:14', '2025-04-24 14:24:17', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (143, 'M006499', 'CWM04104', 'B3CBA2402654-0', 'M006499 MILL, INLAY, RESURF SR 20/SR 81, HENRY', 'M006499 MILL, INLAY, RESURF SR 20/SR 81, HENRY', NULL, 'GDOT', '3161', 120800.00, 1, 'HENRY', 1, '', 0, '2024-11-19', '2025-08-31', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2024-12-11 15:35:47', '2025-04-25 15:50:12', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -34486,10 +34562,10 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (268, '0014170, M006227', 'CWM04062', 'B1CBA2201414-0', 'SR 22 SPUR MILL / INLAY / RESURFACING', 'SR 22 SPUR MILL / INLAY / RESURFACING', NULL, 'GDOT', '12798', 286150.00, 1, 'MUSCOGEE', 1, '', 0, '2022-06-24', '2024-08-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 15:33:26', '2025-04-23 15:29:55', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (269, '0006857, 0006866', 'CWM04061', 'B1CBA2201375-0', 'SR 92 WIDENING & RECONST.', 'SR 92 WIDENING & RECONST.', NULL, 'GDOT', '12796', 1095904.00, 1, 'COBB, PAULDING', 0, '', 0, '2022-06-07', '2025-06-07', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 15:43:48', '2025-04-23 15:29:38', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (270, 'M006292', 'CWM04060', 'B1CBA2201627-0', 'SR 155 MILL / INLAY / RESURF', 'SR 155 MILL / INLAY / RESURF', NULL, 'GDOT', '32811', 108400.00, 1, 'DEKALB', 1, '', 0, '2022-07-06', '2023-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 15:46:26', '2025-04-23 14:48:54', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
-(271, 'M006285', 'CWM04059', 'B1CBA2201614-0', 'SR 3 MILL / INLAY / RESURF', 'SR 3 MILL / INLAY / RESURF', NULL, 'GDOT', '32813', 19100.00, 1, 'FULTON', 1, '', 0, '2022-06-30', '2023-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 16:00:03', '2025-04-23 14:48:36', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
+(271, 'M006285', 'CWM04059', 'B1CBA2201614-0', 'SR 3 MILL / INLAY / RESURF', 'SR 3 MILL / INLAY / RESURF', NULL, 'GDOT', '32813', 19100.00, 1, 'FULTON', 1, '', 0, '2022-06-30', '2023-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 16:00:03', '2025-04-23 14:48:36', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (272, 'SPLOST CW18-05A', 'CWM04058', '22-15', 'S. HOUSTON LAKE RD & FEAGIN MILL INTERSECTION RESURF', 'S. HOUSTON LAKE RD & FEAGIN MILL INTERSECTION RESURF', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12807', 271465.00, 0, 'HOUSTON', 1, '', 0, '2022-04-11', '2023-04-11', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 16:23:38', '2025-04-23 14:48:20', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
-(273, 'SPLOST CW12-02', 'CWM04056', '22-03', 'ELBERTA RD PH 1 IMPROVEMENTS', 'ELBERTA RD PH 1 IMPROVEMENTS', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12805', 937982.00, 0, 'HOUSTON', 0, '', 0, '2022-04-27', '2025-06-01', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 22:20:09', '2025-08-07 22:27:59', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
+(273, 'SPLOST CW12-02', 'CWM04056', '22-03', 'ELBERTA RD PH 1 IMPROVEMENTS', 'ELBERTA RD PH 1 IMPROVEMENTS', NULL, 'HOUSTON COUNTY BOARD OF COMMISSIONERS', '12805', 937982.00, 0, 'HOUSTON', 0, '', 0, '2022-04-27', '2025-06-01', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-14 22:20:09', '2025-08-07 22:27:59', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
 (274, 'M006290', 'CWM04055', 'B1CBA2201024-0', 'SR 280 MILL / INLAY / RESURF', 'SR 280 MILL / INLAY / RESURF', NULL, 'GDOT', '32801', 163225.00, 1, 'COBB', 1, '', 0, '2022-04-01', '2022-12-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-17 18:23:48', '2025-04-23 14:47:56', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (275, '0016440', 'CWM04054', 'B3CBA2200993-0', 'RECONST / REHAB FOR TURN LANES ON SR 22 @ SR 85', 'RECONST / REHAB FOR TURN LANES ON SR 22 @ SR 85', NULL, 'GDOT', '12775', 60944.00, 1, 'MUSCOGEE', 0, '', 0, '2022-04-05', '2023-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-17 19:10:26', '2025-04-23 14:46:52', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
 (276, 'M006222', 'CWM04052', 'B1CBA2201038-0', 'MILL, INLAY, RESURFACING SR 113', 'MILL, INLAY, RESURFACING SR 113', NULL, 'GDOT', '32773', 6375.00, 1, 'CARROLL', 1, '', 0, '2022-03-24', '2022-12-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-02-17 19:29:35', '2025-04-23 14:44:47', NULL, 7, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -34620,11 +34696,11 @@ INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `pro
 (401, '0000304', 'TAL20009', 'B1CBA1902043-0', 'SR66 OV BRASSTOWN CR', 'SR66 OV BRASSTOWN CR', NULL, 'GDOT', '19048.06', 131999.65, 1, 'TOWNS', 0, '', 0, '2020-06-02', '2021-06-30', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-17 14:22:04', '2025-04-17 15:37:37', NULL, 39, NULL, NULL, NULL, NULL, NULL, NULL),
 (402, '0015520', 'TAL20007', 'B1CBA18016005-0', 'BRIDGE CR 205', 'BRIDGE CR 205', NULL, 'GDOT', '18042.06', 5200.00, 1, 'FRANKLIN', 0, '', 0, '2019-11-19', '2020-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-17 15:47:12', '2025-04-18 12:20:57', NULL, 39, NULL, NULL, NULL, NULL, NULL, NULL),
 (403, '0010409', 'TAL20006', 'B3CBA1801519-0', 'US41 / SR3 OVER LYNN CRK', 'US41 / SR3 OVER LYNN CRK', NULL, 'GDOT', '18030.04', 17463.60, 1, 'GORDON', 0, '', 0, '2019-09-23', '2019-09-30', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-28 15:52:17', '2025-04-28 17:43:09', NULL, 39, NULL, NULL, NULL, NULL, NULL, NULL),
-(404, '0013740', 'TID51005', 'B1CBA2401149-0', '0013740 CARROLL', 'SR 166 OVER BIG INDIAN CREEK APPROACHES', 'undefined', 'GDOT', '159', 78915.00, 1, 'CARROLL', 0, '', 0, '2024-02-25', '2025-10-31', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-04-28 19:12:47', '2025-11-18 20:54:48', '2025-11-18 20:54:48', 63, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
+(404, '0013740', 'TID51005', 'B1CBA2401149-0', '0013740 CARROLL', 'SR 166 OVER BIG INDIAN CREEK APPROACHES', 'undefined', 'GDOT', '159', 78915.00, 1, 'CARROLL', 0, '', 0, '2024-02-25', '2025-10-31', NULL, '', 1, 'undefined', 'undefined', 0.00, NULL, 0.00, 0, '', NULL, NULL, NULL, NULL, '2025-04-28 19:12:47', '2025-11-18 20:54:48', '2025-11-18 20:54:48', 63, NULL, NULL, NULL, NULL, NULL, NULL),
 (405, '0018058', 'GGC78002', 'B1CBA2402297-0', 'B1CBA2402297-0 CALL:006 0018058 JEFF DAVIS', 'B1CBA2402297-0 CALL:006 0018058 JEFF DAVIS', NULL, 'GDOT', 'NA', 19104.00, 1, 'JEFF DAVIS', 0, '', 0, '2024-12-05', '2025-06-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-29 17:51:58', '2025-06-05 14:08:51', NULL, 40, NULL, NULL, NULL, NULL, NULL, NULL),
 (406, 'NA', 'TID51004', 'NA', 'MARS HILL RD OVER ALLATOONA CREEK', 'MARS HILL RD OVER ALLATOONA CREEK', NULL, 'COBB COUNTY', '151', 38000.00, 0, 'COBB', 0, '', 0, '2023-04-12', '2025-06-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 15:08:59', '2025-04-30 15:26:15', NULL, 63, NULL, NULL, NULL, NULL, NULL, NULL),
-(407, '0013936', 'TID51003', 'B1CBA2002310-0', 'CAROLL', 'CAROLL', NULL, 'GDOT', '132', 49728.00, 0, 'CARROLL', 0, '', 0, '2021-02-01', '2022-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 15:37:15', '2025-04-30 15:51:03', NULL, 63, NULL, NULL, NULL, NULL, NULL, NULL),
+(407, '0013936', 'TID51003', 'B1CBA2002310-0', 'CAROLL', 'CAROLL', NULL, 'GDOT', '132', 49728.00, 0, 'CARROLL', 0, '', 0, '2021-02-01', '2022-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 15:37:15', '2025-04-30 15:51:03', NULL, 63, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `project` (`project_id`, `project_id_number`, `project_number`, `proposal_number`, `name`, `description`, `location`, `owner`, `subcontract`, `contract_amount`, `federal_funding`, `county`, `resurfacing`, `invoice_contact`, `certified_payrolls`, `start_date`, `end_date`, `due_date`, `manager`, `status`, `po_number`, `po_cg`, `concrete_quote_price`, `concrete_start_date`, `concrete_quote_price_escalator`, `concrete_time_period_every_n`, `concrete_time_period_unit`, `retainage`, `retainage_percentage`, `retainage_adjustment_percentage`, `retainage_adjustment_completion`, `created_at`, `updated_at`, `updated_at_concrete_quote_price`, `company_id`, `inspector_id`, `county_id`, `vendor_id`, `concrete_class_id`, `prevailing_wage`, `prevailing_rate`) VALUES
 (408, 'NA', 'UIG49005', 'NA', 'W. GWINNETT ST RECONSTRUCTION', 'W. GWINNETT ST RECONSTRUCTION', NULL, 'CITY OF SAVANNAH', 'CIP #TE-709-03', 52740.00, 0, 'CITY OF SAVANNAH', 0, '', 0, '2022-03-16', '2025-06-30', NULL, '', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 19:30:12', '2025-04-30 19:32:16', NULL, 45, NULL, NULL, NULL, NULL, NULL, NULL),
 (409, '0017315', 'UIG49004', 'B3CBA2102171-0', 'CONSTRUCTION OF A BRIDGE AND APPROACHES ON STANFIELD RD (CR 190) OVER REEDY CREEK', 'CONSTRUCTION OF A BRIDGE AND APPROACHES ON STANFIELD RD (CR 190) OVER REEDY CREEK', NULL, 'GDOT', '2118-0003', 60408.00, 1, 'WAYNE', 0, '', 0, '2022-02-01', '2023-03-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 19:50:53', '2025-04-30 19:51:56', NULL, 45, NULL, NULL, NULL, NULL, NULL, NULL),
 (410, '0013604', 'UIG49003', 'B1CBA2002010-0', 'SR-4 / US-1 AT SOUTH PRONG CREEK 3.9 MI. NW OF HEPHIZBAH', 'SR-4 / US-1 AT SOUTH PRONG CREEK 3.9 MI. NW OF HEPHIZBAH', NULL, 'GDOT', '2011-0017', 74700.00, 1, 'RICHMOND', 0, '', 0, '2021-02-09', '2021-07-31', NULL, '', 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2025-04-30 20:14:09', '2025-04-30 20:16:15', NULL, 45, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -34824,8 +34900,7 @@ INSERT INTO `project_concrete_class` (`id`, `project_id`, `concrete_class_id`, `
 (2, 523, 1, 162.00),
 (3, 513, 2, 160.00),
 (4, 524, 2, 140.00),
-(5, 532, 2, 170.00),
-(9, 48, 4, 10.00);
+(5, 532, 2, 170.00);
 
 -- --------------------------------------------------------
 
@@ -34974,8 +35049,7 @@ INSERT INTO `project_contact` (`contact_id`, `name`, `email`, `phone`, `role`, `
 (126, 'ROBERT MOON', '', '', 'PROJECT MANAGER', '', 529, NULL),
 (127, 'SUSAN FERGUSON', '', '', 'ACCOUNTS PAYABLE', '', 529, NULL),
 (128, 'BEN PAULK', '', '', 'PROJECT MANAGER', '', 532, NULL),
-(129, 'ANNA PEACOCK', '', '', 'ACCOUNTS PAYABLE', '', 532, NULL),
-(130, NULL, NULL, NULL, 'heh', '', 48, 37);
+(129, 'ANNA PEACOCK', '', '', 'ACCOUNTS PAYABLE', '', 532, NULL);
 
 -- --------------------------------------------------------
 
@@ -35028,9 +35102,7 @@ INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
 (172, 43, 22),
 (188, 44, 23),
 (173, 45, 22),
-(191, 46, 24),
-(611, 47, 25),
-(701, 48, 45),
+(703, 46, 24),
 (203, 49, 27),
 (669, 50, 28),
 (219, 51, 29),
@@ -35091,7 +35163,6 @@ INSERT INTO `project_county` (`id`, `project_id`, `county_id`) VALUES
 (309, 106, 60),
 (311, 107, 61),
 (314, 108, 62),
-(317, 109, 63),
 (60, 110, 8),
 (284, 111, 48),
 (192, 112, 24),
@@ -35738,7 +35809,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (283, 6781.000000, 19.75, 'equation', NULL, NULL, 1, NULL, NULL, 45, 28, 9, 0, NULL, NULL, NULL),
 (284, 4645.000000, 19.00, 'equation', NULL, NULL, 1, NULL, NULL, 45, 29, 9, 0, NULL, NULL, NULL),
 (285, 25.000000, 295.00, 'same', NULL, NULL, 1, NULL, NULL, 45, 52, NULL, 0, NULL, NULL, NULL),
-(320, 934.000000, 84.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 605, 39, 0, NULL, NULL, NULL),
+(320, 934.000000, 84.00, 'equation', NULL, NULL, 1, 0, NULL, 46, 605, 39, 0, 0, NULL, NULL),
 (321, 1280.000000, 172.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 606, 38, 0, NULL, NULL, NULL),
 (322, 2300.000000, 64.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 607, 37, 0, NULL, NULL, NULL),
 (323, 330.000000, 72.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 608, 36, 0, NULL, NULL, NULL),
@@ -35762,15 +35833,6 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (341, 6.000000, 2150.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 41, 20, 0, NULL, NULL, NULL),
 (342, 1.000000, 2150.00, 'equation', NULL, NULL, 1, NULL, NULL, 46, 120, 20, 0, NULL, NULL, NULL),
 (343, 3.000000, 2150.00, 'equation', NULL, NULL, 0, NULL, NULL, 46, 41, 20, 0, NULL, NULL, NULL),
-(344, 121.000000, 56.00, 'equation', NULL, NULL, 1, NULL, NULL, 47, 757, 22, 0, NULL, NULL, NULL),
-(345, 174.000000, 260.00, 'same', NULL, NULL, 1, NULL, NULL, 47, 760, NULL, 0, NULL, NULL, NULL),
-(346, 1.000000, 19895.05, 'none', NULL, NULL, 1, NULL, NULL, 47, 123, NULL, 0, NULL, NULL, NULL),
-(347, 297.000000, 50.00, 'equation', NULL, -3.000000, 1, 0, NULL, 48, 77, 22, 0, 0, 'CONC', NULL),
-(348, 620.000000, 32.00, 'equation', NULL, NULL, 1, NULL, NULL, 48, 31, 11, 0, NULL, NULL, NULL),
-(349, 358.000000, 57.00, 'equation', NULL, NULL, 1, NULL, NULL, 48, 79, 22, 0, NULL, NULL, NULL),
-(350, 1630.000000, 17.57, 'equation', NULL, NULL, 1, NULL, NULL, 48, 26, 8, 0, NULL, NULL, NULL),
-(351, 80.000000, 600.00, 'same', NULL, NULL, 1, NULL, NULL, 48, 124, NULL, 0, NULL, NULL, NULL),
-(352, 10.000000, 225.00, 'same', NULL, NULL, 1, NULL, NULL, 48, 52, NULL, 0, NULL, NULL, NULL),
 (353, 335.000000, 125.34, 'equation', NULL, 123.000000, 1, NULL, NULL, 49, 40, 18, 0, NULL, NULL, NULL),
 (354, 209.000000, 77.44, 'equation', NULL, 76.000000, 1, NULL, NULL, 49, 125, 12, 0, NULL, NULL, NULL),
 (355, 430.000000, 57.06, 'equation', NULL, 56.000000, 1, NULL, NULL, 49, 61, 11, 0, NULL, NULL, NULL),
@@ -36049,8 +36111,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (629, 12024.000000, 34.50, 'equation', NULL, NULL, 1, NULL, NULL, 87, 31, 11, 0, NULL, NULL, NULL),
 (630, 596.000000, 67.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 32, 12, 0, NULL, NULL, NULL),
 (631, 6.000000, 1500.00, '', NULL, NULL, 1, NULL, NULL, 87, 507, 20, 0, NULL, NULL, NULL),
-(632, 3424.000000, 31.50, 'equation', NULL, NULL, 1, NULL, NULL, 87, 623, 11, 0, NULL, NULL, NULL);
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(632, 3424.000000, 31.50, 'equation', NULL, NULL, 1, NULL, NULL, 87, 623, 11, 0, NULL, NULL, NULL),
 (633, 237.000000, 67.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 484, 22, 0, NULL, NULL, NULL),
 (634, 2211.000000, 53.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 79, 22, 0, NULL, NULL, NULL),
 (635, 445.000000, 55.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 69, 12, 0, NULL, NULL, NULL),
@@ -36059,7 +36120,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (638, 31647.000000, 17.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 625, 8, 0, NULL, NULL, NULL),
 (639, 28281.000000, 17.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 626, 8, 0, NULL, NULL, NULL),
 (640, 5.350000, 285.00, 'same', NULL, NULL, 1, NULL, NULL, 87, 52, NULL, 0, NULL, NULL, NULL),
-(641, 146.000000, 1600.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 627, 15, 0, NULL, NULL, NULL),
+(641, 146.000000, 1600.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 627, 15, 0, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
 (642, 2.000000, 1600.00, 'equation', NULL, NULL, 1, NULL, NULL, 87, 628, 15, 0, NULL, NULL, NULL),
 (643, 222.000000, 680.00, 'same', NULL, NULL, 1, NULL, NULL, 87, 629, NULL, 0, NULL, NULL, NULL),
 (644, 56.000000, 65.00, 'equation', NULL, NULL, 1, NULL, NULL, 88, 39, 12, 0, NULL, NULL, NULL),
@@ -36560,8 +36622,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1174, 20.000000, 200.00, 'same', NULL, NULL, 1, NULL, NULL, 184, 52, NULL, 0, NULL, NULL, NULL),
 (1175, 230.000000, 35.00, 'none', NULL, NULL, 1, NULL, NULL, 185, 133, NULL, 0, NULL, NULL, NULL),
 (1176, 848.000000, 42.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 31, 11, 0, NULL, NULL, NULL),
-(1177, 174.000000, 77.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 125, 12, 0, NULL, NULL, NULL);
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(1177, 174.000000, 77.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 125, 12, 0, NULL, NULL, NULL),
 (1178, 1.000000, 2300.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 41, 20, 0, NULL, NULL, NULL),
 (1179, 48.000000, 81.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 221, 39, 0, NULL, NULL, NULL),
 (1180, 25.000000, 61.00, 'equation', NULL, NULL, 1, NULL, NULL, 186, 79, 22, 0, NULL, NULL, NULL),
@@ -36570,7 +36631,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1183, 50.000000, 55.00, 'none', NULL, NULL, 1, NULL, NULL, 186, 133, NULL, 0, NULL, NULL, NULL),
 (1184, 16.000000, 79.00, 'equation', NULL, NULL, 1, NULL, NULL, 187, 31, 11, 0, NULL, NULL, NULL),
 (1185, 139.000000, 166.00, 'equation', NULL, NULL, 1, NULL, NULL, 187, 222, 22, 0, NULL, NULL, NULL),
-(1186, 20.000000, 83.00, 'equation', NULL, NULL, 1, NULL, NULL, 187, 36, 14, 0, NULL, NULL, NULL),
+(1186, 20.000000, 83.00, 'equation', NULL, NULL, 1, NULL, NULL, 187, 36, 14, 0, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
 (1187, 4.000000, 2100.00, 'equation', NULL, NULL, 1, NULL, NULL, 187, 47, 24, 0, NULL, NULL, NULL),
 (1188, 48.000000, 82.00, 'none', NULL, NULL, 1, NULL, NULL, 188, 133, NULL, 0, NULL, NULL, NULL),
 (1189, 437.000000, 57.00, 'equation', NULL, NULL, 1, NULL, NULL, 189, 74, 22, 0, NULL, NULL, NULL),
@@ -37067,8 +37129,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1706, 2668.000000, 34.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 63, 11, 0, NULL, NULL, NULL),
 (1707, 9106.000000, 21.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 26, 8, 0, NULL, NULL, NULL),
 (1708, 5402.000000, 21.50, 'equation', NULL, NULL, 1, NULL, NULL, 39, 27, 8, 0, NULL, NULL, NULL),
-(1709, 355.000000, 48.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 61, 11, 0, NULL, NULL, NULL);
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(1709, 355.000000, 48.00, 'equation', NULL, NULL, 1, NULL, NULL, 39, 61, 11, 0, NULL, NULL, NULL),
 (1710, 56.000000, 2100.00, 'same', NULL, NULL, 1, NULL, NULL, 39, 186, NULL, 0, NULL, NULL, NULL),
 (1711, 696.000000, 25.00, 'none', NULL, NULL, 1, NULL, NULL, 39, 102, NULL, 0, NULL, NULL, NULL),
 (1712, 0.000000, 3500.00, 'same', NULL, NULL, 1, NULL, NULL, 39, 103, NULL, 0, NULL, NULL, NULL),
@@ -37077,7 +37138,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (1715, 606.000000, 52.50, 'equation', NULL, NULL, 1, NULL, NULL, 283, 283, 11, 0, NULL, NULL, NULL),
 (1716, 881.000000, 22.00, 'equation', NULL, NULL, 1, NULL, NULL, 283, 84, 23, 0, NULL, NULL, NULL),
 (1717, 1839.000000, 20.50, 'equation', NULL, NULL, 1, NULL, NULL, 283, 35, 14, 0, NULL, NULL, NULL),
-(1718, 2.000000, 800.00, 'none', NULL, NULL, 1, NULL, NULL, 283, 284, NULL, 0, NULL, NULL, NULL),
+(1718, 2.000000, 800.00, 'none', NULL, NULL, 1, NULL, NULL, 283, 284, NULL, 0, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
 (1719, 1.000000, 1000.00, 'equation', NULL, NULL, 1, NULL, NULL, 283, 48, 25, 0, NULL, NULL, NULL),
 (1720, 3343.000000, 77.00, 'equation', NULL, NULL, 1, NULL, NULL, 283, 285, 22, 0, NULL, NULL, NULL),
 (1721, 529.000000, 98.50, 'equation', NULL, NULL, 1, NULL, NULL, 283, 286, 22, 0, NULL, NULL, NULL),
@@ -37574,8 +37636,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (2214, 7.000000, 700.00, 'same', NULL, NULL, 1, NULL, NULL, 385, 204, NULL, 0, NULL, NULL, NULL),
 (2215, 1.000000, 964.56, 'none', NULL, NULL, 1, NULL, NULL, 385, 60, NULL, 0, NULL, 'BO', 'BOND'),
 (2216, 2.000000, 2100.00, 'equation', NULL, NULL, 1, NULL, NULL, 386, 41, 20, 0, NULL, NULL, NULL),
-(2217, 0.000000, 126.00, 'none', NULL, NULL, 1, NULL, NULL, 386, 60, NULL, 0, NULL, 'BO', 'BOND');
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(2217, 0.000000, 126.00, 'none', NULL, NULL, 1, NULL, NULL, 386, 60, NULL, 0, NULL, 'BO', 'BOND'),
 (2218, 0.000000, 4.00, 'equation', NULL, NULL, 1, NULL, NULL, 22, 211, 23, 0, NULL, 'H12', '12 IN HEADER CURB'),
 (2219, 0.000000, 53.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 291, 11, 0, NULL, NULL, NULL),
 (2220, 0.000000, 700.00, 'same', NULL, NULL, 1, NULL, NULL, 12, 360, NULL, 0, NULL, NULL, NULL),
@@ -37584,7 +37645,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (2223, 0.000000, 107.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 69, 12, 0, NULL, NULL, NULL),
 (2224, 0.000000, 80.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 77, 22, 0, NULL, NULL, NULL),
 (2225, 0.000000, 1442.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 38, 16, 0, NULL, NULL, NULL),
-(2226, 0.000000, 121.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 64, 39, 0, NULL, NULL, NULL),
+(2226, 0.000000, 121.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 64, 39, 0, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
 (2227, 0.000000, 111.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 125, 12, 0, NULL, NULL, NULL),
 (2228, 8.000000, 200.00, 'none', NULL, NULL, 1, NULL, NULL, 352, 266, NULL, 0, NULL, NULL, NULL),
 (2229, 8.000000, 200.00, 'same', NULL, NULL, 1, NULL, NULL, 352, 101, NULL, 0, NULL, NULL, NULL),
@@ -38084,8 +38146,7 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (2737, 1.000000, -83.10, 'none', NULL, NULL, 1, NULL, NULL, 482, 496, NULL, 0, NULL, NULL, NULL),
 (2738, 800.000000, 140.00, 'equation', NULL, NULL, 1, NULL, NULL, 161, 497, 12, 0, NULL, NULL, NULL),
 (2739, 1300.000000, 35.00, 'equation', NULL, NULL, 1, NULL, NULL, 161, 498, 23, 0, NULL, NULL, NULL),
-(2740, 200.000000, 35.00, 'equation', NULL, NULL, 1, NULL, NULL, 161, 499, 10, 0, NULL, NULL, NULL);
-INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
+(2740, 200.000000, 35.00, 'equation', NULL, NULL, 1, NULL, NULL, 161, 499, 10, 0, NULL, NULL, NULL),
 (2741, 200.000000, 35.00, 'equation', NULL, NULL, 1, NULL, NULL, 161, 500, 8, 0, NULL, NULL, NULL),
 (2742, 0.000000, 81.00, 'equation', NULL, NULL, 1, NULL, NULL, 10, 605, 39, 0, NULL, NULL, NULL),
 (2743, 0.000000, 302.00, 'same', NULL, NULL, 1, NULL, NULL, 10, 505, NULL, 0, NULL, NULL, NULL),
@@ -38094,7 +38155,8 @@ INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `qua
 (2746, 0.000000, 100.00, 'none', NULL, NULL, 1, NULL, NULL, 291, 506, NULL, 0, NULL, NULL, NULL),
 (2747, 0.000000, 249.50, 'same', NULL, NULL, 1, NULL, NULL, 241, 101, NULL, 0, NULL, NULL, NULL),
 (2748, 0.000000, 2800.00, 'equation', NULL, NULL, 1, NULL, NULL, 12, 323, 24, 0, NULL, NULL, NULL),
-(2749, 0.000000, 45.00, 'equation', NULL, NULL, 1, NULL, NULL, 22, 177, 11, 0, NULL, NULL, NULL),
+(2749, 0.000000, 45.00, 'equation', NULL, NULL, 1, NULL, NULL, 22, 177, 11, 0, NULL, NULL, NULL);
+INSERT INTO `project_item` (`id`, `quantity`, `price`, `yield_calculation`, `quantity_old`, `price_old`, `principal`, `change_order`, `change_order_date`, `project_id`, `item_id`, `equation_id`, `apply_retainage`, `bonded`, `code`, `contract_name`) VALUES
 (2750, 139.000000, 125.00, 'equation', NULL, NULL, 1, NULL, NULL, 488, 74, 22, 0, NULL, NULL, NULL),
 (2751, 58.000000, 177.00, 'equation', NULL, NULL, 1, NULL, NULL, 488, 40, 18, 0, NULL, NULL, NULL),
 (2752, 6.000000, 3100.00, 'equation', NULL, NULL, 1, NULL, NULL, 488, 507, 20, 0, NULL, NULL, NULL),
@@ -38503,9 +38565,7 @@ INSERT INTO `project_item_history` (`id`, `project_item_id`, `action_type`, `old
 (33, 3059, 'update_quantity', '3360', '360', '2025-12-04 21:55:29', 1),
 (34, 3086, 'add', NULL, NULL, '2025-10-09 14:05:22', 6),
 (35, 3086, 'update_price', '0', '124', '2025-10-09 14:08:10', 6),
-(36, 3026, 'update_quantity', '2300', '2400', '2026-02-23 04:52:43', 1),
-(37, 347, 'update_price', '47', '-3', '2026-03-15 21:58:22', 30),
-(38, 347, 'update_price', '-3', '50', '2026-03-15 21:59:07', 30);
+(36, 3026, 'update_quantity', '2300', '2400', '2026-02-23 04:52:43', 1);
 
 -- --------------------------------------------------------
 
@@ -38533,8 +38593,6 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (10, '', '2024-10-17', 45),
 (11, '', '2024-10-18', 39),
 (12, '', '2024-10-18', 46),
-(13, '', '2024-10-18', 47),
-(14, '', '2024-10-18', 48),
 (15, '', '2024-10-21', 50),
 (16, '', '2024-10-21', 51),
 (17, '', '2024-10-22', 55),
@@ -38737,7 +38795,6 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (254, '', '2024-12-02', 46),
 (255, '', '2024-12-02', 73),
 (256, '', '2024-12-02', 83),
-(257, '', '2024-12-02', 48),
 (258, '', '2024-12-02', 22),
 (259, '', '2024-12-02', 8),
 (260, '', '2024-12-02', 121),
@@ -39266,8 +39323,6 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (799, '', '2025-04-22', 395),
 (800, '', '2025-04-22', 208),
 (801, '', '2025-04-22', 208),
-(802, '', '2025-04-22', 48),
-(803, '', '2025-04-22', 47),
 (804, '', '2025-04-22', 46),
 (805, '', '2025-04-22', 41),
 (806, '', '2025-04-22', 170),
@@ -40296,13 +40351,13 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (1952, '', '2025-12-17', 523),
 (1953, '', '2025-12-17', 523),
 (1954, '', '2025-12-17', 524),
-(1955, '', '2025-12-17', 524);
-INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
+(1955, '', '2025-12-17', 524),
 (1956, '', '2025-12-17', 524),
 (1957, '', '2025-12-17', 524),
 (1958, '', '2025-12-17', 524),
 (1959, '', '2025-12-17', 524),
-(1960, '', '2025-12-17', 524),
+(1960, '', '2025-12-17', 524);
+INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (1961, '', '2025-12-17', 524),
 (1962, '', '2025-12-17', 524),
 (1963, '', '2025-12-18', 469),
@@ -40415,16 +40470,6 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2070, '', '2026-02-03', 8),
 (2071, '', '2026-02-03', 8),
 (2072, '', '2026-02-03', 8),
-(2073, '', '2026-02-04', 47),
-(2074, '', '2026-02-04', 47),
-(2075, '', '2026-02-04', 47),
-(2076, '', '2026-02-04', 47),
-(2077, '', '2026-02-04', 47),
-(2078, '', '2026-02-04', 47),
-(2079, '', '2026-02-04', 47),
-(2080, '', '2026-02-04', 47),
-(2081, '', '2026-02-04', 47),
-(2082, '', '2026-02-04', 47),
 (2083, '', '2026-02-05', 532),
 (2084, '', '2026-02-05', 532),
 (2085, '', '2026-02-05', 532),
@@ -40464,34 +40509,12 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2121, 'Change concrete quote price, old value: 160', '2026-03-06', 513),
 (2122, 'Add New Item: 12 IN HEADER CURB', '2026-03-06', 513),
 (2123, 'Change contract amount, old value: 101780.3', '2026-03-06', 513),
-(2124, 'Change location, old value: ', '2026-03-06', 48),
-(2125, 'Yes', '2026-03-06', 48),
-(2126, 'Yes', '2026-03-06', 48),
 (2127, 'Change contract amount, old value: 101880.3', '2026-03-08', 513),
-(2128, 'Yes', '2026-03-08', 48),
-(2129, 'Change prevailing labor types, old values: ', '2026-03-08', 48),
-(2130, 'Change prevailing county, old value: None', '2026-03-08', 48),
-(2131, 'Change prevailing labor types, old values: LABOR ($12), Subcointractor ($12)', '2026-03-08', 48),
-(2132, 'Change prevailing labor types, old values: LABOR ($12), Subcointractor ($12)', '2026-03-08', 48),
 (2133, 'Add New Item: BOND', '2026-03-08', 513),
 (2134, 'Change contract amount, old value: 101880.3', '2026-03-08', 513),
 (2135, 'Change prevailing labor types, old values: ', '2026-03-08', 513),
 (2136, 'Change contract amount, old value: 99845.3', '2026-03-08', 513),
 (2137, 'Change prevailing labor types, old values: ', '2026-03-08', 513),
-(2138, 'Change counties, old values: ', '2026-03-13', 48),
-(2139, 'Change prevailing labor types, old values: ', '2026-03-13', 48),
-(2140, 'Change prevailing county, old value: CITY OF SANDY SPRINGS', '2026-03-15', 48),
-(2141, 'Change counties, old values: ', '2026-03-15', 48),
-(2142, 'Change prevailing labor types, old values: ', '2026-03-15', 48),
-(2143, 'Change prevailing county, old value: None', '2026-03-15', 48),
-(2144, 'Change prevailing labor types, old values: ', '2026-03-15', 48),
-(2145, 'Change prevailing labor types, old values: LABOR ($10), Laborer-Sub ($10)', '2026-03-15', 48),
-(2146, 'Change concrete start date, old value: ', '2026-03-15', 48),
-(2147, 'Change concrete vendor, old value: ', '2026-03-15', 48),
-(2148, 'Change concrete quote price escalator, old value: 0', '2026-03-15', 48),
-(2149, 'Change concrete time periodo every n, old value: 0', '2026-03-15', 48),
-(2150, 'Change concrete time periodo unit, old value: ', '2026-03-15', 48),
-(2151, 'Change prevailing labor types, old values: LABOR ($10), Laborer-Sub ($10), Subcontractor ($10)', '2026-03-15', 48),
 (2152, 'Yes', '2026-03-15', 41),
 (2153, 'Yes', '2026-03-15', 41),
 (2154, 'Change prevailing labor types, old values: ', '2026-03-15', 41),
@@ -40499,8 +40522,6 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2156, 'Yes', '2026-03-15', 170),
 (2157, 'Yes', '2026-03-15', 170),
 (2158, 'Change prevailing labor types, old values: ', '2026-03-15', 170),
-(2159, 'Change prevailing labor types, old values: LABOR ($10), Laborer-Sub ($10), Subcontractor ($10)', '2026-03-15', 48),
-(2160, 'Change prevailing labor types, old values: LABOR ($10), Laborer-Sub ($10), Subcontractor ($10)', '2026-03-15', 48),
 (2161, 'Yes', '2026-03-15', 489),
 (2162, 'Yes', '2026-03-15', 489),
 (2163, 'Change prevailing labor types, old values: ', '2026-03-15', 489),
@@ -40508,18 +40529,10 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2165, 'Yes', '2026-03-15', 95),
 (2166, 'Yes', '2026-03-15', 95),
 (2167, 'Change prevailing labor types, old values: ', '2026-03-15', 95),
-(2168, 'Change prevailing labor types, old values: LABOR ($10), Laborer-Sub ($10), Subcontractor ($10)', '2026-03-15', 48),
 (2169, 'Change location, old value: ', '2026-03-15', 253),
 (2170, 'Yes', '2026-03-15', 253),
 (2171, 'Yes', '2026-03-15', 253),
 (2172, 'Change prevailing labor types, old values: ', '2026-03-15', 253),
-(2173, 'Change Price Item: CONC DRIVEWAY, 6 IN, Previous Price: 47, New Price: -3', '2026-03-15', 48),
-(2174, 'Change Price Item: CONC DRIVEWAY, 6 IN, Previous Price: -3, New Price: 50', '2026-03-15', 48),
-(2175, 'Change contract amount, old value: 133094.1', '2026-03-17', 48),
-(2176, 'Change prevailing labor types, old values:  - Laborer-Sub ($10),  - Subcontractor ($10), AUGUSTA - LABOR ($10)', '2026-03-17', 48),
-(2177, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-17', 48),
-(2178, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-17', 48),
-(2179, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-17', 48),
 (2180, 'Change location, old value: ', '2026-03-17', 176),
 (2181, 'Yes', '2026-03-17', 176),
 (2182, 'Yes', '2026-03-17', 176),
@@ -40535,16 +40548,13 @@ INSERT INTO `project_notes` (`id`, `notes`, `date`, `project_id`) VALUES
 (2192, 'Change prevailing labor types, old values: RICHMOND - LABOR ($12), RICHMOND - Laborer-Sub ($12)', '2026-03-18', 253),
 (2193, 'Change counties, old values: ', '2026-03-18', 253),
 (2194, 'Change prevailing labor types, old values: ', '2026-03-18', 253),
-(2195, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-18', 48),
-(2196, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-20', 48),
-(2197, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-20', 48),
-(2198, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-20', 48),
 (2199, 'Change prevailing labor types, old values: RICHMOND - LABOR ($12), RICHMOND - Laborer-Sub ($12), ROCKMART - Lead ($12), TALIAFERRO - Laborer-Sub ($12)', '2026-03-20', 253),
-(2200, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-22', 48),
-(2201, 'Change prevailing labor types, old values: AUGUSTA - LABOR ($10)', '2026-03-23', 48),
 (2202, 'Change contract amount, old value: 99845.3', '2026-03-27', 513),
 (2203, 'Change prevailing labor types, old values: ', '2026-03-27', 513),
-(2204, 'Removed pay item: 12 IN HEADER CURB (catalog item ID: 211, project_item_id: 3128). Previous quantity: 10, previous price: 10, previous line total: 100', '2026-04-03', 513);
+(2204, 'Removed pay item: 12 IN HEADER CURB (catalog item ID: 211, project_item_id: 3128). Previous quantity: 10, previous price: 10, previous line total: 100', '2026-04-03', 513),
+(2205, 'Change retainage, old value: No', '2026-04-28', 46),
+(2206, 'Change prevailing wage, old value: No', '2026-04-28', 46),
+(2207, 'Change prevailing labor types, old values: ', '2026-04-28', 46);
 
 -- --------------------------------------------------------
 
@@ -40568,8 +40578,7 @@ INSERT INTO `project_prevailing_role` (`id`, `project_id`, `county_id`, `role_id
 (67, 253, 35, 6, 12.00),
 (68, 253, 35, 5, 12.00),
 (69, 253, 169, 2, 12.00),
-(70, 253, 193, 5, 12.00),
-(72, 48, 45, 6, 10.00);
+(70, 253, 193, 5, 12.00);
 
 -- --------------------------------------------------------
 
@@ -40764,7 +40773,6 @@ CREATE TABLE `reminder` (
 --
 
 INSERT INTO `reminder` (`reminder_id`, `subject`, `body`, `day`, `status`) VALUES
-(11, 'tets', '<p>tets</p>', '2025-11-23', 1),
 (12, 'test diferte fecha', '<p>w</p>', '2025-11-24', 1);
 
 -- --------------------------------------------------------
@@ -40784,8 +40792,7 @@ CREATE TABLE `reminder_recipient` (
 --
 
 INSERT INTO `reminder_recipient` (`id`, `reminder_id`, `user_id`) VALUES
-(19, 11, 1),
-(20, 12, 1);
+(23, 12, 1);
 
 -- --------------------------------------------------------
 
@@ -40835,25 +40842,6 @@ CREATE TABLE `rol_permission` (
 --
 
 INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_permission`, `delete_permission`, `rol_id`, `function_id`) VALUES
-(175, 1, 1, 1, 1, 1, 1),
-(176, 1, 1, 1, 1, 1, 2),
-(177, 1, 1, 1, 1, 1, 3),
-(178, 1, 1, 1, 1, 1, 4),
-(179, 1, 1, 1, 1, 1, 5),
-(180, 1, 1, 1, 1, 1, 6),
-(181, 1, 1, 1, 1, 1, 7),
-(182, 1, 1, 1, 1, 1, 8),
-(183, 1, 1, 1, 1, 1, 9),
-(184, 1, 1, 1, 1, 1, 10),
-(185, 1, 1, 1, 1, 1, 11),
-(186, 1, 1, 1, 1, 1, 12),
-(187, 1, 1, 1, 1, 1, 13),
-(188, 1, 1, 1, 1, 1, 14),
-(189, 1, 1, 1, 1, 1, 15),
-(190, 1, 1, 1, 1, 1, 16),
-(191, 1, 1, 1, 1, 1, 17),
-(192, 1, 1, 1, 1, 1, 18),
-(193, 1, 1, 1, 1, 1, 19),
 (194, 1, 1, 1, 1, 3, 1),
 (195, 1, 0, 0, 0, 3, 3),
 (196, 1, 0, 0, 0, 3, 4),
@@ -40923,17 +40911,6 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (294, 1, 0, 0, 0, 5, 17),
 (295, 1, 0, 0, 0, 5, 18),
 (296, 1, 0, 0, 0, 5, 19),
-(314, 1, 1, 1, 1, 1, 20),
-(315, 1, 1, 1, 1, 1, 21),
-(316, 1, 1, 1, 1, 1, 22),
-(317, 1, 1, 1, 1, 1, 23),
-(318, 1, 1, 1, 1, 1, 24),
-(319, 1, 1, 1, 1, 1, 25),
-(320, 1, 1, 1, 1, 1, 26),
-(321, 1, 1, 1, 1, 1, 27),
-(322, 1, 1, 1, 1, 1, 28),
-(323, 1, 1, 1, 1, 1, 29),
-(324, 1, 1, 1, 1, 1, 30),
 (421, 1, 0, 0, 0, 8, 1),
 (422, 1, 0, 0, 0, 8, 6),
 (423, 1, 0, 0, 0, 8, 7),
@@ -40958,7 +40935,6 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (452, 1, 0, 0, 0, 9, 21),
 (453, 1, 0, 1, 0, 9, 22),
 (454, 1, 1, 1, 1, 9, 23),
-(455, 1, 1, 1, 1, 1, 31),
 (456, 1, 0, 0, 0, 7, 1),
 (457, 1, 0, 0, 0, 7, 7),
 (458, 1, 0, 0, 0, 7, 8),
@@ -40988,37 +40964,68 @@ INSERT INTO `rol_permission` (`id`, `view_permission`, `add_permission`, `edit_p
 (482, 1, 1, 1, 1, 10, 29),
 (483, 1, 1, 1, 1, 10, 30),
 (484, 1, 1, 1, 1, 10, 31),
-(485, 1, 1, 1, 1, 1, 32),
-(486, 1, 1, 1, 1, 1, 33),
-(487, 1, 1, 1, 1, 1, 34),
-(488, 1, 1, 1, 1, 1, 35),
-(489, 1, 1, 1, 1, 1, 36),
-(490, 1, 1, 1, 1, 1, 37),
-(491, 1, 1, 1, 1, 1, 38),
-(492, 1, 1, 1, 1, 1, 39),
-(493, 1, 1, 1, 1, 1, 40),
-(494, 1, 1, 1, 1, 4, 1),
-(495, 1, 0, 0, 0, 4, 8),
-(496, 1, 0, 0, 0, 4, 9),
-(497, 1, 1, 1, 0, 4, 18),
-(498, 1, 0, 0, 0, 4, 21),
-(499, 1, 0, 0, 0, 4, 22),
-(500, 1, 0, 0, 0, 4, 10),
-(501, 1, 1, 1, 1, 4, 11),
-(502, 1, 1, 1, 0, 4, 19),
-(503, 1, 0, 0, 0, 4, 20),
-(504, 1, 0, 0, 0, 4, 13),
-(505, 1, 0, 0, 0, 4, 7),
-(506, 1, 1, 1, 1, 4, 14),
-(507, 1, 0, 0, 0, 4, 15),
-(508, 1, 1, 1, 1, 4, 16),
-(509, 1, 0, 0, 0, 4, 17),
-(510, 1, 0, 0, 0, 4, 23),
-(511, 1, 1, 1, 1, 4, 40),
-(512, 1, 0, 0, 0, 4, 2),
-(513, 1, 0, 0, 0, 4, 3),
-(514, 1, 1, 1, 1, 4, 12),
-(515, 1, 0, 0, 0, 4, 4);
+(516, 1, 1, 1, 1, 1, 1),
+(517, 1, 1, 1, 1, 1, 29),
+(518, 1, 1, 1, 1, 1, 6),
+(519, 1, 1, 1, 1, 1, 13),
+(520, 1, 1, 1, 1, 1, 5),
+(521, 1, 1, 1, 1, 1, 24),
+(522, 1, 1, 1, 1, 1, 25),
+(523, 1, 1, 1, 1, 1, 26),
+(524, 1, 1, 1, 1, 1, 27),
+(525, 1, 1, 1, 1, 1, 30),
+(526, 1, 1, 1, 1, 1, 28),
+(527, 1, 1, 1, 1, 1, 32),
+(528, 1, 1, 1, 1, 1, 38),
+(529, 1, 1, 1, 1, 1, 8),
+(530, 1, 1, 1, 1, 1, 9),
+(531, 1, 1, 1, 1, 1, 18),
+(532, 1, 1, 1, 1, 1, 36),
+(533, 1, 1, 1, 1, 1, 22),
+(534, 1, 1, 1, 1, 1, 10),
+(535, 1, 1, 1, 1, 1, 7),
+(536, 1, 1, 1, 1, 1, 31),
+(537, 1, 1, 1, 1, 1, 11),
+(538, 1, 1, 1, 1, 1, 33),
+(539, 1, 1, 1, 1, 1, 39),
+(540, 1, 1, 1, 1, 1, 19),
+(541, 1, 1, 1, 1, 1, 21),
+(542, 1, 1, 1, 1, 1, 16),
+(543, 1, 1, 1, 1, 1, 15),
+(544, 1, 1, 1, 1, 1, 35),
+(545, 1, 1, 1, 1, 1, 20),
+(546, 1, 1, 1, 1, 1, 34),
+(547, 1, 1, 1, 1, 1, 14),
+(548, 1, 1, 1, 1, 1, 37),
+(549, 1, 1, 1, 1, 1, 2),
+(550, 1, 1, 1, 1, 1, 3),
+(551, 1, 1, 1, 1, 1, 17),
+(552, 1, 1, 1, 1, 1, 40),
+(553, 1, 1, 1, 1, 1, 23),
+(554, 1, 1, 1, 1, 1, 12),
+(555, 1, 1, 1, 1, 1, 4),
+(556, 1, 1, 1, 1, 4, 1),
+(557, 1, 0, 0, 0, 4, 13),
+(558, 1, 0, 0, 0, 4, 8),
+(559, 1, 0, 0, 0, 4, 9),
+(560, 1, 1, 1, 0, 4, 18),
+(561, 1, 0, 0, 0, 4, 22),
+(562, 1, 0, 0, 0, 4, 10),
+(563, 1, 0, 0, 0, 4, 7),
+(564, 1, 1, 1, 1, 4, 11),
+(565, 1, 1, 1, 0, 4, 19),
+(566, 1, 0, 0, 0, 4, 21),
+(567, 1, 1, 1, 1, 4, 16),
+(568, 1, 0, 0, 0, 4, 15),
+(569, 1, 0, 0, 0, 4, 20),
+(570, 1, 1, 1, 1, 4, 14),
+(571, 1, 0, 0, 0, 4, 2),
+(572, 1, 0, 0, 0, 4, 3),
+(573, 1, 0, 0, 0, 4, 17),
+(574, 1, 1, 1, 1, 4, 40),
+(575, 1, 0, 0, 0, 4, 23),
+(576, 1, 1, 1, 1, 4, 12),
+(577, 1, 0, 0, 0, 4, 4);
 
 -- --------------------------------------------------------
 
@@ -41038,8 +41045,28 @@ CREATE TABLE `rol_widget_access` (
 --
 
 INSERT INTO `rol_widget_access` (`id`, `rol_id`, `widget_id`, `is_enabled`) VALUES
-(1, 1, 1, 1),
-(2, 4, 1, 1);
+(4, 1, 1, 1),
+(5, 1, 2, 1),
+(6, 1, 3, 1),
+(7, 1, 4, 1),
+(8, 1, 5, 1),
+(9, 1, 6, 1),
+(10, 1, 7, 1),
+(11, 1, 8, 1),
+(12, 1, 9, 1),
+(13, 1, 10, 1),
+(14, 1, 11, 1),
+(15, 4, 1, 1),
+(16, 4, 2, 0),
+(17, 4, 3, 0),
+(18, 4, 4, 0),
+(19, 4, 5, 0),
+(20, 4, 6, 0),
+(21, 4, 7, 0),
+(22, 4, 8, 0),
+(23, 4, 9, 0),
+(24, 4, 10, 0),
+(25, 4, 11, 0);
 
 -- --------------------------------------------------------
 
@@ -44752,7 +44779,7 @@ INSERT INTO `schedule` (`schedule_id`, `description`, `location`, `latitud`, `lo
 (4761, '3 PED ISLANDS DOWELED IN', '', NULL, NULL, '2026-03-03', '', 0.000000, '', 0, 43, NULL, NULL, NULL),
 (4762, '3 PED ISLANDS DOWELED IN', '', NULL, NULL, '2026-03-04', '', 0.000000, '', 0, 43, NULL, NULL, NULL),
 (4763, '3 PED ISLANDS DOWELED IN', '', NULL, NULL, '2026-03-05', '', 0.000000, '', 0, 43, NULL, NULL, NULL),
-(4764, '3 PED ISLANDS DOWELED IN', '', NULL, NULL, '2026-03-06', '', 0.000000, '', 0, 43, NULL, NULL, NULL),
+(4764, '3 PED ISLANDS DOWELED IN', '', NULL, NULL, '2026-03-06', 'null', 0.000000, '', 0, 43, NULL, NULL, NULL),
 (4765, 'CURB, SW, DW', '', NULL, NULL, '2026-02-26', 'null', 0.000000, '', 0, 147, NULL, NULL, NULL),
 (4766, 'CURB, SW, DW', '', NULL, NULL, '2026-02-27', 'null', 0.000000, '', 0, 147, NULL, NULL, NULL),
 (4767, 'CURB, TOP & THROAT', '', NULL, NULL, '2026-02-23', '', 0.000000, '', 0, 388, NULL, NULL, NULL),
@@ -45670,7 +45697,7 @@ CREATE TABLE `subcontractor` (
 --
 
 INSERT INTO `subcontractor` (`subcontractor_id`, `name`, `address`, `phone`, `contact_name`, `contact_email`, `company_name`, `company_phone`, `company_address`, `created_at`, `updated_at`) VALUES
-(1, 'Empleado_Prueba_1', '', '', NULL, '', '', '', '', '2025-04-08 20:48:43', '2025-04-15 21:25:35'),
+(1, 'Empleado_Prueba_1', '', '', '', '', '', '', '', '2025-04-08 20:48:43', '2026-04-28 03:27:05'),
 (2, 'Empleado_Prueba_2', '', '', NULL, '', '', '', '', '2025-04-15 21:23:51', NULL),
 (3, 'Empleado_Prueba_3', '', '', NULL, '', '', '', '', '2025-04-15 21:24:23', NULL),
 (4, 'Empleado_Prueba_4', '', '', NULL, '', '', '', '', '2025-04-15 21:25:07', NULL),
@@ -46007,8 +46034,8 @@ CREATE TABLE `tasks` (
 --
 
 INSERT INTO `tasks` (`task_id`, `description`, `status`, `created_at`, `due_date`, `user_id`) VALUES
-(3, 'Tarea de prueba', 'complete', '2026-04-25 02:40:43', '2026-04-30', 1),
-(4, 'Tarea de prueba 2', 'pending', '2026-04-25 02:41:00', '2026-04-29', 1),
+(3, 'Tarea de prueba', 'pending', '2026-04-25 02:40:43', '2026-04-30', 1),
+(4, 'Tarea de prueba 2', 'complete', '2026-04-25 02:41:00', '2026-04-29', 1),
 (5, 'Prueba', 'pending', '2026-04-25 03:53:04', '2026-04-30', 1);
 
 -- --------------------------------------------------------
@@ -46078,8 +46105,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `name`, `lastname`, `email`, `password`, `status`, `estimator`, `bond`, `retainage`, `chat`, `phone`, `created_at`, `updated_at`, `player_id`, `push_token`, `plataforma`, `imagen`, `preferred_lang`, `rol_id`) VALUES
-(1, 'Empleado_Prueba_1', 'Iglesias', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, 1, '', '2024-04-12 09:24:44', '2026-04-26 20:22:19', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'android', NULL, 'en', 3),
-(3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, 1, 1, 0, '', '2024-06-25 18:17:59', '2026-02-23 04:36:23', NULL, NULL, NULL, NULL, 'es', 3),
+(1, 'Empleado_Prueba_1', 'Iglesias', 'admin@example.com', '$2y$12$ojiMWHh/4xuvv0D8JdpY7OnlBd5TuYTW76SyWlR5QNbOAgtBt64dy', 1, 0, 1, 1, 1, '', '2024-04-12 09:24:44', '2026-04-26 23:11:21', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'cP3-g9BwTE2gfwf_SD8y40:APA91bFJ1ExJRhBRgnrymFyf4SWeCOo4S3T8Jr7XzIzxEQv5XHg2wt5zSwgZM83Nz2A6W4J_UxOHCoaYR_0ULKF73IRBB7ozgScwjtS8JZXCeNlzO-EB72c', 'android', NULL, 'en', 3),
+(3, 'Empleado_Prueba_3', 'Garcia', '', '', 1, 0, 1, 1, 0, '', '2024-06-25 18:17:59', '2026-04-26 21:51:20', NULL, NULL, NULL, NULL, 'es', 3),
 (4, 'Empleado_Prueba_4', 'Royster', '', '', 1, 0, NULL, NULL, NULL, '', '2024-06-25 18:21:43', '2025-10-19 18:46:42', NULL, NULL, NULL, NULL, 'es', 1),
 (6, 'Empleado_Prueba_6', 'Valdez', '', '', 1, 1, 1, 1, 1, '', '2024-06-25 18:33:59', '2026-02-23 04:36:35', NULL, NULL, NULL, NULL, 'es', 10),
 (7, 'Empleado_Prueba_7', 'Royster', '', '', 1, 1, 1, 1, 1, '', '2024-06-25 18:37:07', '2026-02-23 04:37:06', NULL, NULL, NULL, NULL, 'es', 6),
@@ -46426,29 +46453,6 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3712, 1, 1, 1, 0, 8, 19),
 (3713, 1, 1, 1, 1, 8, 20),
 (3714, 1, 0, 1, 0, 8, 22),
-(3775, 1, 1, 1, 1, 3, 1),
-(3776, 1, 0, 0, 0, 3, 3),
-(3777, 1, 0, 0, 0, 3, 4),
-(3778, 0, 1, 0, 0, 3, 5),
-(3779, 0, 1, 0, 0, 3, 6),
-(3780, 1, 1, 0, 0, 3, 7),
-(3781, 1, 0, 0, 0, 3, 8),
-(3782, 1, 0, 1, 0, 3, 9),
-(3783, 1, 1, 1, 1, 3, 10),
-(3784, 1, 1, 1, 1, 3, 11),
-(3785, 1, 1, 1, 1, 3, 12),
-(3786, 0, 1, 0, 0, 3, 13),
-(3787, 0, 1, 0, 0, 3, 14),
-(3788, 1, 1, 1, 1, 3, 15),
-(3789, 1, 0, 0, 0, 3, 16),
-(3790, 1, 0, 0, 0, 3, 17),
-(3791, 1, 1, 1, 0, 3, 18),
-(3792, 1, 1, 1, 0, 3, 19),
-(3793, 1, 1, 0, 0, 3, 20),
-(3794, 1, 1, 1, 0, 3, 21),
-(3795, 1, 0, 0, 0, 3, 22),
-(3796, 1, 1, 1, 1, 3, 23),
-(3797, 1, 1, 1, 1, 3, 33),
 (3798, 1, 1, 1, 1, 6, 1),
 (3799, 1, 1, 1, 1, 6, 2),
 (3800, 1, 1, 1, 1, 6, 3),
@@ -46555,47 +46559,112 @@ INSERT INTO `user_permission` (`id`, `view_permission`, `add_permission`, `edit_
 (3975, 1, 1, 1, 1, 30, 35),
 (3976, 1, 1, 1, 1, 30, 36),
 (3977, 1, 1, 1, 1, 30, 37),
-(3981, 1, 1, 1, 1, 1, 1),
-(3982, 1, 1, 1, 1, 1, 40),
-(3993, 1, 1, 1, 1, 1, 29),
-(3994, 1, 1, 1, 1, 1, 6),
-(3995, 1, 1, 1, 1, 1, 13),
-(3996, 1, 1, 1, 1, 1, 5),
-(3997, 1, 1, 1, 1, 1, 24),
-(3998, 1, 1, 1, 1, 1, 25),
-(3999, 1, 1, 1, 1, 1, 26),
-(4000, 1, 1, 1, 1, 1, 27),
-(4001, 1, 1, 1, 1, 1, 28),
-(4002, 1, 1, 1, 1, 1, 32),
-(4003, 1, 1, 1, 1, 1, 38),
-(4004, 1, 1, 1, 1, 1, 8),
-(4005, 1, 1, 1, 1, 1, 8),
-(4006, 1, 1, 1, 1, 1, 9),
-(4007, 1, 1, 1, 1, 1, 18),
-(4008, 1, 1, 1, 1, 1, 36),
-(4009, 1, 1, 1, 1, 1, 22),
-(4010, 1, 1, 1, 1, 1, 10),
-(4011, 1, 1, 1, 1, 1, 7),
-(4012, 1, 1, 1, 1, 1, 31),
-(4013, 1, 1, 1, 1, 1, 11),
-(4014, 1, 1, 1, 1, 1, 33),
-(4015, 1, 1, 1, 1, 1, 39),
-(4016, 1, 1, 1, 1, 1, 19),
-(4017, 1, 1, 1, 1, 1, 21),
-(4018, 1, 1, 1, 1, 1, 16),
-(4019, 1, 1, 1, 1, 1, 15),
-(4020, 1, 1, 1, 1, 1, 35),
-(4021, 1, 1, 1, 1, 1, 20),
-(4022, 1, 1, 1, 1, 1, 34),
-(4023, 1, 1, 1, 1, 1, 14),
-(4024, 1, 1, 1, 1, 1, 37),
-(4025, 1, 1, 1, 1, 1, 2),
-(4026, 1, 1, 1, 1, 1, 3),
-(4027, 1, 1, 1, 1, 1, 17),
-(4028, 1, 1, 1, 1, 1, 23),
-(4029, 1, 1, 1, 1, 1, 12),
-(4030, 1, 1, 1, 1, 1, 4),
-(4031, 1, 1, 1, 1, 1, 30);
+(4080, 1, 1, 1, 1, 3, 1),
+(4081, 0, 1, 0, 0, 3, 6),
+(4082, 0, 1, 0, 0, 3, 13),
+(4083, 0, 1, 0, 0, 3, 5),
+(4084, 1, 0, 0, 0, 3, 8),
+(4085, 1, 0, 0, 0, 3, 8),
+(4086, 1, 0, 1, 0, 3, 9),
+(4087, 1, 1, 1, 0, 3, 18),
+(4088, 1, 0, 0, 0, 3, 22),
+(4089, 1, 1, 1, 1, 3, 10),
+(4090, 1, 1, 0, 0, 3, 7),
+(4091, 1, 1, 1, 1, 3, 11),
+(4092, 1, 1, 1, 1, 3, 33),
+(4093, 1, 1, 1, 0, 3, 19),
+(4094, 1, 1, 1, 0, 3, 21),
+(4095, 1, 0, 0, 0, 3, 16),
+(4096, 1, 1, 1, 1, 3, 15),
+(4097, 1, 1, 0, 0, 3, 20),
+(4098, 0, 1, 0, 0, 3, 14),
+(4099, 1, 0, 0, 0, 3, 3),
+(4100, 1, 0, 0, 0, 3, 17),
+(4101, 1, 1, 1, 1, 3, 23),
+(4102, 1, 1, 1, 1, 3, 12),
+(4103, 1, 0, 0, 0, 3, 4),
+(4104, 1, 1, 1, 1, 1, 1),
+(4105, 1, 1, 1, 1, 1, 29),
+(4106, 1, 1, 1, 1, 1, 6),
+(4107, 1, 1, 1, 1, 1, 13),
+(4108, 1, 1, 1, 1, 1, 5),
+(4109, 1, 1, 1, 1, 1, 24),
+(4110, 1, 1, 1, 1, 1, 25),
+(4111, 1, 1, 1, 1, 1, 26),
+(4112, 1, 1, 1, 1, 1, 27),
+(4113, 1, 1, 1, 1, 1, 30),
+(4114, 1, 1, 1, 1, 1, 28),
+(4115, 1, 1, 1, 1, 1, 32),
+(4116, 1, 1, 1, 1, 1, 38),
+(4117, 1, 1, 1, 1, 1, 8),
+(4118, 1, 1, 1, 1, 1, 9),
+(4119, 1, 1, 1, 1, 1, 18),
+(4120, 1, 1, 1, 1, 1, 36),
+(4121, 1, 1, 1, 1, 1, 22),
+(4122, 1, 1, 1, 1, 1, 10),
+(4123, 1, 1, 1, 1, 1, 7),
+(4124, 1, 1, 1, 1, 1, 31),
+(4125, 1, 1, 1, 1, 1, 11),
+(4126, 1, 1, 1, 1, 1, 33),
+(4127, 1, 1, 1, 1, 1, 39),
+(4128, 1, 1, 1, 1, 1, 19),
+(4129, 1, 1, 1, 1, 1, 21),
+(4130, 1, 1, 1, 1, 1, 16),
+(4131, 1, 1, 1, 1, 1, 15),
+(4132, 1, 1, 1, 1, 1, 35),
+(4133, 1, 1, 1, 1, 1, 20),
+(4134, 1, 1, 1, 1, 1, 34),
+(4135, 1, 1, 1, 1, 1, 14),
+(4136, 1, 1, 1, 1, 1, 37),
+(4137, 1, 1, 1, 1, 1, 2),
+(4138, 1, 1, 1, 1, 1, 3),
+(4139, 1, 1, 1, 1, 1, 17),
+(4140, 1, 1, 1, 1, 1, 40),
+(4141, 1, 1, 1, 1, 1, 23),
+(4142, 1, 1, 1, 1, 1, 12),
+(4143, 1, 1, 1, 1, 1, 4);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `user_preference_widget`
+--
+
+CREATE TABLE `user_preference_widget` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `widget_id` int(11) NOT NULL,
+  `is_visible` tinyint(1) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `user_preference_widget`
+--
+
+INSERT INTO `user_preference_widget` (`id`, `user_id`, `widget_id`, `is_visible`) VALUES
+(1, 4, 1, 1),
+(2, 3, 1, 1),
+(3, 3, 2, 1),
+(4, 3, 3, 1),
+(5, 3, 4, 1),
+(6, 3, 5, 1),
+(7, 3, 6, 1),
+(8, 3, 7, 1),
+(9, 3, 8, 1),
+(10, 3, 9, 1),
+(11, 3, 10, 1),
+(12, 3, 11, 1),
+(13, 1, 1, 1),
+(14, 1, 2, 1),
+(15, 1, 3, 1),
+(16, 1, 4, 1),
+(17, 1, 5, 1),
+(18, 1, 6, 1),
+(19, 1, 7, 1),
+(20, 1, 8, 1),
+(21, 1, 9, 1),
+(22, 1, 10, 1),
+(23, 1, 11, 1);
 
 -- --------------------------------------------------------
 
@@ -46627,17 +46696,39 @@ CREATE TABLE `user_widget_access` (
 --
 
 INSERT INTO `user_widget_access` (`id`, `user_id`, `widget_id`, `is_enabled`) VALUES
-(1, 1, 1, 1),
-(2, 1, 2, 1),
-(3, 1, 3, 1),
-(4, 1, 4, 1),
-(5, 1, 5, 1),
-(6, 1, 6, 1),
-(7, 1, 7, 1),
-(8, 1, 8, 1),
-(9, 1, 9, 1),
-(10, 1, 10, 1),
-(11, 1, 11, 1);
+(38, 4, 1, 1),
+(39, 4, 2, 0),
+(40, 4, 3, 0),
+(41, 4, 4, 0),
+(42, 4, 5, 0),
+(43, 4, 6, 0),
+(44, 4, 7, 0),
+(45, 4, 8, 0),
+(46, 4, 9, 0),
+(47, 4, 10, 0),
+(48, 4, 11, 0),
+(49, 3, 1, 1),
+(50, 3, 2, 1),
+(51, 3, 3, 1),
+(52, 3, 4, 1),
+(53, 3, 5, 1),
+(54, 3, 6, 1),
+(55, 3, 7, 1),
+(56, 3, 8, 1),
+(57, 3, 9, 1),
+(58, 3, 10, 1),
+(59, 3, 11, 1),
+(60, 1, 1, 1),
+(61, 1, 2, 1),
+(62, 1, 3, 1),
+(63, 1, 4, 1),
+(64, 1, 5, 1),
+(65, 1, 6, 1),
+(66, 1, 7, 1),
+(67, 1, 8, 1),
+(68, 1, 9, 1),
+(69, 1, 10, 1),
+(70, 1, 11, 1);
 
 -- --------------------------------------------------------
 
@@ -47305,6 +47396,14 @@ ALTER TABLE `user_permission`
   ADD KEY `Ref194` (`function_id`);
 
 --
+-- Indices de la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_user_preference_widget` (`user_id`,`widget_id`),
+  ADD KEY `fk_upw_widget` (`widget_id`);
+
+--
 -- Indices de la tabla `user_qbwc_token`
 --
 ALTER TABLE `user_qbwc_token`
@@ -47340,7 +47439,7 @@ ALTER TABLE `advertisement`
 -- AUTO_INCREMENT de la tabla `company`
 --
 ALTER TABLE `company`
-  MODIFY `company_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
+  MODIFY `company_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=138;
 
 --
 -- AUTO_INCREMENT de la tabla `company_contact`
@@ -47370,7 +47469,7 @@ ALTER TABLE `concrete_vendor_contact`
 -- AUTO_INCREMENT de la tabla `county`
 --
 ALTER TABLE `county`
-  MODIFY `county_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=249;
+  MODIFY `county_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
 
 --
 -- AUTO_INCREMENT de la tabla `data_tracking`
@@ -47460,7 +47559,7 @@ ALTER TABLE `estimate_company`
 -- AUTO_INCREMENT de la tabla `estimate_county`
 --
 ALTER TABLE `estimate_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=589;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=605;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_estimator`
@@ -47478,7 +47577,7 @@ ALTER TABLE `estimate_note_item`
 -- AUTO_INCREMENT de la tabla `estimate_project_type`
 --
 ALTER TABLE `estimate_project_type`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1330;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1338;
 
 --
 -- AUTO_INCREMENT de la tabla `estimate_quote`
@@ -47592,13 +47691,13 @@ ALTER TABLE `invoice_override_payment`
 -- AUTO_INCREMENT de la tabla `item`
 --
 ALTER TABLE `item`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=865;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=866;
 
 --
 -- AUTO_INCREMENT de la tabla `log`
 --
 ALTER TABLE `log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=655;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=734;
 
 --
 -- AUTO_INCREMENT de la tabla `material`
@@ -47640,7 +47739,7 @@ ALTER TABLE `plan_downloading`
 -- AUTO_INCREMENT de la tabla `plan_status`
 --
 ALTER TABLE `plan_status`
-  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `project`
@@ -47670,7 +47769,7 @@ ALTER TABLE `project_contact`
 -- AUTO_INCREMENT de la tabla `project_county`
 --
 ALTER TABLE `project_county`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=703;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=704;
 
 --
 -- AUTO_INCREMENT de la tabla `project_item`
@@ -47688,7 +47787,7 @@ ALTER TABLE `project_item_history`
 -- AUTO_INCREMENT de la tabla `project_notes`
 --
 ALTER TABLE `project_notes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2205;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2208;
 
 --
 -- AUTO_INCREMENT de la tabla `project_prevailing_role`
@@ -47706,7 +47805,7 @@ ALTER TABLE `project_price_adjustment`
 -- AUTO_INCREMENT de la tabla `project_stage`
 --
 ALTER TABLE `project_stage`
-  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `stage_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT de la tabla `project_type`
@@ -47724,7 +47823,7 @@ ALTER TABLE `proposal_type`
 -- AUTO_INCREMENT de la tabla `race`
 --
 ALTER TABLE `race`
-  MODIFY `race_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `race_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT de la tabla `reimbursement_history`
@@ -47736,13 +47835,13 @@ ALTER TABLE `reimbursement_history`
 -- AUTO_INCREMENT de la tabla `reminder`
 --
 ALTER TABLE `reminder`
-  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `reminder_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT de la tabla `reminder_recipient`
 --
 ALTER TABLE `reminder_recipient`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT de la tabla `rol`
@@ -47754,13 +47853,13 @@ ALTER TABLE `rol`
 -- AUTO_INCREMENT de la tabla `rol_permission`
 --
 ALTER TABLE `rol_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=516;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=578;
 
 --
 -- AUTO_INCREMENT de la tabla `rol_widget_access`
 --
 ALTER TABLE `rol_widget_access`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT de la tabla `schedule`
@@ -47802,7 +47901,7 @@ ALTER TABLE `subcontractor_notes`
 -- AUTO_INCREMENT de la tabla `sync_queue_qbwc`
 --
 ALTER TABLE `sync_queue_qbwc`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=396;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=397;
 
 --
 -- AUTO_INCREMENT de la tabla `tasks`
@@ -47832,7 +47931,13 @@ ALTER TABLE `user_access_token`
 -- AUTO_INCREMENT de la tabla `user_permission`
 --
 ALTER TABLE `user_permission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4032;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4144;
+
+--
+-- AUTO_INCREMENT de la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT de la tabla `user_qbwc_token`
@@ -47844,7 +47949,7 @@ ALTER TABLE `user_qbwc_token`
 -- AUTO_INCREMENT de la tabla `user_widget_access`
 --
 ALTER TABLE `user_widget_access`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT de la tabla `widgets`
@@ -48258,6 +48363,13 @@ ALTER TABLE `user_access_token`
 ALTER TABLE `user_permission`
   ADD CONSTRAINT `Reffunction4` FOREIGN KEY (`function_id`) REFERENCES `function` (`function_id`),
   ADD CONSTRAINT `Refuser3` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+
+--
+-- Filtros para la tabla `user_preference_widget`
+--
+ALTER TABLE `user_preference_widget`
+  ADD CONSTRAINT `fk_upw_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_upw_widget` FOREIGN KEY (`widget_id`) REFERENCES `widgets` (`widget_id`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `user_qbwc_token`
