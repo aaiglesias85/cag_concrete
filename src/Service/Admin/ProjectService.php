@@ -6,7 +6,9 @@ use App\Constants\FunctionId;
 use App\Dto\Admin\Project\ProjectIdRequest;
 use App\Dto\Admin\Project\ProjectIdsRequest;
 use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
+use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectListarRequest;
+use App\Dto\Admin\Project\ProjectSalvarRequest;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\ConcreteClass;
@@ -3208,56 +3210,250 @@ class ProjectService extends Base
     }
 
     /**
-     * ActualizarProject: Actuializa los datos del rol en la BD.
+     * Alta de proyecto (DTO validado).
      *
-     * @param int $project_id Id
-     *
-     * @author Marcel
+     * @return array{success: bool, error?: string, project_id?: mixed, items?: mixed}
      */
-    public function ActualizarProject(
-        $project_id,
-        $company_id,
-        $inspector_id,
-        $number,
-        $name,
-        $description,
-        $location,
-        $po_number,
-        $po_cg,
-        $manager,
-        $status,
-        $owner,
-        $subcontract,
-        $federal_funding,
-        $county_ids,
-        $resurfacing,
-        $invoice_contact,
-        $certified_payrolls,
-        $start_date,
-        $end_date,
-        $due_date,
-        $contract_amount,
-        $proposal_number,
-        $project_id_number,
-        $items,
-        $contacts,
-        $concrete_classes,
-        $ajustes_precio,
-        $archivos,
-        $vendor_id,
-        $concrete_class_id,
-        $concrete_quote_price,
-        $concrete_start_date,
-        $concrete_quote_price_escalator,
-        $concrete_time_period_every_n,
-        $concrete_time_period_unit,
-        $retainage,
-        $retainage_percentage,
-        $retainage_adjustment_percentage,
-        $retainage_adjustment_completion,
-        $prevailing_wage,
-        $prevailing_roles,
-    ) {
+    public function SalvarProject(ProjectSalvarRequest $d): array
+    {
+        $p = $this->prepararDatosDesdeProjectSalvarRequest($d);
+        $company_id = $p['company_id'];
+        $inspector_id = $p['inspector_id'];
+        $number = $p['number'];
+        $name = $p['name'];
+        $description = $p['description'];
+        $location = $p['location'];
+        $po_number = $p['po_number'];
+        $po_cg = $p['po_cg'];
+        $contract_amount = $p['contract_amount'];
+        $proposal_number = $p['proposal_number'];
+        $project_id_number = $p['project_id_number'];
+        $manager = $p['manager'];
+        $status = $p['status'];
+        $owner = $p['owner'];
+        $subcontract = $p['subcontract'];
+        $federal_funding = $p['federal_funding'];
+        $county_ids = $p['county_ids'];
+        $resurfacing = $p['resurfacing'];
+        $invoice_contact = $p['invoice_contact'];
+        $certified_payrolls = $p['certified_payrolls'];
+        $start_date = $p['start_date'];
+        $end_date = $p['end_date'];
+        $due_date = $p['due_date'];
+        $vendor_id = $p['vendor_id'];
+        $concrete_class_id = $p['concrete_class_id'];
+        $concrete_quote_price = $p['concrete_quote_price'];
+        $concrete_start_date = $p['concrete_start_date'];
+        $concrete_quote_price_escalator = $p['concrete_quote_price_escalator'];
+        $concrete_time_period_every_n = $p['concrete_time_period_every_n'];
+        $concrete_time_period_unit = $p['concrete_time_period_unit'];
+        $retainage = $p['retainage'];
+        $retainage_percentage = $p['retainage_percentage'];
+        $retainage_adjustment_percentage = $p['retainage_adjustment_percentage'];
+        $retainage_adjustment_completion = $p['retainage_adjustment_completion'];
+        $prevailing_wage = $p['prevailing_wage'];
+        $prevailing_roles = $p['prevailing_roles'];
+        $items = $p['items'];
+        $contacts = $p['contacts'];
+        $concrete_classes = $p['concrete_classes'];
+
+        $em = $this->getDoctrine()->getManager();
+
+        // Verificar number
+        $project = $this->getDoctrine()->getRepository(Project::class)
+           ->findOneBy(['projectNumber' => $number]);
+        if (null != $project) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The project number is in use, please try entering another one.';
+
+            return $resultado;
+        }
+
+        $entity = new Project();
+
+        $entity->setProjectNumber($number);
+        $entity->setName($name);
+        $entity->setDescription($description);
+        $entity->setLocation($location);
+        $entity->setPoNumber($po_number);
+        $entity->setPoCG($po_cg);
+        $entity->setManager($manager);
+        $entity->setStatus($status);
+        $contract_amount = str_replace(['$', ','], '', (string) $contract_amount);
+        $entity->setContractAmount('' === $contract_amount ? null : (float) $contract_amount);
+        $entity->setProposalNumber($proposal_number);
+        $entity->setProjectIdNumber($project_id_number);
+
+        if ('' != $company_id) {
+            $company = $this->getDoctrine()->getRepository(Company::class)
+               ->find($company_id);
+            $entity->setCompany($company);
+        }
+        if ('' != $inspector_id) {
+            $inspector = $this->getDoctrine()->getRepository(Inspector::class)
+               ->find($inspector_id);
+            $entity->setInspector($inspector);
+        }
+
+        $entity->setOwner($owner);
+        $entity->setSubcontract($subcontract);
+        $entity->setFederalFunding($federal_funding);
+        $entity->setResurfacing($resurfacing);
+        $entity->setInvoiceContact($invoice_contact);
+        $entity->setCertifiedPayrolls($certified_payrolls);
+
+        if ('' != $start_date) {
+            $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
+            $entity->setStartDate($start_date);
+        }
+
+        if ('' != $end_date) {
+            $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
+            $entity->setEndDate($end_date);
+        }
+
+        if ('' != $due_date) {
+            $due_date = \DateTime::createFromFormat('m/d/Y', $due_date);
+            $entity->setDueDate($due_date);
+        }
+
+        if ('' != $concrete_start_date) {
+            $date = \DateTime::createFromFormat('m/d/Y', $concrete_start_date);
+            $entity->setConcreteStartDate($date);
+        }
+
+        if ('' !== $vendor_id) {
+            $conc_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
+               ->find($vendor_id);
+            $entity->setConcreteVendor($conc_vendor);
+        }
+
+        if ('' != $concrete_class_id) {
+            $id_class = $concrete_class_id;
+
+            if (is_object($id_class)) {
+                $id_class = isset($id_class->concreteClassId) ? $id_class->concreteClassId : (isset($id_class->id) ? $id_class->id : null);
+            } elseif (is_array($id_class)) {
+                $id_class = isset($id_class['concreteClassId']) ? $id_class['concreteClassId'] : (isset($id_class['id']) ? $id_class['id'] : null);
+            }
+
+            if ($id_class) {
+                $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
+                   ->find($id_class);
+
+                $entity->setConcreteClass($concrete_class);
+            }
+        }
+
+        // $entity->setConcreteQuotePrice($concrete_quote_price);
+        $val = ('' !== $concrete_quote_price && null !== $concrete_quote_price) ? (float) $concrete_quote_price : null;
+        $entity->setConcreteQuotePrice($val);
+        $valEscalator = ('' !== $concrete_quote_price_escalator && null !== $concrete_quote_price_escalator) ? (float) $concrete_quote_price_escalator : null;
+        $entity->setConcreteQuotePriceEscalator($valEscalator);
+        $valTpEveryN = ('' !== $concrete_time_period_every_n && null !== $concrete_time_period_every_n) ? (int) $concrete_time_period_every_n : null;
+        $entity->setConcreteTimePeriodEveryN($valTpEveryN);
+        $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
+
+        if ('' !== $concrete_quote_price) {
+            $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
+        }
+
+        $entity->setRetainage($retainage);
+        $valRetPct = ('' !== $retainage_percentage && null !== $retainage_percentage) ? (float) $retainage_percentage : null;
+        $entity->setRetainagePercentage($valRetPct);
+        $valRetAdjPct = ('' !== $retainage_adjustment_percentage && null !== $retainage_adjustment_percentage) ? (float) $retainage_adjustment_percentage : null;
+        $entity->setRetainageAdjustmentPercentage($valRetAdjPct);
+        $valRetAdjComp = ('' !== $retainage_adjustment_completion && null !== $retainage_adjustment_completion) ? (float) $retainage_adjustment_completion : null;
+        $entity->setRetainageAdjustmentCompletion($valRetAdjComp);
+
+        $entity->setPrevailingWage($prevailing_wage);
+
+        $entity->setCreatedAt(new \DateTime());
+
+        $em->persist($entity);
+
+        // items
+        $items_new = $this->SalvarItems($entity, $items);
+
+        // save contacts
+        $this->SalvarContacts($entity, $contacts);
+
+        // save concrete classes
+        $this->SalvarConcreteClasses($entity, $concrete_classes);
+
+        // counties
+        $this->SalvarCounties($entity, $county_ids, false);
+
+        // prevailing roles (cada uno con role_id y rate)
+        $this->SalvarPrevailingRoles($entity, $prevailing_roles, false);
+
+        $em->flush();
+
+        // Salvar log
+        $log_operacion = 'Add';
+        $log_categoria = 'Project';
+        $log_descripcion = "The project is added: $name";
+        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
+
+        $resultado['success'] = true;
+        $resultado['project_id'] = $entity->getProjectId();
+        $resultado['items'] = $items_new;
+
+        return $resultado;
+    }
+
+    /**
+     * Actualización de proyecto (DTO validado).
+     *
+     * @return array{success: bool, error?: string, project_id?: mixed, items?: mixed}
+     */
+    public function ActualizarProject(ProjectActualizarRequest $d): array
+    {
+        $salvar = ProjectSalvarRequest::fromActualizarRequest($d);
+        $p = $this->prepararDatosDesdeProjectSalvarRequest($salvar);
+        $company_id = $p['company_id'];
+        $inspector_id = $p['inspector_id'];
+        $number = $p['number'];
+        $name = $p['name'];
+        $description = $p['description'];
+        $location = $p['location'];
+        $po_number = $p['po_number'];
+        $po_cg = $p['po_cg'];
+        $contract_amount = $p['contract_amount'];
+        $proposal_number = $p['proposal_number'];
+        $project_id_number = $p['project_id_number'];
+        $manager = $p['manager'];
+        $status = $p['status'];
+        $owner = $p['owner'];
+        $subcontract = $p['subcontract'];
+        $federal_funding = $p['federal_funding'];
+        $county_ids = $p['county_ids'];
+        $resurfacing = $p['resurfacing'];
+        $invoice_contact = $p['invoice_contact'];
+        $certified_payrolls = $p['certified_payrolls'];
+        $start_date = $p['start_date'];
+        $end_date = $p['end_date'];
+        $due_date = $p['due_date'];
+        $vendor_id = $p['vendor_id'];
+        $concrete_class_id = $p['concrete_class_id'];
+        $concrete_quote_price = $p['concrete_quote_price'];
+        $concrete_start_date = $p['concrete_start_date'];
+        $concrete_quote_price_escalator = $p['concrete_quote_price_escalator'];
+        $concrete_time_period_every_n = $p['concrete_time_period_every_n'];
+        $concrete_time_period_unit = $p['concrete_time_period_unit'];
+        $retainage = $p['retainage'];
+        $retainage_percentage = $p['retainage_percentage'];
+        $retainage_adjustment_percentage = $p['retainage_adjustment_percentage'];
+        $retainage_adjustment_completion = $p['retainage_adjustment_completion'];
+        $prevailing_wage = $p['prevailing_wage'];
+        $prevailing_roles = $p['prevailing_roles'];
+        $items = $p['items'];
+        $contacts = $p['contacts'];
+        $concrete_classes = $p['concrete_classes'];
+        $ajustes_precio = $p['ajustes_precio'];
+        $archivos = $p['archivos'];
+        $project_id = (int) $d->project_id;
+
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Project::class)
@@ -3658,201 +3854,76 @@ class ProjectService extends Base
 
             return $resultado;
         }
+
+        return ['success' => false, 'error' => 'Project not found'];
     }
 
     /**
-     * SalvarProject: Guarda los datos de project en la BD.
+     * @return array<string, mixed>
+     */
+    private function prepararDatosDesdeProjectSalvarRequest(ProjectSalvarRequest $d): array
+    {
+        $county_ids = $d->county_id;
+        if (\is_string($county_ids) && !empty($county_ids)) {
+            $county_ids = explode(',', $county_ids);
+        }
+        if (!\is_array($county_ids)) {
+            $county_ids = [];
+        }
+
+        return [
+            'company_id' => $d->company_id,
+            'inspector_id' => $d->inspector_id,
+            'number' => $d->number,
+            'name' => $d->name,
+            'description' => $d->description,
+            'location' => $d->location,
+            'po_number' => $d->po_number,
+            'po_cg' => $d->po_cg,
+            'contract_amount' => $d->contract_amount,
+            'proposal_number' => $d->proposal_number,
+            'project_id_number' => $d->project_id_number,
+            'manager' => $d->manager,
+            'status' => $d->status,
+            'owner' => $d->owner,
+            'subcontract' => $d->subcontract,
+            'federal_funding' => $d->federal_funding,
+            'county_ids' => $county_ids,
+            'resurfacing' => $d->resurfacing,
+            'invoice_contact' => $d->invoice_contact,
+            'certified_payrolls' => $d->certified_payrolls,
+            'start_date' => $d->start_date,
+            'end_date' => $d->end_date,
+            'due_date' => $d->due_date,
+            'vendor_id' => $d->vendor_id,
+            'concrete_class_id' => $d->concrete_class_id,
+            'concrete_quote_price' => $d->concrete_quote_price,
+            'concrete_start_date' => $d->concrete_start_date,
+            'concrete_quote_price_escalator' => $d->concrete_quote_price_escalator,
+            'concrete_time_period_every_n' => $d->concrete_time_period_every_n,
+            'concrete_time_period_unit' => $d->concrete_time_period_unit,
+            'retainage' => $d->retainage,
+            'retainage_percentage' => $d->retainage_percentage,
+            'retainage_adjustment_percentage' => $d->retainage_adjustment_percentage,
+            'retainage_adjustment_completion' => $d->retainage_adjustment_completion,
+            'prevailing_wage' => $d->prevailing_wage,
+            'prevailing_roles' => $d->prevailing_roles,
+            'items' => json_decode($d->items ?? 'null'),
+            'contacts' => json_decode($d->contacts ?? 'null'),
+            'concrete_classes' => json_decode($d->concrete_classes ?? 'null'),
+            'ajustes_precio' => json_decode($d->ajustes_precio ?? 'null'),
+            'archivos' => json_decode($d->archivos ?? 'null'),
+        ];
+    }
+
+    /**
+     * Implementación interna (parámetros escalares). Usar {@see SalvarProject()} desde controladores.
      *
      * @param string $description Nombre
      *
      * @author Marcel
      */
-    public function SalvarProject(
-        $company_id,
-        $inspector_id,
-        $number,
-        $name,
-        $description,
-        $location,
-        $po_number,
-        $po_cg,
-        $manager,
-        $status,
-        $owner,
-        $subcontract,
-        $federal_funding,
-        $county_ids,
-        $resurfacing,
-        $invoice_contact,
-        $certified_payrolls,
-        $start_date,
-        $end_date,
-        $due_date,
-        $contract_amount,
-        $proposal_number,
-        $project_id_number,
-        $items,
-        $contacts,
-        $concrete_classes,
-        $vendor_id,
-        $concrete_class_id,
-        $concrete_quote_price,
-        $concrete_start_date,
-        $concrete_quote_price_escalator,
-        $concrete_time_period_every_n,
-        $concrete_time_period_unit,
-        $retainage,
-        $retainage_percentage,
-        $retainage_adjustment_percentage,
-        $retainage_adjustment_completion,
-        $prevailing_wage,
-        $prevailing_roles,
-    ) {
-        $em = $this->getDoctrine()->getManager();
-
-        // Verificar number
-        $project = $this->getDoctrine()->getRepository(Project::class)
-           ->findOneBy(['projectNumber' => $number]);
-        if (null != $project) {
-            $resultado['success'] = false;
-            $resultado['error'] = 'The project number is in use, please try entering another one.';
-
-            return $resultado;
-        }
-
-        $entity = new Project();
-
-        $entity->setProjectNumber($number);
-        $entity->setName($name);
-        $entity->setDescription($description);
-        $entity->setLocation($location);
-        $entity->setPoNumber($po_number);
-        $entity->setPoCG($po_cg);
-        $entity->setManager($manager);
-        $entity->setStatus($status);
-        $contract_amount = str_replace(['$', ','], '', (string) $contract_amount);
-        $entity->setContractAmount('' === $contract_amount ? null : (float) $contract_amount);
-        $entity->setProposalNumber($proposal_number);
-        $entity->setProjectIdNumber($project_id_number);
-
-        if ('' != $company_id) {
-            $company = $this->getDoctrine()->getRepository(Company::class)
-               ->find($company_id);
-            $entity->setCompany($company);
-        }
-        if ('' != $inspector_id) {
-            $inspector = $this->getDoctrine()->getRepository(Inspector::class)
-               ->find($inspector_id);
-            $entity->setInspector($inspector);
-        }
-
-        $entity->setOwner($owner);
-        $entity->setSubcontract($subcontract);
-        $entity->setFederalFunding($federal_funding);
-        $entity->setResurfacing($resurfacing);
-        $entity->setInvoiceContact($invoice_contact);
-        $entity->setCertifiedPayrolls($certified_payrolls);
-
-        if ('' != $start_date) {
-            $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
-            $entity->setStartDate($start_date);
-        }
-
-        if ('' != $end_date) {
-            $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
-            $entity->setEndDate($end_date);
-        }
-
-        if ('' != $due_date) {
-            $due_date = \DateTime::createFromFormat('m/d/Y', $due_date);
-            $entity->setDueDate($due_date);
-        }
-
-        if ('' != $concrete_start_date) {
-            $date = \DateTime::createFromFormat('m/d/Y', $concrete_start_date);
-            $entity->setConcreteStartDate($date);
-        }
-
-        if ('' !== $vendor_id) {
-            $conc_vendor = $this->getDoctrine()->getRepository(ConcreteVendor::class)
-               ->find($vendor_id);
-            $entity->setConcreteVendor($conc_vendor);
-        }
-
-        if ('' != $concrete_class_id) {
-            $id_class = $concrete_class_id;
-
-            if (is_object($id_class)) {
-                $id_class = isset($id_class->concreteClassId) ? $id_class->concreteClassId : (isset($id_class->id) ? $id_class->id : null);
-            } elseif (is_array($id_class)) {
-                $id_class = isset($id_class['concreteClassId']) ? $id_class['concreteClassId'] : (isset($id_class['id']) ? $id_class['id'] : null);
-            }
-
-            if ($id_class) {
-                $concrete_class = $this->getDoctrine()->getRepository(ConcreteClass::class)
-                   ->find($id_class);
-
-                $entity->setConcreteClass($concrete_class);
-            }
-        }
-
-        // $entity->setConcreteQuotePrice($concrete_quote_price);
-        $val = ('' !== $concrete_quote_price && null !== $concrete_quote_price) ? (float) $concrete_quote_price : null;
-        $entity->setConcreteQuotePrice($val);
-        $valEscalator = ('' !== $concrete_quote_price_escalator && null !== $concrete_quote_price_escalator) ? (float) $concrete_quote_price_escalator : null;
-        $entity->setConcreteQuotePriceEscalator($valEscalator);
-        $valTpEveryN = ('' !== $concrete_time_period_every_n && null !== $concrete_time_period_every_n) ? (int) $concrete_time_period_every_n : null;
-        $entity->setConcreteTimePeriodEveryN($valTpEveryN);
-        $entity->setConcreteTimePeriodUnit($concrete_time_period_unit);
-
-        if ('' !== $concrete_quote_price) {
-            $entity->setUpdatedAtConcreteQuotePrice(new \DateTime());
-        }
-
-        $entity->setRetainage($retainage);
-        $valRetPct = ('' !== $retainage_percentage && null !== $retainage_percentage) ? (float) $retainage_percentage : null;
-        $entity->setRetainagePercentage($valRetPct);
-        $valRetAdjPct = ('' !== $retainage_adjustment_percentage && null !== $retainage_adjustment_percentage) ? (float) $retainage_adjustment_percentage : null;
-        $entity->setRetainageAdjustmentPercentage($valRetAdjPct);
-        $valRetAdjComp = ('' !== $retainage_adjustment_completion && null !== $retainage_adjustment_completion) ? (float) $retainage_adjustment_completion : null;
-        $entity->setRetainageAdjustmentCompletion($valRetAdjComp);
-
-        $entity->setPrevailingWage($prevailing_wage);
-
-        $entity->setCreatedAt(new \DateTime());
-
-        $em->persist($entity);
-
-        // items
-        $items_new = $this->SalvarItems($entity, $items);
-
-        // save contacts
-        $this->SalvarContacts($entity, $contacts);
-
-        // save concrete classes
-        $this->SalvarConcreteClasses($entity, $concrete_classes);
-
-        // counties
-        $this->SalvarCounties($entity, $county_ids, false);
-
-        // prevailing roles (cada uno con role_id y rate)
-        $this->SalvarPrevailingRoles($entity, $prevailing_roles, false);
-
-        $em->flush();
-
-        // Salvar log
-        $log_operacion = 'Add';
-        $log_categoria = 'Project';
-        $log_descripcion = "The project is added: $name";
-        $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-        $resultado['success'] = true;
-        $resultado['project_id'] = $entity->getProjectId();
-        $resultado['items'] = $items_new;
-
-        return $resultado;
-    }
-
+    
     /**
      * SalvarArchivos.
      *

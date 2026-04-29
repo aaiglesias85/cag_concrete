@@ -66,7 +66,7 @@ No añadir métodos nuevos salvo necesidad; nuevas capacidades → servicios iny
 
 ### 4.1 DTOs — **hecho en API y gran parte del Admin**; excepciones explícitas §9.2.
 
-**App (`/api`):** inventario «pasar DTO al servicio» cerrado — ver [`README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md`](README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md) (filas 41–45 y tabla Completado). **Admin:** mismo documento; CRUD/listados amplios usan DTO; algunas acciones complejas siguen parciales (p. ej. `persistProject`, adjuntos).
+**App (`/api`):** inventario «pasar DTO al servicio» cerrado — ver [`README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md`](README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md) (filas 41–45 y tabla Completado). **Admin:** mismo documento; CRUD/listados amplios usan DTO; algunas acciones complejas siguen parciales (p. ej. sub-recursos de proyecto, adjuntos).
 
 Convención: `App\Dto\Admin\{Módulo}\…`, `AdminValidationResponseTrait`, `fromHttpRequest` en DTO cuando aplique.
 

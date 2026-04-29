@@ -156,171 +156,42 @@ class ProjectController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ProjectSalvarRequest $d): JsonResponse
     {
-        return $this->persistProject('', $d);
+        try {
+            $resultado = $this->projectService->SalvarProject($d);
+
+            if ($resultado['success']) {
+                $resultadoJson['success'] = $resultado['success'];
+                $resultadoJson['project_id'] = $resultado['project_id'];
+                $resultadoJson['message'] = 'The operation was successful';
+                $resultadoJson['items'] = $resultado['items'];
+
+                return $this->json($resultadoJson);
+            }
+            $resultadoJson['success'] = $resultado['success'];
+            $resultadoJson['error'] = $resultado['error'];
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = $e->getMessage();
+
+            return $this->json($resultadoJson);
+        }
     }
 
     /**
      * actualizar Acción que actualiza un proyecto existente.
      */
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Edit, jsonOnDenied: true)]
-    public function actualizar(ProjectActualizarRequest $dAct): JsonResponse
+    public function actualizar(ProjectActualizarRequest $d): JsonResponse
     {
-        $d = ProjectSalvarRequest::fromActualizarRequest($dAct);
-
-        return $this->persistProject((string) $dAct->project_id, $d);
-    }
-
-    private function persistProject(string $project_id, ProjectSalvarRequest $d): JsonResponse
-    {
-        $company_id = $d->company_id;
-        $inspector_id = $d->inspector_id;
-        $number = $d->number;
-        $name = $d->name;
-        $description = $d->description;
-        $location = $d->location;
-        $po_number = $d->po_number;
-        $po_cg = $d->po_cg;
-        $contract_amount = $d->contract_amount;
-        $proposal_number = $d->proposal_number;
-        $project_id_number = $d->project_id_number;
-
-        $manager = $d->manager;
-        $status = $d->status;
-        $owner = $d->owner;
-        $subcontract = $d->subcontract;
-        $federal_funding = $d->federal_funding;
-        $county_id = $d->county_id;
-        if (is_string($county_id) && !empty($county_id)) {
-            $county_id = explode(',', $county_id);
-        }
-        if (!is_array($county_id)) {
-            $county_id = [];
-        }
-        $resurfacing = $d->resurfacing;
-        $invoice_contact = $d->invoice_contact;
-        $certified_payrolls = $d->certified_payrolls;
-        $start_date = $d->start_date;
-        $end_date = $d->end_date;
-        $due_date = $d->due_date;
-
-        $vendor_id = $d->vendor_id;
-        $concrete_class_id = $d->concrete_class_id;
-        $concrete_quote_price = $d->concrete_quote_price;
-        $concrete_start_date = $d->concrete_start_date;
-        $concrete_quote_price_escalator = $d->concrete_quote_price_escalator;
-        $concrete_time_period_every_n = $d->concrete_time_period_every_n;
-        $concrete_time_period_unit = $d->concrete_time_period_unit;
-
-        $retainage = $d->retainage;
-        $retainage_percentage = $d->retainage_percentage;
-        $retainage_adjustment_percentage = $d->retainage_adjustment_percentage;
-        $retainage_adjustment_completion = $d->retainage_adjustment_completion;
-
-        $prevailing_wage = $d->prevailing_wage;
-        $prevailing_roles = $d->prevailing_roles;
-
-        $items = json_decode($d->items ?? 'null');
-        $contacts = json_decode($d->contacts ?? 'null');
-        $concrete_classes = json_decode($d->concrete_classes ?? 'null');
-        $ajustes_precio = json_decode($d->ajustes_precio ?? 'null');
-        $archivos = json_decode($d->archivos ?? 'null');
-
         try {
-            if ('' == $project_id) {
-                $resultado = $this->projectService->SalvarProject(
-                    $company_id,
-                    $inspector_id,
-                    $number,
-                    $name,
-                    $description,
-                    $location,
-                    $po_number,
-                    $po_cg,
-                    $manager,
-                    $status,
-                    $owner,
-                    $subcontract,
-                    $federal_funding,
-                    $county_id,
-                    $resurfacing,
-                    $invoice_contact,
-                    $certified_payrolls,
-                    $start_date,
-                    $end_date,
-                    $due_date,
-                    $contract_amount,
-                    $proposal_number,
-                    $project_id_number,
-                    $items,
-                    $contacts,
-                    $concrete_classes,
-                    $vendor_id,
-                    $concrete_class_id,
-                    $concrete_quote_price,
-                    $concrete_start_date,
-                    $concrete_quote_price_escalator,
-                    $concrete_time_period_every_n,
-                    $concrete_time_period_unit,
-                    $retainage,
-                    $retainage_percentage,
-                    $retainage_adjustment_percentage,
-                    $retainage_adjustment_completion,
-                    $prevailing_wage,
-                    $prevailing_roles
-                );
-            } else {
-                $resultado = $this->projectService->ActualizarProject(
-                    $project_id,
-                    $company_id,
-                    $inspector_id,
-                    $number,
-                    $name,
-                    $description,
-                    $location,
-                    $po_number,
-                    $po_cg,
-                    $manager,
-                    $status,
-                    $owner,
-                    $subcontract,
-                    $federal_funding,
-                    $county_id,
-                    $resurfacing,
-                    $invoice_contact,
-                    $certified_payrolls,
-                    $start_date,
-                    $end_date,
-                    $due_date,
-                    $contract_amount,
-                    $proposal_number,
-                    $project_id_number,
-                    $items,
-                    $contacts,
-                    $concrete_classes,
-                    $ajustes_precio,
-                    $archivos,
-                    $vendor_id,
-                    $concrete_class_id,
-                    $concrete_quote_price,
-                    $concrete_start_date,
-                    $concrete_quote_price_escalator,
-                    $concrete_time_period_every_n,
-                    $concrete_time_period_unit,
-                    $retainage,
-                    $retainage_percentage,
-                    $retainage_adjustment_percentage,
-                    $retainage_adjustment_completion,
-                    $prevailing_wage,
-                    $prevailing_roles
-                );
-            }
+            $resultado = $this->projectService->ActualizarProject($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['project_id'] = $resultado['project_id'];
                 $resultadoJson['message'] = 'The operation was successful';
-
-                // new items
                 $resultadoJson['items'] = $resultado['items'];
 
                 return $this->json($resultadoJson);
