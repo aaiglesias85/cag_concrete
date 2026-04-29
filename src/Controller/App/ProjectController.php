@@ -6,7 +6,8 @@ use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Dto\Api\Request\Project\CargarProyectoDatosRequest;
 use App\Dto\Api\Request\Project\ListarProjectsQueryRequest;
-use App\Dto\Api\Response\Common\ApiJsonPayload;
+use App\Dto\Api\Response\Project\ProjectCargarDatosResponse;
+use App\Dto\Api\Response\Project\ProjectListarResponse;
 use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Service\App\LoginService;
 use App\Service\App\ProjectService;
@@ -151,10 +152,10 @@ class ProjectController extends AbstractController
             );
 
             if ($resultado['success']) {
-                return $this->json(new ApiJsonPayload($resultado));
+                return $this->json(ProjectListarResponse::fromServiceResult($resultado));
             }
 
-            return $this->json(new ApiJsonPayload($resultado), 400);
+            return $this->json(ProjectListarResponse::fromServiceResult($resultado), 400);
         } catch (\Exception $e) {
             $this->loginService->writelogerror($e->getMessage());
 
@@ -233,17 +234,12 @@ class ProjectController extends AbstractController
         try {
             $resultado = $this->projectService->CargarDatosProject($dto->project_id);
 
-            if ($resultado['success']) {
-                return $this->json(new ApiJsonPayload([
-                    'success' => true,
-                    'project' => $resultado['project'],
-                ]));
-            }
+            $fallbackError = $this->translator->trans('project.error.not_found', [], 'messages', $lang) ?: 'Project not found';
 
-            return $this->json(new ApiJsonPayload([
-                'success' => false,
-                'error' => $resultado['error'] ?? $this->translator->trans('project.error.not_found', [], 'messages', $lang) ?: 'Project not found',
-            ]), 400);
+            return $this->json(
+                ProjectCargarDatosResponse::fromServiceResult($resultado, $fallbackError),
+                $resultado['success'] ? 200 : 400
+            );
         } catch (\Exception $e) {
             $this->loginService->writelogerror($e->getMessage());
 

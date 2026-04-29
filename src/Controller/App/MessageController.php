@@ -10,8 +10,15 @@ use App\Dto\Api\Request\Messaging\EnviarPrimerMensajeRequest;
 use App\Dto\Api\Request\Messaging\MarcarLeidosRequest;
 use App\Dto\Api\Request\Messaging\OcultarConversacionRequest;
 use App\Dto\Api\Request\Messaging\TraducirMensajeRequest;
-use App\Dto\Api\Response\Common\ApiJsonPayload;
 use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
+use App\Dto\Api\Response\Message\MessageBooleanOutcomeResponse;
+use App\Dto\Api\Response\Message\MessageEnviarMensajeResponse;
+use App\Dto\Api\Response\Message\MessageEnviarPrimerMensajeResponse;
+use App\Dto\Api\Response\Message\MessageListarConversacionesResponse;
+use App\Dto\Api\Response\Message\MessageListarMensajesResponse;
+use App\Dto\Api\Response\Message\MessageListarUsuariosResponse;
+use App\Dto\Api\Response\Message\MessageObtenerConversacionResponse;
+use App\Dto\Api\Response\Message\MessageTraducirResponse;
 use App\Service\App\MessageService;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -78,10 +85,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageListarUsuariosResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageListarUsuariosResponse::fromServiceResult($result));
     }
 
     /**
@@ -111,10 +118,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageListarConversacionesResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageListarConversacionesResponse::fromServiceResult($result));
     }
 
     /**
@@ -151,10 +158,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageObtenerConversacionResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageObtenerConversacionResponse::fromServiceResult($result));
     }
 
     /**
@@ -195,10 +202,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageListarMensajesResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageListarMensajesResponse::fromServiceResult($result));
     }
 
     /**
@@ -245,10 +252,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageEnviarMensajeResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageEnviarMensajeResponse::fromServiceResult($result));
     }
 
     /**
@@ -297,10 +304,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageEnviarPrimerMensajeResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageEnviarPrimerMensajeResponse::fromServiceResult($result));
     }
 
     /**
@@ -343,10 +350,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result));
     }
 
     /**
@@ -398,10 +405,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageTraducirResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageTraducirResponse::fromServiceResult($result));
     }
 
     /**
@@ -446,10 +453,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result));
     }
 
     /**
@@ -490,10 +497,10 @@ class MessageController extends AbstractController
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
-            return $this->json(new ApiJsonPayload($result), $status);
+            return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result), $status);
         }
 
-        return $this->json(new ApiJsonPayload($result));
+        return $this->json(MessageBooleanOutcomeResponse::fromServiceResult($result));
     }
 
     private function jsonJsonInputError(\Exception $e): JsonResponse

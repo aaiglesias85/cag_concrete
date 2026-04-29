@@ -3,8 +3,8 @@
 namespace App\Dto\Api\Response\Common;
 
 /**
- * Respuesta JSON genérica para payloads ya definidos por el servicio (listados, sincronización, etc.).
- * No altera la forma del wire format; solo tipa el contrato en el controlador.
+ * Respuesta JSON genérica para payloads arbitrarios (legacy).
+ * En la API app (`App\Controller\App`) es preferible usar DTOs dedicados en `App\Dto\Api\Response\{Project,Offline,Message,...}`.
  *
  * @template-covariant T of array<string, mixed>
  */

@@ -5,7 +5,8 @@ namespace App\Controller\App;
 use App\Controller\App\Traits\ApiValidationResponseTrait;
 use App\Controller\App\Traits\SetsTranslatorLocaleTrait;
 use App\Dto\Api\Request\Offline\OfflineSincronizarRequest;
-use App\Dto\Api\Response\Common\ApiJsonPayload;
+use App\Dto\Api\Response\Offline\OfflineListarInformacionResponse;
+use App\Dto\Api\Response\Offline\OfflineSincronizarResponse;
 use App\Dto\Api\Response\Common\ApiSimpleFailureResponse;
 use App\Service\App\LoginService;
 use App\Service\App\OfflineService;
@@ -94,10 +95,10 @@ class OfflineController extends AbstractController
             $resultado = $this->offlineService->ListarInformacionRequerida();
 
             if ($resultado['success']) {
-                return $this->json(new ApiJsonPayload($resultado));
+                return $this->json(OfflineListarInformacionResponse::fromServiceResult($resultado));
             }
 
-            return $this->json(new ApiJsonPayload($resultado), 400);
+            return $this->json(OfflineListarInformacionResponse::fromServiceResult($resultado), 400);
         } catch (\Exception $e) {
             $this->loginService->writelogerror($e->getMessage());
 
@@ -215,11 +216,11 @@ class OfflineController extends AbstractController
             if ($resultado['success']) {
                 $resultado['message'] = $this->translator->trans('offline.message.sincronizado', [], 'messages', $lang);
 
-                return $this->json(new ApiJsonPayload($resultado));
+                return $this->json(OfflineSincronizarResponse::fromPayload($resultado));
             }
             $resultado['error'] = $resultado['error'] ?? $this->translator->trans('offline.error.sincronizar_perfil', [], 'messages', $lang);
 
-            return $this->json(new ApiJsonPayload($resultado), 400);
+            return $this->json(OfflineSincronizarResponse::fromPayload($resultado), 400);
         } catch (\Exception $e) {
             $this->loginService->writelogerror($e->getMessage());
 
