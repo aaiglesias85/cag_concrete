@@ -48,13 +48,7 @@ class RaceController extends AbstractAdminController
             $dt = $listar->dt;
 
             // total + data en una sola llamada a tu servicio
-            $result = $this->raceService->ListarRaces(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->raceService->ListarRaces($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -78,12 +72,8 @@ class RaceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::RACE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(RaceSalvarRequest $d): JsonResponse
     {
-        $code = (string) $d->code;
-        $description = (string) $d->description;
-        $classification = (string) $d->classification;
-
         try {
-            $resultado = $this->raceService->SalvarRace($code, $description, $classification);
+            $resultado = $this->raceService->SalvarRace($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -110,13 +100,8 @@ class RaceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::RACE, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(RaceActualizarRequest $d): JsonResponse
     {
-        $race_id = (string) $d->race_id;
-        $code = (string) $d->code;
-        $description = (string) $d->description;
-        $classification = (string) $d->classification;
-
         try {
-            $resultado = $this->raceService->ActualizarRace($race_id, $code, $description, $classification);
+            $resultado = $this->raceService->ActualizarRace($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -143,10 +128,8 @@ class RaceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::RACE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(RaceIdRequest $dto): JsonResponse
     {
-        $race_id = $dto->race_id;
-
         try {
-            $resultado = $this->raceService->EliminarRace($race_id);
+            $resultado = $this->raceService->EliminarRace($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -171,10 +154,8 @@ class RaceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::RACE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarRaces(RaceIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->raceService->EliminarRaces($ids);
+            $resultado = $this->raceService->EliminarRaces($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -199,10 +180,8 @@ class RaceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::RACE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(RaceIdRequest $dto): JsonResponse
     {
-        $race_id = $dto->race_id;
-
         try {
-            $resultado = $this->raceService->CargarDatosRace($race_id);
+            $resultado = $this->raceService->CargarDatosRace($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['race'] = $resultado['race'];

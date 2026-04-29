@@ -64,7 +64,9 @@ No añadir métodos nuevos salvo necesidad; nuevas capacidades → servicios iny
 
 ## 4. HTTP y dominio
 
-### 4.1 DTOs — **hecho en API y gran parte del Admin**; pendientes puntuales §9.2.
+### 4.1 DTOs — **hecho en API y gran parte del Admin**; excepciones explícitas §9.2.
+
+**App (`/api`):** inventario «pasar DTO al servicio» cerrado — ver [`README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md`](README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md) (filas 41–45 y tabla Completado). **Admin:** mismo documento; CRUD/listados amplios usan DTO; algunas acciones complejas siguen parciales (p. ej. `persistProject`, adjuntos).
 
 Convención: `App\Dto\Admin\{Módulo}\…`, `AdminValidationResponseTrait`, `fromHttpRequest` en DTO cuando aplique.
 
@@ -99,6 +101,8 @@ Objetivo incremental: 2–3 tests `KernelTestCase`/`WebTestCase` sobre flujos es
 
 Si la generación de `/api/doc` obligara a marcar servicios `public: true`, preferir lazy o aislar la doc; **en `config/services.yaml` actual no hay `public: true` explícito para `ProjectService`** (revisar tras cambios en Nelmio).
 
+**Estado verificado:** no hace falta `public: true` para Nelmio por sí solo; `App\Service\App\ProjectService` inyecta `AdminProjectService` con `#[Lazy]` (evita cargar el admin al resolver la doc); en `doctrine.yaml`, `enable_native_lazy_objects: false` evita errores con `/api/doc` si aún no se usa PHP 8.4. Tras subir Nelmio: `bin/console cache:warmup --env=dev` y comprobar `/api/doc`.
+
 ### 8.2 Variables de entorno — **hecho**
 
 Plantilla versionada [`.env.dist`](../.env.dist); tabla y notas de producción (`APP_ENV`, rotación de `APP_SECRET` / JWT y sesiones) en [README.md](../README.md) «Variables de entorno y despliegue».
@@ -113,7 +117,7 @@ Plantilla versionada [`.env.dist`](../.env.dist); tabla y notas de producción (
 | **B** | DI sin locator en servicios | **Hecho** |
 | **C** | Extraer lógica de `Base` (fachada + satélites) | **Hecho** (evolución continúa §2.2) |
 | **D** | `App\Utils` → `App\Service` | **Hecho** |
-| **E** | DTO + validación API y Admin | **Hecho** (Admin casi completo; exclude §9.2) |
+| **E** | DTO + validación API y Admin | **Hecho** (App API inventario cerrado; Admin amplio con parciales documentados; §9.2 exclusiones) |
 | **F** | Throttling, deprecations security, rate limiters API | **Hecho** |
 | **G** | Messenger | **Pospuesto** (fuera de alcance) |
 
@@ -123,11 +127,13 @@ Plantilla versionada [`.env.dist`](../.env.dist); tabla y notas de producción (
 - **B:** Sin `container->get` en servicios de aplicación; convención documentada arriba.
 - **C:** `Base` como fachada. **Permisos/menú:** `UserPermissionMenuService`. **Satélites `App\Service\Base\`:** `BaseFileLogService`, `BaseDateFormatService`, `BaseCleanupService`, `BaseInvoicePaymentsDisplayService`, `BaseApplicationLogService`, `BaseTextNormalizationService`, `BasePasswordService`, `BaseCalendarMonthService`, `BaseItemYieldCatalogService`, `BaseYieldExpressionService`, `BaseConcreteYieldMetricsService`, `BaseContactListingService`, `BaseHolidayCountyService`, `BaseProjectNotesWriterService`. No crecer `Base` sin necesidad.
 - **D:** Solo `App\Service\*` para servicios de aplicación.
-- **E API:** DTOs en login, usuario, offline, mensajes, proyecto (lista/datos); `ApiValidationResponseTrait`; OpenAPI login 400/429 donde aplique.
+- **E API:** DTOs en login, usuario, offline, mensajes, proyecto (lista/datos); donde hay body/query validado, delegación en servicio (`*DesdeRequest`, `*DesdeQuery`, etc.) sin desempaquetar en controlador — [`README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md`](README_INVENTARIO_DTO_SERVICIO_CONTROLADORES.md); `ApiValidationResponseTrait`; OpenAPI login 400/429 donde aplique.
 - **E Admin:** DTOs en: `UsuarioController`, `PerfilController`, `CountyController`, `CompanyController`, `DistrictController`, `UnitController`, `RaceController`, `ProposalTypeController`, `ProjectTypeController`, `PlanStatusController`, `InspectorController`, `HolidayController`, `MaterialController`, `ItemController`, `ConcreteClassController`, `AdvertisementController`, `ConcreteVendorController`, `EquationController`, `ReminderController`, `DataTrackingController`, `LogController`, `NotificationController`, `ProjectStageController`, `OverheadPriceController`, `PlanDownloadingController`, `OverridePaymentController`, `SubcontractorController`, `TaskController`, `PaymentController`, `ScheduleController`, `InvoiceController`, `EmployeeController`, `EmployeeRoleController`, `EmployeeRrhhController`, `DefaultController`, `EstimateNoteItemController`, `ReporteEmployeeController`, `ReporteSubcontractorController`, `EstimateController`, `ProjectController`.
 - **F:** `security.yaml` + `rate_limiter.yaml` como en tabla inicial.
 
-### 9.2 Sin patrón DTO (baja prioridad / otro formato)
+### 9.2 Sin patrón DTO completo (baja prioridad / otro formato)
+
+No son «pendientes» del inventario App/Admin JSON: integraciones distintas o controladores mínimos.
 
 | Clase | Nota |
 |-------|------|

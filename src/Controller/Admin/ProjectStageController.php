@@ -44,13 +44,7 @@ class ProjectStageController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->projectStageService->ListarStages(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->projectStageService->ListarStages($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,12 +65,8 @@ class ProjectStageController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ProjectStageSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $color = (string) ($d->color ?? '');
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->projectStageService->SalvarStage($description, $color, $status);
+            $resultado = $this->projectStageService->SalvarStage($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -100,13 +90,8 @@ class ProjectStageController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ProjectStageActualizarRequest $d): JsonResponse
     {
-        $stage_id = (string) $d->stage_id;
-        $description = (string) $d->description;
-        $color = (string) ($d->color ?? '');
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->projectStageService->ActualizarStage($stage_id, $description, $color, $status);
+            $resultado = $this->projectStageService->ActualizarStage($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -130,10 +115,8 @@ class ProjectStageController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ProjectStageIdRequest $dto): JsonResponse
     {
-        $stage_id = $dto->stage_id;
-
         try {
-            $resultado = $this->projectStageService->EliminarStage($stage_id);
+            $resultado = $this->projectStageService->EliminarStage($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -155,10 +138,8 @@ class ProjectStageController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarStages(ProjectStageIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->projectStageService->EliminarStages($ids);
+            $resultado = $this->projectStageService->EliminarStages($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -180,10 +161,8 @@ class ProjectStageController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_STAGE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ProjectStageIdRequest $dto): JsonResponse
     {
-        $stage_id = $dto->stage_id;
-
         try {
-            $resultado = $this->projectStageService->CargarDatosStage($stage_id);
+            $resultado = $this->projectStageService->CargarDatosStage($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['stage'] = $resultado['stage'];

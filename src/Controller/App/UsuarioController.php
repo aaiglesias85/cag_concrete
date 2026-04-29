@@ -13,7 +13,6 @@ use App\Dto\Api\Response\Usuario\UsuarioCargarDatosFailureResponse;
 use App\Dto\Api\Response\Usuario\UsuarioCargarDatosSuccessResponse;
 use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenFailureResponse;
 use App\Dto\Api\Response\Usuario\UsuarioSalvarImagenSuccessResponse;
-use App\Entity\Usuario;
 use App\Service\App\LoginService;
 use App\Service\App\UsuarioService;
 use OpenApi\Attributes as OA;
@@ -178,31 +177,7 @@ class UsuarioController extends AbstractController
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
             }
 
-            $user = $this->getUser();
-            if (!$user instanceof Usuario) {
-                return $this->json(new ApiSimpleFailureResponse('Not authenticated'), 401);
-            }
-            // Si solo se envía preferred_lang, mantener el resto de datos del usuario
-            $nombre = null !== $payload->nombre ? $payload->nombre : $user->getNombre();
-            $apellidos = null !== $payload->apellidos ? $payload->apellidos : $user->getApellidos();
-            $email = null !== $payload->email ? $payload->email : $user->getEmail();
-            $telefono = null !== $payload->telefono ? $payload->telefono : $user->getTelefono();
-
-            // Contraseñas opcionales (solo si se quiere cambiar)
-            $password_actual = $payload->password_actual ?? '';
-            $password = $payload->password ?? '';
-            $preferred_lang = $payload->preferred_lang;
-
-            // Actualizar datos (con o sin cambiar contraseña o idioma)
-            $resultado = $this->usuarioService->ActualizarMisDatos(
-                $nombre,
-                $apellidos,
-                $email,
-                $telefono,
-                $password_actual,
-                $password,
-                $preferred_lang
-            );
+            $resultado = $this->usuarioService->ActualizarMisDatosDesdeRequest($payload);
 
             return $this->json(new UsuarioActualizarDatosResponse(
                 (bool) $resultado['success'],
@@ -279,46 +254,17 @@ class UsuarioController extends AbstractController
         $this->setTranslatorLocale($this->translator, $lang);
 
         try {
-            $usuario = $this->getUser();
-            if (null == $usuario) {
-                return $this->json(new UsuarioSalvarImagenFailureResponse(
-                    $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages', $lang)
-                ));
-            }
-
             $payload = SalvarImagenUsuarioRequest::fromHttpRequest($request);
             $violations = $this->validator->validate($payload);
             if (\count($violations) > 0) {
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
             }
 
-            $imagen = $payload->imagen;
-
-            $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen), true);
-            if (false === $binary || '' === $binary) {
-                return $this->json(new UsuarioSalvarImagenFailureResponse(
-                    $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages', $lang)
-                ));
-            }
-
-            // Crear directorio si no existe
-            $dir = 'uploads/usuario/';
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-
-            // Generar nombre único para la imagen
-            $foto = $this->usuarioService->generarCadenaAleatoria().'.jpeg';
-            $ruta_completa = $dir.$foto;
-
-            file_put_contents($ruta_completa, $binary);
-
-            // Actualizar imagen del usuario en BD (a través del servicio)
-            $resultado = $this->usuarioService->ActualizarImagenPerfil($foto);
+            $resultado = $this->usuarioService->SalvarImagenPerfilDesdeRequest($payload);
 
             if ($resultado['success']) {
                 return $this->json(new UsuarioSalvarImagenSuccessResponse(
-                    $foto,
+                    (string) ($resultado['imagen'] ?? ''),
                     $this->translator->trans('usuario.message.imagen_guardada', [], 'messages', $lang)
                 ));
             }

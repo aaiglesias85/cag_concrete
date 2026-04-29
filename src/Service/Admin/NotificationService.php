@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Notification\NotificationIdRequest;
+use App\Dto\Admin\Notification\NotificationIdsRequest;
+use App\Dto\Admin\Notification\NotificationListarRequest;
 use App\Entity\Notification;
 use App\Entity\Usuario;
 use App\Repository\NotificationRepository;
@@ -41,12 +44,11 @@ class NotificationService extends Base
     /**
      * EliminarNotification: Elimina un notification en la BD.
      *
-     * @param int $notification_id Id
-     *
      * @author Marcel
      */
-    public function EliminarNotification($notification_id)
+    public function EliminarNotification(NotificationIdRequest $dto)
     {
+        $notification_id = $dto->notification_id;
         $em = $this->getDoctrine()->getManager();
 
         $notification = $this->getDoctrine()->getRepository(Notification::class)
@@ -69,15 +71,14 @@ class NotificationService extends Base
     /**
      * EliminarNotifications: Elimina los notifications seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarNotifications($ids)
+    public function EliminarNotifications(NotificationIdsRequest $dto)
     {
+        $ids = $dto->ids;
         $em = $this->getDoctrine()->getManager();
 
-        if ('' != $ids) {
+        if (!empty($ids)) {
             $ids = explode(',', (string) $ids);
             foreach ($ids as $notification_id) {
                 if ('' != $notification_id) {
@@ -133,17 +134,25 @@ class NotificationService extends Base
     /**
      * ListarNotifications: Listar los notifications.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarNotifications($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id, $leida)
+    public function ListarNotifications(NotificationListarRequest $listar, Usuario $viewer)
     {
+        $dt = $listar->dt;
+        $usuario_id = $viewer->isAdministrador() ? '' : $viewer->getUsuarioId();
         /** @var NotificationRepository $notificationRepo */
         $notificationRepo = $this->getDoctrine()->getRepository(Notification::class);
-        $resultado = $notificationRepo->ListarNotificacionesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id, $leida);
+        $resultado = $notificationRepo->ListarNotificacionesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->fecha_inicial,
+            $listar->fecha_fin,
+            $usuario_id,
+            $listar->leida,
+        );
 
         $data = [];
 

@@ -83,13 +83,7 @@ class CompanyController extends AbstractAdminController
             $dt = $listar->dt;
 
             // total + data en una sola llamada a tu servicio
-            $result = $this->companyService->ListarCompanies(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->companyService->ListarCompanies($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -113,22 +107,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(CompanySalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $phone = (string) ($d->phone ?? '');
-        $address = (string) ($d->address ?? '');
-        $contactName = (string) ($d->contactName ?? '');
-        $contactEmail = (string) ($d->contactEmail ?? '');
-        $email = (string) ($d->email ?? '');
-        $website = (string) ($d->website ?? '');
-        $contactsRaw = $d->contacts;
-        $contacts = [];
-        if (null !== $contactsRaw && '' !== (string) $contactsRaw) {
-            $decoded = json_decode((string) $contactsRaw, false);
-            $contacts = \is_array($decoded) ? $decoded : [];
-        }
-
         try {
-            $resultado = $this->companyService->SalvarCompany($name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts);
+            $resultado = $this->companyService->SalvarCompany($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -155,23 +135,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(CompanyActualizarRequest $d): JsonResponse
     {
-        $company_id = (string) $d->company_id;
-        $name = (string) $d->name;
-        $phone = (string) ($d->phone ?? '');
-        $address = (string) ($d->address ?? '');
-        $contactName = (string) ($d->contactName ?? '');
-        $contactEmail = (string) ($d->contactEmail ?? '');
-        $email = (string) ($d->email ?? '');
-        $website = (string) ($d->website ?? '');
-        $contactsRaw = $d->contacts;
-        $contacts = [];
-        if (null !== $contactsRaw && '' !== (string) $contactsRaw) {
-            $decoded = json_decode((string) $contactsRaw, false);
-            $contacts = \is_array($decoded) ? $decoded : [];
-        }
-
         try {
-            $resultado = $this->companyService->ActualizarCompany($company_id, $name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts);
+            $resultado = $this->companyService->ActualizarCompany($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -198,10 +163,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(CompanyIdRequest $dto): JsonResponse
     {
-        $company_id = $dto->company_id;
-
         try {
-            $resultado = $this->companyService->EliminarCompany($company_id);
+            $resultado = $this->companyService->EliminarCompany($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -226,10 +189,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarCompanies(CompanyIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->companyService->EliminarCompanies($ids);
+            $resultado = $this->companyService->EliminarCompanies($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -254,10 +215,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(CompanyIdRequest $dto): JsonResponse
     {
-        $company_id = $dto->company_id;
-
         try {
-            $resultado = $this->companyService->CargarDatosCompany($company_id);
+            $resultado = $this->companyService->CargarDatosCompany($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['company'] = $resultado['company'];
@@ -282,10 +241,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarContact(CompanyContactIdRequest $dto): JsonResponse
     {
-        $contact_id = $dto->contact_id;
-
         try {
-            $resultado = $this->companyService->EliminarContact($contact_id);
+            $resultado = $this->companyService->EliminarContact($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -311,14 +268,7 @@ class CompanyController extends AbstractAdminController
     public function salvarContact(CompanyContactSalvarRequest $d): JsonResponse
     {
         try {
-            $resultado = $this->companyService->SalvarContact(
-                $d->company_id,
-                (string) $d->name,
-                (string) ($d->phone ?? ''),
-                (string) ($d->email ?? ''),
-                (string) ($d->role ?? ''),
-                (string) ($d->notes ?? '')
-            );
+            $resultado = $this->companyService->SalvarContact($d);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -345,15 +295,7 @@ class CompanyController extends AbstractAdminController
     public function actualizarContact(CompanyContactActualizarRequest $d): JsonResponse
     {
         try {
-            $resultado = $this->companyService->ActualizarContact(
-                $d->contact_id,
-                $d->company_id,
-                (string) $d->name,
-                (string) ($d->phone ?? ''),
-                (string) ($d->email ?? ''),
-                (string) ($d->role ?? ''),
-                (string) ($d->notes ?? '')
-            );
+            $resultado = $this->companyService->ActualizarContact($d);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -379,10 +321,8 @@ class CompanyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COMPANY, AdminPermission::View, jsonOnDenied: true)]
     public function listarContacts(CompanyIdRequest $dto): JsonResponse
     {
-        $company_id = $dto->company_id;
-
         try {
-            $lista = $this->companyService->ListarContactsDeCompany($company_id);
+            $lista = $this->companyService->ListarContactsDeCompanyAdmin($dto);
 
             $resultadoJson['success'] = true;
             $resultadoJson['contacts'] = $lista;

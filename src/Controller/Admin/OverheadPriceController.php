@@ -44,13 +44,7 @@ class OverheadPriceController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->overheadService->ListarOverheads(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->overheadService->ListarOverheads($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class OverheadPriceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(OverheadPriceSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $price = (string) $d->price;
-
         try {
-            $resultado = $this->overheadService->SalvarOverhead($name, $price);
+            $resultado = $this->overheadService->SalvarOverhead($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -98,12 +89,8 @@ class OverheadPriceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(OverheadPriceActualizarRequest $d): JsonResponse
     {
-        $overhead_id = (string) $d->overhead_id;
-        $name = (string) $d->name;
-        $price = (string) $d->price;
-
         try {
-            $resultado = $this->overheadService->ActualizarOverhead($overhead_id, $name, $price);
+            $resultado = $this->overheadService->ActualizarOverhead($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -126,10 +113,8 @@ class OverheadPriceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(OverheadPriceIdRequest $dto): JsonResponse
     {
-        $overhead_id = $dto->overhead_id;
-
         try {
-            $resultado = $this->overheadService->EliminarOverhead($overhead_id);
+            $resultado = $this->overheadService->EliminarOverhead($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -151,10 +136,8 @@ class OverheadPriceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarOverheads(OverheadPriceIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->overheadService->EliminarOverheads($ids);
+            $resultado = $this->overheadService->EliminarOverheads($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -176,10 +159,8 @@ class OverheadPriceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERHEAD, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(OverheadPriceIdRequest $dto): JsonResponse
     {
-        $overhead_id = $dto->overhead_id;
-
         try {
-            $resultado = $this->overheadService->CargarDatosOverhead($overhead_id);
+            $resultado = $this->overheadService->CargarDatosOverhead($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['overhead'] = $resultado['overhead'];

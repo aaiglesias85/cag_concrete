@@ -48,13 +48,7 @@ class UnitController extends AbstractAdminController
             $dt = $listar->dt;
 
             // total + data en una sola llamada a tu servicio
-            $result = $this->unitService->ListarUnits(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->unitService->ListarUnits($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -78,11 +72,8 @@ class UnitController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::UNIT, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(UnitSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->unitService->SalvarUnit($description, $status);
+            $resultado = $this->unitService->SalvarUnit($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -109,12 +100,8 @@ class UnitController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::UNIT, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(UnitActualizarRequest $d): JsonResponse
     {
-        $unit_id = (string) $d->unit_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->unitService->ActualizarUnit($unit_id, $description, $status);
+            $resultado = $this->unitService->ActualizarUnit($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -141,10 +128,8 @@ class UnitController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::UNIT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(UnitIdRequest $dto): JsonResponse
     {
-        $unit_id = $dto->unit_id;
-
         try {
-            $resultado = $this->unitService->EliminarUnit($unit_id);
+            $resultado = $this->unitService->EliminarUnit($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -169,10 +154,8 @@ class UnitController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::UNIT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarUnits(UnitIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->unitService->EliminarUnits($ids);
+            $resultado = $this->unitService->EliminarUnits($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -197,10 +180,8 @@ class UnitController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::UNIT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(UnitIdRequest $dto): JsonResponse
     {
-        $unit_id = $dto->unit_id;
-
         try {
-            $resultado = $this->unitService->CargarDatosUnit($unit_id);
+            $resultado = $this->unitService->CargarDatosUnit($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['unit'] = $resultado['unit'];

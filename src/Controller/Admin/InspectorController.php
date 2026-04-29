@@ -44,13 +44,7 @@ class InspectorController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->inspectorService->ListarInspectors(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->inspectorService->ListarInspectors($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,13 +65,8 @@ class InspectorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(InspectorSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $email = (string) $d->email;
-        $phone = (string) ($d->phone ?? '');
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->inspectorService->SalvarInspector($name, $email, $phone, $status);
+            $resultado = $this->inspectorService->SalvarInspector($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -101,14 +90,8 @@ class InspectorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(InspectorActualizarRequest $d): JsonResponse
     {
-        $inspector_id = (string) $d->inspector_id;
-        $name = (string) $d->name;
-        $email = (string) $d->email;
-        $phone = (string) ($d->phone ?? '');
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->inspectorService->ActualizarInspector($inspector_id, $name, $email, $phone, $status);
+            $resultado = $this->inspectorService->ActualizarInspector($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -132,10 +115,8 @@ class InspectorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(InspectorIdRequest $dto): JsonResponse
     {
-        $inspector_id = $dto->inspector_id;
-
         try {
-            $resultado = $this->inspectorService->EliminarInspector($inspector_id);
+            $resultado = $this->inspectorService->EliminarInspector($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -157,10 +138,8 @@ class InspectorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarInspectors(InspectorIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->inspectorService->EliminarInspectors($ids);
+            $resultado = $this->inspectorService->EliminarInspectors($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -182,10 +161,8 @@ class InspectorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INSPECTOR, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(InspectorIdRequest $dto): JsonResponse
     {
-        $inspector_id = $dto->inspector_id;
-
         try {
-            $resultado = $this->inspectorService->CargarDatosInspector($inspector_id);
+            $resultado = $this->inspectorService->CargarDatosInspector($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['inspector'] = $resultado['inspector'];

@@ -49,16 +49,7 @@ class CountyController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $district_id = $listar->district_id;
-
-            $result = $this->countyService->ListarCountys(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $district_id
-            );
+            $result = $this->countyService->ListarCountys($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -79,12 +70,8 @@ class CountyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COUNTY, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(CountySalvarRequest $d): JsonResponse
     {
-        $district_id = (string) ($d->district_id ?? '');
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->countyService->SalvarCounty($description, $status, $district_id);
+            $resultado = $this->countyService->SalvarCounty($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -108,13 +95,8 @@ class CountyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COUNTY, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(CountyActualizarRequest $d): JsonResponse
     {
-        $county_id = (string) $d->county_id;
-        $district_id = (string) ($d->district_id ?? '');
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->countyService->ActualizarCounty($county_id, $description, $status, $district_id);
+            $resultado = $this->countyService->ActualizarCounty($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -138,10 +120,8 @@ class CountyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COUNTY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(CountyIdRequest $dto): JsonResponse
     {
-        $county_id = $dto->county_id;
-
         try {
-            $resultado = $this->countyService->EliminarCounty($county_id);
+            $resultado = $this->countyService->EliminarCounty($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -163,10 +143,8 @@ class CountyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COUNTY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarCountys(CountyIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->countyService->EliminarCountys($ids);
+            $resultado = $this->countyService->EliminarCountys($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -188,10 +166,8 @@ class CountyController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::COUNTY, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(CountyIdRequest $dto): JsonResponse
     {
-        $county_id = $dto->county_id;
-
         try {
-            $resultado = $this->countyService->CargarDatosCounty($county_id);
+            $resultado = $this->countyService->CargarDatosCounty($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['county'] = $resultado['county'];

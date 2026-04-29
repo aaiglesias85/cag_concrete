@@ -60,25 +60,8 @@ class ReporteSubcontractorController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $subcontractor_id = $listar->subcontractor_id;
-            $project_id = $listar->project_id;
-            $project_item_id = $listar->project_item_id;
-            $fecha_inicial = $listar->fechaInicial;
-            $fecha_fin = $listar->fechaFin;
-
             // total + data en una sola llamada a tu servicio
-            $result = $this->reporteService->ListarReporteSubcontractors(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $subcontractor_id,
-                $project_id,
-                $project_item_id,
-                $fecha_inicial,
-                $fecha_fin
-            );
+            $result = $this->reporteService->ListarReporteSubcontractors($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -102,15 +85,8 @@ class ReporteSubcontractorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
     public function exportarExcel(ReporteSubcontractorExportFiltroRequest $f): JsonResponse
     {
-        $search = $f->search;
-        $subcontractor_id = $f->subcontractor_id;
-        $project_id = $f->project_id;
-        $project_item_id = $f->project_item_id;
-        $fecha_inicial = $f->fecha_inicial;
-        $fecha_fin = $f->fecha_fin;
-
         try {
-            $url = $this->reporteService->ExportarExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $url = $this->reporteService->ExportarExcel($f);
 
             $resultadoJson['success'] = true;
             $resultadoJson['message'] = 'The operation was successful';
@@ -131,15 +107,8 @@ class ReporteSubcontractorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REPORTE_SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
     public function devolverTotal(ReporteSubcontractorExportFiltroRequest $f): JsonResponse
     {
-        $search = $f->search;
-        $subcontractor_id = $f->subcontractor_id;
-        $project_id = $f->project_id;
-        $project_item_id = $f->project_item_id;
-        $fecha_inicial = $f->fecha_inicial;
-        $fecha_fin = $f->fecha_fin;
-
         try {
-            $total = $this->reporteService->DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+            $total = $this->reporteService->DevolverTotal($f);
 
             $resultadoJson['success'] = true;
             $resultadoJson['total'] = $total;

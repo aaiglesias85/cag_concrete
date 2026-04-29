@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Subcontractor\SubcontractorIdRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorIdsRequest;
+use App\Dto\Admin\Subcontractor\SubcontractorListarRequest;
 use App\Entity\DataTrackingLabor;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Subcontractor;
@@ -431,12 +434,13 @@ class SubcontractorService extends Base
     /**
      * CargarDatosSubcontractor: Carga los datos de un subcontractor.
      *
-     * @param int $subcontractor_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosSubcontractor($subcontractor_id)
+    public function CargarDatosSubcontractor(SubcontractorIdRequest|int|string $subcontractor_id)
     {
+        if ($subcontractor_id instanceof SubcontractorIdRequest) {
+            $subcontractor_id = $subcontractor_id->subcontractor_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -510,12 +514,13 @@ class SubcontractorService extends Base
     /**
      * EliminarSubcontractor: Elimina un rol en la BD.
      *
-     * @param int $subcontractor_id Id
-     *
      * @author Marcel
      */
-    public function EliminarSubcontractor($subcontractor_id)
+    public function EliminarSubcontractor(SubcontractorIdRequest|int|string $subcontractor_id)
     {
+        if ($subcontractor_id instanceof SubcontractorIdRequest) {
+            $subcontractor_id = $subcontractor_id->subcontractor_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Subcontractor::class)
@@ -548,12 +553,11 @@ class SubcontractorService extends Base
     /**
      * EliminarSubcontractors: Elimina los subcontractors seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarSubcontractors($ids)
+    public function EliminarSubcontractors(SubcontractorIdsRequest|string $ids)
     {
+        $ids = $ids instanceof SubcontractorIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
@@ -778,6 +782,29 @@ class SubcontractorService extends Base
         return [
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
+
+    /**
+     * Listado admin subcontractors (DTO).
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarSubcontractorsParaAdmin(SubcontractorListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarSubcontractors(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
         ];
     }
 }

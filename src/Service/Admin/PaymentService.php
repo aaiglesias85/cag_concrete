@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Payment\PaymentInvoiceIdRequest;
+use App\Dto\Admin\Payment\PaymentListarNotesRequest;
+use App\Dto\Admin\Payment\PaymentListarRequest;
 use App\Entity\Invoice;
 use App\Entity\InvoiceAttachment;
 use App\Entity\InvoiceItem;
@@ -502,12 +505,13 @@ class PaymentService extends Base
     /**
      * CargarDatosPayment: Carga los datos de un invoice.
      *
-     * @param int $invoice_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosPayment($invoice_id)
+    public function CargarDatosPayment(PaymentInvoiceIdRequest|int|string $invoice_id)
     {
+        if ($invoice_id instanceof PaymentInvoiceIdRequest) {
+            $invoice_id = $invoice_id->invoice_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -1121,6 +1125,69 @@ class PaymentService extends Base
         return [
             'data' => $data,
             'total' => $resultado['total'],
+        ];
+    }
+
+    /**
+     * Listado payment: invoices (DTO).
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarInvoicesParaPaymentAdmin(PaymentListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarInvoices(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->company_id,
+            $listar->project_id,
+            $listar->fecha_inicial,
+            $listar->fecha_fin,
+            $listar->paid
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
+        ];
+    }
+
+    /**
+     * Notas de invoice en pantalla payment (DTO). El 6.º argumento de {@see ListarNotes} es el invoice_id.
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarNotesParaPaymentAdmin(PaymentListarNotesRequest $listar): array
+    {
+        $invoice_id = isset($listar->invoice_id) ? trim((string) $listar->invoice_id) : '';
+        $dt = $listar->dt;
+        if ('' === $invoice_id) {
+            return [
+                'draw' => $dt['draw'],
+                'data' => [],
+                'total' => 0,
+            ];
+        }
+
+        $result = $this->ListarNotes(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $invoice_id,
+            $listar->fecha_inicial,
+            $listar->fecha_fin
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
         ];
     }
 

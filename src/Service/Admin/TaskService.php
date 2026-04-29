@@ -2,6 +2,12 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Task\TaskActualizarRequest;
+use App\Dto\Admin\Task\TaskCambiarEstadoRequest;
+use App\Dto\Admin\Task\TaskIdRequest;
+use App\Dto\Admin\Task\TaskIdsRequest;
+use App\Dto\Admin\Task\TaskListarRequest;
+use App\Dto\Admin\Task\TaskSalvarRequest;
 use App\Entity\Task;
 use App\Entity\Usuario;
 use App\Repository\TaskRepository;
@@ -9,9 +15,10 @@ use App\Service\Base\Base;
 
 class TaskService extends Base
 {
-    public function CargarDatosTask($task_id): array
+    public function CargarDatosTask(TaskIdRequest $dto): array
     {
         $resultado = [];
+        $task_id = $dto->task_id;
         $entity = $this->getDoctrine()->getRepository(Task::class)->find($task_id);
         if ($entity instanceof Task) {
             $u = $entity->getAssignedUser();
@@ -36,8 +43,9 @@ class TaskService extends Base
         return $resultado;
     }
 
-    public function EliminarTask($task_id): array
+    public function EliminarTask(TaskIdRequest $dto): array
     {
+        $task_id = $dto->task_id;
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(Task::class)->find($task_id);
         if ($entity instanceof Task) {
@@ -52,12 +60,13 @@ class TaskService extends Base
         return ['success' => false, 'error' => 'The requested record does not exist'];
     }
 
-    public function EliminarTasks($ids): array
+    public function EliminarTasks(TaskIdsRequest $dto): array
     {
+        $ids = $dto->ids;
         $em = $this->getDoctrine()->getManager();
         $cant_eliminada = 0;
         $cant_total = 0;
-        if ('' !== $ids && null !== $ids) {
+        if (!empty($ids)) {
             foreach (explode(',', (string) $ids) as $task_id) {
                 if ('' === $task_id) {
                     continue;
@@ -85,8 +94,13 @@ class TaskService extends Base
         return ['success' => true, 'message' => $mensaje];
     }
 
-    public function ActualizarTask($task_id, $description, $status, $due_day, $usuario_id): array
+    public function ActualizarTask(TaskActualizarRequest $d): array
     {
+        $task_id = $d->task_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+        $due_day = (string) ($d->due_day ?? '');
+        $usuario_id = (string) ($d->usuario_id ?? '');
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(Task::class)->find($task_id);
         if (!$entity instanceof Task) {
@@ -105,8 +119,12 @@ class TaskService extends Base
         return ['success' => true, 'task_id' => $entity->getTaskId()];
     }
 
-    public function SalvarTask($description, $status, $due_day, $usuario_id): array
+    public function SalvarTask(TaskSalvarRequest $d): array
     {
+        $description = (string) $d->description;
+        $status = (string) $d->status;
+        $due_day = (string) ($d->due_day ?? '');
+        $usuario_id = (string) ($d->usuario_id ?? '');
         $em = $this->getDoctrine()->getManager();
         $entity = new Task();
         $entity->setDescription($description);
@@ -126,29 +144,21 @@ class TaskService extends Base
     /**
      * @return array{data: list<array<string, mixed>>, total: int}
      */
-    public function ListarTasks(
-        $start,
-        $limit,
-        $sSearch,
-        $orderField,
-        $orderDir,
-        $fecha_inicial,
-        $fecha_fin,
-        $statusFiltro,
-        $usuarioFiltro,
-    ): array {
+    public function ListarTasks(TaskListarRequest $listar): array
+    {
+        $dt = $listar->dt;
         /** @var TaskRepository $repo */
         $repo = $this->getDoctrine()->getRepository(Task::class);
         $resultado = $repo->ListarTasksConTotal(
-            (int) $start,
-            (int) $limit,
-            $sSearch,
-            (string) $orderField,
-            (string) $orderDir,
-            (string) $fecha_inicial,
-            (string) $fecha_fin,
-            (string) $statusFiltro,
-            (string) $usuarioFiltro,
+            (int) $dt['start'],
+            (int) $dt['length'],
+            $dt['search'],
+            (string) $dt['orderField'],
+            (string) $dt['orderDir'],
+            (string) $listar->fecha_inicial,
+            (string) $listar->fecha_fin,
+            (string) $listar->statusFiltro,
+            (string) $listar->usuarioFiltro,
             null,
         );
 
@@ -284,6 +294,31 @@ class TaskService extends Base
         return $this->elActorPuedeCambiarEstadoTarea($viewer, $perm, $task);
     }
 
+    public function CambiarEstadoTask(TaskCambiarEstadoRequest $d, ?Usuario $actor, array $perm = []): array
+    {
+        $task_id = $d->task_id;
+        $status = (string) ($d->status ?? '');
+        $nuevo = $this->normalizarStatus($status);
+        $em = $this->getDoctrine()->getManager();
+        $entity = $em->getRepository(Task::class)->find($task_id);
+        if (!$entity instanceof Task) {
+            return ['success' => false, 'error' => 'The requested record does not exist'];
+        }
+        if (null !== $actor) {
+            if (!$this->elActorPuedeCambiarEstadoTarea($actor, $perm, $entity)) {
+                return ['success' => false, 'error' => 'Not allowed to change this task state'];
+            }
+        }
+        if ($entity->getStatus() === $nuevo) {
+            return ['success' => true, 'message' => 'The operation was successful'];
+        }
+        $entity->setStatus($nuevo);
+        $em->flush();
+        $this->SalvarLog('Update', 'Task', 'The task status is changed: '.$nuevo);
+
+        return ['success' => true, 'message' => 'The operation was successful'];
+    }
+
     private function normalizarStatus(?string $status): string
     {
         $s = strtolower(trim((string) $status));
@@ -315,29 +350,6 @@ class TaskService extends Base
         $u = $entity->getAssignedUser();
 
         return null !== $u && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId();
-    }
-
-    public function CambiarEstadoTask($task_id, string $status, ?Usuario $actor, array $perm = []): array
-    {
-        $nuevo = $this->normalizarStatus($status);
-        $em = $this->getDoctrine()->getManager();
-        $entity = $em->getRepository(Task::class)->find($task_id);
-        if (!$entity instanceof Task) {
-            return ['success' => false, 'error' => 'The requested record does not exist'];
-        }
-        if (null !== $actor) {
-            if (!$this->elActorPuedeCambiarEstadoTarea($actor, $perm, $entity)) {
-                return ['success' => false, 'error' => 'Not allowed to change this task state'];
-            }
-        }
-        if ($entity->getStatus() === $nuevo) {
-            return ['success' => true, 'message' => 'The operation was successful'];
-        }
-        $entity->setStatus($nuevo);
-        $em->flush();
-        $this->SalvarLog('Update', 'Task', 'The task status is changed: '.$nuevo);
-
-        return ['success' => true, 'message' => 'The operation was successful'];
     }
 
     private function resolverUsuario($usuario_id): ?Usuario

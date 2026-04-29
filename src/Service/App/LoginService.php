@@ -2,6 +2,7 @@
 
 namespace App\Service\App;
 
+use App\Dto\Api\Request\Login\AutenticarRequest;
 use App\Entity\AccessToken;
 use App\Entity\Usuario;
 use App\Repository\UsuarioRepository;
@@ -47,6 +48,21 @@ class LoginService extends Base
         if ($this->translator instanceof LocaleAwareInterface) {
             $this->translator->setLocale($locale);
         }
+    }
+
+    /**
+     * Login API: validación ya hecha en {@see AutenticarRequest}.
+     */
+    public function AutenticarDesdeRequest(AutenticarRequest $payload, string $lang = 'es'): array
+    {
+        return $this->AutenticarLogin(
+            $payload->email,
+            $payload->password,
+            $payload->player_id,
+            $payload->push_token,
+            $payload->plataforma,
+            $lang
+        );
     }
 
     /**

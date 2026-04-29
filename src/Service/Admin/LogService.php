@@ -3,6 +3,9 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Log\LogIdRequest;
+use App\Dto\Admin\Log\LogIdsRequest;
+use App\Dto\Admin\Log\LogListarRequest;
 use App\Entity\Log;
 use App\Entity\Usuario;
 use App\Repository\LogRepository;
@@ -13,12 +16,11 @@ class LogService extends Base
     /**
      * EliminarLog: Elimina un log en la BD.
      *
-     * @param int $log_id Id
-     *
      * @author Marcel
      */
-    public function EliminarLog($log_id)
+    public function EliminarLog(LogIdRequest $dto)
     {
+        $log_id = $dto->log_id;
         $em = $this->getDoctrine()->getManager();
 
         $log = $this->getDoctrine()->getRepository(Log::class)
@@ -41,15 +43,14 @@ class LogService extends Base
     /**
      * EliminarLogs: Elimina los logs seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarLogs($ids)
+    public function EliminarLogs(LogIdsRequest $dto)
     {
+        $ids = $dto->ids;
         $em = $this->getDoctrine()->getManager();
 
-        if ('' != $ids) {
+        if (!empty($ids)) {
             $ids = explode(',', (string) $ids);
             foreach ($ids as $log_id) {
                 if ('' != $log_id) {
@@ -117,17 +118,24 @@ class LogService extends Base
     /**
      * ListarLogs: Listar los logs.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarLogs($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id)
+    public function ListarLogs(LogListarRequest $listar, Usuario $viewer)
     {
+        $dt = $listar->dt;
+        $usuario_id = $viewer->isAdministrador() ? '' : $viewer->getUsuarioId();
         /** @var LogRepository $logRepo */
         $logRepo = $this->getDoctrine()->getRepository(Log::class);
-        $resultado = $logRepo->ListarLogsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin, $usuario_id);
+        $resultado = $logRepo->ListarLogsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->fecha_inicial,
+            $listar->fecha_fin,
+            $usuario_id,
+        );
 
         $data = [];
 

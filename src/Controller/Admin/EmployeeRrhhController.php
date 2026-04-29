@@ -51,13 +51,7 @@ class EmployeeRrhhController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->employeeService->ListarEmployees(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->employeeService->ListarEmployees($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -78,30 +72,8 @@ class EmployeeRrhhController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_RRHH, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EmployeeRrhhSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $address = $d->address;
-        $phone = $d->phone;
-        $cert_rate_type = $d->cert_rate_type;
-        $social_security_number = $d->social_security_number;
-        $apprentice_percentage = $d->apprentice_percentage;
-        $work_code = $d->work_code;
-        $gender = $d->gender;
-        $race_id = $d->race_id;
-        $date_hired = $d->date_hired;
-        $date_terminated = $d->date_terminated;
-        $reason_terminated = $d->reason_terminated;
-        $time_card_notes = $d->time_card_notes;
-        $regular_rate_per_hour = $d->regular_rate_per_hour;
-        $overtime_rate_per_hour = $d->overtime_rate_per_hour;
-        $special_rate_per_hour = $d->special_rate_per_hour;
-        $trade_licenses_info = $d->trade_licenses_info;
-        $notes = $d->notes;
-        $is_osha_10_certified = $d->is_osha_10_certified;
-        $is_veteran = $d->is_veteran;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->employeeService->SalvarEmployee($name, $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
+            $resultado = $this->employeeService->SalvarEmployee($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -125,31 +97,8 @@ class EmployeeRrhhController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_RRHH, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(EmployeeRrhhActualizarRequest $d): JsonResponse
     {
-        $employee_id = (string) $d->employee_id;
-        $name = (string) $d->name;
-        $address = $d->address;
-        $phone = $d->phone;
-        $cert_rate_type = $d->cert_rate_type;
-        $social_security_number = $d->social_security_number;
-        $apprentice_percentage = $d->apprentice_percentage;
-        $work_code = $d->work_code;
-        $gender = $d->gender;
-        $race_id = $d->race_id;
-        $date_hired = $d->date_hired;
-        $date_terminated = $d->date_terminated;
-        $reason_terminated = $d->reason_terminated;
-        $time_card_notes = $d->time_card_notes;
-        $regular_rate_per_hour = $d->regular_rate_per_hour;
-        $overtime_rate_per_hour = $d->overtime_rate_per_hour;
-        $special_rate_per_hour = $d->special_rate_per_hour;
-        $trade_licenses_info = $d->trade_licenses_info;
-        $notes = $d->notes;
-        $is_osha_10_certified = $d->is_osha_10_certified;
-        $is_veteran = $d->is_veteran;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $address, $phone, $cert_rate_type, $social_security_number, $apprentice_percentage, $work_code, $gender, $race_id, $date_hired, $date_terminated, $reason_terminated, $time_card_notes, $regular_rate_per_hour, $overtime_rate_per_hour, $special_rate_per_hour, $trade_licenses_info, $notes, $is_osha_10_certified, $is_veteran, $status);
+            $resultado = $this->employeeService->ActualizarEmployee($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -173,10 +122,8 @@ class EmployeeRrhhController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_RRHH, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EmployeeIdRequest $dto): JsonResponse
     {
-        $employee_id = $dto->employee_id;
-
         try {
-            $resultado = $this->employeeService->Eliminar($employee_id);
+            $resultado = $this->employeeService->Eliminar($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -198,10 +145,8 @@ class EmployeeRrhhController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_RRHH, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarVarios(EmployeeIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->employeeService->EliminarVarios($ids);
+            $resultado = $this->employeeService->EliminarVarios($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -223,10 +168,8 @@ class EmployeeRrhhController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_RRHH, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EmployeeIdRequest $dto): JsonResponse
     {
-        $employee_id = $dto->employee_id;
-
         try {
-            $resultado = $this->employeeService->CargarDatosEmployee($employee_id);
+            $resultado = $this->employeeService->CargarDatosEmployee($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['employee'] = $resultado['employee'];

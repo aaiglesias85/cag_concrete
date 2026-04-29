@@ -2,6 +2,7 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Default\SaveWidgetPreferenceRequest;
 use App\Entity\RolWidgetAccess;
 use App\Entity\UserWidgetAccess;
 use App\Entity\Usuario;
@@ -123,6 +124,14 @@ final class WidgetAccessService
             (int) $widget->getWidgetId(),
             $visible
         );
+    }
+
+    /**
+     * Misma lógica que {@see setUserWidgetFromMyWidgetsPage} usando el DTO del endpoint admin.
+     */
+    public function setUserWidgetFromMyWidgetsPageFromDto(int $userId, SaveWidgetPreferenceRequest $dto): void
+    {
+        $this->setUserWidgetFromMyWidgetsPage($userId, (string) $dto->widget_id, $dto->is_active);
     }
 
     /**

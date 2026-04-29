@@ -70,30 +70,13 @@ class ScheduleController extends AbstractAdminController
     public function listar(ScheduleListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $project_id = $listar->project_id;
-            $vendor_id = $listar->vendor_id;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-
-            // total + data en una sola llamada a tu servicio
-            $result = $this->scheduleService->ListarSchedules(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $project_id,
-                $vendor_id,
-                $fecha_inicial,
-                $fecha_fin);
+            $r = $this->scheduleService->ListarSchedulesParaAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -232,10 +215,8 @@ class ScheduleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ScheduleIdRequest $dto): JsonResponse
     {
-        $schedule_id = $dto->schedule_id;
-
         try {
-            $resultado = $this->scheduleService->EliminarSchedule($schedule_id);
+            $resultado = $this->scheduleService->EliminarSchedule($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -260,10 +241,8 @@ class ScheduleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarSchedules(ScheduleIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->scheduleService->EliminarSchedules($ids);
+            $resultado = $this->scheduleService->EliminarSchedules($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -288,10 +267,8 @@ class ScheduleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SCHEDULE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ScheduleIdRequest $dto): JsonResponse
     {
-        $schedule_id = $dto->schedule_id;
-
         try {
-            $resultado = $this->scheduleService->CargarDatosSchedule($schedule_id);
+            $resultado = $this->scheduleService->CargarDatosSchedule($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['schedule'] = $resultado['schedule'];

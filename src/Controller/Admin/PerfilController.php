@@ -61,13 +61,7 @@ class PerfilController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->perfilService->ListarPerfiles(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->perfilService->ListarPerfiles($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -88,13 +82,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(PerfilSalvarRequest $d): JsonResponse
     {
-        $descripcion = (string) $d->descripcion;
-        $permisos = json_decode((string) $d->permisos);
-        $waRaw = $d->widget_access;
-        $widgetAccess = is_string($waRaw) && '' !== $waRaw ? json_decode($waRaw, true) : null;
-
         try {
-            $resultado = $this->perfilService->SalvarPerfil($descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
+            $resultado = $this->perfilService->SalvarPerfil($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -117,14 +106,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(PerfilActualizarRequest $d): JsonResponse
     {
-        $perfil_id = (string) $d->perfil_id;
-        $descripcion = (string) $d->descripcion;
-        $permisos = json_decode((string) $d->permisos);
-        $waRaw = $d->widget_access;
-        $widgetAccess = is_string($waRaw) && '' !== $waRaw ? json_decode($waRaw, true) : null;
-
         try {
-            $resultado = $this->perfilService->ActualizarPerfil($perfil_id, $descripcion, $permisos, is_array($widgetAccess) ? $widgetAccess : null);
+            $resultado = $this->perfilService->ActualizarPerfil($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -147,10 +130,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(PerfilIdRequest $dto): JsonResponse
     {
-        $perfil_id = $dto->perfil_id;
-
         try {
-            $resultado = $this->perfilService->EliminarPerfil($perfil_id);
+            $resultado = $this->perfilService->EliminarPerfil($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -172,10 +153,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarPerfiles(PerfilIdsRequest $dto): JsonResponse
     {
-        $ids = $dto->ids;
-
         try {
-            $resultado = $this->perfilService->EliminarPerfiles($ids);
+            $resultado = $this->perfilService->EliminarPerfiles($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -197,10 +176,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(PerfilIdRequest $dto): JsonResponse
     {
-        $perfil_id = $dto->perfil_id;
-
         try {
-            $resultado = $this->perfilService->CargarDatosPerfil($perfil_id);
+            $resultado = $this->perfilService->CargarDatosPerfil($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['perfil'] = $resultado['perfil'];
@@ -222,10 +199,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
     public function listarPermisos(PerfilIdRequest $dto): JsonResponse
     {
-        $perfil_id = $dto->perfil_id;
-
         try {
-            $permisos = $this->perfilService->ListarPermisosDePerfil($perfil_id);
+            $permisos = $this->perfilService->ListarPermisosDePerfil($dto);
 
             $resultadoJson['success'] = true;
             $resultadoJson['permisos'] = $permisos;
@@ -242,9 +217,8 @@ class PerfilController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ROL, AdminPermission::View, jsonOnDenied: true)]
     public function listarWidgetPreferences(PerfilIdRequest $dto): JsonResponse
     {
-        $perfil_id = $dto->perfil_id;
         try {
-            $widgets = $this->perfilService->listarWidgetPreferencesDePerfil($perfil_id);
+            $widgets = $this->perfilService->listarWidgetPreferencesDePerfil($dto);
 
             return $this->json(['success' => true, 'widgets' => $widgets]);
         } catch (\Exception $e) {

@@ -45,13 +45,7 @@ class ConcreteVendorController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->concreteVendorService->ListarVendors(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->concreteVendorService->ListarVendors($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -72,15 +66,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ConcreteVendorSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $phone = (string) ($d->phone ?? '');
-        $address = (string) ($d->address ?? '');
-        $contactName = (string) ($d->contactName ?? '');
-        $contactEmail = (string) ($d->contactEmail ?? '');
-        $contacts = null !== $d->contacts && '' !== $d->contacts ? json_decode($d->contacts) : null;
-
         try {
-            $resultado = $this->concreteVendorService->SalvarVendor($name, $phone, $address, $contactName, $contactEmail, $contacts);
+            $resultado = $this->concreteVendorService->SalvarVendor($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -104,16 +91,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ConcreteVendorActualizarRequest $d): JsonResponse
     {
-        $vendor_id = (string) $d->vendor_id;
-        $name = (string) $d->name;
-        $phone = (string) ($d->phone ?? '');
-        $address = (string) ($d->address ?? '');
-        $contactName = (string) ($d->contactName ?? '');
-        $contactEmail = (string) ($d->contactEmail ?? '');
-        $contacts = null !== $d->contacts && '' !== $d->contacts ? json_decode($d->contacts) : null;
-
         try {
-            $resultado = $this->concreteVendorService->ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail, $contacts);
+            $resultado = $this->concreteVendorService->ActualizarVendor($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -137,10 +116,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ConcreteVendorIdRequest $dto): JsonResponse
     {
-        $vendor_id = $dto->vendor_id;
-
         try {
-            $resultado = $this->concreteVendorService->EliminarVendor($vendor_id);
+            $resultado = $this->concreteVendorService->EliminarVendor($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -162,10 +139,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarVendors(ConcreteVendorIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->concreteVendorService->EliminarVendors($ids);
+            $resultado = $this->concreteVendorService->EliminarVendors($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -187,10 +162,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ConcreteVendorIdRequest $dto): JsonResponse
     {
-        $vendor_id = $dto->vendor_id;
-
         try {
-            $resultado = $this->concreteVendorService->CargarDatosVendor($vendor_id);
+            $resultado = $this->concreteVendorService->CargarDatosVendor($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['vendor'] = $resultado['vendor'];
@@ -212,10 +185,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::View, jsonOnDenied: true)]
     public function listarContacts(ConcreteVendorIdRequest $dto): JsonResponse
     {
-        $vendor_id = $dto->vendor_id;
-
         try {
-            $contacts = $this->concreteVendorService->ListarContactsDeConcreteVendor($vendor_id);
+            $contacts = $this->concreteVendorService->ListarContactsDeConcreteVendorAdmin($dto);
 
             $resultadoJson['success'] = true;
             $resultadoJson['contacts'] = $contacts;
@@ -232,10 +203,8 @@ class ConcreteVendorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_VENDOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarContact(ConcreteVendorContactIdRequest $dto): JsonResponse
     {
-        $contact_id = $dto->contact_id;
-
         try {
-            $resultado = $this->concreteVendorService->EliminarContact($contact_id);
+            $resultado = $this->concreteVendorService->EliminarContact($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';

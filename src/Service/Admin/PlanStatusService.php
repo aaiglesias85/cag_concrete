@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\PlanStatus\PlanStatusActualizarRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusIdRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusIdsRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusListarRequest;
+use App\Dto\Admin\PlanStatus\PlanStatusSalvarRequest;
 use App\Entity\Estimate;
 use App\Entity\PlanStatus;
 use App\Repository\EstimateRepository;
@@ -13,15 +18,14 @@ class PlanStatusService extends Base
     /**
      * CargarDatosStatus: Carga los datos de un status.
      *
-     * @param int $status_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosStatus($status_id)
+    public function CargarDatosStatus(PlanStatusIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $status_id = $dto->status_id;
         $entity = $this->getDoctrine()->getRepository(PlanStatus::class)
            ->find($status_id);
         /** @var PlanStatus $entity */
@@ -39,13 +43,12 @@ class PlanStatusService extends Base
     /**
      * EliminarStatus: Elimina un status en la BD.
      *
-     * @param int $status_id Id
-     *
      * @author Marcel
      */
-    public function EliminarStatus($status_id)
+    public function EliminarStatus(PlanStatusIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $status_id = $dto->status_id;
 
         $entity = $this->getDoctrine()->getRepository(PlanStatus::class)
            ->find($status_id);
@@ -85,18 +88,17 @@ class PlanStatusService extends Base
     /**
      * EliminarStatuss: Elimina los statuss seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarStatuss($ids)
+    public function EliminarStatuss(PlanStatusIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $status_id) {
                 if ('' != $status_id) {
                     ++$cant_total;
@@ -142,13 +144,15 @@ class PlanStatusService extends Base
     /**
      * ActualizarStatus: Actuializa los datos del status en la BD.
      *
-     * @param int $status_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarStatus($status_id, $description, $status)
+    public function ActualizarStatus(PlanStatusActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $status_id = (int) $d->status_id;
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         $entity = $this->getDoctrine()->getRepository(PlanStatus::class)
            ->find($status_id);
@@ -180,18 +184,24 @@ class PlanStatusService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarStatus: Guarda los datos de status en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarStatus($description, $status)
+    public function SalvarStatus(PlanStatusSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         // Verificar name
         $plan = $this->getDoctrine()->getRepository(PlanStatus::class)
@@ -227,17 +237,21 @@ class PlanStatusService extends Base
     /**
      * ListarStatus: Listar los statuss.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarStatus($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarStatus(PlanStatusListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var PlanStatusRepository $planStatusRepo */
         $planStatusRepo = $this->getDoctrine()->getRepository(PlanStatus::class);
-        $resultado = $planStatusRepo->ListarStatusConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $planStatusRepo->ListarStatusConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -255,5 +269,10 @@ class PlanStatusService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

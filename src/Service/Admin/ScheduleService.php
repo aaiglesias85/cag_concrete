@@ -3,6 +3,9 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Schedule\ScheduleIdRequest;
+use App\Dto\Admin\Schedule\ScheduleIdsRequest;
+use App\Dto\Admin\Schedule\ScheduleListarRequest;
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingLabor;
@@ -504,12 +507,13 @@ class ScheduleService extends Base
     /**
      * CargarDatosSchedule: Carga los datos de un schedule.
      *
-     * @param int $schedule_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosSchedule($schedule_id)
+    public function CargarDatosSchedule(ScheduleIdRequest|int|string $schedule_id)
     {
+        if ($schedule_id instanceof ScheduleIdRequest) {
+            $schedule_id = $schedule_id->schedule_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -606,12 +610,13 @@ class ScheduleService extends Base
     /**
      * EliminarSchedule: Elimina un rol en la BD.
      *
-     * @param int $schedule_id Id
-     *
      * @author Marcel
      */
-    public function EliminarSchedule($schedule_id)
+    public function EliminarSchedule(ScheduleIdRequest|int|string $schedule_id)
     {
+        if ($schedule_id instanceof ScheduleIdRequest) {
+            $schedule_id = $schedule_id->schedule_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Schedule::class)
@@ -644,12 +649,11 @@ class ScheduleService extends Base
     /**
      * EliminarSchedules: Elimina los schedules seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarSchedules($ids)
+    public function EliminarSchedules(ScheduleIdsRequest|string $ids)
     {
+        $ids = $ids instanceof ScheduleIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
@@ -1161,6 +1165,33 @@ class ScheduleService extends Base
         return [
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
+
+    /**
+     * Listado admin schedules (DTO).
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarSchedulesParaAdmin(ScheduleListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarSchedules(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->project_id,
+            $listar->vendor_id,
+            $listar->fecha_inicial,
+            $listar->fecha_fin
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
         ];
     }
 

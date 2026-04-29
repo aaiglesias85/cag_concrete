@@ -132,34 +132,13 @@ class ProjectController extends AbstractAdminController
     public function listar(ProjectListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $company_id = $listar->company_id;
-            $status = $listar->status;
-            $fecha_inicial = $listar->fechaInicial;
-            $fecha_fin = $listar->fechaFin;
-            $missing_info = $listar->missing_info ? true : false;
-
-            $data = $this->projectService->ListarProjects(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $company_id,
-                $status,
-                $fecha_inicial,
-                $fecha_fin,
-                $missing_info
-            );
-
-            $total = $this->projectService->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info);
+            $r = $this->projectService->ListarYTotalProjectsAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $data,
-                'recordsTotal' => (int) $total,
-                'recordsFiltered' => (int) $total,
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -364,10 +343,8 @@ class ProjectController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ProjectIdRequest $dto): JsonResponse
     {
-        $project_id = $dto->project_id;
-
         try {
-            $resultado = $this->projectService->EliminarProject($project_id);
+            $resultado = $this->projectService->EliminarProject($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -392,10 +369,8 @@ class ProjectController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarProjects(ProjectIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->projectService->EliminarProjects($ids);
+            $resultado = $this->projectService->EliminarProjects($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -420,10 +395,8 @@ class ProjectController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ProjectIdRequest $dto): JsonResponse
     {
-        $project_id = $dto->project_id;
-
         try {
-            $resultado = $this->projectService->CargarDatosProject($project_id);
+            $resultado = $this->projectService->CargarDatosProject($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['project'] = $resultado['project'];
@@ -1031,27 +1004,8 @@ class ProjectController extends AbstractAdminController
     public function listarDataTracking(ProjectListarDataTrackingRequest $listar): JsonResponse
     {
         try {
+            $result = $this->projectService->ListarDataTrackingsParaProjectTab($listar);
             $dt = $listar->dt;
-
-            $project_id = $listar->project_id;
-            $pending = $listar->pending;
-            $fecha_inicial = $listar->fechaInicial;
-            $fecha_fin = $listar->fechaFin;
-            $only_punch = $listar->only_punch ?? '';
-
-            // total + data en una sola llamada a tu servicio
-            $result = '' != $project_id ? $this->projectService->ListarDataTrackings(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin,
-                $pending,
-                $only_punch
-            ) : ['data' => [], 'total' => 0];
 
             $resultadoJson = [
                 'draw' => $dt['draw'],

@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\DataTracking\DataTrackingIdRequest;
+use App\Dto\Admin\DataTracking\DataTrackingIdsRequest;
+use App\Dto\Admin\DataTracking\DataTrackingListarRequest;
 use App\Entity\ConcreteVendor;
 use App\Entity\DataTracking;
 use App\Entity\DataTrackingAttachment;
@@ -550,13 +553,13 @@ class DataTrackingService extends Base
     /**
      * CargarDatosDataTracking: Carga los datos de un item project.
      *
-     * @param int            $data_tracking_id Id
-     * @param ProjectService $projectService
-     *
      * @author Marcel
      */
-    public function CargarDatosDataTracking($data_tracking_id, $projectService)
+    public function CargarDatosDataTracking(DataTrackingIdRequest|int|string $data_tracking_id, ProjectService $projectService)
     {
+        if ($data_tracking_id instanceof DataTrackingIdRequest) {
+            $data_tracking_id = $data_tracking_id->data_tracking_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -933,12 +936,13 @@ class DataTrackingService extends Base
     /**
      * EliminarDataTracking: Elimina un item details en la BD.
      *
-     * @param int $data_tracking_id Id
-     *
      * @author Marcel
      */
-    public function EliminarDataTracking($data_tracking_id)
+    public function EliminarDataTracking(DataTrackingIdRequest|int|string $data_tracking_id)
     {
+        if ($data_tracking_id instanceof DataTrackingIdRequest) {
+            $data_tracking_id = $data_tracking_id->data_tracking_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(DataTracking::class)
@@ -986,12 +990,11 @@ class DataTrackingService extends Base
     /**
      * EliminarDataTrackings: Elimina los data trackings.
      *
-     * @param string $ids Ids en CSV
-     *
      * @author Marcel
      */
-    public function EliminarDataTrackings($ids)
+    public function EliminarDataTrackings(DataTrackingIdsRequest|string $ids)
     {
+        $ids = $ids instanceof DataTrackingIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
         $updatesForInvoice = [];
 
@@ -1575,6 +1578,40 @@ class DataTrackingService extends Base
 
         // pending
         $entity->setPending($pending);
+    }
+
+    /**
+     * Listado admin data tracking + total (DTO).
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarDataTrackingsParaAdmin(DataTrackingListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $project_id = $listar->project_id;
+        $pending = $listar->pending;
+        $fecha_inicial = $listar->fecha_inicial;
+        $fecha_fin = $listar->fecha_fin;
+        $only_punch = $listar->only_punch ?? '';
+
+        $result = $this->ListarDataTrackings(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $project_id,
+            $fecha_inicial,
+            $fecha_fin,
+            $pending,
+            $only_punch
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
+        ];
     }
 
     /**

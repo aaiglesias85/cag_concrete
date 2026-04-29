@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Invoice\InvoiceIdRequest;
+use App\Dto\Admin\Invoice\InvoiceIdsRequest;
+use App\Dto\Admin\Invoice\InvoiceListarRequest;
 use App\Entity\Invoice;
 use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemOverridePayment;
@@ -1521,12 +1524,13 @@ class InvoiceService extends Base
     /**
      * CargarDatosInvoice: Carga los datos de un invoice.
      *
-     * @param int $invoice_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosInvoice($invoice_id)
+    public function CargarDatosInvoice(InvoiceIdRequest|int|string $invoice_id)
     {
+        if ($invoice_id instanceof InvoiceIdRequest) {
+            $invoice_id = $invoice_id->invoice_id;
+        }
         $this->logOverrideInvoice('cargar_datos_invoice', ['invoice_id' => (int) $invoice_id]);
         $resultado = [];
         $arreglo_resultado = [];
@@ -2180,12 +2184,13 @@ class InvoiceService extends Base
     /**
      * EliminarInvoice: Elimina un rol en la BD.
      *
-     * @param int $invoice_id Id
-     *
      * @author Marcel
      */
-    public function EliminarInvoice($invoice_id)
+    public function EliminarInvoice(InvoiceIdRequest|int|string $invoice_id)
     {
+        if ($invoice_id instanceof InvoiceIdRequest) {
+            $invoice_id = $invoice_id->invoice_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Invoice::class)
@@ -2218,12 +2223,11 @@ class InvoiceService extends Base
     /**
      * EliminarInvoices: Elimina los invoices seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarInvoices($ids)
+    public function EliminarInvoices(InvoiceIdsRequest|string $ids)
     {
+        $ids = $ids instanceof InvoiceIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
@@ -2714,6 +2718,33 @@ class InvoiceService extends Base
         return [
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
+
+    /**
+     * Listado admin invoices (DTO).
+     *
+     * @return array{data: list<mixed>, total: int, draw: int}
+     */
+    public function ListarInvoicesParaAdmin(InvoiceListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarInvoices(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->company_id,
+            $listar->project_id,
+            $listar->fecha_inicial,
+            $listar->fecha_fin
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
         ];
     }
 

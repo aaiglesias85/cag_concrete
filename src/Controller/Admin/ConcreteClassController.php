@@ -44,13 +44,7 @@ class ConcreteClassController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->concreteClassService->Listar(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->concreteClassService->Listar($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class ConcreteClassController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ConcreteClassSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->concreteClassService->Salvar($name, $status);
+            $resultado = $this->concreteClassService->Salvar($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -99,12 +90,8 @@ class ConcreteClassController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ConcreteClassActualizarRequest $d): JsonResponse
     {
-        $concrete_class_id = (string) $d->concrete_class_id;
-        $name = (string) $d->name;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->concreteClassService->Actualizar($concrete_class_id, $name, $status);
+            $resultado = $this->concreteClassService->Actualizar($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -128,10 +115,8 @@ class ConcreteClassController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ConcreteClassIdRequest $dto): JsonResponse
     {
-        $concrete_class_id = $dto->concrete_class_id;
-
         try {
-            $resultado = $this->concreteClassService->EliminarClass($concrete_class_id);
+            $resultado = $this->concreteClassService->EliminarClass($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -153,10 +138,8 @@ class ConcreteClassController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarVarios(ConcreteClassIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->concreteClassService->EliminarVarios($ids);
+            $resultado = $this->concreteClassService->EliminarVarios($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -178,10 +161,8 @@ class ConcreteClassController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::CONCRETE_CLASS, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ConcreteClassIdRequest $dto): JsonResponse
     {
-        $concrete_class_id = $dto->concrete_class_id;
-
         try {
-            $resultado = $this->concreteClassService->CargarDatos($concrete_class_id);
+            $resultado = $this->concreteClassService->CargarDatos($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['class'] = $resultado['class'];

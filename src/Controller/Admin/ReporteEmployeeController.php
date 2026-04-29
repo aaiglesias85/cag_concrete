@@ -60,23 +60,8 @@ class ReporteEmployeeController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $employee_id = $listar->employee_id;
-            $project_id = $listar->project_id;
-            $fecha_inicial = $listar->fechaInicial;
-            $fecha_fin = $listar->fechaFin;
-
             // total + data en una sola llamada a tu servicio
-            $result = $this->reporteService->ListarReporteEmployees(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $employee_id,
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin
-            );
+            $result = $this->reporteService->ListarReporteEmployees($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -100,14 +85,8 @@ class ReporteEmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
     public function exportarExcel(ReporteEmployeeExportFiltroRequest $f): JsonResponse
     {
-        $search = $f->search;
-        $employee_id = $f->employee_id;
-        $project_id = $f->project_id;
-        $fecha_inicial = $f->fecha_inicial;
-        $fecha_fin = $f->fecha_fin;
-
         try {
-            $url = $this->reporteService->ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
+            $url = $this->reporteService->ExportarExcel($f);
 
             $resultadoJson['success'] = true;
             $resultadoJson['message'] = 'The operation was successful';
@@ -128,14 +107,8 @@ class ReporteEmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REPORTE_EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
     public function devolverTotal(ReporteEmployeeExportFiltroRequest $f): JsonResponse
     {
-        $search = $f->search;
-        $employee_id = $f->employee_id;
-        $project_id = $f->project_id;
-        $fecha_inicial = $f->fecha_inicial;
-        $fecha_fin = $f->fecha_fin;
-
         try {
-            $total = $this->reporteService->DevolverTotal($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
+            $total = $this->reporteService->DevolverTotal($f);
 
             $resultadoJson['success'] = true;
             $resultadoJson['total'] = $total;

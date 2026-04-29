@@ -57,31 +57,13 @@ class InvoiceController extends AbstractAdminController
     public function listar(InvoiceListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $company_id = $listar->company_id;
-            $project_id = $listar->project_id;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-
-            // total + data en una sola llamada a tu servicio
-            $result = $this->invoiceService->ListarInvoices(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $company_id,
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin
-            );
+            $r = $this->invoiceService->ListarInvoicesParaAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -176,10 +158,8 @@ class InvoiceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(InvoiceIdRequest $dto): JsonResponse
     {
-        $invoice_id = $dto->invoice_id;
-
         try {
-            $resultado = $this->invoiceService->EliminarInvoice($invoice_id);
+            $resultado = $this->invoiceService->EliminarInvoice($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -204,10 +184,8 @@ class InvoiceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarInvoices(InvoiceIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->invoiceService->EliminarInvoices($ids);
+            $resultado = $this->invoiceService->EliminarInvoices($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -232,10 +210,8 @@ class InvoiceController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(InvoiceIdRequest $dto): JsonResponse
     {
-        $invoice_id = $dto->invoice_id;
-
         try {
-            $resultado = $this->invoiceService->CargarDatosInvoice($invoice_id);
+            $resultado = $this->invoiceService->CargarDatosInvoice($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['invoice'] = $resultado['invoice'];

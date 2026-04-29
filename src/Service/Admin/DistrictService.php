@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\District\DistrictActualizarRequest;
+use App\Dto\Admin\District\DistrictIdRequest;
+use App\Dto\Admin\District\DistrictIdsRequest;
+use App\Dto\Admin\District\DistrictListarRequest;
+use App\Dto\Admin\District\DistrictSalvarRequest;
 use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Estimate;
@@ -15,15 +20,14 @@ class DistrictService extends Base
     /**
      * CargarDatosDistrict: Carga los datos de un district.
      *
-     * @param int $district_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosDistrict($district_id)
+    public function CargarDatosDistrict(DistrictIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $district_id = $dto->district_id;
         $entity = $this->getDoctrine()->getRepository(District::class)
            ->find($district_id);
         /** @var District $entity */
@@ -41,13 +45,12 @@ class DistrictService extends Base
     /**
      * EliminarDistrict: Elimina un district en la BD.
      *
-     * @param int $district_id Id
-     *
      * @author Marcel
      */
-    public function EliminarDistrict($district_id)
+    public function EliminarDistrict(DistrictIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $district_id = $dto->district_id;
 
         $entity = $this->getDoctrine()->getRepository(District::class)
            ->find($district_id);
@@ -85,18 +88,17 @@ class DistrictService extends Base
     /**
      * EliminarDistricts: Elimina los districts seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarDistricts($ids)
+    public function EliminarDistricts(DistrictIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $district_id) {
                 if ('' != $district_id) {
                     ++$cant_total;
@@ -168,13 +170,15 @@ class DistrictService extends Base
     /**
      * ActualizarDistrict: Actuializa los datos del rol en la BD.
      *
-     * @param int $district_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarDistrict($district_id, $description, $status)
+    public function ActualizarDistrict(DistrictActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $district_id = $d->district_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(District::class)
            ->find($district_id);
@@ -191,7 +195,7 @@ class DistrictService extends Base
             }
 
             $entity->setDescription($description);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $em->flush();
 
@@ -206,18 +210,24 @@ class DistrictService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarDistrict: Guarda los datos de district en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarDistrict($description, $status)
+    public function SalvarDistrict(DistrictSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         // Verificar name
         $district = $this->getDoctrine()->getRepository(District::class)
@@ -232,7 +242,7 @@ class DistrictService extends Base
         $entity = new District();
 
         $entity->setDescription($description);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         $em->persist($entity);
 
@@ -253,17 +263,21 @@ class DistrictService extends Base
     /**
      * ListarDistricts: Listar los districts.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarDistricts($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarDistricts(DistrictListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var DistrictRepository $districtRepo */
         $districtRepo = $this->getDoctrine()->getRepository(District::class);
-        $resultado = $districtRepo->ListarDistrictsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $districtRepo->ListarDistrictsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -281,5 +295,10 @@ class DistrictService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

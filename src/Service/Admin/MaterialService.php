@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Material\MaterialActualizarRequest;
+use App\Dto\Admin\Material\MaterialIdRequest;
+use App\Dto\Admin\Material\MaterialIdsRequest;
+use App\Dto\Admin\Material\MaterialListarRequest;
+use App\Dto\Admin\Material\MaterialSalvarRequest;
 use App\Entity\DataTrackingMaterial;
 use App\Entity\Material;
 use App\Entity\Unit;
@@ -14,15 +19,14 @@ class MaterialService extends Base
     /**
      * CargarDatosMaterial: Carga los datos de un material.
      *
-     * @param int $material_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosMaterial($material_id)
+    public function CargarDatosMaterial(MaterialIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $material_id = $dto->material_id;
         $entity = $this->getDoctrine()->getRepository(Material::class)
            ->find($material_id);
         /** @var Material $entity */
@@ -41,13 +45,12 @@ class MaterialService extends Base
     /**
      * EliminarMaterial: Elimina un rol en la BD.
      *
-     * @param int $material_id Id
-     *
      * @author Marcel
      */
-    public function EliminarMaterial($material_id)
+    public function EliminarMaterial(MaterialIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $material_id = $dto->material_id;
 
         $entity = $this->getDoctrine()->getRepository(Material::class)
            ->find($material_id);
@@ -84,18 +87,17 @@ class MaterialService extends Base
     /**
      * EliminarMaterials: Elimina los materials seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarMaterials($ids)
+    public function EliminarMaterials(MaterialIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $material_id) {
                 if ('' != $material_id) {
                     ++$cant_total;
@@ -143,13 +145,16 @@ class MaterialService extends Base
     /**
      * ActualizarMaterial: Actuializa los datos del rol en la BD.
      *
-     * @param int $material_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarMaterial($material_id, $unit_id, $name, $price)
+    public function ActualizarMaterial(MaterialActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $material_id = $d->material_id;
+        $unit_id = (string) $d->unit_id;
+        $name = (string) $d->name;
+        $price = $this->parsePriceAsFloat((string) $d->price);
 
         $entity = $this->getDoctrine()->getRepository(Material::class)
            ->find($material_id);
@@ -185,18 +190,25 @@ class MaterialService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarMaterial: Guarda los datos de material en la BD.
      *
-     * @param string $name Nombre
-     *
      * @author Marcel
      */
-    public function SalvarMaterial($unit_id, $name, $price)
+    public function SalvarMaterial(MaterialSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $unit_id = (string) $d->unit_id;
+        $name = (string) $d->name;
+        $price = $this->parsePriceAsFloat((string) $d->price);
 
         // Verificar name
         $material = $this->getDoctrine()->getRepository(Material::class)
@@ -236,17 +248,21 @@ class MaterialService extends Base
     /**
      * ListarMaterials: Listar los materials.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarMaterials($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarMaterials(MaterialListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var MaterialRepository $materialRepo */
         $materialRepo = $this->getDoctrine()->getRepository(Material::class);
-        $resultado = $materialRepo->ListarMaterialsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $materialRepo->ListarMaterialsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -265,5 +281,12 @@ class MaterialService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parsePriceAsFloat(string $price): float
+    {
+        $normalized = str_replace(',', '', trim($price));
+
+        return (float) $normalized;
     }
 }

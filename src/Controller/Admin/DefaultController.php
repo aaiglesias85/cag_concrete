@@ -93,14 +93,11 @@ class DefaultController extends AbstractAdminController
     public function saveWidgetPreference(SaveWidgetPreferenceRequest $dto): JsonResponse
     {
         $usuario = $this->DevolverUsuario();
-        $widgetId = (string) $dto->widget_id;
-        $isActive = $dto->is_active;
 
         try {
-            $this->widgetAccessService->setUserWidgetFromMyWidgetsPage(
+            $this->widgetAccessService->setUserWidgetFromMyWidgetsPageFromDto(
                 $usuario->getUsuarioId(),
-                $widgetId,
-                $isActive
+                $dto
             );
         } catch (\InvalidArgumentException $e) {
             return $this->json(['success' => false, 'message' => $e->getMessage()], 403);

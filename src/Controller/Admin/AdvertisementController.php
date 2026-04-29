@@ -44,15 +44,7 @@ class AdvertisementController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->advertisementService->ListarAdvertisements(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $listar->fecha_inicial,
-                $listar->fecha_fin,
-            );
+            $result = $this->advertisementService->ListarAdvertisements($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -73,14 +65,8 @@ class AdvertisementController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(AdvertisementSalvarRequest $d): JsonResponse
     {
-        $title = (string) $d->title;
-        $description = (string) ($d->description ?? '');
-        $status = (string) $d->status;
-        $start_date = (string) ($d->start_date ?? '');
-        $end_date = (string) ($d->end_date ?? '');
-
         try {
-            $resultado = $this->advertisementService->SalvarAdvertisement($title, $description, $status, $start_date, $end_date);
+            $resultado = $this->advertisementService->SalvarAdvertisement($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -103,15 +89,8 @@ class AdvertisementController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(AdvertisementActualizarRequest $d): JsonResponse
     {
-        $advertisement_id = (string) $d->advertisement_id;
-        $title = (string) $d->title;
-        $description = (string) ($d->description ?? '');
-        $status = (string) $d->status;
-        $start_date = (string) ($d->start_date ?? '');
-        $end_date = (string) ($d->end_date ?? '');
-
         try {
-            $resultado = $this->advertisementService->ActualizarAdvertisement($advertisement_id, $title, $description, $status, $start_date, $end_date);
+            $resultado = $this->advertisementService->ActualizarAdvertisement($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -134,10 +113,8 @@ class AdvertisementController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(AdvertisementIdRequest $dto): JsonResponse
     {
-        $advertisement_id = $dto->advertisement_id;
-
         try {
-            $resultado = $this->advertisementService->EliminarAdvertisement($advertisement_id);
+            $resultado = $this->advertisementService->EliminarAdvertisement($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -159,10 +136,8 @@ class AdvertisementController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarAdvertisements(AdvertisementIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->advertisementService->EliminarAdvertisements($ids);
+            $resultado = $this->advertisementService->EliminarAdvertisements($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -184,10 +159,8 @@ class AdvertisementController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ADVERTISEMENT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(AdvertisementIdRequest $dto): JsonResponse
     {
-        $advertisement_id = $dto->advertisement_id;
-
         try {
-            $resultado = $this->advertisementService->CargarDatosAdvertisement($advertisement_id);
+            $resultado = $this->advertisementService->CargarDatosAdvertisement($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['advertisement'] = $resultado['advertisement'];

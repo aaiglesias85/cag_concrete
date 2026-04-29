@@ -2,6 +2,12 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorActualizarRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorContactIdRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorIdRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorIdsRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorListarRequest;
+use App\Dto\Admin\ConcreteVendor\ConcreteVendorSalvarRequest;
 use App\Entity\ConcreteVendor;
 use App\Entity\ConcreteVendorContact;
 use App\Entity\DataTrackingConcVendor;
@@ -21,12 +27,11 @@ class ConcreteVendorService extends Base
     /**
      * EliminarContact: Elimina un contact en la BD.
      *
-     * @param int $contact_id Id
-     *
      * @author Marcel
      */
-    public function EliminarContact($contact_id)
+    public function EliminarContact(ConcreteVendorContactIdRequest $dto)
     {
+        $contact_id = $dto->contact_id;
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(ConcreteVendorContact::class)
@@ -87,12 +92,11 @@ class ConcreteVendorService extends Base
     /**
      * CargarDatosVendor: Carga los datos de un vendor.
      *
-     * @param int $vendor_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosVendor($vendor_id)
+    public function CargarDatosVendor(ConcreteVendorIdRequest $dto)
     {
+        $vendor_id = $dto->vendor_id;
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -164,12 +168,11 @@ class ConcreteVendorService extends Base
     /**
      * EliminarVendor: Elimina un concrete vendor en la BD.
      *
-     * @param int $vendor_id Id
-     *
      * @author Marcel
      */
-    public function EliminarVendor($vendor_id)
+    public function EliminarVendor(ConcreteVendorIdRequest $dto)
     {
+        $vendor_id = $dto->vendor_id;
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(ConcreteVendor::class)
@@ -250,17 +253,16 @@ class ConcreteVendorService extends Base
     /**
      * EliminarVendors: Elimina los vendors seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarVendors($ids)
+    public function EliminarVendors(ConcreteVendorIdsRequest $dto)
     {
+        $ids = $dto->ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
         $cant_total = 0;
-        if ('' != $ids) {
+        if (!empty($ids)) {
             $ids = explode(',', (string) $ids);
             foreach ($ids as $vendor_id) {
                 if ('' != $vendor_id) {
@@ -310,12 +312,17 @@ class ConcreteVendorService extends Base
     /**
      * ActualizarVendor: Actuializa los datos del rol en la BD.
      *
-     * @param int $vendor_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarVendor($vendor_id, $name, $phone, $address, $contactName, $contactEmail, $contacts)
+    public function ActualizarVendor(ConcreteVendorActualizarRequest $d)
     {
+        $vendor_id = $d->vendor_id;
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $contacts = $this->decodeContactsJson($d->contacts);
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(ConcreteVendor::class)
@@ -354,6 +361,8 @@ class ConcreteVendorService extends Base
 
             return $resultado;
         }
+
+        return ['success' => false, 'error' => 'The requested record does not exist'];
     }
 
     /**
@@ -361,8 +370,14 @@ class ConcreteVendorService extends Base
      *
      * @author Marcel
      */
-    public function SalvarVendor($name, $phone, $address, $contactName, $contactEmail, $contacts)
+    public function SalvarVendor(ConcreteVendorSalvarRequest $d)
     {
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $contacts = $this->decodeContactsJson($d->contacts);
         $em = $this->getDoctrine()->getManager();
 
         // Verificar name
@@ -413,6 +428,10 @@ class ConcreteVendorService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        if (!\is_iterable($contacts)) {
+            return;
+        }
+
         // Senderos
         foreach ($contacts as $value) {
             $contact_entity = null;
@@ -445,17 +464,14 @@ class ConcreteVendorService extends Base
     /**
      * ListarVendors: Listar los vendors.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarVendors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarVendors(ConcreteVendorListarRequest $listar)
     {
+        $dt = $listar->dt;
         /** @var ConcreteVendorRepository $concreteVendorRepo */
         $concreteVendorRepo = $this->getDoctrine()->getRepository(ConcreteVendor::class);
-        $resultado = $concreteVendorRepo->ListarVendorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $concreteVendorRepo->ListarVendorsConTotal($dt['start'], $dt['length'], $dt['search'], $dt['orderField'], $dt['orderDir']);
 
         $data = [];
 
@@ -476,5 +492,31 @@ class ConcreteVendorService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    /**
+     * Contactos del vendor para la acción admin `listarContacts` (DTO).
+     *
+     * @return array<mixed>
+     */
+    public function ListarContactsDeConcreteVendorAdmin(ConcreteVendorIdRequest $dto): array
+    {
+        return parent::ListarContactsDeConcreteVendor($dto->vendor_id);
+    }
+
+    /**
+     * @return list<\stdClass>
+     */
+    private function decodeContactsJson(?string $contactsJson): array
+    {
+        if (null === $contactsJson || '' === trim($contactsJson)) {
+            return [];
+        }
+        $decoded = json_decode($contactsJson);
+        if (!\is_array($decoded)) {
+            return [];
+        }
+
+        return $decoded;
     }
 }

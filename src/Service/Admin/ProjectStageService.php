@@ -3,6 +3,11 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\ProjectStage\ProjectStageActualizarRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageIdRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageIdsRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageListarRequest;
+use App\Dto\Admin\ProjectStage\ProjectStageSalvarRequest;
 use App\Entity\Estimate;
 use App\Entity\ProjectStage;
 use App\Entity\Usuario;
@@ -15,15 +20,14 @@ class ProjectStageService extends Base
     /**
      * CargarDatosStage: Carga los datos de un stage.
      *
-     * @param int $stage_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosStage($stage_id)
+    public function CargarDatosStage(ProjectStageIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $stage_id = $dto->stage_id;
         $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
            ->find($stage_id);
         /** @var ProjectStage $entity */
@@ -42,13 +46,12 @@ class ProjectStageService extends Base
     /**
      * EliminarStage: Elimina un stage en la BD.
      *
-     * @param int $stage_id Id
-     *
      * @author Marcel
      */
-    public function EliminarStage($stage_id)
+    public function EliminarStage(ProjectStageIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $stage_id = $dto->stage_id;
 
         $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
            ->find($stage_id);
@@ -88,18 +91,17 @@ class ProjectStageService extends Base
     /**
      * EliminarStages: Elimina los stages seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarStages($ids)
+    public function EliminarStages(ProjectStageIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $stage_id) {
                 if ('' != $stage_id) {
                     ++$cant_total;
@@ -145,13 +147,16 @@ class ProjectStageService extends Base
     /**
      * ActualizarStage: Actuializa los datos del stage en la BD.
      *
-     * @param int $stage_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarStage($stage_id, $description, $color, $status)
+    public function ActualizarStage(ProjectStageActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $stage_id = (int) $d->stage_id;
+        $description = (string) $d->description;
+        $color = (string) ($d->color ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         $entity = $this->getDoctrine()->getRepository(ProjectStage::class)
            ->find($stage_id);
@@ -184,18 +189,25 @@ class ProjectStageService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarStage: Guarda los datos de stage en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarStage($description, $color, $status)
+    public function SalvarStage(ProjectStageSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $color = (string) ($d->color ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         // Verificar name
         $stage = $this->getDoctrine()->getRepository(ProjectStage::class)
@@ -232,17 +244,21 @@ class ProjectStageService extends Base
     /**
      * ListarStages: Listar los stages.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarStages($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarStages(ProjectStageListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var ProjectStageRepository $projectStageRepo */
         $projectStageRepo = $this->getDoctrine()->getRepository(ProjectStage::class);
-        $resultado = $projectStageRepo->ListarStagesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $projectStageRepo->ListarStagesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -305,5 +321,10 @@ class ProjectStageService extends Base
         }
 
         return $acciones;
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

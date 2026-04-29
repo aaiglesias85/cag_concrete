@@ -2,6 +2,8 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ReporteSubcontractor\ReporteSubcontractorExportFiltroRequest;
+use App\Dto\Admin\ReporteSubcontractor\ReporteSubcontractorListarRequest;
 use App\Entity\DataTrackingSubcontract;
 use App\Repository\DataTrackingSubcontractRepository;
 use App\Service\Base\Base;
@@ -18,8 +20,14 @@ class ReporteSubcontractorService extends Base
      *
      * @return bool|float|int|string|null
      */
-    public function DevolverTotal($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function DevolverTotal(ReporteSubcontractorExportFiltroRequest $f)
     {
+        $search = (string) ($f->search ?? '');
+        $subcontractor_id = $f->subcontractor_id;
+        $project_id = $f->project_id;
+        $project_item_id = $f->project_item_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
         /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
         $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
         $total = $dataTrackingSubcontractRepo->DevolverTotalReporteSubcontractors($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
@@ -34,8 +42,14 @@ class ReporteSubcontractorService extends Base
      *
      * @author Marcel
      */
-    public function ExportarExcel($search, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin)
+    public function ExportarExcel(ReporteSubcontractorExportFiltroRequest $f)
     {
+        $search = (string) ($f->search ?? '');
+        $subcontractor_id = $f->subcontractor_id;
+        $project_id = $f->project_id;
+        $project_item_id = $f->project_item_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
         // Configurar excel
         Cell::setValueBinder(new AdvancedValueBinder());
 
@@ -130,27 +144,25 @@ class ReporteSubcontractorService extends Base
     /**
      * ListarReporteSubcontractors: Listar los reporte subcontractors.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarReporteSubcontractors(
-        $start,
-        $limit,
-        $sSearch,
-        $iSortCol_0,
-        $sSortDir_0,
-        $subcontractor_id,
-        $project_id,
-        $project_item_id,
-        $fecha_inicial,
-        $fecha_fin,
-    ) {
+    public function ListarReporteSubcontractors(ReporteSubcontractorListarRequest $listar)
+    {
+        $dt = $listar->dt;
         /** @var DataTrackingSubcontractRepository $dataTrackingSubcontractRepo */
         $dataTrackingSubcontractRepo = $this->getDoctrine()->getRepository(DataTrackingSubcontract::class);
-        $resultado = $dataTrackingSubcontractRepo->ListarReporteSubcontractorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $subcontractor_id, $project_id, $project_item_id, $fecha_inicial, $fecha_fin);
+        $resultado = $dataTrackingSubcontractRepo->ListarReporteSubcontractorsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->subcontractor_id,
+            $listar->project_id,
+            $listar->project_item_id,
+            $listar->fechaInicial,
+            $listar->fechaFin,
+        );
 
         $data = [];
 

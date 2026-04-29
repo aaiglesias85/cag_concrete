@@ -114,33 +114,13 @@ class DataTrackingController extends AbstractAdminController
     public function listar(DataTrackingListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $project_id = $listar->project_id;
-            $pending = $listar->pending;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-            $only_punch = $listar->only_punch;
-
-            // total + data en una sola llamada a tu servicio
-            $result = $this->dataTrackingService->ListarDataTrackings(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin,
-                $pending,
-                $only_punch
-            );
+            $r = $this->dataTrackingService->ListarDataTrackingsParaAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -257,10 +237,8 @@ class DataTrackingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DATA_TRACKING, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(DataTrackingIdRequest $dto): JsonResponse
     {
-        $data_tracking_id = $dto->data_tracking_id;
-
         try {
-            $resultado = $this->dataTrackingService->EliminarDataTracking($data_tracking_id);
+            $resultado = $this->dataTrackingService->EliminarDataTracking($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -285,10 +263,8 @@ class DataTrackingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DATA_TRACKING, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarDataTrackings(DataTrackingIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->dataTrackingService->EliminarDataTrackings($ids);
+            $resultado = $this->dataTrackingService->EliminarDataTrackings($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -313,10 +289,8 @@ class DataTrackingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DATA_TRACKING, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(DataTrackingIdRequest $dto): JsonResponse
     {
-        $data_tracking_id = $dto->data_tracking_id;
-
         try {
-            $resultado = $this->dataTrackingService->CargarDatosDataTracking($data_tracking_id, $this->projectService);
+            $resultado = $this->dataTrackingService->CargarDatosDataTracking($dto, $this->projectService);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['data_tracking'] = $resultado['data_tracking'];

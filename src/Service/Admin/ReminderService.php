@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Reminder\ReminderActualizarRequest;
+use App\Dto\Admin\Reminder\ReminderIdRequest;
+use App\Dto\Admin\Reminder\ReminderIdsRequest;
+use App\Dto\Admin\Reminder\ReminderListarRequest;
+use App\Dto\Admin\Reminder\ReminderSalvarRequest;
 use App\Entity\Reminder;
 use App\Entity\ReminderRecipient;
 use App\Entity\Usuario;
@@ -14,15 +19,14 @@ class ReminderService extends Base
     /**
      * CargarDatosReminder: Carga los datos de un reminder.
      *
-     * @param int $reminder_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosReminder($reminder_id)
+    public function CargarDatosReminder(ReminderIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $reminder_id = $dto->reminder_id;
         $entity = $this->getDoctrine()->getRepository(Reminder::class)
            ->find($reminder_id);
         /** @var Reminder $entity */
@@ -65,13 +69,12 @@ class ReminderService extends Base
     /**
      * EliminarReminder: Elimina un rol en la BD.
      *
-     * @param int $reminder_id Id
-     *
      * @author Marcel
      */
-    public function EliminarReminder($reminder_id)
+    public function EliminarReminder(ReminderIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $reminder_id = $dto->reminder_id;
 
         $entity = $this->getDoctrine()->getRepository(Reminder::class)
            ->find($reminder_id);
@@ -103,18 +106,17 @@ class ReminderService extends Base
     /**
      * EliminarReminders: Elimina los reminders seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarReminders($ids)
+    public function EliminarReminders(ReminderIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $reminder_id) {
                 if ('' != $reminder_id) {
                     ++$cant_total;
@@ -171,13 +173,18 @@ class ReminderService extends Base
     /**
      * ActualizarReminder: Actuializa los datos del rol en la BD.
      *
-     * @param int $reminder_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarReminder($reminder_id, $day, $subject, $body, $status, $usuarios_id)
+    public function ActualizarReminder(ReminderActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $reminder_id = (int) $d->reminder_id;
+        $dayStr = (string) $d->day;
+        $subject = (string) $d->subject;
+        $body = (string) ($d->body ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
+        $usuarios_id = (string) ($d->usuarios_id ?? '');
 
         $entity = $this->getDoctrine()->getRepository(Reminder::class)
            ->find($reminder_id);
@@ -187,9 +194,9 @@ class ReminderService extends Base
             $entity->setBody($body);
             $entity->setStatus($status);
 
-            if ('' != $day) {
-                $day = \DateTime::createFromFormat('m/d/Y', $day);
-                $entity->setDay($day);
+            if ('' != $dayStr) {
+                $dayDt = \DateTime::createFromFormat('m/d/Y', $dayStr);
+                $entity->setDay($dayDt);
             }
 
             // salvar destinatario
@@ -200,7 +207,9 @@ class ReminderService extends Base
             // Salvar log
             $log_operacion = 'Update';
             $log_categoria = 'Reminder';
-            $log_descripcion = "The reminder is modified: $subject, Date: ".$day->format('m/d/Y');
+            $dayLog = $entity->getDay();
+            $dayFmt = null !== $dayLog ? $dayLog->format('m/d/Y') : '';
+            $log_descripcion = "The reminder is modified: $subject, Date: $dayFmt";
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
@@ -208,6 +217,11 @@ class ReminderService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
@@ -215,9 +229,15 @@ class ReminderService extends Base
      *
      * @author Marcel
      */
-    public function SalvarReminder($day, $subject, $body, $status, $usuarios_id)
+    public function SalvarReminder(ReminderSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $dayStr = (string) $d->day;
+        $subject = (string) $d->subject;
+        $body = (string) ($d->body ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
+        $usuarios_id = (string) ($d->usuarios_id ?? '');
 
         $entity = new Reminder();
 
@@ -225,9 +245,9 @@ class ReminderService extends Base
         $entity->setBody($body);
         $entity->setStatus($status);
 
-        if ('' != $day) {
-            $day = \DateTime::createFromFormat('m/d/Y', $day);
-            $entity->setDay($day);
+        if ('' != $dayStr) {
+            $dayDt = \DateTime::createFromFormat('m/d/Y', $dayStr);
+            $entity->setDay($dayDt);
         }
 
         $em->persist($entity);
@@ -240,7 +260,9 @@ class ReminderService extends Base
         // Salvar log
         $log_operacion = 'Add';
         $log_categoria = 'Reminder';
-        $log_descripcion = "The reminder is added: $subject, Date: ".$day->format('m/d/Y');
+        $dayLog = $entity->getDay();
+        $dayFmt = null !== $dayLog ? $dayLog->format('m/d/Y') : '';
+        $log_descripcion = "The reminder is added: $subject, Date: $dayFmt";
         $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
         $resultado['success'] = true;
@@ -285,17 +307,25 @@ class ReminderService extends Base
     /**
      * ListarReminders: Listar los reminders.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarReminders($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
+    public function ListarReminders(ReminderListarRequest $listar)
     {
+        $dt = $listar->dt;
+        $fecha_inicial = $listar->fecha_inicial;
+        $fecha_fin = $listar->fecha_fin;
+
         /** @var ReminderRepository $reminderRepo */
         $reminderRepo = $this->getDoctrine()->getRepository(Reminder::class);
-        $resultado = $reminderRepo->ListarRemindersConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
+        $resultado = $reminderRepo->ListarRemindersConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $fecha_inicial,
+            $fecha_fin
+        );
 
         $data = [];
 
@@ -339,5 +369,10 @@ class ReminderService extends Base
         }
 
         return $emails;
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

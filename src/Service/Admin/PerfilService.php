@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Perfil\PerfilActualizarRequest;
+use App\Dto\Admin\Perfil\PerfilIdRequest;
+use App\Dto\Admin\Perfil\PerfilIdsRequest;
+use App\Dto\Admin\Perfil\PerfilListarRequest;
+use App\Dto\Admin\Perfil\PerfilSalvarRequest;
 use App\Entity\Funcion;
 use App\Entity\PermisoPerfil;
 use App\Entity\Rol;
@@ -32,21 +37,20 @@ class PerfilService extends Base
         parent::__construct($doctrine, $mailer, $containerBag, $security, $logger, $urlGenerator, $twig, $widgetAccessService);
     }
 
-    public function listarWidgetPreferencesDePerfil(int $perfilId): array
+    public function listarWidgetPreferencesDePerfil(PerfilIdRequest $dto): array
     {
-        return $this->widgetAccessService->getWidgetStatesForRol($perfilId);
+        return $this->widgetAccessService->getWidgetStatesForRol($dto->perfil_id);
     }
 
     /**
      * ListarPermisosDePerfil: Carga todos los permisos de un perfil.
      *
-     * @param int $perfil_id Id
-     *
      * @author Marcel
      */
-    public function ListarPermisosDePerfil($perfil_id)
+    public function ListarPermisosDePerfil(PerfilIdRequest $dto)
     {
         $permisos = [];
+        $perfil_id = $dto->perfil_id;
 
         /** @var PermisoPerfilRepository $permisoPerfilRepo */
         $permisoPerfilRepo = $this->getDoctrine()->getRepository(PermisoPerfil::class);
@@ -74,15 +78,14 @@ class PerfilService extends Base
     /**
      * CargarDatosPerfil: Carga los datos de un perfil.
      *
-     * @param int $perfil_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosPerfil($perfil_id)
+    public function CargarDatosPerfil(PerfilIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $perfil_id = $dto->perfil_id;
         $entity = $this->getDoctrine()->getRepository(Rol::class)
             ->find($perfil_id);
         if (null != $entity) {
@@ -120,13 +123,12 @@ class PerfilService extends Base
     /**
      * EliminarPerfil: Elimina un rol en la BD.
      *
-     * @param int $rol_id Id
-     *
      * @author Marcel
      */
-    public function EliminarPerfil($rol_id)
+    public function EliminarPerfil(PerfilIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $rol_id = $dto->perfil_id;
 
         $rol = $this->getDoctrine()->getRepository(Rol::class)
             ->find($rol_id);
@@ -172,18 +174,17 @@ class PerfilService extends Base
     /**
      * EliminarPerfiles: Elimina los perfiles seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarPerfiles($ids)
+    public function EliminarPerfiles(PerfilIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $perfil_id) {
                 if ('' != $perfil_id) {
                     ++$cant_total;
@@ -234,13 +235,16 @@ class PerfilService extends Base
     /**
      * ActualizarPerfil: Actuializa los datos del rol en la BD.
      *
-     * @param int $rol_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarPerfil($rol_id, $nombre, $permisos, $widgetAccess = null)
+    public function ActualizarPerfil(PerfilActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $rol_id = (int) $d->perfil_id;
+        $nombre = (string) $d->descripcion;
+        $permisos = $this->decodePermisosObjects((string) $d->permisos);
+        $widgetAccess = $this->decodeWidgetAccessOptional($d->widget_access);
 
         $entity = $this->getDoctrine()->getRepository(Rol::class)
             ->find($rol_id);
@@ -296,8 +300,8 @@ class PerfilService extends Base
 
             $em->flush();
 
-            if (null !== $widgetAccess && is_array($widgetAccess)) {
-                $this->widgetAccessService->replaceRolWidgets((int) $rol_id, $widgetAccess);
+            if (null !== $widgetAccess) {
+                $this->widgetAccessService->replaceRolWidgets($rol_id, $widgetAccess);
             }
 
             // Salvar log
@@ -310,18 +314,25 @@ class PerfilService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarPerfil: Guarda los datos del rol en la BD.
      *
-     * @param string $nombre Nombre
-     *
      * @author Marcel
      */
-    public function SalvarPerfil($nombre, $permisos, $widgetAccess = null)
+    public function SalvarPerfil(PerfilSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $nombre = (string) $d->descripcion;
+        $permisos = $this->decodePermisosObjects((string) $d->permisos);
+        $widgetAccess = $this->decodeWidgetAccessOptional($d->widget_access);
 
         // Verificar nombre
         $rol = $this->getDoctrine()->getRepository(Rol::class)
@@ -368,7 +379,7 @@ class PerfilService extends Base
         }
 
         $em->flush();
-        if (null !== $widgetAccess && is_array($widgetAccess) && null !== $entity->getRolId()) {
+        if (null !== $widgetAccess && null !== $entity->getRolId()) {
             $this->widgetAccessService->replaceRolWidgets((int) $entity->getRolId(), $widgetAccess);
         }
 
@@ -386,18 +397,20 @@ class PerfilService extends Base
     /**
      * ListarPerfiles con total y acciones.
      *
-     * @param int    $start      Inicio (offset)
-     * @param int    $limit      Límite de registros
-     * @param string $sSearch    Filtro de búsqueda
-     * @param string $iSortCol_0 Columna de orden
-     * @param string $sSortDir_0 Dirección de orden (ASC/DESC)
-     *
      * @author Marcel
      */
-    public function ListarPerfiles(int $start, int $limit, ?string $sSearch, string $iSortCol_0, string $sSortDir_0): array
+    public function ListarPerfiles(PerfilListarRequest $listar): array
     {
+        $dt = $listar->dt;
+
         $resultado = $this->getDoctrine()->getRepository(Rol::class)
-            ->ListarRolesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+            ->ListarRolesConTotal(
+                $dt['start'],
+                $dt['length'],
+                $dt['search'],
+                $dt['orderField'],
+                $dt['orderDir']
+            );
 
         $data = [];
 
@@ -414,5 +427,34 @@ class PerfilService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    /**
+     * Decodifica el JSON de permisos como array de objetos (`stdClass`), igual que `json_decode` sin bandera associative.
+     *
+     * @return array<int, object>
+     */
+    private function decodePermisosObjects(string $permisosJson): array
+    {
+        $decoded = json_decode($permisosJson);
+        if (!\is_array($decoded)) {
+            return [];
+        }
+
+        return $decoded;
+    }
+
+    private function decodeWidgetAccessOptional(?string $widgetAccess): ?array
+    {
+        if (null === $widgetAccess || '' === $widgetAccess) {
+            return null;
+        }
+
+        $data = json_decode($widgetAccess, true);
+        if (!\is_array($data)) {
+            return null;
+        }
+
+        return $data;
     }
 }

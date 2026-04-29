@@ -2,6 +2,7 @@
 
 namespace App\Service\App;
 
+use App\Dto\Api\Request\Offline\OfflineSincronizarRequest;
 use App\Repository\CompanyRepository;
 use App\Service\Admin\WidgetAccessService;
 use App\Service\Base\Base;
@@ -90,6 +91,29 @@ class OfflineService extends Base
                    ? $row['updated_at']->format('c') : $row['updated_at'] ?? null,
             ];
         }, $rows);
+    }
+
+    /**
+     * POST sincronizar: construye el array de perfil desde el DTO validado.
+     */
+    public function SincronizarDesdeOfflineRequest(OfflineSincronizarRequest $request): array
+    {
+        $profile = $request->profile_offline;
+        if (null === $profile) {
+            return ['success' => false, 'error' => $this->translator->trans('offline.error.sincronizar_perfil', [], 'messages')];
+        }
+
+        $profile_offline = [
+            'nombre' => $profile->nombre,
+            'apellidos' => $profile->apellidos,
+            'email' => $profile->email,
+            'telefono' => $profile->telefono,
+            'passwordactual' => $profile->passwordactual ?? '',
+            'password' => $profile->password ?? '',
+            'imagen' => $profile->imagen,
+        ];
+
+        return $this->SincronizarPerfilUsuario($profile_offline);
     }
 
     /**

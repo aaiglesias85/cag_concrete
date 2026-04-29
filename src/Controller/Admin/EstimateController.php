@@ -141,40 +141,13 @@ class EstimateController extends AbstractAdminController
     public function listar(EstimateListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $stage_id = $listar->stage_id;
-            $project_type_id = $listar->project_type_id;
-            $proposal_type_id = $listar->proposal_type_id;
-            $status_id = $listar->status_id;
-            $county_id = $listar->county_id;
-            $district_id = $listar->district_id;
-            $fecha_inicial = $listar->fechaInicial;
-            $fecha_fin = $listar->fechaFin;
-
-            $data = $this->estimateService->ListarEstimates(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $stage_id,
-                $project_type_id,
-                $proposal_type_id,
-                $status_id,
-                $county_id,
-                $district_id,
-                $fecha_inicial,
-                $fecha_fin
-            );
-
-            $total = $this->estimateService->TotalEstimates($dt['search'], $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+            $r = $this->estimateService->ListarYTotalEstimatesAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $data,
-                'recordsTotal' => (int) $total,
-                'recordsFiltered' => (int) $total,
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -390,10 +363,8 @@ class EstimateController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EstimateIdRequest $dto): JsonResponse
     {
-        $estimate_id = $dto->estimate_id;
-
         try {
-            $resultado = $this->estimateService->EliminarEstimate($estimate_id);
+            $resultado = $this->estimateService->EliminarEstimate($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -418,10 +389,8 @@ class EstimateController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarEstimates(EstimateIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->estimateService->EliminarEstimates($ids);
+            $resultado = $this->estimateService->EliminarEstimates($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -490,10 +459,8 @@ class EstimateController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EstimateIdRequest $dto): JsonResponse
     {
-        $estimate_id = $dto->estimate_id;
-
         try {
-            $resultado = $this->estimateService->CargarDatosEstimate($estimate_id);
+            $resultado = $this->estimateService->CargarDatosEstimate($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['estimate'] = $resultado['estimate'];

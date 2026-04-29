@@ -2,6 +2,10 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Usuario\UsuarioIdRequest;
+use App\Dto\Admin\Usuario\UsuarioIdsRequest;
+use App\Dto\Admin\Usuario\UsuarioListarRequest;
+use App\Dto\Api\Request\Login\OlvidoContrasennaRequest;
 use App\Entity\Funcion;
 use App\Entity\PermisoUsuario;
 use App\Entity\Rol;
@@ -160,12 +164,13 @@ class UsuarioService extends Base
     /**
      * CargarDatosUsuario: Carga los datos de un usuario.
      *
-     * @param int $usuario_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosUsuario($usuario_id)
+    public function CargarDatosUsuario(UsuarioIdRequest|int|string $usuario_id)
     {
+        if ($usuario_id instanceof UsuarioIdRequest) {
+            $usuario_id = $usuario_id->usuario_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -230,12 +235,13 @@ class UsuarioService extends Base
     /**
      * ActivarDesactivarUsuario: Activa/Desactiva un usuario.
      *
-     * @param int $usuario_id Id del usuario
-     *
      * @author Marcel
      */
-    public function ActivarDesactivarUsuario($usuario_id)
+    public function ActivarDesactivarUsuario(UsuarioIdRequest|int|string $usuario_id)
     {
+        if ($usuario_id instanceof UsuarioIdRequest) {
+            $usuario_id = $usuario_id->usuario_id;
+        }
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
@@ -261,12 +267,11 @@ class UsuarioService extends Base
     /**
      * RecuperarContrasenna: Recupera la contrasenna de un usuario.
      *
-     * @param string $email Email del usuario
-     *
      * @author Marcel
      */
-    public function RecuperarContrasenna($email)
+    public function RecuperarContrasenna(OlvidoContrasennaRequest|string $emailOrDto)
     {
+        $email = $emailOrDto instanceof OlvidoContrasennaRequest ? (string) ($emailOrDto->email ?? '') : (string) $emailOrDto;
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
@@ -316,12 +321,13 @@ class UsuarioService extends Base
     /**
      * EliminarUsuario: Elimina un usuario en la BD.
      *
-     * @param int $usuario_id Id del usuario
-     *
      * @author Marcel
      */
-    public function EliminarUsuario($usuario_id)
+    public function EliminarUsuario(UsuarioIdRequest|int|string $usuario_id)
     {
+        if ($usuario_id instanceof UsuarioIdRequest) {
+            $usuario_id = $usuario_id->usuario_id;
+        }
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
@@ -371,12 +377,11 @@ class UsuarioService extends Base
     /**
      * EliminarUsuarios: Elimina varios usuarios en la BD.
      *
-     * @param string $ids Lista de ids separados por coma
-     *
      * @author Marcel
      */
-    public function EliminarUsuarios($ids)
+    public function EliminarUsuarios(UsuarioIdsRequest|string $ids)
     {
+        $ids = $ids instanceof UsuarioIdsRequest ? (string) $ids->ids : (string) $ids;
         $resultado = [];
         $em = $this->getDoctrine()->getManager();
 
@@ -667,6 +672,31 @@ class UsuarioService extends Base
         return [
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
+        ];
+    }
+
+    /**
+     * Listado admin usuarios (DTO).
+     *
+     * @return array{data: array<int, array<string, mixed>>, total: int, draw: int}
+     */
+    public function ListarUsuariosParaAdmin(UsuarioListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarUsuarios(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->perfil_id,
+            $listar->estado
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
         ];
     }
 

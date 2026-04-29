@@ -2,6 +2,9 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\OverridePayment\OverridePaymentIdRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentIdsRequest;
+use App\Dto\Admin\OverridePayment\OverridePaymentListarRequest;
 use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemOverridePayment;
 use App\Entity\InvoiceItemOverridePaymentPaidQtyHistory;
@@ -122,13 +125,43 @@ class OverridePaymentService extends Base
     }
 
     /**
+     * Listado admin override payment (DTO).
+     *
+     * @return array{data: array<int, array<string, mixed>>, total: int, draw: int}
+     */
+    public function ListarCabecerasInvoiceOverridePaymentParaAdmin(OverridePaymentListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $result = $this->ListarCabecerasInvoiceOverridePayment(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            null !== $listar->company_id ? (string) $listar->company_id : '',
+            null !== $listar->project_id ? (string) $listar->project_id : '',
+            null !== $listar->fecha_inicial ? (string) $listar->fecha_inicial : '',
+            null !== $listar->fecha_fin ? (string) $listar->fecha_fin : ''
+        );
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $result['data'],
+            'total' => (int) $result['total'],
+        ];
+    }
+
+    /**
      * Cabecera `invoice_override_payment` por id para el formulario de edición.
      * Mismo shape que una fila de {@see ListarCabecerasInvoiceOverridePayment} (id, company_id, project_id, date, …).
      *
      * @return array{success: bool, override?: array<string, mixed>, error?: string}
      */
-    public function CargarDatosInvoiceOverridePayment(int $invoiceOverridePaymentId): array
+    public function CargarDatosInvoiceOverridePayment(OverridePaymentIdRequest|int $invoiceOverridePaymentId): array
     {
+        if ($invoiceOverridePaymentId instanceof OverridePaymentIdRequest) {
+            $invoiceOverridePaymentId = (int) $invoiceOverridePaymentId->id;
+        }
         if ($invoiceOverridePaymentId <= 0) {
             return ['success' => false, 'error' => 'Invalid id'];
         }
@@ -177,8 +210,11 @@ class OverridePaymentService extends Base
      *
      * @return array{success: bool, error?: string}
      */
-    public function EliminarCabeceraInvoiceOverridePayment(int $invoiceOverridePaymentId): array
+    public function EliminarCabeceraInvoiceOverridePayment(OverridePaymentIdRequest|int $invoiceOverridePaymentId): array
     {
+        if ($invoiceOverridePaymentId instanceof OverridePaymentIdRequest) {
+            $invoiceOverridePaymentId = (int) $invoiceOverridePaymentId->id;
+        }
         $em = $this->getDoctrine()->getManager();
         $header = $em->getRepository(InvoiceOverridePayment::class)->find($invoiceOverridePaymentId);
         if (null === $header) {
@@ -196,8 +232,9 @@ class OverridePaymentService extends Base
      *
      * @return array{success: bool, deleted?: int, requested?: int, error?: string}
      */
-    public function EliminarCabecerasInvoiceOverridePayment(string $idsCsv): array
+    public function EliminarCabecerasInvoiceOverridePayment(OverridePaymentIdsRequest|string $idsCsv): array
     {
+        $idsCsv = $idsCsv instanceof OverridePaymentIdsRequest ? (string) $idsCsv->ids : (string) $idsCsv;
         $parts = array_filter(array_map('intval', explode(',', (string) $idsCsv)));
         if ([] === $parts) {
             return ['success' => false, 'error' => 'No valid IDs'];

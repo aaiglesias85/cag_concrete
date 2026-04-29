@@ -213,27 +213,13 @@ class UsuarioController extends AbstractAdminController
     public function listar(UsuarioListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $perfil_id = $listar->perfil_id;
-            $estado = $listar->estado;
-
-            // total + data en una sola llamada a tu servicio
-            $result = $this->usuarioService->ListarUsuarios(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $perfil_id,
-                $estado
-            );
+            $r = $this->usuarioService->ListarUsuariosParaAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -345,10 +331,8 @@ class UsuarioController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(UsuarioIdRequest $dto): JsonResponse
     {
-        $usuario_id = $dto->usuario_id;
-
         try {
-            $resultado = $this->usuarioService->EliminarUsuario($usuario_id);
+            $resultado = $this->usuarioService->EliminarUsuario($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -373,10 +357,8 @@ class UsuarioController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarUsuarios(UsuarioIdsRequest $dto): JsonResponse
     {
-        $ids = $dto->ids;
-
         try {
-            $resultado = $this->usuarioService->EliminarUsuarios($ids);
+            $resultado = $this->usuarioService->EliminarUsuarios($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -400,10 +382,9 @@ class UsuarioController extends AbstractAdminController
      */
     public function olvidoContrasenna(OlvidoContrasennaRequest $dto): JsonResponse
     {
-        $email = $dto->email;
         try {
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
-            $this->usuarioService->RecuperarContrasenna($email);
+            $this->usuarioService->RecuperarContrasenna($dto);
 
             // Siempre devolver éxito independientemente de si el email existe o no
             // Esto previene que usuarios maliciosos descubran emails registrados
@@ -427,10 +408,8 @@ class UsuarioController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::Edit, jsonOnDenied: true)]
     public function activarUsuario(UsuarioIdRequest $dto): JsonResponse
     {
-        $usuario_id = $dto->usuario_id;
-
         try {
-            $resultado = $this->usuarioService->ActivarDesactivarUsuario($usuario_id);
+            $resultado = $this->usuarioService->ActivarDesactivarUsuario($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
 
@@ -454,10 +433,8 @@ class UsuarioController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(UsuarioIdRequest $dto): JsonResponse
     {
-        $usuario_id = $dto->usuario_id;
-
         try {
-            $resultado = $this->usuarioService->CargarDatosUsuario($usuario_id);
+            $resultado = $this->usuarioService->CargarDatosUsuario($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['usuario'] = $resultado['usuario'];

@@ -58,13 +58,7 @@ class ItemController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->itemService->ListarItems(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->itemService->ListarItems($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -94,15 +88,8 @@ class ItemController extends AbstractAdminController
             return $this->json($resultadoJson);
         }
 
-        $unit_id = $d->unit_id;
-        $name = (string) $d->name;
-        $description = (string) ($d->description ?? '');
-        $status = (string) $d->status;
-        $yield_calculation = $d->yield_calculation;
-        $equation_id = $d->equation_id;
-
         try {
-            $resultado = $this->itemService->SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->SalvarItem($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -136,16 +123,8 @@ class ItemController extends AbstractAdminController
             return $this->json($resultadoJson);
         }
 
-        $item_id = (string) $d->item_id;
-        $unit_id = $d->unit_id;
-        $name = (string) $d->name;
-        $description = (string) ($d->description ?? '');
-        $status = (string) $d->status;
-        $yield_calculation = $d->yield_calculation;
-        $equation_id = $d->equation_id;
-
         try {
-            $resultado = $this->itemService->ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id);
+            $resultado = $this->itemService->ActualizarItem($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -170,10 +149,8 @@ class ItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ItemIdRequest $dto): JsonResponse
     {
-        $item_id = $dto->item_id;
-
         try {
-            $resultado = $this->itemService->EliminarItem($item_id);
+            $resultado = $this->itemService->EliminarItem($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -195,10 +172,8 @@ class ItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarItems(ItemIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->itemService->EliminarItems($ids);
+            $resultado = $this->itemService->EliminarItems($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -220,10 +195,8 @@ class ItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ITEM, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ItemIdRequest $dto): JsonResponse
     {
-        $item_id = $dto->item_id;
-
         try {
-            $resultado = $this->itemService->CargarDatosItem($item_id);
+            $resultado = $this->itemService->CargarDatosItem($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['item'] = $resultado['item'];

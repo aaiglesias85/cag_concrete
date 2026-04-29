@@ -3,16 +3,6 @@ var Tasks = function () {
     var rowDelete = null;
     var oTable;
 
-    var escHtml = function (s) {
-        if (s === null || s === undefined) {
-            return '';
-        }
-        return String(s)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-    };
-
     var escAttr = function (s) {
         if (s === null || s === undefined) {
             return '';
@@ -27,22 +17,23 @@ var Tasks = function () {
         var isComplete = row.status === 'complete';
         var txtPending = row.label_pending != null && row.label_pending !== '' ? row.label_pending : 'Pending';
         var txtComplete = row.label_complete != null && row.label_complete !== '' ? row.label_complete : 'Complete';
-        var txtCurrent = row.status_label != null && row.status_label !== '' ? row.status_label : (isComplete ? txtComplete : txtPending);
-        var currentClass = isComplete ? 'text-success' : 'text-gray-800';
+        var isChecked = isComplete ? 'checked' : '';
+        var switchDisabled =
+            '<div class="form-check form-switch form-check-custom form-check-success form-check-solid mb-0">' +
+            '<input class="form-check-input status-task-toggle" type="checkbox" role="switch" disabled ' + isChecked + ' /></div>';
 
         if (!permiso.editar) {
-            return '<div class="d-flex justify-content-start align-items-center py-1">' +
-                '<span class="fs-7 fw-semibold ' + currentClass + '">' + escHtml(txtCurrent) + '</span></div>';
+            return '<div class="d-flex justify-content-start align-items-center py-1" style="overflow:visible">' + switchDisabled + '</div>';
         }
-        var isChecked = isComplete ? 'checked' : '';
-        return '<div class="d-flex align-items-center justify-content-start flex-nowrap gap-3 py-1 task-status-wrap" ' +
-            'data-label-pending="' + escAttr(txtPending) + '" data-label-complete="' + escAttr(txtComplete) + '">' +
-            '<span class="task-status-current fs-7 fw-semibold ' + currentClass + '">' + escHtml(txtCurrent) + '</span>' +
-            '<div class="form-check form-switch form-check-custom form-check-solid form-check-success mb-0 d-flex align-items-center">' +
-            '<input class="form-check-input task-status-toggle cursor-pointer" type="checkbox" data-id="' + row.id + '" ' + isChecked + ' ' +
-            'title="' + escAttr('Change status') + '" />' +
-            '</div>' +
-            '</div>';
+
+        return (
+            '<div class="d-flex align-items-center justify-content-start flex-nowrap py-1 task-status-wrap" ' +
+            'data-label-pending="' + escAttr(txtPending) + '" data-label-complete="' + escAttr(txtComplete) + '" style="overflow:visible">' +
+            '<div class="form-check form-switch form-check-custom form-check-success form-check-solid mb-0">' +
+            '<input class="form-check-input status-task-toggle task-status-toggle cursor-pointer" type="checkbox" role="switch" ' +
+            'data-id="' + escAttr(row.id) + '" ' + isChecked + ' />' +
+            '</div></div>'
+        );
     };
 
     var initTable = function () {
@@ -138,7 +129,7 @@ var Tasks = function () {
             });
             columnDefs.push({
                 targets: 4,
-                className: 'text-start',
+                className: 'text-start overflow-visible',
                 render: renderStatusColumn
             });
         } else {
@@ -150,7 +141,7 @@ var Tasks = function () {
             });
             columnDefs.push({
                 targets: 3,
-                className: 'text-start',
+                className: 'text-start overflow-visible',
                 render: renderStatusColumn
             });
         }

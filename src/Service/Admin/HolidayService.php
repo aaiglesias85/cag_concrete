@@ -2,6 +2,10 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Holiday\HolidayIdRequest;
+use App\Dto\Admin\Holiday\HolidayIdsRequest;
+use App\Dto\Admin\Holiday\HolidayListarRequest;
+use App\Dto\Admin\Holiday\HolidaySalvarRequest;
 use App\Entity\Holiday;
 use App\Repository\HolidayRepository;
 use App\Service\Base\Base;
@@ -11,15 +15,14 @@ class HolidayService extends Base
     /**
      * CargarDatosHoliday: Carga los datos de un holiday.
      *
-     * @param int $holiday_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosHoliday($holiday_id)
+    public function CargarDatosHoliday(HolidayIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $holiday_id = $dto->holiday_id;
         $entity = $this->getDoctrine()->getRepository(Holiday::class)
            ->find($holiday_id);
         /** @var Holiday $entity */
@@ -37,13 +40,12 @@ class HolidayService extends Base
     /**
      * EliminarHoliday: Elimina un rol en la BD.
      *
-     * @param int $holiday_id Id
-     *
      * @author Marcel
      */
-    public function EliminarHoliday($holiday_id)
+    public function EliminarHoliday(HolidayIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $holiday_id = $dto->holiday_id;
 
         $entity = $this->getDoctrine()->getRepository(Holiday::class)
            ->find($holiday_id);
@@ -72,18 +74,17 @@ class HolidayService extends Base
     /**
      * EliminarHolidays: Elimina los holidays seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarHolidays($ids)
+    public function EliminarHolidays(HolidayIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $holiday_id) {
                 if ('' != $holiday_id) {
                     ++$cant_total;
@@ -121,13 +122,29 @@ class HolidayService extends Base
     }
 
     /**
-     * ActualizarHoliday: Actuializa los datos del rol en la BD.
-     *
-     * @param int $holiday_id Id
+     * Guardar Holiday (alta o edición según `holiday_id` vacío o no).
      *
      * @author Marcel
      */
-    public function ActualizarHoliday($holiday_id, $day, $description)
+    public function GuardarHoliday(HolidaySalvarRequest $d)
+    {
+        $holiday_id = (string) ($d->holiday_id ?? '');
+        $day = (string) $d->day;
+        $description = (string) $d->description;
+
+        if ('' === $holiday_id) {
+            return $this->crearHoliday($day, $description);
+        }
+
+        return $this->actualizarHoliday($holiday_id, $day, $description);
+    }
+
+    /**
+     * ActualizarHoliday: Actuializa los datos del rol en la BD.
+     *
+     * @author Marcel
+     */
+    private function actualizarHoliday(string $holiday_id, string $day, string $description)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -165,16 +182,19 @@ class HolidayService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarHoliday: Guarda los datos de holiday en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarHoliday($day, $description)
+    private function crearHoliday(string $day, string $description)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -216,17 +236,25 @@ class HolidayService extends Base
     /**
      * ListarHolidays: Listar los holidays.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarHolidays($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
+    public function ListarHolidays(HolidayListarRequest $listar)
     {
+        $dt = $listar->dt;
+        $fecha_inicial = $listar->fecha_inicial;
+        $fecha_fin = $listar->fecha_fin;
+
         /** @var HolidayRepository $holidayRepo */
         $holidayRepo = $this->getDoctrine()->getRepository(Holiday::class);
-        $resultado = $holidayRepo->ListarHolidaysConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
+        $resultado = $holidayRepo->ListarHolidaysConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $fecha_inicial,
+            $fecha_fin
+        );
 
         $data = [];
 

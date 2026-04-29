@@ -44,13 +44,7 @@ class PlanDownloadingController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->planDownloadingService->ListarPlans(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->planDownloadingService->ListarPlans($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class PlanDownloadingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(PlanDownloadingSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->planDownloadingService->SalvarPlan($description, $status);
+            $resultado = $this->planDownloadingService->SalvarPlan($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -99,12 +90,8 @@ class PlanDownloadingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(PlanDownloadingActualizarRequest $d): JsonResponse
     {
-        $plan_downloading_id = (string) $d->plan_downloading_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->planDownloadingService->ActualizarPlan($plan_downloading_id, $description, $status);
+            $resultado = $this->planDownloadingService->ActualizarPlan($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -128,10 +115,8 @@ class PlanDownloadingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(PlanDownloadingIdRequest $dto): JsonResponse
     {
-        $plan_downloading_id = $dto->plan_downloading_id;
-
         try {
-            $resultado = $this->planDownloadingService->EliminarPlan($plan_downloading_id);
+            $resultado = $this->planDownloadingService->EliminarPlan($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -153,10 +138,8 @@ class PlanDownloadingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarPlans(PlanDownloadingIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->planDownloadingService->EliminarPlans($ids);
+            $resultado = $this->planDownloadingService->EliminarPlans($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -178,10 +161,8 @@ class PlanDownloadingController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_DOWNLOADING, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(PlanDownloadingIdRequest $dto): JsonResponse
     {
-        $plan_downloading_id = $dto->plan_downloading_id;
-
         try {
-            $resultado = $this->planDownloadingService->CargarDatosPlan($plan_downloading_id);
+            $resultado = $this->planDownloadingService->CargarDatosPlan($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['plan'] = $resultado['plan'];

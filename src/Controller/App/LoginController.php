@@ -160,14 +160,7 @@ class LoginController extends AbstractController
                 );
             }
 
-            $resultado = $this->loginService->AutenticarLogin(
-                $payload->email,
-                $payload->password,
-                $payload->player_id,
-                $payload->push_token,
-                $payload->plataforma,
-                $lang
-            );
+            $resultado = $this->loginService->AutenticarDesdeRequest($payload, $lang);
 
             if ($resultado['success']) {
                 $loginLimiter->reset();
@@ -350,7 +343,7 @@ class LoginController extends AbstractController
             }
 
             // Procesar recuperación de contraseña (siempre devuelve éxito para evitar descubrir emails existentes)
-            $this->adminUsuarioService->RecuperarContrasenna($payload->email);
+            $this->adminUsuarioService->RecuperarContrasenna($payload);
 
             // Siempre devolver éxito independientemente de si el email existe o no
             // Esto previene que usuarios maliciosos descubran emails registrados

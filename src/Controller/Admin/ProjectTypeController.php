@@ -44,13 +44,7 @@ class ProjectTypeController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->projectTypeService->ListarTypes(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->projectTypeService->ListarTypes($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class ProjectTypeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_TYPE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ProjectTypeSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->projectTypeService->SalvarType($description, $status);
+            $resultado = $this->projectTypeService->SalvarType($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -99,12 +90,8 @@ class ProjectTypeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_TYPE, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ProjectTypeActualizarRequest $d): JsonResponse
     {
-        $type_id = (string) $d->type_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->projectTypeService->ActualizarType($type_id, $description, $status);
+            $resultado = $this->projectTypeService->ActualizarType($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -128,10 +115,8 @@ class ProjectTypeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_TYPE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ProjectTypeIdRequest $dto): JsonResponse
     {
-        $type_id = $dto->type_id;
-
         try {
-            $resultado = $this->projectTypeService->EliminarType($type_id);
+            $resultado = $this->projectTypeService->EliminarType($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -153,10 +138,8 @@ class ProjectTypeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_TYPE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarTypes(ProjectTypeIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->projectTypeService->EliminarTypes($ids);
+            $resultado = $this->projectTypeService->EliminarTypes($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -178,10 +161,8 @@ class ProjectTypeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PROJECT_TYPE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ProjectTypeIdRequest $dto): JsonResponse
     {
-        $type_id = $dto->type_id;
-
         try {
-            $resultado = $this->projectTypeService->CargarDatosType($type_id);
+            $resultado = $this->projectTypeService->CargarDatosType($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['type'] = $resultado['type'];

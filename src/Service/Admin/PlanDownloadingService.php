@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\PlanDownloading\PlanDownloadingActualizarRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingIdRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingIdsRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingListarRequest;
+use App\Dto\Admin\PlanDownloading\PlanDownloadingSalvarRequest;
 use App\Entity\Estimate;
 use App\Entity\PlanDownloading;
 use App\Repository\EstimateRepository;
@@ -13,15 +18,14 @@ class PlanDownloadingService extends Base
     /**
      * CargarDatosPlan: Carga los datos de un plan downloading.
      *
-     * @param int $plan_downloading_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosPlan($plan_downloading_id)
+    public function CargarDatosPlan(PlanDownloadingIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $plan_downloading_id = $dto->plan_downloading_id;
         $entity = $this->getDoctrine()->getRepository(PlanDownloading::class)
            ->find($plan_downloading_id);
         /** @var PlanDownloading $entity */
@@ -39,13 +43,12 @@ class PlanDownloadingService extends Base
     /**
      * EliminarPlan: Elimina un plan downloading en la BD.
      *
-     * @param int $plan_downloading_id Id
-     *
      * @author Marcel
      */
-    public function EliminarPlan($plan_downloading_id)
+    public function EliminarPlan(PlanDownloadingIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $plan_downloading_id = $dto->plan_downloading_id;
 
         $entity = $this->getDoctrine()->getRepository(PlanDownloading::class)
            ->find($plan_downloading_id);
@@ -85,18 +88,17 @@ class PlanDownloadingService extends Base
     /**
      * EliminarPlans: Elimina los plans downloading seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarPlans($ids)
+    public function EliminarPlans(PlanDownloadingIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $plan_downloading_id) {
                 if ('' != $plan_downloading_id) {
                     ++$cant_total;
@@ -142,13 +144,15 @@ class PlanDownloadingService extends Base
     /**
      * ActualizarPlan: Actuializa los datos del plan downloading en la BD.
      *
-     * @param int $plan_downloading_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarPlan($plan_downloading_id, $description, $status)
+    public function ActualizarPlan(PlanDownloadingActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $plan_downloading_id = (int) $d->plan_downloading_id;
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         $entity = $this->getDoctrine()->getRepository(PlanDownloading::class)
            ->find($plan_downloading_id);
@@ -180,18 +184,24 @@ class PlanDownloadingService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarPlan: Guarda los datos de plan en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarPlan($description, $status)
+    public function SalvarPlan(PlanDownloadingSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         // Verificar name
         $plan = $this->getDoctrine()->getRepository(PlanDownloading::class)
@@ -227,17 +237,21 @@ class PlanDownloadingService extends Base
     /**
      * ListarPlans: Listar los plans downloading.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarPlans($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarPlans(PlanDownloadingListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var PlanDownloadingRepository $planDownloadingRepo */
         $planDownloadingRepo = $this->getDoctrine()->getRepository(PlanDownloading::class);
-        $resultado = $planDownloadingRepo->ListarPlansConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $planDownloadingRepo->ListarPlansConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -255,5 +269,10 @@ class PlanDownloadingService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

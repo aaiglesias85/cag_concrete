@@ -247,8 +247,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $sourceLang = $payload->source_lang ?? 'es';
-        $result = $this->messageService->EnviarMensaje($payload->conversation_id, (string) $payload->body, $sourceLang);
+        $result = $this->messageService->EnviarMensajeDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -299,8 +298,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $sourceLang = $payload->source_lang ?? 'es';
-        $result = $this->messageService->EnviarPrimerMensaje($payload->other_user_id, (string) $payload->body, $sourceLang);
+        $result = $this->messageService->EnviarPrimerMensajeDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -346,7 +344,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = $this->messageService->MarcarComoLeidos($payload->conversation_id);
+        $result = $this->messageService->MarcarComoLeidosDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -398,10 +396,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $targetLang = $payload->target_lang ?? 'es';
-        $messageId = $payload->message_id;
-        $conversationId = $payload->conversation_id;
-        $result = $this->messageService->TraducirOnDemand((string) $payload->text, $targetLang, $messageId, $conversationId);
+        $result = $this->messageService->TraducirDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -447,9 +442,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = 'for_me' === $payload->scope
-           ? $this->messageService->EliminarMensajeParaMi($payload->message_id, $payload->conversation_id)
-           : $this->messageService->EliminarMensajeParaTodos($payload->message_id, $payload->conversation_id);
+        $result = $this->messageService->EliminarMensajeDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 
@@ -493,7 +486,7 @@ class MessageController extends AbstractController
         if (\count($violations) > 0) {
             return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
         }
-        $result = $this->messageService->OcultarConversacion($payload->conversation_id);
+        $result = $this->messageService->OcultarConversacionDesdeRequest($payload);
         if (!$result['success']) {
             $status = ($result['error'] ?? '') === 'chat_forbidden' ? 403 : 400;
 

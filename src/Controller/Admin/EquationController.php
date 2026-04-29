@@ -46,13 +46,7 @@ class EquationController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->equationService->ListarEquations(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->equationService->ListarEquations($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -73,12 +67,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EquationSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $equation = (string) $d->equation;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->equationService->SalvarEquation($description, $equation, $status);
+            $resultado = $this->equationService->SalvarEquation($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -102,13 +92,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(EquationActualizarRequest $d): JsonResponse
     {
-        $equation_id = (string) $d->equation_id;
-        $description = (string) $d->description;
-        $equation = (string) $d->equation;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->equationService->ActualizarEquation($equation_id, $description, $equation, $status);
+            $resultado = $this->equationService->ActualizarEquation($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -132,10 +117,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EquationIdRequest $dto): JsonResponse
     {
-        $equation_id = $dto->equation_id;
-
         try {
-            $resultado = $this->equationService->EliminarEquation($equation_id);
+            $resultado = $this->equationService->EliminarEquation($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -158,10 +141,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarEquations(EquationIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->equationService->EliminarEquations($ids);
+            $resultado = $this->equationService->EliminarEquations($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -185,10 +166,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EquationIdRequest $dto): JsonResponse
     {
-        $equation_id = $dto->equation_id;
-
         try {
-            $resultado = $this->equationService->CargarDatosEquation($equation_id);
+            $resultado = $this->equationService->CargarDatosEquation($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['equation'] = $resultado['equation'];
@@ -210,10 +189,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::View, jsonOnDenied: true)]
     public function listarPayItems(EquationIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $lista = $this->equationService->ListarPayItems($ids);
+            $lista = $this->equationService->ListarPayItems($idsDto);
 
             $resultadoJson['success'] = true;
             $resultadoJson['items'] = $lista;
@@ -234,10 +211,8 @@ class EquationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EQUATION, AdminPermission::Edit, jsonOnDenied: true)]
     public function salvarPayItems(EquationSalvarPayItemsRequest $d): JsonResponse
     {
-        $pay_items = json_decode((string) $d->pay_items);
-
         try {
-            $resultado = $this->equationService->SalvarPayItems($pay_items);
+            $resultado = $this->equationService->SalvarPayItems($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];

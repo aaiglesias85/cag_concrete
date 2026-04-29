@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Advertisement\AdvertisementActualizarRequest;
+use App\Dto\Admin\Advertisement\AdvertisementIdRequest;
+use App\Dto\Admin\Advertisement\AdvertisementIdsRequest;
+use App\Dto\Admin\Advertisement\AdvertisementListarRequest;
+use App\Dto\Admin\Advertisement\AdvertisementSalvarRequest;
 use App\Entity\Advertisement;
 use App\Repository\AdvertisementRepository;
 use App\Service\Base\Base;
@@ -41,15 +46,14 @@ class AdvertisementService extends Base
     /**
      * CargarDatosAdvertisement: Carga los datos de un advertisement.
      *
-     * @param int $advertisement_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosAdvertisement($advertisement_id)
+    public function CargarDatosAdvertisement(AdvertisementIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $advertisement_id = $dto->advertisement_id;
         $entity = $this->getDoctrine()->getRepository(Advertisement::class)
            ->find($advertisement_id);
         /** @var Advertisement $entity */
@@ -70,13 +74,12 @@ class AdvertisementService extends Base
     /**
      * EliminarAdvertisement: Elimina un rol en la BD.
      *
-     * @param int $advertisement_id Id
-     *
      * @author Marcel
      */
-    public function EliminarAdvertisement($advertisement_id)
+    public function EliminarAdvertisement(AdvertisementIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $advertisement_id = $dto->advertisement_id;
 
         $entity = $this->getDoctrine()->getRepository(Advertisement::class)
            ->find($advertisement_id);
@@ -105,19 +108,18 @@ class AdvertisementService extends Base
     /**
      * EliminarAdvertisements: Elimina los advertisements seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarAdvertisements($ids)
+    public function EliminarAdvertisements(AdvertisementIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
         $resultado = [];
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $advertisement_id) {
                 if ('' != $advertisement_id) {
                     ++$cant_total;
@@ -157,13 +159,18 @@ class AdvertisementService extends Base
     /**
      * ActualizarAdvertisement: Actuializa los datos del rol en la BD.
      *
-     * @param int $advertisement_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarAdvertisement($advertisement_id, $title, $description, $status, $start_date, $end_date)
+    public function ActualizarAdvertisement(AdvertisementActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $advertisement_id = $d->advertisement_id;
+        $title = (string) $d->title;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $start_date = (string) ($d->start_date ?? '');
+        $end_date = (string) ($d->end_date ?? '');
 
         $entity = $this->getDoctrine()->getRepository(Advertisement::class)
            ->find($advertisement_id);
@@ -181,7 +188,7 @@ class AdvertisementService extends Base
 
             $entity->setTitle($title);
             $entity->setDescription($description);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseAdvertisementStatus($status));
 
             if ('' != $start_date) {
                 $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
@@ -205,18 +212,27 @@ class AdvertisementService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarAdvertisement: Guarda los datos de advertisement en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarAdvertisement($title, $description, $status, $start_date, $end_date)
+    public function SalvarAdvertisement(AdvertisementSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $title = (string) $d->title;
+        $description = (string) ($d->description ?? '');
+        $status = (string) $d->status;
+        $start_date = (string) ($d->start_date ?? '');
+        $end_date = (string) ($d->end_date ?? '');
 
         // Verificar title
         $advertisement = $this->getDoctrine()->getRepository(Advertisement::class)
@@ -232,7 +248,7 @@ class AdvertisementService extends Base
 
         $entity->setTitle($title);
         $entity->setDescription($description);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseAdvertisementStatus($status));
 
         if ('' != $start_date) {
             $start_date = \DateTime::createFromFormat('m/d/Y', $start_date);
@@ -262,17 +278,25 @@ class AdvertisementService extends Base
     /**
      * ListarAdvertisements: Listar los advertisements.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarAdvertisements($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin)
+    public function ListarAdvertisements(AdvertisementListarRequest $listar)
     {
+        $dt = $listar->dt;
+        $fecha_inicial = $listar->fecha_inicial;
+        $fecha_fin = $listar->fecha_fin;
+
         /** @var AdvertisementRepository $advertisementRepo */
         $advertisementRepo = $this->getDoctrine()->getRepository(Advertisement::class);
-        $resultado = $advertisementRepo->ListarAdvertisementsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $fecha_inicial, $fecha_fin);
+        $resultado = $advertisementRepo->ListarAdvertisementsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $fecha_inicial,
+            $fecha_fin
+        );
 
         $data = [];
 
@@ -293,5 +317,10 @@ class AdvertisementService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseAdvertisementStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

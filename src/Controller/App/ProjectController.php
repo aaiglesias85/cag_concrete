@@ -142,14 +142,7 @@ class ProjectController extends AbstractController
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
             }
 
-            $resultado = $this->projectService->ListarProjects(
-                $query->search,
-                $query->empresa_id,
-                $query->fecha_inicial,
-                $query->fecha_fin,
-                $query->limit,
-                $query->offset
-            );
+            $resultado = $this->projectService->ListarProjectsDesdeQuery($query);
 
             if ($resultado['success']) {
                 return $this->json(ProjectListarResponse::fromServiceResult($resultado));
@@ -232,7 +225,7 @@ class ProjectController extends AbstractController
         }
 
         try {
-            $resultado = $this->projectService->CargarDatosProject($dto->project_id);
+            $resultado = $this->projectService->CargarDatosProjectDesdeRequest($dto);
 
             $fallbackError = $this->translator->trans('project.error.not_found', [], 'messages', $lang) ?: 'Project not found';
 

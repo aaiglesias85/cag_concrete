@@ -2,6 +2,12 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Equation\EquationActualizarRequest;
+use App\Dto\Admin\Equation\EquationIdRequest;
+use App\Dto\Admin\Equation\EquationIdsRequest;
+use App\Dto\Admin\Equation\EquationListarRequest;
+use App\Dto\Admin\Equation\EquationSalvarPayItemsRequest;
+use App\Dto\Admin\Equation\EquationSalvarRequest;
 use App\Constants\FunctionId;
 use App\Entity\Equation;
 use App\Entity\EstimateQuoteItem;
@@ -21,8 +27,17 @@ class EquationService extends Base
      *
      * @author Marcel
      */
-    public function SalvarPayItems($pay_items)
+    public function SalvarPayItems(EquationSalvarPayItemsRequest $d)
     {
+        $raw = (string) ($d->pay_items ?? '');
+        $pay_items = json_decode($raw);
+        if (!\is_array($pay_items)) {
+            return [
+                'success' => false,
+                'error' => 'Invalid pay_items JSON',
+            ];
+        }
+
         $em = $this->getDoctrine()->getManager();
 
         foreach ($pay_items as $pay_item) {
@@ -46,15 +61,13 @@ class EquationService extends Base
     /**
      * ListarPayItems: Lista los pay items.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function ListarPayItems($ids)
+    public function ListarPayItems(EquationIdsRequest $dto)
     {
         $items = [];
 
-        $ids = explode(',', (string) $ids);
+        $ids = explode(',', (string) ($dto->ids ?? ''));
         foreach ($ids as $id) {
             $project_items = $this->ListarItemsDeProject($id);
             $items = array_merge($items, $project_items);
@@ -66,15 +79,14 @@ class EquationService extends Base
     /**
      * CargarDatosEquation: Carga los datos de un equation.
      *
-     * @param int $equation_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosEquation($equation_id)
+    public function CargarDatosEquation(EquationIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $equation_id = $dto->equation_id;
         $entity = $this->getDoctrine()->getRepository(Equation::class)
            ->find($equation_id);
         /** @var Equation $entity */
@@ -136,13 +148,12 @@ class EquationService extends Base
     /**
      * EliminarEquation: Elimina un rol en la BD.
      *
-     * @param int $equation_id Id
-     *
      * @author Marcel
      */
-    public function EliminarEquation($equation_id)
+    public function EliminarEquation(EquationIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $equation_id = $dto->equation_id;
 
         $entity = $this->getDoctrine()->getRepository(Equation::class)
            ->find($equation_id);
@@ -200,20 +211,19 @@ class EquationService extends Base
     /**
      * EliminarEquations: Elimina los equations seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarEquations($ids)
+    public function EliminarEquations(EquationIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
         $equation_ids_con_items = [];
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $equation_id) {
                 if ('' != $equation_id) {
                     ++$cant_total;
@@ -280,13 +290,16 @@ class EquationService extends Base
     /**
      * ActualizarEquation: Actuializa los datos del rol en la BD.
      *
-     * @param int $equation_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarEquation($equation_id, $description, $equation, $status)
+    public function ActualizarEquation(EquationActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $equation_id = $d->equation_id;
+        $description = (string) $d->description;
+        $equation = (string) $d->equation;
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(Equation::class)
            ->find($equation_id);
@@ -304,7 +317,7 @@ class EquationService extends Base
 
             $entity->setDescription($description);
             $entity->setEquation($equation);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $em->flush();
 
@@ -319,18 +332,25 @@ class EquationService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarEquation: Guarda los datos de equation en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarEquation($description, $equation, $status)
+    public function SalvarEquation(EquationSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $equation = (string) $d->equation;
+        $status = (string) $d->status;
 
         // Verificar description
         $equation_entity = $this->getDoctrine()->getRepository(Equation::class)
@@ -346,7 +366,7 @@ class EquationService extends Base
 
         $entity->setDescription($description);
         $entity->setEquation($equation);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         $em->persist($entity);
 
@@ -367,17 +387,21 @@ class EquationService extends Base
     /**
      * ListarEquations: Listar los equations.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarEquations($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarEquations(EquationListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var EquationRepository $equationRepo */
         $equationRepo = $this->getDoctrine()->getRepository(Equation::class);
-        $resultado = $equationRepo->ListarEquationsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $equationRepo->ListarEquationsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -445,5 +469,10 @@ class EquationService extends Base
         }
 
         return $acciones;
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

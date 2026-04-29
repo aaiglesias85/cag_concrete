@@ -2,6 +2,12 @@
 
 namespace App\Service\App;
 
+use App\Dto\Api\Request\Messaging\EliminarMensajeRequest;
+use App\Dto\Api\Request\Messaging\EnviarMensajeRequest;
+use App\Dto\Api\Request\Messaging\EnviarPrimerMensajeRequest;
+use App\Dto\Api\Request\Messaging\MarcarLeidosRequest;
+use App\Dto\Api\Request\Messaging\OcultarConversacionRequest;
+use App\Dto\Api\Request\Messaging\TraducirMensajeRequest;
 use App\Entity\Message;
 use App\Entity\MessageConversation;
 use App\Entity\Usuario;
@@ -667,6 +673,44 @@ class MessageService extends Base
 
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    public function EnviarMensajeDesdeRequest(EnviarMensajeRequest $payload): array
+    {
+        $sourceLang = $payload->source_lang ?? 'es';
+
+        return $this->EnviarMensaje((int) $payload->conversation_id, (string) $payload->body, $sourceLang);
+    }
+
+    public function EnviarPrimerMensajeDesdeRequest(EnviarPrimerMensajeRequest $payload): array
+    {
+        $sourceLang = $payload->source_lang ?? 'es';
+
+        return $this->EnviarPrimerMensaje((int) $payload->other_user_id, (string) $payload->body, $sourceLang);
+    }
+
+    public function MarcarComoLeidosDesdeRequest(MarcarLeidosRequest $payload): array
+    {
+        return $this->MarcarComoLeidos((int) $payload->conversation_id);
+    }
+
+    public function TraducirDesdeRequest(TraducirMensajeRequest $payload): array
+    {
+        $targetLang = $payload->target_lang ?? 'es';
+
+        return $this->TraducirOnDemand((string) $payload->text, $targetLang, $payload->message_id, $payload->conversation_id);
+    }
+
+    public function EliminarMensajeDesdeRequest(EliminarMensajeRequest $payload): array
+    {
+        return 'for_me' === $payload->scope
+            ? $this->EliminarMensajeParaMi((int) $payload->message_id, (int) $payload->conversation_id)
+            : $this->EliminarMensajeParaTodos((int) $payload->message_id, (int) $payload->conversation_id);
+    }
+
+    public function OcultarConversacionDesdeRequest(OcultarConversacionRequest $payload): array
+    {
+        return $this->OcultarConversacion((int) $payload->conversation_id);
     }
 
     private function formatearUsuarioCorto(Usuario $u): array

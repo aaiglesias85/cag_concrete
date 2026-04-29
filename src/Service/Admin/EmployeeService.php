@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Employee\EmployeeActualizarRequest;
+use App\Dto\Admin\Employee\EmployeeIdRequest;
+use App\Dto\Admin\Employee\EmployeeIdsRequest;
+use App\Dto\Admin\Employee\EmployeeListarRequest;
+use App\Dto\Admin\Employee\EmployeeSalvarRequest;
 use App\Entity\DataTrackingLabor;
 use App\Entity\Employee;
 use App\Entity\EmployeeRole;
@@ -41,8 +46,9 @@ class EmployeeService extends Base
      *
      * @return array
      */
-    public function ListarProjects($employee_id)
+    public function ListarProjects(EmployeeIdRequest $dto)
     {
+        $employee_id = null !== $dto->employee_id ? (string) $dto->employee_id : null;
         $projects = [];
 
         /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
@@ -80,15 +86,14 @@ class EmployeeService extends Base
     /**
      * CargarDatosEmployee: Carga los datos de un employee.
      *
-     * @param int $employee_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosEmployee($employee_id)
+    public function CargarDatosEmployee(EmployeeIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $employee_id = $dto->employee_id;
         $entity = $this->getDoctrine()->getRepository(Employee::class)
            ->find($employee_id);
         /** @var Employee $entity */
@@ -108,13 +113,12 @@ class EmployeeService extends Base
     /**
      * EliminarEmployee: Elimina un employee en la BD.
      *
-     * @param int $employee_id Id
-     *
      * @author Marcel
      */
-    public function EliminarEmployee($employee_id)
+    public function EliminarEmployee(EmployeeIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $employee_id = $dto->employee_id;
 
         $entity = $this->getDoctrine()->getRepository(Employee::class)
            ->find($employee_id);
@@ -146,18 +150,17 @@ class EmployeeService extends Base
     /**
      * EliminarEmployees: Elimina los employees seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarEmployees($ids)
+    public function EliminarEmployees(EmployeeIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $employee_id) {
                 if ('' != $employee_id) {
                     ++$cant_total;
@@ -221,27 +224,26 @@ class EmployeeService extends Base
     /**
      * ActualizarEmployee: Actuializa los datos del rol en la BD.
      *
-     * @param int $employee_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarEmployee(
-        $employee_id,
-        $name,
-        $hourly_rate,
-        $role_id,
-        $color,
-    ) {
+    public function ActualizarEmployee(EmployeeActualizarRequest $d)
+    {
         $em = $this->getDoctrine()->getManager();
+
+        $employee_id = $d->employee_id;
+        $name = (string) $d->name;
+        $hourly_rate = $d->hourly_rate;
+        $role_id = $d->role_id;
+        $color = $d->color;
 
         $entity = $this->getDoctrine()->getRepository(Employee::class)
            ->find($employee_id);
         /** @var Employee $entity */
         if (null != $entity) {
             $entity->setName($name);
-            $entity->setHourlyRate($hourly_rate);
+            $entity->setHourlyRate(null !== $hourly_rate && '' !== $hourly_rate ? (float) $hourly_rate : null);
 
-            if ('' != $role_id) {
+            if (null !== $role_id && '' !== $role_id) {
                 $role = $this->getDoctrine()->getRepository(EmployeeRole::class)
                    ->find($role_id);
                 $entity->setRole($role);
@@ -264,6 +266,11 @@ class EmployeeService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
@@ -271,13 +278,14 @@ class EmployeeService extends Base
      *
      * @author Marcel
      */
-    public function SalvarEmployee(
-        $name,
-        $hourly_rate,
-        $role_id,
-        $color,
-    ) {
+    public function SalvarEmployee(EmployeeSalvarRequest $d)
+    {
         $em = $this->getDoctrine()->getManager();
+
+        $name = (string) $d->name;
+        $hourly_rate = $d->hourly_rate;
+        $role_id = $d->role_id;
+        $color = $d->color;
 
         $existe = $this->getDoctrine()->getRepository(Employee::class)->findOneBy(['name' => $name]);
 
@@ -292,9 +300,9 @@ class EmployeeService extends Base
 
         $entity->setName($name);
         $entity->setStatus(true);
-        $entity->setHourlyRate($hourly_rate);
+        $entity->setHourlyRate(null !== $hourly_rate && '' !== $hourly_rate ? (float) $hourly_rate : null);
 
-        if ('' != $role_id) {
+        if (null !== $role_id && '' !== $role_id) {
             $role = $this->getDoctrine()->getRepository(EmployeeRole::class)
                ->find($role_id);
             $entity->setRole($role);
@@ -321,17 +329,21 @@ class EmployeeService extends Base
     /**
      * ListarEmployees: Listar los employees.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarEmployees($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarEmployees(EmployeeListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var EmployeeRepository $employeeRepo */
         $employeeRepo = $this->getDoctrine()->getRepository(Employee::class);
-        $resultado = $employeeRepo->ListarEmployeesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $employeeRepo->ListarEmployeesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 

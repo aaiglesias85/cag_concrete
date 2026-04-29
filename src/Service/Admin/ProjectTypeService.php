@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ProjectType\ProjectTypeActualizarRequest;
+use App\Dto\Admin\ProjectType\ProjectTypeIdRequest;
+use App\Dto\Admin\ProjectType\ProjectTypeIdsRequest;
+use App\Dto\Admin\ProjectType\ProjectTypeListarRequest;
+use App\Dto\Admin\ProjectType\ProjectTypeSalvarRequest;
 use App\Entity\EstimateProjectType;
 use App\Entity\ProjectType;
 use App\Repository\EstimateProjectTypeRepository;
@@ -13,15 +18,14 @@ class ProjectTypeService extends Base
     /**
      * CargarDatosType: Carga los datos de un type.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosType($type_id)
+    public function CargarDatosType(ProjectTypeIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $type_id = $dto->type_id;
         $entity = $this->getDoctrine()->getRepository(ProjectType::class)
            ->find($type_id);
         /** @var ProjectType $entity */
@@ -39,13 +43,12 @@ class ProjectTypeService extends Base
     /**
      * EliminarType: Elimina un type en la BD.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function EliminarType($type_id)
+    public function EliminarType(ProjectTypeIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $type_id = $dto->type_id;
 
         $entity = $this->getDoctrine()->getRepository(ProjectType::class)
            ->find($type_id);
@@ -77,18 +80,17 @@ class ProjectTypeService extends Base
     /**
      * EliminarTypes: Elimina los types seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarTypes($ids)
+    public function EliminarTypes(ProjectTypeIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $type_id) {
                 if ('' != $type_id) {
                     ++$cant_total;
@@ -149,13 +151,15 @@ class ProjectTypeService extends Base
     /**
      * ActualizarType: Actuializa los datos del type en la BD.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarType($type_id, $description, $status)
+    public function ActualizarType(ProjectTypeActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $type_id = (int) $d->type_id;
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         $entity = $this->getDoctrine()->getRepository(ProjectType::class)
            ->find($type_id);
@@ -187,18 +191,24 @@ class ProjectTypeService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarType: Guarda los datos de type en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarType($description, $status)
+    public function SalvarType(ProjectTypeSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         // Verificar name
         $type = $this->getDoctrine()->getRepository(ProjectType::class)
@@ -234,17 +244,21 @@ class ProjectTypeService extends Base
     /**
      * ListarTypes: Listar los types.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarTypes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarTypes(ProjectTypeListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var ProjectTypeRepository $projectTypeRepo */
         $projectTypeRepo = $this->getDoctrine()->getRepository(ProjectType::class);
-        $resultado = $projectTypeRepo->ListarTypesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $projectTypeRepo->ListarTypesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -262,5 +276,10 @@ class ProjectTypeService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

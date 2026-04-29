@@ -52,13 +52,7 @@ class MaterialController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->materialService->ListarMaterials(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->materialService->ListarMaterials($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -82,12 +76,8 @@ class MaterialController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(MaterialSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $price = (string) $d->price;
-        $unit_id = (string) $d->unit_id;
-
         try {
-            $resultado = $this->materialService->SalvarMaterial($unit_id, $name, $price);
+            $resultado = $this->materialService->SalvarMaterial($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -113,13 +103,8 @@ class MaterialController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(MaterialActualizarRequest $d): JsonResponse
     {
-        $material_id = (string) $d->material_id;
-        $name = (string) $d->name;
-        $price = (string) $d->price;
-        $unit_id = (string) $d->unit_id;
-
         try {
-            $resultado = $this->materialService->ActualizarMaterial($material_id, $unit_id, $name, $price);
+            $resultado = $this->materialService->ActualizarMaterial($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -145,10 +130,8 @@ class MaterialController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(MaterialIdRequest $dto): JsonResponse
     {
-        $material_id = $dto->material_id;
-
         try {
-            $resultado = $this->materialService->EliminarMaterial($material_id);
+            $resultado = $this->materialService->EliminarMaterial($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -173,10 +156,8 @@ class MaterialController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarMaterials(MaterialIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->materialService->EliminarMaterials($ids);
+            $resultado = $this->materialService->EliminarMaterials($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -201,10 +182,8 @@ class MaterialController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::MATERIAL, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(MaterialIdRequest $dto): JsonResponse
     {
-        $material_id = $dto->material_id;
-
         try {
-            $resultado = $this->materialService->CargarDatosMaterial($material_id);
+            $resultado = $this->materialService->CargarDatosMaterial($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['material'] = $resultado['material'];

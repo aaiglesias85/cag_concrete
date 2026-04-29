@@ -2,6 +2,14 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Company\CompanyActualizarRequest;
+use App\Dto\Admin\Company\CompanyContactActualizarRequest;
+use App\Dto\Admin\Company\CompanyContactIdRequest;
+use App\Dto\Admin\Company\CompanyContactSalvarRequest;
+use App\Dto\Admin\Company\CompanyIdRequest;
+use App\Dto\Admin\Company\CompanyIdsRequest;
+use App\Dto\Admin\Company\CompanyListarRequest;
+use App\Dto\Admin\Company\CompanySalvarRequest;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\Estimate;
@@ -18,12 +26,16 @@ class CompanyService extends Base
     /**
      * SalvarContact: Guarda los datos de un contact en la BD.
      *
-     * @param string $name Nombre
-     *
      * @author Marcel
      */
-    public function SalvarContact($company_id, $name, $phone, $email, $role, $notes)
+    public function SalvarContact(CompanyContactSalvarRequest $d)
     {
+        $company_id = $d->company_id;
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $email = (string) ($d->email ?? '');
+        $role = (string) ($d->role ?? '');
+        $notes = (string) ($d->notes ?? '');
         $em = $this->getDoctrine()->getManager();
 
         // Verificar name
@@ -72,8 +84,15 @@ class CompanyService extends Base
     /**
      * ActualizarContact: actualiza un contacto existente de la empresa.
      */
-    public function ActualizarContact($contact_id, $company_id, $name, $phone, $email, $role, $notes)
+    public function ActualizarContact(CompanyContactActualizarRequest $d)
     {
+        $contact_id = $d->contact_id;
+        $company_id = $d->company_id;
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $email = (string) ($d->email ?? '');
+        $role = (string) ($d->role ?? '');
+        $notes = (string) ($d->notes ?? '');
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(CompanyContact::class)
@@ -124,12 +143,11 @@ class CompanyService extends Base
     /**
      * EliminarContact: Elimina un contact en la BD.
      *
-     * @param int $contact_id Id
-     *
      * @author Marcel
      */
-    public function EliminarContact($contact_id)
+    public function EliminarContact(CompanyContactIdRequest $dto)
     {
+        $contact_id = $dto->contact_id;
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(CompanyContact::class)
@@ -167,12 +185,11 @@ class CompanyService extends Base
     /**
      * CargarDatosCompany: Carga los datos de un company.
      *
-     * @param int $company_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosCompany($company_id)
+    public function CargarDatosCompany(CompanyIdRequest $dto)
     {
+        $company_id = $dto->company_id;
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -198,6 +215,9 @@ class CompanyService extends Base
 
             $resultado['success'] = true;
             $resultado['company'] = $arreglo_resultado;
+        } else {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The requested record does not exist';
         }
 
         return $resultado;
@@ -244,12 +264,11 @@ class CompanyService extends Base
     /**
      * EliminarCompany: Elimina un rol en la BD.
      *
-     * @param int $company_id Id
-     *
      * @author Marcel
      */
-    public function EliminarCompany($company_id)
+    public function EliminarCompany(CompanyIdRequest $dto)
     {
+        $company_id = $dto->company_id;
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Company::class)
@@ -300,17 +319,16 @@ class CompanyService extends Base
     /**
      * EliminarCompanies: Elimina los companies seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarCompanies($ids)
+    public function EliminarCompanies(CompanyIdsRequest $dto)
     {
+        $ids = $dto->ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
         $cant_total = 0;
-        if ('' != $ids) {
+        if (!empty($ids)) {
             $ids = explode(',', (string) $ids);
             foreach ($ids as $company_id) {
                 if ('' != $company_id) {
@@ -394,12 +412,19 @@ class CompanyService extends Base
     /**
      * ActualizarCompany: Actuializa los datos del rol en la BD.
      *
-     * @param int $company_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarCompany($company_id, $name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts)
+    public function ActualizarCompany(CompanyActualizarRequest $d)
     {
+        $company_id = $d->company_id;
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $email = (string) ($d->email ?? '');
+        $website = (string) ($d->website ?? '');
+        $contacts = $this->decodeContactsJson($d->contacts);
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Company::class)
@@ -442,6 +467,8 @@ class CompanyService extends Base
 
             return $resultado;
         }
+
+        return ['success' => false, 'error' => 'The requested record does not exist'];
     }
 
     /**
@@ -449,8 +476,16 @@ class CompanyService extends Base
      *
      * @author Marcel
      */
-    public function SalvarCompany($name, $phone, $address, $contactName, $contactEmail, $email, $website, $contacts)
+    public function SalvarCompany(CompanySalvarRequest $d)
     {
+        $name = (string) $d->name;
+        $phone = (string) ($d->phone ?? '');
+        $address = (string) ($d->address ?? '');
+        $contactName = (string) ($d->contactName ?? '');
+        $contactEmail = (string) ($d->contactEmail ?? '');
+        $email = (string) ($d->email ?? '');
+        $website = (string) ($d->website ?? '');
+        $contacts = $this->decodeContactsJson($d->contacts);
         $em = $this->getDoctrine()->getManager();
 
         // Verificar email
@@ -505,6 +540,10 @@ class CompanyService extends Base
     {
         $em = $this->getDoctrine()->getManager();
 
+        if (!\is_iterable($contacts)) {
+            return;
+        }
+
         // Senderos
         foreach ($contacts as $value) {
             $contact_entity = null;
@@ -537,17 +576,14 @@ class CompanyService extends Base
     /**
      * ListarCompanies: Listar los companies.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarCompanies($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarCompanies(CompanyListarRequest $listar)
     {
+        $dt = $listar->dt;
         /** @var CompanyRepository $companyRepo */
         $companyRepo = $this->getDoctrine()->getRepository(Company::class);
-        $resultado = $companyRepo->ListarCompaniesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $companyRepo->ListarCompaniesConTotal($dt['start'], $dt['length'], $dt['search'], $dt['orderField'], $dt['orderDir']);
 
         $data = [];
 
@@ -568,5 +604,31 @@ class CompanyService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    /**
+     * Contactos de la empresa para la acción admin `listarContacts` (DTO).
+     *
+     * @return array<mixed>
+     */
+    public function ListarContactsDeCompanyAdmin(CompanyIdRequest $dto): array
+    {
+        return parent::ListarContactsDeCompany($dto->company_id);
+    }
+
+    /**
+     * @return list<\stdClass>
+     */
+    private function decodeContactsJson(?string $contactsJson): array
+    {
+        if (null === $contactsJson || '' === trim($contactsJson)) {
+            return [];
+        }
+        $decoded = json_decode($contactsJson);
+        if (!\is_array($decoded)) {
+            return [];
+        }
+
+        return $decoded;
     }
 }

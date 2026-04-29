@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ConcreteClass\ConcreteClassActualizarRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassIdRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassIdsRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassListarRequest;
+use App\Dto\Admin\ConcreteClass\ConcreteClassSalvarRequest;
 use App\Entity\ConcreteClass;
 use App\Entity\Project;
 use App\Repository\ConcreteClassRepository;
@@ -13,15 +18,14 @@ class ConcreteClassService extends Base
     /**
      * CargarDatos: Carga los datos de un concrete class.
      *
-     * @param int $concrete_class_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatos($concrete_class_id)
+    public function CargarDatos(ConcreteClassIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $concrete_class_id = $dto->concrete_class_id;
         $entity = $this->getDoctrine()->getRepository(ConcreteClass::class)
            ->find($concrete_class_id);
         /** @var ConcreteClass $entity */
@@ -46,13 +50,12 @@ class ConcreteClassService extends Base
     /**
      * EliminarClass: Elimina un concrete class en la BD.
      *
-     * @param int $concrete_class_id Id
-     *
      * @author Marcel
      */
-    public function EliminarClass($concrete_class_id)
+    public function EliminarClass(ConcreteClassIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $concrete_class_id = $dto->concrete_class_id;
 
         $entity = $this->getDoctrine()->getRepository(ConcreteClass::class)
            ->find($concrete_class_id);
@@ -92,18 +95,17 @@ class ConcreteClassService extends Base
     /**
      * EliminarVarios: Elimina los concrete classes seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarVarios($ids)
+    public function EliminarVarios(ConcreteClassIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $concrete_class_id) {
                 if ('' != $concrete_class_id) {
                     ++$cant_total;
@@ -149,13 +151,15 @@ class ConcreteClassService extends Base
     /**
      * Actualizar: Actualiza los datos del concrete class en la BD.
      *
-     * @param int $concrete_class_id Id
-     *
      * @author Marcel
      */
-    public function Actualizar($concrete_class_id, $name, $status)
+    public function Actualizar(ConcreteClassActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $concrete_class_id = $d->concrete_class_id;
+        $name = (string) $d->name;
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(ConcreteClass::class)
            ->find($concrete_class_id);
@@ -172,7 +176,7 @@ class ConcreteClassService extends Base
             }
 
             $entity->setName($name);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $em->flush();
 
@@ -196,13 +200,14 @@ class ConcreteClassService extends Base
     /**
      * Salvar: Guarda los datos de concrete class en la BD.
      *
-     * @param string $name Nombre
-     *
      * @author Marcel
      */
-    public function Salvar($name, $status)
+    public function Salvar(ConcreteClassSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $name = (string) $d->name;
+        $status = (string) $d->status;
 
         // Verificar name
         $class = $this->getDoctrine()->getRepository(ConcreteClass::class)
@@ -217,7 +222,7 @@ class ConcreteClassService extends Base
         $entity = new ConcreteClass();
 
         $entity->setName($name);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         $em->persist($entity);
 
@@ -238,17 +243,21 @@ class ConcreteClassService extends Base
     /**
      * Listar: Listar los concrete classes.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function Listar($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function Listar(ConcreteClassListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var ConcreteClassRepository $concreteClassRepo */
         $concreteClassRepo = $this->getDoctrine()->getRepository(ConcreteClass::class);
-        $resultado = $concreteClassRepo->ListarConcreteClassesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $concreteClassRepo->ListarConcreteClassesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -304,5 +313,10 @@ class ConcreteClassService extends Base
         }
 
         return $projects;
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

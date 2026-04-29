@@ -51,16 +51,7 @@ class TaskController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->taskService->ListarTasks(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $listar->fecha_inicial,
-                $listar->fecha_fin,
-                $listar->statusFiltro,
-                $listar->usuarioFiltro);
+            $result = $this->taskService->ListarTasks($listar);
 
             return $this->json([
                 'draw' => $dt['draw'],
@@ -79,13 +70,8 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(TaskSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-        $due_day = (string) ($d->due_day ?? '');
-        $usuario_id = (string) ($d->usuario_id ?? '');
-
         try {
-            $resultado = $this->taskService->SalvarTask($description, $status, $due_day, $usuario_id);
+            $resultado = $this->taskService->SalvarTask($d);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -107,14 +93,8 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(TaskActualizarRequest $d): JsonResponse
     {
-        $task_id = (string) $d->task_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-        $due_day = (string) ($d->due_day ?? '');
-        $usuario_id = (string) ($d->usuario_id ?? '');
-
         try {
-            $resultado = $this->taskService->ActualizarTask($task_id, $description, $status, $due_day, $usuario_id);
+            $resultado = $this->taskService->ActualizarTask($d);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -136,9 +116,8 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(TaskIdRequest $dto): JsonResponse
     {
-        $task_id = $dto->task_id;
         try {
-            $resultado = $this->taskService->EliminarTask($task_id);
+            $resultado = $this->taskService->EliminarTask($dto);
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => 'The operation was successful']);
             }
@@ -152,9 +131,8 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarTasks(TaskIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
         try {
-            $resultado = $this->taskService->EliminarTasks($ids);
+            $resultado = $this->taskService->EliminarTasks($idsDto);
             if ($resultado['success']) {
                 return $this->json([
                     'success' => true,
@@ -171,9 +149,8 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(TaskIdRequest $dto): JsonResponse
     {
-        $task_id = $dto->task_id;
         try {
-            $resultado = $this->taskService->CargarDatosTask($task_id);
+            $resultado = $this->taskService->CargarDatosTask($dto);
             if (isset($resultado['success']) && $resultado['success']) {
                 return $this->json([
                     'success' => true,
@@ -222,13 +199,11 @@ class TaskController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Edit, jsonOnDenied: true)]
     public function cambiarEstado(TaskCambiarEstadoRequest $d): JsonResponse
     {
-        $task_id = $d->task_id;
-        $status = (string) $d->status;
         try {
             $usuario = $this->DevolverUsuario();
             $pT = $this->defaultService->BuscarPermiso($usuario->getUsuarioId(), FunctionId::TASKS);
             $perm = $pT[0] ?? ['ver' => false, 'agregar' => false, 'editar' => false, 'eliminar' => false, 'funcion_id' => FunctionId::TASKS, 'permiso_id' => 0];
-            $resultado = $this->taskService->CambiarEstadoTask($task_id, $status, $usuario, $perm);
+            $resultado = $this->taskService->CambiarEstadoTask($d, $usuario, $perm);
             if ($resultado['success']) {
                 return $this->json([
                     'success' => true,

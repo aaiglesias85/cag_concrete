@@ -46,15 +46,7 @@ class HolidayController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->holidayService->ListarHolidays(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $listar->fecha_inicial,
-                $listar->fecha_fin,
-            );
+            $result = $this->holidayService->ListarHolidays($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -84,15 +76,8 @@ class HolidayController extends AbstractAdminController
             return $auth;
         }
 
-        $day = (string) $d->day;
-        $description = (string) $d->description;
-
         try {
-            if ('' === $holiday_id) {
-                $resultado = $this->holidayService->SalvarHoliday($day, $description);
-            } else {
-                $resultado = $this->holidayService->ActualizarHoliday($holiday_id, $day, $description);
-            }
+            $resultado = $this->holidayService->GuardarHoliday($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -118,10 +103,8 @@ class HolidayController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(HolidayIdRequest $dto): JsonResponse
     {
-        $holiday_id = $dto->holiday_id;
-
         try {
-            $resultado = $this->holidayService->EliminarHoliday($holiday_id);
+            $resultado = $this->holidayService->EliminarHoliday($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -146,10 +129,8 @@ class HolidayController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarHolidays(HolidayIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->holidayService->EliminarHolidays($ids);
+            $resultado = $this->holidayService->EliminarHolidays($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -174,10 +155,8 @@ class HolidayController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::HOLIDAY, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(HolidayIdRequest $dto): JsonResponse
     {
-        $holiday_id = $dto->holiday_id;
-
         try {
-            $resultado = $this->holidayService->CargarDatosHoliday($holiday_id);
+            $resultado = $this->holidayService->CargarDatosHoliday($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['holiday'] = $resultado['holiday'];

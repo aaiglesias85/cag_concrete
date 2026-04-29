@@ -47,21 +47,8 @@ class LogController extends AbstractAdminController
 
             $dt = $listar->dt;
 
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-
-            $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
-
             // total + data en una sola llamada a tu servicio
-            $result = $this->logService->ListarLogs(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $fecha_inicial,
-                $fecha_fin,
-                $usuario_id);
+            $result = $this->logService->ListarLogs($listar, $usuario);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -85,9 +72,7 @@ class LogController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::LOG, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(LogIdRequest $dto): JsonResponse
     {
-        $log_id = $dto->log_id;
-
-        $resultado = $this->logService->EliminarLog($log_id);
+        $resultado = $this->logService->EliminarLog($dto);
         if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = 'The operation was successful';
@@ -106,9 +91,7 @@ class LogController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::LOG, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarLogs(LogIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
-        $resultado = $this->logService->EliminarLogs($ids);
+        $resultado = $this->logService->EliminarLogs($idsDto);
         if ($resultado['success']) {
             $resultadoJson['success'] = $resultado['success'];
             $resultadoJson['message'] = 'The operation was successful';

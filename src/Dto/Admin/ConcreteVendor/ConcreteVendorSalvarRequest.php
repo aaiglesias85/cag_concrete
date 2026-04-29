@@ -19,7 +19,7 @@ final class ConcreteVendorSalvarRequest implements AdminHttpRequestDtoInterface
 
     public ?string $contactEmail = null;
 
-    /** JSON string; se decodifica en el controlador. */
+    /** JSON array string; se decodifica en ConcreteVendorService. */
     public ?string $contacts = null;
 
     public static function fromHttpRequest(Request $request): static

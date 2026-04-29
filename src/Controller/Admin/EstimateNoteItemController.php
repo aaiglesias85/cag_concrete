@@ -44,13 +44,7 @@ class EstimateNoteItemController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->estimateNoteItemService->ListarItems(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->estimateNoteItemService->ListarItems($listar);
 
             return $this->json([
                 'draw' => $dt['draw'],
@@ -66,11 +60,8 @@ class EstimateNoteItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EstimateNoteItemSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $type = $d->type ?? 'item';
-
         try {
-            $resultado = $this->estimateNoteItemService->Salvar($description, $type);
+            $resultado = $this->estimateNoteItemService->Salvar($d);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -89,12 +80,8 @@ class EstimateNoteItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(EstimateNoteItemActualizarRequest $d): JsonResponse
     {
-        $id = $d->id;
-        $description = (string) $d->description;
-        $type = $d->type ?? 'item';
-
         try {
-            $resultado = $this->estimateNoteItemService->Actualizar($id, $description, $type);
+            $resultado = $this->estimateNoteItemService->Actualizar($d);
 
             if ($resultado['success']) {
                 return $this->json([
@@ -113,9 +100,8 @@ class EstimateNoteItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EstimateNoteItemIdRequest $dto): JsonResponse
     {
-        $id = $dto->id;
         try {
-            $resultado = $this->estimateNoteItemService->Eliminar($id);
+            $resultado = $this->estimateNoteItemService->Eliminar($dto);
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => 'The operation was successful']);
             }
@@ -129,9 +115,8 @@ class EstimateNoteItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarVarios(EstimateNoteItemIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
         try {
-            $resultado = $this->estimateNoteItemService->EliminarVarios($ids);
+            $resultado = $this->estimateNoteItemService->EliminarVarios($dto);
             if ($resultado['success']) {
                 return $this->json(['success' => true, 'message' => $resultado['message']]);
             }
@@ -145,9 +130,8 @@ class EstimateNoteItemController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::ESTIMATE_NOTE_ITEM, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EstimateNoteItemIdRequest $dto): JsonResponse
     {
-        $id = $dto->id;
         try {
-            $resultado = $this->estimateNoteItemService->CargarDatos($id);
+            $resultado = $this->estimateNoteItemService->CargarDatos($dto);
             if (!empty($resultado['success'])) {
                 return $this->json(['success' => true, 'item' => $resultado['item']]);
             }

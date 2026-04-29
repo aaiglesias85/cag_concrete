@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemActualizarRequest;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemIdRequest;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemIdsRequest;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemListarRequest;
+use App\Dto\Admin\EstimateNoteItem\EstimateNoteItemSalvarRequest;
 use App\Entity\EstimateNoteItem;
 use App\Repository\EstimateNoteItemRepository;
 use App\Service\Base\Base;
@@ -11,10 +16,11 @@ class EstimateNoteItemService extends Base
     /**
      * CargarDatos: Carga los datos de un estimate note item.
      */
-    public function CargarDatos($id): array
+    public function CargarDatos(EstimateNoteItemIdRequest $dto): array
     {
         $resultado = [];
 
+        $id = $dto->id;
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
         if (null !== $entity) {
             $resultado['success'] = true;
@@ -30,9 +36,10 @@ class EstimateNoteItemService extends Base
     /**
      * Eliminar: Elimina un estimate note item en la BD.
      */
-    public function Eliminar($id): array
+    public function Eliminar(EstimateNoteItemIdRequest $dto): array
     {
         $em = $this->getDoctrine()->getManager();
+        $id = $dto->id;
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
 
         if (null !== $entity) {
@@ -51,14 +58,15 @@ class EstimateNoteItemService extends Base
     /**
      * EliminarVarios: Elimina los estimate note items seleccionados.
      */
-    public function EliminarVarios($ids): array
+    public function EliminarVarios(EstimateNoteItemIdsRequest $dto): array
     {
         $em = $this->getDoctrine()->getManager();
         $cant_eliminada = 0;
         $cant_total = 0;
 
+        $ids = (string) ($dto->ids ?? '');
         if ('' !== $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $id) {
                 $id = trim($id);
                 if ('' === $id) {
@@ -90,9 +98,11 @@ class EstimateNoteItemService extends Base
     /**
      * Actualizar: Actualiza los datos del estimate note item en la BD.
      */
-    public function Actualizar($id, $description, $type = 'item'): array
+    public function Actualizar(EstimateNoteItemActualizarRequest $d): array
     {
-        $type = $this->normalizeType($type);
+        $id = $d->id;
+        $description = (string) $d->description;
+        $type = $this->normalizeType($d->type ?? 'item');
         $em = $this->getDoctrine()->getManager();
         $entity = $this->getDoctrine()->getRepository(EstimateNoteItem::class)->find($id);
 
@@ -111,12 +121,12 @@ class EstimateNoteItemService extends Base
 
     /**
      * Salvar: Guarda un nuevo estimate note item en la BD.
-     *
-     * @param string $type 'item' o 'template'; si se omite o está vacío se usa 'item' (ej. creación desde modal de ítem)
+     * El tipo (`item`/`template`) se normaliza desde `$d->type`; si se omite o está vacío se usa `item`.
      */
-    public function Salvar($description, $type = 'item'): array
+    public function Salvar(EstimateNoteItemSalvarRequest $d): array
     {
-        $type = $this->normalizeType($type);
+        $description = (string) $d->description;
+        $type = $this->normalizeType($d->type ?? 'item');
         $em = $this->getDoctrine()->getManager();
 
         $entity = new EstimateNoteItem();
@@ -140,11 +150,19 @@ class EstimateNoteItemService extends Base
     /**
      * ListarItems: Lista los estimate note items con paginación.
      */
-    public function ListarItems($start, $limit, $sSearch, $orderField, $orderDir): array
+    public function ListarItems(EstimateNoteItemListarRequest $listar): array
     {
+        $dt = $listar->dt;
+
         /** @var EstimateNoteItemRepository $repo */
         $repo = $this->getDoctrine()->getRepository(EstimateNoteItem::class);
-        $resultado = $repo->ListarConTotal($start, $limit, $sSearch, $orderField, $orderDir);
+        $resultado = $repo->ListarConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
         foreach ($resultado['data'] as $value) {

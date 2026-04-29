@@ -44,13 +44,7 @@ class EmployeeRoleController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->employeeRoleService->Listar(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->employeeRoleService->Listar($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class EmployeeRoleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_ROLE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EmployeeRoleSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->employeeRoleService->Salvar($description, $status);
+            $resultado = $this->employeeRoleService->Salvar($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -99,12 +90,8 @@ class EmployeeRoleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_ROLE, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(EmployeeRoleActualizarRequest $d): JsonResponse
     {
-        $role_id = (string) $d->role_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->employeeRoleService->Actualizar($role_id, $description, $status);
+            $resultado = $this->employeeRoleService->Actualizar($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -128,10 +115,8 @@ class EmployeeRoleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_ROLE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EmployeeRoleIdRequest $dto): JsonResponse
     {
-        $role_id = $dto->role_id;
-
         try {
-            $resultado = $this->employeeRoleService->EliminarRole($role_id);
+            $resultado = $this->employeeRoleService->EliminarRole($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -153,10 +138,8 @@ class EmployeeRoleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_ROLE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarVarios(EmployeeRoleIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->employeeRoleService->EliminarVarios($ids);
+            $resultado = $this->employeeRoleService->EliminarVarios($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -178,10 +161,8 @@ class EmployeeRoleController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE_ROLE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EmployeeRoleIdRequest $dto): JsonResponse
     {
-        $role_id = $dto->role_id;
-
         try {
-            $resultado = $this->employeeRoleService->CargarDatos($role_id);
+            $resultado = $this->employeeRoleService->CargarDatos($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['role'] = $resultado['role'];

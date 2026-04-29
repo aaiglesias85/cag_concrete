@@ -3,6 +3,11 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Item\ItemActualizarRequest;
+use App\Dto\Admin\Item\ItemIdRequest;
+use App\Dto\Admin\Item\ItemIdsRequest;
+use App\Dto\Admin\Item\ItemListarRequest;
+use App\Dto\Admin\Item\ItemSalvarRequest;
 use App\Entity\DataTrackingItem;
 use App\Entity\DataTrackingSubcontract;
 use App\Entity\Equation;
@@ -27,15 +32,14 @@ class ItemService extends Base
     /**
      * CargarDatosItem: Carga los datos de un item.
      *
-     * @param int $item_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosItem($item_id)
+    public function CargarDatosItem(ItemIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $item_id = $dto->item_id;
         $entity = $this->getDoctrine()->getRepository(Item::class)
            ->find($item_id);
         /** @var Item $entity */
@@ -96,13 +100,12 @@ class ItemService extends Base
     /**
      * EliminarItem: Elimina un rol en la BD.
      *
-     * @param int $item_id Id
-     *
      * @author Marcel
      */
-    public function EliminarItem($item_id)
+    public function EliminarItem(ItemIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $item_id = $dto->item_id;
 
         $entity = $this->getDoctrine()->getRepository(Item::class)
            ->find($item_id);
@@ -202,18 +205,17 @@ class ItemService extends Base
     /**
      * EliminarItems: Elimina los items seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarItems($ids)
+    public function EliminarItems(ItemIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $item_id) {
                 if ('' != $item_id) {
                     ++$cant_total;
@@ -256,13 +258,20 @@ class ItemService extends Base
     /**
      * ActualizarItem: Actuializa los datos del rol en la BD.
      *
-     * @param int $item_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarItem($item_id, $unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id)
+    public function ActualizarItem(ItemActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $item_id = $d->item_id;
+        $unit_id = $d->unit_id;
+        $name = (string) $d->name;
+        $description = (string) ($d->description ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
+        $bond = $this->parseBondFlag($d->bond);
+        $yield_calculation = $this->stringFromMixed($d->yield_calculation);
+        $equation_id = (string) ($d->equation_id ?? '');
 
         $entity = $this->getDoctrine()->getRepository(Item::class)
            ->find($item_id);
@@ -323,6 +332,11 @@ class ItemService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
@@ -344,14 +358,19 @@ class ItemService extends Base
     /**
      * SalvarItem: Guarda los datos de item en la BD.
      *
-     * @param string $name        Nombre
-     * @param string $description Descripción
-     *
      * @author Marcel
      */
-    public function SalvarItem($unit_id, $name, $description, $status, $bond, $yield_calculation, $equation_id)
+    public function SalvarItem(ItemSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $unit_id = $d->unit_id;
+        $name = (string) $d->name;
+        $description = (string) ($d->description ?? '');
+        $status = $this->parseBooleanStatus((string) $d->status);
+        $bond = $this->parseBondFlag($d->bond);
+        $yield_calculation = $this->stringFromMixed($d->yield_calculation);
+        $equation_id = (string) ($d->equation_id ?? '');
 
         // Verificar name
         $item = $this->getDoctrine()->getRepository(Item::class)
@@ -442,17 +461,21 @@ class ItemService extends Base
     /**
      * ListarItems: Listar los items.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarItems($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarItems(ItemListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var ItemRepository $itemRepo */
         $itemRepo = $this->getDoctrine()->getRepository(Item::class);
-        $resultado = $itemRepo->ListarItemsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $itemRepo->ListarItemsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -522,5 +545,24 @@ class ItemService extends Base
         }
 
         return $acciones;
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function parseBondFlag(mixed $bond): bool
+    {
+        return true === $bond || 1 === $bond || '1' === $bond;
+    }
+
+    private function stringFromMixed(mixed $v): string
+    {
+        if (null === $v || false === $v) {
+            return '';
+        }
+
+        return \is_scalar($v) ? (string) $v : '';
     }
 }

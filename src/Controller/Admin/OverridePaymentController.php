@@ -73,30 +73,13 @@ class OverridePaymentController extends AbstractAdminController
     public function listar(OverridePaymentListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $company_id = $listar->company_id;
-            $project_id = $listar->project_id;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-
-            $result = $this->overridePaymentService->ListarCabecerasInvoiceOverridePayment(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                null !== $company_id ? (string) $company_id : '',
-                null !== $project_id ? (string) $project_id : '',
-                null !== $fecha_inicial ? (string) $fecha_inicial : '',
-                null !== $fecha_fin ? (string) $fecha_fin : ''
-            );
+            $r = $this->overridePaymentService->ListarCabecerasInvoiceOverridePaymentParaAdmin($listar);
 
             return $this->json([
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ]);
         } catch (\Exception $e) {
             return $this->json([
@@ -115,10 +98,8 @@ class OverridePaymentController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(OverridePaymentIdRequest $dto): JsonResponse
     {
-        $id = $dto->id;
-
         try {
-            $r = $this->overridePaymentService->EliminarCabeceraInvoiceOverridePayment($id);
+            $r = $this->overridePaymentService->EliminarCabeceraInvoiceOverridePayment($dto);
             if (!empty($r['success'])) {
                 return $this->json(['success' => true]);
             }
@@ -138,10 +119,9 @@ class OverridePaymentController extends AbstractAdminController
         if ('' === trim((string) $idsDto->ids)) {
             return $this->json(['success' => false, 'error' => 'No records selected']);
         }
-        $ids = (string) $idsDto->ids;
 
         try {
-            $r = $this->overridePaymentService->EliminarCabecerasInvoiceOverridePayment($ids);
+            $r = $this->overridePaymentService->EliminarCabecerasInvoiceOverridePayment($idsDto);
             if (!empty($r['success'])) {
                 return $this->json([
                     'success' => true,
@@ -165,10 +145,8 @@ class OverridePaymentController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::OVERRIDE_PAYMENT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(OverridePaymentIdRequest $dto): JsonResponse
     {
-        $id = $dto->id;
-
         try {
-            $resultado = $this->overridePaymentService->CargarDatosInvoiceOverridePayment($id);
+            $resultado = $this->overridePaymentService->CargarDatosInvoiceOverridePayment($dto);
             if (!empty($resultado['success'])) {
                 return $this->json([
                     'success' => true,

@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\EmployeeRole\EmployeeRoleActualizarRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleIdRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleIdsRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleListarRequest;
+use App\Dto\Admin\EmployeeRole\EmployeeRoleSalvarRequest;
 use App\Entity\Employee;
 use App\Entity\EmployeeRole;
 use App\Repository\EmployeeRepository;
@@ -13,15 +18,14 @@ class EmployeeRoleService extends Base
     /**
      * CargarDatos: Carga los datos de un employee role.
      *
-     * @param int $role_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatos($role_id)
+    public function CargarDatos(EmployeeRoleIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $role_id = $dto->role_id;
         $entity = $this->getDoctrine()->getRepository(EmployeeRole::class)
            ->find($role_id);
         /** @var EmployeeRole $entity */
@@ -42,13 +46,12 @@ class EmployeeRoleService extends Base
     /**
      * EliminarRole: Elimina un employee role en la BD.
      *
-     * @param int $role_id Id
-     *
      * @author Marcel
      */
-    public function EliminarRole($role_id)
+    public function EliminarRole(EmployeeRoleIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $role_id = $dto->role_id;
 
         $entity = $this->getDoctrine()->getRepository(EmployeeRole::class)
            ->find($role_id);
@@ -91,18 +94,17 @@ class EmployeeRoleService extends Base
     /**
      * EliminarVarios: Elimina los employee rolees seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarVarios($ids)
+    public function EliminarVarios(EmployeeRoleIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $role_id) {
                 if ('' != $role_id) {
                     ++$cant_total;
@@ -164,13 +166,15 @@ class EmployeeRoleService extends Base
     /**
      * Actualizar: Actualiza los datos del employee role en la BD.
      *
-     * @param int $role_id Id
-     *
      * @author Marcel
      */
-    public function Actualizar($role_id, $description, $status)
+    public function Actualizar(EmployeeRoleActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $role_id = $d->role_id;
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(EmployeeRole::class)
            ->find($role_id);
@@ -187,7 +191,7 @@ class EmployeeRoleService extends Base
             }
 
             $entity->setDescription($description);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $em->flush();
 
@@ -211,13 +215,14 @@ class EmployeeRoleService extends Base
     /**
      * Salvar: Guarda los datos de employee role en la BD.
      *
-     * @param string $description Description
-     *
      * @author Marcel
      */
-    public function Salvar($description, $status)
+    public function Salvar(EmployeeRoleSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         // Verificar description
         $role = $this->getDoctrine()->getRepository(EmployeeRole::class)
@@ -232,7 +237,7 @@ class EmployeeRoleService extends Base
         $entity = new EmployeeRole();
 
         $entity->setDescription($description);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         $em->persist($entity);
 
@@ -253,17 +258,21 @@ class EmployeeRoleService extends Base
     /**
      * Listar: Listar los employee rolees.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function Listar($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function Listar(EmployeeRoleListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var EmployeeRoleRepository $employeeRoleRepo */
         $employeeRoleRepo = $this->getDoctrine()->getRepository(EmployeeRole::class);
-        $resultado = $employeeRoleRepo->ListarEmployeeRolesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $employeeRoleRepo->ListarEmployeeRolesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -281,5 +290,10 @@ class EmployeeRoleService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

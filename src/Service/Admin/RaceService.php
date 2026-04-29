@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Race\RaceActualizarRequest;
+use App\Dto\Admin\Race\RaceIdRequest;
+use App\Dto\Admin\Race\RaceIdsRequest;
+use App\Dto\Admin\Race\RaceListarRequest;
+use App\Dto\Admin\Race\RaceSalvarRequest;
 use App\Entity\Employee;
 use App\Entity\Race;
 use App\Repository\EmployeeRepository;
@@ -38,15 +43,14 @@ class RaceService extends Base
     /**
      * CargarDatosRace: Carga los datos de un race.
      *
-     * @param int $race_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosRace($race_id)
+    public function CargarDatosRace(RaceIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $race_id = $dto->race_id;
         $entity = $this->getDoctrine()->getRepository(Race::class)
            ->find($race_id);
         /** @var Race $entity */
@@ -65,13 +69,12 @@ class RaceService extends Base
     /**
      * EliminarRace: Elimina un race en la BD.
      *
-     * @param int $race_id Id
-     *
      * @author Marcel
      */
-    public function EliminarRace($race_id)
+    public function EliminarRace(RaceIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $race_id = $dto->race_id;
 
         $entity = $this->getDoctrine()->getRepository(Race::class)
            ->find($race_id);
@@ -111,18 +114,17 @@ class RaceService extends Base
     /**
      * EliminarRaces: Elimina los races seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarRaces($ids)
+    public function EliminarRaces(RaceIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $race_id) {
                 if ('' != $race_id) {
                     ++$cant_total;
@@ -168,13 +170,16 @@ class RaceService extends Base
     /**
      * ActualizarRace: Actuializa los datos del rol en la BD.
      *
-     * @param int $race_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarRace($race_id, $code, $description, $classification)
+    public function ActualizarRace(RaceActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $race_id = (int) $d->race_id;
+        $code = (string) $d->code;
+        $description = (string) $d->description;
+        $classification = (string) ($d->classification ?? '');
 
         $entity = $this->getDoctrine()->getRepository(Race::class)
            ->find($race_id);
@@ -207,18 +212,25 @@ class RaceService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarRace: Guarda los datos de race en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarRace($code, $description, $classification)
+    public function SalvarRace(RaceSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $code = (string) $d->code;
+        $description = (string) $d->description;
+        $classification = (string) ($d->classification ?? '');
 
         // Verificar name
         $race = $this->getDoctrine()->getRepository(Race::class)
@@ -255,17 +267,21 @@ class RaceService extends Base
     /**
      * ListarRaces: Listar los races.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarRaces($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarRaces(RaceListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var RaceRepository $raceRepo */
         $raceRepo = $this->getDoctrine()->getRepository(Race::class);
-        $resultado = $raceRepo->ListarRacesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $raceRepo->ListarRacesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 

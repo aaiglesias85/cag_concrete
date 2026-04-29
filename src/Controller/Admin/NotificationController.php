@@ -47,24 +47,8 @@ class NotificationController extends AbstractAdminController
 
             $dt = $listar->dt;
 
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-            $leida = $listar->leida;
-
-            $usuario_id = $usuario->isAdministrador() ? '' : $usuario->getUsuarioId();
-
             // total + data en una sola llamada a tu servicio
-            $result = $this->notificationService->ListarNotifications(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $fecha_inicial,
-                $fecha_fin,
-                $usuario_id,
-                $leida
-            );
+            $result = $this->notificationService->ListarNotifications($listar, $usuario);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -88,10 +72,8 @@ class NotificationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(NotificationIdRequest $dto): JsonResponse
     {
-        $notification_id = $dto->notification_id;
-
         try {
-            $resultado = $this->notificationService->EliminarNotification($notification_id);
+            $resultado = $this->notificationService->EliminarNotification($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -116,10 +98,8 @@ class NotificationController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::NOTIFICATION, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarNotifications(NotificationIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->notificationService->EliminarNotifications($ids);
+            $resultado = $this->notificationService->EliminarNotifications($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';

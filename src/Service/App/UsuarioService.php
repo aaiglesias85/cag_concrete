@@ -2,6 +2,8 @@
 
 namespace App\Service\App;
 
+use App\Dto\Api\Request\Usuario\ActualizarUsuarioDatosRequest;
+use App\Dto\Api\Request\Usuario\SalvarImagenUsuarioRequest;
 use App\Entity\Usuario;
 use App\Service\Admin\UsuarioService as AdminUsuarioService;
 use App\Service\Admin\WidgetAccessService;
@@ -67,6 +69,40 @@ class UsuarioService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * Merge de campos opcionales con el usuario autenticado (API actualizarDatos).
+     */
+    public function ActualizarMisDatosDesdeRequest(ActualizarUsuarioDatosRequest $payload): array
+    {
+        $usuario = $this->getUser();
+
+        /** @var Usuario|null $usuario */
+        if (!$usuario instanceof Usuario) {
+            return [
+                'success' => false,
+                'error' => $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages'),
+            ];
+        }
+
+        $nombre = null !== $payload->nombre ? $payload->nombre : $usuario->getNombre();
+        $apellidos = null !== $payload->apellidos ? $payload->apellidos : $usuario->getApellidos();
+        $email = null !== $payload->email ? $payload->email : $usuario->getEmail();
+        $telefono = null !== $payload->telefono ? $payload->telefono : $usuario->getTelefono();
+        $password_actual = $payload->password_actual ?? '';
+        $password = $payload->password ?? '';
+        $preferred_lang = $payload->preferred_lang;
+
+        return $this->ActualizarMisDatos(
+            $nombre,
+            $apellidos,
+            $email,
+            $telefono,
+            $password_actual,
+            $password,
+            $preferred_lang
+        );
     }
 
     /**
@@ -155,5 +191,47 @@ class UsuarioService extends Base
     public function generarCadenaAleatoria($limit = 6): string
     {
         return $this->adminUsuarioService->generarCadenaAleatoria($limit);
+    }
+
+    /**
+     * Guardar imagen de perfil desde body JSON validado (decodifica base64 y persiste archivo).
+     *
+     * @return array{success: bool, imagen?: string, error?: string}
+     */
+    public function SalvarImagenPerfilDesdeRequest(SalvarImagenUsuarioRequest $payload): array
+    {
+        if (!$this->getUser() instanceof Usuario) {
+            return [
+                'success' => false,
+                'error' => $this->translator->trans('usuario.error.usuario_no_existe', [], 'messages'),
+            ];
+        }
+
+        $imagen = $payload->imagen ?? '';
+        $binary = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen), true);
+        if (false === $binary || '' === $binary) {
+            return [
+                'success' => false,
+                'error' => $this->translator->trans('usuario.error.decodificar_imagen', [], 'messages'),
+            ];
+        }
+
+        $dir = 'uploads/usuario/';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $foto = $this->generarCadenaAleatoria().'.jpeg';
+        file_put_contents($dir.$foto, $binary);
+
+        $resultado = $this->ActualizarImagenPerfil($foto);
+        if ($resultado['success']) {
+            return ['success' => true, 'imagen' => $foto];
+        }
+
+        return [
+            'success' => false,
+            'error' => $resultado['error'] ?? $this->translator->trans('usuario.error.actualizar_imagen', [], 'messages'),
+        ];
     }
 }

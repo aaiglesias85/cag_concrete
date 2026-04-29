@@ -62,33 +62,13 @@ class PaymentController extends AbstractAdminController
     public function listar(PaymentListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $company_id = $listar->company_id;
-            $project_id = $listar->project_id;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-            $paid = $listar->paid;
-
-            // total + data en una sola llamada a tu servicio
-            $result = $this->paymentService->ListarInvoices(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $company_id,
-                $project_id,
-                $fecha_inicial,
-                $fecha_fin,
-                $paid
-            );
+            $r = $this->paymentService->ListarInvoicesParaPaymentAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -138,10 +118,8 @@ class PaymentController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PAYMENT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(PaymentInvoiceIdRequest $dto): JsonResponse
     {
-        $invoice_id = $dto->invoice_id;
-
         try {
-            $resultado = $this->paymentService->CargarDatosPayment($invoice_id);
+            $resultado = $this->paymentService->CargarDatosPayment($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['payment'] = $resultado['payment'];
@@ -167,29 +145,13 @@ class PaymentController extends AbstractAdminController
     public function listarNotes(PaymentListarNotesRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $invoice_id = $listar->invoice_id;
-            $fecha_inicial = $listar->fecha_inicial;
-            $fecha_fin = $listar->fecha_fin;
-
-            // total + data en una sola llamada a tu servicio
-            $result = '' != $invoice_id ? $this->paymentService->ListarNotes(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $invoice_id,
-                $fecha_inicial,
-                $fecha_fin
-            ) : ['data' => [], 'total' => 0];
+            $r = $this->paymentService->ListarNotesParaPaymentAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);

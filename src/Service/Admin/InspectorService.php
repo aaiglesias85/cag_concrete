@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\Inspector\InspectorActualizarRequest;
+use App\Dto\Admin\Inspector\InspectorIdRequest;
+use App\Dto\Admin\Inspector\InspectorIdsRequest;
+use App\Dto\Admin\Inspector\InspectorListarRequest;
+use App\Dto\Admin\Inspector\InspectorSalvarRequest;
 use App\Entity\DataTracking;
 use App\Entity\Inspector;
 use App\Entity\Project;
@@ -15,15 +20,14 @@ class InspectorService extends Base
     /**
      * CargarDatosInspector: Carga los datos de un inspector.
      *
-     * @param int $inspector_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosInspector($inspector_id)
+    public function CargarDatosInspector(InspectorIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $inspector_id = $dto->inspector_id;
         $entity = $this->getDoctrine()->getRepository(Inspector::class)
            ->find($inspector_id);
         /** @var Inspector $entity */
@@ -88,13 +92,12 @@ class InspectorService extends Base
     /**
      * EliminarInspector: Elimina un rol en la BD.
      *
-     * @param int $inspector_id Id
-     *
      * @author Marcel
      */
-    public function EliminarInspector($inspector_id)
+    public function EliminarInspector(InspectorIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $inspector_id = $dto->inspector_id;
 
         $entity = $this->getDoctrine()->getRepository(Inspector::class)
            ->find($inspector_id);
@@ -145,18 +148,17 @@ class InspectorService extends Base
     /**
      * EliminarInspectors: Elimina los inspectors seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarInspectors($ids)
+    public function EliminarInspectors(InspectorIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $inspector_id) {
                 if ('' != $inspector_id) {
                     ++$cant_total;
@@ -207,13 +209,17 @@ class InspectorService extends Base
     /**
      * ActualizarInspector: Actuializa los datos del rol en la BD.
      *
-     * @param int $inspector_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarInspector($inspector_id, $name, $email, $phone, $status)
+    public function ActualizarInspector(InspectorActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $inspector_id = $d->inspector_id;
+        $name = (string) $d->name;
+        $email = (string) $d->email;
+        $phone = (string) ($d->phone ?? '');
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(Inspector::class)
            ->find($inspector_id);
@@ -234,7 +240,7 @@ class InspectorService extends Base
             $entity->setName($name);
             $entity->setEmail($email);
             $entity->setPhone($phone);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $entity->setUpdatedAt(new \DateTime());
 
@@ -251,6 +257,11 @@ class InspectorService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
@@ -258,9 +269,14 @@ class InspectorService extends Base
      *
      * @author Marcel
      */
-    public function SalvarInspector($name, $email, $phone, $status)
+    public function SalvarInspector(InspectorSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $name = (string) $d->name;
+        $email = (string) $d->email;
+        $phone = (string) ($d->phone ?? '');
+        $status = (string) $d->status;
 
         // Verificar email
         if ('' != $email) {
@@ -279,7 +295,7 @@ class InspectorService extends Base
         $entity->setName($name);
         $entity->setEmail($email);
         $entity->setPhone($phone);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         $entity->setCreatedAt(new \DateTime());
 
@@ -302,17 +318,21 @@ class InspectorService extends Base
     /**
      * ListarInspectors: Listar los inspectors.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarInspectors($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarInspectors(InspectorListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var InspectorRepository $inspectorRepo */
         $inspectorRepo = $this->getDoctrine()->getRepository(Inspector::class);
-        $resultado = $inspectorRepo->ListarInspectorsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $inspectorRepo->ListarInspectorsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -332,5 +352,10 @@ class InspectorService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

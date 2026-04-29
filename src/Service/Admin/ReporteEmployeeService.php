@@ -2,6 +2,8 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ReporteEmployee\ReporteEmployeeExportFiltroRequest;
+use App\Dto\Admin\ReporteEmployee\ReporteEmployeeListarRequest;
 use App\Entity\DataTrackingLabor;
 use App\Repository\DataTrackingLaborRepository;
 use App\Service\Base\Base;
@@ -20,8 +22,13 @@ class ReporteEmployeeService extends Base
      *
      * @return bool|float|int|string|null
      */
-    public function DevolverTotal($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
+    public function DevolverTotal(ReporteEmployeeExportFiltroRequest $f)
     {
+        $search = (string) ($f->search ?? '');
+        $employee_id = $f->employee_id;
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
         /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
         $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
         $total = $dataTrackingLaborRepo->DevolverTotalReporteEmployees($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
@@ -36,8 +43,13 @@ class ReporteEmployeeService extends Base
      *
      * @author Marcel
      */
-    public function ExportarExcel($search, $employee_id, $project_id, $fecha_inicial, $fecha_fin)
+    public function ExportarExcel(ReporteEmployeeExportFiltroRequest $f)
     {
+        $search = (string) ($f->search ?? '');
+        $employee_id = $f->employee_id;
+        $project_id = $f->project_id;
+        $fecha_inicial = $f->fecha_inicial;
+        $fecha_fin = $f->fecha_fin;
         $semanas = $this->ObtenerSemanasReporteExcel($fecha_inicial, $fecha_fin);
         $employees = $this->ListarEmployeesParaReporteExcel($project_id, $fecha_inicial, $fecha_fin, $employee_id);
 
@@ -255,26 +267,24 @@ class ReporteEmployeeService extends Base
     /**
      * ListarReporteEmployees: Listar los reporte employees.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarReporteEmployees(
-        $start,
-        $limit,
-        $sSearch,
-        $iSortCol_0,
-        $sSortDir_0,
-        $employee_id,
-        $project_id,
-        $fecha_inicial,
-        $fecha_fin,
-    ) {
+    public function ListarReporteEmployees(ReporteEmployeeListarRequest $listar)
+    {
+        $dt = $listar->dt;
         /** @var DataTrackingLaborRepository $dataTrackingLaborRepo */
         $dataTrackingLaborRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
-        $resultado = $dataTrackingLaborRepo->ListarReporteEmployeesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $employee_id, $project_id, $fecha_inicial, $fecha_fin);
+        $resultado = $dataTrackingLaborRepo->ListarReporteEmployeesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $listar->employee_id,
+            $listar->project_id,
+            $listar->fechaInicial,
+            $listar->fechaFin,
+        );
 
         $data = [];
 

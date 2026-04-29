@@ -44,13 +44,7 @@ class DistrictController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->districtService->ListarDistricts(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->districtService->ListarDistricts($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -71,11 +65,8 @@ class DistrictController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DISTRICT, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(DistrictSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->districtService->SalvarDistrict($description, $status);
+            $resultado = $this->districtService->SalvarDistrict($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -99,12 +90,8 @@ class DistrictController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DISTRICT, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(DistrictActualizarRequest $d): JsonResponse
     {
-        $district_id = (string) $d->district_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->districtService->ActualizarDistrict($district_id, $description, $status);
+            $resultado = $this->districtService->ActualizarDistrict($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -128,10 +115,8 @@ class DistrictController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DISTRICT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(DistrictIdRequest $dto): JsonResponse
     {
-        $district_id = $dto->district_id;
-
         try {
-            $resultado = $this->districtService->EliminarDistrict($district_id);
+            $resultado = $this->districtService->EliminarDistrict($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -153,10 +138,8 @@ class DistrictController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DISTRICT, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarDistricts(DistrictIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->districtService->EliminarDistricts($ids);
+            $resultado = $this->districtService->EliminarDistricts($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -178,10 +161,8 @@ class DistrictController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::DISTRICT, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(DistrictIdRequest $dto): JsonResponse
     {
-        $district_id = $dto->district_id;
-
         try {
-            $resultado = $this->districtService->CargarDatosDistrict($district_id);
+            $resultado = $this->districtService->CargarDatosDistrict($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['district'] = $resultado['district'];

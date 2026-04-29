@@ -3,6 +3,10 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Project\ProjectIdRequest;
+use App\Dto\Admin\Project\ProjectIdsRequest;
+use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
+use App\Dto\Admin\Project\ProjectListarRequest;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\ConcreteClass;
@@ -613,6 +617,34 @@ class ProjectService extends Base
         }
 
         return $resultado;
+    }
+
+    /**
+     * Tab datatracking en ficha proyecto (DTO).
+     *
+     * @return array{data: list<mixed>, total: int}
+     */
+    public function ListarDataTrackingsParaProjectTab(ProjectListarDataTrackingRequest $listar): array
+    {
+        $project_id = (string) ($listar->project_id ?? '');
+        if ('' === $project_id) {
+            return ['data' => [], 'total' => 0];
+        }
+        $dt = $listar->dt;
+        $only_punch = $listar->only_punch ?? '';
+
+        return $this->ListarDataTrackings(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $project_id,
+            $listar->fechaInicial,
+            $listar->fechaFin,
+            $listar->pending,
+            (string) $only_punch
+        );
     }
 
     /**
@@ -2174,12 +2206,13 @@ class ProjectService extends Base
     /**
      * CargarDatosProject: Carga los datos de un project.
      *
-     * @param int $project_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosProject($project_id)
+    public function CargarDatosProject(ProjectIdRequest|int|string $project_id)
     {
+        if ($project_id instanceof ProjectIdRequest) {
+            $project_id = $project_id->project_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -2958,12 +2991,13 @@ class ProjectService extends Base
     /**
      * EliminarProject: Elimina un rol en la BD.
      *
-     * @param int $project_id Id
-     *
      * @author Marcel
      */
-    public function EliminarProject($project_id)
+    public function EliminarProject(ProjectIdRequest|int|string $project_id)
     {
+        if ($project_id instanceof ProjectIdRequest) {
+            $project_id = $project_id->project_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Project::class)
@@ -3123,12 +3157,11 @@ class ProjectService extends Base
     /**
      * EliminarProjects: Elimina los projects seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarProjects($ids)
+    public function EliminarProjects(ProjectIdsRequest|string $ids)
     {
+        $ids = $ids instanceof ProjectIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
@@ -4404,6 +4437,41 @@ class ProjectService extends Base
         }
 
         return $total;
+    }
+
+    /**
+     * Listado admin projects + total (DTO).
+     *
+     * @return array{data: array<int, mixed>, total: int, draw: int}
+     */
+    public function ListarYTotalProjectsAdmin(ProjectListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $company_id = $listar->company_id;
+        $status = $listar->status;
+        $fecha_inicial = $listar->fechaInicial;
+        $fecha_fin = $listar->fechaFin;
+        $missing_info = $listar->missing_info ? true : false;
+
+        $data = $this->ListarProjects(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $company_id,
+            $status,
+            $fecha_inicial,
+            $fecha_fin,
+            $missing_info
+        );
+        $total = $this->TotalProjects($dt['search'], $company_id, $status, $fecha_inicial, $fecha_fin, $missing_info);
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $data,
+            'total' => (int) $total,
+        ];
     }
 
     /**

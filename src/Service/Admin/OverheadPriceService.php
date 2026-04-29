@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\OverheadPrice\OverheadPriceActualizarRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceIdRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceIdsRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceListarRequest;
+use App\Dto\Admin\OverheadPrice\OverheadPriceSalvarRequest;
 use App\Entity\DataTracking;
 use App\Entity\OverheadPrice;
 use App\Repository\DataTrackingRepository;
@@ -13,15 +18,14 @@ class OverheadPriceService extends Base
     /**
      * CargarDatosOverhead: Carga los datos de un overhead.
      *
-     * @param int $overhead_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosOverhead($overhead_id)
+    public function CargarDatosOverhead(OverheadPriceIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $overhead_id = $dto->overhead_id;
         $entity = $this->getDoctrine()->getRepository(OverheadPrice::class)
            ->find($overhead_id);
         /** @var OverheadPrice $entity */
@@ -39,13 +43,12 @@ class OverheadPriceService extends Base
     /**
      * EliminarOverhead: Elimina un overhead en la BD.
      *
-     * @param int $overhead_id Id
-     *
      * @author Marcel
      */
-    public function EliminarOverhead($overhead_id)
+    public function EliminarOverhead(OverheadPriceIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $overhead_id = $dto->overhead_id;
 
         $entity = $this->getDoctrine()->getRepository(OverheadPrice::class)
            ->find($overhead_id);
@@ -85,18 +88,17 @@ class OverheadPriceService extends Base
     /**
      * EliminarOverheads: Elimina los overheads seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarOverheads($ids)
+    public function EliminarOverheads(OverheadPriceIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $overhead_id) {
                 if ('' != $overhead_id) {
                     ++$cant_total;
@@ -142,13 +144,15 @@ class OverheadPriceService extends Base
     /**
      * ActualizarOverhead: Actuializa los datos del overhead en la BD.
      *
-     * @param int $overhead_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarOverhead($overhead_id, $name, $price)
+    public function ActualizarOverhead(OverheadPriceActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $overhead_id = $d->overhead_id;
+        $name = (string) $d->name;
+        $price = $this->parsePriceAsFloat((string) $d->price);
 
         $entity = $this->getDoctrine()->getRepository(OverheadPrice::class)
            ->find($overhead_id);
@@ -179,6 +183,11 @@ class OverheadPriceService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
@@ -186,9 +195,12 @@ class OverheadPriceService extends Base
      *
      * @author Marcel
      */
-    public function SalvarOverhead($name, $price)
+    public function SalvarOverhead(OverheadPriceSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $name = (string) $d->name;
+        $price = $this->parsePriceAsFloat((string) $d->price);
 
         // Verificar email
         $overhead = $this->getDoctrine()->getRepository(OverheadPrice::class)
@@ -223,17 +235,21 @@ class OverheadPriceService extends Base
     /**
      * ListarOverheads: Listar los overheads.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarOverheads($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarOverheads(OverheadPriceListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var OverheadPriceRepository $overheadPriceRepo */
         $overheadPriceRepo = $this->getDoctrine()->getRepository(OverheadPrice::class);
-        $resultado = $overheadPriceRepo->ListarOverheadsConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $overheadPriceRepo->ListarOverheadsConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -251,5 +267,12 @@ class OverheadPriceService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parsePriceAsFloat(string $price): float
+    {
+        $normalized = str_replace(',', '', trim($price));
+
+        return (float) $normalized;
     }
 }

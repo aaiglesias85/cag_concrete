@@ -64,13 +64,7 @@ class EmployeeController extends AbstractAdminController
             $dt = $listar->dt;
 
             // total + data en una sola llamada a tu servicio
-            $result = $this->employeeService->ListarEmployees(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->employeeService->ListarEmployees($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -94,13 +88,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(EmployeeSalvarRequest $d): JsonResponse
     {
-        $name = (string) $d->name;
-        $hourly_rate = $d->hourly_rate;
-        $role_id = $d->role_id;
-        $color = $d->color;
-
         try {
-            $resultado = $this->employeeService->SalvarEmployee($name, $hourly_rate, $role_id, $color);
+            $resultado = $this->employeeService->SalvarEmployee($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -127,14 +116,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(EmployeeActualizarRequest $d): JsonResponse
     {
-        $employee_id = (string) $d->employee_id;
-        $name = (string) $d->name;
-        $hourly_rate = $d->hourly_rate;
-        $role_id = $d->role_id;
-        $color = $d->color;
-
         try {
-            $resultado = $this->employeeService->ActualizarEmployee($employee_id, $name, $hourly_rate, $role_id, $color);
+            $resultado = $this->employeeService->ActualizarEmployee($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -161,10 +144,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(EmployeeIdRequest $dto): JsonResponse
     {
-        $employee_id = $dto->employee_id;
-
         try {
-            $resultado = $this->employeeService->EliminarEmployee($employee_id);
+            $resultado = $this->employeeService->EliminarEmployee($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -189,10 +170,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarEmployees(EmployeeIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->employeeService->EliminarEmployees($ids);
+            $resultado = $this->employeeService->EliminarEmployees($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -217,10 +196,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(EmployeeIdRequest $dto): JsonResponse
     {
-        $employee_id = $dto->employee_id;
-
         try {
-            $resultado = $this->employeeService->CargarDatosEmployee($employee_id);
+            $resultado = $this->employeeService->CargarDatosEmployee($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['employee'] = $resultado['employee'];
@@ -245,10 +222,8 @@ class EmployeeController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::EMPLOYEE, AdminPermission::View, jsonOnDenied: true)]
     public function listarProjects(EmployeeIdRequest $dto): JsonResponse
     {
-        $employee_id = $dto->employee_id;
-
         try {
-            $projects = $this->employeeService->ListarProjects($employee_id);
+            $projects = $this->employeeService->ListarProjects($dto);
 
             $resultadoJson['success'] = true;
             $resultadoJson['projects'] = $projects;

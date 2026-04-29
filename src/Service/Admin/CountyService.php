@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\County\CountyActualizarRequest;
+use App\Dto\Admin\County\CountyIdRequest;
+use App\Dto\Admin\County\CountyIdsRequest;
+use App\Dto\Admin\County\CountyListarRequest;
+use App\Dto\Admin\County\CountySalvarRequest;
 use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Estimate;
@@ -16,15 +21,14 @@ class CountyService extends Base
     /**
      * CargarDatosCounty: Carga los datos de un county.
      *
-     * @param int $county_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosCounty($county_id)
+    public function CargarDatosCounty(CountyIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $county_id = $dto->county_id;
         $entity = $this->getDoctrine()->getRepository(County::class)
            ->find($county_id);
         /** @var County $entity */
@@ -43,13 +47,12 @@ class CountyService extends Base
     /**
      * EliminarCounty: Elimina un county en la BD.
      *
-     * @param int $county_id Id
-     *
      * @author Marcel
      */
-    public function EliminarCounty($county_id)
+    public function EliminarCounty(CountyIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $county_id = $dto->county_id;
 
         $entity = $this->getDoctrine()->getRepository(County::class)
            ->find($county_id);
@@ -90,18 +93,17 @@ class CountyService extends Base
     /**
      * EliminarCountys: Elimina los countys seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarCountys($ids)
+    public function EliminarCountys(CountyIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
 
             foreach ($ids as $county_id) {
                 if ('' != $county_id) {
@@ -194,13 +196,16 @@ class CountyService extends Base
     /**
      * ActualizarCounty: Actuializa los datos del rol en la BD.
      *
-     * @param int $county_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarCounty($county_id, $description, $status, $district_id)
+    public function ActualizarCounty(CountyActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $county_id = $d->county_id;
+        $district_id = (string) ($d->district_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(County::class)
            ->find($county_id);
@@ -217,7 +222,7 @@ class CountyService extends Base
             }
 
             $entity->setDescription($description);
-            $entity->setStatus($status);
+            $entity->setStatus($this->parseBooleanStatus($status));
 
             $entity->setDistrict(null);
             if ('' !== $district_id) {
@@ -238,18 +243,25 @@ class CountyService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarCounty: Guarda los datos de county en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarCounty($description, $status, $district_id)
+    public function SalvarCounty(CountySalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $district_id = (string) ($d->district_id ?? '');
+        $description = (string) $d->description;
+        $status = (string) $d->status;
 
         // Verificar name
         $county = $this->getDoctrine()->getRepository(County::class)
@@ -264,7 +276,7 @@ class CountyService extends Base
         $entity = new County();
 
         $entity->setDescription($description);
-        $entity->setStatus($status);
+        $entity->setStatus($this->parseBooleanStatus($status));
 
         if ('' !== $district_id) {
             $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
@@ -290,17 +302,23 @@ class CountyService extends Base
     /**
      * ListarCountys: Listar los countys.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarCountys($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id)
+    public function ListarCountys(CountyListarRequest $listar)
     {
+        $dt = $listar->dt;
+        $district_id = $listar->district_id;
+
         /** @var CountyRepository $countyRepo */
         $countyRepo = $this->getDoctrine()->getRepository(County::class);
-        $resultado = $countyRepo->ListarCountysConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0, $district_id);
+        $resultado = $countyRepo->ListarCountysConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $district_id
+        );
 
         $data = [];
 
@@ -319,5 +337,10 @@ class CountyService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

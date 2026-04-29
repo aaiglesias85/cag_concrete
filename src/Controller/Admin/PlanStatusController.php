@@ -47,13 +47,7 @@ class PlanStatusController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            $result = $this->planStatusService->ListarStatus(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $result = $this->planStatusService->ListarStatus($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -77,11 +71,8 @@ class PlanStatusController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(PlanStatusSalvarRequest $d): JsonResponse
     {
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->planStatusService->SalvarStatus($description, $status);
+            $resultado = $this->planStatusService->SalvarStatus($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -108,12 +99,8 @@ class PlanStatusController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(PlanStatusActualizarRequest $d): JsonResponse
     {
-        $status_id = (string) $d->status_id;
-        $description = (string) $d->description;
-        $status = (string) $d->status;
-
         try {
-            $resultado = $this->planStatusService->ActualizarStatus($status_id, $description, $status);
+            $resultado = $this->planStatusService->ActualizarStatus($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -140,10 +127,8 @@ class PlanStatusController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(PlanStatusIdRequest $dto): JsonResponse
     {
-        $status_id = $dto->status_id;
-
         try {
-            $resultado = $this->planStatusService->EliminarStatus($status_id);
+            $resultado = $this->planStatusService->EliminarStatus($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -168,10 +153,8 @@ class PlanStatusController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarStatuss(PlanStatusIdsRequest $dto): JsonResponse
     {
-        $ids = (string) $dto->ids;
-
         try {
-            $resultado = $this->planStatusService->EliminarStatuss($ids);
+            $resultado = $this->planStatusService->EliminarStatuss($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -196,10 +179,8 @@ class PlanStatusController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::PLAN_STATUS, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(PlanStatusIdRequest $dto): JsonResponse
     {
-        $status_id = $dto->status_id;
-
         try {
-            $resultado = $this->planStatusService->CargarDatosStatus($status_id);
+            $resultado = $this->planStatusService->CargarDatosStatus($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['status'] = $resultado['status'];

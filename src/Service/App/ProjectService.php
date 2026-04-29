@@ -2,6 +2,8 @@
 
 namespace App\Service\App;
 
+use App\Dto\Api\Request\Project\CargarProyectoDatosRequest;
+use App\Dto\Api\Request\Project\ListarProjectsQueryRequest;
 use App\Service\Admin\ProjectService as AdminProjectService;
 use App\Service\Admin\WidgetAccessService;
 use App\Service\Base\Base;
@@ -97,6 +99,23 @@ class ProjectService extends Base
     }
 
     /**
+     * GET listar: delegación desde query validada.
+     *
+     * @return array{success: bool, projects?: array, total?: int, error?: string}
+     */
+    public function ListarProjectsDesdeQuery(ListarProjectsQueryRequest $query): array
+    {
+        return $this->ListarProjects(
+            $query->search,
+            $query->empresa_id,
+            $query->fecha_inicial,
+            $query->fecha_fin,
+            $query->limit,
+            $query->offset
+        );
+    }
+
+    /**
      * Normaliza fecha desde formato ISO (Y-m-d) o m/d/Y a m/d/Y para el repositorio.
      */
     private function normalizeDate(string $date): string
@@ -150,5 +169,15 @@ class ProjectService extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * GET cargarDatos: delegación desde query validada.
+     *
+     * @return array{success: bool, project?: array, error?: string}
+     */
+    public function CargarDatosProjectDesdeRequest(CargarProyectoDatosRequest $dto): array
+    {
+        return $this->CargarDatosProject($dto->project_id);
     }
 }

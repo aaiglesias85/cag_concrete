@@ -2,6 +2,11 @@
 
 namespace App\Service\Admin;
 
+use App\Dto\Admin\ProposalType\ProposalTypeActualizarRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeIdRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeIdsRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeListarRequest;
+use App\Dto\Admin\ProposalType\ProposalTypeSalvarRequest;
 use App\Entity\Estimate;
 use App\Entity\ProposalType;
 use App\Repository\EstimateRepository;
@@ -13,15 +18,14 @@ class ProposalTypeService extends Base
     /**
      * CargarDatosType: Carga los datos de un type.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosType($type_id)
+    public function CargarDatosType(ProposalTypeIdRequest $dto)
     {
         $resultado = [];
         $arreglo_resultado = [];
 
+        $type_id = $dto->type_id;
         $entity = $this->getDoctrine()->getRepository(ProposalType::class)
            ->find($type_id);
         /** @var ProposalType $entity */
@@ -39,13 +43,12 @@ class ProposalTypeService extends Base
     /**
      * EliminarType: Elimina un type en la BD.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function EliminarType($type_id)
+    public function EliminarType(ProposalTypeIdRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
+        $type_id = $dto->type_id;
 
         $entity = $this->getDoctrine()->getRepository(ProposalType::class)
            ->find($type_id);
@@ -85,18 +88,17 @@ class ProposalTypeService extends Base
     /**
      * EliminarTypes: Elimina los types seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarTypes($ids)
+    public function EliminarTypes(ProposalTypeIdsRequest $dto)
     {
         $em = $this->getDoctrine()->getManager();
 
+        $ids = (string) ($dto->ids ?? '');
         $cant_eliminada = 0;
         $cant_total = 0;
         if ('' != $ids) {
-            $ids = explode(',', (string) $ids);
+            $ids = explode(',', $ids);
             foreach ($ids as $type_id) {
                 if ('' != $type_id) {
                     ++$cant_total;
@@ -142,13 +144,15 @@ class ProposalTypeService extends Base
     /**
      * ActualizarType: Actuializa los datos del type en la BD.
      *
-     * @param int $type_id Id
-     *
      * @author Marcel
      */
-    public function ActualizarType($type_id, $description, $status)
+    public function ActualizarType(ProposalTypeActualizarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $type_id = (int) $d->type_id;
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         $entity = $this->getDoctrine()->getRepository(ProposalType::class)
            ->find($type_id);
@@ -180,18 +184,24 @@ class ProposalTypeService extends Base
 
             return $resultado;
         }
+
+        $resultado['success'] = false;
+        $resultado['error'] = 'The requested record does not exist';
+
+        return $resultado;
     }
 
     /**
      * SalvarType: Guarda los datos de type en la BD.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    public function SalvarType($description, $status)
+    public function SalvarType(ProposalTypeSalvarRequest $d)
     {
         $em = $this->getDoctrine()->getManager();
+
+        $description = (string) $d->description;
+        $status = $this->parseBooleanStatus((string) $d->status);
 
         // Verificar name
         $type = $this->getDoctrine()->getRepository(ProposalType::class)
@@ -227,17 +237,21 @@ class ProposalTypeService extends Base
     /**
      * ListarTypes: Listar los types.
      *
-     * @param int    $start   Inicio
-     * @param int    $limit   Limite
-     * @param string $sSearch Para buscar
-     *
      * @author Marcel
      */
-    public function ListarTypes($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0)
+    public function ListarTypes(ProposalTypeListarRequest $listar)
     {
+        $dt = $listar->dt;
+
         /** @var ProposalTypeRepository $proposalTypeRepo */
         $proposalTypeRepo = $this->getDoctrine()->getRepository(ProposalType::class);
-        $resultado = $proposalTypeRepo->ListarTypesConTotal($start, $limit, $sSearch, $iSortCol_0, $sSortDir_0);
+        $resultado = $proposalTypeRepo->ListarTypesConTotal(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir']
+        );
 
         $data = [];
 
@@ -255,5 +269,10 @@ class ProposalTypeService extends Base
             'data' => $data,
             'total' => $resultado['total'], // ya viene con el filtro aplicado
         ];
+    }
+
+    private function parseBooleanStatus(string $status): bool
+    {
+        return filter_var($status, FILTER_VALIDATE_BOOLEAN);
     }
 }

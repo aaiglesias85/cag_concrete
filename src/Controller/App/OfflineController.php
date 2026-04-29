@@ -199,19 +199,8 @@ class OfflineController extends AbstractController
                 return $this->json($this->formatValidationFailure($violations), Response::HTTP_BAD_REQUEST);
             }
 
-            $profile = $payload->profile_offline;
-            $profile_offline = [
-                'nombre' => $profile->nombre,
-                'apellidos' => $profile->apellidos,
-                'email' => $profile->email,
-                'telefono' => $profile->telefono,
-                'passwordactual' => $profile->passwordactual ?? '',
-                'password' => $profile->password ?? '',
-                'imagen' => $profile->imagen,
-            ];
-
             // Sincronizar perfil del usuario (por ahora solo se soporta perfil)
-            $resultado = $this->offlineService->SincronizarPerfilUsuario($profile_offline);
+            $resultado = $this->offlineService->SincronizarDesdeOfflineRequest($payload);
 
             if ($resultado['success']) {
                 $resultado['message'] = $this->translator->trans('offline.message.sincronizado', [], 'messages', $lang);

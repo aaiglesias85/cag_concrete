@@ -50,21 +50,13 @@ class SubcontractorController extends AbstractAdminController
     public function listar(SubcontractorListarRequest $listar): JsonResponse
     {
         try {
-            $dt = $listar->dt;
-
-            $result = $this->subcontractorService->ListarSubcontractors(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir']
-            );
+            $r = $this->subcontractorService->ListarSubcontractorsParaAdmin($listar);
 
             $resultadoJson = [
-                'draw' => $dt['draw'],
-                'data' => $result['data'],
-                'recordsTotal' => (int) $result['total'],
-                'recordsFiltered' => (int) $result['total'],
+                'draw' => $r['draw'],
+                'data' => $r['data'],
+                'recordsTotal' => $r['total'],
+                'recordsFiltered' => $r['total'],
             ];
 
             return $this->json($resultadoJson);
@@ -148,10 +140,8 @@ class SubcontractorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(SubcontractorIdRequest $dto): JsonResponse
     {
-        $subcontractor_id = $dto->subcontractor_id;
-
         try {
-            $resultado = $this->subcontractorService->EliminarSubcontractor($subcontractor_id);
+            $resultado = $this->subcontractorService->EliminarSubcontractor($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -173,10 +163,8 @@ class SubcontractorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarSubcontractors(SubcontractorIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->subcontractorService->EliminarSubcontractors($ids);
+            $resultado = $this->subcontractorService->EliminarSubcontractors($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -198,10 +186,8 @@ class SubcontractorController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::SUBCONTRACTOR, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(SubcontractorIdRequest $dto): JsonResponse
     {
-        $subcontractor_id = $dto->subcontractor_id;
-
         try {
-            $resultado = $this->subcontractorService->CargarDatosSubcontractor($subcontractor_id);
+            $resultado = $this->subcontractorService->CargarDatosSubcontractor($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['subcontractor'] = $resultado['subcontractor'];

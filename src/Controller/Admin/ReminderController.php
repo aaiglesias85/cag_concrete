@@ -47,15 +47,7 @@ class ReminderController extends AbstractAdminController
         try {
             $dt = $listar->dt;
 
-            // total + data en una sola llamada a tu servicio
-            $result = $this->reminderService->ListarReminders(
-                $dt['start'],
-                $dt['length'],
-                $dt['search'],
-                $dt['orderField'],
-                $dt['orderDir'],
-                $listar->fecha_inicial,
-                $listar->fecha_fin);
+            $result = $this->reminderService->ListarReminders($listar);
 
             $resultadoJson = [
                 'draw' => $dt['draw'],
@@ -79,14 +71,8 @@ class ReminderController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REMINDER, AdminPermission::Add, jsonOnDenied: true)]
     public function salvar(ReminderSalvarRequest $d): JsonResponse
     {
-        $day = (string) $d->day;
-        $subject = (string) $d->subject;
-        $body = (string) ($d->body ?? '');
-        $status = (string) $d->status;
-        $usuarios_id = (string) ($d->usuarios_id ?? '');
-
         try {
-            $resultado = $this->reminderService->SalvarReminder($day, $subject, $body, $status, $usuarios_id);
+            $resultado = $this->reminderService->SalvarReminder($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -113,15 +99,8 @@ class ReminderController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REMINDER, AdminPermission::Edit, jsonOnDenied: true)]
     public function actualizar(ReminderActualizarRequest $d): JsonResponse
     {
-        $reminder_id = (string) $d->reminder_id;
-        $day = (string) $d->day;
-        $subject = (string) $d->subject;
-        $body = (string) ($d->body ?? '');
-        $status = (string) $d->status;
-        $usuarios_id = (string) ($d->usuarios_id ?? '');
-
         try {
-            $resultado = $this->reminderService->ActualizarReminder($reminder_id, $day, $subject, $body, $status, $usuarios_id);
+            $resultado = $this->reminderService->ActualizarReminder($d);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -148,10 +127,8 @@ class ReminderController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REMINDER, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminar(ReminderIdRequest $dto): JsonResponse
     {
-        $reminder_id = $dto->reminder_id;
-
         try {
-            $resultado = $this->reminderService->EliminarReminder($reminder_id);
+            $resultado = $this->reminderService->EliminarReminder($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -176,10 +153,8 @@ class ReminderController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REMINDER, AdminPermission::Delete, jsonOnDenied: true)]
     public function eliminarReminders(ReminderIdsRequest $idsDto): JsonResponse
     {
-        $ids = (string) $idsDto->ids;
-
         try {
-            $resultado = $this->reminderService->EliminarReminders($ids);
+            $resultado = $this->reminderService->EliminarReminders($idsDto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['message'] = 'The operation was successful';
@@ -204,10 +179,8 @@ class ReminderController extends AbstractAdminController
     #[RequireAdminPermission(FunctionId::REMINDER, AdminPermission::View, jsonOnDenied: true)]
     public function cargarDatos(ReminderIdRequest $dto): JsonResponse
     {
-        $reminder_id = $dto->reminder_id;
-
         try {
-            $resultado = $this->reminderService->CargarDatosReminder($reminder_id);
+            $resultado = $this->reminderService->CargarDatosReminder($dto);
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['reminder'] = $resultado['reminder'];

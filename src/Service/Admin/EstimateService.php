@@ -3,6 +3,9 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Estimate\EstimateIdRequest;
+use App\Dto\Admin\Estimate\EstimateIdsRequest;
+use App\Dto\Admin\Estimate\EstimateListarRequest;
 use App\Entity\Company;
 use App\Entity\CompanyContact;
 use App\Entity\County;
@@ -904,12 +907,13 @@ class EstimateService extends Base
     /**
      * CargarDatosEstimate: Carga los datos de un estimate.
      *
-     * @param int $estimate_id Id
-     *
      * @author Marcel
      */
-    public function CargarDatosEstimate($estimate_id)
+    public function CargarDatosEstimate(EstimateIdRequest|int|string $estimate_id)
     {
+        if ($estimate_id instanceof EstimateIdRequest) {
+            $estimate_id = $estimate_id->estimate_id;
+        }
         $resultado = [];
         $arreglo_resultado = [];
 
@@ -1260,12 +1264,13 @@ class EstimateService extends Base
     /**
      * EliminarEstimate: Elimina un rol en la BD.
      *
-     * @param int $estimate_id Id
-     *
      * @author Marcel
      */
-    public function EliminarEstimate($estimate_id)
+    public function EliminarEstimate(EstimateIdRequest|int|string $estimate_id)
     {
+        if ($estimate_id instanceof EstimateIdRequest) {
+            $estimate_id = $estimate_id->estimate_id;
+        }
         $em = $this->getDoctrine()->getManager();
 
         $entity = $this->getDoctrine()->getRepository(Estimate::class)
@@ -1298,12 +1303,11 @@ class EstimateService extends Base
     /**
      * EliminarEstimates: Elimina los estimates seleccionados en la BD.
      *
-     * @param int $ids Ids
-     *
      * @author Marcel
      */
-    public function EliminarEstimates($ids)
+    public function EliminarEstimates(EstimateIdsRequest|string $ids)
     {
+        $ids = $ids instanceof EstimateIdsRequest ? (string) $ids->ids : (string) $ids;
         $em = $this->getDoctrine()->getManager();
 
         $cant_eliminada = 0;
@@ -2570,6 +2574,47 @@ class EstimateService extends Base
         $estimateProjectTypeRepo = $this->getDoctrine()->getRepository(EstimateProjectType::class);
 
         return $estimateProjectTypeRepo->TotalEstimates($sSearch, $stage_id, $proposal_type_id, $status_id, $county_id, $district_id, $project_type_id, $fecha_inicial, $fecha_fin);
+    }
+
+    /**
+     * Listado admin estimates + total (DTO).
+     *
+     * @return array{data: array<int, mixed>, total: int, draw: int}
+     */
+    public function ListarYTotalEstimatesAdmin(EstimateListarRequest $listar): array
+    {
+        $dt = $listar->dt;
+        $stage_id = $listar->stage_id;
+        $project_type_id = $listar->project_type_id;
+        $proposal_type_id = $listar->proposal_type_id;
+        $status_id = $listar->status_id;
+        $county_id = $listar->county_id;
+        $district_id = $listar->district_id;
+        $fecha_inicial = $listar->fechaInicial;
+        $fecha_fin = $listar->fechaFin;
+
+        $data = $this->ListarEstimates(
+            $dt['start'],
+            $dt['length'],
+            $dt['search'],
+            $dt['orderField'],
+            $dt['orderDir'],
+            $stage_id,
+            $project_type_id,
+            $proposal_type_id,
+            $status_id,
+            $county_id,
+            $district_id,
+            $fecha_inicial,
+            $fecha_fin
+        );
+        $total = $this->TotalEstimates($dt['search'], $stage_id, $project_type_id, $proposal_type_id, $status_id, $county_id, $district_id, $fecha_inicial, $fecha_fin);
+
+        return [
+            'draw' => $dt['draw'],
+            'data' => $data,
+            'total' => (int) $total,
+        ];
     }
 
     /**
