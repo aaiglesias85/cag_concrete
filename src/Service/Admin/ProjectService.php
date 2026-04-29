@@ -3,10 +3,10 @@
 namespace App\Service\Admin;
 
 use App\Constants\FunctionId;
+use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectIdRequest;
 use App\Dto\Admin\Project\ProjectIdsRequest;
 use App\Dto\Admin\Project\ProjectListarDataTrackingRequest;
-use App\Dto\Admin\Project\ProjectActualizarRequest;
 use App\Dto\Admin\Project\ProjectListarRequest;
 use App\Dto\Admin\Project\ProjectSalvarRequest;
 use App\Entity\Company;
@@ -3919,11 +3919,9 @@ class ProjectService extends Base
     /**
      * Implementación interna (parámetros escalares). Usar {@see SalvarProject()} desde controladores.
      *
-     * @param string $description Nombre
-     *
      * @author Marcel
      */
-    
+
     /**
      * SalvarArchivos.
      *
