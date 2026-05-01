@@ -714,12 +714,16 @@ var renderPayItemTotalsTbody = function (rows) {
     };
 
 
-    var renderInvoicedProjectsTbody = function (rows) {
+   var renderInvoicedProjectsTbody = function (rows) {
         var $tb = $('#home-invoiced-projects-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-invoiced-projects-empty-row"><td colspan="3" class="text-center text-muted py-5">No invoices in this range.</td></tr>'
+                '<tr id="home-invoiced-projects-empty-row"><td colspan="3" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-file-sheet fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No invoices in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -728,9 +732,9 @@ var renderPayItemTotalsTbody = function (rows) {
             var r = rows[i] || {};
             html +=
                 '<tr data-invoice-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
-                '<td class="text-gray-800">' + esc(r.project_label || '-') + '</td>' +
-                '<td class="text-gray-800">' + esc(r.invoice_label || '-') + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.amount_total || 0) + '</td>' +
+                '<td><span class="text-gray-800 fw-bold text-hover-primary mb-1 fs-7">' + esc(r.project_label || '-') + '</span></td>' +
+                '<td><span class="badge badge-light-secondary text-gray-600 fw-bold fs-8">' + esc(r.invoice_label || '-') + '</span></td>' +
+                '<td class="text-end pe-3">' + formatHomeMoney(r.amount_total || 0) + '</td>' +
                 '</tr>';
         }
         $tb.html(html);
