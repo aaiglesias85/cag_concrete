@@ -686,12 +686,17 @@ var Index = (function () {
         }
         $tb.html(html);
     };
-    var renderPayItemTotalsTbody = function (rows) {
+   
+var renderPayItemTotalsTbody = function (rows) {
         var $tb = $('#home-pay-item-totals-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-pay-item-totals-empty-row"><td colspan="3" class="text-center text-muted py-5">No pay item totals in this range.</td></tr>'
+                '<tr id="home-pay-item-totals-empty-row"><td colspan="3" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-search-list fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No pay item totals in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -700,13 +705,15 @@ var Index = (function () {
             var r = rows[i] || {};
             html +=
                 '<tr>' +
-                '<td class="text-gray-800">' + esc(r.name || '-') + '</td>' +
-                '<td class="text-gray-800">' + MyApp.formatearNumero(r.quantity || 0, 2, ".", ",") + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.amount || 0) + '</td>' +
+                '<td><span class="text-gray-800 fw-bold fs-7">' + esc(r.name || '-') + '</span></td>' +
+                '<td class="text-end"><span class="text-gray-600 fw-semibold fs-7">' + MyApp.formatearNumero(r.quantity || 0, 2, ".", ",") + '</span></td>' +
+                '<td class="text-end pe-3">' + formatHomeMoney(r.amount || 0) + '</td>' +
                 '</tr>';
         }
         $tb.html(html);
     };
+
+
     var renderInvoicedProjectsTbody = function (rows) {
         var $tb = $('#home-invoiced-projects-tbody');
         if (!$tb.length) return;
