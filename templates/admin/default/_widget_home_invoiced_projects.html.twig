@@ -1,15 +1,15 @@
 <div class="col-12 col-md-6 col-xl-4 mb-5 mb-xl-10" id="widget-invoiced_projects">
     <div class="card card-flush h-100 shadow-sm">
-        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-wrap gap-3">
             <div class="card-title align-items-start flex-column m-0 min-w-0">
                 <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
                 <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
             </div>
             <div class="card-toolbar flex-shrink-0">
-                <div class="d-flex justify-content-end align-items-center gap-2">
+                <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
                     {% for link in w.links %}
                         {% if link.canView %}
-                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="Open invoice module">
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="{{ link.label }}">
                                 <i class="ki-duotone ki-bank fs-4 me-1">
                                     <span class="path1"></span><span class="path2"></span>
                                 </i>
@@ -19,7 +19,8 @@
                     {% endfor %}
                 </div>
             </div>
-            </div>
+        </div>
+        
         <div class="card-body pt-4 pb-4">
             <div class="scroll-y h-250px pe-3">
                 <div class="table-responsive">
@@ -58,9 +59,9 @@
                             </tr>
                         {% endfor %}
                         </tbody>
-                        </table>
-                </div>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+</div>
