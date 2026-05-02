@@ -24,7 +24,7 @@ class CountyRepository extends ServiceEntityRepository
             ->leftJoin('c.district', 'd');
 
         if ('' != $sSearch) {
-            $consulta->andWhere('c.description LIKE :search or d.description LIKE :search')
+            $consulta->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
@@ -78,7 +78,7 @@ class CountyRepository extends ServiceEntityRepository
             ->leftJoin('c.district', 'd');
 
         if ('' != $sSearch) {
-            $consulta->andWhere('c.description LIKE :search or d.description LIKE :search')
+            $consulta->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
@@ -91,6 +91,9 @@ class CountyRepository extends ServiceEntityRepository
         switch ($iSortCol_0) {
             case 'district':
                 $consulta->orderBy('d.description', $sSortDir_0);
+                break;
+            case 'city':
+                $consulta->orderBy('c.city', $sSortDir_0);
                 break;
             default:
                 $consulta->orderBy("c.$iSortCol_0", $sSortDir_0);
@@ -119,7 +122,7 @@ class CountyRepository extends ServiceEntityRepository
             ->leftJoin('c.district', 'd');
 
         if ('' != $sSearch) {
-            $consulta->andWhere('c.description LIKE :search or d.description LIKE :search')
+            $consulta->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
@@ -141,8 +144,10 @@ class CountyRepository extends ServiceEntityRepository
         // Whitelist de columnas ordenables
         $sortable = [
             'countyId' => 'c.countyId',
+            'id' => 'c.countyId',
             'description' => 'c.description',
             'district' => 'd.description',
+            'city' => 'c.city',
             'status' => 'c.status',
         ];
         $orderBy = $sortable[$sortColumn] ?? 'c.description';
@@ -153,7 +158,7 @@ class CountyRepository extends ServiceEntityRepository
             ->leftJoin('c.district', 'd');
 
         if (!empty($sSearch)) {
-            $baseQb->andWhere('c.description LIKE :search or d.description LIKE :search')
+            $baseQb->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 

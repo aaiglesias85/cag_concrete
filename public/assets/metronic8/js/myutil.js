@@ -52,6 +52,11 @@ var MyUtil = function () {
 
   var resetForm = function (form) {
     KTUtil.findAll(KTUtil.get(form), "input").forEach(function (element) {
+      /* No vaciar value en radios: borra value="district"|"city" del HTML y rompe envío / JS. */
+      if (element.type === "radio") {
+        MyApp.resetErrorMessageValidate(element);
+        return;
+      }
       element.value = "";
       MyApp.resetErrorMessageValidate(element);
     });

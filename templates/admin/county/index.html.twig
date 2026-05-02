@@ -7,7 +7,7 @@
       <!--begin::Page title-->
       <div class="page-title d-flex flex-column justify-content-center flex-wrap me-3">
          <!--begin::Title-->
-         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Counties</h1>
+         <h1 class="page-heading d-flex text-gray-900 fw-bold fs-3 flex-column justify-content-center my-0">Locations</h1>
          <!--end::Title-->
          <!--begin::Breadcrumb-->
          <ul class="breadcrumb breadcrumb-separatorless fw-semibold fs-7 my-0 pt-1">
@@ -22,7 +22,7 @@
             </li>
             <!--end::Item-->
             <!--begin::Item-->
-            <li class="breadcrumb-item text-muted">Manage Counties</li>
+            <li class="breadcrumb-item text-muted">Manage Locations</li>
             <!--end::Item-->
          </ul>
          <!--end::Breadcrumb-->
@@ -177,8 +177,9 @@
                         </div>
                      </th>
                      {% endif %}
-                     <th>Name</th>
+                     <th>County</th>
                      <th>District</th>
+                     <th>City</th>
                      <th>Status</th>
                      <th class="text-end min-w-100px">Actions</th>
                   </tr>
@@ -203,7 +204,7 @@
             data-kt-sticky-zindex="95"
          >
             <div class="card-title">
-               <h3 class="card-label">New Counties:</h3>
+               <h3 class="card-label">New Location:</h3>
             </div>
             <div class="card-toolbar">
                <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-county me-2" title="Exit" data-bs-toggle="tooltip">
@@ -224,9 +225,30 @@
             <div class="card-body">
                <div class="form-group ic-form-group">
                   <div class="row">
+                     <div class="col-md-12">
+                        <label class="form-label mb-3">
+                           <span class="ic-step-number">1</span>
+                           Location type
+                        </label>
+                        <div class="d-flex flex-wrap align-items-center gap-5">
+                           <div class="form-check form-check-custom form-check-solid">
+                              <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_district" value="district" checked />
+                              <label class="form-check-label fw-semibold ps-2" for="county_mode_district">District</label>
+                           </div>
+                           <div class="form-check form-check-custom form-check-solid">
+                              <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_city" value="city" />
+                              <label class="form-check-label fw-semibold ps-2" for="county_mode_city">City</label>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div class="form-group ic-form-group">
+                  <div class="row">
                      <div class="col-md-3" id="select-district">
                         <label class="form-label required">
-                           <span class="ic-step-number">1</span>
+                           <span class="ic-step-number">2</span>
                            District
                            <span class="ic-small italic">(required)</span>
                         </label>
@@ -237,9 +259,17 @@
                            {% endfor %}
                         </select>
                      </div>
-                     <div class="col-md-9">
-                        <label class="form-label required"> Name </label>
+                     <div class="col-md-9" id="col-description">
+                        <label class="form-label required">
+                           <span id="label-description-text">Name</span>
+                        </label>
                         <input type="text" class="form-control form-control-validate form-control-solid event-change" id="description" name="description" />
+                     </div>
+                     <div class="col-md-4" id="wrap-city-field" hidden>
+                        <label class="form-label required" id="label-city-wrapper">
+                           Name
+                        </label>
+                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="city" name="city" maxlength="255" />
                      </div>
                   </div>
                </div>
@@ -248,7 +278,7 @@
                   <div class="row">
                      <div class="col-md-4">
                         <label class="form-label">
-                           <span class="ic-step-number">2</span>
+                           <span class="ic-step-number">3</span>
                            Status
                         </label>
                         <div>

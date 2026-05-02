@@ -16,6 +16,9 @@ class County
     #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: true)]
     private ?string $description;
 
+    #[ORM\Column(name: 'city', type: 'string', length: 255, nullable: true)]
+    private ?string $city;
+
     #[ORM\Column(name: 'status', type: 'boolean', nullable: true)]
     private ?bool $status = null;
 
@@ -36,6 +39,16 @@ class County
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function setCity(?string $city): void
+    {
+        $this->city = $city;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
     }
 
     public function getStatus(): ?bool

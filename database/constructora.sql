@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 29-04-2026 a las 01:08:50
+-- Tiempo de generación: 02-05-2026 a las 14:55:41
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -138,6 +138,7 @@ CREATE TABLE `concrete_vendor_contact` (
 CREATE TABLE `county` (
   `county_id` int(11) NOT NULL,
   `description` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
   `status` tinyint(1) DEFAULT NULL,
   `district_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

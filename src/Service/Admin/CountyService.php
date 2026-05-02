@@ -34,6 +34,7 @@ class CountyService extends Base
         /** @var County $entity */
         if (null != $entity) {
             $arreglo_resultado['description'] = $entity->getDescription();
+            $arreglo_resultado['city'] = $entity->getCity() ?? '';
             $arreglo_resultado['status'] = $entity->getStatus();
             $arreglo_resultado['district_id'] = $entity->getDistrict() ? $entity->getDistrict()->getDistrictId() : '';
 
@@ -205,6 +206,8 @@ class CountyService extends Base
         $county_id = $d->county_id;
         $district_id = (string) ($d->district_id ?? '');
         $description = (string) $d->description;
+        $city = null !== $d->city ? trim((string) $d->city) : '';
+        $city = '' !== $city ? $city : null;
         $status = (string) $d->status;
 
         $entity = $this->getDoctrine()->getRepository(County::class)
@@ -222,6 +225,7 @@ class CountyService extends Base
             }
 
             $entity->setDescription($description);
+            $entity->setCity($city);
             $entity->setStatus($this->parseBooleanStatus($status));
 
             $entity->setDistrict(null);
@@ -261,6 +265,8 @@ class CountyService extends Base
 
         $district_id = (string) ($d->district_id ?? '');
         $description = (string) $d->description;
+        $city = null !== $d->city ? trim((string) $d->city) : '';
+        $city = '' !== $city ? $city : null;
         $status = (string) $d->status;
 
         // Verificar name
@@ -276,6 +282,7 @@ class CountyService extends Base
         $entity = new County();
 
         $entity->setDescription($description);
+        $entity->setCity($city);
         $entity->setStatus($this->parseBooleanStatus($status));
 
         if ('' !== $district_id) {
@@ -329,6 +336,7 @@ class CountyService extends Base
                 'id' => $county_id,
                 'description' => $value->getDescription(),
                 'district' => $value->getDistrict() ? $value->getDistrict()->getDescription() : '',
+                'city' => $value->getCity() ?? '',
                 'status' => $value->getStatus() ? 1 : 0,
             ];
         }

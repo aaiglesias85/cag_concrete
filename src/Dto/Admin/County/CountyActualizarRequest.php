@@ -15,6 +15,8 @@ final class CountyActualizarRequest implements AdminHttpRequestDtoInterface
     #[Assert\NotBlank]
     public ?string $description = null;
 
+    public ?string $city = null;
+
     #[Assert\NotBlank]
     public ?string $status = null;
 
@@ -40,6 +42,7 @@ final class CountyActualizarRequest implements AdminHttpRequestDtoInterface
         $cid = $request->get('county_id');
         $d->county_id = \is_string($cid) || is_numeric($cid) ? (string) $cid : null;
         $d->description = \is_string($x = $request->get('description')) ? $x : null;
+        $d->city = \is_string($x = $request->get('city')) ? $x : null;
         $st = $request->get('status');
         $d->status = \is_string($st) ? $st : (is_numeric($st) ? (string) $st : null);
         $did = $request->get('district_id');

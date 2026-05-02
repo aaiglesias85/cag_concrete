@@ -50,6 +50,7 @@ class BaseHolidayCountyService
             $arreglo_resultado[] = [
                 'county_id' => $value->getCountyId(),
                 'description' => $value->getDescription(),
+                'city' => $value->getCity() ?? '',
             ];
         }
 

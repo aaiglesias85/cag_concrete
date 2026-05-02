@@ -21,7 +21,7 @@ final class CountyListarRequest implements AdminHttpRequestDtoInterface
         $d = new self();
         $d->dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'description', 'district', 'status'],
+            allowedOrderFields: ['id', 'description', 'district', 'city', 'status'],
             defaultOrderField: 'description'
         );
         $d->district_id = $request->get('district_id');
