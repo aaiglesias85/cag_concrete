@@ -134,43 +134,57 @@ var Index = (function () {
         var totalAbs = series.reduce(function (a, b) { return a + b; }, 0);
         var height = parseInt(KTUtil.css(element, 'height'), 10) || 200;
 
-        var options = {
+      var options = {
             series: series,
             chart: {
                 type: 'donut',
                 height: height,
+                animations: { enabled: true, easing: 'easeinout', speed: 800 }
             },
             labels: labels,
             colors: colors,
-            dataLabels: {
-                enabled: false,
-            },
+            stroke: { width: 0 },
+            dataLabels: { enabled: false },
             tooltip: {
+                style: { fontSize: '13px' },
                 y: {
                     formatter: function (val, opts) {
-                        var idx = opts.seriesIndex;
-                        var amount = (items[idx] && items[idx].amount !== undefined) ? items[idx].amount : val;
-                        var percent = totalAbs > 0 ? (Math.abs(amount) / totalAbs) * 100 : 0;
-                        return MyApp.formatMoney(amount) + ' · ' + percent.toFixed(1) + '%';
+                        var amount = (items[opts.seriesIndex] && items[opts.seriesIndex].amount !== undefined) ? items[opts.seriesIndex].amount : val;
+                        return MyApp.formatMoney(amount);
                     },
                 },
             },
             legend: {
                 show: true,
                 position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '12px',
+                markers: { radius: 12 },
                 formatter: function (seriesName, opts) {
-                    var idx = opts.seriesIndex;
-                    var amount = (items[idx] && items[idx].amount !== undefined) ? items[idx].amount : 0;
-                    return seriesName + ': ' + MyApp.formatMoney(amount);
+                    var amount = (items[opts.seriesIndex] && items[opts.seriesIndex].amount !== undefined) ? items[opts.seriesIndex].amount : 0;
+                    return seriesName + ': <span class="fw-bold">' + MyApp.formatMoney(amount) + '</span>';
                 },
             },
             plotOptions: {
                 pie: {
                     donut: {
-                        size: '55%',
-                        labels: { show: false },
+                        size: '72%',
+                        labels: {
+                            show: true,
+                            name: { show: true, fontSize: '12px', color: '#A1A5B7', offsetY: -10 },
+                            value: { 
+                                show: true, 
+                                fontSize: '18px', 
+                                fontWeight: 700, 
+                                color: '#3F4254', 
+                                offsetY: 10,
+                                formatter: function (val) { return MyApp.formatMoney(totalAbs); } 
+                            },
+                            total: {
+                                show: true,
+                                label: 'Net Profit',
+                                color: '#A1A5B7',
+                                formatter: function (w) { return MyApp.formatMoney(totalAbs); }
+                            }
+                        }
                     },
                 },
             },
@@ -662,12 +676,17 @@ var Index = (function () {
         }
         $tb.html(html);
     };
+  
     var renderCurrentMonthDataTrackingTbody = function (rows) {
         var $tb = $('#home-current-month-data-tracking-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-current-month-data-tracking-empty-row"><td colspan="6" class="text-center text-muted py-5">No data tracking records in this range.</td></tr>'
+                '<tr id="home-current-month-data-tracking-empty-row"><td colspan="6" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-graph-up fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No data tracking records in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -676,22 +695,27 @@ var Index = (function () {
             var r = rows[i] || {};
             html +=
                 '<tr data-data-tracking-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
-                '<td class="text-gray-800">' + esc(r.date || '-') + '</td>' +
-                '<td class="text-gray-800">' + esc(r.project_number || '-') + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.total_daily_today || 0) + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.profit || 0) + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.totalLabor || 0) + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.total_concrete || 0) + '</td>' +
+                '<td><span class="text-gray-800 fw-bold fs-7">' + esc(r.date || '-') + '</span></td>' +
+                '<td><span class="badge badge-light-secondary text-gray-800 fw-bold fs-7">' + esc(r.project_number || '-') + '</span></td>' +
+                '<td class="text-end">' + formatHomeMoney(r.total_daily_today || 0) + '</td>' +
+                '<td class="text-end">' + formatHomeMoney(r.profit || 0) + '</td>' +
+                '<td class="text-end">' + formatHomeMoney(r.totalLabor || 0) + '</td>' +
+                '<td class="text-end pe-3">' + formatHomeMoney(r.total_concrete || 0) + '</td>' +
                 '</tr>';
         }
         $tb.html(html);
     };
-    var renderPayItemTotalsTbody = function (rows) {
+   
+var renderPayItemTotalsTbody = function (rows) {
         var $tb = $('#home-pay-item-totals-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-pay-item-totals-empty-row"><td colspan="3" class="text-center text-muted py-5">No pay item totals in this range.</td></tr>'
+                '<tr id="home-pay-item-totals-empty-row"><td colspan="3" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-search-list fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No pay item totals in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -700,19 +724,25 @@ var Index = (function () {
             var r = rows[i] || {};
             html +=
                 '<tr>' +
-                '<td class="text-gray-800">' + esc(r.name || '-') + '</td>' +
-                '<td class="text-gray-800">' + MyApp.formatearNumero(r.quantity || 0, 2, ".", ",") + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.amount || 0) + '</td>' +
+                '<td><span class="text-gray-800 fw-bold fs-7">' + esc(r.name || '-') + '</span></td>' +
+                '<td class="text-end"><span class="text-gray-600 fw-semibold fs-7">' + MyApp.formatearNumero(r.quantity || 0, 2, ".", ",") + '</span></td>' +
+                '<td class="text-end pe-3">' + formatHomeMoney(r.amount || 0) + '</td>' +
                 '</tr>';
         }
         $tb.html(html);
     };
-    var renderInvoicedProjectsTbody = function (rows) {
+
+
+   var renderInvoicedProjectsTbody = function (rows) {
         var $tb = $('#home-invoiced-projects-tbody');
         if (!$tb.length) return;
         if (!rows || !rows.length) {
             $tb.html(
-                '<tr id="home-invoiced-projects-empty-row"><td colspan="3" class="text-center text-muted py-5">No invoices in this range.</td></tr>'
+                '<tr id="home-invoiced-projects-empty-row"><td colspan="3" class="text-center">' +
+                '<div class="d-flex flex-column align-items-center justify-content-center py-10">' +
+                '<i class="ki-duotone ki-file-sheet fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span></i>' +
+                '<span class="text-muted fw-semibold fs-6">No invoices in this range.</span>' +
+                '</div></td></tr>'
             );
             return;
         }
@@ -721,9 +751,9 @@ var Index = (function () {
             var r = rows[i] || {};
             html +=
                 '<tr data-invoice-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
-                '<td class="text-gray-800">' + esc(r.project_label || '-') + '</td>' +
-                '<td class="text-gray-800">' + esc(r.invoice_label || '-') + '</td>' +
-                '<td class="text-gray-800">' + formatHomeMoney(r.amount_total || 0) + '</td>' +
+                '<td><span class="text-gray-800 fw-bold text-hover-primary mb-1 fs-7">' + esc(r.project_label || '-') + '</span></td>' +
+                '<td><span class="badge badge-light-secondary text-gray-600 fw-bold fs-8">' + esc(r.invoice_label || '-') + '</span></td>' +
+                '<td class="text-end pe-3">' + formatHomeMoney(r.amount_total || 0) + '</td>' +
                 '</tr>';
         }
         $tb.html(html);

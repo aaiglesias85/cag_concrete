@@ -1,35 +1,38 @@
-<div class="col-12 col-md-6 col-xl-4" id="widget-current_month_data_tracking">
-    <div class="card h-100">
+<div class="col-12 col-md-12 col-xl-12 mb-5 mb-xl-10" id="widget-current_month_data_tracking">
+    <div class="card card-flush h-100 shadow-sm">
         <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
             <div class="card-title align-items-start flex-column m-0 min-w-0">
-                <span class="card-label fw-bold text-gray-900 fs-4">{{ w.title }}</span>
-                <span class="text-gray-500 fs-6 fw-normal mt-2">{{ w.description }}</span>
+                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
+                <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
             </div>
             <div class="card-toolbar flex-shrink-0">
                 <div class="d-flex justify-content-end align-items-center gap-2">
                     {% for link in w.links %}
                         {% if link.canView %}
-                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light" title="Open data tracking module">
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="Open data tracking module">
+                                <i class="ki-duotone ki-chart-line-star fs-4 me-1">
+                                    <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                </i>
                                 {{ link.label }}
                             </a>
                         {% endif %}
                     {% endfor %}
                 </div>
             </div>
-        </div>
-        <div class="card-body pt-0">
-            <div class="scroll-y h-250px my-2 px-3">
+            </div>
+        <div class="card-body pt-4 pb-4">
+            <div class="scroll-y h-300px pe-3">
                 <div class="table-responsive">
-                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2">
+                    <table class="table table-row-dashed table-hover table-row-gray-200 align-middle gs-0 gy-4">
                         <thead>
-                        <tr class="fs-7 fw-bold text-gray-500 text-nowrap">
-                            <th>Date</th>
-                            <th>Project #</th>
-                            <th>Daily total</th>
-                            <th>Profit total</th>
-                            <th>Labor total</th>
-                            <th>Concrete total</th>
-                        </tr>
+                            <tr class="fw-bold text-muted text-uppercase fs-8 text-nowrap">
+                                <th class="min-w-100px">Date</th>
+                                <th class="min-w-100px">Project #</th>
+                                <th class="min-w-120px text-end">Daily Total</th>
+                                <th class="min-w-120px text-end">Profit Total</th>
+                                <th class="min-w-120px text-end">Labor Total</th>
+                                <th class="min-w-120px text-end pe-3">Concrete Total</th>
+                            </tr>
                         </thead>
                         <tbody id="home-current-month-data-tracking-tbody">
                         {% for row in home_current_month_data_tracking %}
@@ -38,22 +41,47 @@
                             {% set labor = row.totalLabor|default(0) %}
                             {% set concrete = row.total_concrete|default(0) %}
                             <tr data-data-tracking-id="{{ row.id }}" style="cursor: pointer;">
-                                <td class="text-gray-800">{{ row.date|default('—') }}</td>
-                                <td class="text-gray-800">{{ row.project_number|default('—') }}</td>
-                                <td class="text-gray-800"><span class="home-money {{ daily > 0 ? 'home-money-positive' : (daily < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ daily < 0 ? '-$' : '$' }}{{ daily|abs|number_format(2, '.', ',') }}</span></td>
-                                <td class="text-gray-800"><span class="home-money {{ profit > 0 ? 'home-money-positive' : (profit < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ profit < 0 ? '-$' : '$' }}{{ profit|abs|number_format(2, '.', ',') }}</span></td>
-                                <td class="text-gray-800"><span class="home-money {{ labor > 0 ? 'home-money-positive' : (labor < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ labor < 0 ? '-$' : '$' }}{{ labor|abs|number_format(2, '.', ',') }}</span></td>
-                                <td class="text-gray-800"><span class="home-money {{ concrete > 0 ? 'home-money-positive' : (concrete < 0 ? 'home-money-negative' : 'home-money-zero') }}">{{ concrete < 0 ? '-$' : '$' }}{{ concrete|abs|number_format(2, '.', ',') }}</span></td>
+                                <td>
+                                    <span class="text-gray-800 fw-bold fs-7">{{ row.date|default('—') }}</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-light-secondary text-gray-800 fw-bold fs-7">{{ row.project_number|default('—') }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold fs-7 {{ daily > 0 ? 'text-success' : (daily < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                        {{ daily < 0 ? '-$' : '$' }}{{ daily|abs|number_format(2, '.', ',') }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold fs-7 {{ profit > 0 ? 'text-success' : (profit < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                        {{ profit < 0 ? '-$' : '$' }}{{ profit|abs|number_format(2, '.', ',') }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold fs-7 {{ labor > 0 ? 'text-success' : (labor < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                        {{ labor < 0 ? '-$' : '$' }}{{ labor|abs|number_format(2, '.', ',') }}
+                                    </span>
+                                </td>
+                                <td class="text-end pe-3">
+                                    <span class="fw-bold fs-7 {{ concrete > 0 ? 'text-success' : (concrete < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                        {{ concrete < 0 ? '-$' : '$' }}{{ concrete|abs|number_format(2, '.', ',') }}
+                                    </span>
+                                </td>
                             </tr>
                         {% else %}
                             <tr id="home-current-month-data-tracking-empty-row">
-                                <td colspan="6" class="text-center text-muted py-5">No data tracking records in this range.</td>
+                                <td colspan="6" class="text-center">
+                                    <div class="d-flex flex-column align-items-center justify-content-center py-10">
+                                        <i class="ki-duotone ki-graph-up fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>
+                                        <span class="text-muted fw-semibold fs-6">No data tracking records in this range.</span>
+                                    </div>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
-                    </table>
+                        </table>
+                </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
