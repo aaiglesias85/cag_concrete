@@ -4,6 +4,15 @@ body,
    background-color: #f4f7fa !important;
 }
 
+[data-kt-app-layout='light-sidebar'] .app-sidebar {
+   background-color: #edf3fd !important;
+}
+
+[data-kt-app-layout='light-sidebar'] .app-sidebar .menu .menu-item .menu-link:hover,
+[data-kt-app-layout='light-sidebar'] .app-sidebar .menu .menu-item .menu-link:focus {
+   background-color: #b8d4f8 !important;
+}
+
 [data-bs-theme='dark'] body,
 [data-bs-theme='dark'] .app-default {
    background-color: #0f1014 !important;
