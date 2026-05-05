@@ -1219,6 +1219,9 @@ class ScheduleService extends Base
         $list = [];
         foreach ($resultado['data'] as $value) {
             $project = $value->getProject();
+            $vendor = $value->getConcreteVendor();
+            $employees = $this->ListarEmployeesDeSchedule($value->getScheduleId());
+            $lead_name = !empty($employees) ? implode(', ', array_map(fn($e) => $e->getName(), $employees)) : '';
             $list[] = [
                 'id' => $value->getScheduleId(),
                 'project_id' => $project ? (int) $project->getProjectId() : 0,
@@ -1226,6 +1229,12 @@ class ScheduleService extends Base
                 'day' => $value->getDay() ? $value->getDay()->format('m/d/Y') : '',
                 'highpriority' => (bool) $value->getHighpriority(),
                 'priority_label' => $value->getHighpriority() ? 'High' : 'Normal',
+                'description' => (string) ($value->getDescription() ?? ''),
+                'location' => (string) ($value->getLocation() ?? ''),
+                'hour' => (string) ($value->getHour() ?? ''),
+                'quantity' => (float) ($value->getQuantity() ?? 0),
+                'vendor_name' => $vendor ? (string) $vendor->getName() : '',
+                'lead_name' => $lead_name,
             ];
         }
 

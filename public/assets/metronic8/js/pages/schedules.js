@@ -1318,39 +1318,31 @@ var Schedules = (function () {
       });
    };
 
-   // google maps (PlaceAutocompleteElement - API recomendada desde 2025)
+   // google maps (Autocomplete clásico — trabaja directo sobre el input visible)
    var latitud = '';
    var longitud = '';
    var inicializarAutocomplete = async function () {
-      await google.maps.importLibrary('places');
+      if (typeof google === 'undefined') return;
 
       const input = document.getElementById('location');
       if (!input) return;
 
-      const container = document.createElement('div');
-      container.className = 'place-autocomplete-wrapper flex-grow-1';
-      input.parentNode.insertBefore(container, input);
-      input.style.display = 'none';
+      await google.maps.importLibrary('places');
 
-      const placeAutocomplete = new google.maps.places.PlaceAutocompleteElement({
-         includedPrimaryTypes: ['street_address'],
-         includedRegionCodes: ['us'],
-         placeholder: input.placeholder || '',
+      const autocomplete = new google.maps.places.Autocomplete(input, {
+         types: ['address'],
+         componentRestrictions: { country: 'us' },
       });
-      container.appendChild(placeAutocomplete);
 
-      placeAutocomplete.addEventListener('gmp-select', async (e) => {
-         const place = e.placePrediction.toPlace();
-         await place.fetchFields({ fields: ['formattedAddress', 'location'] });
-         if (!place.location) {
-            console.log('No se pudo obtener ubicación.');
+      autocomplete.addListener('place_changed', function () {
+         const place = autocomplete.getPlace();
+         if (!place.geometry || !place.geometry.location) {
+            latitud = '';
+            longitud = '';
             return;
          }
-         input.value = place.formattedAddress || '';
-         latitud = place.location.lat();
-         longitud = place.location.lng();
-         console.log('Dirección seleccionada:', place.formattedAddress);
-         console.log('Coordenadas:', place.location.toString());
+         latitud = place.geometry.location.lat();
+         longitud = place.geometry.location.lng();
       });
    };
 
@@ -1664,6 +1656,16 @@ var Schedules = (function () {
 
          // listar calendario
          listarCalendario();
+
+         // Auto-abrir schedule desde el widget del dashboard
+         var scheduleIdEdit = localStorage.getItem('schedule_id_edit');
+         if (scheduleIdEdit) {
+            localStorage.removeItem('schedule_id_edit');
+            resetForms();
+            $('#schedule_id').val(scheduleIdEdit);
+            mostrarForm();
+            editRow(scheduleIdEdit);
+         }
       },
    };
 })();

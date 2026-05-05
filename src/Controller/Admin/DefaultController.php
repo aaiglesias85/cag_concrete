@@ -22,6 +22,7 @@ use App\Service\Admin\ScheduleService;
 use App\Service\Admin\TaskService;
 use App\Service\Admin\WidgetAccessService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class DefaultController extends AbstractAdminController
@@ -104,6 +105,29 @@ class DefaultController extends AbstractAdminController
         }
 
         return $this->json(['success' => true]);
+    }
+
+    /**
+     * listarWorkScheduleHome Devuelve datos del widget Work Schedule para una semana dada.
+     */
+    #[RequireAdminPermission(FunctionId::HOME, AdminPermission::View, jsonOnDenied: true)]
+    public function listarWorkScheduleHome(Request $request): JsonResponse
+    {
+        try {
+            $fechaInicial = (string) ($request->get('fecha_inicial') ?? '');
+            $fechaFin     = (string) ($request->get('fecha_fin') ?? '');
+            $projectId    = (string) ($request->get('project_id') ?? '');
+
+            if (!$fechaInicial || !$fechaFin) {
+                return $this->json(['success' => false, 'error' => 'Dates required']);
+            }
+
+            $data = $this->scheduleService->listarSchedulesPayloadHome($fechaInicial, $fechaFin, 100, $projectId);
+
+            return $this->json(['success' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
     }
 
     /**
