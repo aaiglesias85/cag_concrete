@@ -1,76 +1,703 @@
-<div class="col-12 col-md-6 col-xl-4 mb-5 mb-xl-10" id="widget-work_schedule">
-    <div class="card card-flush h-100 shadow-sm">
-        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
-            <div class="card-title align-items-start flex-column m-0 min-w-0">
-                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
-                <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
+{# ─── Variables calculadas antes del HTML ─────────────────────────────────── #}
+{% set day_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] %}
+{# Sábado (6) o Domingo (7) → mostrar la semana siguiente #}
+{% set _dow  = 'now'|date('N') %}
+{% set _week = (_dow >= 6) ? 'next week' : 'this week' %}
+{% set day_dates  = [
+    ('monday '    ~ _week)|date('m/d/Y'),
+    ('tuesday '   ~ _week)|date('m/d/Y'),
+    ('wednesday ' ~ _week)|date('m/d/Y'),
+    ('thursday '  ~ _week)|date('m/d/Y'),
+    ('friday '    ~ _week)|date('m/d/Y'),
+    ('saturday '  ~ _week)|date('m/d/Y'),
+] %}
+{% set sun_date  = ('monday ' ~ _week)|date_modify('+6 days')|date('m/d/Y') %}
+{% set today_str = 'now'|date('m/d/Y') %}
+
+{# Filtrar entradas de la semana actual (Mon-Sat + Sun) #}
+{% set week_entries = [] %}
+{% for row in home_work_schedule %}
+    {% if row.day in day_dates or row.day == sun_date %}
+        {% set week_entries = week_entries|merge([row]) %}
+    {% endif %}
+{% endfor %}
+
+{# Proyectos únicos — máx 5 #}
+{% set seen          = [] %}
+{% set projects_list = [] %}
+{% for row in week_entries %}
+    {% if row.project_number is not empty
+          and row.project_number not in seen
+          and projects_list|length < 5
+          and row.day in day_dates %}
+        {% set seen          = seen|merge([row.project_number]) %}
+        {% set projects_list = projects_list|merge([{
+            'num': row.project_number,
+            'id':  row.project_id|default(0)
+        }]) %}
+    {% endif %}
+{% endfor %}
+
+{# URL del módulo completo (primer link con permisos) #}
+{% set schedule_url = '' %}
+{% for lnk in w.links %}{% if lnk.canView and schedule_url == '' %}{% set schedule_url = path(lnk.route) %}{% endif %}{% endfor %}
+
+{# ─── Card ────────────────────────────────────────────────────────────────── #}
+<div class="col-12 col-xl-12 mb-5 mb-xl-10" id="widget-work_schedule">
+<div class="card card-flush h-100 shadow-sm">
+
+    {# ── Header ── #}
+    <div class="card-header border-0 pt-5 d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div class="card-title align-items-start flex-column m-0">
+            <div class="d-flex align-items-center gap-2">
+                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title|default('Work Schedule') }}</span>
+                <span class="badge badge-light-primary fw-bold px-3 py-2 fs-8">Week</span>
             </div>
-            <div class="card-toolbar flex-shrink-0">
-                <div class="d-flex justify-content-end align-items-center gap-2">
-                    {% for link in w.links %}
-                        {% if link.canView %}
-                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-warning fw-bold" title="Open schedule module">
-                                <i class="ki-duotone ki-calendar-8 fs-4 me-1">
-                                    <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span>
-                                </i>
-                                {{ link.label }}
-                            </a>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            </div>
-            </div>
-        <div class="card-body pt-4 pb-4">
-            <div class="scroll-y h-250px pe-3">
-                <div class="table-responsive">
-                    <table class="table table-row-dashed table-hover table-row-gray-200 align-middle gs-0 gy-4">
-                        <thead>
-                            <tr class="fw-bold text-muted text-uppercase fs-8 text-nowrap">
-                                <th class="min-w-100px">Project #</th>
-                                <th class="min-w-100px">Day</th>
-                                <th class="min-w-80px text-end">Priority</th>
-                            </tr>
-                        </thead>
-                        <tbody id="home-work-schedule-tbody">
-                        {% for row in home_work_schedule %}
-                            <tr data-schedule-id="{{ row.id }}">
-                                <td>
-                                    {% if row.project_id|default(0) > 0 %}
-                                        <a href="javascript:;" class="project-link text-gray-900 fw-bold text-hover-primary mb-1 fs-6" data-project-id="{{ row.project_id }}">
-                                            {{ row.project_number|default('—') }}
-                                        </a>
-                                    {% else %}
-                                        <span class="text-gray-900 fw-bold fs-6">{{ row.project_number|default('—') }}</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <span class="text-muted fw-semibold d-block fs-7">
-                                        <i class="ki-duotone ki-time fs-6 me-1"><span class="path1"></span><span class="path2"></span></i>
-                                        {{ row.day|default('—') }}
-                                    </span>
-                                </td>
-                                <td class="text-end">
-                                    {% if row.highpriority|default(false) %}
-                                        <span class="badge badge-light-danger fw-bold px-3 py-2">{{ row.priority_label|default('High') }}</span>
-                                    {% else %}
-                                        <span class="badge badge-light-primary fw-bold px-3 py-2">{{ row.priority_label|default('Normal') }}</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr id="home-work-schedule-empty-row">
-                                <td colspan="3" class="text-center">
-                                    <div class="d-flex flex-column align-items-center justify-content-center py-10">
-                                        <i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-4"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span><span class="path6"></span></i>
-                                        <span class="text-muted fw-semibold fs-6">No schedules in this range.</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        </table>
-                </div>
-                </div>
+            {# Navegación de semana #}
+            <div class="d-flex align-items-center gap-1 mt-1">
+                <button id="ws-prev-week" class="btn btn-icon btn-xs btn-light" title="Previous week">
+                    <i class="ki-duotone ki-arrow-left fs-5"><span class="path1"></span><span class="path2"></span></i>
+                </button>
+                <span id="ws-week-label" class="text-gray-400 fs-8 fw-semibold px-1">
+                    {{ day_dates[0] }} — {{ sun_date }}
+                </span>
+                <button id="ws-next-week" class="btn btn-icon btn-xs btn-light" title="Next week">
+                    <i class="ki-duotone ki-arrow-right fs-5"><span class="path1"></span><span class="path2"></span></i>
+                </button>
             </div>
         </div>
+        <div class="d-flex align-items-center gap-2">
+            {# Toggle Sunday #}
+            <div class="d-flex align-items-center gap-1" title="Toggle Sunday">
+                <span class="text-gray-500 fs-8 fw-semibold">Sun</span>
+                <div class="form-check form-switch form-check-custom form-check-solid">
+                    <input class="form-check-input h-20px w-30px" type="checkbox" id="ws-sun-toggle">
+                </div>
+            </div>
+            {# Filter #}
+            <div>
+                <button type="button" class="btn btn-icon btn-sm btn-light"
+                        data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end" title="Filter">
+                    <i class="ki-duotone ki-filter fs-4"><span class="path1"></span><span class="path2"></span></i>
+                </button>
+                <div id="ws-filter-menu" class="menu menu-sub menu-sub-dropdown w-300px" data-kt-menu="true">
+                    <div class="px-7 py-5">
+                        <div class="fs-5 text-gray-900 fw-bold">Filter options</div>
+                    </div>
+                    <div class="separator border-gray-200"></div>
+                    <div class="px-7 py-5">
+                        <div class="mb-3">
+                            <label class="form-label text-gray-700 fs-7" for="ws-filter-period">Quick select</label>
+                            <select class="form-select form-select-solid form-select-sm" id="ws-filter-period">
+                                <option value="">— Quick select —</option>
+                                <option value="this_week" selected>This Week</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="last_2_weeks">Last 2 Weeks</option>
+                            </select>
+                        </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label text-gray-700 fs-7">From</label>
+                                <div class="input-group input-group-solid input-group-sm date-picker-filter"
+                                     id="ws-datetimepicker-from" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control form-control-solid" placeholder="From"
+                                           data-td-target="#ws-datetimepicker-from" autocomplete="off"/>
+                                    <span class="input-group-text" data-td-target="#ws-datetimepicker-from" data-td-toggle="datetimepicker">
+                                        <i class="ki-duotone ki-calendar fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-gray-700 fs-7">To</label>
+                                <div class="input-group input-group-solid input-group-sm date-picker-filter"
+                                     id="ws-datetimepicker-to" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control form-control-solid" placeholder="To"
+                                           data-td-target="#ws-datetimepicker-to" autocomplete="off"/>
+                                    <span class="input-group-text" data-td-target="#ws-datetimepicker-to" data-td-toggle="datetimepicker">
+                                        <i class="ki-duotone ki-calendar fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-5">
+                            <label class="form-label text-gray-700 fs-7" for="ws-filter-project">Project</label>
+                            <select class="form-select form-select-solid form-select-sm" id="ws-filter-project">
+                                <option value=""></option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end mt-5">
+                            <button type="button" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                    data-kt-menu-dismiss="true" id="ws-btn-reset">Reset</button>
+                            <button type="button" class="btn btn-primary fw-semibold px-6"
+                                    data-kt-menu-dismiss="true" id="ws-btn-apply">Apply</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {# Go to Schedule #}
+            {% if schedule_url != '' %}
+                <a href="{{ schedule_url }}" class="btn btn-icon btn-sm btn-light-primary" title="Go to Schedule">
+                    <i class="ki-duotone ki-arrow-up-right fs-4">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </a>
+            {% endif %}
+        </div>
     </div>
+
+    {# ── Body ── #}
+    <div class="card-body pt-3 pb-4" id="ws-card-body">
+        {% if projects_list is empty %}
+            <div class="d-flex flex-column align-items-center justify-content-center py-10">
+                <i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-3">
+                    <span class="path1"></span><span class="path2"></span>
+                    <span class="path3"></span><span class="path4"></span>
+                    <span class="path5"></span><span class="path6"></span>
+                </i>
+                <span class="text-muted fw-semibold fs-6">No schedules this week.</span>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table align-middle gs-0 gy-2 mb-0">
+                    {# ─ Cabeceras de días ─ #}
+                    <thead>
+                        <tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">
+                            <th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>
+                            {% for i, label in day_labels %}
+                                {% set is_today = (day_dates[i] == today_str) %}
+                                {% set dp = day_dates[i]|split('/') %}
+                                <th class="text-center px-2 pb-3 {{ is_today ? 'text-primary' : 'text-gray-400' }}">
+                                    <div>{{ label }}</div>
+                                    <div class="fw-normal" style="font-size:10px">{{ dp[1] * 1 }}/{{ dp[0] * 1 }}</div>
+                                </th>
+                            {% endfor %}
+                            {# Columna Sunday — oculta por defecto #}
+                            {% set sp = sun_date|split('/') %}
+                            <th class="text-center px-2 pb-3 text-gray-400 ws-sun-col" style="display:none">
+                                <div>Sun</div>
+                                <div class="fw-normal" style="font-size:10px">{{ sp[1] * 1 }}/{{ sp[0] * 1 }}</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    {# ─ Filas de proyectos ─ #}
+                    <tbody>
+                        {% for project in projects_list %}
+                            <tr class="border-bottom border-gray-100">
+                                {# Nombre del proyecto #}
+                                <td class="ps-2 py-3">
+                                    {% if project.id > 0 %}
+                                        <a href="javascript:;" class="project-link text-gray-800 fw-bold text-hover-primary fs-6 d-block"
+                                           data-project-id="{{ project.id }}">
+                                            {{ project.num }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-gray-800 fw-bold fs-6">{{ project.num }}</span>
+                                    {% endif %}
+                                </td>
+
+                                {# Celdas Mon–Sat #}
+                                {% for i, day_date in day_dates %}
+                                    {% set is_today = (day_date == today_str) %}
+                                    {# Acumular datos de TODAS las entradas del mismo proyecto+día #}
+                                    {% set has_entry      = false %}
+                                    {% set agg_id         = 0 %}
+                                    {% set agg_desc       = '' %}
+                                    {% set agg_vendor     = '' %}
+                                    {% set agg_hour       = '' %}
+                                    {% set agg_qty        = 0 %}
+                                    {% set agg_lead       = '' %}
+                                    {% set agg_location   = '' %}
+                                    {% for row in week_entries %}
+                                        {% if row.project_number == project.num and row.day == day_date %}
+                                            {% set has_entry = true %}
+                                            {% if agg_id == 0 %}{% set agg_id = row.id %}{% endif %}
+                                            {% if row.description  is defined and row.description  != '' %}{% set agg_desc     = row.description  %}{% endif %}
+                                            {% if row.vendor_name  is defined and row.vendor_name  != '' %}{% set agg_vendor   = row.vendor_name  %}{% endif %}
+                                            {% if row.hour         is defined and row.hour         != '' %}{% set agg_hour     = row.hour         %}{% endif %}
+                                            {% if row.quantity     is defined and row.quantity      > 0  %}{% set agg_qty      = row.quantity     %}{% endif %}
+                                            {% if row.lead_name    is defined and row.lead_name    != '' %}{% set agg_lead     = row.lead_name    %}{% endif %}
+                                            {% if row.location     is defined and row.location     != '' %}{% set agg_location = row.location     %}{% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <td class="text-center px-2 py-2{{ is_today ? ' bg-light-primary' : '' }}">
+                                        {% if has_entry %}
+                                            {# Checkmark verde — abre ese schedule en edit #}
+                                            <a href="javascript:;"
+                                               class="ws-sched-link d-inline-flex align-items-center justify-content-center mb-1"
+                                               data-schedule-id="{{ agg_id }}"
+                                               title="Open schedule">
+                                                <i class="ki-duotone ki-check-circle text-success fs-2">
+                                                    <span class="path1"></span><span class="path2"></span>
+                                                </i>
+                                            </a>
+                                            {# Iconos 2×2 — clickeables + tooltip #}
+                                            <div class="d-flex flex-wrap justify-content-center gap-1" style="max-width:52px;margin:0 auto">
+                                                {% if agg_desc != '' %}
+                                                    <a href="javascript:;"
+                                                       class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary"
+                                                       style="width:20px;height:20px"
+                                                       data-schedule-id="{{ agg_id }}"
+                                                       title="Work: {{ agg_desc }}">
+                                                        <i class="ki-duotone ki-briefcase text-white" style="font-size:9px">
+                                                            <span class="path1"></span><span class="path2"></span>
+                                                        </i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if agg_vendor != '' or agg_hour != '' %}
+                                                    <a href="javascript:;"
+                                                       class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary"
+                                                       style="width:20px;height:20px"
+                                                       data-schedule-id="{{ agg_id }}"
+                                                       title="Vendor: {{ agg_vendor != '' ? agg_vendor : '—' }}{% if agg_hour != '' %} | {{ agg_hour }}h{% endif %}{% if agg_qty > 0 %} | Qty: {{ agg_qty }}{% endif %}">
+                                                        <i class="ki-duotone ki-time text-white" style="font-size:9px">
+                                                            <span class="path1"></span><span class="path2"></span>
+                                                        </i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if agg_lead != '' %}
+                                                    <a href="javascript:;"
+                                                       class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary"
+                                                       style="width:20px;height:20px"
+                                                       data-schedule-id="{{ agg_id }}"
+                                                       title="Lead: {{ agg_lead }}">
+                                                        <i class="ki-duotone ki-user text-white" style="font-size:9px">
+                                                            <span class="path1"></span><span class="path2"></span>
+                                                        </i>
+                                                    </a>
+                                                {% endif %}
+                                                {% if agg_location != '' %}
+                                                    <a href="javascript:;"
+                                                       class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary"
+                                                       style="width:20px;height:20px"
+                                                       data-schedule-id="{{ agg_id }}"
+                                                       title="Location: {{ agg_location }}">
+                                                        <i class="ki-duotone ki-geolocation text-white" style="font-size:9px">
+                                                            <span class="path1"></span><span class="path2"></span>
+                                                        </i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="text-gray-200 fs-6">·</span>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+
+                                {# Celda Sunday — oculta por defecto #}
+                                {% set sun_has_entry    = false %}
+                                {% set sun_agg_id       = 0 %}
+                                {% set sun_agg_desc     = '' %}
+                                {% set sun_agg_vendor   = '' %}
+                                {% set sun_agg_hour     = '' %}
+                                {% set sun_agg_qty      = 0 %}
+                                {% set sun_agg_lead     = '' %}
+                                {% set sun_agg_location = '' %}
+                                {% for row in week_entries %}
+                                    {% if row.project_number == project.num and row.day == sun_date %}
+                                        {% set sun_has_entry = true %}
+                                        {% if sun_agg_id == 0 %}{% set sun_agg_id = row.id %}{% endif %}
+                                        {% if row.description != '' %}{% set sun_agg_desc     = row.description %}{% endif %}
+                                        {% if row.vendor_name != '' %}{% set sun_agg_vendor   = row.vendor_name %}{% endif %}
+                                        {% if row.hour        != '' %}{% set sun_agg_hour     = row.hour        %}{% endif %}
+                                        {% if row.quantity     > 0  %}{% set sun_agg_qty      = row.quantity    %}{% endif %}
+                                        {% if row.lead_name   != '' %}{% set sun_agg_lead     = row.lead_name  %}{% endif %}
+                                        {% if row.location    != '' %}{% set sun_agg_location = row.location   %}{% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                {% set is_today_sun = (sun_date == today_str) %}
+                                <td class="text-center px-2 py-2 ws-sun-col{{ is_today_sun ? ' bg-light-primary' : '' }}" style="display:none">
+                                    {% if sun_has_entry %}
+                                        <a href="javascript:;"
+                                           class="ws-sched-link d-inline-flex align-items-center justify-content-center mb-1"
+                                           data-schedule-id="{{ sun_agg_id }}"
+                                           title="Open schedule">
+                                            <i class="ki-duotone ki-check-circle text-success fs-2">
+                                                <span class="path1"></span><span class="path2"></span>
+                                            </i>
+                                        </a>
+                                        <div class="d-flex flex-wrap justify-content-center gap-1" style="max-width:52px;margin:0 auto">
+                                            {% if sun_agg_desc != '' %}
+                                                <a href="javascript:;" class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary" style="width:20px;height:20px" data-schedule-id="{{ sun_agg_id }}" title="Work: {{ sun_agg_desc }}">
+                                                    <i class="ki-duotone ki-briefcase text-white" style="font-size:9px"><span class="path1"></span><span class="path2"></span></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if sun_agg_vendor != '' or sun_agg_hour != '' %}
+                                                <a href="javascript:;" class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary" style="width:20px;height:20px" data-schedule-id="{{ sun_agg_id }}" title="Vendor: {{ sun_agg_vendor != '' ? sun_agg_vendor : '—' }}{% if sun_agg_hour != '' %} | {{ sun_agg_hour }}h{% endif %}{% if sun_agg_qty > 0 %} | Qty: {{ sun_agg_qty }}{% endif %}">
+                                                    <i class="ki-duotone ki-time text-white" style="font-size:9px"><span class="path1"></span><span class="path2"></span></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if sun_agg_lead != '' %}
+                                                <a href="javascript:;" class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary" style="width:20px;height:20px" data-schedule-id="{{ sun_agg_id }}" title="Lead: {{ sun_agg_lead }}">
+                                                    <i class="ki-duotone ki-user text-white" style="font-size:9px"><span class="path1"></span><span class="path2"></span></i>
+                                                </a>
+                                            {% endif %}
+                                            {% if sun_agg_location != '' %}
+                                                <a href="javascript:;" class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary" style="width:20px;height:20px" data-schedule-id="{{ sun_agg_id }}" title="Location: {{ sun_agg_location }}">
+                                                    <i class="ki-duotone ki-geolocation text-white" style="font-size:9px"><span class="path1"></span><span class="path2"></span></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-200 fs-6">·</span>
+                                    {% endif %}
+                                </td>
+
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+</div>
+
+{# ─── Widget JS ────────────────────────────────────────────────────────────── #}
+<script>
+(function () {
+    var WS_API_URL   = {{ path('listarWorkScheduleHome')|json_encode|raw }};
+    var WS_SCHED_URL = {{ schedule_url|json_encode|raw }};
+    var WS_MON_INIT  = {{ day_dates[0]|json_encode|raw }};
+    var WS_INIT_DATA = {{ home_work_schedule|json_encode|raw }};
+    var wsSunVisible    = false;
+    var wsProjectFilter = '';
+    var wsState = { from: '', to: '', dates: [], data: null };
+
+    /* ── helpers de fecha ────────────────────────────────────────── */
+    function parseDate(str) { var p = str.split('/'); return new Date(p[2], p[0]-1, p[1]); }
+    function fmtDate(d) {
+        var m = String(d.getMonth()+1).padStart(2,'0');
+        var day = String(d.getDate()).padStart(2,'0');
+        return m+'/'+day+'/'+d.getFullYear();
+    }
+    function getMondayOfDate(d) {
+        var day = d.getDay();
+        var diff = day === 0 ? -6 : 1 - day;
+        var mon = new Date(d); mon.setDate(d.getDate() + diff); mon.setHours(0,0,0,0);
+        return mon;
+    }
+    function generateDates(fromStr, toStr) {
+        var from = parseDate(fromStr), to = parseDate(toStr);
+        var dates = [], d = new Date(from);
+        while (d <= to && dates.length < 14) { dates.push(fmtDate(d)); d.setDate(d.getDate()+1); }
+        return dates;
+    }
+    function isValidDate(str) {
+        if (!str || !/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return false;
+        return !isNaN(parseDate(str).getTime());
+    }
+    function todayStr() { return fmtDate(new Date()); }
+
+    /* ── escape HTML ─────────────────────────────────────────────── */
+    function esc(s) {
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    /* ── ícono circular ──────────────────────────────────────────── */
+    function circleIcon(schedId, icon, paths, title) {
+        var spans = '';
+        for (var i=1; i<=paths; i++) spans += '<span class="path'+i+'"></span>';
+        return '<a href="javascript:;" class="ws-sched-link ws-icon-tip d-inline-flex align-items-center justify-content-center rounded-circle bg-primary"'+
+               ' style="width:20px;height:20px" data-schedule-id="'+schedId+'" title="'+esc(title)+'">'+
+               '<i class="ki-duotone '+icon+' text-white" style="font-size:9px">'+spans+'</i></a>';
+    }
+
+    /* ── celda con datos ─────────────────────────────────────────── */
+    function renderCell(schedId, desc, vendor, hour, qty, lead, location) {
+        var html = '<a href="javascript:;" class="ws-sched-link d-inline-flex align-items-center justify-content-center mb-1"'+
+                   ' data-schedule-id="'+schedId+'" title="Open schedule">'+
+                   '<i class="ki-duotone ki-check-circle text-success fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
+        html += '<div class="d-flex flex-wrap justify-content-center gap-1" style="max-width:52px;margin:0 auto">';
+        if (desc)           html += circleIcon(schedId, 'ki-briefcase', 2, 'Work: '+desc);
+        if (vendor || hour) { var t = 'Vendor: '+(vendor||'—')+(hour?' | '+hour+'h':'')+(qty>0?' | Qty: '+qty:''); html += circleIcon(schedId, 'ki-time', 2, t); }
+        if (lead)     html += circleIcon(schedId, 'ki-user', 2, 'Lead: '+lead);
+        if (location) html += circleIcon(schedId, 'ki-geolocation', 2, 'Location: '+location);
+        html += '</div>';
+        return html;
+    }
+
+    /* ── acumular datos de un proyecto+día ───────────────────────── */
+    function accumulate(data, projNum, dayStr) {
+        var r = { has:false, id:0, desc:'', vendor:'', hour:'', qty:0, lead:'', loc:'' };
+        for (var i=0; i<data.length; i++) {
+            var row = data[i];
+            if (row.project_number !== projNum || row.day !== dayStr) continue;
+            r.has = true;
+            if (!r.id)           r.id     = row.id;
+            if (row.description) r.desc   = row.description;
+            if (row.vendor_name) r.vendor = row.vendor_name;
+            if (row.hour)        r.hour   = row.hour;
+            if (row.quantity>0)  r.qty    = row.quantity;
+            if (row.lead_name)   r.lead   = row.lead_name;
+            if (row.location)    r.loc    = row.location;
+        }
+        return r;
+    }
+
+    /* ── label de columna (día abreviado + fecha) ────────────────── */
+    var DAY_ABR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    function colLabel(dateStr) {
+        var d = parseDate(dateStr), p = dateStr.split('/');
+        return DAY_ABR[d.getDay()]+'<br><span style="font-size:10px">'+parseInt(p[1])+'/'+parseInt(p[0])+'</span>';
+    }
+
+    /* ── render completo de la tabla ─────────────────────────────── */
+    function renderTable(data, dates) {
+        var today      = todayStr();
+        var isWeekView = dates.length === 7;
+        var sunDate    = isWeekView ? dates[6] : null;
+
+        /* proyectos únicos máx 5 — excluir proyectos domingo-solo cuando Sun está oculto */
+        var projMap = {};
+        for (var i=0; i<data.length; i++) {
+            var r = data[i];
+            if (!r.project_number || dates.indexOf(r.day) === -1) continue;
+            if (!projMap[r.project_number]) projMap[r.project_number] = { id: r.project_id||0, hasWeekday: false, hasSun: false };
+            if (sunDate && r.day === sunDate) projMap[r.project_number].hasSun = true;
+            else projMap[r.project_number].hasWeekday = true;
+        }
+        var projects = [];
+        for (var pn in projMap) {
+            if (!Object.prototype.hasOwnProperty.call(projMap, pn)) continue;
+            var pm = projMap[pn];
+            if (pm.hasWeekday || (!isWeekView && pm.hasSun) || (isWeekView && wsSunVisible && pm.hasSun)) {
+                projects.push({ num: pn, id: pm.id });
+                if (projects.length >= 5) break;
+            }
+        }
+
+        if (!projects.length) {
+            return '<div class="d-flex flex-column align-items-center justify-content-center py-10">'+
+                   '<i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-3">'+
+                   '<span class="path1"></span><span class="path2"></span><span class="path3"></span>'+
+                   '<span class="path4"></span><span class="path5"></span><span class="path6"></span></i>'+
+                   '<span class="text-muted fw-semibold fs-6">No schedules for this period.</span></div>';
+        }
+
+        /* cabecera */
+        var h = '<div class="table-responsive"><table class="table align-middle gs-0 gy-2 mb-0"><thead>'+
+                '<tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">'+
+                '<th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>';
+        for (var di=0; di<dates.length; di++) {
+            var isSunCol = isWeekView && di === 6;
+            var isT = dates[di]===today;
+            var cls = 'text-center px-2 pb-3 '+(isT?'text-primary':'text-gray-400')+(isSunCol?' ws-sun-col':'');
+            var sty = (isSunCol && !wsSunVisible) ? ' style="display:none"' : '';
+            h += '<th class="'+cls+'"'+sty+'>'+colLabel(dates[di])+'</th>';
+        }
+        h += '</tr></thead><tbody>';
+
+        /* filas */
+        for (var pi=0; pi<projects.length; pi++) {
+            var proj = projects[pi];
+            h += '<tr class="border-bottom border-gray-100"><td class="ps-2 py-3">';
+            h += proj.id > 0
+                ? '<a href="javascript:;" class="project-link text-gray-800 fw-bold text-hover-primary fs-6 d-block" data-project-id="'+proj.id+'">'+esc(proj.num)+'</a>'
+                : '<span class="text-gray-800 fw-bold fs-6">'+esc(proj.num)+'</span>';
+            h += '</td>';
+            for (var ci=0; ci<dates.length; ci++) {
+                var isSunC = isWeekView && ci === 6;
+                var isTC = dates[ci]===today;
+                var agg = accumulate(data, proj.num, dates[ci]);
+                var sunSty = (isSunC && !wsSunVisible) ? ' style="display:none"' : '';
+                h += '<td class="text-center px-2 py-2'+(isTC?' bg-light-primary':'')+(isSunC?' ws-sun-col':'')+'"'+sunSty+'>';
+                h += agg.has ? renderCell(agg.id,agg.desc,agg.vendor,agg.hour,agg.qty,agg.lead,agg.loc) : '<span class="text-gray-200 fs-6">·</span>';
+                h += '</td>';
+            }
+            h += '</tr>';
+        }
+        h += '</tbody></table></div>';
+        return h;
+    }
+
+    /* ── re-render desde caché ───────────────────────────────────── */
+    function reRender() {
+        if (!wsState.data || !wsState.dates.length) return;
+        var body = document.getElementById('ws-card-body');
+        if (!body) return;
+        body.innerHTML = renderTable(wsState.data, wsState.dates);
+        bindHandlers(document.getElementById('widget-work_schedule'));
+    }
+
+    /* ── bind handlers ───────────────────────────────────────────── */
+    function bindHandlers(widget) {
+        widget.querySelectorAll('.ws-icon-tip').forEach(function (el) {
+            new bootstrap.Tooltip(el, { placement:'top', trigger:'hover' });
+        });
+        widget.querySelectorAll('a.project-link').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                var id = el.dataset.projectId;
+                if (!id) return;
+                localStorage.setItem('project_id_edit', id);
+                window.location.href = typeof url_project !== 'undefined' ? url_project : 'project';
+            });
+        });
+        widget.querySelectorAll('a.ws-sched-link').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                var sid = el.dataset.scheduleId;
+                if (!sid || sid==='0') return;
+                localStorage.setItem('schedule_id_edit', sid);
+                window.location.href = WS_SCHED_URL;
+            });
+        });
+    }
+
+    /* ── cargar rango por AJAX ───────────────────────────────────── */
+    function loadRange(fromStr, toStr) {
+        var dates = generateDates(fromStr, toStr);
+        if (!dates.length) return;
+        wsState.from = fromStr; wsState.to = toStr; wsState.dates = dates;
+
+        var body = document.getElementById('ws-card-body');
+        if (!body) return;
+        body.innerHTML = '<div class="d-flex justify-content-center py-10"><span class="spinner-border spinner-border-sm text-primary"></span></div>';
+
+        var label = document.getElementById('ws-week-label');
+        if (label) label.textContent = fromStr+' — '+toStr;
+
+        var fd = new URLSearchParams();
+        fd.set('fecha_inicial', fromStr);
+        fd.set('fecha_fin', toStr);
+        if (wsProjectFilter) fd.set('project_id', wsProjectFilter);
+
+        axios.post(WS_API_URL, fd, { responseType:'json' })
+            .then(function (res) {
+                if (res.data && res.data.success) {
+                    wsState.data = res.data.data;
+                    body.innerHTML = renderTable(wsState.data, wsState.dates);
+                    bindHandlers(document.getElementById('widget-work_schedule'));
+                }
+            })
+            .catch(function () {
+                body.innerHTML = '<div class="text-center text-muted py-6">Error loading data.</div>';
+            });
+    }
+
+    /* ── calcular rango según quick-select ───────────────────────── */
+    function getRangeForQuickSelect(val) {
+        var today = new Date(); today.setHours(0,0,0,0);
+        var from, to;
+        if (val === 'this_week') {
+            from = getMondayOfDate(today);
+            to   = new Date(from); to.setDate(to.getDate()+6);
+        } else if (val === 'last_week') {
+            from = getMondayOfDate(today); from.setDate(from.getDate()-7);
+            to   = new Date(from); to.setDate(to.getDate()+6);
+        } else if (val === 'last_2_weeks') {
+            from = getMondayOfDate(today); from.setDate(from.getDate()-7);
+            to   = new Date(from); to.setDate(to.getDate()+13);
+        }
+        return from ? { from: fmtDate(from), to: fmtDate(to) } : null;
+    }
+
+    /* ── init ────────────────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
+        var widget = document.getElementById('widget-work_schedule');
+        if (!widget) return;
+
+        /* estado inicial desde datos del servidor */
+        var initSun = parseDate(WS_MON_INIT); initSun.setDate(initSun.getDate()+6);
+        wsState.from  = WS_MON_INIT;
+        wsState.to    = fmtDate(initSun);
+        wsState.dates = generateDates(wsState.from, wsState.to);
+        wsState.data  = WS_INIT_DATA;
+
+        /* inicializar FlatpickrUtil en los inputs de fecha */
+        var _fpCfg = { localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }, static: true, position: 'below' };
+        var _fromGroup = document.getElementById('ws-datetimepicker-from');
+        var _toGroup   = document.getElementById('ws-datetimepicker-to');
+        if (typeof FlatpickrUtil !== 'undefined' && _fromGroup && _toGroup) {
+            FlatpickrUtil.initDate('ws-datetimepicker-from', Object.assign({}, _fpCfg, { container: _fromGroup, positionElement: _fromGroup.querySelector('input') }));
+            FlatpickrUtil.initDate('ws-datetimepicker-to',   Object.assign({}, _fpCfg, { container: _toGroup,   positionElement: _toGroup.querySelector('input') }));
+            FlatpickrUtil.setDate('ws-datetimepicker-from', wsState.from);
+            FlatpickrUtil.setDate('ws-datetimepicker-to',   wsState.to);
+        }
+
+        bindHandlers(widget);
+
+        /* toggle Sunday → re-render desde caché */
+        var toggle = document.getElementById('ws-sun-toggle');
+        if (toggle) toggle.addEventListener('change', function () {
+            wsSunVisible = toggle.checked;
+            reRender();
+        });
+
+        /* prev / next — desplaza el rango completo */
+        var prevBtn = document.getElementById('ws-prev-week');
+        var nextBtn = document.getElementById('ws-next-week');
+        if (prevBtn) prevBtn.addEventListener('click', function () {
+            var step = -(wsState.dates.length || 7);
+            var f = parseDate(wsState.from); f.setDate(f.getDate()+step);
+            var t = parseDate(wsState.to);   t.setDate(t.getDate()+step);
+            loadRange(fmtDate(f), fmtDate(t));
+        });
+        if (nextBtn) nextBtn.addEventListener('click', function () {
+            var step = wsState.dates.length || 7;
+            var f = parseDate(wsState.from); f.setDate(f.getDate()+step);
+            var t = parseDate(wsState.to);   t.setDate(t.getDate()+step);
+            loadRange(fmtDate(f), fmtDate(t));
+        });
+
+        /* quick-select auto-rellena From/To */
+        function onPeriodChange(val) {
+            if (!val) return;
+            var range = getRangeForQuickSelect(val);
+            if (!range) return;
+            if (typeof FlatpickrUtil !== 'undefined') {
+                FlatpickrUtil.setDate('ws-datetimepicker-from', range.from);
+                FlatpickrUtil.setDate('ws-datetimepicker-to',   range.to);
+            }
+        }
+
+        /* select2 */
+        if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
+            $('#ws-filter-period').select2({ minimumResultsForSearch: Infinity, width:'100%', dropdownParent:$('#ws-filter-menu') });
+            $('#ws-filter-project').select2({
+                placeholder:'Search project...', allowClear:true, width:'100%',
+                dropdownParent:$('#ws-filter-menu'),
+                ajax:{
+                    url:'project/listarOrdenados', dataType:'json', delay:250,
+                    data: function(p){ return { search: p.term }; },
+                    processResults: function(d){ return { results: $.map(d.projects||[], function(i){ return { id:i.project_id, text:(i.number||'')+' - '+(i.description||'') }; }) }; },
+                    cache:true
+                },
+                minimumInputLength:3
+            });
+            $('#ws-filter-period').on('change', function(){ onPeriodChange($(this).val()); });
+        } else {
+            var pEl = document.getElementById('ws-filter-period');
+            if (pEl) pEl.addEventListener('change', function(){ onPeriodChange(this.value); });
+        }
+
+        /* Apply */
+        var applyBtn = document.getElementById('ws-btn-apply');
+        if (applyBtn) applyBtn.addEventListener('click', function () {
+            var fromVal = typeof FlatpickrUtil !== 'undefined' ? FlatpickrUtil.getString('ws-datetimepicker-from').trim() : '';
+            var toVal   = typeof FlatpickrUtil !== 'undefined' ? FlatpickrUtil.getString('ws-datetimepicker-to').trim()   : '';
+            if (!isValidDate(fromVal) || !isValidDate(toVal)) return;
+            wsProjectFilter = typeof $ !== 'undefined' ? ($('#ws-filter-project').val()||'') : '';
+            loadRange(fromVal, toVal);
+        });
+
+        /* Reset */
+        var resetBtn = document.getElementById('ws-btn-reset');
+        if (resetBtn) resetBtn.addEventListener('click', function () {
+            wsProjectFilter = '';
+            var iSun = parseDate(WS_MON_INIT); iSun.setDate(iSun.getDate()+6);
+            var iTo  = fmtDate(iSun);
+            if (typeof FlatpickrUtil !== 'undefined') {
+                FlatpickrUtil.setDate('ws-datetimepicker-from', WS_MON_INIT);
+                FlatpickrUtil.setDate('ws-datetimepicker-to',   iTo);
+            }
+            if (typeof $ !== 'undefined') {
+                $('#ws-filter-project').val(null).trigger('change');
+                $('#ws-filter-period').val('this_week').trigger('change');
+            }
+            loadRange(WS_MON_INIT, iTo);
+        });
+    });
+}());
+</script>

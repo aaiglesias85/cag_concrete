@@ -6,6 +6,10 @@ listarStatsDashboard:
   path: /dashboard/listarStats
   defaults: { _controller: App\Controller\Admin\DefaultController::listarStats, _format: json }
 
+listarWorkScheduleHome:
+  path: /dashboard/work-schedule
+  defaults: { _controller: App\Controller\Admin\DefaultController::listarWorkScheduleHome, _format: json }
+
 userWidgetPreferences:
   path: /user/widgets
   defaults: { _controller: App\Controller\Admin\DefaultController::widgetPreferences }

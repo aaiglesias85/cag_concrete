@@ -956,10 +956,13 @@ class DefaultService extends Base
                 continue;
             }
             if ('work_schedule' === $w['id']) {
-                $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+                $dow  = (int)(new \DateTime())->format('N'); // 1=Mon … 7=Sun
+                $week = $dow >= 6 ? 'next week' : 'this week';
+                $monday = new \DateTime("monday {$week}");
+                $sunday = (clone $monday)->modify('+6 days'); // Dom = Lun + 6
                 $homeWorkSchedule = $this->scheduleService->listarSchedulesPayloadHome(
-                    $r0['inicial'],
-                    $r0['final']
+                    $monday->format('m/d/Y'),
+                    $sunday->format('m/d/Y')
                 );
                 continue;
             }
