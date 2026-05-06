@@ -115,8 +115,8 @@ class DefaultController extends AbstractAdminController
     {
         try {
             $fechaInicial = (string) ($request->get('fecha_inicial') ?? '');
-            $fechaFin     = (string) ($request->get('fecha_fin') ?? '');
-            $projectId    = (string) ($request->get('project_id') ?? '');
+            $fechaFin = (string) ($request->get('fecha_fin') ?? '');
+            $projectId = (string) ($request->get('project_id') ?? '');
 
             if (!$fechaInicial || !$fechaFin) {
                 return $this->json(['success' => false, 'error' => 'Dates required']);
