@@ -196,7 +196,6 @@ class TaskController extends AbstractAdminController
         }
     }
 
-    #[RequireAdminPermission(FunctionId::TASKS, AdminPermission::Edit, jsonOnDenied: true)]
     public function cambiarEstado(TaskCambiarEstadoRequest $d): JsonResponse
     {
         try {
