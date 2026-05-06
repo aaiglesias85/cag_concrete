@@ -1221,7 +1221,7 @@ class ScheduleService extends Base
             $project = $value->getProject();
             $vendor = $value->getConcreteVendor();
             $employees = $this->ListarEmployeesDeSchedule($value->getScheduleId());
-            $lead_name = !empty($employees) ? implode(', ', array_map(fn($e) => $e->getName(), $employees)) : '';
+            $lead_name = !empty($employees) ? implode(', ', array_map(fn ($e) => $e->getName(), $employees)) : '';
             $list[] = [
                 'id' => $value->getScheduleId(),
                 'project_id' => $project ? (int) $project->getProjectId() : 0,
