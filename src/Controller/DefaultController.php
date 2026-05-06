@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
+use App\Entity\Usuario;
 use App\Service\ScriptService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Email;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class DefaultController extends AbstractController
 {
@@ -18,35 +19,38 @@ class DefaultController extends AbstractController
         $this->scriptService = $scriptService;
     }
 
-    // test email
-    public function testemail()
+    public function testemail(): Response
     {
-        // Enviar email
+        $user = $this->getUser();
+        if (!$user instanceof UserInterface) {
+            return new Response('', 403);
+        }
+
+        $rawTo = $user instanceof Usuario ? $user->getEmail() : $user->getUserIdentifier();
+        $toEmail = trim((string) $rawTo);
+        if ('' === $toEmail || !filter_var($toEmail, FILTER_VALIDATE_EMAIL)) {
+            return new Response('Email inválido', 400);
+        }
+
         $direccion_url = $this->scriptService->ObtenerURL();
         $direccion_from = $this->getParameter('mailer_sender_address');
         $from_name = $this->getParameter('mailer_from_name');
 
         $asunto = 'Test Email';
         $contenido = 'Sending emails is fun again!';
-        // symfony mailer
+        $receptor = ($user instanceof Usuario && $user->getNombre()) ? $user->getNombre() : 'Usuario';
+
         $mensaje = (new TemplatedEmail())
             ->from(new Address($direccion_from, $from_name))
-            ->to('cyborgmnk@gmail.com')
+            ->to($toEmail)
             ->subject($asunto)
             ->htmlTemplate('mailing/mail.html.twig')
             ->context([
                 'direccion_url' => $direccion_url,
                 'asunto' => $asunto,
-                'receptor' => 'Usuario',
+                'receptor' => $receptor,
                 'contenido' => $contenido,
-            ])
-            // attach
-            // ->attachFromPath('/path/to/documents/terms-of-use.pdf')
-            // optionally you can tell email clients to display a custom name for the file
-            // ->attachFromPath('/path/to/documents/privacy.pdf', 'Privacy Policy')
-            // optionally you can provide an explicit MIME type (otherwise it's guessed)
-            // ->attachFromPath('/path/to/documents/contract.doc', 'Contract', 'application/msword')
-        ;
+            ]);
 
         $this->scriptService->mailer->send($mensaje);
 

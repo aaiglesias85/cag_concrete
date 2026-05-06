@@ -80,12 +80,18 @@ security:
       # Swagger documentation - public access
       - { path: ^/api/doc, roles: PUBLIC_ACCESS }
 
+      # Redirección pública /test-email → /admin/test-email (la acción exige ROLE_ADMIN)
+      - { path: ^/test-email$, roles: PUBLIC_ACCESS }
+
       # API login autenticar and olvido-Contrasenna (públicos; throttling vía rate_limiter en LoginController)
       - { path: ^/api/(es|en)/login/autenticar, roles: PUBLIC_ACCESS }
       - { path: ^/api/(es|en)/login/olvido-Contrasenna, roles: PUBLIC_ACCESS }
 
       # API login cerrar-sesion route (requires authentication)
       - { path: ^/api/(es|en)/login/cerrar-sesion, roles: [ROLE_ADMIN, ROLE_USER] }
+
+      # Prueba de correo: solo administradores (antes que la regla general de ^/admin)
+      - { path: ^/admin/test-email, roles: [ROLE_ADMIN] }
 
       # Admin routes require authentication
       - { path: ^/admin, roles: [ROLE_ADMIN, ROLE_USER] }

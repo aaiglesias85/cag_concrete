@@ -48,10 +48,17 @@ login_check:
 logout:
    path: /logout
 
-#test
+#test — sesión admin (ROLE_ADMIN); la URL antigua redirige al nuevo path
 testemail:
+   path: /admin/test-email
+   defaults: { _controller: App\Controller\DefaultController::testemail }
+
+testemail_legacy_redirect:
    path: /test-email
-   defaults: { _controller: App\Controller\DefaultController::testemail, _format: json }
+   defaults:
+      _controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController::redirectAction
+      route: testemail
+      permanent: true
 
 #crons
 crondefinirnotificacionesduedate:
