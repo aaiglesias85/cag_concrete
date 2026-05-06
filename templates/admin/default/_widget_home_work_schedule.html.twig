@@ -28,7 +28,8 @@
 {% for row in week_entries %}
     {% if row.project_number is not empty
           and row.project_number not in seen
-          and projects_list|length < 5 %}
+          and projects_list|length < 5
+          and row.day in day_dates %}
         {% set seen          = seen|merge([row.project_number]) %}
         {% set projects_list = projects_list|merge([{
             'num': row.project_number,
@@ -85,18 +86,42 @@
                     </div>
                     <div class="separator border-gray-200"></div>
                     <div class="px-7 py-5">
-                        <div class="mb-5">
-                            <label class="form-label text-gray-700" for="ws-filter-period">Period</label>
-                            <select class="form-select form-select-solid" id="ws-filter-period">
-                                <option value="current_month" selected>Current Month</option>
-                                <option value="last_month">Last Month</option>
-                                <option value="2_months_ago">Last 2 Months</option>
-                                <option value="3_months_ago">Last 3 Months</option>
+                        <div class="mb-3">
+                            <label class="form-label text-gray-700 fs-7" for="ws-filter-period">Quick select</label>
+                            <select class="form-select form-select-solid form-select-sm" id="ws-filter-period">
+                                <option value="">— Quick select —</option>
+                                <option value="this_week" selected>This Week</option>
+                                <option value="last_week">Last Week</option>
+                                <option value="last_2_weeks">Last 2 Weeks</option>
                             </select>
                         </div>
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <label class="form-label text-gray-700 fs-7">From</label>
+                                <div class="input-group input-group-solid input-group-sm date-picker-filter"
+                                     id="ws-datetimepicker-from" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control form-control-solid" placeholder="From"
+                                           data-td-target="#ws-datetimepicker-from" autocomplete="off"/>
+                                    <span class="input-group-text" data-td-target="#ws-datetimepicker-from" data-td-toggle="datetimepicker">
+                                        <i class="ki-duotone ki-calendar fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label text-gray-700 fs-7">To</label>
+                                <div class="input-group input-group-solid input-group-sm date-picker-filter"
+                                     id="ws-datetimepicker-to" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                                    <input type="text" class="form-control form-control-solid" placeholder="To"
+                                           data-td-target="#ws-datetimepicker-to" autocomplete="off"/>
+                                    <span class="input-group-text" data-td-target="#ws-datetimepicker-to" data-td-toggle="datetimepicker">
+                                        <i class="ki-duotone ki-calendar fs-4"><span class="path1"></span><span class="path2"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mb-5">
-                            <label class="form-label text-gray-700" for="ws-filter-project">Project</label>
-                            <select class="form-select form-select-solid" id="ws-filter-project">
+                            <label class="form-label text-gray-700 fs-7" for="ws-filter-project">Project</label>
+                            <select class="form-select form-select-solid form-select-sm" id="ws-filter-project">
                                 <option value=""></option>
                             </select>
                         </div>
@@ -331,12 +356,13 @@
 {# ─── Widget JS ────────────────────────────────────────────────────────────── #}
 <script>
 (function () {
-    var WS_API_URL    = {{ path('listarWorkScheduleHome')|json_encode|raw }};
-    var WS_SCHED_URL  = {{ schedule_url|json_encode|raw }};
-    var WS_MON_INIT   = {{ day_dates[0]|json_encode|raw }};  {# 'm/d/Y' del lunes inicial #}
-    var wsOffset      = 0; {# 0 = semana actual, -1 = anterior, +1 = siguiente #}
-    var wsSunVisible  = false;
+    var WS_API_URL   = {{ path('listarWorkScheduleHome')|json_encode|raw }};
+    var WS_SCHED_URL = {{ schedule_url|json_encode|raw }};
+    var WS_MON_INIT  = {{ day_dates[0]|json_encode|raw }};
+    var WS_INIT_DATA = {{ home_work_schedule|json_encode|raw }};
+    var wsSunVisible    = false;
     var wsProjectFilter = '';
+    var wsState = { from: '', to: '', dates: [], data: null };
 
     /* ── helpers de fecha ────────────────────────────────────────── */
     function parseDate(str) { var p = str.split('/'); return new Date(p[2], p[0]-1, p[1]); }
@@ -345,15 +371,21 @@
         var day = String(d.getDate()).padStart(2,'0');
         return m+'/'+day+'/'+d.getFullYear();
     }
-    function getWeekDates(monStr, offset) {
-        var mon = parseDate(monStr);
-        mon.setDate(mon.getDate() + offset * 7);
-        var dates = [];
-        for (var i = 0; i < 7; i++) {
-            var d = new Date(mon); d.setDate(mon.getDate() + i);
-            dates.push(fmtDate(d));
-        }
-        return dates; /* [Mon,Tue,Wed,Thu,Fri,Sat,Sun] */
+    function getMondayOfDate(d) {
+        var day = d.getDay();
+        var diff = day === 0 ? -6 : 1 - day;
+        var mon = new Date(d); mon.setDate(d.getDate() + diff); mon.setHours(0,0,0,0);
+        return mon;
+    }
+    function generateDates(fromStr, toStr) {
+        var from = parseDate(fromStr), to = parseDate(toStr);
+        var dates = [], d = new Date(from);
+        while (d <= to && dates.length < 14) { dates.push(fmtDate(d)); d.setDate(d.getDate()+1); }
+        return dates;
+    }
+    function isValidDate(str) {
+        if (!str || !/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return false;
+        return !isNaN(parseDate(str).getTime());
     }
     function todayStr() { return fmtDate(new Date()); }
 
@@ -362,7 +394,7 @@
         return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    /* ── render del ícono circular ───────────────────────────────── */
+    /* ── ícono circular ──────────────────────────────────────────── */
     function circleIcon(schedId, icon, paths, title) {
         var spans = '';
         for (var i=1; i<=paths; i++) spans += '<span class="path'+i+'"></span>';
@@ -371,96 +403,18 @@
                '<i class="ki-duotone '+icon+' text-white" style="font-size:9px">'+spans+'</i></a>';
     }
 
-    /* ── render de una celda con datos ──────────────────────────── */
+    /* ── celda con datos ─────────────────────────────────────────── */
     function renderCell(schedId, desc, vendor, hour, qty, lead, location) {
         var html = '<a href="javascript:;" class="ws-sched-link d-inline-flex align-items-center justify-content-center mb-1"'+
                    ' data-schedule-id="'+schedId+'" title="Open schedule">'+
                    '<i class="ki-duotone ki-check-circle text-success fs-2"><span class="path1"></span><span class="path2"></span></i></a>';
         html += '<div class="d-flex flex-wrap justify-content-center gap-1" style="max-width:52px;margin:0 auto">';
         if (desc)           html += circleIcon(schedId, 'ki-briefcase', 2, 'Work: '+desc);
-        if (vendor || hour) {
-            var t = 'Vendor: '+(vendor||'—');
-            if (hour) t += ' | '+hour+'h';
-            if (qty > 0) t += ' | Qty: '+qty;
-            html += circleIcon(schedId, 'ki-time', 2, t);
-        }
+        if (vendor || hour) { var t = 'Vendor: '+(vendor||'—')+(hour?' | '+hour+'h':'')+(qty>0?' | Qty: '+qty:''); html += circleIcon(schedId, 'ki-time', 2, t); }
         if (lead)     html += circleIcon(schedId, 'ki-user', 2, 'Lead: '+lead);
         if (location) html += circleIcon(schedId, 'ki-geolocation', 2, 'Location: '+location);
         html += '</div>';
         return html;
-    }
-
-    /* ── render completo de la tabla ─────────────────────────────── */
-    function renderTable(data, dates) {
-        var today  = todayStr();
-        var monSat = dates.slice(0,6);
-        var sunD   = dates[6];
-        var labels = ['Mon','Tue','Wed','Thu','Fri','Sat'];
-
-        /* proyectos únicos máx 5 */
-        var seen = {}, projects = [];
-        for (var i=0; i<data.length; i++) {
-            var r = data[i];
-            if (r.project_number && !seen[r.project_number] && projects.length < 5) {
-                seen[r.project_number] = true;
-                projects.push({ num: r.project_number, id: r.project_id||0 });
-            }
-        }
-
-        if (!projects.length) {
-            return '<div class="d-flex flex-column align-items-center justify-content-center py-10">'+
-                   '<i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-3">'+
-                   '<span class="path1"></span><span class="path2"></span><span class="path3"></span>'+
-                   '<span class="path4"></span><span class="path5"></span><span class="path6"></span></i>'+
-                   '<span class="text-muted fw-semibold fs-6">No schedules this week.</span></div>';
-        }
-
-        /* cabecera */
-        var h = '<div class="table-responsive"><table class="table align-middle gs-0 gy-2 mb-0"><thead>'+
-                '<tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">'+
-                '<th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>';
-        for (var d=0; d<6; d++) {
-            var isT = monSat[d]===today;
-            var dp  = monSat[d].split('/');
-            h += '<th class="text-center px-2 pb-3 '+(isT?'text-primary':'text-gray-400')+'">'+
-                 '<div>'+labels[d]+'</div>'+
-                 '<div class="fw-normal" style="font-size:10px">'+parseInt(dp[1])+'/'+parseInt(dp[0])+'</div></th>';
-        }
-        var sp = sunD.split('/');
-        h += '<th class="text-center px-2 pb-3 text-gray-400 ws-sun-col" style="display:'+(wsSunVisible?'':'none')+'">'+
-             '<div>Sun</div><div class="fw-normal" style="font-size:10px">'+parseInt(sp[1])+'/'+parseInt(sp[0])+'</div></th>';
-        h += '</tr></thead><tbody>';
-
-        /* filas */
-        for (var p=0; p<projects.length; p++) {
-            var proj = projects[p];
-            h += '<tr class="border-bottom border-gray-100"><td class="ps-2 py-3">';
-            if (proj.id > 0)
-                h += '<a href="javascript:;" class="project-link text-gray-800 fw-bold text-hover-primary fs-6 d-block" data-project-id="'+proj.id+'">'+esc(proj.num)+'</a>';
-            else
-                h += '<span class="text-gray-800 fw-bold fs-6">'+esc(proj.num)+'</span>';
-            h += '</td>';
-
-            /* celdas Mon-Sat */
-            for (var d=0; d<6; d++) {
-                var isT = monSat[d]===today;
-                var agg = accumulate(data, proj.num, monSat[d]);
-                h += '<td class="text-center px-2 py-2'+(isT?' bg-light-primary':'')+'"">';
-                h += agg.has ? renderCell(agg.id,agg.desc,agg.vendor,agg.hour,agg.qty,agg.lead,agg.loc)
-                             : '<span class="text-gray-200 fs-6">·</span>';
-                h += '</td>';
-            }
-
-            /* celda domingo */
-            var isTSun = sunD===today;
-            var aggSun = accumulate(data, proj.num, sunD);
-            h += '<td class="text-center px-2 py-2 ws-sun-col'+(isTSun?' bg-light-primary':'')+'" style="display:'+(wsSunVisible?'':'none')+'">';
-            h += aggSun.has ? renderCell(aggSun.id,aggSun.desc,aggSun.vendor,aggSun.hour,aggSun.qty,aggSun.lead,aggSun.loc)
-                            : '<span class="text-gray-200 fs-6">·</span>';
-            h += '</td></tr>';
-        }
-        h += '</tbody></table></div>';
-        return h;
     }
 
     /* ── acumular datos de un proyecto+día ───────────────────────── */
@@ -470,7 +424,7 @@
             var row = data[i];
             if (row.project_number !== projNum || row.day !== dayStr) continue;
             r.has = true;
-            if (!r.id)         r.id     = row.id;
+            if (!r.id)           r.id     = row.id;
             if (row.description) r.desc   = row.description;
             if (row.vendor_name) r.vendor = row.vendor_name;
             if (row.hour)        r.hour   = row.hour;
@@ -481,7 +435,92 @@
         return r;
     }
 
-    /* ── bind handlers tras cada render ─────────────────────────── */
+    /* ── label de columna (día abreviado + fecha) ────────────────── */
+    var DAY_ABR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    function colLabel(dateStr) {
+        var d = parseDate(dateStr), p = dateStr.split('/');
+        return DAY_ABR[d.getDay()]+'<br><span style="font-size:10px">'+parseInt(p[1])+'/'+parseInt(p[0])+'</span>';
+    }
+
+    /* ── render completo de la tabla ─────────────────────────────── */
+    function renderTable(data, dates) {
+        var today      = todayStr();
+        var isWeekView = dates.length === 7;
+        var sunDate    = isWeekView ? dates[6] : null;
+
+        /* proyectos únicos máx 5 — excluir proyectos domingo-solo cuando Sun está oculto */
+        var projMap = {};
+        for (var i=0; i<data.length; i++) {
+            var r = data[i];
+            if (!r.project_number || dates.indexOf(r.day) === -1) continue;
+            if (!projMap[r.project_number]) projMap[r.project_number] = { id: r.project_id||0, hasWeekday: false, hasSun: false };
+            if (sunDate && r.day === sunDate) projMap[r.project_number].hasSun = true;
+            else projMap[r.project_number].hasWeekday = true;
+        }
+        var projects = [];
+        for (var pn in projMap) {
+            if (!Object.prototype.hasOwnProperty.call(projMap, pn)) continue;
+            var pm = projMap[pn];
+            if (pm.hasWeekday || (!isWeekView && pm.hasSun) || (isWeekView && wsSunVisible && pm.hasSun)) {
+                projects.push({ num: pn, id: pm.id });
+                if (projects.length >= 5) break;
+            }
+        }
+
+        if (!projects.length) {
+            return '<div class="d-flex flex-column align-items-center justify-content-center py-10">'+
+                   '<i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-3">'+
+                   '<span class="path1"></span><span class="path2"></span><span class="path3"></span>'+
+                   '<span class="path4"></span><span class="path5"></span><span class="path6"></span></i>'+
+                   '<span class="text-muted fw-semibold fs-6">No schedules for this period.</span></div>';
+        }
+
+        /* cabecera */
+        var h = '<div class="table-responsive"><table class="table align-middle gs-0 gy-2 mb-0"><thead>'+
+                '<tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">'+
+                '<th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>';
+        for (var di=0; di<dates.length; di++) {
+            var isSunCol = isWeekView && di === 6;
+            var isT = dates[di]===today;
+            var cls = 'text-center px-2 pb-3 '+(isT?'text-primary':'text-gray-400')+(isSunCol?' ws-sun-col':'');
+            var sty = (isSunCol && !wsSunVisible) ? ' style="display:none"' : '';
+            h += '<th class="'+cls+'"'+sty+'>'+colLabel(dates[di])+'</th>';
+        }
+        h += '</tr></thead><tbody>';
+
+        /* filas */
+        for (var pi=0; pi<projects.length; pi++) {
+            var proj = projects[pi];
+            h += '<tr class="border-bottom border-gray-100"><td class="ps-2 py-3">';
+            h += proj.id > 0
+                ? '<a href="javascript:;" class="project-link text-gray-800 fw-bold text-hover-primary fs-6 d-block" data-project-id="'+proj.id+'">'+esc(proj.num)+'</a>'
+                : '<span class="text-gray-800 fw-bold fs-6">'+esc(proj.num)+'</span>';
+            h += '</td>';
+            for (var ci=0; ci<dates.length; ci++) {
+                var isSunC = isWeekView && ci === 6;
+                var isTC = dates[ci]===today;
+                var agg = accumulate(data, proj.num, dates[ci]);
+                var sunSty = (isSunC && !wsSunVisible) ? ' style="display:none"' : '';
+                h += '<td class="text-center px-2 py-2'+(isTC?' bg-light-primary':'')+(isSunC?' ws-sun-col':'')+'"'+sunSty+'>';
+                h += agg.has ? renderCell(agg.id,agg.desc,agg.vendor,agg.hour,agg.qty,agg.lead,agg.loc) : '<span class="text-gray-200 fs-6">·</span>';
+                h += '</td>';
+            }
+            h += '</tr>';
+        }
+        h += '</tbody></table></div>';
+        return h;
+    }
+
+    /* ── re-render desde caché ───────────────────────────────────── */
+    function reRender() {
+        if (!wsState.data || !wsState.dates.length) return;
+        var body = document.getElementById('ws-card-body');
+        if (!body) return;
+        body.innerHTML = renderTable(wsState.data, wsState.dates);
+        bindHandlers(document.getElementById('widget-work_schedule'));
+    }
+
+    /* ── bind handlers ───────────────────────────────────────────── */
     function bindHandlers(widget) {
         widget.querySelectorAll('.ws-icon-tip').forEach(function (el) {
             new bootstrap.Tooltip(el, { placement:'top', trigger:'hover' });
@@ -506,24 +545,29 @@
         });
     }
 
-    /* ── cargar semana por AJAX ──────────────────────────────────── */
-    function loadWeek(dates) {
+    /* ── cargar rango por AJAX ───────────────────────────────────── */
+    function loadRange(fromStr, toStr) {
+        var dates = generateDates(fromStr, toStr);
+        if (!dates.length) return;
+        wsState.from = fromStr; wsState.to = toStr; wsState.dates = dates;
+
         var body = document.getElementById('ws-card-body');
         if (!body) return;
         body.innerHTML = '<div class="d-flex justify-content-center py-10"><span class="spinner-border spinner-border-sm text-primary"></span></div>';
 
         var label = document.getElementById('ws-week-label');
-        if (label) label.textContent = dates[0]+' — '+dates[6];
+        if (label) label.textContent = fromStr+' — '+toStr;
 
         var fd = new URLSearchParams();
-        fd.set('fecha_inicial', dates[0]);
-        fd.set('fecha_fin',     dates[6]);
+        fd.set('fecha_inicial', fromStr);
+        fd.set('fecha_fin', toStr);
         if (wsProjectFilter) fd.set('project_id', wsProjectFilter);
 
         axios.post(WS_API_URL, fd, { responseType:'json' })
             .then(function (res) {
                 if (res.data && res.data.success) {
-                    body.innerHTML = renderTable(res.data.data, dates);
+                    wsState.data = res.data.data;
+                    body.innerHTML = renderTable(wsState.data, wsState.dates);
                     bindHandlers(document.getElementById('widget-work_schedule'));
                 }
             })
@@ -532,106 +576,127 @@
             });
     }
 
+    /* ── calcular rango según quick-select ───────────────────────── */
+    function getRangeForQuickSelect(val) {
+        var today = new Date(); today.setHours(0,0,0,0);
+        var from, to;
+        if (val === 'this_week') {
+            from = getMondayOfDate(today);
+            to   = new Date(from); to.setDate(to.getDate()+6);
+        } else if (val === 'last_week') {
+            from = getMondayOfDate(today); from.setDate(from.getDate()-7);
+            to   = new Date(from); to.setDate(to.getDate()+6);
+        } else if (val === 'last_2_weeks') {
+            from = getMondayOfDate(today); from.setDate(from.getDate()-7);
+            to   = new Date(from); to.setDate(to.getDate()+13);
+        }
+        return from ? { from: fmtDate(from), to: fmtDate(to) } : null;
+    }
+
     /* ── init ────────────────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {
         var widget = document.getElementById('widget-work_schedule');
         if (!widget) return;
 
-        /* handlers del render inicial (server-side) */
-        bindHandlers(widget);
+        /* estado inicial desde datos del servidor */
+        var initSun = parseDate(WS_MON_INIT); initSun.setDate(initSun.getDate()+6);
+        wsState.from  = WS_MON_INIT;
+        wsState.to    = fmtDate(initSun);
+        wsState.dates = generateDates(wsState.from, wsState.to);
+        wsState.data  = WS_INIT_DATA;
 
-        /* toggle Sunday */
-        var toggle = document.getElementById('ws-sun-toggle');
-        if (toggle) {
-            toggle.addEventListener('change', function () {
-                wsSunVisible = toggle.checked;
-                widget.querySelectorAll('.ws-sun-col').forEach(function (el) {
-                    el.style.display = wsSunVisible ? '' : 'none';
-                });
-            });
+        /* inicializar FlatpickrUtil en los inputs de fecha */
+        var _fpCfg = { localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }, static: true, position: 'below' };
+        var _fromGroup = document.getElementById('ws-datetimepicker-from');
+        var _toGroup   = document.getElementById('ws-datetimepicker-to');
+        if (typeof FlatpickrUtil !== 'undefined' && _fromGroup && _toGroup) {
+            FlatpickrUtil.initDate('ws-datetimepicker-from', Object.assign({}, _fpCfg, { container: _fromGroup, positionElement: _fromGroup.querySelector('input') }));
+            FlatpickrUtil.initDate('ws-datetimepicker-to',   Object.assign({}, _fpCfg, { container: _toGroup,   positionElement: _toGroup.querySelector('input') }));
+            FlatpickrUtil.setDate('ws-datetimepicker-from', wsState.from);
+            FlatpickrUtil.setDate('ws-datetimepicker-to',   wsState.to);
         }
 
-        /* navegación de semana */
+        bindHandlers(widget);
+
+        /* toggle Sunday → re-render desde caché */
+        var toggle = document.getElementById('ws-sun-toggle');
+        if (toggle) toggle.addEventListener('change', function () {
+            wsSunVisible = toggle.checked;
+            reRender();
+        });
+
+        /* prev / next — desplaza el rango completo */
         var prevBtn = document.getElementById('ws-prev-week');
         var nextBtn = document.getElementById('ws-next-week');
         if (prevBtn) prevBtn.addEventListener('click', function () {
-            wsOffset--;
-            loadWeek(getWeekDates(WS_MON_INIT, wsOffset));
+            var step = -(wsState.dates.length || 7);
+            var f = parseDate(wsState.from); f.setDate(f.getDate()+step);
+            var t = parseDate(wsState.to);   t.setDate(t.getDate()+step);
+            loadRange(fmtDate(f), fmtDate(t));
         });
         if (nextBtn) nextBtn.addEventListener('click', function () {
-            wsOffset++;
-            loadWeek(getWeekDates(WS_MON_INIT, wsOffset));
+            var step = wsState.dates.length || 7;
+            var f = parseDate(wsState.from); f.setDate(f.getDate()+step);
+            var t = parseDate(wsState.to);   t.setDate(t.getDate()+step);
+            loadRange(fmtDate(f), fmtDate(t));
         });
 
-        /* select2 para el filtro */
-        if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
-            $('#ws-filter-period').select2({
-                minimumResultsForSearch: Infinity,
-                width: '100%',
-                dropdownParent: $('#ws-filter-menu')
-            });
-            $('#ws-filter-project').select2({
-                placeholder: 'Search project...',
-                allowClear: true,
-                width: '100%',
-                dropdownParent: $('#ws-filter-menu'),
-                ajax: {
-                    url: 'project/listarOrdenados',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) { return { search: params.term }; },
-                    processResults: function (data) {
-                        return {
-                            results: $.map(data.projects || [], function (item) {
-                                return { id: item.project_id, text: (item.number || '') + ' - ' + (item.description || '') };
-                            })
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 3
-            });
+        /* quick-select auto-rellena From/To */
+        function onPeriodChange(val) {
+            if (!val) return;
+            var range = getRangeForQuickSelect(val);
+            if (!range) return;
+            if (typeof FlatpickrUtil !== 'undefined') {
+                FlatpickrUtil.setDate('ws-datetimepicker-from', range.from);
+                FlatpickrUtil.setDate('ws-datetimepicker-to',   range.to);
+            }
         }
 
-        /* helpers de período */
-        function getMondayOfDate(d) {
-            var day = d.getDay();
-            var diff = day === 0 ? -6 : 1 - day;
-            var mon = new Date(d); mon.setDate(d.getDate() + diff); mon.setHours(0,0,0,0);
-            return mon;
-        }
-        function getOffsetForMonday(targetMon) {
-            var initMon = parseDate(WS_MON_INIT); initMon.setHours(0,0,0,0);
-            return Math.round((targetMon - initMon) / (7 * 24 * 60 * 60 * 1000));
-        }
-        function getPeriodMonday(period) {
-            var d = new Date(); d.setDate(1); d.setHours(0,0,0,0);
-            if (period === 'last_month')    d.setMonth(d.getMonth() - 1);
-            else if (period === '2_months_ago') d.setMonth(d.getMonth() - 2);
-            else if (period === '3_months_ago') d.setMonth(d.getMonth() - 3);
-            return getMondayOfDate(d);
+        /* select2 */
+        if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
+            $('#ws-filter-period').select2({ minimumResultsForSearch: Infinity, width:'100%', dropdownParent:$('#ws-filter-menu') });
+            $('#ws-filter-project').select2({
+                placeholder:'Search project...', allowClear:true, width:'100%',
+                dropdownParent:$('#ws-filter-menu'),
+                ajax:{
+                    url:'project/listarOrdenados', dataType:'json', delay:250,
+                    data: function(p){ return { search: p.term }; },
+                    processResults: function(d){ return { results: $.map(d.projects||[], function(i){ return { id:i.project_id, text:(i.number||'')+' - '+(i.description||'') }; }) }; },
+                    cache:true
+                },
+                minimumInputLength:3
+            });
+            $('#ws-filter-period').on('change', function(){ onPeriodChange($(this).val()); });
+        } else {
+            var pEl = document.getElementById('ws-filter-period');
+            if (pEl) pEl.addEventListener('change', function(){ onPeriodChange(this.value); });
         }
 
         /* Apply */
         var applyBtn = document.getElementById('ws-btn-apply');
         if (applyBtn) applyBtn.addEventListener('click', function () {
-            var period = document.getElementById('ws-filter-period').value;
-            wsProjectFilter = (typeof $ !== 'undefined' ? ($('#ws-filter-project').val() || '') : '');
-            var targetMon = getPeriodMonday(period);
-            wsOffset = getOffsetForMonday(targetMon);
-            loadWeek(getWeekDates(WS_MON_INIT, wsOffset));
+            var fromVal = typeof FlatpickrUtil !== 'undefined' ? FlatpickrUtil.getString('ws-datetimepicker-from').trim() : '';
+            var toVal   = typeof FlatpickrUtil !== 'undefined' ? FlatpickrUtil.getString('ws-datetimepicker-to').trim()   : '';
+            if (!isValidDate(fromVal) || !isValidDate(toVal)) return;
+            wsProjectFilter = typeof $ !== 'undefined' ? ($('#ws-filter-project').val()||'') : '';
+            loadRange(fromVal, toVal);
         });
 
         /* Reset */
         var resetBtn = document.getElementById('ws-btn-reset');
         if (resetBtn) resetBtn.addEventListener('click', function () {
             wsProjectFilter = '';
-            wsOffset = 0;
+            var iSun = parseDate(WS_MON_INIT); iSun.setDate(iSun.getDate()+6);
+            var iTo  = fmtDate(iSun);
+            if (typeof FlatpickrUtil !== 'undefined') {
+                FlatpickrUtil.setDate('ws-datetimepicker-from', WS_MON_INIT);
+                FlatpickrUtil.setDate('ws-datetimepicker-to',   iTo);
+            }
             if (typeof $ !== 'undefined') {
                 $('#ws-filter-project').val(null).trigger('change');
-                $('#ws-filter-period').val('current_month').trigger('change');
+                $('#ws-filter-period').val('this_week').trigger('change');
             }
-            loadWeek(getWeekDates(WS_MON_INIT, 0));
+            loadRange(WS_MON_INIT, iTo);
         });
     });
 }());
