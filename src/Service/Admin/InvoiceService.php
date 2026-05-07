@@ -457,7 +457,7 @@ class InvoiceService extends Base
         $fila_retainage = $fila_footer_inicio + 1;
 
         // 4. DATOS CABECERA
-        $objWorksheet->setCellValueExplicit('R4', date('m/d/Y'), DataType::TYPE_STRING);
+        $objWorksheet->setCellValueExplicit('R4', $invoice_entity->getInvoiceDate() ? $invoice_entity->getInvoiceDate()->format('m/d/Y') : '', DataType::TYPE_STRING);
         $objWorksheet->setCellValue('S4', $invoice_entity->getNumber());
         $objWorksheet->setCellValueExplicit('R6', $invoice_entity->getStartDate()->format('m/d/Y'), DataType::TYPE_STRING);
         $objWorksheet->setCellValueExplicit('S6', $invoice_entity->getEndDate()->format('m/d/Y'), DataType::TYPE_STRING);
@@ -994,7 +994,7 @@ class InvoiceService extends Base
             'project_id_number' => $project_entity->getProjectIdNumber(),
             'subcontract' => $project_entity->getSubcontract(),
             'project_number' => $project_entity->getProjectNumber(),
-            'invoice_date' => date('m/d/Y'),
+            'invoice_date' => $invoice_entity->getInvoiceDate() ? $invoice_entity->getInvoiceDate()->format('m/d/Y') : '',
             'invoice_number' => $invoice_entity->getNumber(),
             'start_date' => $invoice_entity->getStartDate()->format('m/d/Y'),
             'end_date' => $invoice_entity->getEndDate()->format('m/d/Y'),
@@ -1555,6 +1555,7 @@ class InvoiceService extends Base
             $arreglo_resultado['number'] = $entity->getNumber();
             $arreglo_resultado['start_date'] = $entity->getStartDate()->format('m/d/Y');
             $arreglo_resultado['end_date'] = $entity->getEndDate()->format('m/d/Y');
+            $arreglo_resultado['invoice_date'] = $entity->getInvoiceDate() ? $entity->getInvoiceDate()->format('m/d/Y') : '';
             $arreglo_resultado['notes'] = $entity->getNotes();
             $arreglo_resultado['paid'] = $entity->getPaid();
 
@@ -2280,7 +2281,7 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -2306,6 +2307,10 @@ class InvoiceService extends Base
 
             if ('' != $end_date) {
                 $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
+            }
+
+            if ('' != $invoice_date) {
+                $invoice_date = \DateTime::createFromFormat('m/d/Y', $invoice_date);
             }
 
             if ($start_date && $end_date) {
@@ -2336,6 +2341,7 @@ class InvoiceService extends Base
 
             $entity->setStartDate($start_date);
             $entity->setEndDate($end_date);
+            $entity->setInvoiceDate($invoice_date);
 
             $entity->setNotes($notes);
             $entity->setPaid($paid);
@@ -2397,7 +2403,7 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar)
+    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -2419,6 +2425,10 @@ class InvoiceService extends Base
 
         if ('' != $end_date) {
             $end_date = \DateTime::createFromFormat('m/d/Y', $end_date);
+        }
+
+        if ('' != $invoice_date) {
+            $invoice_date = \DateTime::createFromFormat('m/d/Y', $invoice_date);
         }
 
         if ($start_date && $end_date) {
@@ -2461,6 +2471,7 @@ class InvoiceService extends Base
         $entity->setNumber($number);
 
         $entity->setStartDate($start_date);
+        $entity->setInvoiceDate($invoice_date);
         $entity->setEndDate($end_date);
 
         $entity->setNotes($notes);

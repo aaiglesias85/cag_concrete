@@ -23,6 +23,8 @@ final class InvoiceActualizarRequest implements AdminHttpRequestDtoInterface
     #[Assert\NotBlank]
     public ?string $end_date = null;
 
+    public ?string $invoice_date = null;
+
     public ?string $notes = null;
 
     public ?string $paid = null;
@@ -42,6 +44,7 @@ final class InvoiceActualizarRequest implements AdminHttpRequestDtoInterface
         $d->project_id = \is_string($pid) || is_numeric($pid) ? (string) $pid : null;
         $d->start_date = \is_string($x = $request->get('start_date')) ? $x : null;
         $d->end_date = \is_string($x = $request->get('end_date')) ? $x : null;
+        $d->invoice_date = \is_string($x = $request->get('invoice_date')) ? $x : null;
         $d->notes = \is_string($x = $request->get('notes')) ? $x : null;
         $p = $request->get('paid');
         $d->paid = \is_string($p) || is_numeric($p) ? (string) $p : null;

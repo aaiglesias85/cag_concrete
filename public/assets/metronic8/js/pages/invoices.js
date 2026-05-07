@@ -571,6 +571,13 @@ var Invoices = (function () {
       // reset
       MyUtil.limpiarSelect('#project');
 
+      FlatpickrUtil.clear('datetimepicker-invoice-date');
+      // Set current date as default for invoice date
+      var today = new Date();
+      var formattedDate = (today.getMonth() + 1).toString().padStart(2, '0') + '/' + 
+                         today.getDate().toString().padStart(2, '0') + '/' + 
+                         today.getFullYear();
+      FlatpickrUtil.setDate('datetimepicker-invoice-date', formattedDate);
       FlatpickrUtil.clear('datetimepicker-start-date');
       FlatpickrUtil.setMaxDate('datetimepicker-start-date', null);
 
@@ -744,14 +751,18 @@ var Invoices = (function () {
       var result = true;
       if (activeTab == 1) {
          var project_id = $('#project').val();
+         var invoice_date = FlatpickrUtil.getString('datetimepicker-invoice-date');
          var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
          var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
 
-         if (!validateForm() || project_id == '' || start_date == '' || end_date == '' || !isValidNumber()) {
+         if (!validateForm() || project_id == '' || invoice_date == '' || start_date == '' || end_date == '' || !isValidNumber()) {
             result = false;
 
             if (project_id == '') {
                MyApp.showErrorMessageValidateSelect(KTUtil.get('select-project'), 'This field is required');
+            }
+            if (invoice_date == '') {
+               MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-invoice-date'), 'This field is required');
             }
             if (start_date == '') {
                MyApp.showErrorMessageValidateInput(KTUtil.get('datetimepicker-start-date'), 'This field is required');
@@ -907,6 +918,9 @@ var Invoices = (function () {
 
          var start_date = FlatpickrUtil.getString('datetimepicker-start-date');
          formData.set('start_date', start_date);
+
+         var invoice_date = FlatpickrUtil.getString('datetimepicker-invoice-date');
+         formData.set('invoice_date', invoice_date);
 
          var end_date = FlatpickrUtil.getString('datetimepicker-end-date');
          formData.set('end_date', end_date);
@@ -1105,6 +1119,11 @@ var Invoices = (function () {
          $('#total_contract_amount').val(MyApp.formatMoney(projectContractAmount, 2, '.', ','));
 
          // Fechas
+         if (invoice.invoice_date && invoice.invoice_date !== '') {
+            let cleanInvoiceDate = invoice.invoice_date.split(' ')[0];
+            FlatpickrUtil.setDate('datetimepicker-invoice-date', cleanInvoiceDate);
+         }
+
          if (invoice.start_date && invoice.start_date !== '') {
             let cleanStartDate = invoice.start_date.split(' ')[0];
             FlatpickrUtil.setDate('datetimepicker-start-date', cleanStartDate);
@@ -1466,6 +1485,13 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          position: 'above',
       });
 
+      // invoice date (solo selección por calendario: no escribir ni pegar)
+      FlatpickrUtil.initDate('datetimepicker-invoice-date', {
+         localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+         allowInput: false,
+      });
+      preventDateInputPasteAndKey('#invoice-date');
+
       // start date (solo selección por calendario: no escribir ni pegar)
       FlatpickrUtil.initDate('datetimepicker-start-date', {
          localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
@@ -1564,6 +1590,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
 
    var definirFechasDueDate = function () {
       // reset
+      FlatpickrUtil.setDate('datetimepicker-invoice-date', '');
       FlatpickrUtil.setDate('datetimepicker-start-date', '');
       FlatpickrUtil.setDate('datetimepicker-end-date', '');
 

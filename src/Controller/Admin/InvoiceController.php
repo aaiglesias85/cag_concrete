@@ -85,13 +85,14 @@ class InvoiceController extends AbstractAdminController
         $project_id = (string) $d->project_id;
         $start_date = (string) $d->start_date;
         $end_date = (string) $d->end_date;
+        $invoice_date = (string) $d->invoice_date;
         $notes = (string) ($d->notes ?? '');
         $paid = $d->paid;
         $items = \is_string($d->items) ? json_decode($d->items) : null;
         $exportar = $d->exportar;
 
         try {
-            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -124,13 +125,14 @@ class InvoiceController extends AbstractAdminController
         $project_id = (string) $d->project_id;
         $start_date = (string) $d->start_date;
         $end_date = (string) $d->end_date;
+        $invoice_date = (string) $d->invoice_date;
         $notes = (string) ($d->notes ?? '');
         $paid = $d->paid;
         $items = \is_string($d->items) ? json_decode($d->items) : null;
         $exportar = $d->exportar;
 
         try {
-            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
