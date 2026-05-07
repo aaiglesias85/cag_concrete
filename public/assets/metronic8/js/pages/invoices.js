@@ -1062,6 +1062,24 @@ var Invoices = (function () {
       });
    };
 
+   var getInvoiceFormTitleJobPart = function (inv) {
+      if (!inv) return '';
+      var result = '';
+      var pn = inv.project_number;
+      if (pn !== undefined && pn !== null && String(pn).trim() !== '') {
+         result += 'Job No: ' + String(pn).trim();
+      }
+      if (inv.number !== undefined && inv.number !== null) {
+         result += (result ? ' - ' : '') + 'Invoice #' + inv.number;
+      }
+      if (inv.start_date !== undefined && inv.start_date !== null) {
+         result += (result ? ' | ' : '') + inv.start_date;
+         if (inv.end_date !== undefined && inv.end_date !== null) {
+            result += ' - ' + inv.end_date;
+         }
+      }
+      return result;
+   };
 
    var editRow = function (invoice_id) {
       var formData = new URLSearchParams();
@@ -1090,7 +1108,7 @@ var Invoices = (function () {
          });
 
          function cargarDatos(invoice) {
-         KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = 'Update Invoice: #' + invoice.number;
+            KTUtil.find(KTUtil.get('form-invoice'), '.card-label').innerHTML = 'Update Invoice: ' + getInvoiceFormTitleJobPart(invoice);
 
          $('#number').val(invoice.number);
 
