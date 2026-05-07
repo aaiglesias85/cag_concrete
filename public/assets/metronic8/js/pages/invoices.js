@@ -2086,7 +2086,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                }
 
                return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
-                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
+                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;" title="${DatatableUtil.escapeHtml(data || '')}">${data || ''}</span>
                            ${badgeRetainage}
                            ${badgeBond}
                            ${badgeBonded}
