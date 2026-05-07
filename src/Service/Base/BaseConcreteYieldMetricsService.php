@@ -37,10 +37,15 @@ class BaseConcreteYieldMetricsService
     {
         $quantity_yield = 0;
 
-        if ('' != $data_tracking_item->getProjectItem()->getYieldCalculation() && 'none' != $data_tracking_item->getProjectItem()->getYieldCalculation()) {
-            if ('equation' == $data_tracking_item->getProjectItem()->getYieldCalculation() && null != $data_tracking_item->getProjectItem()->getEquation()) {
+        $projectItem = $data_tracking_item->getProjectItem();
+        if (null === $projectItem) {
+            return $quantity_yield;
+        }
+
+        if ('' != $projectItem->getYieldCalculation() && 'none' != $projectItem->getYieldCalculation()) {
+            if ('equation' == $projectItem->getYieldCalculation() && null != $projectItem->getEquation()) {
                 $quantity = $data_tracking_item->getQuantity();
-                $quantity_yield = $this->yieldExpression->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+                $quantity_yield = $this->yieldExpression->evaluateExpression($projectItem->getEquation()->getEquation(), $quantity);
             } else {
                 $quantity_yield = $data_tracking_item->getQuantity();
             }
@@ -63,10 +68,11 @@ class BaseConcreteYieldMetricsService
         $dataTrackingItemRepo = $this->doctrine->getRepository(DataTrackingItem::class);
         $data_tracking_items = $dataTrackingItemRepo->ListarItems($data_tracking_id);
         foreach ($data_tracking_items as $data_tracking_item) {
+            $projectItem = $data_tracking_item->getProjectItem();
             $quantity = $data_tracking_item->getQuantity();
             $quantity_yield = $quantity;
-            if ('equation' == $data_tracking_item->getProjectItem()->getYieldCalculation() && null != $data_tracking_item->getProjectItem()->getEquation()) {
-                $quantity_yield = $this->yieldExpression->evaluateExpression($data_tracking_item->getProjectItem()->getEquation()->getEquation(), $quantity);
+            if (null !== $projectItem && 'equation' == $projectItem->getYieldCalculation() && null != $projectItem->getEquation()) {
+                $quantity_yield = $this->yieldExpression->evaluateExpression($projectItem->getEquation()->getEquation(), $quantity);
             }
 
             $total_conc_item += $quantity_yield;

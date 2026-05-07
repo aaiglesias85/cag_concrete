@@ -882,6 +882,9 @@ class DataTrackingService extends Base
         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
         $lista = $dataTrackingItemRepo->ListarItems($data_tracking_id);
         foreach ($lista as $key => $value) {
+            if (null === $value->getProjectItem()) {
+                continue;
+            }
             $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value->getProjectItem());
 
             $quantity = $value->getQuantity();
