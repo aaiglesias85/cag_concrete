@@ -135,24 +135,18 @@ Y = Bone Price * X
 
 ---
 
-## 5. Cómo se afecta el cálculo del Bond cuando se paga en Payments
-
-La suma de todos los invoices previos **no puede ser mayor que 1**, pero en pagos hay que considerar lo que sobra (el `unpaid qty` del bond) para crear el próximo invoice.
-
-**Ejemplo (al crear el Invoice 2):**
-- Inv 1 = `0.48`
-- En Pagos: `un paid = 0.00574`
+## 5. Bond General del Proyecto y Cap en Invoices
 
 ### Bond General del Proyecto
-Valor total del Bond asignado al proyecto.
+Valor total del Bond asignado al proyecto (ver sec. 0 — viene de los ítems con `item.bond = true`).
 
 **Ejemplo:** `Bond_GENERAL = -1850`
 
-### Reglas
-1. Revisar cuánto **Bond Quantity** ya fue usado.
-2. Calcular cuánto **Bond Quantity** queda disponible.
-3. Comparar el **Bond Quantity** solicitado con el disponible.
-4. Aplicar solo lo que esté disponible.
+### Reglas (cap estricto)
+1. Revisar cuánto **Bond Quantity** ya fue usado en invoices anteriores.
+2. Calcular `Disponible = 1 − Σ Bond Quantity anteriores`.
+3. Comparar el **Bond Quantity** solicitado (X) con el disponible.
+4. Aplicar solo lo que esté disponible: `Aplicado = min(X, Disponible)`.
 5. Actualizar el acumulado.
 6. Si no queda Bond disponible, no aplicar nada.
 
@@ -181,86 +175,70 @@ Valor total del Bond asignado al proyecto.
 - Bond Quantity Aplicado = `0`
 - Bond Amount = `0`
 
+> ⚠️ Los pagos del bond (paid_qty del ítem Bond) **no liberan** este cap. El cap es estricto sobre la suma de `bonQuantity` ya asignados en invoices.
+
 ---
 
-## 6. Bond en Pagos — Lógica de Cálculo del Bond Quantity
+## 6. Regla del Cap Acumulado en Invoices (estricta)
 
 ### 6.1 Cálculo individual por Invoice
 
-Cada Invoice calcula su **Bond Quantity** de forma normal (como se hace actualmente).
-
-**Ejemplo:**
-- Invoice 1 → Bond Quantity = `0.48`
-- Invoice 2 → Bond Quantity = `0.20`
-
-Hasta aquí el cálculo individual es correcto.
-
-### 6.2 Consideración de Payments (Pagos)
-
-Cuando existen pagos parciales, se debe considerar cuánto ya fue pagado de los invoices anteriores.
-
-**Ejemplo:**
-
-| Invoice | Bond Quantity | Pago realizado | Unpaid |
-|---------|---------------|----------------|--------|
-| 1       | 0.48          | 0              | 0.48   |
-| 2       | 0.20          | 0.10           | 0.10   |
-
-### 6.3 Regla para crear un nuevo Invoice
-
-Antes de asignar el **Bond Quantity** al nuevo invoice, se debe calcular el acumulado real.
-
-**Paso 1 — Sumar los Bond Quantity anteriores:**
+Cada Invoice calcula su **Bond Quantity** (X) usando la fórmula de la sec. 4.2:
 ```
-0.48 + 0.20 = 0.68
+X = SUM_BONDED_INVOICES / SUM_BONDED_PROJECT
 ```
 
-**Paso 2 — Restar los pagos realizados anteriores:**
-```
-Pagos realizados:
-  Invoice 1 → 0
-  Invoice 2 → 0.10
-Total pagos = 0.10
+### 6.2 Regla del Límite Máximo
 
-0.68 - 0.10 = 0.58
-```
+El límite máximo absoluto del **Σ Bond Quantity acumulado del proyecto** es **`1.00`**, y los pagos **NO** liberan cap.
 
-Ese valor (`0.58`) representa el **consumo acumulado real**.
-
-### 6.4 Regla del Límite Máximo
-
-El límite máximo permitido es **`1.00`**.
-
-#### Caso A — Si el acumulado es menor o igual que 1
-Si:
-```
-(Σ Bond anteriores invoices bond qty − Σ pagos anteriores) <= 1
-```
-👉 **No se hace ningún ajuste.** El nuevo Bond qty se calcula normalmente.
-
-#### Caso B — Si el acumulado supera 1
-Si el cálculo hace que el total supere 1, entonces el nuevo **Bond Quantity** debe ajustarse usando esta fórmula:
+Antes de asignar el Bond Quantity de un invoice:
 
 ```
-Nuevo Bond = 1 − (Σ Bond qty anteriores Invoices − Σ unpaid qty de pagos anteriores)
+Disponible = 1 − Σ Bond qty anteriores
+Bond Quantity Aplicado = min(X, Disponible)
 ```
 
-O explicado de forma conceptual:
+Si `Disponible ≤ 0` → el Bond Quantity Aplicado es `0` y no se asigna más Bond en ese invoice ni en los siguientes.
+
+### 6.3 Ejemplo
+
+| Invoice | X (solicitado) | Disponible antes | Aplicado | Σ Aplicado |
+|---------|----------------|------------------|----------|------------|
+| 1       | 0.48           | 1.00             | 0.48     | 0.48       |
+| 2       | 0.20           | 0.52             | 0.20     | 0.68       |
+| 3       | 0.50           | 0.32             | **0.32** (capado) | 1.00 |
+| 4       | 0.10           | 0.00             | **0.00** | 1.00       |
+
+A partir del invoice 3, el cap entra en juego porque el solicitado (`0.50`) supera el disponible (`0.32`).
+Desde el invoice 4 en adelante, no se asigna más Bond.
+
+### 6.4 Bond Amount
+
 ```
-Nuevo Bond = 1 − consumo acumulado real
+Bond Amount = Bond General × Bond Quantity Aplicado
 ```
 
-Después de esto:
-✅ **No se deben generar más Bond Quantity**, porque `1` es el límite máximo absoluto.
+El Bond General se obtiene de los ítems del catálogo donde `item.bond = true` en el proyecto (ver sec. 0).
 
 ---
 
 ## 7. Resumen Ejecutivo
 
-1. Se calcula cada **Bond** normalmente.
-2. Antes de crear un nuevo invoice:
-   - Se suman todos los **Bond qty** anteriores de los Invoices.
-   - Se restan todas las sumas de los **unpaid qty** anteriores.
-3. Si el acumulado es **menor o igual a 1** → no se ajusta.
-4. Si **supera 1** → se limita usando la fórmula.
-5. Una vez que se llega a **1** → se detiene el cálculo.
+1. Cada invoice calcula su **X** = `SUM_BONDED_INVOICES / SUM_BONDED_PROJECT`.
+2. Antes de aplicar X al invoice se calcula `Disponible = 1 − Σ Bond qty anteriores`.
+3. **Bond Quantity Aplicado** = `min(X, Disponible)`.
+4. **Bond Amount** = `Bond General × Bond Quantity Aplicado`.
+5. Una vez que `Σ Bond qty acumulado = 1.00` → no se asigna más Bond en invoices siguientes.
+6. Los pagos **no liberan cap**: el cap es estricto sobre la suma de bonQuantity.
+
+---
+
+## 8. Bond en Pagos — Display
+
+En la pantalla de pagos, la fila **Bond** muestra:
+- **Paid Qty** = `Σ Paid Amt (Bonded del proyecto) / Σ Contract Amt (Bonded del proyecto)` (recálculo en tiempo real).
+- **Unpaid Qty** = `max(0, 1 − Paid Qty)`.
+- **Paid Amount** = `Bond General × Paid Qty`.
+
+Estos valores son visualizaciones del progreso de pago del bond y **no afectan** el cap acumulado de invoices descrito en la sec. 6.

@@ -124,12 +124,10 @@ class InvoiceService extends Base
     }
 
     /**
-     * RecalcularBonProyecto: aplica la regla de tope Bond Quantity ≤ 1 en el proyecto,
-     * considerando pagos: el consumo acumulado real = Σ bon_quantity (anteriores) − Σ paid_qty Bond (anteriores).
+     * RecalcularBonProyecto: aplica la regla estricta de tope Σ Bond Quantity ≤ 1 en el proyecto.
      * Por cada invoice (orden: start_date, invoice_id):
      * - X = Bond Quantity calculado = SumBondedInvoiceItems(invoice) / SumBondedProject(project)
-     * - Consumo acumulado real = Σ bon_quantity (invoices anteriores) − Σ paid_qty Bond (invoices anteriores)
-     * - Disponible = 1 − consumo acumulado real
+     * - Disponible = 1 − Σ bon_quantity (invoices anteriores)
      * - Bond Quantity Aplicado = min(X, Disponible). Si disponible ≤ 0, no se asigna más Bond.
      * - Bond Amount (Y) = Bond General × Bond Quantity Aplicado.
      *
@@ -157,21 +155,15 @@ class InvoiceService extends Base
         $this->sortInvoicesByStartDateAndId($allInvoices);
 
         $MAX_BON_QUANTITY = 1.0;
-        // Acumulados de invoices ya procesados (para consumo real: bon - paid)
         $totalBonQuantityPrevious = 0.0;
-        $totalBondPaidQtyPrevious = 0.0;
 
         foreach ($allInvoices as $invoice) {
             /** @var Invoice $invoice */
-            // Consumo acumulado real = Σ bon_quantity anteriores − Σ paid_qty Bond anteriores
-            $consumedReal = $totalBonQuantityPrevious - $totalBondPaidQtyPrevious;
-            $available = $MAX_BON_QUANTITY - $consumedReal;
+            $available = $MAX_BON_QUANTITY - $totalBonQuantityPrevious;
             if ($available <= 0.0) {
                 $invoice->setBonQuantity(0.0);
                 $invoice->setBonAmount(0.0);
                 $em->persist($invoice);
-                // Sigue sumando paid_qty de este invoice para el siguiente
-                $totalBondPaidQtyPrevious += $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice((int) $invoice->getInvoiceId());
                 continue;
             }
 
@@ -188,9 +180,8 @@ class InvoiceService extends Base
                 $x = 1.0;
             }
 
-            // Nuevo Bond = min(X, disponible). Si supera 1, se limita: aplicado = 1 − consumo acumulado real
             $applied = min($x, $available);
-            $applied = round($applied, 5); // Bond qty con 5 decimales
+            $applied = round($applied, 5);
             $bonAmount = round($bondGeneral * $applied, 2);
 
             $invoice->setBonQuantity($applied);
@@ -198,7 +189,6 @@ class InvoiceService extends Base
             $em->persist($invoice);
 
             $totalBonQuantityPrevious += $applied;
-            $totalBondPaidQtyPrevious += $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice((int) $invoice->getInvoiceId());
         }
 
         $em->flush();
@@ -1398,26 +1388,19 @@ class InvoiceService extends Base
     private function getBonQuantityAvailableBeforeInvoice($project_id, Invoice $entity): float
     {
         $project_id = (string) $project_id;
-        $invoice_id = (int) $entity->getInvoiceId();
         $start_date_str = $entity->getStartDate() instanceof \DateTimeInterface
            ? $entity->getStartDate()->format('m/d/Y') : '';
 
         /** @var InvoiceRepository $invoiceRepo */
         $invoiceRepo = $this->getDoctrine()->getRepository(Invoice::class);
-        /** @var InvoiceItemRepository $invoiceItemRepo */
-        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
 
         $bon_used_before_or_on = (float) $invoiceRepo->SumBonQuantityUsedBeforeOrOnDate($project_id, $start_date_str);
-        $bond_paid_before_or_on = $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForProjectBeforeOrOnDate((int) $project_id, $start_date_str);
 
         $this_bon_qty = null !== $entity->getBonQuantity() ? (float) $entity->getBonQuantity() : 0.0;
-        $this_bond_paid = $this->paidQtyOverrideResolver->sumEffectiveBondPaidQtyForInvoice($invoice_id);
 
         $used_before_this = $bon_used_before_or_on - $this_bon_qty;
-        $paid_before_this = $bond_paid_before_or_on - $this_bond_paid;
-        $consumed_before_this = $used_before_this - $paid_before_this;
 
-        return max(0.0, min(1.0, 1.0 - $consumed_before_this));
+        return max(0.0, min(1.0, 1.0 - $used_before_this));
     }
 
     /**
@@ -1545,6 +1528,7 @@ class InvoiceService extends Base
             $arreglo_resultado['project_id'] = $project_id;
 
             $project = $entity->getProject();
+            $arreglo_resultado['project_number'] = $project ? $project->getProjectNumber() : null;
             $arreglo_resultado['contract_amount'] = $project && null !== $project->getContractAmount() ? (float) $project->getContractAmount() : 0.0;
 
             $company_id = $project->getCompany()->getCompanyId();
