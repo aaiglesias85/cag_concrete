@@ -1062,18 +1062,16 @@ class InvoiceService extends Base
             $prevInvoice = $inv;
         }
 
-        // 2. Si hay un invoice anterior, buscamos este mismo ítem en ese invoice
+        // 2. Si hay un invoice anterior, buscamos este mismo ítem en ese invoice.
+        //    PREVIOUS BILL QTY debe coincidir con la "Final Invoiced Quantity" del invoice anterior
+        //    para ese ítem (= quantity + quantity_brought_forward del item del invoice anterior).
         if (null !== $prevInvoice) {
             foreach ($invoiceItemRepo->ListarItems($prevInvoice->getInvoiceId()) as $prevItem) {
                 if ($prevItem->getProjectItem()->getId() === $value->getProjectItem()->getId()) {
-                    // 3. Tomamos el Unpaid real de la base de datos (que YA incluye los overrides aplicados)
-                    $prev_unpaid = (float) ($prevItem->getUnpaidQty() ?? 0);
+                    $prev_qty = (float) ($prevItem->getQuantity() ?? 0);
+                    $prev_qbf = (float) ($prevItem->getQuantityBroughtForward() ?? 0);
 
-                    // 4. Tomamos el QBF que se aplicó en ese invoice
-                    $prev_qbf = null !== $prevItem->getQuantityBroughtForward() ? (float) $prevItem->getQuantityBroughtForward() : 0.0;
-
-                    // 5. Reconstruimos la deuda: Unpaid + QBF
-                    $previous_bill_qty = max(0.0, $prev_unpaid + $prev_qbf);
+                    $previous_bill_qty = $prev_qty + $prev_qbf;
                     $previous_bill_amount = $previous_bill_qty * (float) $prevItem->getPrice();
                     break;
                 }
