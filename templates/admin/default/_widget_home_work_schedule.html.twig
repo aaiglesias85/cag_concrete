@@ -167,15 +167,23 @@
                                 {% set is_today = (day_dates[i] == today_str) %}
                                 {% set dp = day_dates[i]|split('/') %}
                                 <th class="text-center px-2 pb-3 {{ is_today ? 'text-primary' : 'text-gray-400' }}">
-                                    <div>{{ label }}</div>
-                                    <div class="fw-normal" style="font-size:10px">{{ dp[1] * 1 }}/{{ dp[0] * 1 }}</div>
+                                    <div class="ws-day-header d-inline-flex flex-column align-items-center cursor-pointer rounded px-2 py-1"
+                                         data-day="{{ day_dates[i] }}"
+                                         title="Ver detalle del día">
+                                        <span>{{ label }}</span>
+                                        <span class="fw-normal" style="font-size:10px">{{ dp[1] * 1 }}/{{ dp[0] * 1 }}</span>
+                                    </div>
                                 </th>
                             {% endfor %}
                             {# Columna Sunday — oculta por defecto #}
                             {% set sp = sun_date|split('/') %}
                             <th class="text-center px-2 pb-3 text-gray-400 ws-sun-col" style="display:none">
-                                <div>Sun</div>
-                                <div class="fw-normal" style="font-size:10px">{{ sp[1] * 1 }}/{{ sp[0] * 1 }}</div>
+                                <div class="ws-day-header d-inline-flex flex-column align-items-center cursor-pointer rounded px-2 py-1"
+                                     data-day="{{ sun_date }}"
+                                     title="Ver detalle del día">
+                                    <span>Sun</span>
+                                    <span class="fw-normal" style="font-size:10px">{{ sp[1] * 1 }}/{{ sp[0] * 1 }}</span>
+                                </div>
                             </th>
                         </tr>
                     </thead>
@@ -198,7 +206,6 @@
                                 {# Celdas Mon–Sat #}
                                 {% for i, day_date in day_dates %}
                                     {% set is_today = (day_date == today_str) %}
-                                    {# Acumular datos de TODAS las entradas del mismo proyecto+día #}
                                     {% set has_entry      = false %}
                                     {% set agg_id         = 0 %}
                                     {% set agg_desc       = '' %}
@@ -221,7 +228,6 @@
                                     {% endfor %}
                                     <td class="text-center px-2 py-2{{ is_today ? ' bg-light-primary' : '' }}">
                                         {% if has_entry %}
-                                            {# Checkmark verde — abre ese schedule en edit #}
                                             <a href="javascript:;"
                                                class="ws-sched-link d-inline-flex align-items-center justify-content-center mb-1"
                                                data-schedule-id="{{ agg_id }}"
@@ -230,7 +236,6 @@
                                                     <span class="path1"></span><span class="path2"></span>
                                                 </i>
                                             </a>
-                                            {# Iconos 2×2 — clickeables + tooltip #}
                                             <div class="d-flex flex-wrap justify-content-center gap-1" style="max-width:52px;margin:0 auto">
                                                 {% if agg_desc != '' %}
                                                     <a href="javascript:;"
@@ -347,6 +352,17 @@
                     </tbody>
                 </table>
             </div>
+
+            {# ── Panel de detalle del día (oculto hasta hacer click en un encabezado) ── #}
+            <div id="ws-day-detail-panel" style="display:none" class="mt-5 border-top pt-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span id="ws-day-detail-label" class="fw-bold text-gray-800 fs-6"></span>
+                    <button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light" title="Cerrar">
+                        <i class="ki-duotone ki-cross fs-4"><span class="path1"></span><span class="path2"></span></i>
+                    </button>
+                </div>
+                <div id="ws-day-detail-body"></div>
+            </div>
         {% endif %}
     </div>
 
@@ -388,6 +404,9 @@
         return !isNaN(parseDate(str).getTime());
     }
     function todayStr() { return fmtDate(new Date()); }
+
+    var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var DAY_ABR   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
     /* ── escape HTML ─────────────────────────────────────────────── */
     function esc(s) {
@@ -436,10 +455,135 @@
     }
 
     /* ── label de columna (día abreviado + fecha) ────────────────── */
-    var DAY_ABR = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     function colLabel(dateStr) {
         var d = parseDate(dateStr), p = dateStr.split('/');
         return DAY_ABR[d.getDay()]+'<br><span style="font-size:10px">'+parseInt(p[1])+'/'+parseInt(p[0])+'</span>';
+    }
+
+    /* ── render panel de detalle de un día ──────────────────────── */
+    function renderDayDetail(data, dayStr) {
+        var entries = [];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].day === dayStr) entries.push(data[i]);
+        }
+
+        if (!entries.length) {
+            return '<div class="text-muted fs-7 py-2">No hay schedules para este día.</div>';
+        }
+
+        var html = '<div class="d-flex flex-column gap-4">';
+        for (var j = 0; j < entries.length; j++) {
+            var e = entries[j];
+            var borderColor = e.highpriority ? '#f1416c' : '#009ef7';
+            html += '<div class="d-flex align-items-stretch gap-0" style="border-left:3px solid '+borderColor+';padding-left:12px">';
+            html += '<div class="flex-grow-1">';
+
+            /* Proyecto */
+            html += '<div class="d-flex align-items-center gap-2 mb-1">';
+            if (e.project_id > 0) {
+                html += '<a href="javascript:;" class="project-link fw-bold text-gray-800 text-hover-primary fs-6" data-project-id="'+e.project_id+'">'+esc(e.project_number)+'</a>';
+            } else {
+                html += '<span class="fw-bold text-gray-800 fs-6">'+esc(e.project_number)+'</span>';
+            }
+            if (e.highpriority) html += '<span class="badge badge-light-danger fs-9">High Priority</span>';
+            html += '</div>';
+
+            /* Descripción */
+            if (e.description) {
+                html += '<div class="text-gray-600 fs-7 mb-2">'+esc(e.description)+'</div>';
+            }
+
+            /* Info: lead, location, vendor/horas */
+            html += '<div class="d-flex flex-wrap gap-3">';
+            if (e.lead_name) {
+                html += '<span class="d-flex align-items-center gap-1 text-gray-500 fs-8">'+
+                        '<i class="ki-duotone ki-user fs-7 text-primary"><span class="path1"></span><span class="path2"></span></i>'+
+                        esc(e.lead_name)+'</span>';
+            }
+            if (e.location) {
+                html += '<span class="d-flex align-items-center gap-1 text-gray-500 fs-8">'+
+                        '<i class="ki-duotone ki-geolocation fs-7 text-primary"><span class="path1"></span><span class="path2"></span></i>'+
+                        esc(e.location)+'</span>';
+            }
+            if (e.vendor_name || e.hour) {
+                var vt = '';
+                if (e.vendor_name) vt += esc(e.vendor_name);
+                if (e.hour)        vt += (vt ? ' · ' : '') + esc(e.hour) + 'h';
+                if (e.quantity > 0) vt += ' · ' + e.quantity + ' qty';
+                html += '<span class="d-flex align-items-center gap-1 text-gray-500 fs-8">'+
+                        '<i class="ki-duotone ki-time fs-7 text-primary"><span class="path1"></span><span class="path2"></span></i>'+
+                        vt+'</span>';
+            }
+            html += '</div>';
+            html += '</div>';
+
+            /* Botón abrir schedule */
+            html += '<div class="ms-auto ps-3 d-flex align-items-center">'+
+                    '<a href="javascript:;" class="ws-sched-link btn btn-icon btn-xs btn-light-primary" data-schedule-id="'+e.id+'" title="Abrir schedule">'+
+                    '<i class="ki-duotone ki-arrow-up-right fs-5"><span class="path1"></span><span class="path2"></span></i></a></div>';
+
+            html += '</div>';
+        }
+        html += '</div>';
+        return html;
+    }
+
+    /* ── resaltar encabezado del día seleccionado ───────────────── */
+    function highlightDayHeader(dayStr) {
+        document.querySelectorAll('#widget-work_schedule .ws-day-header').forEach(function(el) {
+            el.style.background    = '';
+            el.style.color         = '';
+            el.style.borderRadius  = '';
+            el.style.padding       = '';
+        });
+        if (!dayStr) return;
+        var active = document.querySelector('#widget-work_schedule .ws-day-header[data-day="'+dayStr+'"]');
+        if (active) {
+            active.style.background   = '#f1416c';
+            active.style.color        = '#ffffff';
+            active.style.borderRadius = '20px';
+            active.style.padding      = '4px 8px';
+        }
+    }
+
+    /* ── mostrar/ocultar panel de detalle ────────────────────────── */
+    function showDayDetail(dayStr) {
+        var panel = document.getElementById('ws-day-detail-panel');
+        var label = document.getElementById('ws-day-detail-label');
+        var body  = document.getElementById('ws-day-detail-body');
+        if (!panel || !label || !body) return;
+
+        highlightDayHeader(dayStr);
+
+        var d = parseDate(dayStr);
+        var p = dayStr.split('/');
+        label.textContent = DAY_NAMES[d.getDay()] + ' ' + parseInt(p[1]) + '/' + parseInt(p[0]) + '/' + p[2];
+
+        body.innerHTML = renderDayDetail(wsState.data || WS_INIT_DATA, dayStr);
+        panel.style.display = '';
+
+        /* bind handlers dentro del panel */
+        body.querySelectorAll('.project-link').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                var id = el.dataset.projectId;
+                if (!id) return;
+                localStorage.setItem('project_id_edit', id);
+                window.location.href = typeof url_project !== 'undefined' ? url_project : 'project';
+            });
+        });
+        body.querySelectorAll('.ws-sched-link').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                var sid = el.dataset.scheduleId;
+                if (!sid || sid==='0') return;
+                localStorage.setItem('schedule_id_edit', sid);
+                window.location.href = WS_SCHED_URL;
+            });
+        });
+
+        /* scroll suave hacia el panel */
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     /* ── render completo de la tabla ─────────────────────────────── */
@@ -448,7 +592,6 @@
         var isWeekView = dates.length === 7;
         var sunDate    = isWeekView ? dates[6] : null;
 
-        /* proyectos únicos máx 5 — excluir proyectos domingo-solo cuando Sun está oculto */
         var projMap = {};
         for (var i=0; i<data.length; i++) {
             var r = data[i];
@@ -484,7 +627,9 @@
             var isT = dates[di]===today;
             var cls = 'text-center px-2 pb-3 '+(isT?'text-primary':'text-gray-400')+(isSunCol?' ws-sun-col':'');
             var sty = (isSunCol && !wsSunVisible) ? ' style="display:none"' : '';
-            h += '<th class="'+cls+'"'+sty+'>'+colLabel(dates[di])+'</th>';
+            h += '<th class="'+cls+'"'+sty+'>'+
+                 '<div class="ws-day-header d-inline-flex flex-column align-items-center cursor-pointer rounded px-2 py-1" '+
+                 'data-day="'+dates[di]+'" title="Ver detalle del día">'+colLabel(dates[di])+'</div></th>';
         }
         h += '</tr></thead><tbody>';
 
@@ -508,6 +653,15 @@
             h += '</tr>';
         }
         h += '</tbody></table></div>';
+
+        /* panel detalle */
+        h += '<div id="ws-day-detail-panel" style="display:none" class="mt-5 border-top pt-4">'+
+             '<div class="d-flex align-items-center justify-content-between mb-3">'+
+             '<span id="ws-day-detail-label" class="fw-bold text-gray-800 fs-6"></span>'+
+             '<button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light" title="Cerrar">'+
+             '<i class="ki-duotone ki-cross fs-4"><span class="path1"></span><span class="path2"></span></i></button></div>'+
+             '<div id="ws-day-detail-body"></div></div>';
+
         return h;
     }
 
@@ -542,6 +696,21 @@
                 localStorage.setItem('schedule_id_edit', sid);
                 window.location.href = WS_SCHED_URL;
             });
+        });
+
+        /* click en encabezado de día → mostrar detalle */
+        widget.querySelectorAll('.ws-day-header').forEach(function(el) {
+            el.addEventListener('click', function() {
+                showDayDetail(el.dataset.day);
+            });
+        });
+
+        /* cerrar panel */
+        var closeBtn = widget.querySelector('#ws-day-detail-close');
+        if (closeBtn) closeBtn.addEventListener('click', function() {
+            var panel = document.getElementById('ws-day-detail-panel');
+            if (panel) panel.style.display = 'none';
+            highlightDayHeader(null);
         });
     }
 
@@ -598,14 +767,12 @@
         var widget = document.getElementById('widget-work_schedule');
         if (!widget) return;
 
-        /* estado inicial desde datos del servidor */
         var initSun = parseDate(WS_MON_INIT); initSun.setDate(initSun.getDate()+6);
         wsState.from  = WS_MON_INIT;
         wsState.to    = fmtDate(initSun);
         wsState.dates = generateDates(wsState.from, wsState.to);
         wsState.data  = WS_INIT_DATA;
 
-        /* inicializar FlatpickrUtil en los inputs de fecha */
         var _fpCfg = { localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }, static: true, position: 'below' };
         var _fromGroup = document.getElementById('ws-datetimepicker-from');
         var _toGroup   = document.getElementById('ws-datetimepicker-to');
@@ -618,14 +785,12 @@
 
         bindHandlers(widget);
 
-        /* toggle Sunday → re-render desde caché */
         var toggle = document.getElementById('ws-sun-toggle');
         if (toggle) toggle.addEventListener('change', function () {
             wsSunVisible = toggle.checked;
             reRender();
         });
 
-        /* prev / next — desplaza el rango completo */
         var prevBtn = document.getElementById('ws-prev-week');
         var nextBtn = document.getElementById('ws-next-week');
         if (prevBtn) prevBtn.addEventListener('click', function () {
@@ -641,7 +806,6 @@
             loadRange(fmtDate(f), fmtDate(t));
         });
 
-        /* quick-select auto-rellena From/To */
         function onPeriodChange(val) {
             if (!val) return;
             var range = getRangeForQuickSelect(val);
@@ -652,7 +816,6 @@
             }
         }
 
-        /* select2 */
         if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
             $('#ws-filter-period').select2({ minimumResultsForSearch: Infinity, width:'100%', dropdownParent:$('#ws-filter-menu') });
             $('#ws-filter-project').select2({
@@ -672,7 +835,6 @@
             if (pEl) pEl.addEventListener('change', function(){ onPeriodChange(this.value); });
         }
 
-        /* Apply */
         var applyBtn = document.getElementById('ws-btn-apply');
         if (applyBtn) applyBtn.addEventListener('click', function () {
             var fromVal = typeof FlatpickrUtil !== 'undefined' ? FlatpickrUtil.getString('ws-datetimepicker-from').trim() : '';
@@ -682,7 +844,6 @@
             loadRange(fromVal, toVal);
         });
 
-        /* Reset */
         var resetBtn = document.getElementById('ws-btn-reset');
         if (resetBtn) resetBtn.addEventListener('click', function () {
             wsProjectFilter = '';
