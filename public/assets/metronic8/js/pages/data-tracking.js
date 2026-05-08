@@ -4515,6 +4515,10 @@ var DataTracking = (function () {
    };
 
    return {
+      goToTab: function (tabNum) {
+         activeTab = parseInt(tabNum, 10) || 1;
+         mostrarTab();
+      },
       //main function to initiate the module
       init: function () {
          initWidgets();
@@ -4572,7 +4576,15 @@ var DataTracking = (function () {
 
             localStorage.removeItem('data_tracking_id_edit');
 
-            editRow(data_tracking_id_edit);
+            var tabToOpen = parseInt(localStorage.getItem('data_tracking_tab') || '1', 10);
+            localStorage.removeItem('data_tracking_tab');
+
+            var editPromise = editRow(data_tracking_id_edit);
+            if (tabToOpen > 1 && editPromise && editPromise.then) {
+               editPromise.then(function () {
+                  DataTracking.goToTab(tabToOpen);
+               });
+            }
          }
       },
    };

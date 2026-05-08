@@ -7,6 +7,15 @@
             </div>
             <div class="card-toolbar flex-shrink-0">
                 <div class="d-flex justify-content-end align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-1">
+                        <button type="button" id="dt-widget-btn-all" class="btn btn-sm btn-light fw-semibold fs-8 px-3">All</button>
+                        <div class="input-group input-group-sm w-auto">
+                            <span class="input-group-text bg-light border-0 pe-1">
+                                <i class="ki-duotone ki-calendar fs-5 text-gray-500"><span class="path1"></span><span class="path2"></span></i>
+                            </span>
+                            <input type="text" id="dt-widget-date-range" class="form-control form-control-sm bg-light border-0 text-gray-700 fw-semibold fs-7" style="min-width:180px;cursor:pointer;" readonly placeholder="Select range…" />
+                        </div>
+                    </div>
                     {% for link in w.links %}
                         {% if link.canView %}
                             <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="Open data tracking module">
@@ -19,33 +28,37 @@
                     {% endfor %}
                 </div>
             </div>
-            </div>
+        </div>
         <div class="card-body pt-4 pb-4">
-            <div class="scroll-y h-300px pe-3">
-                <div class="table-responsive">
-                    <table class="table table-row-dashed table-hover table-row-gray-200 align-middle gs-0 gy-4">
-                        <thead>
+            <div class="h-400px pe-3" style="overflow:auto;">
+                    <table class="table table-row-dashed table-row-gray-200 align-middle gs-0 gy-2" id="dt-widget-table">
+                        <thead style="position: sticky; top: 0; z-index: 2; background: var(--kt-card-bg, #fff);">
                             <tr class="fw-bold text-muted text-uppercase fs-8 text-nowrap">
-                                <th class="min-w-100px">Date</th>
-                                <th class="min-w-100px">Project #</th>
-                                <th class="min-w-120px text-end">Daily Total</th>
-                                <th class="min-w-120px text-end">Profit Total</th>
-                                <th class="min-w-120px text-end">Labor Total</th>
-                                <th class="min-w-120px text-end pe-3">Concrete Total</th>
+                                <th class="w-30px"></th>
+                                <th class="min-w-120px">Project</th>
+                                <th class="min-w-110px text-end">Total</th>
+                                <th class="min-w-110px text-end">Profit</th>
+                                <th class="min-w-110px text-end">Labor</th>
+                                <th class="min-w-110px text-end pe-3">Concrete</th>
                             </tr>
                         </thead>
                         <tbody id="home-current-month-data-tracking-tbody">
-                        {% for row in home_current_month_data_tracking %}
-                            {% set daily = row.total_daily_today|default(0) %}
-                            {% set profit = row.profit|default(0) %}
-                            {% set labor = row.totalLabor|default(0) %}
-                            {% set concrete = row.total_concrete|default(0) %}
-                            <tr data-data-tracking-id="{{ row.id }}" style="cursor: pointer;">
-                                <td>
-                                    <span class="text-gray-800 fw-bold fs-7">{{ row.date|default('—') }}</span>
+                        {% for proj in home_current_month_data_tracking %}
+                            {% set daily = proj.total_daily_today|default(0) %}
+                            {% set profit = proj.profit|default(0) %}
+                            {% set labor = proj.totalLabor|default(0) %}
+                            {% set concrete = proj.total_concrete|default(0) %}
+                            {% set rowId = 'dt-proj-' ~ loop.index %}
+                            <tr class="dt-project-row fw-bold fs-7" data-bs-toggle="collapse" data-bs-target="#{{ rowId }}" style="cursor:pointer;">
+                                <td class="text-center">
+                                    <i class="ki-duotone ki-down fs-6 text-gray-500 dt-chevron"><span class="path1"></span></i>
                                 </td>
                                 <td>
-                                    <span class="badge badge-light-secondary text-gray-800 fw-bold fs-7">{{ row.project_number|default('—') }}</span>
+                                    <a href="javascript:;" class="dt-project-link badge badge-light-primary text-gray-800 fw-bold fs-7"
+                                       data-project-id="{{ proj.project_id|default(0) }}"
+                                       onclick="event.stopPropagation();">
+                                        {{ proj.project_number }}
+                                    </a>
                                 </td>
                                 <td class="text-end">
                                     <span class="fw-bold fs-7 {{ daily > 0 ? 'text-success' : (daily < 0 ? 'text-danger' : 'text-gray-600') }}">
@@ -58,14 +71,95 @@
                                     </span>
                                 </td>
                                 <td class="text-end">
-                                    <span class="fw-bold fs-7 {{ labor > 0 ? 'text-success' : (labor < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                    <span class="fw-bold fs-7 text-gray-700">
                                         {{ labor < 0 ? '-$' : '$' }}{{ labor|abs|number_format(2, '.', ',') }}
                                     </span>
                                 </td>
                                 <td class="text-end pe-3">
-                                    <span class="fw-bold fs-7 {{ concrete > 0 ? 'text-success' : (concrete < 0 ? 'text-danger' : 'text-gray-600') }}">
+                                    <span class="fw-bold fs-7 text-gray-700">
                                         {{ concrete < 0 ? '-$' : '$' }}{{ concrete|abs|number_format(2, '.', ',') }}
                                     </span>
+                                </td>
+                            </tr>
+                            <tr class="dt-detail-row">
+                                <td colspan="6" class="p-0 border-0">
+                                    <div class="collapse" id="{{ rowId }}">
+                                        {# <div class="bg-light-primary rounded mx-2 mb-2 px-3 py-2"> #}
+                                        <div class="rounded mx-2 mb-2 px-3 py-2">
+                                            <table class="table table-sm table-row-gray-300 align-middle mb-0 gs-0 gy-1">
+                                                <thead>
+                                                    <tr class="fw-bold text-muted text-uppercase fs-9">
+                                                        <th class="min-w-80px">Date</th>
+                                                        <th class="min-w-80px">Lead</th>
+                                                        <th class="min-w-90px text-end">Daily Total</th>
+                                                        <th class="min-w-90px text-end">Profit</th>
+                                                        <th class="min-w-90px text-end">Labor</th>
+                                                        <th class="min-w-90px text-end">Concrete</th>
+                                                        <th class="min-w-120px pe-2">Items</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for entry in proj.entries %}
+                                                    {% set ed = entry.total_daily_today|default(0) %}
+                                                    {% set ep = entry.profit|default(0) %}
+                                                    {% set el = entry.totalLabor|default(0) %}
+                                                    {% set ec = entry.total_concrete|default(0) %}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="javascript:;" class="dt-nav-link text-gray-700 fs-8"
+                                                               data-dt-id="{{ entry.id }}" data-dt-tab="1">
+                                                                {{ entry.date|default('—') }}
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            {% if entry.crew_lead|default('') is not empty %}
+                                                                <a href="javascript:;" class="dt-nav-link text-gray-700 fs-8"
+                                                                   data-dt-id="{{ entry.id }}" data-dt-tab="3">
+                                                                    {{ entry.crew_lead }}
+                                                                </a>
+                                                            {% else %}
+                                                                <span class="text-muted fs-8">—</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span class="fs-8 {{ ed > 0 ? 'text-success fw-semibold' : (ed < 0 ? 'text-danger fw-semibold' : 'text-gray-600') }}">
+                                                                {{ ed < 0 ? '-$' : '$' }}{{ ed|abs|number_format(2, '.', ',') }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span class="fs-8 {{ ep > 0 ? 'text-success fw-semibold' : (ep < 0 ? 'text-danger fw-semibold' : 'text-gray-600') }}">
+                                                                {{ ep < 0 ? '-$' : '$' }}{{ ep|abs|number_format(2, '.', ',') }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <span class="text-gray-700 fs-8">
+                                                                {{ el < 0 ? '-$' : '$' }}{{ el|abs|number_format(2, '.', ',') }}
+                                                            </span>
+                                                        </td>
+                                                        <td class="text-end">
+                                                            <a href="javascript:;" class="dt-nav-link text-gray-700 fs-8"
+                                                               data-dt-id="{{ entry.id }}" data-dt-tab="5">
+                                                                {{ ec < 0 ? '-$' : '$' }}{{ ec|abs|number_format(2, '.', ',') }}
+                                                            </a>
+                                                        </td>
+                                                        <td class="pe-2">
+                                                            {% if entry.items_label|default('') is not empty %}
+                                                                <a href="javascript:;" class="dt-nav-link text-gray-600 fs-8 dt-items-label"
+                                                                   data-dt-id="{{ entry.id }}" data-dt-tab="2"
+                                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                                   title="{{ entry.items_label }}">
+                                                                    {{ entry.items_label|slice(0, 30) }}{% if entry.items_label|length > 30 %}…{% endif %}
+                                                                </a>
+                                                            {% else %}
+                                                                <span class="text-muted fs-8">—</span>
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}
@@ -79,9 +173,8 @@
                             </tr>
                         {% endfor %}
                         </tbody>
-                        </table>
-                </div>
-                </div>
+                    </table>
             </div>
         </div>
     </div>
+</div>
