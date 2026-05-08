@@ -22,13 +22,12 @@
     {% endif %}
 {% endfor %}
 
-{# Proyectos únicos — máx 5 #}
+{# Proyectos únicos — sin límite fijo, la tabla usa scroll #}
 {% set seen          = [] %}
 {% set projects_list = [] %}
 {% for row in week_entries %}
     {% if row.project_number is not empty
           and row.project_number not in seen
-          and projects_list|length < 5
           and row.day in day_dates %}
         {% set seen          = seen|merge([row.project_number]) %}
         {% set projects_list = projects_list|merge([{
@@ -37,6 +36,7 @@
         }]) %}
     {% endif %}
 {% endfor %}
+{% set week_project_total = projects_list|length %}
 
 {# URL del módulo completo (primer link con permisos) #}
 {% set schedule_url = '' %}
@@ -52,6 +52,7 @@
             <div class="d-flex align-items-center gap-2">
                 <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title|default('Work Schedule') }}</span>
                 <span class="badge badge-light-primary fw-bold px-3 py-2 fs-8">Week</span>
+                <span id="ws-week-count" class="text-muted fw-semibold fs-8">{{ week_project_total }} Project{{ week_project_total != 1 ? 's' : '' }}</span>
             </div>
             {# Navegación de semana #}
             <div class="d-flex align-items-center gap-1 mt-1">
@@ -157,10 +158,10 @@
                 <span class="text-muted fw-semibold fs-6">No schedules this week.</span>
             </div>
         {% else %}
-            <div class="table-responsive">
-                <table class="table align-middle gs-0 gy-2 mb-0">
+            <div id="ws-table-wrap" style="max-height:300px;overflow-y:auto;overflow-x:auto">
+                <table class="table align-middle gs-0 gy-2 mb-0" style="min-width:700px">
                     {# ─ Cabeceras de días ─ #}
-                    <thead>
+                    <thead style="position:sticky;top:0;z-index:3;background:var(--kt-card-bg,#fff)">
                         <tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">
                             <th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>
                             {% for i, label in day_labels %}
@@ -351,17 +352,33 @@
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>{# /ws-table-wrap #}
+            <div class="d-flex justify-content-end mt-1">
+                <button type="button" id="ws-expand-table" class="btn btn-icon btn-xs btn-light"
+                        title="Expand to see full list">
+                    <i class="ki-duotone ki-maximize fs-5"><span class="path1"></span><span class="path2"></span></i>
+                </button>
             </div>
 
-            {# ── Panel de detalle del día (oculto hasta hacer click en un encabezado) ── #}
-            <div id="ws-day-detail-panel" style="display:none" class="mt-5 border-top pt-4">
+            {# ── Panel de detalle del día ── #}
+            <div id="ws-day-detail-panel" style="display:none" class="mt-4 border-top pt-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <span id="ws-day-detail-label" class="fw-bold text-gray-800 fs-6"></span>
-                    <button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light" title="Cerrar">
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="ws-day-detail-label" class="fw-bold text-gray-800 fs-6"></span>
+                        <span id="ws-day-detail-count" class="text-muted fw-semibold fs-8"></span>
+                    </div>
+                    <button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light"
+                            title="Cerrar vista del día">
                         <i class="ki-duotone ki-cross fs-4"><span class="path1"></span><span class="path2"></span></i>
                     </button>
                 </div>
-                <div id="ws-day-detail-body"></div>
+                <div id="ws-day-detail-body" style="max-height:300px;overflow-y:auto"></div>
+                <div class="d-flex justify-content-end mt-1">
+                    <button type="button" id="ws-expand-detail" class="btn btn-icon btn-xs btn-light"
+                            title="Expandir lista del día">
+                        <i class="ki-duotone ki-maximize fs-5"><span class="path1"></span><span class="path2"></span></i>
+                    </button>
+                </div>
             </div>
         {% endif %}
     </div>
@@ -407,6 +424,52 @@
 
     var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     var DAY_ABR   = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    /* ── contar proyectos únicos en el rango ─────────────────────── */
+    function countUniqueProjects(data, dates) {
+        var seen = {};
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].project_number && dates.indexOf(data[i].day) !== -1) {
+                seen[data[i].project_number] = true;
+            }
+        }
+        return Object.keys(seen).length;
+    }
+
+    /* ── contar entradas de un día específico ────────────────────── */
+    function countDayEntries(data, dayStr) {
+        var n = 0;
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].day === dayStr) n++;
+        }
+        return n;
+    }
+
+    /* ── actualizar contador semanal en el header ────────────────── */
+    function updateWeekCount(data, dates) {
+        var span = document.getElementById('ws-week-count');
+        if (!span) return;
+        var n = countUniqueProjects(data, dates);
+        span.textContent = n + (n === 1 ? ' Project' : ' Projects');
+    }
+
+    /* ── toggle expand ───────────────────────────────────────────── */
+    function bindExpandToggle(btnId, wrapId) {
+        var btn = document.getElementById(btnId);
+        var wrap = document.getElementById(wrapId);
+        if (!btn || !wrap) return;
+        var expanded = false;
+        btn.addEventListener('click', function () {
+            expanded = !expanded;
+            wrap.style.maxHeight = expanded ? 'none' : '300px';
+            var icon = btn.querySelector('i');
+            if (icon) {
+                icon.className = expanded
+                    ? 'ki-duotone ki-minimize fs-5'
+                    : 'ki-duotone ki-maximize fs-5';
+            }
+        });
+    }
 
     /* ── escape HTML ─────────────────────────────────────────────── */
     function esc(s) {
@@ -559,6 +622,12 @@
         var p = dayStr.split('/');
         label.textContent = DAY_NAMES[d.getDay()] + ' ' + parseInt(p[1]) + '/' + parseInt(p[0]) + '/' + p[2];
 
+        var countEl = document.getElementById('ws-day-detail-count');
+        if (countEl) {
+            var n = countDayEntries(wsState.data || WS_INIT_DATA, dayStr);
+            countEl.textContent = n + (n === 1 ? ' job' : ' jobs');
+        }
+
         body.innerHTML = renderDayDetail(wsState.data || WS_INIT_DATA, dayStr);
         panel.style.display = '';
 
@@ -606,7 +675,6 @@
             var pm = projMap[pn];
             if (pm.hasWeekday || (!isWeekView && pm.hasSun) || (isWeekView && wsSunVisible && pm.hasSun)) {
                 projects.push({ num: pn, id: pm.id });
-                if (projects.length >= 5) break;
             }
         }
 
@@ -619,15 +687,17 @@
         }
 
         /* cabecera */
-        var h = '<div class="table-responsive"><table class="table align-middle gs-0 gy-2 mb-0"><thead>'+
+        var TH_STICKY = 'position:sticky;top:0;background:var(--kt-card-bg,#fff);z-index:2';
+        var h = '<div id="ws-table-wrap" style="max-height:300px;overflow-y:auto;overflow-x:auto">'+
+                '<div class="table-responsive"><table class="table align-middle gs-0 gy-2 mb-0"><thead>'+
                 '<tr class="fw-bold fs-8 text-uppercase border-bottom border-gray-200">'+
-                '<th class="ps-2 pb-3 text-gray-500" style="min-width:110px">Project</th>';
+                '<th class="ps-2 pb-3 text-gray-500" style="min-width:110px;'+TH_STICKY+'">Project</th>';
         for (var di=0; di<dates.length; di++) {
             var isSunCol = isWeekView && di === 6;
             var isT = dates[di]===today;
             var cls = 'text-center px-2 pb-3 '+(isT?'text-primary':'text-gray-400')+(isSunCol?' ws-sun-col':'');
-            var sty = (isSunCol && !wsSunVisible) ? ' style="display:none"' : '';
-            h += '<th class="'+cls+'"'+sty+'>'+
+            var thStyle = (isSunCol && !wsSunVisible) ? 'display:none;'+TH_STICKY : TH_STICKY;
+            h += '<th class="'+cls+'" style="'+thStyle+'">'+
                  '<div class="ws-day-header d-inline-flex flex-column align-items-center cursor-pointer rounded px-2 py-1" '+
                  'data-day="'+dates[di]+'" title="Ver detalle del día">'+colLabel(dates[di])+'</div></th>';
         }
@@ -652,15 +722,25 @@
             }
             h += '</tr>';
         }
-        h += '</tbody></table></div>';
+        h += '</tbody></table></div></div>'; /* close table-responsive + ws-table-wrap */
+        h += '<div class="d-flex justify-content-end mt-1">'+
+             '<button type="button" id="ws-expand-table" class="btn btn-icon btn-xs btn-light" title="Expand to see full list">'+
+             '<i class="ki-duotone ki-maximize fs-5"><span class="path1"></span><span class="path2"></span></i></button></div>';
 
         /* panel detalle */
-        h += '<div id="ws-day-detail-panel" style="display:none" class="mt-5 border-top pt-4">'+
+        h += '<div id="ws-day-detail-panel" style="display:none" class="mt-4 border-top pt-4">'+
              '<div class="d-flex align-items-center justify-content-between mb-3">'+
+             '<div class="d-flex align-items-center gap-2">'+
              '<span id="ws-day-detail-label" class="fw-bold text-gray-800 fs-6"></span>'+
-             '<button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light" title="Cerrar">'+
+             '<span id="ws-day-detail-count" class="text-muted fw-semibold fs-8"></span>'+
+             '</div>'+
+             '<button type="button" id="ws-day-detail-close" class="btn btn-icon btn-xs btn-light" title="Cerrar vista del día">'+
              '<i class="ki-duotone ki-cross fs-4"><span class="path1"></span><span class="path2"></span></i></button></div>'+
-             '<div id="ws-day-detail-body"></div></div>';
+             '<div id="ws-day-detail-body" style="max-height:300px;overflow-y:auto"></div>'+
+             '<div class="d-flex justify-content-end mt-1">'+
+             '<button type="button" id="ws-expand-detail" class="btn btn-icon btn-xs btn-light" title="Expandir lista del día">'+
+             '<i class="ki-duotone ki-maximize fs-5"><span class="path1"></span><span class="path2"></span></i></button></div>'+
+             '</div>';
 
         return h;
     }
@@ -672,6 +752,7 @@
         if (!body) return;
         body.innerHTML = renderTable(wsState.data, wsState.dates);
         bindHandlers(document.getElementById('widget-work_schedule'));
+        updateWeekCount(wsState.data, wsState.dates);
     }
 
     /* ── bind handlers ───────────────────────────────────────────── */
@@ -712,6 +793,10 @@
             if (panel) panel.style.display = 'none';
             highlightDayHeader(null);
         });
+
+        /* expand toggles */
+        bindExpandToggle('ws-expand-table', 'ws-table-wrap');
+        bindExpandToggle('ws-expand-detail', 'ws-day-detail-body');
     }
 
     /* ── cargar rango por AJAX ───────────────────────────────────── */
@@ -738,6 +823,7 @@
                     wsState.data = res.data.data;
                     body.innerHTML = renderTable(wsState.data, wsState.dates);
                     bindHandlers(document.getElementById('widget-work_schedule'));
+                    updateWeekCount(wsState.data, wsState.dates);
                 }
             })
             .catch(function () {
@@ -772,6 +858,7 @@
         wsState.to    = fmtDate(initSun);
         wsState.dates = generateDates(wsState.from, wsState.to);
         wsState.data  = WS_INIT_DATA;
+        updateWeekCount(wsState.data, wsState.dates);
 
         var _fpCfg = { localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }, static: true, position: 'below' };
         var _fromGroup = document.getElementById('ws-datetimepicker-from');
