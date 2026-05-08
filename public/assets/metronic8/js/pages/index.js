@@ -715,7 +715,7 @@ var Index = (function () {
                 /* '<div class="bg-light-primary rounded mx-2 mb-2 px-3 py-2">' + */
                 '<div class="rounded mx-2 mb-2 px-3 py-2">' +
                 '<table class="table table-sm table-row-gray-300 align-middle mb-0 gs-0 gy-1">' +
-                '<thead><tr class="fw-bold text-muted text-uppercase fs-9">' +
+                '<thead class="dt-sub-thead" style="position:sticky;top:36px;z-index:1;background:var(--kt-card-bg,#fff);"><tr class="fw-bold text-muted text-uppercase fs-9">' +
                 '<th class="min-w-80px">Date</th><th class="min-w-80px">Lead</th>' +
                 '<th class="min-w-90px text-end">Daily Total</th><th class="min-w-90px text-end">Profit</th>' +
                 '<th class="min-w-90px text-end">Labor</th><th class="min-w-90px text-end">Concrete</th>' +
@@ -752,6 +752,20 @@ var Index = (function () {
         $tb.html(html);
         initDtWidgetTooltips();
         initDtWidgetChevrons();
+        applyDtSubTheadTop();
+    };
+
+    var getDtMainTheadHeight = function () {
+        var th = document.querySelector('#dt-widget-table > thead');
+        return th ? Math.ceil(th.getBoundingClientRect().height) : 36;
+    };
+
+    var applyDtSubTheadTop = function () {
+        var top = getDtMainTheadHeight();
+        var nodes = document.querySelectorAll('#home-current-month-data-tracking-tbody .dt-sub-thead');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].style.top = top + 'px';
+        }
     };
 
     var initDtWidgetTooltips = function () {
@@ -1442,6 +1456,7 @@ var renderPayItemTotalsTbody = function (rows) {
             initDtWidgetDateRange();
             initDtWidgetTooltips();
             initDtWidgetChevrons();
+            applyDtSubTheadTop();
         },
     };
 })();
