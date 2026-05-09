@@ -330,7 +330,8 @@ class DataTrackingItemRepository extends ServiceEntityRepository
      * Returns item names grouped by data_tracking_id for a set of IDs — single query.
      *
      * @param int[] $trackingIds
-     * @return array<int, string[]>  keyed by tracking id
+     *
+     * @return array<int, string[]> keyed by tracking id
      */
     public function itemNamesByTrackingIds(array $trackingIds): array
     {
