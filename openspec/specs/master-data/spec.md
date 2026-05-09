@@ -45,3 +45,27 @@ El sistema SHALL exponer `LogController` y entidad `Log` para consulta de regist
 ### Requirement: Tipos de estimación / propuesta
 
 El sistema SHALL gestionar catálogos que alimentan estimaciones (`ProposalType`, etc.) según rutas admin existentes.
+
+### Requirement: Librería de compañías — indicadores E y P
+
+En el listado administrativo de compañías (Librería), el sistema SHALL mostrar en la **misma columna que el nombre** (`Name`), inmediatamente después del texto del nombre, los indicadores que correspondan según el backend: badge **E** (origen vía estimados) y/o badge **P** (compañía asociada a al menos un proyecto), con estilo coherente con Metronic (p. ej. `badge-light-info` / `badge-light-primary`). Si no aplica ninguno, MUST mostrarse solo el nombre sin badges adicionales.
+
+#### Scenario: Fila con solo E
+
+- **WHEN** el backend indica origen estimados verdadero y asociación a proyecto falsa
+- **THEN** la celda de nombre MUST incluir el badge **E** tras el nombre y MUST NOT mostrar **P**
+
+#### Scenario: Fila con solo P
+
+- **WHEN** el backend indica origen estimados falso y asociación a proyecto verdadera
+- **THEN** la celda de nombre MUST incluir el badge **P** tras el nombre y MUST NOT mostrar **E**
+
+#### Scenario: Fila con E y P
+
+- **WHEN** el backend indica ambos verdaderos
+- **THEN** la celda de nombre MUST mostrar ambos badges **E** y **P** tras el nombre
+
+#### Scenario: Leyenda o ayuda
+
+- **WHEN** el usuario sitúa el foco o el puntero sobre los badges (p. ej. tooltip o `title`)
+- **THEN** MUST poder entenderse que **E** se refiere al origen vía estimados y **P** al vínculo con proyectos

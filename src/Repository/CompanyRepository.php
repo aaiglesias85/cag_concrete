@@ -30,6 +30,8 @@ class CompanyRepository extends ServiceEntityRepository
      * ListarOrdenadosParaOffline: Lista companies como arrays para trabajo offline.
      * Usa getArrayResult() para evitar lazy loading (requiere PHP 8.4 en Doctrine ORM 3.4).
      *
+     * Nota: no incluye originated_from_estimates ni linkedToProject; el cliente offline no los requiere hoy.
+     *
      * @return array<array<string, mixed>>
      */
     public function ListarOrdenadosParaOffline(): array
@@ -110,6 +112,7 @@ class CompanyRepository extends ServiceEntityRepository
     {
         // Whitelist de columnas ordenables
         $sortable = [
+            'id' => 'c.companyId',
             'companyId' => 'c.companyId',
             'name' => 'c.name',
             'phone' => 'c.phone',

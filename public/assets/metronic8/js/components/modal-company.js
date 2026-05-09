@@ -3,6 +3,9 @@ var ModalCompany = function () {
     // para guardar el company
     var company_new = null;
 
+    /** Si true, el POST marca la compañía como originada en estimados (E). */
+    var salvarFromEstimates = false;
+
     // getter y setters
     var getCompany = function () {
         return company_new;
@@ -38,7 +41,12 @@ var ModalCompany = function () {
         return result;
     };
 
-    var mostrarModal = function () {
+    /**
+     * @param {{ fromEstimates?: boolean }} [options]
+     */
+    var mostrarModal = function (options) {
+        options = options || {};
+        salvarFromEstimates = !!options.fromEstimates;
 
         // reset form
         resetFormCompany();
@@ -73,6 +81,10 @@ var ModalCompany = function () {
                 formData.set("contactName", '');
                 formData.set("contactEmail", '');
                 formData.set("contacts", JSON.stringify([]));
+
+                if (salvarFromEstimates) {
+                    formData.set("from_estimates", "1");
+                }
 
                 BlockUtil.block('#modal-company .modal-content');
 

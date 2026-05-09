@@ -1902,7 +1902,7 @@ var Estimates = (function () {
    var initAccionesCompany = function () {
       $(document).off('click', '.btn-add-company');
       $(document).on('click', '.btn-add-company', function (e) {
-         ModalCompany.mostrarModal();
+         ModalCompany.mostrarModal({ fromEstimates: true });
       });
 
       $('#modal-company').on('hidden.bs.modal', function () {
