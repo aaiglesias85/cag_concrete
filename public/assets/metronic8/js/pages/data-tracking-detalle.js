@@ -227,6 +227,12 @@ var DataTrackingDetalle = (function () {
          });
 
       function cargarDatos(data_tracking) {
+         if (data_tracking.project_id !== null && data_tracking.project_id !== undefined && data_tracking.project_id !== '') {
+            if (typeof DataTracking !== 'undefined' && typeof DataTracking.setProjectSelectFromId === 'function') {
+               DataTracking.setProjectSelectFromId(data_tracking.project_id);
+            }
+         }
+
          // datos project
          $('#proyect-number-detalle').html(data_tracking.project_number);
          $('#proyect-name-detalle').html(data_tracking.project_description);

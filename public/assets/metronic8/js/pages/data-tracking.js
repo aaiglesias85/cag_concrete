@@ -1488,6 +1488,34 @@ var DataTracking = (function () {
          },
       });
    };
+
+   /** Preselect project from ?project_id= (e.g. link from project view-only tab). */
+   var applyProjectIdFromQuery = function () {
+      try {
+         var params = new URLSearchParams(window.location.search);
+         var raw = params.get('project_id');
+         if (raw === null || raw === '') {
+            return;
+         }
+         var id = String(raw).trim();
+         if (!/^\d+$/.test(id)) {
+            return;
+         }
+         if ($('#project').find('option[value="' + id + '"]').length === 0) {
+            return;
+         }
+         $('#project').val(id).trigger('change');
+
+         params.delete('project_id');
+         var newSearch = params.toString();
+         var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+         if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', newUrl);
+         }
+      } catch (e) {
+         /* ignore */
+      }
+   };
    var calcularTotalConcrete = function () {
       var cantidad = NumberUtil.getNumericValue('#total_conc_used');
       var price = NumberUtil.getNumericValue('#conc_price');
@@ -4519,6 +4547,7 @@ var DataTracking = (function () {
       init: function () {
          initWidgets();
          initTable();
+         applyProjectIdFromQuery();
 
          initWizard();
 
@@ -4574,6 +4603,21 @@ var DataTracking = (function () {
 
             editRow(data_tracking_id_edit);
          }
+      },
+
+      /** Align main list #project select with a loaded data tracking (view/edit detail). */
+      setProjectSelectFromId: function (projectId) {
+         if (projectId === null || projectId === undefined || projectId === '') {
+            return;
+         }
+         var id = String(projectId);
+         if ($('#project').find('option[value="' + id + '"]').length === 0) {
+            return;
+         }
+         $('#project').off('change', changeProject);
+         $('#project').val(id);
+         $('#project').trigger('change');
+         $('#project').on('change', changeProject);
       },
    };
 })();
