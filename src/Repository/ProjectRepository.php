@@ -546,6 +546,7 @@ class ProjectRepository extends ServiceEntityRepository
      * Entre los company_id dados, devuelve los que tienen al menos un proyecto asociado.
      *
      * @param list<int> $companyIds
+     *
      * @return list<int>
      */
     public function filterCompanyIdsWithProjects(array $companyIds): array
