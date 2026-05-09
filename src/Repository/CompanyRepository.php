@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Company;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -24,6 +25,29 @@ class CompanyRepository extends ServiceEntityRepository
            ->orderBy('c.name', 'ASC')
            ->getQuery()
            ->getResult();
+    }
+
+    /**
+     * Compañías con al menos un proyecto (criterio alineado con indicador P en librería).
+     * Para filtros de listados admin; ListarOrdenados sigue usándose donde hace falta el catálogo completo.
+     *
+     * @return Company[]
+     */
+    public function ListarOrdenadosConProyectoAsociado(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        return $qb
+            ->where($qb->expr()->exists(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->select('1')
+                    ->from(Project::class, 'p')
+                    ->where('p.company = c')
+                    ->getDQL()
+            ))
+            ->orderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

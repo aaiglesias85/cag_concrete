@@ -71,9 +71,10 @@ class ProjectController extends AbstractAdminController
         $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PROJECT);
         $permiso = $permisos[0] ?? throw new \LogicException('Permiso PROJECT esperado tras #[RequireAdminPermission].');
 
-        // companies
-        $companies = $this->projectService->getDoctrine()->getRepository(Company::class)
-           ->ListarOrdenados();
+        $companyRepo = $this->projectService->getDoctrine()->getRepository(Company::class);
+        // companies: catálogo completo para altas/edición; companies_filtro: solo con proyecto (P) para filtro del listado
+        $companies = $companyRepo->ListarOrdenados();
+        $companies_filtro = $companyRepo->ListarOrdenadosConProyectoAsociado();
 
         // inspectors
         $inspectors = $this->projectService->getDoctrine()->getRepository(Inspector::class)
@@ -110,6 +111,7 @@ class ProjectController extends AbstractAdminController
         return $this->render('admin/project/index.html.twig', [
             'permiso' => $permiso,
             'companies' => $companies,
+            'companies_filtro' => $companies_filtro,
             'inspectors' => $inspectors,
             'items' => $items,
             'equations' => $equations,
