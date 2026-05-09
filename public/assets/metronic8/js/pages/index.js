@@ -677,6 +677,7 @@ var Index = (function () {
         $tb.html(html);
     };
   
+    var dtWidgetCollapseCounter = 0;
     var renderCurrentMonthDataTrackingTbody = function (rows) {
         var $tb = $('#home-current-month-data-tracking-tbody');
         if (!$tb.length) return;
@@ -692,18 +693,159 @@ var Index = (function () {
         }
         var html = '';
         for (var i = 0; i < rows.length; i++) {
-            var r = rows[i] || {};
+            var proj = rows[i] || {};
+            dtWidgetCollapseCounter++;
+            var rowId = 'dt-proj-ajax-' + dtWidgetCollapseCounter;
+            var daily = parseFloat(proj.total_daily_today) || 0;
+            var profit = parseFloat(proj.profit) || 0;
+            var labor = parseFloat(proj.totalLabor) || 0;
+            var concrete = parseFloat(proj.total_concrete) || 0;
+            var projId = proj.project_id || 0;
             html +=
-                '<tr data-data-tracking-id="' + esc(r.id || '') + '" style="cursor: pointer;">' +
-                '<td><span class="text-gray-800 fw-bold fs-7">' + esc(r.date || '-') + '</span></td>' +
-                '<td><span class="badge badge-light-secondary text-gray-800 fw-bold fs-7">' + esc(r.project_number || '-') + '</span></td>' +
-                '<td class="text-end">' + formatHomeMoney(r.total_daily_today || 0) + '</td>' +
-                '<td class="text-end">' + formatHomeMoney(r.profit || 0) + '</td>' +
-                '<td class="text-end">' + formatHomeMoney(r.totalLabor || 0) + '</td>' +
-                '<td class="text-end pe-3">' + formatHomeMoney(r.total_concrete || 0) + '</td>' +
-                '</tr>';
+                '<tr class="dt-project-row fw-bold fs-7" data-bs-toggle="collapse" data-bs-target="#' + rowId + '" style="cursor:pointer;">' +
+                '<td class="text-center"><i class="ki-duotone ki-down fs-6 text-gray-500 dt-chevron"><span class="path1"></span></i></td>' +
+                '<td><a href="javascript:;" class="dt-project-link badge badge-light-primary text-gray-800 fw-bold fs-7" data-project-id="' + esc(projId) + '" onclick="event.stopPropagation();">' + esc(proj.project_number || '—') + '</a></td>' +
+                '<td class="text-end">' + formatHomeMoney(daily) + '</td>' +
+                '<td class="text-end">' + formatHomeMoney(profit) + '</td>' +
+                '<td class="text-end"><span class="fw-bold fs-7 text-gray-700">' + (labor < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(labor), 2, '.', ',') + '</span></td>' +
+                '<td class="text-end pe-3"><span class="fw-bold fs-7 text-gray-700">' + (concrete < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(concrete), 2, '.', ',') + '</span></td>' +
+                '</tr>' +
+                '<tr class="dt-detail-row"><td colspan="6" class="p-0 border-0">' +
+                '<div class="collapse" id="' + rowId + '">' +
+                /* '<div class="bg-light-primary rounded mx-2 mb-2 px-3 py-2">' + */
+                '<div class="rounded mx-2 mb-2 px-3 py-2">' +
+                '<table class="table table-sm table-row-gray-300 align-middle mb-0 gs-0 gy-1">' +
+                '<thead class="dt-sub-thead" style="position:sticky;top:36px;z-index:1;background:var(--kt-card-bg,#fff);"><tr class="fw-bold text-muted text-uppercase fs-9">' +
+                '<th class="min-w-80px">Date</th><th class="min-w-80px">Lead</th>' +
+                '<th class="min-w-90px text-end">Daily Total</th><th class="min-w-90px text-end">Profit</th>' +
+                '<th class="min-w-90px text-end">Labor</th><th class="min-w-90px text-end">Concrete</th>' +
+                '<th class="min-w-120px pe-2">Items</th></tr></thead><tbody>';
+            var entries = Array.isArray(proj.entries) ? proj.entries : [];
+            for (var j = 0; j < entries.length; j++) {
+                var e = entries[j] || {};
+                var dtId = e.id || 0;
+                var ed = parseFloat(e.total_daily_today) || 0;
+                var ep = parseFloat(e.profit) || 0;
+                var el = parseFloat(e.totalLabor) || 0;
+                var ec = parseFloat(e.total_concrete) || 0;
+                var itemsLabel = esc(e.items_label || '');
+                var itemsShort = itemsLabel.length > 30 ? itemsLabel.slice(0, 30) + '…' : itemsLabel;
+                var itemsCell = itemsLabel
+                    ? '<a href="javascript:;" class="dt-nav-link text-gray-600 fs-8 dt-items-label" data-dt-id="' + dtId + '" data-dt-tab="2" data-bs-toggle="tooltip" data-bs-placement="top" title="' + itemsLabel + '">' + itemsShort + '</a>'
+                    : '<span class="text-muted fs-8">—</span>';
+                var leadCell = e.crew_lead
+                    ? '<a href="javascript:;" class="dt-nav-link text-gray-700 fs-8" data-dt-id="' + dtId + '" data-dt-tab="3">' + esc(e.crew_lead) + '</a>'
+                    : '<span class="text-muted fs-8">—</span>';
+                html +=
+                    '<tr>' +
+                    '<td><a href="javascript:;" class="dt-nav-link text-gray-700 fs-8" data-dt-id="' + dtId + '" data-dt-tab="1">' + esc(e.date || '—') + '</a></td>' +
+                    '<td>' + leadCell + '</td>' +
+                    '<td class="text-end"><span class="fs-8 ' + (ed > 0 ? 'text-success fw-semibold' : (ed < 0 ? 'text-danger fw-semibold' : 'text-gray-600')) + '">' + (ed < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(ed), 2, '.', ',') + '</span></td>' +
+                    '<td class="text-end"><span class="fs-8 ' + (ep > 0 ? 'text-success fw-semibold' : (ep < 0 ? 'text-danger fw-semibold' : 'text-gray-600')) + '">' + (ep < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(ep), 2, '.', ',') + '</span></td>' +
+                    '<td class="text-end"><span class="text-gray-700 fs-8">' + (el < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(el), 2, '.', ',') + '</span></td>' +
+                    '<td class="text-end"><a href="javascript:;" class="dt-nav-link text-gray-700 fs-8" data-dt-id="' + dtId + '" data-dt-tab="5">' + (ec < 0 ? '-$' : '$') + MyApp.formatearNumero(Math.abs(ec), 2, '.', ',') + '</a></td>' +
+                    '<td class="pe-2">' + itemsCell + '</td>' +
+                    '</tr>';
+            }
+            html += '</tbody></table></div></div></td></tr>';
         }
         $tb.html(html);
+        initDtWidgetTooltips();
+        initDtWidgetChevrons();
+        applyDtSubTheadTop();
+    };
+
+    var getDtMainTheadHeight = function () {
+        var th = document.querySelector('#dt-widget-table > thead');
+        return th ? Math.ceil(th.getBoundingClientRect().height) : 36;
+    };
+
+    var applyDtSubTheadTop = function () {
+        var top = getDtMainTheadHeight();
+        var nodes = document.querySelectorAll('#home-current-month-data-tracking-tbody .dt-sub-thead');
+        for (var i = 0; i < nodes.length; i++) {
+            nodes[i].style.top = top + 'px';
+        }
+    };
+
+    var initDtWidgetTooltips = function () {
+        if (!window.bootstrap || !bootstrap.Tooltip) return;
+        var nodes = document.querySelectorAll('#home-current-month-data-tracking-tbody .dt-items-label[data-bs-toggle="tooltip"]');
+        for (var i = 0; i < nodes.length; i++) {
+            bootstrap.Tooltip.getOrCreateInstance(nodes[i]);
+        }
+    };
+
+    var initDtWidgetChevrons = function () {
+        var $tbody = $('#home-current-month-data-tracking-tbody');
+        $tbody.find('.dt-project-row').each(function () {
+            var target = $(this).data('bs-target');
+            if (!target) return;
+            var $chevron = $(this).find('.dt-chevron');
+            $(target).on('show.bs.collapse', function () {
+                $chevron.removeClass('ki-down').addClass('ki-up');
+            }).on('hide.bs.collapse', function () {
+                $chevron.removeClass('ki-up').addClass('ki-down');
+            });
+        });
+    };
+
+    var initDtWidgetDateRange = function () {
+        var input = document.getElementById('dt-widget-date-range');
+        var btnAll = document.getElementById('dt-widget-btn-all');
+        if (!input || typeof flatpickr === 'undefined') return;
+
+        var fmt = function (d) {
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+
+        var setAllMode = function () {
+            input.value = '';
+            if (btnAll) {
+                btnAll.classList.remove('btn-light');
+                btnAll.classList.add('btn-primary');
+            }
+            if (fp) fp.clear();
+            FlatpickrUtil.clear('home-datetimepicker-fecha-desde');
+            FlatpickrUtil.clear('home-datetimepicker-fecha-hasta');
+            var $period = $('#home-date-period');
+            if ($period.length && $.fn.select2 && $period.hasClass('select2-hidden-accessible')) {
+                $period.val('all').trigger('change');
+            } else if ($period.length) {
+                $period.val('all');
+            }
+            reloadDashboardData();
+        };
+
+        var setRangeMode = function (start, end) {
+            input.value = fmt(start) + ' — ' + fmt(end);
+            if (btnAll) {
+                btnAll.classList.remove('btn-primary');
+                btnAll.classList.add('btn-light');
+            }
+        };
+
+        var c = getCurrentMonthBounds();
+        setRangeMode(c.start, c.end);
+
+        var fp = flatpickr(input, {
+            mode: 'range',
+            dateFormat: 'm/d/Y',
+            defaultDate: [c.start, c.end],
+            onClose: function (dates) {
+                if (dates.length !== 2) return;
+                setRangeMode(dates[0], dates[1]);
+                FlatpickrUtil.setDate('home-datetimepicker-fecha-desde', dates[0]);
+                FlatpickrUtil.setDate('home-datetimepicker-fecha-hasta', dates[1]);
+                reloadDashboardData();
+            },
+        });
+
+        if (btnAll) {
+            btnAll.addEventListener('click', function () {
+                setAllMode();
+            });
+        }
     };
    
 var renderPayItemTotalsTbody = function (rows) {
@@ -1274,9 +1416,27 @@ var renderPayItemTotalsTbody = function (rows) {
         $(document)
             .off('click', '#home-bid-deadlines-tbody tr[data-estimate-id]')
             .on('click', '#home-bid-deadlines-tbody tr[data-estimate-id]', onOpenEstimateFromBidDeadlines);
+        $(document).off('click', '#home-current-month-data-tracking-tbody tr[data-data-tracking-id]');
         $(document)
-            .off('click', '#home-current-month-data-tracking-tbody tr[data-data-tracking-id]')
-            .on('click', '#home-current-month-data-tracking-tbody tr[data-data-tracking-id]', onOpenDataTrackingFromCurrentMonthWidget);
+            .off('click', '#home-current-month-data-tracking-tbody .dt-project-link')
+            .on('click', '#home-current-month-data-tracking-tbody .dt-project-link', function (e) {
+                e.preventDefault();
+                var projectId = $(this).data('project-id');
+                if (!projectId) return;
+                localStorage.setItem('project_id_edit', projectId);
+                window.location.href = typeof url_project !== 'undefined' && url_project ? url_project : 'project';
+            });
+        $(document)
+            .off('click', '#home-current-month-data-tracking-tbody .dt-nav-link')
+            .on('click', '#home-current-month-data-tracking-tbody .dt-nav-link', function (e) {
+                e.preventDefault();
+                var dtId = $(this).data('dt-id');
+                var dtTab = $(this).data('dt-tab') || 1;
+                if (!dtId) return;
+                localStorage.setItem('data_tracking_id_edit', dtId);
+                localStorage.setItem('data_tracking_tab', dtTab);
+                window.location.href = C.urlDataTracking || 'data_tracking';
+            });
         $(document)
             .off('click', '#home-invoiced-projects-tbody tr[data-invoice-id]')
             .on('click', '#home-invoiced-projects-tbody tr[data-invoice-id]', onOpenInvoiceFromInvoicedProjects);
@@ -1293,6 +1453,10 @@ var renderPayItemTotalsTbody = function (rows) {
             initEstimatorSubmittedShareChart();
             initInvoiceProfitChart();
             initCostBreakdownChart();
+            initDtWidgetDateRange();
+            initDtWidgetTooltips();
+            initDtWidgetChevrons();
+            applyDtSubTheadTop();
         },
     };
 })();

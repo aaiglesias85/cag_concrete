@@ -46,7 +46,12 @@
                                 data-label-complete="{{ t.label_complete|default('')|e('html_attr') }}">
                                 <td><span class="home-task-due {{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.due_date|default('—') }}</span></td>
                                 <td>
-                                    <div class="home-task-desc {{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}">{{ t.description|default('')|nl2br }}</div>
+                                    {% set truncated_desc = t.description|default('')|slice(0, 50) %}
+                                    {% set full_desc = t.description|default('') %}
+                                    <div class="home-task-desc {{ is_complete ? 'text-muted text-decoration-line-through' : 'text-gray-800' }}"
+                                         {% if full_desc|length > 50 %}title="{{ full_desc|e('html_attr') }}"{% endif %}>
+                                        {{ truncated_desc }}{% if full_desc|length > 50 %}...{% endif %}
+                                    </div>
                                     {% if t.show_assigned|default(false) and t.assigned|default('') %}
                                         <div class="text-muted fs-8 mt-1">Assigned: {{ t.assigned }}</div>
                                     {% endif %}

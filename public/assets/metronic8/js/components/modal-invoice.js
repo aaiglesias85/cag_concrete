@@ -791,7 +791,7 @@ var ModalInvoice = (function () {
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>${badgeRetainage}${badgeBond}${badgeBonded}${icono}</div>`;
+               return `<div style="width: 200px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;" title="${DatatableUtil.escapeHtml(data || '')}">${data || ''}</span>${badgeRetainage}${badgeBond}${badgeBonded}${icono}</div>`;
             },
          },
          // unit

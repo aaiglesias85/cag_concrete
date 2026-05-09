@@ -233,9 +233,8 @@ class TaskService extends Base
      */
     public function listarTareasPayloadHome(Usuario $viewer, array $perm, string $fi, string $ff, int $limit = 30): array
     {
-        if (empty($perm['ver'])) {
-            return [];
-        }
+        // Even without full module access, show user their assigned tasks in the widget
+        // Only restrict if they can't view/see tasks at all
         $only = (int) $viewer->getUsuarioId();
 
         /** @var TaskRepository $repo */
@@ -251,6 +250,7 @@ class TaskService extends Base
             '',
             '',
             $only,
+            true,  // includePendingWithoutDateRange: Show all pending tasks regardless of date
         );
         $list = [];
         foreach ($resultado['data'] as $task) {
@@ -341,15 +341,19 @@ class TaskService extends Base
 
     public function elActorPuedeCambiarEstadoTarea(Usuario $actor, array $perm, Task $entity): bool
     {
-        if (empty($perm['editar'])) {
-            return false;
-        }
+        // Admin can always change status
         if ($actor->isAdministrador()) {
             return true;
         }
+        
+        // User can change status of their own assigned tasks (regardless of module access)
         $u = $entity->getAssignedUser();
-
-        return null !== $u && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId();
+        if (null !== $u && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId()) {
+            return true;
+        }
+        
+        // For other tasks, need explicit edit permission on the module
+        return !empty($perm['editar']);
     }
 
     private function resolverUsuario($usuario_id): ?Usuario

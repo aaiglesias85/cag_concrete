@@ -325,4 +325,39 @@ class DataTrackingItemRepository extends ServiceEntityRepository
 
         return $arreglo;
     }
+
+    /**
+     * Returns item names grouped by data_tracking_id for a set of IDs — single query.
+     *
+     * @param int[] $trackingIds
+     * @return array<int, string[]>  keyed by tracking id
+     */
+    public function itemNamesByTrackingIds(array $trackingIds): array
+    {
+        if ([] === $trackingIds) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('d_t_i')
+            ->select('IDENTITY(d_t_i.dataTracking) AS tracking_id')
+            ->addSelect('i.name AS item_name')
+            ->leftJoin('d_t_i.projectItem', 'p_i')
+            ->leftJoin('p_i.item', 'i')
+            ->where('IDENTITY(d_t_i.dataTracking) IN (:ids)')
+            ->setParameter('ids', $trackingIds)
+            ->orderBy('d_t_i.id', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $tid = (int) $row['tracking_id'];
+            $name = (string) ($row['item_name'] ?? '');
+            if ('' !== $name) {
+                $map[$tid][] = $name;
+            }
+        }
+
+        return $map;
+    }
 }

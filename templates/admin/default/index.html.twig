@@ -118,7 +118,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="row g-4 g-xl-6">
+                <div class="row g-4 g-xl-6" id="home-widgets-container" data-user-id="{{ usuario.usuarioId }}">
                     {% for w in dashboard_widgets %}
                         {% if w.id is defined and w.id == 'tasks' and home_task is not null %}
                             {% include 'admin/default/_widget_home_tasks.html.twig' with { w: w, home_task: home_task } only %}
@@ -235,5 +235,6 @@
     <script>
         jQuery(function () { Index.init(); });
     </script>
+    <script src="{{ asset('assets/metronic8/js/pages/home_widgets_sortable.js') }}?{{ 'now'|date('U') }}"></script>
     {% endif %}
 {% endblock %}

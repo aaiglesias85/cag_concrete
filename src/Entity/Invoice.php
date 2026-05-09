@@ -21,6 +21,9 @@ class Invoice
     #[ORM\Column(name: 'start_date', type: 'date', nullable: false)]
     private ?\DateTimeInterface $startDate;
 
+    #[ORM\Column(name: 'invoice_date', type: 'date', nullable: true)]
+    private ?\DateTimeInterface $invoiceDate;
+
     #[ORM\Column(name: 'end_date', type: 'date', nullable: false)]
     private ?\DateTimeInterface $endDate;
 
@@ -137,6 +140,16 @@ class Invoice
     public function setEndDate(?\DateTimeInterface $endDate): void
     {
         $this->endDate = $endDate;
+    }
+
+    public function getInvoiceDate(): ?\DateTimeInterface
+    {
+        return $this->invoiceDate;
+    }
+
+    public function setInvoiceDate(?\DateTimeInterface $invoiceDate): void
+    {
+        $this->invoiceDate = $invoiceDate;
     }
 
     public function getNotes(): ?string

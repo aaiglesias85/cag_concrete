@@ -882,6 +882,9 @@ class DataTrackingService extends Base
         $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
         $lista = $dataTrackingItemRepo->ListarItems($data_tracking_id);
         foreach ($lista as $key => $value) {
+            if (null === $value->getProjectItem()) {
+                continue;
+            }
             $yield_calculation_name = $this->DevolverYieldCalculationDeItemProject($value->getProjectItem());
 
             $quantity = $value->getQuantity();
@@ -1688,6 +1691,7 @@ class DataTrackingService extends Base
 
             $data[] = [
                 'id' => $data_tracking_id,
+                'project_id' => $value->getProject()->getProjectId(),
                 'project' => $value->getProject()->getProjectNumber().' - '.$value->getProject()->getDescription(),
                 'date' => $value->getDate()->format('m/d/Y'),
                 'stationNumber' => $value->getStationNumber(),
@@ -1748,27 +1752,59 @@ class DataTrackingService extends Base
             ''
         );
 
-        $out = [];
-        foreach ($result['data'] as $row) {
+        $rows = $result['data'];
+
+        // Fetch item names for all entries in one query
+        $trackingIds = array_map(fn($r) => (int) $r['id'], $rows);
+        /** @var DataTrackingItemRepository $dtiRepo */
+        $dtiRepo = $this->getDoctrine()->getRepository(\App\Entity\DataTrackingItem::class);
+        $itemNameMap = $dtiRepo->itemNamesByTrackingIds($trackingIds);
+
+        $grouped = [];
+        foreach ($rows as $row) {
             $projectLabel = (string) ($row['project'] ?? '');
             $projectNumber = '';
             if ('' !== $projectLabel) {
                 $parts = explode(' - ', $projectLabel, 2);
                 $projectNumber = trim((string) $parts[0]);
             }
+            $key = $projectNumber ?: '—';
 
-            $out[] = [
-                'id' => (int) ($row['id'] ?? 0),
-                'date' => (string) ($row['date'] ?? ''),
-                'project_number' => $projectNumber,
-                'total_daily_today' => (float) ($row['total_daily_today'] ?? 0),
-                'profit' => (float) ($row['profit'] ?? 0),
-                'totalLabor' => (float) ($row['totalLabor'] ?? 0),
-                'total_concrete' => (float) ($row['total_concrete'] ?? 0),
+            $tid = (int) ($row['id'] ?? 0);
+            $itemNames = $itemNameMap[$tid] ?? [];
+            $itemsLabel = implode(', ', $itemNames);
+
+            $entry = [
+                'id'               => $tid,
+                'date'             => (string) ($row['date'] ?? ''),
+                'crew_lead'        => (string) ($row['crewLead'] ?? ''),
+                'total_daily_today'=> (float) ($row['total_daily_today'] ?? 0),
+                'profit'           => (float) ($row['profit'] ?? 0),
+                'totalLabor'       => (float) ($row['totalLabor'] ?? 0),
+                'total_concrete'   => (float) ($row['total_concrete'] ?? 0),
+                'items_label'      => $itemsLabel,
             ];
+
+            if (isset($grouped[$key])) {
+                $grouped[$key]['total_daily_today'] += $entry['total_daily_today'];
+                $grouped[$key]['profit']            += $entry['profit'];
+                $grouped[$key]['totalLabor']        += $entry['totalLabor'];
+                $grouped[$key]['total_concrete']    += $entry['total_concrete'];
+                $grouped[$key]['entries'][]          = $entry;
+            } else {
+                $grouped[$key] = [
+                    'project_number'   => $key,
+                    'project_id'       => (int) ($row['project_id'] ?? 0),
+                    'total_daily_today'=> $entry['total_daily_today'],
+                    'profit'           => $entry['profit'],
+                    'totalLabor'       => $entry['totalLabor'],
+                    'total_concrete'   => $entry['total_concrete'],
+                    'entries'          => [$entry],
+                ];
+            }
         }
 
-        return $out;
+        return array_values($grouped);
     }
 
     /**

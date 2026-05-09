@@ -822,7 +822,7 @@ class DefaultService extends Base
             ],
             [
                 'id' => 'current_month_data_tracking',
-                'title' => 'Current month projects (data tracking)',
+                'title' => 'Project Breakdown',
                 'description' => 'Aggregates for the current month from data tracking.',
                 'layout' => 'table',
                 'columns' => ['Date', 'Project #', 'Daily total', 'Profit total', 'Labor total', 'Concrete total'],

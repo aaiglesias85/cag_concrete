@@ -15,6 +15,7 @@ class TaskRepository extends ServiceEntityRepository
 
     /**
      * @param int|null $onlyAssignedToUserId if set, only tasks with assignee with this user id
+     * @param bool $includePendingWithoutDateRange if true, includes all pending tasks regardless of date range
      *
      * @return array{data: Task[], total: int}
      */
@@ -29,6 +30,7 @@ class TaskRepository extends ServiceEntityRepository
         ?string $statusFiltro = '',
         ?string $usuarioFiltro = '',
         ?int $onlyAssignedToUserId = null,
+        bool $includePendingWithoutDateRange = false,
     ): array {
         $sortable = [
             'id' => 't.taskId',
@@ -49,19 +51,54 @@ class TaskRepository extends ServiceEntityRepository
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if (null !== $fecha_inicial && '' !== $fecha_inicial) {
-            $fi = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
-            if (false !== $fi) {
-                $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate >= :fecha_inicial')
-                    ->setParameter('fecha_inicial', $fi->format('Y-m-d'));
-            }
-        }
+        // If includePendingWithoutDateRange is true, allow pending tasks without date restrictions
+        if ($includePendingWithoutDateRange) {
+            $dateCondition = $baseQb->expr()->orX();
+            
+            // All pending tasks (no date restriction)
+            $dateCondition->add('t.status = :pending_status');
+            $baseQb->setParameter('pending_status', 'pending');
+            
+            // Completed tasks within date range
+            if ((null !== $fecha_inicial && '' !== $fecha_inicial) || (null !== $fecha_fin && '' !== $fecha_fin)) {
+                $completedCondition = $baseQb->expr()->andX('t.status != :pending_status');
+                
+                if (null !== $fecha_inicial && '' !== $fecha_inicial) {
+                    $fi = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+                    if (false !== $fi) {
+                        $completedCondition->add('t.dueDate IS NOT NULL AND t.dueDate >= :fecha_inicial');
+                        $baseQb->setParameter('fecha_inicial', $fi->format('Y-m-d'));
+                    }
+                }
 
-        if (null !== $fecha_fin && '' !== $fecha_fin) {
-            $ff = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
-            if (false !== $ff) {
-                $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate <= :fecha_final')
-                    ->setParameter('fecha_final', $ff->format('Y-m-d'));
+                if (null !== $fecha_fin && '' !== $fecha_fin) {
+                    $ff = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+                    if (false !== $ff) {
+                        $completedCondition->add('t.dueDate IS NOT NULL AND t.dueDate <= :fecha_final');
+                        $baseQb->setParameter('fecha_final', $ff->format('Y-m-d'));
+                    }
+                }
+                
+                $dateCondition->add($completedCondition);
+            }
+            
+            $baseQb->andWhere($dateCondition);
+        } else {
+            // Original date filtering logic
+            if (null !== $fecha_inicial && '' !== $fecha_inicial) {
+                $fi = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+                if (false !== $fi) {
+                    $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate >= :fecha_inicial')
+                        ->setParameter('fecha_inicial', $fi->format('Y-m-d'));
+                }
+            }
+
+            if (null !== $fecha_fin && '' !== $fecha_fin) {
+                $ff = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+                if (false !== $ff) {
+                    $baseQb->andWhere('t.dueDate IS NOT NULL AND t.dueDate <= :fecha_final')
+                        ->setParameter('fecha_final', $ff->format('Y-m-d'));
+                }
             }
         }
 
