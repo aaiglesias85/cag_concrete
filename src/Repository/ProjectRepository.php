@@ -565,7 +565,7 @@ class ProjectRepository extends ServiceEntityRepository
 
         $out = [];
         foreach ($rows as $row) {
-            if (isset($row['cid']) && '' !== $row['cid'] && null !== $row['cid']) {
+            if (isset($row['cid']) && '' !== $row['cid']) {
                 $out[] = (int) $row['cid'];
             }
         }
