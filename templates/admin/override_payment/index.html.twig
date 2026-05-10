@@ -68,7 +68,7 @@
                            <div class="mb-3">
                               <select id="filtro-op-list-company" class="form-select form-select2 form-select-solid fw-bold">
                                  <option value="">Company</option>
-                                 {% for item in companies %}
+                                 {% for item in companies_filtro %}
                                  <option value="{{ item.companyId }}">{{ item.name }}</option>
                                  {% endfor %}
                               </select>
@@ -283,7 +283,7 @@
                            </label>
                            <select id="filtro-company-op" class="form-control form-select form-select2 form-select-solid fw-bold">
                               <option value="">Select</option>
-                              {% for item in companies %}
+                              {% for item in companies_filtro %}
                               <option value="{{ item.companyId }}">{{ item.name }}</option>
                               {% endfor %}
                            </select>

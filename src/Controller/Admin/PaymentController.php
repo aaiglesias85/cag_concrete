@@ -44,12 +44,12 @@ class PaymentController extends AbstractAdminController
         $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PAYMENT);
         $permiso = $permisos[0] ?? throw new \LogicException('Permiso PAYMENT esperado tras #[RequireAdminPermission].');
 
-        $companies = $this->paymentService->getDoctrine()->getRepository(Company::class)
+        $companies_filtro = $this->paymentService->getDoctrine()->getRepository(Company::class)
             ->ListarOrdenadosConProyectoAsociado();
 
         return $this->render('admin/payment/index.html.twig', [
             'permiso' => $permiso,
-            'companies' => $companies,
+            'companies_filtro' => $companies_filtro,
             'direccion_url' => $this->paymentService->ObtenerURL(),
         ]);
     }
