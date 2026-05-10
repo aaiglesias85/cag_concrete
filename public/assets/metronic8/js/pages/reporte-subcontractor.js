@@ -339,7 +339,7 @@ var ReporteSubcontractor = function () {
         for (var i = 0; i < projects.length; i++) {
             $('#filtro-project').append(new Option(`${projects[i].number} - ${projects[i].description}`, projects[i].project_id, false, false));
         }
-        $('#filtro-project').select2();
+        $('#filtro-project').select2(MyApp.select2OptionsForElement($('#filtro-project')));
     }
 
     var changeProject = function (e) {
@@ -406,7 +406,7 @@ var ReporteSubcontractor = function () {
         for (var i = 0; i < items.length; i++) {
             $('#filtro-project-item').append(new Option(`${items[i].item} - ${items[i].unit}`, items[i].project_item_id, false, false));
         }
-        $('#filtro-project-item').select2();
+        $('#filtro-project-item').select2(MyApp.select2OptionsForElement($('#filtro-project-item')));
     }
 
     var listarSubcontractorsDeProject = function (project_id) {
@@ -443,7 +443,7 @@ var ReporteSubcontractor = function () {
         for (var i = 0; i < subcontractors.length; i++) {
             $('#filtro-subcontractor').append(new Option(subcontractors[i].name, subcontractors[i].subcontractor_id, false, false));
         }
-        $('#filtro-subcontractor').select2();
+        $('#filtro-subcontractor').select2(MyApp.select2OptionsForElement($('#filtro-subcontractor')));
     }
 
     var initAccionExportar = function () {

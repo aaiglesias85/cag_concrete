@@ -340,7 +340,7 @@ var ReporteEmployee = function () {
         for (var i = 0; i < projects.length; i++) {
             $('#filtro-project').append(new Option(`${projects[i].number} - ${projects[i].description}`, projects[i].project_id, false, false));
         }
-        $('#filtro-project').select2();
+        $('#filtro-project').select2(MyApp.select2OptionsForElement($('#filtro-project')));
     }
 
     var changeProject = function (e) {
@@ -404,7 +404,7 @@ var ReporteEmployee = function () {
         for (var i = 0; i < employees.length; i++) {
             $('#filtro-employee').append(new Option(employees[i].name, employees[i].employee_id, false, false));
         }
-        $('#filtro-employee').select2();
+        $('#filtro-employee').select2(MyApp.select2OptionsForElement($('#filtro-employee')));
     }
 
     var initAccionExportar = function () {

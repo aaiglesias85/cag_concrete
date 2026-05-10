@@ -389,7 +389,7 @@ var OverridePayment = (function () {
       var company_id = $('#filtro-op-list-company').val();
       MyUtil.limpiarSelect('#filtro-op-list-project');
       if (company_id === '' || company_id == null) {
-         $('#filtro-op-list-project').select2();
+         $('#filtro-op-list-project').select2(MyApp.select2OptionsForElement($('#filtro-op-list-project')));
          return;
       }
       BlockUtil.block('#select-filtro-op-list-project');
@@ -406,7 +406,7 @@ var OverridePayment = (function () {
                      var descripcion = projects[i].number + ' - ' + projects[i].description;
                      $('#filtro-op-list-project').append(new Option(descripcion, projects[i].project_id, false, false));
                   }
-                  $('#filtro-op-list-project').select2();
+                  $('#filtro-op-list-project').select2(MyApp.select2OptionsForElement($('#filtro-op-list-project')));
                }
             }
          })
@@ -1840,7 +1840,7 @@ var OverridePayment = (function () {
       var company_id = $('#filtro-company-op').val();
       MyUtil.limpiarSelect('#filtro-project-op');
       if (company_id === '' || company_id == null) {
-         $('#filtro-project-op').select2();
+         $('#filtro-project-op').select2(MyApp.select2OptionsForElement($('#filtro-project-op')));
          $('#form-override-payment').removeData('pending-op-project-id');
          return;
       }
@@ -1858,7 +1858,7 @@ var OverridePayment = (function () {
                      var descripcion = projects[i].number + ' - ' + projects[i].description;
                      $('#filtro-project-op').append(new Option(descripcion, projects[i].project_id, false, false));
                   }
-                  $('#filtro-project-op').select2();
+                  $('#filtro-project-op').select2(MyApp.select2OptionsForElement($('#filtro-project-op')));
                   applyPendingFormProject();
                }
             }

@@ -867,7 +867,7 @@ var Payments = (function () {
                         var descripcion = `${projects[i].number} - ${projects[i].description}`;
                         $('#filtro-project').append(new Option(descripcion, projects[i].project_id, false, false));
                      }
-                     $('#filtro-project').select2();
+                     $('#filtro-project').select2(MyApp.select2OptionsForElement($('#filtro-project')));
                   } else {
                      toastr.error(response.error, '');
                   }

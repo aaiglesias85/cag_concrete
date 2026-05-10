@@ -910,12 +910,32 @@ var MyApp = function () {
         });
     }
 
+    /**
+     * Opciones Select2 solo cuando el `<select>` está **dentro del panel del botón Filter**
+     * (ancestro `.menu-sub-dropdown` del KTMenu): fija `dropdownParent` en ese contenedor para que
+     * la búsqueda del dropdown no cierre el menú. Fuera de ese panel no se añade nada (comportamiento Select2 por defecto).
+     */
+    var select2OptionsForElement = function ($el) {
+        var opts = {};
+        if (!$el || !$el.length) {
+            return opts;
+        }
+        var $menu = $el.closest('.menu-sub-dropdown');
+        if ($menu.length) {
+            opts.dropdownParent = $menu;
+        }
+        return opts;
+    };
+
     var initSelect2 = function () {
         if (!jQuery().select2) {
             return;
         }
 
-        $(".form-select2").select2();
+        $('.form-select2').each(function () {
+            var $el = $(this);
+            $el.select2(select2OptionsForElement($el));
+        });
     }
 
     //mostrar modal con la notificacion
@@ -1262,6 +1282,7 @@ var MyApp = function () {
         getPermiso: getPermiso,
         setPermiso: setPermiso,
         initWidgets: initWidgets,
+        select2OptionsForElement: select2OptionsForElement,
         initSwitch: initSwitch,
         initMarkdown: initMarkdown,
         initJustNumber: initJustNumber,

@@ -13,7 +13,12 @@ var MyUtil = function () {
     }
 
 
-    $(id).select2();
+    var $sel = $(id);
+    var s2opts =
+      typeof MyApp !== 'undefined' && MyApp.select2OptionsForElement
+         ? MyApp.select2OptionsForElement($sel)
+         : {};
+    $sel.select2(s2opts);
   }
 
   // reset error validacion
