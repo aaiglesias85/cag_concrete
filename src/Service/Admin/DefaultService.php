@@ -717,6 +717,52 @@ class DefaultService extends Base
     }
 
     /**
+     * DevolverDataProfitCostOverview: datos combinados para el widget Project Profit & Cost Overview.
+     *
+     * @return array
+     */
+    public function DevolverDataProfitCostOverview(string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $status = ''): array
+    {
+        // costs breakdown (Concrete, Labor, Materials)
+        $costsData = $this->DevolverDataChartCosts($project_id, $fecha_inicial, $fecha_fin, $status);
+        $daily_job_costs = (float) $costsData['total'];
+
+        // daily revenue = sum of Daily Tracking Totals
+        /** @var DataTrackingItemRepository $dataTrackingItemRepo */
+        $dataTrackingItemRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
+        $daily_revenue = (float) $dataTrackingItemRepo->TotalDaily('', '', $project_id, $fecha_inicial, $fecha_fin, $status);
+
+        $actual_gross_profit = $daily_revenue - $daily_job_costs;
+        $porciento_profit = $daily_revenue > 0 ? (int) round($actual_gross_profit / $daily_revenue * 100) : 0;
+
+        // payments against invoices
+        /** @var InvoiceItemRepository $invoiceItemRepo */
+        $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
+        $pid = $project_id ?: null;
+        $fi = $fecha_inicial ?: null;
+        $ff = $fecha_fin ?: null;
+        $st = $status ?: null;
+        $payments_received = (float) $invoiceItemRepo->TotalInvoicePaidAmount(null, null, $pid, $fi, $ff, null, $st);
+        $invoice_totals = (float) $invoiceItemRepo->TotalInvoice(null, null, $pid, $fi, $ff, null, $st);
+        $porciento_payments = $invoice_totals > 0 ? round($payments_received / $invoice_totals * 100, 1) : 0;
+
+        return [
+            'costs' => $costsData,
+            'gross_profit' => [
+                'daily_revenue' => $daily_revenue,
+                'daily_job_costs' => $daily_job_costs,
+                'actual_gross_profit' => $actual_gross_profit,
+                'porciento' => $porciento_profit,
+            ],
+            'payments' => [
+                'received' => $payments_received,
+                'invoiced' => $invoice_totals,
+                'porciento' => $porciento_payments,
+            ],
+        ];
+    }
+
+    /**
      * ListarProyectosConMontos: lista los proyectos ordenados por el monto.
      *
      * @return array
@@ -871,6 +917,17 @@ class DefaultService extends Base
                     ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
                 ],
             ],
+            [
+                'id' => 'project_profit_cost_overview',
+                'title' => 'Project Profit & Cost Overview',
+                'description' => 'Daily job costs, actual gross profit, and payments against invoices.',
+                'layout' => 'chart',
+                'columns' => [],
+                'links' => [
+                    ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
+                    ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => FunctionId::INVOICE],
+                ],
+            ],
         ];
     }
 
@@ -930,6 +987,7 @@ class DefaultService extends Base
         $homeInvoicedProjects = null;
         $homeInvoiceProfit = null;
         $homeCostBreakdown = null;
+        $homeProfitCostOverview = null;
 
         foreach ($dashboardWidgets as $w) {
             if (empty($w['id'])) {
@@ -1045,6 +1103,15 @@ class DefaultService extends Base
                     $r0['inicial'],
                     $r0['final']
                 );
+                continue;
+            }
+            if ('project_profit_cost_overview' === $w['id']) {
+                $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+                $homeProfitCostOverview = $this->DevolverDataProfitCostOverview(
+                    '',
+                    $r0['inicial'],
+                    $r0['final']
+                );
             }
         }
 
@@ -1060,6 +1127,7 @@ class DefaultService extends Base
             'home_invoiced_projects' => $homeInvoicedProjects,
             'home_invoice_profit' => $homeInvoiceProfit,
             'home_cost_breakdown' => $homeCostBreakdown,
+            'home_profit_cost_overview' => $homeProfitCostOverview,
         ];
     }
 

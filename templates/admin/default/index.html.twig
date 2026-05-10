@@ -142,6 +142,8 @@
                             {% include 'admin/default/_widget_home_invoice_profit.html.twig' with { w: w, home_invoice_profit: home_invoice_profit } only %}
                         {% elseif w.id is defined and w.id == 'job_cost_breakdown' and home_cost_breakdown is not null %}
                             {% include 'admin/default/_widget_home_cost_breakdown.html.twig' with { w: w, home_cost_breakdown: home_cost_breakdown } only %}
+                        {% elseif w.id is defined and w.id == 'project_profit_cost_overview' and home_profit_cost_overview is not null %}
+                            {% include 'admin/default/_widget_home_project_profit_cost_overview.html.twig' with { w: w, home_profit_cost_overview: home_profit_cost_overview } only %}
                         {% else %}
                         <div class="col-12 col-md-6 col-xl-4" id="widget-{{ w.id }}">
                             <div class="card h-100">
@@ -222,6 +224,7 @@
             invoicedProjectsData: {% if home_invoiced_projects is not null %}{{ home_invoiced_projects|json_encode|raw }}{% else %}null{% endif %},
             invoiceProfitData: {% if home_invoice_profit is not null %}{{ home_invoice_profit|json_encode|raw }}{% else %}null{% endif %},
             costBreakdownData: {% if home_cost_breakdown is not null %}{{ home_cost_breakdown|json_encode|raw }}{% else %}null{% endif %},
+            profitCostOverviewData: {% if home_profit_cost_overview is not null %}{{ home_profit_cost_overview|json_encode|raw }}{% else %}null{% endif %},
             urlEstimate: {{ url('estimate')|json_encode|raw }},
             urlDataTracking: {{ url('data_tracking')|json_encode|raw }},
             urlInvoice: {{ url('invoice')|json_encode|raw }},

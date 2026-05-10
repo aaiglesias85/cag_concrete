@@ -307,6 +307,323 @@ var Index = (function () {
             chartCostBreakdown.render();
         }, 120);
     };
+    var chartPcoCosts = null;
+    var initPcoCostsChart = function () {
+        var element = document.getElementById('home-chart-pco-costs');
+        if (!element || typeof ApexCharts === 'undefined') return;
+        if (chartPcoCosts) { chartPcoCosts.destroy(); chartPcoCosts = null; }
+
+        var payload = (C.profitCostOverviewData && C.profitCostOverviewData.costs) || { data: [] };
+        var items = Array.isArray(payload.data) ? payload.data : [];
+        var series = items.map(function (it) { return Math.abs(parseFloat(it.amount) || 0); });
+        var labels = items.map(function (it) { return it.name || ''; });
+        var colors = items.map(function (it) { return it.color || '#3699FF'; });
+        var totalAbs = series.reduce(function (a, b) { return a + b; }, 0);
+        var height = parseInt(KTUtil.css(element, 'height'), 10) || 240;
+
+        chartPcoCosts = new ApexCharts(element, {
+            series: series,
+            chart: { type: 'donut', height: height, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+            labels: labels,
+            colors: colors,
+            stroke: { width: 0 },
+            dataLabels: { enabled: false },
+            tooltip: {
+                style: { fontSize: '13px' },
+                y: {
+                    formatter: function (val, opts) {
+                        var amount = (items[opts.seriesIndex] && items[opts.seriesIndex].amount !== undefined) ? items[opts.seriesIndex].amount : val;
+                        var pct = totalAbs > 0 ? (Math.abs(amount) / totalAbs * 100).toFixed(1) : '0.0';
+                        return MyApp.formatMoney(amount) + ' (' + pct + '%)';
+                    },
+                },
+            },
+            legend: {
+                show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '13px', fontWeight: 500, markers: { radius: 12 },
+                formatter: function (seriesName, opts) {
+                    var amount = (items[opts.seriesIndex] && items[opts.seriesIndex].amount !== undefined) ? items[opts.seriesIndex].amount : 0;
+                    return seriesName + ' <span style="color:#A1A5B7;font-weight:400;margin-left:5px">' + MyApp.formatMoney(amount) + '</span>';
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '72%',
+                        labels: {
+                            show: true,
+                            name: { show: true, fontSize: '12px', color: '#A1A5B7', fontWeight: 500, offsetY: -10 },
+                            value: { show: true, fontSize: '16px', fontWeight: 700, color: '#3F4254', offsetY: 10, formatter: function () { return MyApp.formatMoney(totalAbs); } },
+                            total: { show: true, label: 'Total Costs', color: '#A1A5B7', fontSize: '12px', formatter: function () { return MyApp.formatMoney(totalAbs); } }
+                        }
+                    },
+                },
+            },
+        });
+        setTimeout(function () { chartPcoCosts.render(); }, 120);
+    };
+
+    var chartPcoGrossProfit = null;
+    var initPcoGrossProfitChart = function () {
+        var element = document.getElementById('home-chart-pco-gross-profit');
+        if (!element || typeof ApexCharts === 'undefined') return;
+        if (chartPcoGrossProfit) { chartPcoGrossProfit.destroy(); chartPcoGrossProfit = null; }
+
+        var gp = (C.profitCostOverviewData && C.profitCostOverviewData.gross_profit) || {};
+        var actual_gross_profit = parseFloat(gp.actual_gross_profit) || 0;
+        var daily_job_costs = parseFloat(gp.daily_job_costs) || 0;
+        var daily_revenue = parseFloat(gp.daily_revenue) || 0;
+        var porciento = parseFloat(gp.porciento) || 0;
+        var height = parseInt(KTUtil.css(element, 'height'), 10) || 240;
+
+        var seriesProfit = Math.max(0, actual_gross_profit);
+        var seriesCosts = Math.max(0, daily_job_costs);
+
+        chartPcoGrossProfit = new ApexCharts(element, {
+            series: [seriesProfit, seriesCosts],
+            chart: { type: 'donut', height: height, animations: { enabled: true, easing: 'easeinout', speed: 800 } },
+            labels: ['Calculated Profit from Daily Tracking', 'Daily Job Costs totals'],
+            colors: ['#17C653', '#F1416C'],
+            stroke: { width: 0 },
+            dataLabels: { enabled: false },
+            tooltip: {
+                style: { fontSize: '13px' },
+                y: {
+                    formatter: function (val, opts) {
+                        var amounts = [actual_gross_profit, daily_job_costs];
+                        var amount = amounts[opts.seriesIndex] !== undefined ? amounts[opts.seriesIndex] : val;
+                        var pct = daily_revenue > 0 ? (Math.abs(amount) / daily_revenue * 100).toFixed(1) : '0.0';
+                        return MyApp.formatMoney(amount) + ' (' + pct + '%)';
+                    },
+                },
+            },
+            legend: {
+                show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '13px', fontWeight: 500, markers: { radius: 12 },
+                formatter: function (seriesName, opts) {
+                    var amounts = [actual_gross_profit, daily_job_costs];
+                    var amount = amounts[opts.seriesIndex] !== undefined ? amounts[opts.seriesIndex] : 0;
+                    return seriesName + ' <span style="color:#A1A5B7;font-weight:400;margin-left:5px">' + MyApp.formatMoney(amount) + '</span>';
+                },
+            },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '72%',
+                        labels: {
+                            show: true,
+                            name: { show: true, fontSize: '11px', color: '#A1A5B7', fontWeight: 500, offsetY: -10 },
+                            value: { show: true, fontSize: '18px', fontWeight: 700, color: actual_gross_profit >= 0 ? '#17C653' : '#F1416C', offsetY: 8, formatter: function () { return MyApp.formatMoney(actual_gross_profit); } },
+                            total: { show: true, label: porciento + '%', color: '#A1A5B7', fontSize: '13px', formatter: function () { return MyApp.formatMoney(actual_gross_profit); } }
+                        }
+                    },
+                },
+            },
+        });
+        setTimeout(function () { chartPcoGrossProfit.render(); }, 120);
+    };
+
+    var updatePcoPeriodLabel = function () {
+        var $label = $('#home-pco-period-label');
+        if (!$label.length) return;
+        var sel = $('#pco-date-period').val() || 'all';
+        var fi = FlatpickrUtil.getString('pco-datetimepicker-fecha-desde');
+        var ff = FlatpickrUtil.getString('pco-datetimepicker-fecha-hasta');
+        if (fi && ff) {
+            $label.text(fi + ' — ' + ff);
+            return;
+        }
+        if (sel === 'current_month') {
+            var c = getCurrentMonthBounds();
+            $label.text(c.fi + ' — ' + c.ff);
+            return;
+        }
+        if (sel === 'last_month') {
+            var l = getLastMonthBounds();
+            $label.text(l.fi + ' — ' + l.ff);
+            return;
+        }
+        $label.text('All Time');
+    };
+
+    var getPcoPeriodParams = function () {
+        var sel = $('#pco-date-period').val() || 'current_month';
+        var fi = FlatpickrUtil.getString('pco-datetimepicker-fecha-desde');
+        var ff = FlatpickrUtil.getString('pco-datetimepicker-fecha-hasta');
+        var projectId = $('#pco-filter-project').val() || '';
+        if (sel === 'all' && !fi && !ff) {
+            return { fechaInicial: '', fechaFin: '', project_id: projectId };
+        }
+        if (fi && ff) {
+            return { fechaInicial: fi, fechaFin: ff, project_id: projectId };
+        }
+        if (sel === 'current_month') {
+            var c = getCurrentMonthBounds();
+            return { fechaInicial: c.fi, fechaFin: c.ff, project_id: projectId };
+        }
+        if (sel === 'last_month') {
+            var l = getLastMonthBounds();
+            return { fechaInicial: l.fi, fechaFin: l.ff, project_id: projectId };
+        }
+        return { fechaInicial: '', fechaFin: '', project_id: projectId };
+    };
+
+    var reloadPcoData = function () {
+        if (!C.urlDashboardStats) return;
+        if (!document.getElementById('home-chart-pco-costs') && !document.getElementById('home-chart-pco-gross-profit')) return;
+        var p = getPcoPeriodParams();
+        var formData = new URLSearchParams();
+        formData.set('project_id', p.project_id || '');
+        formData.set('status', '');
+        formData.set('fechaInicial', p.fechaInicial || '');
+        formData.set('fechaFin', p.fechaFin || '');
+        BlockUtil.block('#widget-project_profit_cost_overview');
+        axios
+            .post(C.urlDashboardStats, formData, { responseType: 'json' })
+            .then(function (res) {
+                var d = res.data || {};
+                if (d.success && d.stats && d.stats.project_profit_cost_overview) {
+                    C.profitCostOverviewData = d.stats.project_profit_cost_overview;
+                    var gp = C.profitCostOverviewData.gross_profit || {};
+                    var costsTotal = (C.profitCostOverviewData.costs || {}).total || 0;
+                    if ($('#home-pco-total-costs').length) {
+                        $('#home-pco-total-costs').html(formatHomeMoney(costsTotal));
+                    }
+                    if ($('#home-pco-gross-profit').length) {
+                        var gpVal = parseFloat(gp.actual_gross_profit) || 0;
+                        $('#home-pco-gross-profit').html(formatHomeMoney(gpVal));
+                    }
+                    renderPcoPaymentsBar();
+                    initPcoCostsChart();
+                    initPcoGrossProfitChart();
+                    updatePcoPeriodLabel();
+                } else if (d.error) {
+                    toastr.error(d.error, '');
+                }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+                BlockUtil.unblock('#widget-project_profit_cost_overview');
+            });
+    };
+
+    var syncPcoDatesWithPeriodSelect = function () {
+        var v = $('#pco-date-period').val();
+        if (v === 'all') {
+            FlatpickrUtil.clear('pco-datetimepicker-fecha-desde');
+            FlatpickrUtil.clear('pco-datetimepicker-fecha-hasta');
+        } else if (v === 'current_month') {
+            var c = getCurrentMonthBounds();
+            FlatpickrUtil.setDate('pco-datetimepicker-fecha-desde', c.start);
+            FlatpickrUtil.setDate('pco-datetimepicker-fecha-hasta', c.end);
+        } else if (v === 'last_month') {
+            var l = getLastMonthBounds();
+            FlatpickrUtil.setDate('pco-datetimepicker-fecha-desde', l.start);
+            FlatpickrUtil.setDate('pco-datetimepicker-fecha-hasta', l.end);
+        }
+    };
+
+    var initPcoFilter = function () {
+        if (!$('#filter-menu-pco').length) return;
+
+        var fromGroup = document.getElementById('pco-datetimepicker-fecha-desde');
+        var fromInput = fromGroup ? fromGroup.querySelector('input') : null;
+        if (fromGroup && fromInput) {
+            FlatpickrUtil.initDate('pco-datetimepicker-fecha-desde', {
+                localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+                container: fromGroup,
+                positionElement: fromInput,
+                static: true,
+                position: 'below',
+            });
+        }
+        var toGroup = document.getElementById('pco-datetimepicker-fecha-hasta');
+        var toInput = toGroup ? toGroup.querySelector('input') : null;
+        if (toGroup && toInput) {
+            FlatpickrUtil.initDate('pco-datetimepicker-fecha-hasta', {
+                localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' },
+                container: toGroup,
+                positionElement: toInput,
+                static: true,
+                position: 'above',
+            });
+        }
+
+        var $period = $('#pco-date-period');
+        if ($period.length && $.fn.select2) {
+            $period.select2({
+                width: '100%',
+                minimumResultsForSearch: Infinity,
+                dropdownParent: $('#filter-menu-pco'),
+            });
+        }
+        var $project = $('#pco-filter-project');
+        if ($project.length && $.fn.select2) {
+            $project.select2({
+                placeholder: 'Search projects',
+                allowClear: true,
+                width: '100%',
+                dropdownParent: $('#filter-menu-pco'),
+                ajax: {
+                    url: 'project/listarOrdenados',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) { return { search: params.term }; },
+                    processResults: function (data) {
+                        return {
+                            results: $.map(data.projects || [], function (item) {
+                                return { id: item.project_id, text: (item.number || '') + ' - ' + (item.description || '') };
+                            }),
+                        };
+                    },
+                    cache: true,
+                },
+                minimumInputLength: 3,
+            });
+        }
+
+        $period.on('change', function () { syncPcoDatesWithPeriodSelect(); });
+
+        // set current_month dates on init
+        syncPcoDatesWithPeriodSelect();
+
+        $(document).off('click', '#btn-apply-pco-filter');
+        $(document).on('click', '#btn-apply-pco-filter', function () {
+            reloadPcoData();
+        });
+
+        $(document).off('click', '#btn-reset-pco-filter');
+        $(document).on('click', '#btn-reset-pco-filter', function () {
+            if ($.fn.select2 && $period.hasClass('select2-hidden-accessible')) {
+                $period.val('current_month').trigger('change');
+            } else {
+                $period.val('current_month');
+                syncPcoDatesWithPeriodSelect();
+            }
+            if ($.fn.select2 && $project.hasClass('select2-hidden-accessible')) {
+                $project.val(null).trigger('change');
+            } else {
+                $project.val('');
+            }
+            reloadPcoData();
+        });
+    };
+
+    var renderPcoPaymentsBar = function () {
+        var pay = (C.profitCostOverviewData && C.profitCostOverviewData.payments) || {};
+        var received = parseFloat(pay.received) || 0;
+        var invoiced = parseFloat(pay.invoiced) || 0;
+        var pct = parseFloat(pay.porciento) || 0;
+        var pctDisplay = pct > 100 ? 100 : pct;
+
+        var $pct = $('#home-pco-payments-pct');
+        var $bar = $('#home-pco-payments-bar');
+        var $recv = $('#home-pco-received');
+        var $inv = $('#home-pco-invoiced');
+        if ($pct.length) $pct.text(pct + '%');
+        if ($bar.length) $bar.css('width', pctDisplay + '%');
+        if ($recv.length) $recv.text('$' + MyApp.formatearNumero(received, 2, '.', ','));
+        if ($inv.length) $inv.text('$' + MyApp.formatearNumero(invoiced, 2, '.', ','));
+    };
+
     var chartEstimateWinLoss = null;
     var initEstimateWinLossChart = function () {
         var element = document.getElementById('home-chart-estimate-win-loss');
@@ -1041,6 +1358,7 @@ var renderPayItemTotalsTbody = function (rows) {
                     C.estimatorSubmittedShareData = d.stats.chart_estimator_submitted_share || { total: 0, data: [] };
                     C.invoiceProfitData = d.stats.chart_profit || { total: 0, data: [] };
                     C.costBreakdownData = d.stats.chart_costs || { total: 0, data: [] };
+
                     if ($('#home-total-estimate-win-loss').length) {
                         $('#home-total-estimate-win-loss').text(parseInt(C.estimateWinLossData.total, 10) || 0);
                     }
@@ -1453,6 +1771,11 @@ var renderPayItemTotalsTbody = function (rows) {
             initEstimatorSubmittedShareChart();
             initInvoiceProfitChart();
             initCostBreakdownChart();
+            initPcoCostsChart();
+            initPcoGrossProfitChart();
+            renderPcoPaymentsBar();
+            updatePcoPeriodLabel();
+            initPcoFilter();
             initDtWidgetDateRange();
             initDtWidgetTooltips();
             initDtWidgetChevrons();

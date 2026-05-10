@@ -2309,7 +2309,8 @@ INSERT INTO `widgets` (`widget_id`, `code`, `title`, `description`, `sort_order`
 (8, 'invoiced_projects', 'Invoiced projects (period)', 'Billed amount and quick glance of payment total.', 70),
 (9, 'pay_item_totals', 'Pay item totals (period)', 'Sums of pay item quantities and amounts.', 80),
 (10, 'invoice_profit_share', 'Invoice / profit share', 'Real profitability vs. invoiced amounts.', 90),
-(11, 'job_cost_breakdown', 'Job Cost Breakdown', 'Labor, materials, and other direct costs.', 100);
+(11, 'job_cost_breakdown', 'Job Cost Breakdown', 'Labor, materials, and other direct costs.', 100),
+(12, 'project_profit_cost_overview', 'Project Profit & Cost Overview', 'Daily job costs, actual gross profit, and payments against invoices.', 110);
 
 --
 -- Índices para tablas volcadas

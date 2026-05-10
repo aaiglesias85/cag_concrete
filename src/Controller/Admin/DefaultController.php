@@ -246,6 +246,15 @@ class DefaultController extends AbstractAdminController
                 );
             }
 
+            if ($w->isWidgetVisibleOnHome($userId, 'project_profit_cost_overview')) {
+                $stats['project_profit_cost_overview'] = $this->defaultService->DevolverDataProfitCostOverview(
+                    $projectId,
+                    $fechaInicial,
+                    $fechaFin,
+                    $status
+                );
+            }
+
             $resultadoJson = [
                 'success' => true,
                 'stats' => $stats,
