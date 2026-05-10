@@ -541,4 +541,35 @@ class ProjectRepository extends ServiceEntityRepository
             'total_proyectos_canceled' => (int) $row['total_proyectos_canceled'],
         ];
     }
+
+    /**
+     * Entre los company_id dados, devuelve los que tienen al menos un proyecto asociado.
+     *
+     * @param list<int> $companyIds
+     *
+     * @return list<int>
+     */
+    public function filterCompanyIdsWithProjects(array $companyIds): array
+    {
+        if ([] === $companyIds) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('p')
+            ->select('DISTINCT c.companyId AS cid')
+            ->innerJoin('p.company', 'c')
+            ->where('c.companyId IN (:ids)')
+            ->setParameter('ids', $companyIds)
+            ->getQuery()
+            ->getScalarResult();
+
+        $out = [];
+        foreach ($rows as $row) {
+            if (isset($row['cid']) && '' !== $row['cid']) {
+                $out[] = (int) $row['cid'];
+            }
+        }
+
+        return array_values(array_unique($out));
+    }
 }

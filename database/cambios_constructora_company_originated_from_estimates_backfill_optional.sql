@@ -1,0 +1,10 @@
+-- OPCIONAL: backfill de originated_from_estimates = 1 para compañías que ya tienen
+-- filas en estimate_company. Solo ejecutar si producto define que E aplica también al histórico
+-- (ver Open Questions en openspec/changes/company-source-estimates-vs-projects/design.md).
+--
+-- Descomentar tras revisión:
+--
+-- UPDATE company c
+-- INNER JOIN estimate_company ec ON ec.company_id = c.company_id
+-- SET c.originated_from_estimates = 1
+-- WHERE c.originated_from_estimates = 0;

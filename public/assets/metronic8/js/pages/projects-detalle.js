@@ -1328,6 +1328,7 @@ var ProjectsDetalle = (function () {
          { data: 'totalLabor' },
          { data: 'total_daily_today' },
          { data: 'profit' },
+         { data: null },
       ];
 
       // column defs
@@ -1410,6 +1411,15 @@ var ProjectsDetalle = (function () {
                return DatatableUtil.getRenderColumnDiv(html, 100);
             },
          },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAcciones(data, type, row, typeof permiso !== 'undefined' ? permiso : {}, ['detalle']);
+            },
+         },
       ];
 
       // language
@@ -1473,6 +1483,21 @@ var ProjectsDetalle = (function () {
       oTableDataTracking.search(search).draw();
    };
    var initAccionesDataTracking = function () {
+      $(document).off('click', '#btn-open-datatracking-from-project-detalle');
+      $(document).on('click', '#btn-open-datatracking-from-project-detalle', function (e) {
+         e.preventDefault();
+         var pid = $('#project_id_detalle').val();
+         if (!pid) {
+            return;
+         }
+         var base = typeof url_datatracking !== 'undefined' ? url_datatracking : '';
+         if (!base) {
+            return;
+         }
+         var sep = base.indexOf('?') >= 0 ? '&' : '?';
+         window.location.href = base + sep + 'project_id=' + encodeURIComponent(pid);
+      });
+
       $(document).off('click', '#data-tracking-table-editable-detalle a.edit');
       $(document).on('click', '#data-tracking-table-editable-detalle a.edit', function (e) {
          var data_tracking_id = $(this).data('id');
@@ -1482,8 +1507,8 @@ var ProjectsDetalle = (function () {
          window.location.href = url_datatracking;
       });
 
-      $(document).off('click', '#data-tracking-table-editable-detalle a.view');
-      $(document).on('click', '#data-tracking-table-editable-detalle a.view', function (e) {
+      $(document).off('click', '#data-tracking-table-editable-detalle a.view, #data-tracking-table-editable-detalle a.detalle');
+      $(document).on('click', '#data-tracking-table-editable-detalle a.view, #data-tracking-table-editable-detalle a.detalle', function (e) {
          var data_tracking_id = $(this).data('id');
          localStorage.setItem('data_tracking_id_view', data_tracking_id);
 

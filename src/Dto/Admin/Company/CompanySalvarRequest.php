@@ -26,6 +26,9 @@ final class CompanySalvarRequest implements AdminHttpRequestDtoInterface
 
     public ?string $contacts = null;
 
+    /** Alta desde flujo de estimados → marca E en catálogo. */
+    public bool $fromEstimates = false;
+
     #[Assert\Callback]
     public function validateContactsJson(ExecutionContextInterface $context): void
     {
@@ -41,6 +44,18 @@ final class CompanySalvarRequest implements AdminHttpRequestDtoInterface
         }
     }
 
+    private static function isTruthyRequestFlag(mixed $value): bool
+    {
+        if (true === $value || 1 === $value) {
+            return true;
+        }
+        if (!\is_string($value) && !\is_numeric($value)) {
+            return false;
+        }
+
+        return \in_array(strtolower((string) $value), ['1', 'true', 'yes', 'on'], true);
+    }
+
     public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
@@ -52,6 +67,7 @@ final class CompanySalvarRequest implements AdminHttpRequestDtoInterface
         $d->email = \is_string($x = $request->get('email')) ? $x : null;
         $d->website = \is_string($x = $request->get('website')) ? $x : null;
         $d->contacts = \is_string($x = $request->get('contacts')) ? $x : null;
+        $d->fromEstimates = self::isTruthyRequestFlag($request->get('from_estimates'));
 
         return $d;
     }

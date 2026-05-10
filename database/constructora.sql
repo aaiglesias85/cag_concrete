@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: db
--- Tiempo de generación: 02-05-2026 a las 14:55:41
+-- Tiempo de generación: 09-05-2026 a las 02:03:40
 -- Versión del servidor: 5.7.44
 -- Versión de PHP: 8.3.26
 
@@ -52,16 +52,17 @@ CREATE TABLE `company` (
   `created_at` datetime DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL COMMENT 'Email de la compañía',
-  `website` varchar(500) DEFAULT NULL COMMENT 'Sitio web de la compañía'
+  `website` varchar(500) DEFAULT NULL COMMENT 'Sitio web de la compañía',
+  `originated_from_estimates` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `company`
 --
 
-INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`, `contact_email`, `created_at`, `updated_at`, `email`, `website`) VALUES
-(1, 'CONTRACTOR, INC', '(618)985-7850', '', NULL, NULL, '2024-04-13 19:10:40', '2024-10-18 23:59:37', NULL, NULL),
-(3, 'Disrupsoft', '(653)289-6532', '', NULL, NULL, '2024-04-24 04:23:31', '2024-10-11 19:55:35', NULL, NULL);
+INSERT INTO `company` (`company_id`, `name`, `phone`, `address`, `contact_name`, `contact_email`, `created_at`, `updated_at`, `email`, `website`, `originated_from_estimates`) VALUES
+(1, 'CONTRACTOR, INC', '(618)985-7850', '', NULL, NULL, '2024-04-13 19:10:40', '2024-10-18 23:59:37', NULL, NULL, 0),
+(3, 'Disrupsoft', '(653)289-6532', '', NULL, NULL, '2024-04-24 04:23:31', '2024-10-11 19:55:35', NULL, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -735,6 +736,7 @@ CREATE TABLE `invoice` (
   `number` varchar(50) DEFAULT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
+  `invoice_date` date DEFAULT NULL,
   `notes` text,
   `paid` tinyint(1) DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
@@ -752,10 +754,10 @@ CREATE TABLE `invoice` (
 -- Volcado de datos para la tabla `invoice`
 --
 
-INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity`, `bon_amount`, `invoice_current_retainage`, `invoice_retainage_calculated`) VALUES
-(9, '1', '2025-02-01', '2025-02-28', '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(12, '2', '2025-03-01', '2025-03-31', '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL, NULL),
-(13, '3', '2025-04-01', '2025-04-30', '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `invoice` (`invoice_id`, `number`, `start_date`, `end_date`, `invoice_date`, `notes`, `paid`, `created_at`, `updated_at`, `project_id`, `txn_id`, `edit_sequence`, `bon_quantity`, `bon_amount`, `invoice_current_retainage`, `invoice_retainage_calculated`) VALUES
+(9, '1', '2025-02-01', '2025-02-28', NULL, '', 1, '2025-02-24 02:01:04', '2025-02-24 02:11:48', 2, NULL, NULL, NULL, NULL, NULL, NULL),
+(12, '2', '2025-03-01', '2025-03-31', NULL, '', 1, '2025-02-24 02:22:13', '2025-02-24 02:25:18', 2, NULL, NULL, NULL, NULL, NULL, NULL),
+(13, '3', '2025-04-01', '2025-04-30', NULL, '', 1, '2025-02-24 02:27:06', '2025-02-24 02:27:25', 2, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 

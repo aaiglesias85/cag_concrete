@@ -40,13 +40,14 @@ class InvoiceController extends AbstractAdminController
         $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::INVOICE);
         $permiso = $permisos[0] ?? throw new \LogicException('Permiso INVOICE esperado tras #[RequireAdminPermission].');
 
-        // companies
-        $companies = $this->invoiceService->getDoctrine()->getRepository(Company::class)
-           ->ListarOrdenados();
+        $companyRepo = $this->invoiceService->getDoctrine()->getRepository(Company::class);
+        $companies = $companyRepo->ListarOrdenados();
+        $companies_filtro = $companyRepo->ListarOrdenadosConProyectoAsociado();
 
         return $this->render('admin/invoice/index.html.twig', [
             'permiso' => $permiso,
             'companies' => $companies,
+            'companies_filtro' => $companies_filtro,
         ]);
     }
 

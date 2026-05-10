@@ -35,6 +35,9 @@ class Company
     #[ORM\Column(name: 'website', type: 'string', length: 500, nullable: true)]
     private ?string $website = null;
 
+    #[ORM\Column(name: 'originated_from_estimates', type: 'boolean', options: ['default' => false])]
+    private bool $originatedFromEstimates = false;
+
     #[ORM\Column(name: 'created_at', type: 'datetime', nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
@@ -126,6 +129,18 @@ class Company
     public function setWebsite(?string $website): self
     {
         $this->website = $website;
+
+        return $this;
+    }
+
+    public function isOriginatedFromEstimates(): bool
+    {
+        return $this->originatedFromEstimates;
+    }
+
+    public function setOriginatedFromEstimates(bool $originatedFromEstimates): self
+    {
+        $this->originatedFromEstimates = $originatedFromEstimates;
 
         return $this;
     }

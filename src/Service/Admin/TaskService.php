@@ -345,13 +345,13 @@ class TaskService extends Base
         if ($actor->isAdministrador()) {
             return true;
         }
-        
+
         // User can change status of their own assigned tasks (regardless of module access)
         $u = $entity->getAssignedUser();
         if (null !== $u && (int) $u->getUsuarioId() === (int) $actor->getUsuarioId()) {
             return true;
         }
-        
+
         // For other tasks, need explicit edit permission on the module
         return !empty($perm['editar']);
     }

@@ -64,6 +64,34 @@ var Companies = (function () {
       // export
       exportButtons();
    };
+
+   /** Nombre + badges E/P al final (misma celda); orden/filtro usan solo el nombre. */
+   var renderCompanyNameWithOrigin = function (data, type, row) {
+      var name = data != null && data !== '' ? String(data) : '';
+      if (type === 'sort' || type === 'filter' || type === 'type') {
+         return name;
+      }
+      if (type === 'export') {
+         var plain = name;
+         if (row.fromEstimates) {
+            plain += ' E';
+         }
+         if (row.linkedToProject) {
+            plain += ' P';
+         }
+         return plain;
+      }
+      var escaped = $('<div>').text(name).html();
+      var badges = '';
+      if (row.fromEstimates) {
+         badges += ' <span class="badge badge-light-info" title="From estimates">E</span>';
+      }
+      if (row.linkedToProject) {
+         badges += ' <span class="badge badge-light-primary" title="Linked to a project">P</span>';
+      }
+      return escaped + badges;
+   };
+
    var getColumnsTable = function () {
       // columns
       const columns = [];
@@ -83,6 +111,10 @@ var Companies = (function () {
             render: DatatableUtil.getRenderColumnCheck,
          },
          {
+            targets: 1,
+            render: renderCompanyNameWithOrigin,
+         },
+         {
             targets: 2,
             render: DatatableUtil.getRenderColumnPhone,
          },
@@ -96,6 +128,10 @@ var Companies = (function () {
 
       if (!permiso.eliminar) {
          columnDefs = [
+            {
+               targets: 0,
+               render: renderCompanyNameWithOrigin,
+            },
             {
                targets: 1,
                render: DatatableUtil.getRenderColumnPhone,

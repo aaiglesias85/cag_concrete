@@ -507,6 +507,9 @@ class CompanyService extends Base
         $entity->setContactEmail($contactEmail);
         $entity->setEmail($email);
         $entity->setWebsite($website);
+        if ($d->fromEstimates) {
+            $entity->setOriginatedFromEstimates(true);
+        }
 
         $entity->setCreatedAt(new \DateTime());
 
@@ -585,6 +588,18 @@ class CompanyService extends Base
         $companyRepo = $this->getDoctrine()->getRepository(Company::class);
         $resultado = $companyRepo->ListarCompaniesConTotal($dt['start'], $dt['length'], $dt['search'], $dt['orderField'], $dt['orderDir']);
 
+        $pageIds = [];
+        foreach ($resultado['data'] as $row) {
+            $cid = $row->getCompanyId();
+            if (null !== $cid) {
+                $pageIds[] = $cid;
+            }
+        }
+        /** @var ProjectRepository $projectRepo */
+        $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+        $linkedIds = $projectRepo->filterCompanyIdsWithProjects($pageIds);
+        $linkedSet = array_fill_keys($linkedIds, true);
+
         $data = [];
 
         foreach ($resultado['data'] as $value) {
@@ -597,6 +612,8 @@ class CompanyService extends Base
                 'address' => $value->getAddress(),
                 'contactName' => $value->getContactName(),
                 'contactEmail' => $value->getContactEmail(),
+                'fromEstimates' => $value->isOriginatedFromEstimates(),
+                'linkedToProject' => null !== $company_id && isset($linkedSet[$company_id]),
             ];
         }
 

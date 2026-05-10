@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Company;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -27,8 +28,33 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
+     * Compañías con al menos un proyecto (criterio alineado con indicador P en librería).
+     * Para filtros de listados admin; ListarOrdenados sigue usándose donde hace falta el catálogo completo.
+     *
+     * @return Company[]
+     */
+    public function ListarOrdenadosConProyectoAsociado(): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        return $qb
+            ->where($qb->expr()->exists(
+                $this->getEntityManager()->createQueryBuilder()
+                    ->select('1')
+                    ->from(Project::class, 'p')
+                    ->where('p.company = c')
+                    ->getDQL()
+            ))
+            ->orderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * ListarOrdenadosParaOffline: Lista companies como arrays para trabajo offline.
      * Usa getArrayResult() para evitar lazy loading (requiere PHP 8.4 en Doctrine ORM 3.4).
+     *
+     * Nota: no incluye originated_from_estimates ni linkedToProject; el cliente offline no los requiere hoy.
      *
      * @return array<array<string, mixed>>
      */
@@ -110,6 +136,7 @@ class CompanyRepository extends ServiceEntityRepository
     {
         // Whitelist de columnas ordenables
         $sortable = [
+            'id' => 'c.companyId',
             'companyId' => 'c.companyId',
             'name' => 'c.name',
             'phone' => 'c.phone',

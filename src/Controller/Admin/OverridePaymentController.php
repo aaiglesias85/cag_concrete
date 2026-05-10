@@ -57,7 +57,7 @@ class OverridePaymentController extends AbstractAdminController
         $permisos = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::OVERRIDE_PAYMENT);
         $permiso = $permisos[0] ?? throw new \LogicException('Permiso OVERRIDE_PAYMENT esperado tras #[RequireAdminPermission].');
         $companies = $this->overridePaymentService->getDoctrine()->getRepository(Company::class)
-            ->ListarOrdenados();
+            ->ListarOrdenadosConProyectoAsociado();
 
         return $this->render('admin/override_payment/index.html.twig', [
             'permiso' => $permiso,
