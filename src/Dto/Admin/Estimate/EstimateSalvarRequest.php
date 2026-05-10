@@ -8,13 +8,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class EstimateSalvarRequest implements AdminHttpRequestDtoInterface
 {
-    #[Assert\NotBlank]
     public ?string $project_id = null;
 
     #[Assert\NotBlank]
     public ?string $name = null;
 
-    #[Assert\NotBlank]
     public ?string $bidDeadline = null;
 
     public ?string $county_ids = null;
