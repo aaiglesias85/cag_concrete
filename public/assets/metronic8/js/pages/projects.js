@@ -2254,13 +2254,12 @@ var Projects = (function () {
       }
 
       if (nEditingRowItem == null) {
-         quantity = quantity.trim().replace(/^[-+]/, '');
+       quantity = quantity.trim().replace(/^[-+]/, '').replace(/,/g, '');
       } else {
          var old_cant = items[nEditingRowItem].quantity > 0 ? parseFloat(items[nEditingRowItem].quantity) : 0;
          var raw_quantity = quantity.trim(); // por si tiene espacios
          var sign = raw_quantity.charAt(0); // obtenemos el primer carácter
-         var number = parseFloat(raw_quantity.replace(/^[-+]/, '')); // quitamos signo y convertimos a número
-
+        var number = parseFloat(raw_quantity.replace(/^[-+]/, '').replace(/,/g, '')) || 0;
          // Por defecto, si no tiene signo, consideramos que es una asignación directa
          var new_quantity = 0;
 
