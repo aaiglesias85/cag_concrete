@@ -359,6 +359,7 @@ var Perfiles = function () {
             return validateForm();
         }
         if (tab == 2) {
+            devolverPermisos();
             if (permisos.length == 0) {
                 toastr.error("You must select the profile permissions", "");
                 return false;
