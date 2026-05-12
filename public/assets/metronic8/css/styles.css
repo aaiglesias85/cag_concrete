@@ -5,7 +5,7 @@ body,
 }
 
 [data-kt-app-layout='light-sidebar'] .app-sidebar {
-   background-color: #edf3fd !important;
+   background-color: var(--sidebar-color, #edf3fd) !important;
 }
 
 [data-kt-app-layout='light-sidebar'] .app-sidebar .menu .menu-item .menu-link:hover,
@@ -16,6 +16,91 @@ body,
 [data-bs-theme='dark'] body,
 [data-bs-theme='dark'] .app-default {
    background-color: #0f1014 !important;
+}
+
+/* ============================================================
+   Modo oscuro — barra lateral y texto (inspirado en Teams)
+   ============================================================ */
+
+[data-bs-theme='dark'] .app-sidebar {
+   background-color: #1e2028 !important;
+   border-right: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .app-sidebar-logo {
+   border-bottom: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .menu-title,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .menu-icon i,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .menu-arrow,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-content {
+   color: #e0e4ef !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .menu-arrow::before,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .menu-arrow::after {
+   background-color: #e0e4ef !important;
+   border-color: #e0e4ef !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link .bullet {
+   background-color: #e0e4ef !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link:hover,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link:focus {
+   background-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link.active,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item.here > .menu-link {
+   background-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link.active .menu-title,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link.active .menu-icon i,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-link.active .menu-arrow,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item.here > .menu-link .menu-title,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item.here > .menu-link .menu-icon i,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item.here > .menu-link .menu-arrow {
+   color: #ffffff !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-content .menu-heading,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-heading.fs-7,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-heading.text-uppercase {
+   color: #9aa0b0 !important;
+   opacity: 1;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub {
+   background-color: rgba(0, 0, 0, 0.20) !important;
+   border-radius: 0.5rem;
+   padding: 0.25rem 0;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-title,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-bullet,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub .menu-link .menu-icon i {
+   color: #c8d0e0 !important;
+}
+
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub .menu-link:hover,
+[data-bs-theme='dark'] .app-sidebar .menu .menu-item .menu-sub .menu-link.active {
+   background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Variables de texto en modo oscuro — mejora contraste general */
+[data-bs-theme='dark'] {
+   --bs-body-color: #e0e4ef;
+   --bs-heading-color: #f0f2f8;
+}
+
+[data-bs-theme='dark'] .text-gray-700,
+[data-bs-theme='dark'] .text-gray-800,
+[data-bs-theme='dark'] .text-gray-900 {
+   color: #c8d0e0 !important;
 }
 
 /* ---------------------------------------------------------------------------

@@ -171,10 +171,23 @@ var Profile = function () {
             }
         );
 
+        // tab appearance
+        KTUtil.on(
+            KTUtil.get("kt_profile_aside"),
+            "#tab-link-appearance",
+            "click",
+            function () {
+                resetTabs();
+                KTUtil.addClass(this, "active");
+                KTUtil.removeClass(KTUtil.get("tab-content-appearance"), "hide");
+            }
+        );
+
         //reset tabs
         function resetTabs() {
             KTUtil.addClass(KTUtil.get("tab-content-general"), "hide");
             KTUtil.addClass(KTUtil.get("tab-content-pass"), "hide");
+            KTUtil.addClass(KTUtil.get("tab-content-appearance"), "hide");
 
             KTUtil.findAll(KTUtil.get("kt_profile_aside"), ".active").forEach(
                 function (element) {
@@ -182,6 +195,32 @@ var Profile = function () {
                 }
             );
         }
+
+        // guardar color sidebar
+        $(document).off('click', '#btn-salvar-appearance');
+        $(document).on('click', '#btn-salvar-appearance', function () {
+            var color = $('#sidebar-color').val();
+            var formData = new URLSearchParams();
+            formData.set('sidebar_color', color);
+
+            BlockUtil.block('#form-profile');
+            axios.post('usuario/actualizarSidebarColor', formData, {responseType: 'json'})
+                .then(function (res) {
+                    var response = res.data;
+                    if (response.success) {
+                        document.documentElement.style.setProperty('--sidebar-color', color);
+                        var sidebar = document.querySelector('.app-sidebar');
+                        if (sidebar) { sidebar.style.backgroundColor = color; }
+                        toastr.success('Sidebar color updated.', '');
+                    } else {
+                        toastr.error(response.error || 'Error saving color.', '');
+                    }
+                })
+                .catch(MyUtil.catchErrorAxios)
+                .then(function () {
+                    BlockUtil.unblock('#form-profile');
+                });
+        });
     };
 
 

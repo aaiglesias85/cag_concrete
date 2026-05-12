@@ -1,6 +1,7 @@
 <div
    id="kt_app_sidebar"
    class="app-sidebar flex-column"
+   {% if app.user %}style="background-color: {{ app.user.sidebarColor }} !important;"{% endif %}
    data-kt-drawer="true"
    data-kt-drawer-name="app-sidebar"
    data-kt-drawer-activate="{default: true, lg: false}"

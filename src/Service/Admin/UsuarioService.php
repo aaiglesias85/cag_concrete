@@ -797,6 +797,27 @@ class UsuarioService extends Base
      *
      * @param int $limit Longitud de la cadena
      */
+    public function ActualizarSidebarColor(int $usuario_id, mixed $color): array
+    {
+        if (!$color || !preg_match('/^#[0-9a-fA-F]{6}$/', (string) $color)) {
+            return ['success' => false, 'error' => 'Invalid color format.'];
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        /** @var Usuario $entity */
+        $entity = $this->getDoctrine()->getRepository(Usuario::class)->find($usuario_id);
+
+        if (null === $entity) {
+            return ['success' => false, 'error' => 'User not found.'];
+        }
+
+        $entity->setSidebarColor($color);
+        $entity->setUpdatedAt(new \DateTime());
+        $em->flush();
+
+        return ['success' => true];
+    }
+
     public function generarCadenaAleatoria($limit = 6): string
     {
         $codigo = '';

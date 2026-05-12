@@ -66,6 +66,9 @@ class Usuario implements UserInterface, EquatableInterface
     #[ORM\Column(name: 'preferred_lang', type: 'string', length: 2, nullable: true, options: ['default' => 'es'])]
     private ?string $preferredLang = 'es';
 
+    #[ORM\Column(name: 'sidebar_color', type: 'string', length: 7, nullable: true, options: ['default' => '#edf3fd'])]
+    private ?string $sidebarColor = '#edf3fd';
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Rol")]
     #[ORM\JoinColumn(name: 'rol_id', referencedColumnName: 'rol_id', nullable: true)]
     private ?Rol $rol;
@@ -367,6 +370,20 @@ class Usuario implements UserInterface, EquatableInterface
     public function setPreferredLang(?string $preferredLang): self
     {
         $this->preferredLang = ('en' === $preferredLang ? 'en' : 'es');
+
+        return $this;
+    }
+
+    public function getSidebarColor(): string
+    {
+        return $this->sidebarColor ?? '#edf3fd';
+    }
+
+    public function setSidebarColor(?string $color): self
+    {
+        if ($color && preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+            $this->sidebarColor = $color;
+        }
 
         return $this;
     }

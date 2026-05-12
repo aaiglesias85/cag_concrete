@@ -121,6 +121,12 @@
                                         Change Password
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link m-0" href="javascript:" id="tab-link-appearance">
+                                        <app-keenicon name="brush" class="fs-2 me-1"></app-keenicon>
+                                        Appearance
+                                    </a>
+                                </li>
                             </ul>
                             <!--end::Nav-->
                         </div>
@@ -203,6 +209,24 @@
                                                        name="telefono" value="{{ usuario.telefono }}" autocomplete="off">
                                             </div>
                                             <!--end::Col-->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="tab-content-appearance" class="hide">
+                                    <div class="row mb-6">
+                                        <label class="col-lg-3 col-form-label fw-semibold fs-6">Sidebar Color:</label>
+                                        <div class="col-lg-9 fv-row d-flex align-items-center gap-4">
+                                            <input type="color" id="sidebar-color" value="{{ usuario.sidebarColor }}"
+                                                   class="form-control form-control-color" style="width:60px;height:40px;cursor:pointer;"/>
+                                            <span class="text-muted fs-7">Choose the color for the left sidebar. Default: <code>#edf3fd</code></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-9 offset-lg-3">
+                                            <button type="button" id="btn-salvar-appearance" class="btn btn-success">
+                                                <i class="las la-save"></i> Save
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

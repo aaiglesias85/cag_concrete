@@ -489,6 +489,24 @@ class UsuarioController extends AbstractAdminController
     /**
      * listarOrdenados Acciรณn que lista los usuarios.
      */
+    public function actualizarSidebarColor(Request $request): JsonResponse
+    {
+        $g = $this->adminAccess->exigirUsuarioOlogin($this->getUser());
+        if ($g instanceof RedirectResponse) {
+            return $this->json(['success' => false, 'error' => 'Unauthorized']);
+        }
+
+        $color = $request->get('sidebar_color');
+
+        try {
+            $resultado = $this->usuarioService->ActualizarSidebarColor($g->getUsuarioId(), $color);
+
+            return $this->json($resultado);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
     #[RequireAdminPermission(FunctionId::USUARIO, AdminPermission::View, jsonOnDenied: true)]
     public function listarOrdenados(Request $request): JsonResponse
     {

@@ -19,6 +19,10 @@
 
     <link href="{{ asset('assets/metronic8/css/my-components.css') }}" rel="stylesheet" type="text/css" />
 
+    {% if app.user %}
+    <style>:root { --sidebar-color: {{ app.user.sidebarColor }}; }</style>
+    {% endif %}
+
 {% endblock %}
 
 {% block bodytag %}

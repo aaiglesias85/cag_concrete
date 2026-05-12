@@ -42,6 +42,11 @@ listarTodosUsuariosAdmin:
   path:  /usuario/listarOrdenados
   defaults: { _controller: App\Controller\Admin\UsuarioController::listarOrdenados, _format: json }
 
+actualizarSidebarColorAdmin:
+  path: /usuario/actualizarSidebarColor
+  defaults: { _controller: App\Controller\Admin\UsuarioController::actualizarSidebarColor, _format: json }
+  methods: [POST]
+
 denegado:
    path: /denegado
    defaults: { _controller: App\Controller\Admin\UsuarioController::denegado }
