@@ -1,7 +1,26 @@
+{% if app.user %}
+<style>
+    #kt_app_sidebar { background-color: {{ app.user.sidebarColor }} !important; }
+    [data-bs-theme='dark'] #kt_app_sidebar { background-color: #1e2028 !important; }
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-link:hover,
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-link:focus {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-link.active,
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-item.here > .menu-link {
+        background-color: rgba(255, 255, 255, 0.14) !important;
+    }
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-title,
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-link:hover .menu-title,
+    [data-bs-theme='dark'] #kt_app_sidebar .menu-link.active .menu-title {
+        color: #ffffff !important;
+    }
+</style>
+{% endif %}
+
 <div
    id="kt_app_sidebar"
    class="app-sidebar flex-column"
-   {% if app.user %}style="background-color: {{ app.user.sidebarColor }} !important;"{% endif %}
    data-kt-drawer="true"
    data-kt-drawer-name="app-sidebar"
    data-kt-drawer-activate="{default: true, lg: false}"

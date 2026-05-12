@@ -208,9 +208,13 @@ var Profile = function () {
                 .then(function (res) {
                     var response = res.data;
                     if (response.success) {
-                        document.documentElement.style.setProperty('--sidebar-color', color);
-                        var sidebar = document.querySelector('.app-sidebar');
-                        if (sidebar) { sidebar.style.backgroundColor = color; }
+                        var styleEl = document.getElementById('sidebar-color-style');
+                        if (!styleEl) {
+                            styleEl = document.createElement('style');
+                            styleEl.id = 'sidebar-color-style';
+                            document.head.appendChild(styleEl);
+                        }
+                        styleEl.textContent = '#kt_app_sidebar { background-color: ' + color + ' !important; } [data-bs-theme="dark"] #kt_app_sidebar { background-color: #1e2028 !important; }';
                         toastr.success('Sidebar color updated.', '');
                     } else {
                         toastr.error(response.error || 'Error saving color.', '');
