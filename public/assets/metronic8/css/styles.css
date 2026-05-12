@@ -91,17 +91,167 @@ body,
    background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* Variables de texto en modo oscuro — mejora contraste general */
+/* ============================================================
+   Opción A — Variables globales dark mode + componentes
+   ============================================================ */
 [data-bs-theme='dark'] {
-   --bs-body-color: #e0e4ef;
-   --bs-heading-color: #f0f2f8;
+   /* Texto y fondos */
+   --bs-body-color: #DBDFE9;
+   --bs-body-bg: #15171C;
+   --bs-heading-color: #F5F5F5;
+
+   /* Escala de grises invertida para dark */
+   --bs-gray-100: #1b1b29;
+   --bs-gray-200: #21263a;
+   --bs-gray-300: #2a2f45;
+   --bs-gray-400: #353c55;
+   --bs-gray-500: #636674;
+   --bs-gray-600: #99A1B7;
+   --bs-gray-700: #B5B5C3;
+   --bs-gray-800: #DBDFE9;
+   --bs-gray-900: #F5F5F5;
+
+   /* Cards */
+   --bs-card-bg: #1e2028;
+   --bs-card-border-color: #2d3748;
+   --bs-card-title-color: #F5F5F5;
+   --bs-card-cap-bg: #252836;
+
+   /* Tablas */
+   --bs-table-color: #DBDFE9;
+   --bs-table-bg: transparent;
+   --bs-table-border-color: #2d3748;
+   --bs-table-striped-bg: #252836;
+   --bs-table-hover-bg: rgba(255, 255, 255, 0.04);
+
+   /* Bordes y fondos secundarios */
+   --bs-border-color: #2d3748;
+   --bs-secondary-bg: #252836;
+   --bs-tertiary-bg: #1a1d23;
+
+   /* Formularios */
+   --bs-input-bg: #1e2028;
+   --bs-input-border-color: #2d3748;
+   --bs-input-color: #DBDFE9;
+
+   /* Texto muted */
+   --bs-text-muted: #99A1B7;
 }
 
-[data-bs-theme='dark'] .text-gray-700,
-[data-bs-theme='dark'] .text-gray-800,
-[data-bs-theme='dark'] .text-gray-900 {
-   color: #c8d0e0 !important;
+/* --- Texto general --- */
+[data-bs-theme='dark'] .text-gray-500 { color: #99A1B7 !important; }
+[data-bs-theme='dark'] .text-gray-600 { color: #99A1B7 !important; }
+[data-bs-theme='dark'] .text-gray-700 { color: #B5B5C3 !important; }
+[data-bs-theme='dark'] .text-gray-800 { color: #DBDFE9 !important; }
+[data-bs-theme='dark'] .text-gray-900 { color: #F5F5F5 !important; }
+[data-bs-theme='dark'] .text-muted    { color: #99A1B7 !important; }
+[data-bs-theme='dark'] .text-dark     { color: #DBDFE9 !important; }
+
+/* --- Cards --- */
+[data-bs-theme='dark'] .card {
+   background-color: #1e2028 !important;
+   border-color: #2d3748 !important;
 }
+[data-bs-theme='dark'] .card-header {
+   background-color: #252836 !important;
+   border-bottom-color: #2d3748 !important;
+}
+[data-bs-theme='dark'] .card-footer {
+   background-color: #252836 !important;
+   border-top-color: #2d3748 !important;
+}
+[data-bs-theme='dark'] .card-title,
+[data-bs-theme='dark'] .card-label {
+   color: #F5F5F5 !important;
+}
+
+/* --- Tabs de navegación --- */
+[data-bs-theme='dark'] .nav-tabs .nav-link {
+   color: #99A1B7 !important;
+}
+[data-bs-theme='dark'] .nav-tabs .nav-link:hover {
+   color: #DBDFE9 !important;
+}
+[data-bs-theme='dark'] .nav-tabs .nav-link.active {
+   color: #1B84FF !important;
+   background-color: transparent !important;
+   border-bottom-color: #1B84FF !important;
+}
+[data-bs-theme='dark'] .nav-line-tabs .nav-link.active {
+   color: #1B84FF !important;
+}
+
+/* --- Wizard / Stepper tabs --- */
+[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-title {
+   color: #DBDFE9 !important;
+}
+[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-desc {
+   color: #99A1B7 !important;
+}
+[data-bs-theme='dark'] .nav-link.active .wizard-wrapper .wizard-label .wizard-title {
+   color: #1B84FF !important;
+}
+[data-bs-theme='dark'] .nav-link.valid .wizard-wrapper .wizard-label .wizard-title {
+   color: #DBDFE9 !important;
+}
+
+/* --- Tablas --- */
+[data-bs-theme='dark'] .table > thead > tr > th {
+   color: #99A1B7 !important;
+   background-color: #252836 !important;
+   border-bottom-color: #2d3748 !important;
+}
+[data-bs-theme='dark'] .table > tbody > tr > td,
+[data-bs-theme='dark'] .table > tbody > tr > th {
+   color: #DBDFE9 !important;
+   border-color: #2d3748 !important;
+}
+[data-bs-theme='dark'] .table > tbody > tr:hover > td {
+   background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+/* --- Formularios --- */
+[data-bs-theme='dark'] .form-control,
+[data-bs-theme='dark'] .form-select {
+   background-color: #1e2028 !important;
+   border-color: #2d3748 !important;
+   color: #DBDFE9 !important;
+}
+[data-bs-theme='dark'] .form-control-solid,
+[data-bs-theme='dark'] .form-select-solid {
+   background-color: #252836 !important;
+   color: #DBDFE9 !important;
+   border-color: transparent !important;
+}
+[data-bs-theme='dark'] .form-control::placeholder { color: #636674 !important; }
+[data-bs-theme='dark'] .input-group-text {
+   background-color: #252836 !important;
+   border-color: #2d3748 !important;
+   color: #99A1B7 !important;
+}
+
+/* --- Separadores y bordes --- */
+[data-bs-theme='dark'] .separator { border-color: #2d3748 !important; }
+[data-bs-theme='dark'] .border     { border-color: #2d3748 !important; }
+
+/* --- Dropdowns --- */
+[data-bs-theme='dark'] .dropdown-menu {
+   background-color: #1e2028 !important;
+   border-color: #2d3748 !important;
+}
+[data-bs-theme='dark'] .dropdown-item {
+   color: #DBDFE9 !important;
+}
+[data-bs-theme='dark'] .dropdown-item:hover {
+   background-color: #252836 !important;
+}
+
+/* --- Badges y pills --- */
+[data-bs-theme='dark'] .badge.bg-light { background-color: #252836 !important; color: #DBDFE9 !important; }
+
+/* --- Scrollbar (webkit) --- */
+[data-bs-theme='dark'] ::-webkit-scrollbar-track { background: #1a1d23; }
+[data-bs-theme='dark'] ::-webkit-scrollbar-thumb { background: #353c55; border-radius: 4px; }
 
 /* ---------------------------------------------------------------------------
    Personalización sidebar / menú (colores Metronic dark-sidebar)
