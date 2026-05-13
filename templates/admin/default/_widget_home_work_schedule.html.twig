@@ -677,7 +677,6 @@
                 projects.push({ num: pn, id: pm.id });
             }
         }
-
         if (!projects.length) {
             return '<div class="d-flex flex-column align-items-center justify-content-center py-10">'+
                    '<i class="ki-duotone ki-calendar-remove fs-3x text-muted mb-3">'+
@@ -857,8 +856,6 @@
         wsState.from  = WS_MON_INIT;
         wsState.to    = fmtDate(initSun);
         wsState.dates = generateDates(wsState.from, wsState.to);
-        wsState.data  = WS_INIT_DATA;
-        updateWeekCount(wsState.data, wsState.dates);
 
         var _fpCfg = { localization: { locale: 'en', startOfTheWeek: 0, format: 'MM/dd/yyyy' }, static: true, position: 'below' };
         var _fromGroup = document.getElementById('ws-datetimepicker-from');
@@ -869,8 +866,6 @@
             FlatpickrUtil.setDate('ws-datetimepicker-from', wsState.from);
             FlatpickrUtil.setDate('ws-datetimepicker-to',   wsState.to);
         }
-
-        bindHandlers(widget);
 
         var toggle = document.getElementById('ws-sun-toggle');
         if (toggle) toggle.addEventListener('change', function () {
@@ -946,6 +941,11 @@
             }
             loadRange(WS_MON_INIT, iTo);
         });
+
+        /* Always fetch via AJAX on init — same path as navigation — so the
+           widget is never stuck showing an empty server-side render when data
+           exists. */
+        loadRange(wsState.from, wsState.to);
     });
 }());
 </script>

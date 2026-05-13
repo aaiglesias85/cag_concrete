@@ -122,7 +122,7 @@ class DefaultController extends AbstractAdminController
                 return $this->json(['success' => false, 'error' => 'Dates required']);
             }
 
-            $data = $this->scheduleService->listarSchedulesPayloadHome($fechaInicial, $fechaFin, 100, $projectId);
+            $data = $this->scheduleService->listarSchedulesPayloadHome($fechaInicial, $fechaFin, 0, $projectId);
 
             return $this->json(['success' => true, 'data' => $data]);
         } catch (\Exception $e) {
@@ -169,7 +169,7 @@ class DefaultController extends AbstractAdminController
                 $stats['work_schedule'] = $this->scheduleService->listarSchedulesPayloadHome(
                     $fechaInicial,
                     $fechaFin,
-                    30,
+                    0,
                     $projectId
                 );
             }

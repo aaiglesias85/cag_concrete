@@ -1020,7 +1020,8 @@ class DefaultService extends Base
                 $sunday = (clone $monday)->modify('+6 days'); // Dom = Lun + 6
                 $homeWorkSchedule = $this->scheduleService->listarSchedulesPayloadHome(
                     $monday->format('m/d/Y'),
-                    $sunday->format('m/d/Y')
+                    $sunday->format('m/d/Y'),
+                    0  // sin límite → traer todos los schedules de la semana
                 );
                 continue;
             }
