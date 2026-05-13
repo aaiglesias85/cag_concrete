@@ -33,6 +33,45 @@ class DataTrackingLaborRepository extends ServiceEntityRepository
     }
 
     /**
+     * Mapa data_tracking_id => [nombres de Leads] para una lista de trackings (1 query).
+     *
+     * @param int[] $trackingIds
+     *
+     * @return array<int, string[]>
+     */
+    public function leadNamesByTrackingIds(array $trackingIds): array
+    {
+        if ([] === $trackingIds) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('d_t_l')
+            ->select('IDENTITY(d_t_l.dataTracking) AS tracking_id')
+            ->addSelect('e.name AS emp_name')
+            ->addSelect('se.name AS sub_name')
+            ->leftJoin('d_t_l.employee', 'e')
+            ->leftJoin('d_t_l.employeeSubcontractor', 'se')
+            ->where('IDENTITY(d_t_l.dataTracking) IN (:ids)')
+            ->andWhere('d_t_l.role = :lead')
+            ->setParameter('ids', $trackingIds)
+            ->setParameter('lead', 'Lead')
+            ->orderBy('d_t_l.id', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $tid = (int) $row['tracking_id'];
+            $name = (string) ($row['emp_name'] ?? $row['sub_name'] ?? '');
+            if ('' !== $name) {
+                $map[$tid][] = $name;
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * ListarDataTrackingsDeEmployee: Lista el data tracking de employee.
      *
      * @return DataTrackingLabor[]

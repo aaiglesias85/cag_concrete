@@ -1754,11 +1754,15 @@ class DataTrackingService extends Base
 
         $rows = $result['data'];
 
-        // Fetch item names for all entries in one query
+        // Fetch item names + lead names for all entries in one query each
         $trackingIds = array_map(fn ($r) => (int) $r['id'], $rows);
         /** @var DataTrackingItemRepository $dtiRepo */
         $dtiRepo = $this->getDoctrine()->getRepository(DataTrackingItem::class);
         $itemNameMap = $dtiRepo->itemNamesByTrackingIds($trackingIds);
+
+        /** @var DataTrackingLaborRepository $dtlRepo */
+        $dtlRepo = $this->getDoctrine()->getRepository(DataTrackingLabor::class);
+        $leadNameMap = $dtlRepo->leadNamesByTrackingIds($trackingIds);
 
         $grouped = [];
         foreach ($rows as $row) {
@@ -1774,10 +1778,18 @@ class DataTrackingService extends Base
             $itemNames = $itemNameMap[$tid] ?? [];
             $itemsLabel = implode(', ', $itemNames);
 
+            /* Lead: preferir empleado(s) con role='Lead' del tab Labor;
+               fallback al campo de texto crew_lead saneado. */
+            $leadNames = $leadNameMap[$tid] ?? [];
+            $leadLabel = implode(', ', $leadNames);
+            if ('' === $leadLabel) {
+                $leadLabel = self::sanitizeCrewLead($row['crewLead'] ?? null);
+            }
+
             $entry = [
                 'id' => $tid,
                 'date' => (string) ($row['date'] ?? ''),
-                'crew_lead' => self::sanitizeCrewLead($row['crewLead'] ?? null),
+                'crew_lead' => $leadLabel,
                 'total_daily_today' => (float) ($row['total_daily_today'] ?? 0),
                 'profit' => (float) ($row['profit'] ?? 0),
                 'totalLabor' => (float) ($row['totalLabor'] ?? 0),
