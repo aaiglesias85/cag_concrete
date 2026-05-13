@@ -97,6 +97,10 @@ final class DataTrackingActualizarRequest implements AdminHttpRequestDtoInterfac
             return null;
         }
         if (\is_string($v)) {
+            $t = trim($v);
+            if ('' === $t || 0 === strcasecmp($t, 'undefined') || 0 === strcasecmp($t, 'null')) {
+                return null;
+            }
             return $v;
         }
         if (is_numeric($v)) {

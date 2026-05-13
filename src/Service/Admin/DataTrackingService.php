@@ -1777,7 +1777,7 @@ class DataTrackingService extends Base
             $entry = [
                 'id' => $tid,
                 'date' => (string) ($row['date'] ?? ''),
-                'crew_lead' => (string) ($row['crewLead'] ?? ''),
+                'crew_lead' => self::sanitizeCrewLead($row['crewLead'] ?? null),
                 'total_daily_today' => (float) ($row['total_daily_today'] ?? 0),
                 'profit' => (float) ($row['profit'] ?? 0),
                 'totalLabor' => (float) ($row['totalLabor'] ?? 0),
@@ -1830,5 +1830,21 @@ class DataTrackingService extends Base
         }
 
         return $default;
+    }
+
+    /**
+     * Defensa contra datos heredados donde se guardó la string literal "undefined"/"null"
+     * en lugar de NULL/vacío.
+     */
+    private static function sanitizeCrewLead(mixed $value): string
+    {
+        if (null === $value) {
+            return '';
+        }
+        $s = trim((string) $value);
+        if ('' === $s || 0 === strcasecmp($s, 'undefined') || 0 === strcasecmp($s, 'null')) {
+            return '';
+        }
+        return $s;
     }
 }
