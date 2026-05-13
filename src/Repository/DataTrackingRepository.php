@@ -299,19 +299,29 @@ class DataTrackingRepository extends ServiceEntityRepository
         }
 
         if ('' != $fecha_inicial) {
-            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format('Y-m-d');
-
-            $baseQb->andWhere('d_t.date >= :fecha_inicial')
-                ->setParameter('fecha_inicial', $fecha_inicial);
+            $fechaDt = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            if (!$fechaDt) {
+                // Fallback: probar formato ISO Y-m-d
+                $fechaDt = \DateTime::createFromFormat('Y-m-d', $fecha_inicial);
+            }
+            if ($fechaDt) {
+                $fecha_inicial = $fechaDt->format('Y-m-d');
+                $baseQb->andWhere('d_t.date >= :fecha_inicial')
+                    ->setParameter('fecha_inicial', $fecha_inicial);
+            }
         }
 
         if ('' != $fecha_fin) {
-            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
-            $fecha_fin = $fecha_fin->format('Y-m-d');
-
-            $baseQb->andWhere('d_t.date <= :fecha_fin')
-                ->setParameter('fecha_fin', $fecha_fin);
+            $fechaDt = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            if (!$fechaDt) {
+                // Fallback: probar formato ISO Y-m-d
+                $fechaDt = \DateTime::createFromFormat('Y-m-d', $fecha_fin);
+            }
+            if ($fechaDt) {
+                $fecha_fin = $fechaDt->format('Y-m-d');
+                $baseQb->andWhere('d_t.date <= :fecha_fin')
+                    ->setParameter('fecha_fin', $fecha_fin);
+            }
         }
 
         if ('' !== $pending) {
@@ -370,19 +380,27 @@ class DataTrackingRepository extends ServiceEntityRepository
         }
 
         if ('' != $fecha_inicial) {
-            $fecha_inicial = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
-            $fecha_inicial = $fecha_inicial->format('Y-m-d');
-
-            $consulta->andWhere('d_t.date >= :start')
-                ->setParameter('start', $fecha_inicial);
+            $fechaDt = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            if (!$fechaDt) {
+                $fechaDt = \DateTime::createFromFormat('Y-m-d', $fecha_inicial);
+            }
+            if ($fechaDt) {
+                $fecha_inicial = $fechaDt->format('Y-m-d');
+                $consulta->andWhere('d_t.date >= :start')
+                    ->setParameter('start', $fecha_inicial);
+            }
         }
 
         if ('' != $fecha_fin) {
-            $fecha_fin = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
-            $fecha_fin = $fecha_fin->format('Y-m-d');
-
-            $consulta->andWhere('d_t.date <= :end')
-                ->setParameter('end', $fecha_fin);
+            $fechaDt = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            if (!$fechaDt) {
+                $fechaDt = \DateTime::createFromFormat('Y-m-d', $fecha_fin);
+            }
+            if ($fechaDt) {
+                $fecha_fin = $fechaDt->format('Y-m-d');
+                $consulta->andWhere('d_t.date <= :end')
+                    ->setParameter('end', $fecha_fin);
+            }
         }
 
         if ('' !== $status) {

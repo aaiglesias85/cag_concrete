@@ -7,13 +7,51 @@
             </div>
             <div class="card-toolbar flex-shrink-0">
                 <div class="d-flex justify-content-end align-items-center gap-2">
-                    <div class="d-flex align-items-center gap-1">
-                        <button type="button" id="dt-widget-btn-all" class="btn btn-sm btn-light fw-semibold fs-8 px-3">All</button>
-                        <div class="input-group input-group-sm w-auto">
-                            <span class="input-group-text bg-light border-0 pe-1">
-                                <i class="ki-duotone ki-calendar fs-5 text-gray-500"><span class="path1"></span><span class="path2"></span></i>
-                            </span>
-                            <input type="text" id="dt-widget-date-range" class="form-control form-control-sm bg-light border-0 text-gray-700 fw-semibold fs-7" style="min-width:180px;cursor:pointer;" readonly placeholder="Select range…" />
+                    {# ── Unified filter ── #}
+                    <div>
+                        <button type="button" class="btn btn-sm btn-light fw-semibold fs-8 px-3 d-flex align-items-center gap-1" id="dt-filter-btn"
+                                data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                            <i class="ki-duotone ki-filter fs-5"><span class="path1"></span><span class="path2"></span></i>
+                            <span id="dt-filter-label">Current month</span>
+                        </button>
+                        <div id="dt-filter-menu" class="menu menu-sub menu-sub-dropdown w-300px" data-kt-menu="true">
+                            <div class="px-7 py-5">
+                                <div class="fs-5 text-gray-900 fw-bold">Filter</div>
+                            </div>
+                            <div class="separator border-gray-200"></div>
+                            <div class="px-7 py-5">
+                                <div class="mb-3">
+                                    <label class="form-label text-gray-700 fs-7">Period</label>
+                                    <select class="form-select form-select-sm bg-body border border-gray-300 text-gray-700 fw-semibold" id="dt-period-select" style="border-radius:0.475rem">
+                                        <option value="all">All time</option>
+                                        <option value="current_month" selected>Current month</option>
+                                        <option value="last_month">Last month</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="row g-2 mb-3" id="dt-custom-range" style="display:none">
+                                    <div class="col-6">
+                                        <label class="form-label text-gray-700 fs-7">From</label>
+                                        <input type="date" class="form-control form-control-sm" id="dt-date-from" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label text-gray-700 fs-7">To</label>
+                                        <input type="date" class="form-control form-control-sm" id="dt-date-to" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-gray-700 fs-7">Project</label>
+                                    <select class="form-select form-select-solid form-select-sm" id="dt-filter-project">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button type="button" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                            data-kt-menu-dismiss="true" id="dt-btn-reset">Reset</button>
+                                    <button type="button" class="btn btn-primary fw-semibold px-6"
+                                            data-kt-menu-dismiss="true" id="dt-btn-apply">Apply</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     {% for link in w.links %}
@@ -178,3 +216,170 @@
         </div>
     </div>
 </div>
+
+<script>
+(function () {
+    var dtActivePeriod = 'current_month';
+
+    /* ── helpers de fecha ─────────────────────────────────────── */
+    function fmtDate(d) {
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var day = String(d.getDate()).padStart(2, '0');
+        return m + '/' + day + '/' + d.getFullYear();
+    }
+    function getMonthBounds(offset) {
+        var now = new Date();
+        var first = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+        var last  = new Date(now.getFullYear(), now.getMonth() + offset + 1, 0);
+        return { fi: fmtDate(first), ff: fmtDate(last),
+                 label: first.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) };
+    }
+
+    /* ── actualizar filtros globales del dashboard ────────────── */
+    function setGlobalPeriod(period, fi, ff) {
+        var $sel = typeof $ !== 'undefined' ? $('#home-date-period') : null;
+        if ($sel && $sel.length) {
+            $sel.hasClass('select2-hidden-accessible')
+                ? $sel.val(period).trigger('change')
+                : $sel.val(period);
+        }
+        if (typeof FlatpickrUtil !== 'undefined') {
+            if (fi) FlatpickrUtil.setDate('home-datetimepicker-fecha-desde', fi);
+            else    FlatpickrUtil.clear('home-datetimepicker-fecha-desde');
+            if (ff) FlatpickrUtil.setDate('home-datetimepicker-fecha-hasta', ff);
+            else    FlatpickrUtil.clear('home-datetimepicker-fecha-hasta');
+        }
+    }
+    function setGlobalProject(projectId, projectText) {
+        if (typeof $ === 'undefined') return;
+        var $proj = $('#home-filter-project');
+        if (!$proj.length) return;
+        if (!projectId) {
+            $proj.hasClass('select2-hidden-accessible')
+                ? $proj.val(null).trigger('change')
+                : $proj.val('');
+            return;
+        }
+        if ($proj.hasClass('select2-hidden-accessible')) {
+            /* Select2 AJAX necesita que la opción exista en el DOM primero */
+            if (!$proj.find('option[value="' + projectId + '"]').length) {
+                $proj.append(new Option(projectText || projectId, projectId, true, true));
+            }
+            $proj.val(projectId).trigger('change');
+        } else {
+            $proj.val(projectId);
+        }
+    }
+
+    /* ── label del botón ─────────────────────────────────────── */
+    function updateLabel(periodLabel, projText) {
+        var el  = document.getElementById('dt-filter-label');
+        var btn = document.getElementById('dt-filter-btn');
+        if (el)  el.textContent = periodLabel + (projText ? ' · ' + projText : '');
+        if (btn) {
+            var active = !!projText || periodLabel !== 'Current month';
+            btn.classList.toggle('btn-light',        !active);
+            btn.classList.toggle('btn-light-primary', active);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var periodSel = document.getElementById('dt-period-select');
+        var customRow = document.getElementById('dt-custom-range');
+
+        /* mostrar/ocultar fechas custom */
+        if (periodSel && customRow) {
+            periodSel.addEventListener('change', function () {
+                customRow.style.display = this.value === 'custom' ? '' : 'none';
+            });
+        }
+
+        /* Select2 solo para project */
+        if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
+            $('#dt-filter-project').select2({
+                placeholder: 'Search project…', allowClear: true, width: '100%',
+                dropdownParent: $('#dt-filter-menu'),
+                ajax: {
+                    url: 'project/listarOrdenados', dataType: 'json', delay: 250,
+                    data: function (p) { return { search: p.term }; },
+                    processResults: function (d) {
+                        return { results: $.map(d.projects || [], function (i) {
+                            return { id: i.project_id, text: (i.number || '') + ' - ' + (i.description || '') };
+                        })};
+                    },
+                    cache: true
+                },
+                minimumInputLength: 3
+            });
+        }
+
+        /* ── Apply ───────────────────────────────────────────── */
+        var applyBtn = document.getElementById('dt-btn-apply');
+        if (applyBtn) applyBtn.addEventListener('click', function () {
+            var period = periodSel ? periodSel.value : 'current_month';
+            var fi = '', ff = '', periodLabel = 'Current month';
+
+            if (period === 'all') {
+                periodLabel = 'All time';
+            } else if (period === 'current_month') {
+                var cm = getMonthBounds(0);  fi = cm.fi; ff = cm.ff; periodLabel = cm.label;
+            } else if (period === 'last_month') {
+                var lm = getMonthBounds(-1); fi = lm.fi; ff = lm.ff; periodLabel = lm.label;
+            } else if (period === 'custom') {
+                var fromEl = document.getElementById('dt-date-from');
+                var toEl   = document.getElementById('dt-date-to');
+                var fiIso  = fromEl ? fromEl.value : '';
+                var ffIso  = toEl   ? toEl.value   : '';
+                if (fiIso && ffIso) {
+                    var fp = fiIso.split('-'); fi = fp[1]+'/'+fp[2]+'/'+fp[0];
+                    var tp = ffIso.split('-'); ff = tp[1]+'/'+tp[2]+'/'+tp[0];
+                    period = 'all'; /* 'all' + fechas → getPeriodParams lo detecta como custom */
+                    periodLabel = fi + ' – ' + ff;
+                } else {
+                    return; /* fechas incompletas, no hacer nada */
+                }
+            }
+
+            /* capturar proyecto ANTES de que KTMenu cierre el dropdown */
+            var projectId   = (typeof $ !== 'undefined' ? ($('#dt-filter-project').val() || '') : '');
+            var projText    = '';
+            var projFullText = '';
+            if (projectId && typeof $ !== 'undefined') {
+                var sel = $('#dt-filter-project').select2('data');
+                if (sel && sel[0]) {
+                    projFullText = sel[0].text || '';
+                    projText = projFullText.split(' - ')[0].trim();
+                }
+            }
+
+            /* actualizar filtros globales y recargar */
+            setGlobalPeriod(period, fi, ff);
+            setGlobalProject(projectId, projFullText);
+            dtActivePeriod = period;
+
+            /* reloadDashboardData() está dentro de un IIFE, no es global.
+               Disparamos el click del botón Apply global que ya está enlazado. */
+            if (typeof $ !== 'undefined' && $('#btn-filtrar-home-task').length) {
+                $('#btn-filtrar-home-task').trigger('click');
+            }
+            updateLabel(periodLabel, projText);
+        });
+
+        /* ── Reset ───────────────────────────────────────────── */
+        var resetBtn = document.getElementById('dt-btn-reset');
+        if (resetBtn) resetBtn.addEventListener('click', function () {
+            if (periodSel) periodSel.value = 'current_month';
+            if (customRow) customRow.style.display = 'none';
+            var cm = getMonthBounds(0);
+            setGlobalPeriod('current_month', cm.fi, cm.ff);
+            setGlobalProject('');
+            dtActivePeriod = 'current_month';
+            if (typeof $ !== 'undefined') $('#dt-filter-project').val(null).trigger('change');
+            if (typeof $ !== 'undefined' && $('#btn-filtrar-home-task').length) {
+                $('#btn-filtrar-home-task').trigger('click');
+            }
+            updateLabel(cm.label, '');
+        });
+    });
+}());
+</script>

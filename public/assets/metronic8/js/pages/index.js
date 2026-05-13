@@ -1594,7 +1594,13 @@ var renderPayItemTotalsTbody = function (rows) {
             syncDatesWithPeriodSelect();
         });
 
-        syncDatesWithPeriodSelect();
+        /* Solo inicializar fechas si el widget no las configuró ya
+           (evita pisar un rango custom seteado por setGlobalPeriod) */
+        var initFi = FlatpickrUtil.getString('home-datetimepicker-fecha-desde');
+        var initFf = FlatpickrUtil.getString('home-datetimepicker-fecha-hasta');
+        if (!initFi || !initFf) {
+            syncDatesWithPeriodSelect();
+        }
 
         $(document).off('click', '#btn-filtrar-home-task');
         $(document).on('click', '#btn-filtrar-home-task', function () {
