@@ -167,10 +167,10 @@ body,
 
 /* --- Tabs de navegación --- */
 [data-bs-theme='dark'] .nav-tabs .nav-link {
-   color: #99A1B7 !important;
+   color: #DBDFE9 !important;
 }
 [data-bs-theme='dark'] .nav-tabs .nav-link:hover {
-   color: #DBDFE9 !important;
+   color: #ffffff !important;
 }
 [data-bs-theme='dark'] .nav-tabs .nav-link.active {
    color: #1B84FF !important;
@@ -182,17 +182,38 @@ body,
 }
 
 /* --- Wizard / Stepper tabs --- */
-[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-title {
-   color: #DBDFE9 !important;
+/* Títulos y descripciones */
+[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-title,
+[data-bs-theme='dark'] .wizzard-tabs .wizard-wrapper .wizard-label .wizard-title,
+[data-bs-theme='dark'] .wizard-wrapper .wizard-title {
+   color: #ffffff !important;
 }
-[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-desc {
-   color: #99A1B7 !important;
+[data-bs-theme='dark'] .wizard-wrapper .wizard-label .wizard-desc,
+[data-bs-theme='dark'] .wizzard-tabs .wizard-wrapper .wizard-label .wizard-desc,
+[data-bs-theme='dark'] .wizard-wrapper .wizard-desc {
+   color: #c8cdd9 !important;
 }
-[data-bs-theme='dark'] .nav-link.active .wizard-wrapper .wizard-label .wizard-title {
+/* Tab activo */
+[data-bs-theme='dark'] .nav-link.active .wizard-wrapper .wizard-label .wizard-title,
+[data-bs-theme='dark'] .nav-link.active .wizard-wrapper .wizard-title,
+[data-bs-theme='dark'] .wizzard-tabs .nav-link.active .wizard-wrapper .wizard-label .wizard-title {
    color: #1B84FF !important;
 }
-[data-bs-theme='dark'] .nav-link.valid .wizard-wrapper .wizard-label .wizard-title {
+/* Tab validado */
+[data-bs-theme='dark'] .nav-link.valid .wizard-wrapper .wizard-label .wizard-title,
+[data-bs-theme='dark'] .nav-link.valid .wizard-wrapper .wizard-title {
    color: #DBDFE9 !important;
+}
+/* Números del wizard */
+[data-bs-theme='dark'] .wizard-wrapper .wizard-number .number {
+   color: #99A1B7 !important;
+}
+/* SVG icons (arrow) en wizard tabs — fix fill="#000000" */
+[data-bs-theme='dark'] .wizard-wrapper .svg-icon svg [fill="#000000"] {
+   fill: #808290 !important;
+}
+[data-bs-theme='dark'] .wizard-wrapper .svg-icon svg [opacity="0.3"] {
+   opacity: 0.6 !important;
 }
 
 /* --- Tablas --- */
