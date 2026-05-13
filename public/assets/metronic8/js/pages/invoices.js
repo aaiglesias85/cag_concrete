@@ -137,6 +137,11 @@ var Invoices = (function () {
 
       // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
       oTable.on('draw', function () {
+         // Show table only after AJAX returns filtered results (prevents flash of stale data)
+         if (oTable.search() && oTable.search().length >= 3) {
+            showTableContent();
+         }
+
          // reset select all
          resetSelectRecords(table);
 
@@ -383,7 +388,6 @@ var Invoices = (function () {
 
          debounceTimeout = setTimeout(function () {
             if (searchTerm.length >= 3) {
-               showTableContent();
                oTable.search(searchTerm).draw();
             } else if (searchTerm === '') {
                // Al limpiar el search, volver al estado inicial (ocultar tabla, mostrar mensaje)

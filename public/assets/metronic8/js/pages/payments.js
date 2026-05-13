@@ -76,6 +76,11 @@ var Payments = (function () {
       });
 
       oTable.on('draw', function () {
+         // Show table only after AJAX returns filtered results (prevents flash of stale data)
+         if (oTable.search() && oTable.search().length >= 3) {
+            showTableContent();
+         }
+
          resetSelectRecords(table);
          initAccionEditar();
          initAccionExportar();
@@ -208,7 +213,6 @@ var Payments = (function () {
          const searchTerm = e.target.value.trim();
          debounceTimeout = setTimeout(function () {
             if (searchTerm.length >= 3) {
-               showTableContent();
                oTable.search(searchTerm).draw();
             } else if (searchTerm === '') {
                if (oTable) oTable.search('').draw();
