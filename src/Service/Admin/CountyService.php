@@ -214,9 +214,11 @@ class CountyService extends Base
            ->find($county_id);
         /** @var County $entity */
         if (null != $entity) {
-            // Verificar name
+            // Verificar name — la relación district es ManyToOne, pasar string vacío rompe la búsqueda.
+            // Incluir city para distinguir filas County (city=null) vs City (city con valor) del mismo description+district.
+            $districtForCheck = ('' !== $district_id && ctype_digit($district_id)) ? (int) $district_id : null;
             $county = $this->getDoctrine()->getRepository(County::class)
-               ->findOneBy(['description' => $description, 'district' => $district_id]);
+               ->findOneBy(['description' => $description, 'district' => $districtForCheck, 'city' => $city]);
             if (null != $county && $entity->getCountyId() != $county->getCountyId()) {
                 $resultado['success'] = false;
                 $resultado['error'] = 'The county name is in use, please try entering another one.';
@@ -269,9 +271,11 @@ class CountyService extends Base
         $city = '' !== $city ? $city : null;
         $status = (string) $d->status;
 
-        // Verificar name
+        // Verificar name — la relación district es ManyToOne, pasar string vacío rompe la búsqueda.
+        // Incluir city para distinguir filas County (city=null) vs City (city con valor) del mismo description+district.
+        $districtForCheck = ('' !== $district_id && ctype_digit($district_id)) ? (int) $district_id : null;
         $county = $this->getDoctrine()->getRepository(County::class)
-           ->findOneBy(['description' => $description, 'district' => $district_id]);
+           ->findOneBy(['description' => $description, 'district' => $districtForCheck, 'city' => $city]);
         if (null != $county) {
             $resultado['success'] = false;
             $resultado['error'] = 'The county name is in use, please try entering another one.';
