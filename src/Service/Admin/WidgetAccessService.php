@@ -321,6 +321,19 @@ final class WidgetAccessService
     }
 
     /**
+     * Códigos de widgets ocultos globalmente (no se muestran en ningún lado).
+     *
+     * @return list<string>
+     */
+    public function getHiddenWidgetCodes(): array
+    {
+        return [
+            'invoice_profit_share',
+            'job_cost_breakdown',
+        ];
+    }
+
+    /**
      * @return array<string, list<string>>
      */
     private static function codeToLayoutKeys(): array

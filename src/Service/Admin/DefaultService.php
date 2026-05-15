@@ -943,7 +943,11 @@ class DefaultService extends Base
         $wa->ensureUserWidgetAccessSeededFromRolIfEmpty($usuarioId);
 
         foreach ($definiciones as $def) {
-            if (!$wa->isWidgetVisibleOnHome($usuarioId, (string) $def['id'])) {
+            $id = (string) $def['id'];
+            if (in_array($id, $this->getHiddenWidgetIds(), true)) {
+                continue;
+            }
+            if (!$wa->isWidgetVisibleOnHome($usuarioId, $id)) {
                 continue;
             }
 
@@ -1133,6 +1137,16 @@ class DefaultService extends Base
     }
 
     /**
+     * Widgets ocultos globalmente. Delega en WidgetAccessService.
+     *
+     * @return list<string>
+     */
+    protected function getHiddenWidgetIds(): array
+    {
+        return $this->widgetAccessService->getHiddenWidgetCodes();
+    }
+
+    /**
      * "My Widgets": solo widgets permitidos por admin (`user_widget_access`); el toggle refleja la preferencia de Home.
      *
      * @return list<array<string, mixed>>
@@ -1145,6 +1159,9 @@ class DefaultService extends Base
         $out = [];
         foreach ($this->getWidgetDefinitionCatalog() as $def) {
             $id = (string) $def['id'];
+            if (in_array($id, $this->getHiddenWidgetIds(), true)) {
+                continue;
+            }
             if (!$wa->isWidgetEnabledForUser($usuarioId, $id)) {
                 continue;
             }

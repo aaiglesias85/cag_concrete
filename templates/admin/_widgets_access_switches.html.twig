@@ -1,6 +1,7 @@
 {# Reutilizable: perfil, usuario. Requiere `widgets` (entidad App\Entity\Widget[]). #}
 <div class="row g-4">
    {% for w in widgets %}
+      {% if w.code not in ['invoice_profit_share', 'job_cost_breakdown'] %}
       <div class="col-12 col-md-6 col-xl-4">
          <div class="card border border-gray-200 h-100">
             <div class="card-body d-flex align-items-start justify-content-between gap-3 p-5">
@@ -18,5 +19,6 @@
             </div>
          </div>
       </div>
+      {% endif %}
    {% endfor %}
 </div>
