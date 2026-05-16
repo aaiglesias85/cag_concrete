@@ -125,6 +125,7 @@ final class DataTrackingSalvarRequest implements AdminHttpRequestDtoInterface
             if ('' === $t || 0 === strcasecmp($t, 'undefined') || 0 === strcasecmp($t, 'null')) {
                 return null;
             }
+
             return $v;
         }
         if (is_numeric($v)) {

@@ -1857,6 +1857,7 @@ class DataTrackingService extends Base
         if ('' === $s || 0 === strcasecmp($s, 'undefined') || 0 === strcasecmp($s, 'null')) {
             return '';
         }
+
         return $s;
     }
 }

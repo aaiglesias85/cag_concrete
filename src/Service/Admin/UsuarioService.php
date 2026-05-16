@@ -794,8 +794,6 @@ class UsuarioService extends Base
 
     /**
      * Generar cadena aleatoria para nombres de archivo.
-     *
-     * @param int $limit Longitud de la cadena
      */
     public function ActualizarSidebarColor(int $usuario_id, mixed $color): array
     {

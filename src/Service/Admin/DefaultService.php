@@ -718,8 +718,6 @@ class DefaultService extends Base
 
     /**
      * DevolverDataProfitCostOverview: datos combinados para el widget Project Profit & Cost Overview.
-     *
-     * @return array
      */
     public function DevolverDataProfitCostOverview(string $project_id = '', string $fecha_inicial = '', string $fecha_fin = '', string $status = ''): array
     {

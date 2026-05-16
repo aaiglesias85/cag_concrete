@@ -115,7 +115,7 @@ class ProjectService extends Base
     private function keyPreviousInvoiceTotals(int $projectItemId, ?string $invoiceStartAfterYmd): string
     {
         return null !== $invoiceStartAfterYmd
-            ? $projectItemId . '~' . $invoiceStartAfterYmd
+            ? $projectItemId.'~'.$invoiceStartAfterYmd
             : (string) $projectItemId;
     }
 
@@ -399,7 +399,7 @@ class ProjectService extends Base
             'cutoff_ymd' => $cutoffYmd,
             'count' => \count($postLines),
             'invoice_item_ids' => array_map(
-                static fn(InvoiceItem $ii) => $ii->getId(),
+                static fn (InvoiceItem $ii) => $ii->getId(),
                 $postLines
             ),
         ]);
@@ -534,8 +534,8 @@ class ProjectService extends Base
         foreach ($archivos as $archivo) {
             // Eliminar archivo
             $dir = 'uploads/project/';
-            if (is_file($dir . $archivo)) {
-                unlink($dir . $archivo);
+            if (is_file($dir.$archivo)) {
+                unlink($dir.$archivo);
             }
 
             $em = $this->getDoctrine()->getManager();
@@ -565,8 +565,8 @@ class ProjectService extends Base
 
         // Eliminar archivo
         $dir = 'uploads/project/';
-        if (is_file($dir . $archivo)) {
-            unlink($dir . $archivo);
+        if (is_file($dir.$archivo)) {
+            unlink($dir.$archivo);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -727,7 +727,7 @@ class ProjectService extends Base
 
             $data[] = [
                 'id' => $data_tracking_id,
-                'project' => $value->getProject()->getProjectNumber() . ' - ' . $value->getProject()->getDescription(),
+                'project' => $value->getProject()->getProjectNumber().' - '.$value->getProject()->getDescription(),
                 'date' => $value->getDate()->format('m/d/Y'),
                 'stationNumber' => $value->getStationNumber(),
                 'measuredBy' => $value->getMeasuredBy(),
@@ -938,13 +938,13 @@ class ProjectService extends Base
         if ('' !== $item_id) {
             /** @var ProjectItemRepository $projectItemRepo */
             $projectItemRepo = $this->getDoctrine()->getRepository(ProjectItem::class);
-            /* $project_item = $projectItemRepo->BuscarItemProject($project_id, $item_id, $price);
-            if (!empty($project_item) && $project_item_id != $project_item[0]->getId()) {
-                $resultado['success'] = false;
-                $resultado['error'] = 'The item already exists in the project';
+        /* $project_item = $projectItemRepo->BuscarItemProject($project_id, $item_id, $price);
+        if (!empty($project_item) && $project_item_id != $project_item[0]->getId()) {
+            $resultado['success'] = false;
+            $resultado['error'] = 'The item already exists in the project';
 
-                return $resultado;
-            }*/
+            return $resultado;
+        }*/
         } else {
             // Verificar name
             $item = $this->getDoctrine()->getRepository(Item::class)
@@ -1182,10 +1182,10 @@ class ProjectService extends Base
             if (null !== $project_entity) {
                 $notas = [
                     [
-                        'notes' => 'Removed pay item: ' . $item_name
-                            . '. Previous quantity: ' . $qty_str
-                            . ', previous price: ' . $price_str
-                            . ', previous line total: ' . $line_total,
+                        'notes' => 'Removed pay item: '.$item_name
+                            .'. Previous quantity: '.$qty_str
+                            .', previous price: '.$price_str
+                            .', previous line total: '.$line_total,
                         'date' => new \DateTime(),
                     ],
                 ];
@@ -1423,13 +1423,13 @@ class ProjectService extends Base
             $entity->setProject($project_entity);
 
             $log_operacion = 'Add';
-            $log_descripcion = "The notes: $notes is add to the project: " . $project_entity->getName();
+            $log_descripcion = "The notes: $notes is add to the project: ".$project_entity->getName();
 
             if ($is_new) {
                 $em->persist($entity);
             } else {
                 $log_operacion = 'Update';
-                $log_descripcion = "The notes: $notes is modified to the project: " . $project_entity->getName();
+                $log_descripcion = "The notes: $notes is modified to the project: ".$project_entity->getName();
             }
 
             $em->flush();
@@ -1516,10 +1516,10 @@ class ProjectService extends Base
 
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="'.$id.'"> <i class="la la-edit"></i> </a> ';
+                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="'.$id.'"><i class="la la-trash"></i></a>';
             } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
             }
         }
 
@@ -1846,9 +1846,9 @@ class ProjectService extends Base
         }
 
         $this->logCompletionPaidTrace(
-            'computePreviousInvoiceTotals START project_item_id=' . $project_item_id
-                . ' invoiceStartAfterYmd=' . ($invoiceStartAfterYmd ?? 'null')
-                . ' cacheKey=' . $cacheKey
+            'computePreviousInvoiceTotals START project_item_id='.$project_item_id
+                .' invoiceStartAfterYmd='.($invoiceStartAfterYmd ?? 'null')
+                .' cacheKey='.$cacheKey
         );
 
         $total_quantity = 0.0;
@@ -1969,14 +1969,14 @@ class ProjectService extends Base
         $this->previousInvoiceTotalsByProjectItem[$cacheKey] = $result;
 
         $this->logCompletionPaidTrace(
-            'computePreviousInvoiceTotals RESULT project_item_id=' . $project_item_id
-                . ' total_paid_effective=' . $total_paid
-                . ' paid_amount_total=' . $paid_amount_total
-                . ' total_quantity=' . $total_quantity
-                . ' line_count=' . $lineIndex
-                . ' paidQtyByOverrideId=' . json_encode($paidQtyByOverrideId, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
-                . ' sumStoredPaidNoOverride=' . $sumStoredPaidNoOverride
-                . ' sumStoredPaidAmountNoOverride=' . $sumStoredPaidAmountNoOverride
+            'computePreviousInvoiceTotals RESULT project_item_id='.$project_item_id
+                .' total_paid_effective='.$total_paid
+                .' paid_amount_total='.$paid_amount_total
+                .' total_quantity='.$total_quantity
+                .' line_count='.$lineIndex
+                .' paidQtyByOverrideId='.json_encode($paidQtyByOverrideId, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)
+                .' sumStoredPaidNoOverride='.$sumStoredPaidNoOverride
+                .' sumStoredPaidAmountNoOverride='.$sumStoredPaidAmountNoOverride
         );
 
         return $result;
@@ -2196,7 +2196,7 @@ class ProjectService extends Base
         }
         $ts = strtotime($t);
         if (false !== $ts) {
-            $d = new \DateTime('@' . $ts);
+            $d = new \DateTime('@'.$ts);
             $d->setTime(0, 0, 0);
 
             return $d;
@@ -2418,9 +2418,9 @@ class ProjectService extends Base
     public function ListarItemsCompletion($project_id, $fecha_inicial = '', $fecha_fin = '')
     {
         $this->logCompletionPaidTrace(
-            'ListarItemsCompletion START project_id=' . $project_id
-                . ' fecha_inicial=' . $fecha_inicial
-                . ' fecha_fin=' . $fecha_fin
+            'ListarItemsCompletion START project_id='.$project_id
+                .' fecha_inicial='.$fecha_inicial
+                .' fecha_fin='.$fecha_fin
         );
 
         $items = [];
@@ -2492,14 +2492,14 @@ class ProjectService extends Base
             $has_paid_qty_override_history = $paidOverrideHistRepo->TieneHistorialPorProjectItem($project_item_id);
 
             $this->logCompletionPaidTrace(
-                'completion_fila project_id=' . $project_id
-                    . ' project_item_id=' . $project_item_id
-                    . ' item=' . ($value->getItem()->getName() ?? '')
-                    . ' paid_qty=' . $paid_qty
-                    . ' total_paid_amount=' . $total_paid_amount
-                    . ' invoiced_qty=' . $invoiced_qty
-                    . ' diff_qty=' . $diff_qty
-                    . ' has_paid_qty_override_history=' . ($has_paid_qty_override_history ? '1' : '0')
+                'completion_fila project_id='.$project_id
+                    .' project_item_id='.$project_item_id
+                    .' item='.($value->getItem()->getName() ?? '')
+                    .' paid_qty='.$paid_qty
+                    .' total_paid_amount='.$total_paid_amount
+                    .' invoiced_qty='.$invoiced_qty
+                    .' diff_qty='.$diff_qty
+                    .' has_paid_qty_override_history='.($has_paid_qty_override_history ? '1' : '0')
             );
 
             $items[] = [
@@ -2535,7 +2535,7 @@ class ProjectService extends Base
             ];
         }
 
-        $this->logCompletionPaidTrace('ListarItemsCompletion END project_id=' . $project_id . ' items_count=' . count($items));
+        $this->logCompletionPaidTrace('ListarItemsCompletion END project_id='.$project_id.' items_count='.count($items));
 
         return $items;
     }
@@ -2594,7 +2594,7 @@ class ProjectService extends Base
             $new_value = null !== $new_value_raw && '' !== $new_value_raw ? number_format((float) $new_value_raw, 2, '.', ',') : $new_value_raw;
             $invoice_number = '';
             if ($value->getInvoiceItem() && $value->getInvoiceItem()->getInvoice()) {
-                $invoice_number = ' (Invoice #' . $value->getInvoiceItem()->getInvoice()->getNumber() . ')';
+                $invoice_number = ' (Invoice #'.$value->getInvoiceItem()->getInvoice()->getNumber().')';
             }
             $mensaje = "{$fecha} Updated unpaid qty from \"{$old_value}\" to \"{$new_value}\" by \"{$user_name}\"{$invoice_number}";
 
@@ -2657,7 +2657,7 @@ class ProjectService extends Base
             $item_id = $project_item->getItem()->getItemId();
             $item_name = $project_item->getItem()->getName();
             $unit = null != $project_item->getItem()->getUnit() ? $project_item->getItem()->getUnit()->getDescription() : '';
-            $items_map[$item_id] = $item_name . ($unit ? ' - ' . $unit : '');
+            $items_map[$item_id] = $item_name.($unit ? ' - '.$unit : '');
         }
 
         foreach ($project_ajustes as $key => $project_ajuste) {
@@ -3148,8 +3148,8 @@ class ProjectService extends Base
         foreach ($attachments as $attachment) {
             // eliminar archivo
             $file_eliminar = $attachment->getFile();
-            if ('' != $file_eliminar && is_file($dir . $file_eliminar)) {
-                unlink($dir . $file_eliminar);
+            if ('' != $file_eliminar && is_file($dir.$file_eliminar)) {
+                unlink($dir.$file_eliminar);
             }
 
             $em->remove($attachment);
@@ -3475,7 +3475,7 @@ class ProjectService extends Base
 
             if ($number != $entity->getProjectNumber()) {
                 $notas[] = [
-                    'notes' => 'Change project number, old value: ' . $entity->getProjectNumber(),
+                    'notes' => 'Change project number, old value: '.$entity->getProjectNumber(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3484,7 +3484,7 @@ class ProjectService extends Base
 
             if ($name != $entity->getName()) {
                 $notas[] = [
-                    'notes' => 'Change name, old value: ' . $entity->getName(),
+                    'notes' => 'Change name, old value: '.$entity->getName(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3492,7 +3492,7 @@ class ProjectService extends Base
 
             if ($description != $entity->getDescription()) {
                 $notas[] = [
-                    'notes' => 'Change description, old value: ' . $entity->getDescription(),
+                    'notes' => 'Change description, old value: '.$entity->getDescription(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3500,7 +3500,7 @@ class ProjectService extends Base
 
             if ($location != $entity->getLocation()) {
                 $notas[] = [
-                    'notes' => 'Change location, old value: ' . $entity->getLocation(),
+                    'notes' => 'Change location, old value: '.$entity->getLocation(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3511,7 +3511,7 @@ class ProjectService extends Base
 
             if ($manager != $entity->getManager()) {
                 $notas[] = [
-                    'notes' => 'Change manager, old value: ' . $entity->getManager(),
+                    'notes' => 'Change manager, old value: '.$entity->getManager(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3532,7 +3532,7 @@ class ProjectService extends Base
                 }
 
                 $notas[] = [
-                    'notes' => 'Change status, old value: ' . $old_status,
+                    'notes' => 'Change status, old value: '.$old_status,
                     'date' => new \DateTime(),
                 ];
             }
@@ -3540,7 +3540,7 @@ class ProjectService extends Base
 
             if ($contract_amount != $entity->getContractAmount()) {
                 $notas[] = [
-                    'notes' => 'Change contract amount, old value: ' . $entity->getContractAmount(),
+                    'notes' => 'Change contract amount, old value: '.$entity->getContractAmount(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3548,7 +3548,7 @@ class ProjectService extends Base
 
             if ($proposal_number != $entity->getProposalNumber()) {
                 $notas[] = [
-                    'notes' => 'Change proposal id #, old value: ' . $entity->getProposalNumber(),
+                    'notes' => 'Change proposal id #, old value: '.$entity->getProposalNumber(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3556,7 +3556,7 @@ class ProjectService extends Base
 
             if ($project_id_number != $entity->getProjectIdNumber()) {
                 $notas[] = [
-                    'notes' => 'Change project id #, old value: ' . $entity->getProjectIdNumber(),
+                    'notes' => 'Change project id #, old value: '.$entity->getProjectIdNumber(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3565,7 +3565,7 @@ class ProjectService extends Base
             if ('' != $company_id) {
                 if ($entity->getCompany() && $company_id != $entity->getCompany()->getCompanyId()) {
                     $notas[] = [
-                        'notes' => 'Change company, old value: ' . $entity->getCompany()->getName(),
+                        'notes' => 'Change company, old value: '.$entity->getCompany()->getName(),
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3578,7 +3578,7 @@ class ProjectService extends Base
             if ('' != $inspector_id) {
                 if ($entity->getInspector() && $inspector_id != $entity->getInspector()->getInspectorId()) {
                     $notas[] = [
-                        'notes' => 'Change inspector, old value: ' . $entity->getInspector()->getName(),
+                        'notes' => 'Change inspector, old value: '.$entity->getInspector()->getName(),
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3590,7 +3590,7 @@ class ProjectService extends Base
 
             if ($owner != $entity->getOwner()) {
                 $notas[] = [
-                    'notes' => 'Change owner, old value: ' . $entity->getOwner(),
+                    'notes' => 'Change owner, old value: '.$entity->getOwner(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3598,7 +3598,7 @@ class ProjectService extends Base
 
             if ($subcontract != $entity->getSubcontract()) {
                 $notas[] = [
-                    'notes' => 'Change Subcontract NO, old value: ' . $entity->getSubcontract(),
+                    'notes' => 'Change Subcontract NO, old value: '.$entity->getSubcontract(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3606,7 +3606,7 @@ class ProjectService extends Base
 
             if ($federal_funding != $entity->getFederalFunding()) {
                 $notas[] = [
-                    'notes' => 'Change federal funding, old value: ' . ($entity->getFederalFunding() ? 'Yes' : 'No'),
+                    'notes' => 'Change federal funding, old value: '.($entity->getFederalFunding() ? 'Yes' : 'No'),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3614,7 +3614,7 @@ class ProjectService extends Base
 
             if ($resurfacing != $entity->getResurfacing()) {
                 $notas[] = [
-                    'notes' => 'Change resurfacing, old value: ' . ($entity->getResurfacing() ? 'Yes' : 'No'),
+                    'notes' => 'Change resurfacing, old value: '.($entity->getResurfacing() ? 'Yes' : 'No'),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3622,7 +3622,7 @@ class ProjectService extends Base
 
             if ($invoice_contact != $entity->getInvoiceContact()) {
                 $notas[] = [
-                    'notes' => 'Change invoice contact, old value: ' . $entity->getInvoiceContact(),
+                    'notes' => 'Change invoice contact, old value: '.$entity->getInvoiceContact(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3630,7 +3630,7 @@ class ProjectService extends Base
 
             if ($certified_payrolls != $entity->getCertifiedPayrolls()) {
                 $notas[] = [
-                    'notes' => 'Change certified payrolls, old value: ' . ($entity->getCertifiedPayrolls() ? 'Yes' : 'No'),
+                    'notes' => 'Change certified payrolls, old value: '.($entity->getCertifiedPayrolls() ? 'Yes' : 'No'),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3641,7 +3641,7 @@ class ProjectService extends Base
             if ('' != $start_date) {
                 if ($start_date != $start_date_old) {
                     $notas[] = [
-                        'notes' => 'Change start date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $start_date_old),
+                        'notes' => 'Change start date, old value: '.preg_replace('/\/00(\d{2})$/', '/20$1', $start_date_old),
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3655,7 +3655,7 @@ class ProjectService extends Base
             if ('' != $end_date) {
                 if ($end_date != $end_date_old) {
                     $notas[] = [
-                        'notes' => 'Change end date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $end_date_old),
+                        'notes' => 'Change end date, old value: '.preg_replace('/\/00(\d{2})$/', '/20$1', $end_date_old),
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3670,7 +3670,7 @@ class ProjectService extends Base
             if ('' != $due_date) {
                 if ($due_date != $due_date_old) {
                     $notas[] = [
-                        'notes' => 'Change due date, old value: ' . preg_replace('/\/00(\d{2})$/', '/20$1', $due_date_old),
+                        'notes' => 'Change due date, old value: '.preg_replace('/\/00(\d{2})$/', '/20$1', $due_date_old),
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3685,7 +3685,7 @@ class ProjectService extends Base
             if ('' === $concrete_start_date || null === $concrete_start_date) {
                 if ('' !== $concrete_start_date_old) {
                     $notas[] = [
-                        'notes' => 'Change concrete start date, old value: ' . $concrete_start_date_old,
+                        'notes' => 'Change concrete start date, old value: '.$concrete_start_date_old,
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3693,7 +3693,7 @@ class ProjectService extends Base
             } else {
                 if ($concrete_start_date != $concrete_start_date_old) {
                     $notas[] = [
-                        'notes' => 'Change concrete start date, old value: ' . $concrete_start_date_old,
+                        'notes' => 'Change concrete start date, old value: '.$concrete_start_date_old,
                         'date' => new \DateTime(),
                     ];
                 }
@@ -3722,14 +3722,14 @@ class ProjectService extends Base
 
             if ($vendor_id != $vendor_id_old) {
                 $notas[] = [
-                    'notes' => 'Change concrete vendor, old value: ' . $vendor_descripcion_old,
+                    'notes' => 'Change concrete vendor, old value: '.$vendor_descripcion_old,
                     'date' => new \DateTime(),
                 ];
             }
 
             if ($concrete_quote_price != $entity->getConcreteQuotePrice()) {
                 $notas[] = [
-                    'notes' => 'Change concrete quote price, old value: ' . $entity->getConcreteQuotePrice(),
+                    'notes' => 'Change concrete quote price, old value: '.$entity->getConcreteQuotePrice(),
                     'date' => new \DateTime(),
                 ];
 
@@ -3741,7 +3741,7 @@ class ProjectService extends Base
             $valEscalator = ('' !== $concrete_quote_price_escalator && null !== $concrete_quote_price_escalator) ? (float) $concrete_quote_price_escalator : null;
             if ($valEscalator != $entity->getConcreteQuotePriceEscalator()) {
                 $notas[] = [
-                    'notes' => 'Change concrete quote price escalator, old value: ' . $entity->getConcreteQuotePriceEscalator(),
+                    'notes' => 'Change concrete quote price escalator, old value: '.$entity->getConcreteQuotePriceEscalator(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3750,7 +3750,7 @@ class ProjectService extends Base
             $valTpEveryN = ('' !== $concrete_time_period_every_n && null !== $concrete_time_period_every_n) ? (int) $concrete_time_period_every_n : null;
             if ($valTpEveryN != $entity->getConcreteTimePeriodEveryN()) {
                 $notas[] = [
-                    'notes' => 'Change concrete time periodo every n, old value: ' . $entity->getConcreteTimePeriodEveryN(),
+                    'notes' => 'Change concrete time periodo every n, old value: '.$entity->getConcreteTimePeriodEveryN(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3758,7 +3758,7 @@ class ProjectService extends Base
 
             if ($concrete_time_period_unit != $entity->getConcreteTimePeriodUnit()) {
                 $notas[] = [
-                    'notes' => 'Change concrete time periodo unit, old value: ' . $entity->getConcreteTimePeriodUnit(),
+                    'notes' => 'Change concrete time periodo unit, old value: '.$entity->getConcreteTimePeriodUnit(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3766,7 +3766,7 @@ class ProjectService extends Base
 
             if ($retainage != $entity->getRetainage()) {
                 $notas[] = [
-                    'notes' => 'Change retainage, old value: ' . ($entity->getRetainage() ? 'Yes' : 'No'),
+                    'notes' => 'Change retainage, old value: '.($entity->getRetainage() ? 'Yes' : 'No'),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3775,7 +3775,7 @@ class ProjectService extends Base
             $valRetPct = ('' !== $retainage_percentage && null !== $retainage_percentage) ? (float) $retainage_percentage : null;
             if ($valRetPct != $entity->getRetainagePercentage()) {
                 $notas[] = [
-                    'notes' => 'Change retainage percentage, old value: ' . $entity->getRetainagePercentage(),
+                    'notes' => 'Change retainage percentage, old value: '.$entity->getRetainagePercentage(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3784,7 +3784,7 @@ class ProjectService extends Base
             $valRetAdjPct = ('' !== $retainage_adjustment_percentage && null !== $retainage_adjustment_percentage) ? (float) $retainage_adjustment_percentage : null;
             if ($valRetAdjPct != $entity->getRetainageAdjustmentPercentage()) {
                 $notas[] = [
-                    'notes' => 'Change retainage adjustment percentage, old value: ' . $entity->getRetainageAdjustmentPercentage(),
+                    'notes' => 'Change retainage adjustment percentage, old value: '.$entity->getRetainageAdjustmentPercentage(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3793,7 +3793,7 @@ class ProjectService extends Base
             $valRetAdjComp = ('' !== $retainage_adjustment_completion && null !== $retainage_adjustment_completion) ? (float) $retainage_adjustment_completion : null;
             if ($valRetAdjComp != $entity->getRetainageAdjustmentCompletion()) {
                 $notas[] = [
-                    'notes' => 'Change retainage adjustment completion, old value: ' . $entity->getRetainageAdjustmentCompletion(),
+                    'notes' => 'Change retainage adjustment completion, old value: '.$entity->getRetainageAdjustmentCompletion(),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3801,7 +3801,7 @@ class ProjectService extends Base
 
             if ($prevailing_wage != $entity->getPrevailingWage()) {
                 $notas[] = [
-                    'notes' => 'Change prevailing wage, old value: ' . ($entity->getPrevailingWage() ? 'Yes' : 'No'),
+                    'notes' => 'Change prevailing wage, old value: '.($entity->getPrevailingWage() ? 'Yes' : 'No'),
                     'date' => new \DateTime(),
                 ];
             }
@@ -3813,7 +3813,7 @@ class ProjectService extends Base
             $county_changes = $this->SalvarCounties($entity, $county_ids, true);
             if ($county_changes['changed']) {
                 $notas[] = [
-                    'notes' => 'Change counties, old values: ' . $county_changes['old_descriptions'],
+                    'notes' => 'Change counties, old values: '.$county_changes['old_descriptions'],
                     'date' => new \DateTime(),
                 ];
             }
@@ -3822,7 +3822,7 @@ class ProjectService extends Base
             $prevailing_role_changes = $this->SalvarPrevailingRoles($entity, $prevailing_roles, true);
             if ($prevailing_role_changes['changed']) {
                 $notas[] = [
-                    'notes' => 'Change prevailing labor types, old values: ' . $prevailing_role_changes['old_descriptions'],
+                    'notes' => 'Change prevailing labor types, old values: '.$prevailing_role_changes['old_descriptions'],
                     'date' => new \DateTime(),
                 ];
             }
@@ -4107,7 +4107,7 @@ class ProjectService extends Base
                 $county = $projectPrevailingRole->getCounty();
                 $countyDesc = null !== $county ? $county->getDescription() : '';
                 if (null !== $role) {
-                    $role_descriptions_old[] = $countyDesc . ' - ' . $role->getDescription() . ' ($' . ($projectPrevailingRole->getRate() ?? '') . ')';
+                    $role_descriptions_old[] = $countyDesc.' - '.$role->getDescription().' ($'.($projectPrevailingRole->getRate() ?? '').')';
                 }
             }
             $result['old_descriptions'] = implode(', ', $role_descriptions_old);
@@ -4556,16 +4556,16 @@ class ProjectService extends Base
         }
         $permiso = $this->BuscarPermiso($usuario->getUsuarioId(), FunctionId::PROJECT);
 
-        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
+        $acciones = '<a href="javascript:;" class="view m-portlet__nav-link btn m-btn m-btn--hover-info m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
 
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="' . $id . '"> <i class="la la-edit"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="'.$id.'"> <i class="la la-edit"></i> </a> ';
             } else {
-                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="' . $id . '"> <i class="la la-eye"></i> </a> ';
+                $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
             }
             if ($permiso[0]['eliminar']) {
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="' . $id . '"><i class="la la-trash"></i></a>';
+                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="'.$id.'"><i class="la la-trash"></i></a>';
             }
         }
 
