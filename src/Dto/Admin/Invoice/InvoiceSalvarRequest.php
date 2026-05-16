@@ -28,6 +28,9 @@ final class InvoiceSalvarRequest implements AdminHttpRequestDtoInterface
 
     public ?string $items = null;
 
+    /** JSON array de adjuntos (mismo formato que en Payments). */
+    public ?string $archivos = null;
+
     public ?string $exportar = null;
 
     public static function fromHttpRequest(Request $request): static
@@ -44,6 +47,7 @@ final class InvoiceSalvarRequest implements AdminHttpRequestDtoInterface
         $p = $request->get('paid');
         $d->paid = \is_string($p) || is_numeric($p) ? (string) $p : null;
         $d->items = \is_string($x = $request->get('items')) ? $x : null;
+        $d->archivos = \is_string($x = $request->get('archivos')) ? $x : null;
         $ex = $request->get('exportar');
         $d->exportar = \is_string($ex) || is_numeric($ex) ? (string) $ex : null;
 

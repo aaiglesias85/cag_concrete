@@ -13,6 +13,8 @@ use App\Dto\Admin\Invoice\InvoiceListarRequest;
 use App\Dto\Admin\Invoice\InvoiceProyectoIdRequest;
 use App\Dto\Admin\Invoice\InvoiceSalvarRequest;
 use App\Dto\Admin\Invoice\InvoiceValidarRequest;
+use App\Dto\Admin\Payment\PaymentArchivoRequest;
+use App\Dto\Admin\Payment\PaymentArchivosRequest;
 use App\Entity\Company;
 use App\Entity\Item;
 use App\Security\AdminPermission;
@@ -20,6 +22,7 @@ use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
 use App\Service\Admin\InvoiceService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 class InvoiceController extends AbstractAdminController
 {
@@ -52,6 +55,7 @@ class InvoiceController extends AbstractAdminController
             'permiso_payment' => $permiso_payment,
             'companies' => $companies,
             'companies_filtro' => $companies_filtro,
+            'direccion_url' => $this->invoiceService->ObtenerURL(),
         ]);
     }
 
@@ -95,9 +99,10 @@ class InvoiceController extends AbstractAdminController
         $paid = $d->paid;
         $items = \is_string($d->items) ? json_decode($d->items) : null;
         $exportar = $d->exportar;
+        $archivos = \is_string($d->archivos) ? json_decode($d->archivos) : null;
 
         try {
-            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar, $archivos);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -135,9 +140,10 @@ class InvoiceController extends AbstractAdminController
         $paid = $d->paid;
         $items = \is_string($d->items) ? json_decode($d->items) : null;
         $exportar = $d->exportar;
+        $archivos = \is_string($d->archivos) ? json_decode($d->archivos) : null;
 
         try {
-            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar);
+            $resultado = $this->invoiceService->ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar, $archivos);
 
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
@@ -395,6 +401,76 @@ class InvoiceController extends AbstractAdminController
             $resultado = $this->invoiceService->ObtenerSiguientePeriodoInvoice($project_id);
 
             return $this->json($resultado);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Edit, jsonOnDenied: true)]
+    public function salvarArchivo(Request $request): JsonResponse
+    {
+        $resultadoJson = [];
+
+        try {
+            $file = $request->files->get('file');
+            $resultadoJson = $this->invoiceService->SubirArchivoAdjuntoInvoice($file);
+
+            return $this->json($resultadoJson);
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+
+            return $this->json($resultadoJson);
+        }
+    }
+
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarArchivo(PaymentArchivoRequest $d): JsonResponse
+    {
+        $archivo = (string) $d->archivo;
+
+        try {
+            $resultado = $this->invoiceService->EliminarArchivoInvoice($archivo);
+            if ($resultado['success']) {
+                return $this->json([
+                    'success' => $resultado['success'],
+                    'message' => 'The operation was successful',
+                ]);
+            }
+
+            return $this->json([
+                'success' => $resultado['success'],
+                'error' => $resultado['error'] ?? 'Error',
+            ]);
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    #[RequireAdminPermission(FunctionId::INVOICE, AdminPermission::Delete, jsonOnDenied: true)]
+    public function eliminarArchivos(PaymentArchivosRequest $d): JsonResponse
+    {
+        $archivos = (string) $d->archivos;
+
+        try {
+            $resultado = $this->invoiceService->EliminarArchivosInvoice($archivos);
+            if ($resultado['success']) {
+                return $this->json([
+                    'success' => $resultado['success'],
+                    'message' => 'The operation was successful',
+                ]);
+            }
+
+            return $this->json([
+                'success' => $resultado['success'],
+                'error' => $resultado['error'] ?? 'Error',
+            ]);
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,

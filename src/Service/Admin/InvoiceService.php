@@ -6,6 +6,7 @@ use App\Dto\Admin\Invoice\InvoiceIdRequest;
 use App\Dto\Admin\Invoice\InvoiceIdsRequest;
 use App\Dto\Admin\Invoice\InvoiceListarRequest;
 use App\Entity\Invoice;
+use App\Entity\InvoiceAttachment;
 use App\Entity\InvoiceItem;
 use App\Entity\InvoiceItemOverridePayment;
 use App\Entity\InvoiceOverridePayment;
@@ -33,6 +34,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
@@ -1589,6 +1591,8 @@ class InvoiceService extends Base
             $payments = $this->ListarPaymentsDeInvoice($invoice_id);
             $arreglo_resultado['payments'] = $payments;
 
+            $arreglo_resultado['archivos'] = $this->listArchivosPayload((int) $invoice_id);
+
             $resultado['success'] = true;
             $resultado['invoice'] = $arreglo_resultado;
         }
@@ -2263,7 +2267,7 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar)
+    public function ActualizarInvoice($invoice_id, $number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar, $archivos = null)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -2357,6 +2361,9 @@ class InvoiceService extends Base
 
             $em->flush();
 
+            $this->syncInvoiceArchivos($entity, $archivos);
+            $em->flush();
+
             // Salvar log
             $log_operacion = 'Update';
             $log_categoria = 'Invoice';
@@ -2385,7 +2392,7 @@ class InvoiceService extends Base
      *
      * @author Marcel
      */
-    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar)
+    public function SalvarInvoice($number, $project_id, $start_date, $end_date, $invoice_date, $notes, $paid, $items, $exportar, $archivos = null)
     {
         $em = $this->getDoctrine()->getManager();
 
@@ -2491,6 +2498,9 @@ class InvoiceService extends Base
         // salvar en la cola
         $this->SalvarInvoiceQuickbook($entity);
 
+        $em->flush();
+
+        $this->syncInvoiceArchivos($entity, $archivos);
         $em->flush();
 
         // Salvar log
@@ -3213,5 +3223,163 @@ class InvoiceService extends Base
             'start_date' => $startDate,
             'end_date' => $endDate,
         ];
+    }
+
+    /**
+     * @return list<array{id: int, name: string|null, file: string|null, posicion: int}>
+     */
+    private function listArchivosPayload(int $invoice_id): array
+    {
+        $archivos = [];
+
+        /** @var \App\Repository\InvoiceAttachmentRepository $invoiceAttachmentRepo */
+        $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
+        $lista = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
+        foreach ($lista as $key => $attachment) {
+            $archivos[] = [
+                'id' => $attachment->getId(),
+                'name' => $attachment->getName(),
+                'file' => $attachment->getFile(),
+                'posicion' => $key,
+            ];
+        }
+
+        return $archivos;
+    }
+
+    /**
+     * @param array<int, object>|null $archivos
+     */
+    private function syncInvoiceArchivos(Invoice $entity, $archivos): void
+    {
+        if (!\is_array($archivos) || [] === $archivos) {
+            return;
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        foreach ($archivos as $value) {
+            $archivo_entity = null;
+
+            if (is_numeric($value->id ?? null)) {
+                $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+                   ->find($value->id);
+            }
+
+            $is_new_archivo = false;
+            if (null == $archivo_entity) {
+                $archivo_entity = new InvoiceAttachment();
+                $is_new_archivo = true;
+            }
+
+            $archivo_entity->setName($value->name ?? null);
+            $archivo_entity->setFile($value->file ?? null);
+
+            if ($is_new_archivo) {
+                $archivo_entity->setInvoice($entity);
+
+                $em->persist($archivo_entity);
+            }
+        }
+    }
+
+    /**
+     * Subida de adjunto de factura (mismo directorio y extensiones que Payments).
+     *
+     * @return array{success: bool, message?: string, name?: string, size?: int, error?: string}
+     */
+    public function SubirArchivoAdjuntoInvoice(?UploadedFile $file): array
+    {
+        $resultadoJson = [];
+
+        try {
+            if (null === $file) {
+                $resultadoJson['success'] = false;
+                $resultadoJson['error'] = 'Invalid file';
+
+                return $resultadoJson;
+            }
+
+            $dir = 'uploads/invoice/';
+            $file_name = $this->upload($file, $dir, ['png', 'jpg', 'pdf', 'doc', 'docx', 'xls', 'xlsx']);
+
+            if ('' != $file_name) {
+                $resultadoJson['success'] = true;
+                $resultadoJson['message'] = 'The operation was successful';
+
+                $resultadoJson['name'] = $file_name;
+                $resultadoJson['size'] = filesize($dir.$file_name);
+            } else {
+                $resultadoJson['success'] = false;
+                $resultadoJson['error'] = 'Invalid file';
+            }
+
+            return $resultadoJson;
+        } catch (\Exception $e) {
+            $resultadoJson['success'] = false;
+            $resultadoJson['error'] = 'Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.';
+
+            return $resultadoJson;
+        }
+    }
+
+    /**
+     * @return array{success: bool}
+     */
+    public function EliminarArchivoInvoice(string $archivo): array
+    {
+        $resultado = [];
+
+        $dir = 'uploads/invoice/';
+        if (is_file($dir.$archivo)) {
+            unlink($dir.$archivo);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+
+        $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+           ->findOneBy(['file' => $archivo]);
+        if (null != $archivo_entity) {
+            $em->remove($archivo_entity);
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+
+        return $resultado;
+    }
+
+    /**
+     * @return array{success: bool}
+     */
+    public function EliminarArchivosInvoice(string $archivos_csv): array
+    {
+        $resultado = [];
+
+        $archivos = explode(',', (string) $archivos_csv);
+        $em = $this->getDoctrine()->getManager();
+        foreach ($archivos as $archivo) {
+            $archivo = trim((string) $archivo);
+            if ('' === $archivo) {
+                continue;
+            }
+            $dir = 'uploads/invoice/';
+            if (is_file($dir.$archivo)) {
+                unlink($dir.$archivo);
+            }
+
+            $archivo_entity = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+               ->findOneBy(['file' => $archivo]);
+            if (null != $archivo_entity) {
+                $em->remove($archivo_entity);
+            }
+        }
+
+        $em->flush();
+
+        $resultado['success'] = true;
+
+        return $resultado;
     }
 }

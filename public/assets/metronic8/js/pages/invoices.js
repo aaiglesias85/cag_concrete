@@ -59,6 +59,8 @@ var Invoices = (function () {
 
    var rowDelete = null;
 
+   var invoiceArchivos = [];
+
    // Tabla de invoices: se inicializa al cargar pero no se muestra hasta que el usuario aplique un filtro o búsqueda
    var oTable;
 
@@ -658,6 +660,9 @@ var Invoices = (function () {
       $('#invoice_current_retainage_display').val('$0.00');
       $('#invoice_retainage_calculated_display').val('$0.00');
 
+      invoiceArchivos = [];
+      actualizarTableListaArchivosInvoice();
+
       //Mostrar el primer tab
       resetWizard();
 
@@ -698,7 +703,7 @@ var Invoices = (function () {
 
    //Wizard
    var activeTab = 1;
-   var totalTabs = 2;
+   var totalTabs = 3;
    var initWizard = function () {
       $(document).off('click', '#form-invoice .wizard-tab');
       $(document).on('click', '#form-invoice .wizard-tab', async function (e) {
@@ -735,10 +740,12 @@ var Invoices = (function () {
          // marcar los pasos validos
          await marcarPasosValidosWizard();
 
-         //bug visual de la tabla que muestra las cols corridas
          switch (activeTab) {
             case 2:
                actualizarTableListaItems();
+               break;
+            case 3:
+               actualizarTableListaArchivosInvoice();
                break;
          }
       });
@@ -781,12 +788,16 @@ var Invoices = (function () {
                $('#tab-items').tab('show');
                actualizarTableListaItems();
                break;
+            case 3:
+               $('#tab-invoice-archivos').tab('show');
+               actualizarTableListaArchivosInvoice();
+               break;
          }
       }, 0);
    };
    var resetWizard = function () {
       activeTab = 1;
-      totalTabs = 2;
+      totalTabs = 3;
       mostrarTab();
       $('.btn-wizard-finalizar').removeClass('hide').addClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
@@ -830,6 +841,12 @@ var Invoices = (function () {
             }
          }
       }
+      if (result && activeTab == 2) {
+         if (items_lista.length == 0) {
+            result = false;
+            toastr.error('The list of items is empty, please add at least one item.', '');
+         }
+      }
 
       return result;
    };
@@ -842,16 +859,298 @@ var Invoices = (function () {
          KTUtil.removeClass(element, 'valid');
       });
 
-      var isCurrentStepValid = await validWizard({ skipRemote: true });
-
       navLinks.forEach(function (element, index) {
          var tab = index + 1;
          if (tab < activeTab) {
-            if (isCurrentStepValid) {
-               KTUtil.addClass(element, 'valid');
+            KTUtil.addClass(element, 'valid');
+         }
+      });
+   };
+
+   var oTableInvoiceArchivos;
+   var nEditingRowInvoiceArchivo = null;
+
+   var initTableListaArchivosInvoice = function () {
+      const table = '#archivo-table-editable-invoice';
+      const columns = [];
+      if (permiso.eliminar) columns.push({ data: 'id' });
+      columns.push({ data: 'name' }, { data: 'file' }, { data: null });
+      let columnDefs = [
+         {
+            targets: 0,
+            orderable: false,
+            render: DatatableUtil.getRenderColumnCheck,
+         },
+      ];
+      if (!permiso.eliminar) columnDefs = [];
+      columnDefs.push({
+         targets: -1,
+         data: null,
+         orderable: false,
+         className: 'text-center',
+         render: function (data, type, row) {
+            return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
+         },
+      });
+      const language = DatatableUtil.getDataTableLenguaje();
+      const order = permiso.eliminar ? [[1, 'asc']] : [[0, 'asc']];
+      oTableInvoiceArchivos = DatatableUtil.initSafeDataTable(table, {
+         data: invoiceArchivos,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, 'All'],
+         ],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+      handleSearchDatatableArchivosInvoice();
+   };
+
+   var handleSearchDatatableArchivosInvoice = function () {
+      $(document).off('keyup', '#lista-invoice-archivos [data-table-filter="search"]');
+      $(document).on('keyup', '#lista-invoice-archivos [data-table-filter="search"]', function (e) {
+         if (oTableInvoiceArchivos) oTableInvoiceArchivos.search(e.target.value).draw();
+      });
+   };
+
+   var actualizarTableListaArchivosInvoice = function () {
+      if (oTableInvoiceArchivos) oTableInvoiceArchivos.destroy();
+      initTableListaArchivosInvoice();
+   };
+
+   var validateFormArchivoInvoice = function () {
+      var result = false;
+      var form = KTUtil.get('archivo-form-invoice');
+      var constraints = {
+         name: { presence: { message: 'This field is required' } },
+      };
+      var errors = validate(form, constraints);
+      if (!errors) {
+         result = true;
+      } else {
+         MyApp.showErrorsValidateForm(form, errors);
+      }
+      MyUtil.attachChangeValidacion(form, constraints);
+      return result;
+   };
+
+   var resetFormArchivoInvoice = function () {
+      MyUtil.resetForm('archivo-form-invoice');
+      $('#fileinput-invoice').val('');
+      $('#fileinput-archivo-invoice .fileinput-filename').html('');
+      $('#fileinput-archivo-invoice').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      nEditingRowInvoiceArchivo = null;
+   };
+
+   var initAccionesArchivoInvoice = function () {
+      $(document).off('click', '#btn-agregar-archivo-invoice');
+      $(document).on('click', '#btn-agregar-archivo-invoice', function (e) {
+         resetFormArchivoInvoice();
+         ModalUtil.show('modal-archivo-invoice', { backdrop: 'static', keyboard: true });
+      });
+      $(document).off('click', '#btn-salvar-archivo-invoice');
+      $(document).on('click', '#btn-salvar-archivo-invoice', function (e) {
+         e.preventDefault();
+         if (validateFormArchivoInvoice() && $('#fileinput-archivo-invoice').hasClass('fileinput-exists')) {
+            var nombre = $('#archivo-name-invoice').val();
+            if (existeNombreArchivoInvoice(nombre)) {
+               toastr.error('The attachment has already been added', 'Error');
+               return;
+            }
+            var fileinput_el = document.getElementById('fileinput-invoice');
+            var file = fileinput_el && fileinput_el.files ? fileinput_el.files[0] : null;
+            if (file) {
+               var formData = new FormData();
+               formData.set('file', file);
+               BlockUtil.block('#modal-archivo-invoice .modal-content');
+               axios
+                  .post('invoice/salvarArchivo', formData, { responseType: 'json' })
+                  .then(function (res) {
+                     if (res.status == 200) {
+                        var response = res.data;
+                        if (response.success) {
+                           toastr.success(response.message, 'Done');
+                           salvarArchivoInvoiceUi(nombre, response.name);
+                        } else {
+                           toastr.error(response.error, 'Error');
+                        }
+                     } else {
+                        toastr.error('Upload failed', 'Error');
+                     }
+                  })
+                  .catch(function (err) {
+                     console.log(err);
+                     toastr.error('Upload failed. The file might be too large or unsupported. Please try a smaller file or a different format.', 'Error !!!');
+                  })
+                  .then(function () {
+                     BlockUtil.unblock('#modal-archivo-invoice .modal-content');
+                  });
+            } else {
+               if (nEditingRowInvoiceArchivo != null) {
+                  invoiceArchivos[nEditingRowInvoiceArchivo].name = nombre;
+                  actualizarTableListaArchivosInvoice();
+                  resetFormArchivoInvoice();
+                  ModalUtil.hide('modal-archivo-invoice');
+               }
+            }
+         } else {
+            if (!$('#fileinput-archivo-invoice').hasClass('fileinput-exists')) {
+               toastr.error('Select the file', '');
             }
          }
       });
+      function existeNombreArchivoInvoice(name) {
+         const pos = nEditingRowInvoiceArchivo;
+         if (pos == null) return invoiceArchivos.some((item) => item.name === name);
+         const excludeId = invoiceArchivos[pos] ? invoiceArchivos[pos].id : null;
+         return invoiceArchivos.some((item) => item.name === name && item.id !== excludeId);
+      }
+      function salvarArchivoInvoiceUi(nombre, archivo) {
+         if (nEditingRowInvoiceArchivo == null) {
+            invoiceArchivos.push({
+               id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
+               name: nombre,
+               file: archivo,
+               posicion: invoiceArchivos.length,
+            });
+         } else {
+            invoiceArchivos[nEditingRowInvoiceArchivo].name = nombre;
+            invoiceArchivos[nEditingRowInvoiceArchivo].file = archivo;
+         }
+         ModalUtil.hide('modal-archivo-invoice');
+         actualizarTableListaArchivosInvoice();
+         resetFormArchivoInvoice();
+      }
+      $(document).off('click', '#archivo-table-editable-invoice a.edit');
+      $(document).on('click', '#archivo-table-editable-invoice a.edit', function () {
+         var posicion = $(this).data('posicion');
+         if (invoiceArchivos[posicion]) {
+            resetFormArchivoInvoice();
+            nEditingRowInvoiceArchivo = posicion;
+            $('#archivo-name-invoice').val(invoiceArchivos[posicion].name);
+            $('#fileinput-archivo-invoice .fileinput-filename').html(invoiceArchivos[nEditingRowInvoiceArchivo].file);
+            $('#fileinput-archivo-invoice').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
+            ModalUtil.show('modal-archivo-invoice', { backdrop: 'static', keyboard: true });
+         }
+      });
+      $(document).off('click', '#archivo-table-editable-invoice a.delete');
+      $(document).on('click', '#archivo-table-editable-invoice a.delete', function (e) {
+         e.preventDefault();
+         var posicion = $(this).data('posicion');
+         Swal.fire({
+            text: 'Are you sure you want to delete the attachment?',
+            icon: 'warning',
+            showCancelButton: true,
+            buttonsStyling: false,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, cancel',
+            customClass: { confirmButton: 'btn fw-bold btn-success', cancelButton: 'btn fw-bold btn-danger' },
+         }).then(function (result) {
+            if (result.value) eliminarUnArchivoInvoice(posicion);
+         });
+      });
+      function eliminarUnArchivoInvoice(posicion) {
+         if (invoiceArchivos[posicion]) {
+            var formData = new URLSearchParams();
+            formData.set('archivo', invoiceArchivos[posicion].file);
+            BlockUtil.block('#lista-invoice-archivos');
+            axios
+               .post('invoice/eliminarArchivo', formData, { responseType: 'json' })
+               .then(function (res) {
+                  if (res.status === 200 || res.status === 201) {
+                     var response = res.data;
+                     if (response.success) {
+                        toastr.success(response.message, '');
+                        deleteArchivoInvoice(posicion);
+                     } else {
+                        toastr.error(response.error, '');
+                     }
+                  } else {
+                     toastr.error('An internal error has occurred, please try again.', '');
+                  }
+               })
+               .catch(MyUtil.catchErrorAxios)
+               .then(function () {
+                  BlockUtil.unblock('#lista-invoice-archivos');
+               });
+         }
+      }
+      $(document).off('click', '#archivo-table-editable-invoice a.download');
+      $(document).on('click', '#archivo-table-editable-invoice a.download', function () {
+         var posicion = $(this).data('posicion');
+         if (invoiceArchivos[posicion]) {
+            var archivo = invoiceArchivos[posicion].file;
+            var url = direccion_url + '/uploads/invoice/' + archivo;
+            AttachmentPreviewUtil.open(url, archivo);
+         }
+      });
+      $(document).off('click', '#btn-eliminar-archivos-invoice');
+      $(document).on('click', '#btn-eliminar-archivos-invoice', function (e) {
+         var ids = DatatableUtil.getTableSelectedRowKeys('#archivo-table-editable-invoice');
+         var archivos_name = [];
+         for (var i = 0; i < ids.length; i++) {
+            var archivo = invoiceArchivos.find((item) => item.id == ids[i]);
+            if (archivo) {
+               archivos_name.push(archivo.file);
+            }
+         }
+         if (archivos_name.length > 0) {
+            Swal.fire({
+               text: 'Are you sure you want to delete the selected atachments?',
+               icon: 'warning',
+               showCancelButton: true,
+               buttonsStyling: false,
+               confirmButtonText: 'Yes, delete it!',
+               confirmButtonClass: 'btn btn-sm btn-bold btn-success',
+               cancelButtonText: 'No, cancel',
+               cancelButtonClass: 'btn btn-sm btn-bold btn-danger',
+            }).then(function (result) {
+               if (result.value) eliminarVariosArchivosInvoice(ids, archivos_name.join(','));
+            });
+         } else {
+            toastr.error('Select attachments to delete', '');
+         }
+      });
+      function eliminarVariosArchivosInvoice(ids, archivos_name) {
+         var formData = new URLSearchParams();
+         formData.set('archivos', archivos_name);
+         BlockUtil.block('#lista-invoice-archivos');
+         axios
+            .post('invoice/eliminarArchivos', formData, { responseType: 'json' })
+            .then(function (res) {
+               if (res.status === 200 || res.status === 201) {
+                  var response = res.data;
+                  if (response.success) {
+                     toastr.success(response.message, '');
+                     deleteArchivosInvoice(ids);
+                  } else {
+                     toastr.error(response.error, '');
+                  }
+               } else {
+                  toastr.error('An internal error has occurred, please try again.', '');
+               }
+            })
+            .catch(MyUtil.catchErrorAxios)
+            .then(function () {
+               BlockUtil.unblock('#lista-invoice-archivos');
+            });
+      }
+      function deleteArchivoInvoice(posicion) {
+         invoiceArchivos.splice(posicion, 1);
+         for (var i = 0; i < invoiceArchivos.length; i++) invoiceArchivos[i].posicion = i;
+         actualizarTableListaArchivosInvoice();
+      }
+      function deleteArchivosInvoice(ids) {
+         for (var i = 0; i < ids.length; i++) {
+            var posicion = invoiceArchivos.findIndex((item) => item.id == ids[i]);
+            if (posicion >= 0) invoiceArchivos.splice(posicion, 1);
+         }
+         for (var j = 0; j < invoiceArchivos.length; j++) invoiceArchivos[j].posicion = j;
+         actualizarTableListaArchivosInvoice();
+      }
    };
 
    var validarInvoice = function () {
@@ -985,6 +1284,8 @@ var Invoices = (function () {
          actualizarItems();
 
          formData.set('items', JSON.stringify(items));
+
+         formData.set('archivos', JSON.stringify(invoiceArchivos));
 
          formData.set('exportar', exportar ? 1 : 0);
 
@@ -1269,6 +1570,20 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          if (invoice.bon_quantity_available != null && invoice.bon_quantity_available !== '') bon_quantity_available = Number(invoice.bon_quantity_available);
 
          actualizarTableListaItems();
+
+         if (invoice.archivos && Array.isArray(invoice.archivos)) {
+            invoiceArchivos = invoice.archivos.map(function (a, idx) {
+               return {
+                  id: a.id,
+                  name: a.name,
+                  file: a.file,
+                  posicion: idx,
+               };
+            });
+         } else {
+            invoiceArchivos = [];
+         }
+         actualizarTableListaArchivosInvoice();
 
          // REGLA: Si la cantidad es 0 -> OCULTAR
          var bondQty = parseFloat($('#total_bonded_x').val().replace(/[^0-9.-]+/g,"")) || 0;
@@ -3099,6 +3414,9 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
          initTable();
 
          initWizard();
+
+         initAccionesArchivoInvoice();
+         initTableListaArchivosInvoice();
 
          initAccionNuevo();
          initAccionSalvar();

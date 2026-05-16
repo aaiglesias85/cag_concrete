@@ -45,3 +45,15 @@ validarInvoiceAdmin:
 obtenerSiguientePeriodoInvoice:
    path: /invoice/obtenerSiguientePeriodo
    defaults: { _controller: App\Controller\Admin\InvoiceController::obtenerSiguientePeriodoInvoice, _format: json }
+
+salvarArchivoInvoiceAdmin:
+   path: /invoice/salvarArchivo
+   defaults: { _controller: App\Controller\Admin\InvoiceController::salvarArchivo, _format: json }
+
+eliminarArchivoInvoiceAdmin:
+   path: /invoice/eliminarArchivo
+   defaults: { _controller: App\Controller\Admin\InvoiceController::eliminarArchivo, _format: json }
+
+eliminarArchivosInvoiceAdmin:
+   path: /invoice/eliminarArchivos
+   defaults: { _controller: App\Controller\Admin\InvoiceController::eliminarArchivos, _format: json }
