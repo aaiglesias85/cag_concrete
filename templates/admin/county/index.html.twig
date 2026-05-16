@@ -207,84 +207,198 @@
                <h3 class="card-label">New Location:</h3>
             </div>
             <div class="card-toolbar">
-               <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-county me-2" title="Exit" data-bs-toggle="tooltip">
-                  <i class="ki-duotone ki-arrow-left fs-1"><span class="path1"></span><span class="path2"></span></i>
-               </a>
+               <button id="btn-wizard-anterior" class="btn btn-icon btn-warning me-2 hide" type="button" title="Back" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-left"></i>
+               </button>
+
+               <button id="btn-wizard-siguiente" class="btn btn-icon btn-primary me-2 hide" type="button" title="Next" data-bs-toggle="tooltip">
+                  <i class="la la-arrow-right"></i>
+               </button>
 
                {% if permiso.agregar or permiso.editar %}
-               <button type="button" id="btn-salvar-county" class="btn btn-icon btn-success" title="Save" data-bs-toggle="tooltip">
-                  <i class="ki-duotone ki-double-check fs-1"><span class="path1"></span><span class="path2"></span></i>
+               <button type="button" id="btn-wizard-finalizar" class="btn btn-icon btn-success me-2" title="Save" data-bs-toggle="tooltip">
+                  <i class="las la-save"></i>
                </button>
                {% endif %}
+
+               <a href="javascript:;" class="btn btn-icon btn-secondary cerrar-form-county" title="Exit" data-bs-toggle="tooltip">
+                  <i class="la la-close"></i>
+               </a>
             </div>
          </div>
 
          <form class="form" id="county-form" action="javascript:;" enctype="multipart/form-data" method="post">
             <input type="hidden" id="county_id" name="county_id" />
 
-            <div class="card-body">
-               <div class="form-group ic-form-group">
-                  <div class="row">
-                     <div class="col-md-12">
-                        <label class="form-label mb-3">
-                           <span class="ic-step-number">1</span>
-                           Location type
-                        </label>
-                        <div class="d-flex flex-wrap align-items-center gap-5">
-                           <div class="form-check form-check-custom form-check-solid">
-                              <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_district" value="district" checked />
-                              <label class="form-check-label fw-semibold ps-2" for="county_mode_district">County</label>
+            <div class="card-body" id="form-county-body">
+               <ul class="wizzard-tabs nav nav-tabs nav-tabs-space-lg nav-tabs-line nav-bold mb-6 hide nav-item-hide">
+                  <li class="nav-item">
+                     <a class="nav-link active wizard-tab" data-item="1" data-bs-toggle="tab" href="#tab-content-general-county" id="tab-general-county">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">1</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">General</div>
+                              <div class="wizard-desc">Location information</div>
                            </div>
-                           <div class="form-check form-check-custom form-check-solid">
-                              <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_city" value="city" />
-                              <label class="form-check-label fw-semibold ps-2" for="county_mode_city">City</label>
+                        </div>
+                     </a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="2" data-bs-toggle="tab" href="#tab-content-county-projects" id="tab-projects-county">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">2</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Projects</div>
+                              <div class="wizard-desc">Linked projects</div>
+                           </div>
+                        </div>
+                     </a>
+                  </li>
+
+                  <li class="nav-item">
+                     <a class="nav-link wizard-tab" data-item="3" data-bs-toggle="tab" href="#tab-content-county-estimates" id="tab-estimates-county">
+                        <div class="wizard-wrapper">
+                           <span class="wizard-number">
+                              <i class="wizard-check ki-duotone ki-check"></i>
+                              <span class="number">3</span>
+                           </span>
+                           <div class="wizard-label">
+                              <div class="wizard-title">Estimates</div>
+                              <div class="wizard-desc">Linked estimates</div>
+                           </div>
+                        </div>
+                     </a>
+                  </li>
+               </ul>
+
+               <div class="tab-content">
+                  <div class="tab-pane fade show active" id="tab-content-general-county" role="tabpanel">
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-12">
+                              <label class="form-label mb-3">
+                                 <span class="ic-step-number">1</span>
+                                 Location type
+                              </label>
+                              <div class="d-flex flex-wrap align-items-center gap-5">
+                                 <div class="form-check form-check-custom form-check-solid">
+                                    <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_district" value="district" checked />
+                                    <label class="form-check-label fw-semibold ps-2" for="county_mode_district">County</label>
+                                 </div>
+                                 <div class="form-check form-check-custom form-check-solid">
+                                    <input class="form-check-input event-change" type="radio" name="county_form_mode" id="county_mode_city" value="city" />
+                                    <label class="form-check-label fw-semibold ps-2" for="county_mode_city">City</label>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-3" id="select-district">
+                              <label class="form-label required">
+                                 <span class="ic-step-number">2</span>
+                                 District
+                                 <span class="ic-small italic">(required)</span>
+                              </label>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="district" name="district">
+                                 <option value="">Select</option>
+                                 {% for item in districts %}
+                                 <option value="{{ item.districtId }}">{{ item.description }}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="col-md-9" id="col-description">
+                              <label class="form-label required">
+                                 <span id="label-description-text">Name</span>
+                              </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="description" name="description" />
+                           </div>
+                           <div class="col-md-4" id="wrap-city-field" hidden>
+                              <label class="form-label required" id="label-city-wrapper">
+                                 Name
+                              </label>
+                              <input type="text" class="form-control form-control-validate form-control-solid event-change" id="city" name="city" maxlength="255" />
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-4">
+                              <label class="form-label">
+                                 <span class="ic-step-number">3</span>
+                                 Status
+                              </label>
+                              <div>
+                                 <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
+                                    <input type="checkbox" id="estadoactivo" class="form-check-input status-active-toggle" checked />
+                                 </div>
+                              </div>
                            </div>
                         </div>
                      </div>
                   </div>
-               </div>
 
-               <div class="form-group ic-form-group">
-                  <div class="row">
-                     <div class="col-md-3" id="select-district">
-                        <label class="form-label required">
-                           <span class="ic-step-number">2</span>
-                           District
-                           <span class="ic-small italic">(required)</span>
-                        </label>
-                        <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="district" name="district">
-                           <option value="">Select</option>
-                           {% for item in districts %}
-                           <option value="{{ item.districtId }}">{{ item.description }}</option>
-                           {% endfor %}
-                        </select>
-                     </div>
-                     <div class="col-md-9" id="col-description">
-                        <label class="form-label required">
-                           <span id="label-description-text">Name</span>
-                        </label>
-                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="description" name="description" />
-                     </div>
-                     <div class="col-md-4" id="wrap-city-field" hidden>
-                        <label class="form-label required" id="label-city-wrapper">
-                           Name
-                        </label>
-                        <input type="text" class="form-control form-control-validate form-control-solid event-change" id="city" name="city" maxlength="255" />
+                  <div class="tab-pane fade" id="tab-content-county-projects" role="tabpanel">
+                     <div class="row" id="lista-county-projects">
+                        <div class="col-md-12">
+                           <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
+                              <div class="d-flex align-items-center position-relative my-1">
+                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
+                                 <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                              </div>
+                           </div>
+                           <table id="county-projects-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>C & G Project #</th>
+                                    <th>County</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Due Date</th>
+                                    <th>Company</th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
+                        </div>
                      </div>
                   </div>
-               </div>
 
-               <div class="form-group ic-form-group">
-                  <div class="row">
-                     <div class="col-md-4">
-                        <label class="form-label">
-                           <span class="ic-step-number">3</span>
-                           Status
-                        </label>
-                        <div>
-                           <div class="form-check form-switch form-check-custom form-check-success form-check-solid">
-                              <input type="checkbox" id="estadoactivo" class="form-check-input status-active-toggle" checked />
+                  <div class="tab-pane fade" id="tab-content-county-estimates" role="tabpanel">
+                     <div class="row" id="lista-county-estimates">
+                        <div class="col-md-12">
+                           <div class="d-flex flex-column flex-lg-row justify-content-between mb-5">
+                              <div class="d-flex align-items-center position-relative my-1">
+                                 <i class="ki-duotone ki-magnifier text-primary fs-1 position-absolute ms-6"><span class="path1"></span><span class="path2"></span></i>
+                                 <input type="text" data-table-filter="search" class="form-control form-control-solid w-300px ps-15" placeholder="Search..." />
+                              </div>
                            </div>
+                           <table id="county-estimates-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
+                              <thead>
+                                 <tr class="fw-bold fs-6 text-gray-800 px-7">
+                                    <th>Name</th>
+                                    <th>Project ID</th>
+                                    <th>Stage</th>
+                                    <th>Status</th>
+                                    <th>Bid deadline</th>
+                                    <th>Actions</th>
+                                 </tr>
+                              </thead>
+                              <tbody class="text-gray-600 fw-semibold"></tbody>
+                           </table>
                         </div>
                      </div>
                   </div>
@@ -306,6 +420,9 @@
        editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
        eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
    };
+
+   var url_project = "{{ url('project') }}";
+   var url_estimate = "{{ url('estimate') }}";
 
    jQuery(document).ready(function () {
        Counties.init();

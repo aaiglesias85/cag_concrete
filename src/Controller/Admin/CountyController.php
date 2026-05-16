@@ -171,6 +171,8 @@ class CountyController extends AbstractAdminController
             if ($resultado['success']) {
                 $resultadoJson['success'] = $resultado['success'];
                 $resultadoJson['county'] = $resultado['county'];
+                $resultadoJson['projects'] = $resultado['projects'] ?? [];
+                $resultadoJson['estimates'] = $resultado['estimates'] ?? [];
 
                 return $this->json($resultadoJson);
             }

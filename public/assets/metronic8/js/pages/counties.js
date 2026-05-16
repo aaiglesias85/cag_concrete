@@ -95,6 +95,355 @@ var Counties = (function () {
       });
    };
 
+   var activeTab = 1;
+   var totalTabs = 1;
+   var countyProjects = [];
+   var countyEstimates = [];
+   var oTableCountyProjects;
+   var oTableCountyEstimates;
+
+   var validWizard = function () {
+      var result = true;
+      if (activeTab === 1) {
+         var district_id = $("#district").val();
+         if (district_id === "" || district_id == null) {
+            MyApp.showErrorMessageValidateSelect(
+               KTUtil.get("select-district"),
+               "This field is required",
+            );
+            result = false;
+         }
+         if (!validateForm()) {
+            result = false;
+         }
+      }
+      return result;
+   };
+
+   var syncWizardButtons = function () {
+      if (totalTabs <= 1) {
+         $("#btn-wizard-anterior").addClass("hide");
+         $("#btn-wizard-siguiente").addClass("hide");
+         return;
+      }
+      if (activeTab === 1) {
+         $("#btn-wizard-anterior").addClass("hide");
+      } else {
+         $("#btn-wizard-anterior").removeClass("hide");
+      }
+      if (activeTab === totalTabs) {
+         $("#btn-wizard-siguiente").addClass("hide");
+      } else {
+         $("#btn-wizard-siguiente").removeClass("hide");
+      }
+   };
+
+   var initWizard = function () {
+      $(document).off("click", "#county-form .wizard-tab");
+      $(document).on("click", "#county-form .wizard-tab", function (e) {
+         e.preventDefault();
+         var item = parseInt($(this).data("item"), 10);
+         if (item > activeTab && !validWizard()) {
+            mostrarTab();
+            return;
+         }
+         activeTab = item;
+         syncWizardButtons();
+         mostrarTab();
+      });
+
+      $(document).off("click", "#btn-wizard-siguiente");
+      $(document).on("click", "#btn-wizard-siguiente", function (e) {
+         if (!validWizard()) {
+            return;
+         }
+         if (activeTab < totalTabs) {
+            activeTab++;
+            syncWizardButtons();
+            mostrarTab();
+         }
+      });
+
+      $(document).off("click", "#btn-wizard-anterior");
+      $(document).on("click", "#btn-wizard-anterior", function (e) {
+         if (activeTab > 1) {
+            activeTab--;
+            syncWizardButtons();
+            mostrarTab();
+         }
+      });
+   };
+
+   var mostrarTab = function () {
+      window.setTimeout(function () {
+         switch (activeTab) {
+            case 1:
+               $("#tab-general-county").tab("show");
+               break;
+            case 2:
+               $("#tab-projects-county").tab("show");
+               actualizarTableListaCountyProjects();
+               break;
+            case 3:
+               $("#tab-estimates-county").tab("show");
+               actualizarTableListaCountyEstimates();
+               break;
+         }
+      }, 0);
+   };
+
+   var resetWizard = function () {
+      activeTab = 1;
+      totalTabs = 1;
+      syncWizardButtons();
+      mostrarTab();
+      $("#county-form ul.wizzard-tabs").addClass("hide");
+   };
+
+   var initTableListaCountyProjects = function () {
+      const table = "#county-projects-table-editable";
+
+      const columns = [
+         { data: "projectNumber" },
+         { data: "county" },
+         { data: "name" },
+         { data: "description" },
+         { data: "dueDate" },
+         { data: "company" },
+         { data: "status" },
+         { data: "nota" },
+         { data: null },
+      ];
+
+      let columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 150);
+            },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data ?? "", 150);
+            },
+         },
+         {
+            targets: 4,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 100);
+            },
+         },
+         {
+            targets: 6,
+            render: function (data, type, row) {
+               var status = {
+                  1: { title: "In Progress", class: "badge-primary" },
+                  0: { title: "Not Started", class: "badge-danger" },
+                  2: { title: "Completed", class: "badge-success" },
+               };
+               var st = status[data] || status[0];
+               return `<div style="width: 180px;"><span class="badge ${st.class}">${st.title}</span></div>`;
+            },
+         },
+         {
+            targets: 7,
+            render: function (data, type, row) {
+               var html = "";
+               if (data != null) {
+                  html = `${data.nota} <span class="badge badge-primary">${data.date}</span>`;
+               }
+               return html;
+            },
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: "text-center",
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(
+                  data,
+                  type,
+                  row,
+                  ["detalle"],
+               );
+            },
+         },
+      ];
+
+      const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[0, "asc"]];
+
+      oTableCountyProjects = DatatableUtil.initSafeDataTable(table, {
+         data: countyProjects,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, "All"],
+         ],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableCountyProjects();
+   };
+
+   var handleSearchDatatableCountyProjects = function () {
+      $(document).off("keyup", "#lista-county-projects [data-table-filter='search']");
+      $(document).on("keyup", "#lista-county-projects [data-table-filter='search']", function (e) {
+         if (oTableCountyProjects) {
+            oTableCountyProjects.search(e.target.value).draw();
+         }
+      });
+   };
+
+   var actualizarTableListaCountyProjects = function () {
+      if (oTableCountyProjects) {
+         oTableCountyProjects.destroy();
+         oTableCountyProjects = null;
+      }
+      initTableListaCountyProjects();
+   };
+
+   var initTableListaCountyEstimates = function () {
+      const table = "#county-estimates-table-editable";
+
+      const columns = [
+         { data: "name" },
+         { data: "projectId" },
+         { data: "stage" },
+         { data: "status" },
+         { data: "bidDeadline" },
+         { data: null },
+      ];
+
+      let columnDefs = [
+         {
+            targets: 0,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(
+                  data != null ? String(data) : "",
+                  180,
+               );
+            },
+         },
+         {
+            targets: 1,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(
+                  data != null ? String(data) : "",
+                  120,
+               );
+            },
+         },
+         {
+            targets: 2,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(
+                  data != null ? String(data) : "",
+                  120,
+               );
+            },
+         },
+         {
+            targets: 3,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(
+                  data != null ? String(data) : "",
+                  120,
+               );
+            },
+         },
+         {
+            targets: 4,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(
+                  data != null ? String(data) : "",
+                  100,
+               );
+            },
+         },
+         {
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: "text-center",
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAccionesDataSourceLocal(
+                  data,
+                  type,
+                  row,
+                  ["detalle"],
+               );
+            },
+         },
+      ];
+
+      const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[0, "asc"]];
+
+      oTableCountyEstimates = DatatableUtil.initSafeDataTable(table, {
+         data: countyEstimates,
+         displayLength: 30,
+         lengthMenu: [
+            [10, 25, 30, 50, -1],
+            [10, 25, 30, 50, "All"],
+         ],
+         order: order,
+         columns: columns,
+         columnDefs: columnDefs,
+         language: language,
+      });
+
+      handleSearchDatatableCountyEstimates();
+   };
+
+   var handleSearchDatatableCountyEstimates = function () {
+      $(document).off("keyup", "#lista-county-estimates [data-table-filter='search']");
+      $(document).on("keyup", "#lista-county-estimates [data-table-filter='search']", function (e) {
+         if (oTableCountyEstimates) {
+            oTableCountyEstimates.search(e.target.value).draw();
+         }
+      });
+   };
+
+   var actualizarTableListaCountyEstimates = function () {
+      if (oTableCountyEstimates) {
+         oTableCountyEstimates.destroy();
+         oTableCountyEstimates = null;
+      }
+      initTableListaCountyEstimates();
+   };
+
+   var initAccionesCountyRelated = function () {
+      $(document).off("click", "#county-projects-table-editable a.detalle");
+      $(document).on("click", "#county-projects-table-editable a.detalle", function (e) {
+         var posicion = $(this).data("posicion");
+         if (countyProjects[posicion]) {
+            localStorage.setItem(
+               "project_id_detalle",
+               countyProjects[posicion].id,
+            );
+            window.location.href = url_project;
+         }
+      });
+
+      $(document).off("click", "#county-estimates-table-editable a.detalle");
+      $(document).on("click", "#county-estimates-table-editable a.detalle", function (e) {
+         var posicion = $(this).data("posicion");
+         if (countyEstimates[posicion]) {
+            localStorage.setItem(
+               "estimate_id_edit",
+               String(countyEstimates[posicion].id),
+            );
+            window.location.href = url_estimate;
+         }
+      });
+   };
+
    //Inicializar table
    var oTable;
    var initTable = function () {
@@ -450,6 +799,12 @@ var Counties = (function () {
       // tooltips selects
       MyApp.resetErrorMessageValidateSelect(KTUtil.get("county-form"));
 
+      countyProjects = [];
+      countyEstimates = [];
+      actualizarTableListaCountyProjects();
+      actualizarTableListaCountyEstimates();
+      resetWizard();
+
       event_change = false;
    };
 
@@ -509,8 +864,8 @@ var Counties = (function () {
 
    //Salvar
    var initAccionSalvar = function () {
-      $(document).off("click", "#btn-salvar-county");
-      $(document).on("click", "#btn-salvar-county", function (e) {
+      $(document).off("click", "#btn-wizard-finalizar");
+      $(document).on("click", "#btn-wizard-finalizar", function (e) {
          btnClickSalvarForm();
       });
 
@@ -586,16 +941,19 @@ var Counties = (function () {
    var initAccionCerrar = function () {
       $(document).off("click", ".cerrar-form-county");
       $(document).on("click", ".cerrar-form-county", function (e) {
-         cerrarForms();
+         e.preventDefault();
+         ModalUtil.show("modal-salvar-cambios", {
+            backdrop: "static",
+            keyboard: true,
+         });
       });
    };
 
-   //Cerrar forms
+   //Cerrar forms (p.ej. tras guardar exitoso — sin modal)
    var cerrarForms = function () {
       if (!event_change) {
          cerrarFormsConfirmated();
       } else {
-         // mostar modal
          ModalUtil.show("modal-salvar-cambios", {
             backdrop: "static",
             keyboard: true,
@@ -618,7 +976,7 @@ var Counties = (function () {
             var bsModal = bootstrap.Modal.getInstance(modal);
             if (bsModal) bsModal.hide();
          }
-         $("#btn-salvar-county").trigger("click");
+         $("#btn-wizard-finalizar").trigger("click");
       });
       $(document).off("click", "#btn-exit-discard-and-close");
       $(document).on("click", "#btn-exit-discard-and-close", function (e) {
@@ -654,7 +1012,7 @@ var Counties = (function () {
          var formData = new URLSearchParams();
          formData.set("county_id", county_id);
 
-         BlockUtil.block("#form-county");
+         BlockUtil.block("#form-county-body");
 
          axios
             .post("county/cargarDatos", formData, { responseType: "json" })
@@ -662,8 +1020,11 @@ var Counties = (function () {
                if (res.status === 200 || res.status === 201) {
                   var response = res.data;
                   if (response.success) {
-                     //Datos unit
-                     cargarDatos(response.county);
+                     cargarDatosCounty(
+                        response.county,
+                        response.projects,
+                        response.estimates,
+                     );
                   } else {
                      toastr.error(response.error, "");
                   }
@@ -676,10 +1037,10 @@ var Counties = (function () {
             })
             .catch(MyUtil.catchErrorAxios)
             .then(function () {
-               BlockUtil.unblock("#form-county");
+               BlockUtil.unblock("#form-county-body");
             });
 
-         function cargarDatos(county) {
+         function cargarDatosCounty(county, projectsRaw, estimatesRaw) {
             KTUtil.find(KTUtil.get("form-county"), ".card-label").innerHTML =
                "Update Location: " + county.description;
 
@@ -691,6 +1052,15 @@ var Counties = (function () {
             applyCountyFormModeFromRecord(county);
 
             $("#estadoactivo").prop("checked", county.status);
+
+            countyProjects = projectsRaw || [];
+            countyEstimates = estimatesRaw || [];
+            actualizarTableListaCountyProjects();
+            actualizarTableListaCountyEstimates();
+
+            totalTabs = 3;
+            $("#county-form ul.wizzard-tabs").removeClass("hide");
+            syncWizardButtons();
 
             event_change = false;
          }
@@ -829,6 +1199,8 @@ var Counties = (function () {
          initAccionChange();
 
          initCountyFormModeToggle();
+         initWizard();
+         initAccionesCountyRelated();
       },
    };
 })();

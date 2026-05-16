@@ -10,10 +10,12 @@ use App\Dto\Admin\County\CountySalvarRequest;
 use App\Entity\County;
 use App\Entity\District;
 use App\Entity\Estimate;
+use App\Entity\Project;
 use App\Entity\ProjectCounty;
 use App\Repository\CountyRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectCountyRepository;
+use App\Repository\ProjectRepository;
 use App\Service\Base\Base;
 
 class CountyService extends Base
@@ -38,11 +40,86 @@ class CountyService extends Base
             $arreglo_resultado['status'] = $entity->getStatus();
             $arreglo_resultado['district_id'] = $entity->getDistrict() ? $entity->getDistrict()->getDistrictId() : '';
 
+            $countyId = (int) $entity->getCountyId();
             $resultado['success'] = true;
             $resultado['county'] = $arreglo_resultado;
+            $resultado['projects'] = $this->listarProjectsRelacionadosCounty($countyId);
+            $resultado['estimates'] = $this->listarEstimatesRelacionadosCounty($countyId);
         }
 
         return $resultado;
+    }
+
+    /**
+     * Proyectos vinculados al county (misma forma que ConcreteClassService::ListarProjects).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function listarProjectsRelacionadosCounty(int $county_id): array
+    {
+        $projects = [];
+
+        /** @var ProjectRepository $projectRepo */
+        $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+        $countyProjects = $projectRepo->ListarProjectsDeCounty($county_id);
+
+        foreach ($countyProjects as $key => $value) {
+            $project_id = $value->getProjectId();
+            $nota = $this->ListarUltimaNotaDeProject($project_id);
+            $company = $value->getCompany();
+            $startDate = $value->getStartDate();
+            $endDate = $value->getEndDate();
+            $dueDate = $value->getDueDate();
+
+            $projects[] = [
+                'id' => $project_id,
+                'projectNumber' => $value->getProjectNumber(),
+                'name' => $value->getName(),
+                'description' => $value->getDescription(),
+                'company' => $company ? $company->getName() : '',
+                'county' => $this->getCountiesDescriptionForProject($value),
+                'status' => $value->getStatus(),
+                'startDate' => $startDate ? $startDate->format('m/d/Y') : '',
+                'endDate' => $endDate ? $endDate->format('m/d/Y') : '',
+                'dueDate' => $dueDate ? $dueDate->format('m/d/Y') : '',
+                'nota' => $nota,
+                'posicion' => $key,
+            ];
+        }
+
+        return $projects;
+    }
+
+    /**
+     * Estimados con county_id persistido en el county indicado.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function listarEstimatesRelacionadosCounty(int $county_id): array
+    {
+        $rows = [];
+
+        /** @var EstimateRepository $estimateRepo */
+        $estimateRepo = $this->getDoctrine()->getRepository(Estimate::class);
+        $estimates = $estimateRepo->ListarEstimatesDeCounty((string) $county_id);
+
+        foreach ($estimates as $key => $e) {
+            $stage = $e->getStage();
+            $status = $e->getStatus();
+            $bid = $e->getBidDeadline();
+
+            $rows[] = [
+                'id' => $e->getEstimateId(),
+                'name' => $e->getName() ?? '',
+                'projectId' => $e->getProjectId() ?? '',
+                'stage' => $stage ? (string) $stage->getDescription() : '',
+                'status' => $status ? (string) $status->getDescription() : '',
+                'bidDeadline' => $bid ? $bid->format('m/d/Y') : '',
+                'posicion' => $key,
+            ];
+        }
+
+        return $rows;
     }
 
     /**
