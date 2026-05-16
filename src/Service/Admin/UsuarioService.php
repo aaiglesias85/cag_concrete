@@ -802,7 +802,7 @@ class UsuarioService extends Base
         }
 
         $em = $this->getDoctrine()->getManager();
-        /** @var Usuario $entity */
+        /** @var Usuario|null $entity */
         $entity = $this->getDoctrine()->getRepository(Usuario::class)->find($usuario_id);
 
         if (null === $entity) {
