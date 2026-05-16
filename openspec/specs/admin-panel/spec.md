@@ -84,3 +84,17 @@ Select2 en **modales**, formularios de alta/edición u otros contextos **sin** e
 
 - **WHEN** el usuario utiliza un Select2 en un modal, formulario de detalle u otro contexto que **no** sea el submenú desplegado por **Filter**
 - **THEN** este requisito MUST NOT imponer reglas adicionales más allá de las que ya use ese contexto (p. ej. `dropdownParent` propio del modal)
+
+### Requirement: Modal primary action label for append-to-list flows
+
+En la interfaz admin (`templates/admin/*` y bloques modal asociados), cuando un modal existe **solo** para que el usuario **añada** una fila o registro relacionado que aparece después en una tabla o lista vinculada al contexto actual (por ejemplo ítem de obra, ítem en presupuesto o factura, contacto ligado a empresa u obra, nota incremental, archivo en contexto de lista), el botón principal de confirmación en el pie del modal SHALL mostrar el texto **Add** (literal inglés estándar, salvo política explícita de i18n). El sistema MUST NOT usar la etiqueta **Save** únicamente en estos flujos de incorporación a lista, para no confundirlos con el guardado del formulario principal o del wizard.
+
+#### Scenario: Modal de alta incremental confirma con Add
+
+- **WHEN** el usuario completa los campos requeridos de un modal cuyo fin es solo agregar una fila a una lista/tab asociada
+- **THEN** el texto visible del botón principal de confirmación en el pie MUST ser **Add** (excepto donde el mismo control exprese mejor un subtipo, p. ej. **Add note**, según texto acordado en plantilla).
+
+#### Scenario: Wizard o guardado de documento íntegro excluye esta regla
+
+- **WHEN** el usuario confirma un guardado pensado como persistencia global del recurso abierto en la página o cierre del wizard
+- **THEN** ese botón SHOULD conservar etiquetas como **Save** donde corresponda y MUST NOT estar obligado a **Add**.
