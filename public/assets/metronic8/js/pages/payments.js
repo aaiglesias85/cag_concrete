@@ -103,6 +103,7 @@ var Payments = (function () {
          { data: 'startDate' },
          { data: 'endDate' },
          { data: 'total' },
+         { data: 'paymentAmount', orderable: false },
          { data: 'notes' },
          { data: 'createdAt' },
          { data: 'paid' },
@@ -159,8 +160,9 @@ var Payments = (function () {
          },
          {
             targets: 7,
+            orderable: false,
             render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(data, 150);
+               return `<span>${MyApp.formatMoney(data)}</span>`;
             },
          },
          {
@@ -169,9 +171,15 @@ var Payments = (function () {
                return DatatableUtil.getRenderColumnDiv(data, 150);
             },
          },
+         {
+            targets: 9,
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderColumnDiv(data, 150);
+            },
+         },
          // --- Columna de Estado con Toggle ---
          {
-            targets: 9, // Columna Status
+            targets: 10, // Columna Status
             className: 'text-center', // Centra el contenido en la celda
             render: function (data, type, row) {
                var isChecked = data == 1 ? 'checked' : '';

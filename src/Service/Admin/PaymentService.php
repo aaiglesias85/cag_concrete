@@ -1101,6 +1101,7 @@ class PaymentService extends Base
             /** @var InvoiceItemRepository $invoiceItemRepo */
             $invoiceItemRepo = $this->getDoctrine()->getRepository(InvoiceItem::class);
             $total = $invoiceItemRepo->TotalInvoiceFinalAmountThisPeriod((string) $invoice_id);
+            $paymentAmount = $invoiceItemRepo->TotalInvoicePaidAmount((string) $invoice_id);
 
             // Llamada simple (ahora devuelve float directo)
             $retainage_valor = $this->CalcularRetainageConRegla($invoice_id);
@@ -1116,6 +1117,7 @@ class PaymentService extends Base
                 'endDate' => $value->getEndDate()->format('m/d/Y'),
                 'notes' => $this->truncate($value->getNotes(), 50),
                 'total' => $total,
+                'paymentAmount' => $paymentAmount,
                 'retainage_amount' => number_format($retainage_valor, 2),
                 'createdAt' => $value->getCreatedAt()->format('m/d/Y'),
                 'paid' => $value->getPaid() ? 1 : 0,
