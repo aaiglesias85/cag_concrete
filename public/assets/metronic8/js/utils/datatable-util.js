@@ -90,8 +90,12 @@ var DatatableUtil = (function () {
    };
 
    // render acciones (estilo unificado: btn-light-* btn-sm fs-3 me-1)
-   var getRenderAcciones = function (data, type, row, permiso, acciones, witdh = 50) {
-      var html = '<div class="d-flex justify-content-center flex-shrink-0">';
+   // prependHtml / appendHtml: HTML opcional dentro del mismo flex que el resto de acciones
+   var getRenderAcciones = function (data, type, row, permiso, acciones, witdh = 50, prependHtml, appendHtml) {
+      var html = '<div class="d-flex justify-content-center flex-nowrap align-items-center flex-shrink-0">';
+      if (prependHtml) {
+         html += prependHtml;
+      }
 
       // detalle
       if (acciones.includes('detalle')) {
@@ -131,6 +135,10 @@ var DatatableUtil = (function () {
       // estado
       if (acciones.includes('status') && permiso.editar) {
          html += _getRenderAccionEstado(row);
+      }
+
+      if (appendHtml) {
+         html += appendHtml;
       }
 
       html += '</div>';

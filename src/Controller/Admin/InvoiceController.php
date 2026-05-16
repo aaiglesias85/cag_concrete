@@ -44,8 +44,12 @@ class InvoiceController extends AbstractAdminController
         $companies = $companyRepo->ListarOrdenados();
         $companies_filtro = $companyRepo->ListarOrdenadosConProyectoAsociado();
 
+        $permisosPayment = $this->adminAccess->buscarPermisosMismoBase($usuario->getUsuarioId(), FunctionId::PAYMENT);
+        $permiso_payment = $permisosPayment[0] ?? null;
+
         return $this->render('admin/invoice/index.html.twig', [
             'permiso' => $permiso,
+            'permiso_payment' => $permiso_payment,
             'companies' => $companies,
             'companies_filtro' => $companies_filtro,
         ]);

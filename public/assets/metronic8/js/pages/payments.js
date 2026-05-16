@@ -5,6 +5,11 @@ var Payments = (function () {
    var showTableContent = function () {
       $('#payment-list-placeholder').addClass('hide');
       $('#payment-table-wrapper').removeClass('hide');
+      if (oTable) {
+         requestAnimationFrame(function () {
+            oTable.columns.adjust();
+         });
+      }
    };
 
    //Inicializar table
@@ -73,9 +78,19 @@ var Payments = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         initComplete: function () {
+            var api = this.api();
+            requestAnimationFrame(function () {
+               api.columns.adjust();
+            });
+         },
       });
 
       oTable.on('draw', function () {
+         requestAnimationFrame(function () {
+            oTable.columns.adjust();
+         });
+
          // Show table only after AJAX returns filtered results (prevents flash of stale data)
          if (oTable.search() && oTable.search().length >= 3) {
             showTableContent();
@@ -684,8 +699,24 @@ var Payments = (function () {
       });
    };
 
-   // Agregamos el parámetro isReadOnly con valor por defecto false
-   var editRow = function (invoice_id, isReadOnly = false) {
+   var stripInvoiceIdFromUrl = function () {
+      try {
+         var u = new URL(window.location.href);
+         if (!u.searchParams.has('invoice_id')) {
+            return;
+         }
+         u.searchParams.delete('invoice_id');
+         var qs = u.searchParams.toString();
+         history.replaceState(null, '', u.pathname + (qs ? '?' + qs : '') + u.hash);
+      } catch (e) {
+         /* ignore */
+      }
+   };
+
+   // opts.fromDeepLink: abrir desde ?invoice_id=…; si el invoice viene paid, modo solo lectura como en el listado
+   var editRow = function (invoice_id, isReadOnly = false, opts) {
+      var fromDeepLink = opts && opts.fromDeepLink === true;
+      var loadSuccess = false;
       var formData = new URLSearchParams();
       formData.set('invoice_id', invoice_id);
 
@@ -697,6 +728,7 @@ var Payments = (function () {
             if (res.status === 200 || res.status === 201) {
                var response = res.data;
                if (response.success) {
+                  loadSuccess = true;
                   invoice = response.payment;
                   cargarDatos(response.payment);
                } else {
@@ -710,7 +742,12 @@ var Payments = (function () {
          .then(function () {
             BlockUtil.unblock('#form-payment-body');
 
-            if (isReadOnly) {
+            var effectiveReadOnly = isReadOnly;
+            if (loadSuccess && fromDeepLink && invoice && (invoice.paid == 1 || invoice.paid === true)) {
+               effectiveReadOnly = true;
+            }
+
+            if (effectiveReadOnly) {
                paymentFormReadOnly = true;
                // 1. Deshabilitar todos los inputs, selects y textareas dentro del formulario (no los enlaces del wizard)
                $('#form-payment').find('input, select, textarea, button').prop('disabled', true);
@@ -736,6 +773,10 @@ var Payments = (function () {
                $('#btn-salvar-invoice').removeClass('hide');
                // Habilitar todo por si acaso venía de un view
                $('#form-payment').find('input, select, textarea, button').prop('disabled', false);
+            }
+
+            if (fromDeepLink) {
+               stripInvoiceIdFromUrl();
             }
          });
 
@@ -2865,6 +2906,22 @@ var Payments = (function () {
       $card.removeClass('d-none hide').show(); 
    };
 
+   var applyInvoiceIdDeepLink = function () {
+      var params = new URLSearchParams(window.location.search);
+      var raw = params.get('invoice_id');
+      if (!raw) {
+         return;
+      }
+      var trimmed = String(raw).trim();
+      if (!/^\d+$/.test(trimmed)) {
+         return;
+      }
+      resetForms();
+      $('#invoice_id').val(trimmed);
+      mostrarForm();
+      editRow(trimmed, false, { fromDeepLink: true });
+   };
+
    return {
       init: function () {
          initWidgets();
@@ -2885,6 +2942,7 @@ var Payments = (function () {
          initAccionChange();
          initRetainageModal();
          initAccionStatusChange();
+         applyInvoiceIdDeepLink();
       },
    };
 })();

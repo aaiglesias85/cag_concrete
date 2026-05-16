@@ -406,7 +406,7 @@
                      <th>Notes</th>
                      <th>Status</th>
                      <th>Created At</th>
-                     <th class="text-end min-w-100px">Actions</th>
+                     <th class="text-center min-w-125px">Actions</th>
                   </tr>
                </thead>
                <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -809,6 +809,14 @@
        editar: {% if permiso.editar %}{{ permiso.editar }}{% else %}0{% endif %},
        eliminar: {% if permiso.eliminar %}{{ permiso.eliminar }}{% else %}0{% endif %}
    };
+
+   var permiso_payment = {% if permiso_payment is defined and permiso_payment is not null %}{
+       ver: {% if permiso_payment.ver %}1{% else %}0{% endif %},
+       agregar: {% if permiso_payment.agregar %}1{% else %}0{% endif %},
+       editar: {% if permiso_payment.editar %}1{% else %}0{% endif %},
+       eliminar: {% if permiso_payment.eliminar %}1{% else %}0{% endif %}
+   }{% else %}null{% endif %};
+   var payments_index_url = "{{ path('payment')|e('js') }}";
 
    jQuery(document).ready(function () {
        Invoices.init();

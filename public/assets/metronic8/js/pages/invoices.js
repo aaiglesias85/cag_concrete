@@ -66,6 +66,33 @@ var Invoices = (function () {
    var showTableContent = function () {
       $('#invoice-list-placeholder').addClass('hide');
       $('#invoice-table-wrapper').removeClass('hide');
+      // La tabla se inicializa estando oculta: sin adjust(), cabecera y cuerpo (scrollX/FixedColumns) quedan desalineados
+      if (oTable) {
+         requestAnimationFrame(function () {
+            oTable.columns.adjust();
+         });
+      }
+   };
+
+   /** Enlace a Payments con invoice_id (solo si hay permiso ver en PAYMENT). */
+   var renderInvoicePaymentsQuickLink = function (row) {
+      if (typeof permiso_payment === 'undefined' || permiso_payment === null || !permiso_payment.ver) {
+         return '';
+      }
+      if (!row || row.id === undefined || row.id === null || row.id === '') {
+         return '';
+      }
+      var base = typeof payments_index_url !== 'undefined' ? payments_index_url : '';
+      if (!base) {
+         return '';
+      }
+      var sep = base.indexOf('?') === -1 ? '?' : '&';
+      var url = base + sep + 'invoice_id=' + encodeURIComponent(String(row.id));
+      return (
+         '<a href="' +
+         url +
+         '" class="btn btn-icon btn-light-success btn-sm ms-1 invoice-payments-quick-link" title="Payments"><span class="fs-3 fw-bold lh-1">$</span></a>'
+      );
    };
 
    //Inicializar table
@@ -133,10 +160,21 @@ var Invoices = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
+         initComplete: function () {
+            var api = this.api();
+            requestAnimationFrame(function () {
+               api.columns.adjust();
+            });
+         },
       });
 
       // Re-init functions on every table re-draw -- more info: https://datatables.net/reference/event/draw
       oTable.on('draw', function () {
+         // scrollX + FixedColumns: re-sincronizar anchos tras cada redibujado
+         requestAnimationFrame(function () {
+            oTable.columns.adjust();
+         });
+
          // Show table only after AJAX returns filtered results (prevents flash of stale data)
          if (oTable.search() && oTable.search().length >= 3) {
             showTableContent();
@@ -366,15 +404,24 @@ var Invoices = (function () {
       if (permiso.editar) accionesInvoice.push('edit');
       if (permiso.eliminar) accionesInvoice.push('delete');
 
-      columnDefs.push({
-         targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, accionesInvoice);
-         },
-      });
+         columnDefs.push({
+            targets: -1,
+            data: null,
+            orderable: false,
+            className: 'text-center text-nowrap',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAcciones(
+                  data,
+                  type,
+                  row,
+                  permiso,
+                  accionesInvoice,
+                  50,
+                  undefined,
+                  renderInvoicePaymentsQuickLink(row) || undefined,
+               );
+            },
+         });
 
       return columnDefs;
    };
