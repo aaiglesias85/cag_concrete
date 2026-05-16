@@ -1111,8 +1111,8 @@ var Payments = (function () {
                      row.project_item_id +
                      '" title="View change order history"></i>';
                }
-               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
-                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">${data || ''}</span>
+               return `<div class="d-flex align-items-center" style="width: 250px; max-width: 100%; min-width: 0;">
+                           ${DatatableUtil.buildTruncatedTextPopoverTrigger(data)}
                            ${badgeRetainage}
                            ${badgeBond}
                            ${badgeBonded}
@@ -1324,6 +1324,7 @@ var Payments = (function () {
             }
          },
          drawCallback: function () {
+            DatatableUtil.initTruncatedTextPopovers(this.api().table().body());
             handleChangeOrderHistory();
             handleQuantityHistory();
             handlePriceHistory();

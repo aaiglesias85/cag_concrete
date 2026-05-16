@@ -393,6 +393,80 @@ var DatatableUtil = (function () {
       return typeof text === 'string' ? text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : text;
    };
 
+   /** Cierre de otros popovers al abrir uno (DataTable re-draw safe: bind once). */
+   var _dtPopoverExclusiveBound = false;
+   var bindTruncatedPopoverExclusive = function () {
+      if (_dtPopoverExclusiveBound) return;
+      _dtPopoverExclusiveBound = true;
+      document.addEventListener(
+         'show.bs.popover',
+         function (e) {
+            if (!e.target || !e.target.hasAttribute || !e.target.hasAttribute('data-dt-longtext-trigger')) {
+               return;
+            }
+            document.querySelectorAll('[data-dt-longtext-trigger="1"]').forEach(function (el) {
+               if (el === e.target) return;
+               var inst = typeof bootstrap !== 'undefined' && bootstrap.Popover ? bootstrap.Popover.getInstance(el) : null;
+               if (inst) inst.hide();
+            });
+         },
+         true,
+      );
+   };
+
+   /**
+    * Span truncado con popover Bootstrap 5 (hover/foco/clic) para el texto íntegro.
+    * Requiere initTruncatedTextPopovers(container) tras cada draw del DataTable.
+    */
+   var buildTruncatedTextPopoverTrigger = function (plainText) {
+      var plain = plainText == null ? '' : String(plainText);
+      var encoded = encodeURIComponent(plain);
+      var esc = escapeHtml(plain);
+      return (
+         '<span class="text-truncate flex-grow-1 min-w-0 me-1" style="cursor: help;" tabindex="0" role="button" aria-label="Full text" ' +
+            'data-dt-longtext-trigger="1" data-dt-fulltext="' +
+            encoded +
+            '">' +
+            esc +
+            '</span>'
+      );
+   };
+
+   /**
+    * Inicializa popovers en elementos [data-dt-longtext-trigger] dentro de root (tbody o tabla).
+    */
+   var initTruncatedTextPopovers = function (root) {
+      if (typeof root === 'string') root = document.querySelector(root);
+      if (!root || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
+
+      bindTruncatedPopoverExclusive();
+
+      root.querySelectorAll('[data-dt-longtext-trigger="1"]').forEach(function (el) {
+         var enc = el.getAttribute('data-dt-fulltext');
+         if (enc === null) return;
+         var full = '';
+         try {
+            full = decodeURIComponent(enc);
+         } catch (err) {
+            full = enc;
+         }
+
+         var existing = bootstrap.Popover.getInstance(el);
+         if (existing) existing.dispose();
+
+         new bootstrap.Popover(el, {
+            container: 'body',
+            html: false,
+            sanitize: true,
+            trigger: 'hover focus click',
+            delay: { show: 120, hide: 80 },
+            placement: 'auto',
+            customClass: 'dt-longtext-popover',
+            content: full,
+         });
+      });
+   };
+
    // escapar el contenido de la tabla
    var initSafeDataTable = function (selector, options = {}) {
       // Procesamos columnDefs
@@ -462,6 +536,8 @@ var DatatableUtil = (function () {
       escapeHtml: escapeHtml,
       initSafeDataTable: initSafeDataTable,
       stateSaveParams: stateSaveParams,
+      buildTruncatedTextPopoverTrigger: buildTruncatedTextPopoverTrigger,
+      initTruncatedTextPopovers: initTruncatedTextPopovers,
    };
 })();
 

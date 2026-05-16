@@ -2181,8 +2181,8 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                      '" title="View change order history"></i>';
                }
 
-               return `<div style="width: 250px; overflow: hidden; white-space: nowrap; display: flex; align-items: center;">
-                           <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;" title="${DatatableUtil.escapeHtml(data || '')}">${data || ''}</span>
+               return `<div class="d-flex align-items-center" style="width: 250px; max-width: 100%; min-width: 0;">
+                           ${DatatableUtil.buildTruncatedTextPopoverTrigger(data)}
                            ${badgeRetainage}
                            ${badgeBond}
                            ${badgeBonded}
@@ -2416,6 +2416,10 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                   $(row).addClass('row-secondary');
                }
             }
+         },
+
+         drawCallback: function () {
+            DatatableUtil.initTruncatedTextPopovers(this.api().table().body());
          },
 
          // totales
