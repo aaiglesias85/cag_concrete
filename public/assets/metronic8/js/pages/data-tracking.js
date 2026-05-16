@@ -635,7 +635,6 @@ var DataTracking = (function () {
             activeTab++;
             $('#btn-wizard-anterior').removeClass('hide');
             if (activeTab == totalTabs) {
-               $('#btn-wizard-finalizar').removeClass('hide');
                $('#btn-wizard-siguiente').addClass('hide');
             }
 
@@ -650,7 +649,6 @@ var DataTracking = (function () {
             $('#btn-wizard-anterior').addClass('hide');
          }
          if (activeTab < totalTabs) {
-            $('#btn-wizard-finalizar').addClass('hide');
             $('#btn-wizard-siguiente').removeClass('hide');
          }
          mostrarTab();
@@ -683,7 +681,7 @@ var DataTracking = (function () {
                actualizarTableListaSubcontracts();
                break;
             case 7:
-               $('#tab-archivos').tab('show');
+               $('#tab-archivo').tab('show');
                actualizarTableListaArchivos();
                break;
          }
@@ -693,7 +691,7 @@ var DataTracking = (function () {
       activeTab = 1;
       totalTabs = 7;
       mostrarTab();
-      // $('#btn-wizard-finalizar').removeClass('hide').addClass('hide');
+      $('#btn-wizard-finalizar').removeClass('hide');
       $('#btn-wizard-anterior').removeClass('hide').addClass('hide');
       $('#btn-wizard-siguiente').removeClass('hide');
       $('.nav-item-hide').removeClass('hide').addClass('hide');
