@@ -12,6 +12,7 @@ var MeasurementsWidget = (function () {
    var data = null;              // payload actual {counties, employees, projects, total_projects}
    var map = null;               // google.maps.Map
    var markers = [];             // burbujas activas en el mapa
+   var markerCluster = null;     // instancia MarkerClusterer
    var infoWindow = null;
    var activeEmployeeId = null;  // empleado actualmente filtrado en el mapa
    var expandedEmployees = {};   // empleado_id -> bool (acordeón abierto)
@@ -290,6 +291,10 @@ var MeasurementsWidget = (function () {
    };
 
    var clearMarkers = function () {
+      if (markerCluster) {
+         markerCluster.clearMarkers();
+         markerCluster = null;
+      }
       markers.forEach(function (m) {
          m.setMap(null);
       });
@@ -321,9 +326,9 @@ var MeasurementsWidget = (function () {
             scale: radius,
          };
 
+         // map: null porque el clusterer maneja la visibilidad.
          var marker = new google.maps.Marker({
             position: { lat: item.lat, lng: item.lng },
-            map: map,
             icon: icon,
             label: {
                text: String(item.count),
@@ -351,6 +356,18 @@ var MeasurementsWidget = (function () {
          markers.push(marker);
          bounds.extend(marker.getPosition());
       });
+
+      // Cluster: agrupa burbujas cercanas con un círculo más grande con el total.
+      // Al hacer zoom se separan automáticamente.
+      if (markers.length > 0 && typeof markerClusterer !== "undefined" && markerClusterer.MarkerClusterer) {
+         markerCluster = new markerClusterer.MarkerClusterer({
+            map: map,
+            markers: markers,
+         });
+      } else {
+         // Fallback si la librería no cargó: marker individuales sin cluster
+         markers.forEach(function (m) { m.setMap(map); });
+      }
 
       if (markers.length > 0) {
          map.fitBounds(bounds, 40);
