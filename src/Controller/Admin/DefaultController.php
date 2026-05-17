@@ -131,6 +131,35 @@ class DefaultController extends AbstractAdminController
     }
 
     /**
+     * listarMeasurementsHome: Devuelve el payload del widget Measurements
+     * con sus propios filtros locales (project + rango de fechas).
+     */
+    #[RequireAdminPermission(FunctionId::HOME, AdminPermission::View, jsonOnDenied: true)]
+    public function listarMeasurementsHome(DashboardListarStatsRequest $f): JsonResponse
+    {
+        try {
+            $usuario = $this->DevolverUsuario();
+            if (!$this->widgetAccessService->isWidgetVisibleOnHome($usuario->getUsuarioId(), 'measurements')) {
+                return $this->json(['success' => false, 'error' => 'Widget not enabled.']);
+            }
+
+            $projectId = (string) ($f->project_id ?? '');
+            $fechaInicial = (string) ($f->fechaInicial ?? '');
+            $fechaFin = (string) ($f->fechaFin ?? '');
+
+            $data = $this->dataTrackingService->obtenerMeasurementsPayloadHome(
+                $projectId,
+                $fechaInicial,
+                $fechaFin
+            );
+
+            return $this->json(['success' => true, 'data' => $data]);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
      * listarStats Acción para filtrar el dashboard.
      */
     #[RequireAdminPermission(FunctionId::HOME, AdminPermission::View, jsonOnDenied: true)]

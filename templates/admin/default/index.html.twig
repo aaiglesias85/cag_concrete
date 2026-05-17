@@ -144,6 +144,8 @@
                             {% include 'admin/default/_widget_home_cost_breakdown.html.twig' with { w: w, home_cost_breakdown: home_cost_breakdown } only %}
                         {% elseif w.id is defined and w.id == 'project_profit_cost_overview' and home_profit_cost_overview is not null %}
                             {% include 'admin/default/_widget_home_project_profit_cost_overview.html.twig' with { w: w, home_profit_cost_overview: home_profit_cost_overview } only %}
+                        {% elseif w.id is defined and w.id == 'measurements' and home_measurements is not null %}
+                            {% include 'admin/default/_widget_home_measurements.html.twig' with { w: w, home_measurements: home_measurements } only %}
                         {% else %}
                         <div class="col-12 col-md-6 col-xl-4" id="widget-{{ w.id }}">
                             <div class="card h-100">
@@ -239,5 +241,34 @@
         jQuery(function () { Index.init(); });
     </script>
     <script src="{{ asset('assets/metronic8/js/pages/home_widgets_sortable.js') }}?{{ 'now'|date('U') }}"></script>
+
+    {# Widget Measurements: mapa Google + panel empleados #}
+    {% if home_measurements is not null %}
+    <script>
+        window.HomeMeasurementsData = {{ home_measurements|json_encode|raw }};
+        window.HomeMeasurementsUrl = {{ path('listarMeasurementsHome')|json_encode|raw }};
+    </script>
+    <script>
+       ((g) => {
+          var h, a, k, p = 'The Google Maps JavaScript API', c = 'google', l = 'importLibrary', q = '__ib__', m = document, b = window;
+          b = b[c] || (b[c] = {});
+          var d = b.maps || (b.maps = {}), r = new Set(), e = new URLSearchParams(),
+             u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement('script'));
+                e.set('libraries', [...r] + '');
+                for (k in g) e.set(k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()), g[k]);
+                e.set('callback', c + '.maps.' + q);
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                d[q] = f;
+                a.onerror = () => (h = n(Error(p + ' could not load.')));
+                a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+                m.head.append(a);
+             }));
+          d[l] ? console.warn(p + ' only loads once. Ignoring:', g) : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+       })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
+       google.maps.importLibrary('maps');
+    </script>
+    <script src="{{ asset('assets/metronic8/js/pages/measurements_widget.js') }}?{{ 'now'|date('U') }}"></script>
+    {% endif %}
     {% endif %}
 {% endblock %}

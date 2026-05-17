@@ -1860,4 +1860,316 @@ class DataTrackingService extends Base
 
         return $s;
     }
+
+    /**
+     * Payload del widget Measurements para el dashboard home.
+     *
+     * El "panel lateral" lista los Usuarios con perfil "Field Measurements".
+     * El match con un DataTracking es por `measured_by` (texto libre) comparado
+     * case-insensitive con "name + lastname" del usuario.
+     *
+     * Estructura devuelta:
+     *  - counties[]:     { id, name, city, state_code, lat, lng, projects_count, project_ids[] }
+     *  - employees[]:    { id, name, projects_count, percentage, counties:[{id,count}], rows:[{date,project_number,county,project_id}] }
+     *  - projects[]:     { id, project_number, name }    (para dropdown del filtro local)
+     *  - total_projects: int                              (denominador del %)
+     *  - _debug:         { projects_in_period, projects_with_county, counties_with_coords,
+     *                      counties_without_coords, field_measurements_total }
+     *
+     * @return array<string, mixed>
+     */
+    public function obtenerMeasurementsPayloadHome(string $project_id, string $fecha_inicial, string $fecha_fin): array
+    {
+        $conn = $this->getDoctrine()->getConnection();
+
+        $params = [];
+        $where = [];
+
+        // Filtro de fechas: vienen como m/d/Y desde el frontend → convertir a Y-m-d para BD
+        if ('' !== $fecha_inicial) {
+            $d = \DateTime::createFromFormat('m/d/Y', $fecha_inicial);
+            if ($d instanceof \DateTime) {
+                $where[] = 'dt.date >= :fecha_ini';
+                $params['fecha_ini'] = $d->format('Y-m-d').' 00:00:00';
+            }
+        }
+        if ('' !== $fecha_fin) {
+            $d = \DateTime::createFromFormat('m/d/Y', $fecha_fin);
+            if ($d instanceof \DateTime) {
+                $where[] = 'dt.date <= :fecha_fin';
+                $params['fecha_fin'] = $d->format('Y-m-d').' 23:59:59';
+            }
+        }
+        if ('' !== $project_id) {
+            $where[] = 'dt.project_id = :project_id';
+            $params['project_id'] = (int) $project_id;
+        }
+
+        $whereSql = empty($where) ? '' : ' AND '.implode(' AND ', $where);
+
+        // 1) Total de proyectos distintos en el período (denominador del %)
+        $sqlTotal = "
+            SELECT COUNT(DISTINCT dt.project_id) AS total
+            FROM data_tracking dt
+            WHERE 1=1 $whereSql
+        ";
+        $totalProjects = (int) $conn->fetchOne($sqlTotal, $params);
+
+        // 2) Counties con sus coordenadas y count de proyectos distintos
+        $sqlCounties = "
+            SELECT
+                c.county_id          AS id,
+                c.description        AS name,
+                COALESCE(c.city, '') AS city,
+                COALESCE(s.code, '') AS state_code,
+                c.latitude           AS lat,
+                c.longitude          AS lng,
+                COUNT(DISTINCT dt.project_id) AS projects_count,
+                GROUP_CONCAT(DISTINCT dt.project_id) AS project_ids
+            FROM data_tracking dt
+            INNER JOIN project_county pc ON pc.project_id = dt.project_id
+            INNER JOIN county c          ON c.county_id   = pc.county_id
+            LEFT  JOIN state s           ON s.id          = c.state_id
+            WHERE c.latitude IS NOT NULL
+              AND c.longitude IS NOT NULL
+              $whereSql
+            GROUP BY c.county_id, c.description, c.city, s.code, c.latitude, c.longitude
+            ORDER BY c.description ASC
+        ";
+        $countyRows = $conn->fetchAllAssociative($sqlCounties, $params);
+        $counties = [];
+        foreach ($countyRows as $r) {
+            $counties[] = [
+                'id' => (int) $r['id'],
+                'name' => (string) $r['name'],
+                'city' => (string) ($r['city'] ?? ''),
+                'state_code' => (string) ($r['state_code'] ?? ''),
+                'lat' => null !== $r['lat'] ? (float) $r['lat'] : null,
+                'lng' => null !== $r['lng'] ? (float) $r['lng'] : null,
+                'projects_count' => (int) $r['projects_count'],
+                'project_ids' => array_filter(array_map('intval', explode(',', (string) ($r['project_ids'] ?? '')))),
+            ];
+        }
+
+        // 3) Filas por usuario Field Measurements: matchear measured_by con name+lastname
+        $sqlRows = "
+            SELECT
+                u.user_id            AS user_id,
+                TRIM(CONCAT(COALESCE(u.name,''), ' ', COALESCE(u.lastname,''))) AS user_full_name,
+                dt.id                AS tracking_id,
+                dt.date              AS work_date,
+                p.project_id         AS project_id,
+                p.project_number     AS project_number,
+                COALESCE(c.description, '') AS county_name,
+                c.county_id          AS county_id
+            FROM user u
+            INNER JOIN rol r            ON r.rol_id = u.rol_id
+            INNER JOIN data_tracking dt
+                ON LOWER(TRIM(dt.measured_by)) =
+                   LOWER(TRIM(CONCAT(COALESCE(u.name,''), ' ', COALESCE(u.lastname,''))))
+            INNER JOIN project p        ON p.project_id   = dt.project_id
+            LEFT  JOIN project_county pc ON pc.project_id = p.project_id
+            LEFT  JOIN county c          ON c.county_id   = pc.county_id
+            WHERE LOWER(TRIM(r.name)) = 'field measurements'
+              AND COALESCE(u.status, 1) = 1
+              AND dt.measured_by IS NOT NULL
+              AND TRIM(dt.measured_by) <> ''
+              $whereSql
+            ORDER BY u.name ASC, u.lastname ASC, dt.date DESC
+        ";
+        $userRows = $conn->fetchAllAssociative($sqlRows, $params);
+
+        // 4) Reagrupar por usuario
+        $employees = [];
+        foreach ($userRows as $r) {
+            $uid = (int) $r['user_id'];
+            if (!isset($employees[$uid])) {
+                $employees[$uid] = [
+                    'id' => $uid,
+                    'name' => (string) $r['user_full_name'],
+                    'project_ids' => [],
+                    'counties_count' => [], // county_id => [distinct project_ids]
+                    'rows' => [],
+                    '_seen_rows' => [],
+                ];
+            }
+            $emp = &$employees[$uid];
+            $projectId = (int) $r['project_id'];
+            $countyId = null !== $r['county_id'] ? (int) $r['county_id'] : null;
+
+            if (!in_array($projectId, $emp['project_ids'], true)) {
+                $emp['project_ids'][] = $projectId;
+            }
+
+            if (null !== $countyId) {
+                if (!isset($emp['counties_count'][$countyId])) {
+                    $emp['counties_count'][$countyId] = [];
+                }
+                if (!in_array($projectId, $emp['counties_count'][$countyId], true)) {
+                    $emp['counties_count'][$countyId][] = $projectId;
+                }
+            }
+
+            $rowKey = (int) $r['tracking_id'].'-'.($countyId ?? 0);
+            if (!in_array($rowKey, $emp['_seen_rows'], true)) {
+                $emp['_seen_rows'][] = $rowKey;
+                $emp['rows'][] = [
+                    'date' => $this->formatWorkDate($r['work_date']),
+                    'project_id' => $projectId,
+                    'project_number' => (string) ($r['project_number'] ?? ''),
+                    'county' => (string) ($r['county_name'] ?? ''),
+                    'county_id' => $countyId,
+                ];
+            }
+            unset($emp);
+        }
+
+        // 5) Calcular porcentaje
+        $employeesOut = [];
+        foreach ($employees as $emp) {
+            $projectsCount = count($emp['project_ids']);
+            $percentage = $totalProjects > 0 ? round(($projectsCount / $totalProjects) * 100, 1) : 0.0;
+
+            $countiesArr = [];
+            foreach ($emp['counties_count'] as $cid => $pids) {
+                $countiesArr[] = ['id' => (int) $cid, 'count' => count($pids)];
+            }
+
+            $employeesOut[] = [
+                'id' => $emp['id'],
+                'name' => $emp['name'],
+                'projects_count' => $projectsCount,
+                'percentage' => $percentage,
+                'counties' => $countiesArr,
+                'rows' => $emp['rows'],
+            ];
+        }
+
+        usort($employeesOut, function ($a, $b) {
+            return $b['percentage'] <=> $a['percentage'];
+        });
+
+        // 6) Proyectos del período (para dropdown del filtro local)
+        $sqlProjects = "
+            SELECT DISTINCT p.project_id AS id, p.project_number, p.name
+            FROM data_tracking dt
+            INNER JOIN project p ON p.project_id = dt.project_id
+            WHERE 1=1 $whereSql
+            ORDER BY p.project_number ASC
+        ";
+        $projectRows = $conn->fetchAllAssociative($sqlProjects, $params);
+        $projects = [];
+        foreach ($projectRows as $r) {
+            $projects[] = [
+                'id' => (int) $r['id'],
+                'project_number' => (string) ($r['project_number'] ?? ''),
+                'name' => (string) ($r['name'] ?? ''),
+            ];
+        }
+
+        // 7) Diagnóstico: counts útiles para entender por qué faltan burbujas/empleados
+        $debug = $this->buildMeasurementsDebug($conn, $whereSql, $params);
+
+        return [
+            'counties' => $counties,
+            'employees' => $employeesOut,
+            'projects' => $projects,
+            'total_projects' => $totalProjects,
+            'range' => [
+                'inicial' => $fecha_inicial,
+                'final' => $fecha_fin,
+            ],
+            'project_id' => $project_id,
+            '_debug' => $debug,
+        ];
+    }
+
+    /**
+     * Counts diagnóstico para el widget Measurements: ayudan al admin a entender
+     * por qué no aparecen burbujas o empleados (datos faltantes en project_county,
+     * counties sin coords, sin usuarios con perfil correcto, etc).
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array<string, int>
+     */
+    private function buildMeasurementsDebug(\Doctrine\DBAL\Connection $conn, string $whereSql, array $params): array
+    {
+        // Proyectos en el período (denominador)
+        $projectsInPeriod = (int) $conn->fetchOne(
+            "SELECT COUNT(DISTINCT dt.project_id) FROM data_tracking dt WHERE 1=1 $whereSql",
+            $params
+        );
+
+        // Proyectos del período con AL MENOS un county asignado
+        $projectsWithCounty = (int) $conn->fetchOne(
+            "
+            SELECT COUNT(DISTINCT dt.project_id)
+            FROM data_tracking dt
+            INNER JOIN project_county pc ON pc.project_id = dt.project_id
+            WHERE 1=1 $whereSql
+            ",
+            $params
+        );
+
+        // Counties asignados a esos proyectos: cuántos tienen coords vs no
+        $countiesWithCoords = (int) $conn->fetchOne(
+            "
+            SELECT COUNT(DISTINCT c.county_id)
+            FROM data_tracking dt
+            INNER JOIN project_county pc ON pc.project_id = dt.project_id
+            INNER JOIN county c          ON c.county_id   = pc.county_id
+            WHERE c.latitude IS NOT NULL AND c.longitude IS NOT NULL
+              $whereSql
+            ",
+            $params
+        );
+        $countiesWithoutCoords = (int) $conn->fetchOne(
+            "
+            SELECT COUNT(DISTINCT c.county_id)
+            FROM data_tracking dt
+            INNER JOIN project_county pc ON pc.project_id = dt.project_id
+            INNER JOIN county c          ON c.county_id   = pc.county_id
+            WHERE (c.latitude IS NULL OR c.longitude IS NULL)
+              $whereSql
+            ",
+            $params
+        );
+
+        // Total de usuarios con perfil Field Measurements activos
+        $fieldMeasurementsTotal = (int) $conn->fetchOne(
+            "
+            SELECT COUNT(*)
+            FROM user u
+            INNER JOIN rol r ON r.rol_id = u.rol_id
+            WHERE LOWER(TRIM(r.name)) = 'field measurements'
+              AND COALESCE(u.status, 1) = 1
+            "
+        );
+
+        return [
+            'projects_in_period' => $projectsInPeriod,
+            'projects_with_county' => $projectsWithCounty,
+            'counties_with_coords' => $countiesWithCoords,
+            'counties_without_coords' => $countiesWithoutCoords,
+            'field_measurements_total' => $fieldMeasurementsTotal,
+        ];
+    }
+
+    /**
+     * Formatea una fecha de DataTracking (DATETIME en BD) a m/d/y para mostrar en el acordeón.
+     */
+    private function formatWorkDate(mixed $raw): string
+    {
+        if (null === $raw || '' === $raw) {
+            return '';
+        }
+        try {
+            $dt = $raw instanceof \DateTimeInterface ? $raw : new \DateTime((string) $raw);
+
+            return $dt->format('m/d/y');
+        } catch (\Throwable) {
+            return '';
+        }
+    }
 }

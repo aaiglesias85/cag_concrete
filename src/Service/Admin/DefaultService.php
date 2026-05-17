@@ -926,6 +926,16 @@ class DefaultService extends Base
                     ['route' => 'invoice', 'label' => 'Invoices', 'funcion_id' => FunctionId::INVOICE],
                 ],
             ],
+            [
+                'id' => 'measurements',
+                'title' => 'Measurements',
+                'description' => 'Geolocated map of project work and per-employee workload distribution.',
+                'layout' => 'map',
+                'columns' => [],
+                'links' => [
+                    ['route' => 'data_tracking', 'label' => 'Data tracking', 'funcion_id' => FunctionId::DATA_TRACKING],
+                ],
+            ],
         ];
     }
 
@@ -990,6 +1000,7 @@ class DefaultService extends Base
         $homeInvoiceProfit = null;
         $homeCostBreakdown = null;
         $homeProfitCostOverview = null;
+        $homeMeasurements = null;
 
         foreach ($dashboardWidgets as $w) {
             if (empty($w['id'])) {
@@ -1115,6 +1126,15 @@ class DefaultService extends Base
                     $r0['inicial'],
                     $r0['final']
                 );
+                continue;
+            }
+            if ('measurements' === $w['id']) {
+                $r0 = $this->taskService->resolverRangoFechasPeriodo('current_month', '', '');
+                $homeMeasurements = $this->dataTrackingService->obtenerMeasurementsPayloadHome(
+                    '',
+                    $r0['inicial'],
+                    $r0['final']
+                );
             }
         }
 
@@ -1131,6 +1151,7 @@ class DefaultService extends Base
             'home_invoice_profit' => $homeInvoiceProfit,
             'home_cost_breakdown' => $homeCostBreakdown,
             'home_profit_cost_overview' => $homeProfitCostOverview,
+            'home_measurements' => $homeMeasurements,
         ];
     }
 

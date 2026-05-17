@@ -1,0 +1,98 @@
+<div class="col-12 mb-5 mb-xl-10" id="widget-{{ w.id }}">
+    <div class="card card-flush h-100 shadow-sm" id="measurements-widget">
+        <div class="card-header border-0 pt-5 d-flex align-items-start justify-content-between flex-nowrap gap-3">
+            <div class="card-title align-items-start flex-column m-0 min-w-0">
+                <span class="card-label fw-bold text-gray-800 fs-3">{{ w.title }}</span>
+                <span class="text-gray-500 fs-7 fw-semibold mt-1">{{ w.description }}</span>
+            </div>
+            <div class="card-toolbar flex-shrink-0">
+                <div class="d-flex justify-content-end align-items-center gap-2">
+                    {# ── Unified filter (mismo patrón que widget Project Breakdown) ── #}
+                    <div>
+                        <button type="button" class="btn btn-sm btn-light fw-semibold fs-8 px-3 d-flex align-items-center gap-1"
+                                id="measurements-filter-btn"
+                                data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">
+                            <i class="ki-duotone ki-filter fs-5"><span class="path1"></span><span class="path2"></span></i>
+                            <span id="measurements-filter-label">Current month</span>
+                        </button>
+                        <div id="measurements-filter-menu" class="menu menu-sub menu-sub-dropdown w-300px" data-kt-menu="true">
+                            <div class="px-7 py-5">
+                                <div class="fs-5 text-gray-900 fw-bold">Filter</div>
+                            </div>
+                            <div class="separator border-gray-200"></div>
+                            <div class="px-7 py-5">
+                                <div class="mb-3">
+                                    <label class="form-label text-gray-700 fs-7">Period</label>
+                                    <select class="form-select form-select-sm bg-body border border-gray-300 text-gray-700 fw-semibold" id="measurements-period-select" style="border-radius:0.475rem">
+                                        <option value="all">All time</option>
+                                        <option value="current_month" selected>Current month</option>
+                                        <option value="last_month">Last month</option>
+                                        <option value="custom">Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="row g-2 mb-3" id="measurements-custom-range" style="display:none">
+                                    <div class="col-6">
+                                        <label class="form-label text-gray-700 fs-7">From</label>
+                                        <input type="date" class="form-control form-control-sm" id="measurements-date-from" />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label text-gray-700 fs-7">To</label>
+                                        <input type="date" class="form-control form-control-sm" id="measurements-date-to" />
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-gray-700 fs-7">Project</label>
+                                    <select class="form-select form-select-solid form-select-sm" id="measurements-filter-project-select">
+                                        <option value=""></option>
+                                    </select>
+                                </div>
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button type="button" class="btn btn-light btn-active-light-primary fw-semibold me-2 px-6"
+                                            data-kt-menu-dismiss="true" id="measurements-btn-reset">Reset</button>
+                                    <button type="button" class="btn btn-primary fw-semibold px-6"
+                                            data-kt-menu-dismiss="true" id="measurements-btn-apply">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% for link in w.links %}
+                        {% if link.canView %}
+                            <a href="{{ path(link.route) }}" class="btn btn-sm btn-light-primary fw-bold" title="Go to module">
+                                {{ link.label }}
+                            </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body pt-4 pb-4">
+            <div class="row g-4" id="measurements-body">
+                {# Mapa #}
+                <div class="col-12 col-lg-9">
+                    <div id="measurements-map" style="width: 100%; height: 520px; border-radius: 6px; background: #f3f6f9;"></div>
+                    <div class="d-flex align-items-center mt-3 text-muted fs-7">
+                        <span id="measurements-summary">Loading…</span>
+                        <span class="ms-3" id="measurements-active-filter" style="display: none;">
+                            <i class="ki-duotone ki-user fs-4 text-primary me-1"><span class="path1"></span><span class="path2"></span></i>
+                            Showing employee: <strong id="measurements-active-filter-name"></strong>
+                            <button type="button" class="btn btn-sm btn-link text-danger ms-1 p-0" id="measurements-clear-employee-filter">Clear</button>
+                        </span>
+                    </div>
+                    <div id="measurements-diagnostic" style="display: none;"></div>
+                </div>
+
+                {# Panel lateral: empleados #}
+                <div class="col-12 col-lg-3">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <h4 class="fw-bold mb-0 fs-5">Crew</h4>
+                        <span class="text-muted fs-7">% of <span id="measurements-total-projects">0</span> projects</span>
+                    </div>
+                    <div id="measurements-employees-list" class="d-flex flex-column gap-2" style="max-height: 520px; overflow-y: auto;">
+                        {# Renderizado por JS #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
