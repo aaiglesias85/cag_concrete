@@ -139,7 +139,7 @@ class CountyRepository extends ServiceEntityRepository
      *
      * @return array{data: array<int, mixed>, total: int}
      */
-    public function ListarCountysConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC', $district_id = ''): array
+    public function ListarCountysConTotal(int $start, int $limit, ?string $sSearch = null, string $sortColumn = 'description', string $sortDirection = 'ASC', $district_id = '', $state_id = ''): array
     {
         // Whitelist de columnas ordenables
         $sortable = [
@@ -147,6 +147,7 @@ class CountyRepository extends ServiceEntityRepository
             'id' => 'c.countyId',
             'description' => 'c.description',
             'district' => 'd.description',
+            'state' => 's.code',
             'city' => 'c.city',
             'status' => 'c.status',
         ];
@@ -155,16 +156,22 @@ class CountyRepository extends ServiceEntityRepository
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('c')
-            ->leftJoin('c.district', 'd');
+            ->leftJoin('c.district', 'd')
+            ->leftJoin('c.state', 's');
 
         if (!empty($sSearch)) {
-            $baseQb->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search')
+            $baseQb->andWhere('c.description LIKE :search OR d.description LIKE :search OR c.city LIKE :search OR s.name LIKE :search OR s.code LIKE :search')
                 ->setParameter('search', "%{$sSearch}%");
         }
 
-        if ('' !== $district_id) {
+        if ('' !== $district_id && null !== $district_id) {
             $baseQb->andWhere('d.districtId = :district_id')
                 ->setParameter('district_id', $district_id);
+        }
+
+        if ('' !== $state_id && null !== $state_id) {
+            $baseQb->andWhere('s.id = :state_id')
+                ->setParameter('state_id', $state_id);
         }
 
         // 1) Datos

@@ -12,6 +12,7 @@ use App\Entity\District;
 use App\Entity\Estimate;
 use App\Entity\Project;
 use App\Entity\ProjectCounty;
+use App\Entity\State;
 use App\Repository\CountyRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\ProjectCountyRepository;
@@ -39,6 +40,9 @@ class CountyService extends Base
             $arreglo_resultado['city'] = $entity->getCity() ?? '';
             $arreglo_resultado['status'] = $entity->getStatus();
             $arreglo_resultado['district_id'] = $entity->getDistrict() ? $entity->getDistrict()->getDistrictId() : '';
+            $arreglo_resultado['state_id'] = $entity->getState() ? $entity->getState()->getId() : '';
+            $arreglo_resultado['latitude'] = $entity->getLatitude() ?? '';
+            $arreglo_resultado['longitude'] = $entity->getLongitude() ?? '';
 
             $countyId = (int) $entity->getCountyId();
             $resultado['success'] = true;
@@ -282,10 +286,13 @@ class CountyService extends Base
 
         $county_id = $d->county_id;
         $district_id = (string) ($d->district_id ?? '');
+        $state_id = (string) ($d->state_id ?? '');
         $description = (string) $d->description;
         $city = null !== $d->city ? trim((string) $d->city) : '';
         $city = '' !== $city ? $city : null;
         $status = (string) $d->status;
+        $latitude = $this->normalizeCoordinate($d->latitude);
+        $longitude = $this->normalizeCoordinate($d->longitude);
 
         $entity = $this->getDoctrine()->getRepository(County::class)
            ->find($county_id);
@@ -306,11 +313,25 @@ class CountyService extends Base
             $entity->setDescription($description);
             $entity->setCity($city);
             $entity->setStatus($this->parseBooleanStatus($status));
+            $entity->setLatitude($latitude);
+            $entity->setLongitude($longitude);
 
             $entity->setDistrict(null);
             if ('' !== $district_id) {
                 $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
                 $entity->setDistrict($district);
+            }
+
+            $entity->setState(null);
+            if ('' !== $state_id) {
+                $state = $this->getDoctrine()->getRepository(State::class)->find($state_id);
+                if (null === $state) {
+                    $resultado['success'] = false;
+                    $resultado['error'] = 'The selected state does not exist.';
+
+                    return $resultado;
+                }
+                $entity->setState($state);
             }
 
             $em->flush();
@@ -343,10 +364,13 @@ class CountyService extends Base
         $em = $this->getDoctrine()->getManager();
 
         $district_id = (string) ($d->district_id ?? '');
+        $state_id = (string) ($d->state_id ?? '');
         $description = (string) $d->description;
         $city = null !== $d->city ? trim((string) $d->city) : '';
         $city = '' !== $city ? $city : null;
         $status = (string) $d->status;
+        $latitude = $this->normalizeCoordinate($d->latitude);
+        $longitude = $this->normalizeCoordinate($d->longitude);
 
         // Verificar name — la relación district es ManyToOne, pasar string vacío rompe la búsqueda.
         // Incluir city para distinguir filas County (city=null) vs City (city con valor) del mismo description+district.
@@ -365,10 +389,23 @@ class CountyService extends Base
         $entity->setDescription($description);
         $entity->setCity($city);
         $entity->setStatus($this->parseBooleanStatus($status));
+        $entity->setLatitude($latitude);
+        $entity->setLongitude($longitude);
 
         if ('' !== $district_id) {
             $district = $this->getDoctrine()->getRepository(District::class)->find($district_id);
             $entity->setDistrict($district);
+        }
+
+        if ('' !== $state_id) {
+            $state = $this->getDoctrine()->getRepository(State::class)->find($state_id);
+            if (null === $state) {
+                $resultado['success'] = false;
+                $resultado['error'] = 'The selected state does not exist.';
+
+                return $resultado;
+            }
+            $entity->setState($state);
         }
 
         $em->persist($entity);
@@ -396,6 +433,7 @@ class CountyService extends Base
     {
         $dt = $listar->dt;
         $district_id = $listar->district_id;
+        $state_id = $listar->state_id;
 
         /** @var CountyRepository $countyRepo */
         $countyRepo = $this->getDoctrine()->getRepository(County::class);
@@ -405,7 +443,8 @@ class CountyService extends Base
             $dt['search'],
             $dt['orderField'],
             $dt['orderDir'],
-            $district_id
+            $district_id,
+            $state_id
         );
 
         $data = [];
@@ -417,7 +456,10 @@ class CountyService extends Base
                 'id' => $county_id,
                 'description' => $value->getDescription(),
                 'district' => $value->getDistrict() ? $value->getDistrict()->getDescription() : '',
+                'state' => $value->getState() ? $value->getState()->getCode() : '',
                 'city' => $value->getCity() ?? '',
+                'latitude' => $value->getLatitude() ?? '',
+                'longitude' => $value->getLongitude() ?? '',
                 'status' => $value->getStatus() ? 1 : 0,
             ];
         }
@@ -431,5 +473,18 @@ class CountyService extends Base
     private function parseBooleanStatus(string $status): bool
     {
         return filter_var($status, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    private function normalizeCoordinate(?string $value): ?string
+    {
+        if (null === $value) {
+            return null;
+        }
+        $value = trim($value);
+        if ('' === $value || !is_numeric($value)) {
+            return null;
+        }
+
+        return $value;
     }
 }

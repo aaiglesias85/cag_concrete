@@ -105,6 +105,14 @@ var Counties = (function () {
    var validWizard = function () {
       var result = true;
       if (activeTab === 1) {
+         var state_id = $("#state_id").val();
+         if (state_id === "" || state_id == null) {
+            MyApp.showErrorMessageValidateSelect(
+               KTUtil.get("select-state"),
+               "This field is required",
+            );
+            result = false;
+         }
          var district_id = $("#district").val();
          if (district_id === "" || district_id == null) {
             MyApp.showErrorMessageValidateSelect(
@@ -455,6 +463,7 @@ var Counties = (function () {
          data: function (d) {
             return $.extend({}, d, {
                district_id: $("#filtro-district").val(),
+               state_id: $("#filtro-state").val(),
             });
          },
          method: "post",
@@ -527,6 +536,7 @@ var Counties = (function () {
       }
       columns.push(
          { data: "description" },
+         { data: "state" },
          { data: "district" },
          { data: "city" },
          { data: "status" },
@@ -536,41 +546,27 @@ var Counties = (function () {
       return columns;
    };
    var getColumnsDefTable = function () {
+      var textColumn = function (width) {
+         return function (data, type, row) {
+            return DatatableUtil.getRenderColumnDiv(
+               DatatableUtil.escapeHtml(data != null ? String(data) : ""),
+               width || 150,
+            );
+         };
+      };
+
       let columnDefs = [
          {
             targets: 0,
             orderable: false,
             render: DatatableUtil.getRenderColumnCheck,
          },
+         { targets: 1, render: textColumn(150) }, // description (County)
+         { targets: 2, render: textColumn(90) }, // state
+         { targets: 3, render: textColumn(150) }, // district
+         { targets: 4, render: textColumn(150) }, // city
          {
-            targets: 1,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(
-                  DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                  150,
-               );
-            },
-         },
-         {
-            targets: 2,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(
-                  DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                  150,
-               );
-            },
-         },
-         {
-            targets: 3,
-            render: function (data, type, row) {
-               return DatatableUtil.getRenderColumnDiv(
-                  DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                  150,
-               );
-            },
-         },
-         {
-            targets: 4,
+            targets: 5,
             className: "text-center",
             render: DatatableUtil.getRenderColumnEstado,
          },
@@ -578,35 +574,12 @@ var Counties = (function () {
 
       if (!permiso.eliminar) {
          columnDefs = [
+            { targets: 0, render: textColumn(150) }, // description (County)
+            { targets: 1, render: textColumn(90) }, // state
+            { targets: 2, render: textColumn(150) }, // district
+            { targets: 3, render: textColumn(150) }, // city
             {
-               targets: 0,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(
-                     DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                     150,
-                  );
-               },
-            },
-            {
-               targets: 1,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(
-                     DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                     150,
-                  );
-               },
-            },
-            {
-               targets: 2,
-               render: function (data, type, row) {
-                  return DatatableUtil.getRenderColumnDiv(
-                     DatatableUtil.escapeHtml(data != null ? String(data) : ""),
-                     150,
-                  );
-               },
-            },
-            {
-               targets: 3,
+               targets: 4,
                className: "text-center",
                render: DatatableUtil.getRenderColumnEstado,
             },
@@ -779,6 +752,12 @@ var Counties = (function () {
       KTUtil.get("filtro-district").value = "";
       KTUtil.triggerEvent(KTUtil.get("filtro-district"), "change");
 
+      var filtroState = KTUtil.get("filtro-state");
+      if (filtroState) {
+         filtroState.value = "";
+         KTUtil.triggerEvent(filtroState, "change");
+      }
+
       oTable.search("").draw();
    };
 
@@ -790,6 +769,16 @@ var Counties = (function () {
 
       KTUtil.get("district").value = "";
       KTUtil.triggerEvent(KTUtil.get("district"), "change");
+
+      var stateSel = KTUtil.get("state_id");
+      if (stateSel) {
+         stateSel.value = "";
+         KTUtil.triggerEvent(stateSel, "change");
+      }
+
+      $("#latitude").val("");
+      $("#longitude").val("");
+      $("#county-place-search").val("");
 
       KTUtil.get("estadoactivo").checked = true;
 
@@ -874,14 +863,16 @@ var Counties = (function () {
 
          event_change = false;
 
+         var state_id = $("#state_id").val();
          var district_id = $("#district").val();
 
-         if (validateForm() && district_id !== "") {
+         if (validateForm() && district_id !== "" && state_id !== "") {
             var formData = new URLSearchParams();
 
             var county_id = $("#county_id").val();
             formData.set("county_id", county_id);
 
+            formData.set("state_id", state_id);
             formData.set("district_id", district_id);
 
             var description = $("#description").val();
@@ -892,6 +883,9 @@ var Counties = (function () {
             } else {
                formData.set("city", $("#city").val() || "");
             }
+
+            formData.set("latitude", $("#latitude").val() || "");
+            formData.set("longitude", $("#longitude").val() || "");
 
             var status = $("#estadoactivo").prop("checked") ? 1 : 0;
             formData.set("status", status);
@@ -928,6 +922,12 @@ var Counties = (function () {
                   BlockUtil.unblock("#form-county");
                });
          } else {
+            if (state_id === "") {
+               MyApp.showErrorMessageValidateSelect(
+                  KTUtil.get("select-state"),
+                  "This field is required",
+               );
+            }
             if (district_id === "") {
                MyApp.showErrorMessageValidateSelect(
                   KTUtil.get("select-district"),
@@ -1046,8 +1046,14 @@ var Counties = (function () {
 
             $("#description").val(county.description);
 
+            $("#state_id").val(county.state_id || "");
+            $("#state_id").trigger("change");
+
             $("#district").val(county.district_id);
             $("#district").trigger("change");
+
+            $("#latitude").val(county.latitude || "");
+            $("#longitude").val(county.longitude || "");
 
             applyCountyFormModeFromRecord(county);
 
@@ -1185,6 +1191,65 @@ var Counties = (function () {
       MyApp.initWidgets();
    };
 
+   // Google Places autocomplete para llenar lat/lng al crear/editar County.
+   // Requiere que la API de Google Maps con librería 'places' esté cargada en el layout.
+   var placeAutocompleteInstance = null;
+   var attachPlaceAutocomplete = function () {
+      var input = document.getElementById("county-place-search");
+      if (!input || placeAutocompleteInstance) {
+         return;
+      }
+
+      placeAutocompleteInstance = new google.maps.places.Autocomplete(input, {
+         types: ["geocode"],
+         componentRestrictions: { country: "us" },
+         fields: ["geometry", "formatted_address", "name"],
+      });
+
+      placeAutocompleteInstance.addListener("place_changed", function () {
+         var place = placeAutocompleteInstance.getPlace();
+         if (!place || !place.geometry || !place.geometry.location) {
+            return;
+         }
+         var loc = place.geometry.location;
+         $("#latitude").val(loc.lat().toFixed(7));
+         $("#longitude").val(loc.lng().toFixed(7));
+         event_change = true;
+      });
+   };
+
+   var initCountyPlaceAutocomplete = function () {
+      // Botón clear: independiente de Google Maps, siempre se engancha.
+      $(document).off("click", "#btn-clear-coords");
+      $(document).on("click", "#btn-clear-coords", function (e) {
+         e.preventDefault();
+         $("#county-place-search").val("");
+         $("#latitude").val("");
+         $("#longitude").val("");
+         event_change = true;
+      });
+
+      // Esperar a que google.maps.places.Autocomplete esté disponible.
+      // El loader del layout carga la API asíncronamente, así que polleamos
+      // hasta ~20s. Si no se carga, el usuario podrá ingresar lat/lng manualmente.
+      var attempts = 0;
+      var maxAttempts = 40;
+      var timer = setInterval(function () {
+         attempts++;
+         if (
+            typeof google !== "undefined" &&
+            google.maps &&
+            google.maps.places &&
+            google.maps.places.Autocomplete
+         ) {
+            clearInterval(timer);
+            attachPlaceAutocomplete();
+         } else if (attempts >= maxAttempts) {
+            clearInterval(timer);
+         }
+      }, 500);
+   };
+
    return {
       //main function to initiate the module
       init: function () {
@@ -1199,6 +1264,7 @@ var Counties = (function () {
          initAccionChange();
 
          initCountyFormModeToggle();
+         initCountyPlaceAutocomplete();
          initWizard();
          initAccionesCountyRelated();
       },

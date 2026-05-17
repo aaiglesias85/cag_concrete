@@ -26,6 +26,16 @@ class County
     #[ORM\JoinColumn(name: 'district_id', referencedColumnName: 'district_id')]
     private ?District $district;
 
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\State')]
+    #[ORM\JoinColumn(name: 'state_id', referencedColumnName: 'id', nullable: true)]
+    private ?State $state = null;
+
+    #[ORM\Column(name: 'latitude', type: 'decimal', precision: 10, scale: 7, nullable: true)]
+    private ?string $latitude = null;
+
+    #[ORM\Column(name: 'longitude', type: 'decimal', precision: 10, scale: 7, nullable: true)]
+    private ?string $longitude = null;
+
     public function getCountyId(): ?int
     {
         return $this->countyId;
@@ -71,5 +81,35 @@ class County
     public function setDistrict(?District $district): void
     {
         $this->district = $district;
+    }
+
+    public function getState(): ?State
+    {
+        return $this->state;
+    }
+
+    public function setState(?State $state): void
+    {
+        $this->state = $state;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): void
+    {
+        $this->longitude = $longitude;
     }
 }

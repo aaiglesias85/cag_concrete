@@ -9,6 +9,7 @@ use App\Dto\Admin\County\CountyIdsRequest;
 use App\Dto\Admin\County\CountyListarRequest;
 use App\Dto\Admin\County\CountySalvarRequest;
 use App\Entity\District;
+use App\Entity\State;
 use App\Security\AdminPermission;
 use App\Security\Attribute\RequireAdminPermission;
 use App\Service\Admin\AdminAccessService;
@@ -37,9 +38,13 @@ class CountyController extends AbstractAdminController
         $districts = $this->countyService->getDoctrine()->getRepository(District::class)
             ->ListarOrdenados();
 
+        $states = $this->countyService->getDoctrine()->getRepository(State::class)
+            ->ListarOrdenados();
+
         return $this->render('admin/county/index.html.twig', [
             'permiso' => $permiso,
             'districts' => $districts,
+            'states' => $states,
         ]);
     }
 

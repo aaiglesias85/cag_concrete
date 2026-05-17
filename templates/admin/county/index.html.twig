@@ -81,6 +81,14 @@
                         <!--begin::Content-->
                         <div class="px-7 py-5">
                            <div class="mb-3">
+                              <select id="filtro-state" class="form-select form-select2 form-select-solid fw-bold">
+                                 <option value="">State</option>
+                                 {% for item in states %}
+                                 <option value="{{ item.id }}">{{ item.name }} ({{ item.code }})</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="mb-3">
                               <select id="filtro-district" class="form-select form-select2 form-select-solid fw-bold">
                                  <option value="">District</option>
                                  {% for item in districts %}
@@ -178,6 +186,7 @@
                      </th>
                      {% endif %}
                      <th>County</th>
+                     <th>State</th>
                      <th>District</th>
                      <th>City</th>
                      <th>Status</th>
@@ -303,9 +312,27 @@
 
                      <div class="form-group ic-form-group">
                         <div class="row">
-                           <div class="col-md-3" id="select-district">
+                           <div class="col-md-4" id="select-state">
                               <label class="form-label required">
                                  <span class="ic-step-number">2</span>
+                                 State
+                                 <span class="ic-small italic">(required)</span>
+                              </label>
+                              <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="state_id" name="state_id">
+                                 <option value="">Select</option>
+                                 {% for item in states %}
+                                 <option value="{{ item.id }}">{{ item.name }} ({{ item.code }})</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
+                           <div class="col-md-3" id="select-district">
+                              <label class="form-label required">
+                                 <span class="ic-step-number">3</span>
                                  District
                                  <span class="ic-small italic">(required)</span>
                               </label>
@@ -318,12 +345,14 @@
                            </div>
                            <div class="col-md-9" id="col-description">
                               <label class="form-label required">
+                                 <span class="ic-step-number">4</span>
                                  <span id="label-description-text">Name</span>
                               </label>
                               <input type="text" class="form-control form-control-validate form-control-solid event-change" id="description" name="description" />
                            </div>
                            <div class="col-md-4" id="wrap-city-field" hidden>
                               <label class="form-label required" id="label-city-wrapper">
+                                 <span class="ic-step-number">4</span>
                                  Name
                               </label>
                               <input type="text" class="form-control form-control-validate form-control-solid event-change" id="city" name="city" maxlength="255" />
@@ -333,9 +362,35 @@
 
                      <div class="form-group ic-form-group">
                         <div class="row">
+                           <div class="col-md-12">
+                              <label class="form-label">
+                                 <span class="ic-step-number">5</span>
+                                 Map location
+                                 <span class="ic-small italic">(optional — required to show on the map)</span>
+                              </label>
+                              <input type="text" class="form-control form-control-solid event-change mb-2" id="county-place-search" placeholder="Search county, city or address..." autocomplete="off" />
+                              <div class="d-flex flex-wrap gap-3 align-items-center">
+                                 <div class="d-flex flex-column">
+                                    <label class="form-label fs-7 text-muted mb-1" for="latitude">Latitude</label>
+                                    <input type="number" step="any" min="-90" max="90" class="form-control form-control-sm form-control-solid event-change" id="latitude" name="latitude" style="width: 180px;" />
+                                 </div>
+                                 <div class="d-flex flex-column">
+                                    <label class="form-label fs-7 text-muted mb-1" for="longitude">Longitude</label>
+                                    <input type="number" step="any" min="-180" max="180" class="form-control form-control-sm form-control-solid event-change" id="longitude" name="longitude" style="width: 180px;" />
+                                 </div>
+                                 <button type="button" id="btn-clear-coords" class="btn btn-light-warning btn-sm align-self-end">
+                                    <i class="ki-duotone ki-cross fs-3"><span class="path1"></span><span class="path2"></span></i> Clear
+                                 </button>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="form-group ic-form-group">
+                        <div class="row">
                            <div class="col-md-4">
                               <label class="form-label">
-                                 <span class="ic-step-number">3</span>
+                                 <span class="ic-step-number">6</span>
                                  Status
                               </label>
                               <div>
@@ -411,6 +466,31 @@
 </div>
 <!--end::Content-->
 {% endblock %} {% block javascriptsspecific %}
+
+<!-- Google Maps loader (Places autocomplete para coordenadas en el form de County) -->
+<script>
+   ((g) => {
+      var h, a, k, p = 'The Google Maps JavaScript API', c = 'google', l = 'importLibrary', q = '__ib__', m = document, b = window;
+      b = b[c] || (b[c] = {});
+      var d = b.maps || (b.maps = {}), r = new Set(), e = new URLSearchParams(),
+         u = () => h || (h = new Promise(async (f, n) => {
+            await (a = m.createElement('script'));
+            e.set('libraries', [...r] + '');
+            for (k in g) e.set(k.replace(/[A-Z]/g, (t) => '_' + t[0].toLowerCase()), g[k]);
+            e.set('callback', c + '.maps.' + q);
+            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+            d[q] = f;
+            a.onerror = () => (h = n(Error(p + ' could not load.')));
+            a.nonce = m.querySelector('script[nonce]')?.nonce || '';
+            m.head.append(a);
+         }));
+      d[l] ? console.warn(p + ' only loads once. Ignoring:', g) : (d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n)));
+   })({ key: '{{ google_maps_api_key }}', v: 'weekly' });
+   // Pre-carga la librería 'places' para que google.maps.places.Autocomplete esté disponible.
+   google.maps.importLibrary('places');
+</script>
+
+<script src="{{ asset('assets/metronic8/js/gmp-place-autocomplete-patch.js') }}"></script>
 <script src="{{ asset('assets/metronic8/assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
 <script src="{{ asset('assets/metronic8/js/pages/counties.js') }}?{{ 'now' | date('U') }}"></script>
 <script>

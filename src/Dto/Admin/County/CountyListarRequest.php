@@ -16,15 +16,18 @@ final class CountyListarRequest implements AdminHttpRequestDtoInterface
 
     public mixed $district_id = null;
 
+    public mixed $state_id = null;
+
     public static function fromHttpRequest(Request $request): static
     {
         $d = new self();
         $d->dt = DataTablesHelper::parse(
             $request,
-            allowedOrderFields: ['id', 'description', 'district', 'city', 'status'],
+            allowedOrderFields: ['id', 'description', 'district', 'state', 'city', 'status'],
             defaultOrderField: 'description'
         );
         $d->district_id = $request->get('district_id');
+        $d->state_id = $request->get('state_id');
 
         return $d;
     }
