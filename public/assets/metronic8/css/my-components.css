@@ -541,6 +541,34 @@ div.tagsinput.has-error {
    background: #fff8e1 !important;
 }
 
+/* --- Dark mode: row highlights con tonos oscuros legibles --- */
+[data-bs-theme='dark'] .row-pending > td {
+   background: #4a2e1a !important;
+   color: #f5d4ba !important;
+}
+[data-bs-theme='dark'] .row-secondary > td {
+   background: #1a3050 !important;
+   color: #b8d4f8 !important;
+}
+[data-bs-theme='dark'] .row-incorrect-vendor > td {
+   background: #4a4520 !important;
+   color: #f0e8a0 !important;
+}
+[data-bs-theme='dark'] .row-price-vendor > td {
+   background: #4a2e1a !important;
+   color: #f5d4ba !important;
+}
+[data-bs-theme='dark'] .row-change-order > td {
+   border-left: 4px solid #ffc107 !important;
+   background: #3d3318 !important;
+   color: #ffe082 !important;
+}
+[data-bs-theme='dark'] .row-change-order.row-secondary > td {
+   border-left: 4px solid #ffc107 !important;
+   background: #3d3318 !important;
+   color: #ffe082 !important;
+}
+
 table.table.dataTable.table-striped > tbody > tr:nth-of-type(2n + 1):not(.row-pending) > * {
    box-shadow: none;
 }
