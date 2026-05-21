@@ -51,6 +51,32 @@ var DataTracking = (function () {
    var rowDelete = null;
    var items = [];
 
+   /** 'new' sin data_tracking_id; 'edit' al cargar registro existente en #form-data-tracking */
+   var getDataTrackingFormMode = function () {
+      return String($('#data_tracking_id').val() || '').trim() !== '' ? 'edit' : 'new';
+   };
+
+   var getAccionesTablaLocal = function () {
+      return DatatableUtil.getAccionesDataSourceLocal(getDataTrackingFormMode(), permiso);
+   };
+
+   var getAccionesTablaArchivos = function () {
+      var acciones = getAccionesTablaLocal();
+      acciones.push('download');
+      return acciones;
+   };
+
+   var getAccionesListado = function () {
+      var acciones = ['detalle'];
+      if (permiso.editar) {
+         acciones.push('edit');
+      }
+      if (permiso.eliminar) {
+         acciones.push('delete');
+      }
+      return acciones;
+   };
+
    //Inicializar table
    var oTable;
    var initTable = function () {
@@ -307,13 +333,14 @@ var DataTracking = (function () {
       }
 
       // acciones
+      var accionesListado = getAccionesListado();
       columnDefs.push({
          targets: -1,
          data: null,
          orderable: false,
          className: 'text-center',
          render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['detalle', 'edit', 'delete']);
+            return DatatableUtil.getRenderAcciones(data, type, row, permiso, accionesListado);
          },
       });
 
@@ -429,12 +456,17 @@ var DataTracking = (function () {
       actualizarRecordsSeleccionados();
    };
    var actualizarRecordsSeleccionados = function () {
+      var $btnBulkDelete = $('#btn-eliminar-data-tracking');
+      if (!$btnBulkDelete.length) {
+         return;
+      }
+
       var selectedData = oTable.rows({ selected: true }).data().toArray();
 
       if (selectedData.length > 0) {
-         $('#btn-eliminar-data-tracking').removeClass('hide');
+         $btnBulkDelete.removeClass('hide');
       } else {
-         $('#btn-eliminar-data-tracking').addClass('hide');
+         $btnBulkDelete.addClass('hide');
       }
    };
 
@@ -1970,7 +2002,7 @@ var DataTracking = (function () {
             className: 'text-center',
             render: function (data, type, row) {
                if (row.isGroupHeader) return '';
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaLocal());
             },
          },
       ];
@@ -2619,7 +2651,7 @@ var DataTracking = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaLocal());
             },
          },
       ];
@@ -3126,7 +3158,7 @@ var DataTracking = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaLocal());
             },
          },
       ];
@@ -3421,7 +3453,7 @@ var DataTracking = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaLocal());
             },
          },
       ];
@@ -3794,7 +3826,7 @@ var DataTracking = (function () {
             orderable: false,
             className: 'text-center',
             render: function (data, type, row) {
-               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete']);
+               return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaLocal());
             },
          },
       ];
@@ -4189,7 +4221,7 @@ var DataTracking = (function () {
          orderable: false,
          className: 'text-center',
          render: function (data, type, row) {
-            return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
+            return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaArchivos());
          },
       });
 
