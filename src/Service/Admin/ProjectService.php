@@ -4091,7 +4091,6 @@ class ProjectService extends Base
      * SalvarCity: asocia una ubicación tipo City (registro county con columna city poblada).
      *
      * @param Project $entity
-     * @param mixed   $city_id
      * @param bool    $check_changes
      *
      * @return array{changed: bool, old_description: string}

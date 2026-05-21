@@ -126,7 +126,24 @@ Detalle variable a variable y placeholders: **[`.env.dist`](.env.dist)**.
 | `composer phpstan:full` | Misma reglas sin baseline (toda la deuda) |
 | `composer cs-check` / `composer cs-fix` | PHP-CS-Fixer (`src/`, `tests/`, `config/`) |
 | `composer test` | PHPUnit (humo + suite en `tests/`) |
-| `composer quality` | `phpstan` + `test` |
+| `composer quality` | `cs-check` + `phpstan` + `test` (mismo criterio que `pre-push` + tests) |
+| `composer quality:fix` | `cs-fix` + `phpstan` — ejecutar **antes del commit** al tocar PHP |
 | `composer install-git-hooks` | Activa `pre-push` (`.githooks/pre-push`) |
+
+### Antes de `git push`
+
+El hook `pre-push` ejecuta `cs-check` (no modifica archivos) y `phpstan`. Si falla el estilo:
+
+```bash
+composer quality:fix
+git add -u && git commit -m 'style: PHP-CS-Fixer'
+git push
+```
+
+Si el push fallaba porque el hook antiguo aplicaba `cs-fix` y dejaba cambios sin commitear, actualiza el hook con `composer install-git-hooks` tras hacer pull de estos cambios.
+
+Emergencia: `SKIP_PRE_PUSH=1 git push` o `git push --no-verify`.
+
+Los agentes de Cursor deben seguir `.cursor/rules/php-quality.mdc` al editar PHP.
 
 Variables de entorno: ver sección **Variables de entorno y despliegue** arriba y [`.env.dist`](.env.dist).

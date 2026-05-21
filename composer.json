@@ -103,8 +103,13 @@
       "cs-fix": "@php vendor/bin/php-cs-fixer fix",
       "test": "@php vendor/bin/phpunit",
       "quality": [
+         "@cs-check",
          "@phpstan",
          "@test"
+      ],
+      "quality:fix": [
+         "@cs-fix",
+         "@phpstan"
       ],
       "install-git-hooks": "git config core.hooksPath .githooks",
       "post-install-cmd": [

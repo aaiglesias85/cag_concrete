@@ -1,0 +1,40 @@
+---
+description: Calidad PHP obligatoria (PHP-CS-Fixer + PHPStan) al tocar código Symfony
+globs: src/**/*.php,tests/**/*.php,config/**/*.php
+alwaysApply: false
+---
+
+# Calidad PHP (obligatorio)
+
+Al crear o modificar archivos PHP en este proyecto, **antes de dar por terminado el trabajo** debes ejecutar y dejar en verde:
+
+```bash
+composer cs-fix
+composer phpstan
+```
+
+Si solo quieres verificar sin escribir en disco:
+
+```bash
+composer cs-check
+composer phpstan
+```
+
+## Reglas
+
+1. **No omitir PHPStan** tras cambios en `src/`, `tests/` o `config/`. El análisis usa `phpstan.neon` + baseline; errores nuevos deben corregirse, no ignorarse.
+2. **Formateo**: el estilo es `@Symfony` (`.php-cs-fixer.dist.php`). Aplica `composer cs-fix` y **incluye esos cambios en el mismo commit** que el código funcional.
+3. **Caché Symfony para PHPStan**: si PHPStan falla por contenedor, ejecuta `php bin/console cache:warmup --env=dev` y repite `composer phpstan`.
+4. **Push**: el hook `.githooks/pre-push` ejecuta `composer quality` (cs-check + phpstan). Si falla, corrige y haz commit antes de `git push`.
+5. **Emergencia** (solo si el usuario lo pide explícitamente): `SKIP_PRE_PUSH=1 git push` o `git push --no-verify`.
+
+## Flujo recomendado al cerrar una tarea
+
+```bash
+composer cs-fix
+composer phpstan
+git add -u
+# commit junto con los cambios de estilo
+```
+
+No sugieras push hasta que `composer quality` termine con código 0.
