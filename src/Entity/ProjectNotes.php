@@ -23,6 +23,10 @@ class ProjectNotes
     #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: true)]
     private ?Project $project;
 
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Usuario')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'user_id', nullable: true)]
+    private ?Usuario $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -56,5 +60,15 @@ class ProjectNotes
     public function setProject(?Project $project): void
     {
         $this->project = $project;
+    }
+
+    public function getUser(): ?Usuario
+    {
+        return $this->user;
+    }
+
+    public function setUser(?Usuario $user): void
+    {
+        $this->user = $user;
     }
 }

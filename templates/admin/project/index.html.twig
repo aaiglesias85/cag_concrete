@@ -728,8 +728,8 @@
                               <span class="number">13</span>
                            </span>
                            <div class="wizard-label">
-                              <div class="wizard-title">Notes</div>
-                              <div class="wizard-desc">List of notes</div>
+                              <div class="wizard-title">Log</div>
+                              <div class="wizard-desc">List of log entries</div>
                            </div>
                         </div>
                      </a>
@@ -1379,11 +1379,6 @@
                                     <i class="ki-duotone ki-plus-circle fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
                                     New
                                  </button>
-                                 {% endif %} {% if permiso.eliminar %}
-                                 <button id="btn-eliminar-notes" class="btn btn-danger w-125px">
-                                    <i class="ki-duotone ki-trash fs-1 me-2"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span></i>
-                                    Delete
-                                 </button>
                                  {% endif %}
                               </div>
 
@@ -1422,15 +1417,9 @@
                            <table id="notes-table-editable" class="table table-striped align-middle table-row-dashed fs-6 gy-3 gs-5">
                               <thead>
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
-                                    {% if permiso.eliminar %}
-                                    <th class="w-10px pe-2">
-                                       <div class="form-check form-check-sm form-check-custom form-check-solid me-3">
-                                          <input class="form-check-input check-select-all-notes" type="checkbox" data-kt-check="true" data-kt-check-target="#notes-table-editable .form-check-input" value="1" title="Select all" />
-                                       </div>
-                                    </th>
-                                    {% endif %}
                                     <th>Date</th>
-                                    <th>Notes</th>
+                                    <th>Log</th>
+                                    <th>User</th>
                                     <th>Actions</th>
                                  </tr>
                               </thead>
@@ -2261,8 +2250,8 @@
                               <span class="number">13</span>
                            </span>
                            <div class="wizard-label">
-                              <div class="wizard-title">Notes</div>
-                              <div class="wizard-desc">List of notes</div>
+                              <div class="wizard-title">Log</div>
+                              <div class="wizard-desc">List of log entries</div>
                            </div>
                         </div>
                      </a>
@@ -2821,7 +2810,8 @@
                               <thead>
                                  <tr class="fw-bold fs-6 text-gray-800 px-7">
                                     <th>Date</th>
-                                    <th>Notes</th>
+                                    <th>Log</th>
+                                    <th>User</th>
                                  </tr>
                               </thead>
                               <tbody class="text-gray-600 fw-semibold"></tbody>
@@ -3375,7 +3365,7 @@
       <div class="modal-content">
          <div class="modal-header">
             <h5 class="modal-title">
-               New Note
+               New Log Entry
                <span style="margin-left: 10px">
                   <span id="proyect-number-item" class="m-badge m-badge--info"></span>
                   <span id="proyect-name-item"></span>
@@ -3409,7 +3399,7 @@
                <div class="form-group ic-form-group">
                   <label class="form-label required">
                      <span class="ic-step-number">2</span>
-                     Notes
+                     Log
                   </label>
                   <div class="row">
                      <div class="col-md-12">

@@ -21,7 +21,9 @@ class ProjectNotesRepository extends ServiceEntityRepository
     public function ListarNotesDeProject($project_id, $fecha_inicial = '', $fecha_fin = '', $sort = 'DESC')
     {
         $consulta = $this->createQueryBuilder('p_n')
-            ->leftJoin('p_n.project', 'p');
+            ->leftJoin('p_n.project', 'p')
+            ->leftJoin('p_n.user', 'u')
+            ->addSelect('u');
 
         if ('' != $project_id) {
             $consulta->andWhere('p.projectId = :project_id')
@@ -61,7 +63,9 @@ class ProjectNotesRepository extends ServiceEntityRepository
         $project_id = '', $fecha_inicial = '', $fecha_fin = '')
     {
         $consulta = $this->createQueryBuilder('p_n')
-            ->leftJoin('p_n.project', 'p');
+            ->leftJoin('p_n.project', 'p')
+            ->leftJoin('p_n.user', 'u')
+            ->addSelect('u');
 
         // Filtro por búsqueda
         if (!empty($sSearch)) {
@@ -162,7 +166,9 @@ class ProjectNotesRepository extends ServiceEntityRepository
 
         // QB base con filtros (se reutiliza para datos y conteo)
         $baseQb = $this->createQueryBuilder('p_n')
-            ->leftJoin('p_n.project', 'p');
+            ->leftJoin('p_n.project', 'p')
+            ->leftJoin('p_n.user', 'u')
+            ->addSelect('u');
 
         // Filtrar por búsqueda
         if ($sSearch) {

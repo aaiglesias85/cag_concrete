@@ -2771,9 +2771,8 @@ var Projects = (function () {
       return total;
    };
 
-   // notes
+   // project log (notes)
    var oTableNotes;
-   var rowDeleteNote = null;
    var rowEditNote = null;
    var initTableNotes = function () {
       const table = '#notes-table-editable';
@@ -2793,40 +2792,24 @@ var Projects = (function () {
          error: DatatableUtil.errorDataTable,
       };
 
-      // columns: checkbox (id) si permiso.eliminar, date, notes, actions
-      const columns = [];
-      if (permiso.eliminar) {
-         columns.push({ data: 'id' });
-      }
-      columns.push({ data: 'date' }, { data: 'notes' }, { data: null });
+      const columns = [{ data: 'date' }, { data: 'notes' }, { data: 'user' }, { data: null }];
 
-      // column defs
-      let columnDefs = [];
-      if (permiso.eliminar) {
-         columnDefs.push({
-            targets: 0,
+      const columnDefs = [
+         {
+            targets: -1,
+            data: null,
             orderable: false,
-            searchable: false,
-            render: DatatableUtil.getRenderColumnCheck,
-         });
-      }
-      columnDefs.push({
-         targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
-            return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit', 'delete']);
+            className: 'text-center',
+            render: function (data, type, row) {
+               return DatatableUtil.getRenderAcciones(data, type, row, permiso, ['edit']);
+            },
          },
-      });
+      ];
 
-      // language
       const language = DatatableUtil.getDataTableLenguaje();
+      const order = [[0, 'desc']];
 
-      // order: nunca por columna checkbox (0), por fecha (1) desc por defecto
-      const order = permiso.eliminar ? [[1, 'desc']] : [[0, 'desc']];
-
-      var dtOptions = {
+      oTableNotes = $(table).DataTable({
          searchDelay: 500,
          processing: true,
          serverSide: true,
@@ -2842,37 +2825,12 @@ var Projects = (function () {
          columns: columns,
          columnDefs: columnDefs,
          language: language,
-      };
-      if (permiso.eliminar) {
-         dtOptions.select = {
-            info: false,
-            style: 'multi',
-            selector: 'td:first-child input[type="checkbox"]',
-            className: 'row-selected',
-         };
-      }
-      oTableNotes = $(table).DataTable(dtOptions);
-
-      // Re-init functions on every table re-draw
-      oTableNotes.on('draw', function () {
-         initAccionesNotes();
-         $('.check-select-all-notes').prop('checked', false);
       });
 
-      // Select all checkbox in header (solo si hay columna de checkbox)
-      if (permiso.eliminar) {
-         $(document).off('click', '.check-select-all-notes');
-         $(document).on('click', '.check-select-all-notes', function () {
-            var checked = this.checked;
-            if (checked) {
-               oTableNotes.rows({ page: 'current' }).select();
-            } else {
-               oTableNotes.rows({ page: 'current' }).deselect();
-            }
-         });
-      }
+      oTableNotes.on('draw', function () {
+         initAccionesNotes();
+      });
 
-      // search
       handleSearchDatatableNotes();
    };
    var handleSearchDatatableNotes = function () {
@@ -2971,7 +2929,7 @@ var Projects = (function () {
                MyApp.showErrorMessageValidateInput(KTUtil.get('notes-date'), 'This field is required');
             }
             if (notesIsEmpty) {
-               toastr.error('The note cannot be empty.', '');
+               toastr.error('The log entry cannot be empty.', '');
             }
          }
       });
@@ -2985,161 +2943,6 @@ var Projects = (function () {
          // mostar modal
          ModalUtil.show('modal-notes', { backdrop: 'static', keyboard: true });
       });
-
-      $(document).off('click', '#notes-table-editable a.delete');
-      $(document).on('click', '#notes-table-editable a.delete', function (e) {
-         e.preventDefault();
-         var notes_id = $(this).data('id');
-
-         Swal.fire({
-            text: 'Are you sure you want to delete the notes?',
-            icon: 'warning',
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'No, cancel',
-            customClass: {
-               confirmButton: 'btn fw-bold btn-success',
-               cancelButton: 'btn fw-bold btn-danger',
-            },
-         }).then(function (result) {
-            if (result.value) {
-               eliminarNote(notes_id);
-            }
-         });
-      });
-
-      function eliminarNote(notes_id) {
-         var formData = new URLSearchParams();
-         formData.set('notes_id', notes_id);
-
-         BlockUtil.block('#lista-notes');
-
-         axios
-            .post('project/eliminarNotes', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     toastr.success(response.message, '');
-
-                     btnClickFiltrarNotes();
-                  } else {
-                     toastr.error(response.error, '');
-                  }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#lista-notes');
-            });
-      }
-
-      $(document).off('click', '#btn-eliminar-notes');
-      $(document).on('click', '#btn-eliminar-notes', function (e) {
-         e.preventDefault();
-
-         var selectedRows = oTableNotes.rows({ selected: true });
-         var selectedIds = [];
-         selectedRows.every(function (rowIdx) {
-            var row = this.data();
-            if (row && row.id) selectedIds.push(row.id);
-         });
-
-         if (selectedIds.length === 0) {
-            toastr.warning('Select one or more notes to delete (use the checkboxes).', '');
-            return;
-         }
-
-         Swal.fire({
-            text: 'Are you sure you want to delete the selected note(s)?',
-            icon: 'warning',
-            showCancelButton: true,
-            buttonsStyling: false,
-            confirmButtonText: 'Yes, delete!',
-            cancelButtonText: 'No, cancel',
-            customClass: {
-               confirmButton: 'btn fw-bold btn-success',
-               cancelButton: 'btn fw-bold btn-danger',
-            },
-         }).then(function (result) {
-            if (result.value) {
-               eliminarNotesPorIds(selectedIds);
-            }
-         });
-      });
-
-      function eliminarNotesPorIds(ids) {
-         BlockUtil.block('#lista-notes');
-         var total = ids.length;
-         var done = 0;
-         var hasError = false;
-
-         function doNext() {
-            if (done >= total) {
-               BlockUtil.unblock('#lista-notes');
-               if (!hasError) {
-                  toastr.success('The selected note(s) were deleted.', '');
-                  btnClickFiltrarNotes();
-               }
-               return;
-            }
-            var formData = new URLSearchParams();
-            formData.set('notes_id', ids[done]);
-            axios
-               .post('project/eliminarNotes', formData, { responseType: 'json' })
-               .then(function (res) {
-                  if ((res.status === 200 || res.status === 201) && res.data && res.data.success) {
-                     done++;
-                     doNext();
-                  } else {
-                     hasError = true;
-                     toastr.error(res.data && res.data.error ? res.data.error : 'Error deleting note.', '');
-                     BlockUtil.unblock('#lista-notes');
-                     btnClickFiltrarNotes();
-                  }
-               })
-               .catch(function (err) {
-                  hasError = true;
-                  MyUtil.catchErrorAxios(err);
-                  BlockUtil.unblock('#lista-notes');
-                  btnClickFiltrarNotes();
-               });
-         }
-         doNext();
-      }
-
-      function eliminarNotes(fechaInicial, fechaFin) {
-         var formData = new URLSearchParams();
-         var project_id = $('#project_id').val();
-         formData.set('project_id', project_id);
-         formData.set('from', fechaInicial);
-         formData.set('to', fechaFin);
-         BlockUtil.block('#lista-notes');
-         axios
-            .post('project/eliminarNotesDate', formData, { responseType: 'json' })
-            .then(function (res) {
-               if (res.status === 200 || res.status === 201) {
-                  var response = res.data;
-                  if (response.success) {
-                     toastr.success(response.message, '');
-                     FlatpickrUtil.clear('datetimepicker-desde-notes');
-                     FlatpickrUtil.clear('datetimepicker-hasta-notes');
-                     btnClickFiltrarNotes();
-                  } else {
-                     toastr.error(response.error, '');
-                  }
-               } else {
-                  toastr.error('An internal error has occurred, please try again.', '');
-               }
-            })
-            .catch(MyUtil.catchErrorAxios)
-            .then(function () {
-               BlockUtil.unblock('#lista-notes');
-            });
-      }
    };
 
    var editRowNote = function (notes_id) {

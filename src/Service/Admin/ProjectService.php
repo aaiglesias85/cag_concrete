@@ -1293,29 +1293,8 @@ class ProjectService extends Base
      */
     public function EliminarNotes($notes_id)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $entity = $this->getDoctrine()->getRepository(ProjectNotes::class)
-            ->find($notes_id);
-        /** @var ProjectNotes $entity */
-        if (null != $entity) {
-            $notes = $entity->getNotes();
-            $project_name = $entity->getProject()->getName();
-
-            $em->remove($entity);
-            $em->flush();
-
-            // Salvar log
-            $log_operacion = 'Delete';
-            $log_categoria = 'Project Notes';
-            $log_descripcion = "The notes: $notes is delete from project: $project_name";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = 'The requested record does not exist';
-        }
+        $resultado['success'] = false;
+        $resultado['error'] = 'Deleting project log entries is not allowed.';
 
         return $resultado;
     }
@@ -1329,34 +1308,8 @@ class ProjectService extends Base
      */
     public function EliminarNotesDate($project_id, $from, $to)
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $project_entity = $this->getDoctrine()->getRepository(Project::class)
-            ->find($project_id);
-        /** @var Project $project_entity */
-        if (null != $project_entity) {
-            $project_name = $project_entity->getName();
-
-            /** @var ProjectNotesRepository $projectNotesRepo */
-            $projectNotesRepo = $this->getDoctrine()->getRepository(ProjectNotes::class);
-            $notes = $projectNotesRepo->ListarNotesDeProject($project_id, $from, $to);
-            foreach ($notes as $entity) {
-                $em->remove($entity);
-            }
-
-            $em->flush();
-
-            // Salvar log
-            $log_operacion = 'Delete';
-            $log_categoria = 'Project Notes';
-            $log_descripcion = "The notes $from and $to is delete from project: $project_name";
-            $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
-
-            $resultado['success'] = true;
-        } else {
-            $resultado['success'] = false;
-            $resultado['error'] = 'The requested record does not exist';
-        }
+        $resultado['success'] = false;
+        $resultado['error'] = 'Deleting project log entries is not allowed.';
 
         return $resultado;
     }
@@ -1422,20 +1375,25 @@ class ProjectService extends Base
 
             $entity->setProject($project_entity);
 
+            $usuario = $this->getUser();
+            if ($usuario instanceof Usuario) {
+                $entity->setUser($usuario);
+            }
+
             $log_operacion = 'Add';
-            $log_descripcion = "The notes: $notes is add to the project: ".$project_entity->getName();
+            $log_descripcion = "The log entry: $notes is add to the project: ".$project_entity->getName();
 
             if ($is_new) {
                 $em->persist($entity);
             } else {
                 $log_operacion = 'Update';
-                $log_descripcion = "The notes: $notes is modified to the project: ".$project_entity->getName();
+                $log_descripcion = "The log entry: $notes is modified to the project: ".$project_entity->getName();
             }
 
             $em->flush();
 
             // Salvar log
-            $log_categoria = 'Project Notes';
+            $log_categoria = 'Project Log';
             $this->SalvarLog($log_operacion, $log_categoria, $log_descripcion);
 
             $resultado['success'] = true;
@@ -1470,10 +1428,14 @@ class ProjectService extends Base
             $notes = $value->getNotes();
             $notes = mb_convert_encoding($notes, 'UTF-8', 'UTF-8');
 
+            $user = $value->getUser();
+            $userName = null !== $user ? $user->getNombreCompleto() : '';
+
             $data[] = [
                 'id' => $notes_id,
                 'notes' => $notes,
                 'date' => $value->getDate()->format('m/d/Y'),
+                'user' => $userName,
             ];
         }
 
@@ -1517,7 +1479,6 @@ class ProjectService extends Base
         if (count($permiso) > 0) {
             if ($permiso[0]['editar']) {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="Edit record" data-id="'.$id.'"> <i class="la la-edit"></i> </a> ';
-                $acciones .= ' <a href="javascript:;" class="delete m-portlet__nav-link btn m-btn m-btn--hover-danger m-btn--icon m-btn--icon-only m-btn--pill" title="Delete record" data-id="'.$id.'"><i class="la la-trash"></i></a>';
             } else {
                 $acciones .= '<a href="javascript:;" class="edit m-portlet__nav-link btn m-btn m-btn--hover-success m-btn--icon m-btn--icon-only m-btn--pill" title="View record" data-id="'.$id.'"> <i class="la la-eye"></i> </a> ';
             }

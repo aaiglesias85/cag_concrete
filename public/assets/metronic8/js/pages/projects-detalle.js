@@ -854,7 +854,7 @@ var ProjectsDetalle = (function () {
       };
 
       // columns
-      const columns = [{ data: 'date' }, { data: 'notes' }];
+      const columns = [{ data: 'date' }, { data: 'notes' }, { data: 'user' }];
 
       // column defs
       let columnDefs = [];
@@ -863,7 +863,7 @@ var ProjectsDetalle = (function () {
       const language = DatatableUtil.getDataTableLenguaje();
 
       // order
-      const order = [[0, 'asc']];
+      const order = [[0, 'desc']];
 
       oTableNotes = $(table).DataTable({
          searchDelay: 500,
