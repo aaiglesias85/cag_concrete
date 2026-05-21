@@ -1086,7 +1086,7 @@ var Payments = (function () {
             targets: 0,
             render: function (data, type, row) {
                if (row.isGroupHeader) return '<strong>' + row.groupTitle + '</strong>';
-               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+               return `<div class="d-flex align-items-center" style="width: 100px; max-width: 100%; min-width: 0;">${DatatableUtil.buildTruncatedTextPopoverTrigger(data)}</div>`;
             },
          },
          {

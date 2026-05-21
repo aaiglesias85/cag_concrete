@@ -866,3 +866,30 @@ gmp-place-autocomplete:focus-within {
 .modal-footer .btn-icon i {
    font-size: 1.5rem !important;
 }
+
+/* Texto truncado en DataTables: popover táctil (Invoices / Payments ítems) */
+.dt-longtext-cell {
+   cursor: pointer;
+   max-width: 100%;
+}
+
+.dt-longtext-cell.dt-longtext--truncated .dt-longtext-label {
+   border-bottom: 1px dotted var(--bs-gray-500);
+}
+
+.dt-longtext-cell .dt-longtext-more-icon {
+   font-size: 0.95rem;
+   color: var(--bs-primary);
+   pointer-events: none;
+}
+
+.popover.dt-longtext-popover {
+   max-width: min(90vw, 28rem);
+}
+
+.popover.dt-longtext-popover .popover-body {
+   max-height: 12rem;
+   overflow-y: auto;
+   word-break: break-word;
+   white-space: pre-wrap;
+}

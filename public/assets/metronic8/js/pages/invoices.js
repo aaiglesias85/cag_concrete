@@ -2471,7 +2471,7 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
                if (row.isGroupHeader) {
                   return '<strong>' + row.groupTitle + '</strong>';
                }
-               return `<div style="width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${data || ''}</div>`;
+               return `<div class="d-flex align-items-center" style="width: 100px; max-width: 100%; min-width: 0;">${DatatableUtil.buildTruncatedTextPopoverTrigger(data)}</div>`;
             },
          },
          // item

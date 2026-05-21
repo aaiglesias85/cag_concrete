@@ -414,8 +414,66 @@ var DatatableUtil = (function () {
       );
    };
 
+   /** Cierra popovers de texto largo al tocar/clicar fuera (bind once). */
+   var _dtPopoverDismissBound = false;
+   var bindTruncatedPopoverDismissOutside = function () {
+      if (_dtPopoverDismissBound) return;
+      _dtPopoverDismissBound = true;
+      document.addEventListener('click', function (e) {
+         if (e.target.closest && e.target.closest('[data-dt-longtext-trigger="1"]')) return;
+         if (e.target.closest && e.target.closest('.popover.dt-longtext-popover')) return;
+         document.querySelectorAll('[data-dt-longtext-trigger="1"]').forEach(function (el) {
+            var inst = typeof bootstrap !== 'undefined' && bootstrap.Popover ? bootstrap.Popover.getInstance(el) : null;
+            if (inst) inst.hide();
+         });
+      });
+   };
+
+   /** Evita que el clic en el trigger active handlers de fila del DataTable. */
+   var _dtPopoverGuardsBound = false;
+   var bindTruncatedPopoverInteractionGuards = function () {
+      if (_dtPopoverGuardsBound) return;
+      _dtPopoverGuardsBound = true;
+      document.addEventListener(
+         'click',
+         function (e) {
+            if (e.target.closest && e.target.closest('[data-dt-longtext-trigger="1"]')) {
+               e.stopPropagation();
+            }
+         },
+         true,
+      );
+   };
+
+   var isLongTextTruncated = function (labelEl) {
+      if (!labelEl) return false;
+      return labelEl.scrollWidth > labelEl.clientWidth + 1;
+   };
+
+   var markTruncatedLongTextTriggers = function (root) {
+      root.querySelectorAll('[data-dt-longtext-trigger="1"]').forEach(function (el) {
+         var label = el.querySelector('.dt-longtext-label') || el;
+         var icon = el.querySelector('.dt-longtext-more-icon');
+         var truncated = isLongTextTruncated(label);
+         if (truncated) {
+            el.classList.add('dt-longtext--truncated');
+            if (icon) icon.classList.remove('d-none');
+         } else {
+            el.classList.remove('dt-longtext--truncated');
+            if (icon) icon.classList.add('d-none');
+            el.removeAttribute('tabindex');
+            el.removeAttribute('role');
+            el.removeAttribute('title');
+            if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
+               var inst = bootstrap.Popover.getInstance(el);
+               if (inst) inst.dispose();
+            }
+         }
+      });
+   };
+
    /**
-    * Span truncado con popover Bootstrap 5 (hover/foco/clic) para el texto íntegro.
+    * Celda truncada con popover Bootstrap 5 (clic/foco) para el texto íntegro.
     * Requiere initTruncatedTextPopovers(container) tras cada draw del DataTable.
     */
    var buildTruncatedTextPopoverTrigger = function (plainText) {
@@ -423,11 +481,14 @@ var DatatableUtil = (function () {
       var encoded = encodeURIComponent(plain);
       var esc = escapeHtml(plain);
       return (
-         '<span class="text-truncate flex-grow-1 min-w-0 me-1" style="cursor: help;" tabindex="0" role="button" aria-label="Full text" ' +
+         '<span class="dt-longtext-cell d-inline-flex align-items-center min-w-0 flex-grow-1 py-1" ' +
             'data-dt-longtext-trigger="1" data-dt-fulltext="' +
             encoded +
-            '">' +
+            '" tabindex="0" role="button" aria-label="View full text" title="Tap to view full text">' +
+            '<span class="dt-longtext-label text-truncate min-w-0">' +
             esc +
+            '</span>' +
+            '<i class="bi bi-info-circle dt-longtext-more-icon flex-shrink-0 ms-1 d-none" aria-hidden="true"></i>' +
             '</span>'
       );
    };
@@ -435,13 +496,12 @@ var DatatableUtil = (function () {
    /**
     * Inicializa popovers en elementos [data-dt-longtext-trigger] dentro de root (tbody o tabla).
     */
-   var initTruncatedTextPopovers = function (root) {
-      if (typeof root === 'string') root = document.querySelector(root);
+   var initTruncatedTextPopoversOnRoot = function (root) {
       if (!root || typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
 
-      bindTruncatedPopoverExclusive();
+      markTruncatedLongTextTriggers(root);
 
-      root.querySelectorAll('[data-dt-longtext-trigger="1"]').forEach(function (el) {
+      root.querySelectorAll('[data-dt-longtext-trigger="1"].dt-longtext--truncated').forEach(function (el) {
          var enc = el.getAttribute('data-dt-fulltext');
          if (enc === null) return;
          var full = '';
@@ -450,20 +510,40 @@ var DatatableUtil = (function () {
          } catch (err) {
             full = enc;
          }
+         if (!full) return;
 
          var existing = bootstrap.Popover.getInstance(el);
          if (existing) existing.dispose();
+
+         el.setAttribute('tabindex', '0');
+         el.setAttribute('role', 'button');
+         el.setAttribute('title', 'Tap to view full text');
 
          new bootstrap.Popover(el, {
             container: 'body',
             html: false,
             sanitize: true,
-            trigger: 'hover focus click',
-            delay: { show: 120, hide: 80 },
+            trigger: 'click focus',
             placement: 'auto',
             customClass: 'dt-longtext-popover',
             content: full,
          });
+      });
+   };
+
+   /**
+    * Inicializa popovers en elementos [data-dt-longtext-trigger] dentro de root (tbody o tabla).
+    */
+   var initTruncatedTextPopovers = function (root) {
+      if (typeof root === 'string') root = document.querySelector(root);
+      if (!root) return;
+
+      bindTruncatedPopoverExclusive();
+      bindTruncatedPopoverDismissOutside();
+      bindTruncatedPopoverInteractionGuards();
+
+      requestAnimationFrame(function () {
+         initTruncatedTextPopoversOnRoot(root);
       });
    };
 
