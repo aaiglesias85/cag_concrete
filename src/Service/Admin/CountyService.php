@@ -272,6 +272,20 @@ class CountyService extends Base
             $texto_error = 'The county could not be deleted because it is related to one or more project estimates.';
         }
 
+        if ('' === $texto_error) {
+            /** @var ProjectRepository $projectRepo */
+            $projectRepo = $this->getDoctrine()->getRepository(Project::class);
+            $projectsWithCity = (int) $projectRepo->createQueryBuilder('p')
+                ->select('COUNT(p.projectId)')
+                ->where('IDENTITY(p.cityCounty) = :county_id')
+                ->setParameter('county_id', (int) $county_id)
+                ->getQuery()
+                ->getSingleScalarResult();
+            if ($projectsWithCity > 0) {
+                $texto_error = 'The location could not be deleted because it is related to one or more projects as city.';
+            }
+        }
+
         return $texto_error;
     }
 

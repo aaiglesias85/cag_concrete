@@ -421,6 +421,9 @@ var Projects = (function () {
       $('#county').val('');
       $('#county').trigger('change');
 
+      $('#city').val('');
+      $('#city').trigger('change');
+
       $('#status').val(1);
       $('#status').trigger('change');
 
@@ -893,6 +896,9 @@ var Projects = (function () {
          formData.set('county_id', '');
       }
 
+      var city_id = $('#city').val();
+      formData.set('city_id', city_id ? city_id : '');
+
       var federal_funding = $('#federal_funding').prop('checked') ? 1 : 0;
       formData.set('federal_funding', federal_funding);
 
@@ -1144,6 +1150,13 @@ var Projects = (function () {
             $('#county').val(null);
          }
          $('#county').trigger('change');
+
+         if (project.city_id) {
+            $('#city').val(project.city_id);
+         } else {
+            $('#city').val('');
+         }
+         $('#city').trigger('change');
 
          $('#name').val(project.name);
          $('#description').val(project.description);

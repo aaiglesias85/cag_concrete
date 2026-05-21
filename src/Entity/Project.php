@@ -105,6 +105,10 @@ class Project
     #[ORM\JoinColumn(name: 'inspector_id', referencedColumnName: 'inspector_id')]
     private ?Inspector $inspector;
 
+    #[ORM\ManyToOne(targetEntity: County::class)]
+    #[ORM\JoinColumn(name: 'city_id', referencedColumnName: 'county_id', nullable: true)]
+    private ?County $cityCounty = null;
+
     #[ORM\ManyToOne(targetEntity: ConcreteVendor::class)]
     #[ORM\JoinColumn(name: 'vendor_id', referencedColumnName: 'vendor_id')]
     private ?ConcreteVendor $concreteVendor;
@@ -538,5 +542,15 @@ class Project
     public function setPrevailingRate(?float $prevailingRate): void
     {
         $this->prevailingRate = $prevailingRate;
+    }
+
+    public function getCityCounty(): ?County
+    {
+        return $this->cityCounty;
+    }
+
+    public function setCityCounty(?County $cityCounty): void
+    {
+        $this->cityCounty = $cityCounty;
     }
 }

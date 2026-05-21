@@ -44,6 +44,66 @@ class CountyRepository extends ServiceEntityRepository
     }
 
     /**
+     * ListarCondadosOrdenados: ubicaciones tipo County (sin nombre de ciudad en columna city).
+     *
+     * @return County[]
+     */
+    public function ListarCondadosOrdenados($sSearch = '', $status = '', $district_id = '')
+    {
+        $consulta = $this->createQueryBuilder('c')
+            ->leftJoin('c.district', 'd')
+            ->andWhere('c.city IS NULL OR TRIM(c.city) = :emptyCity')
+            ->setParameter('emptyCity', '');
+
+        if ('' != $sSearch) {
+            $consulta->andWhere('c.description LIKE :search OR d.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ('' !== $district_id) {
+            $consulta->andWhere('d.districtId = :district_id')
+                ->setParameter('district_id', $district_id);
+        }
+
+        if ('' !== $status) {
+            $consulta->andWhere('c.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        $consulta->orderBy('c.description', 'ASC');
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
+     * ListarCiudadesOrdenadas: ubicaciones tipo City (columna city poblada).
+     *
+     * @return County[]
+     */
+    public function ListarCiudadesOrdenadas($sSearch = '', $status = '')
+    {
+        $consulta = $this->createQueryBuilder('c')
+            ->leftJoin('c.district', 'd')
+            ->andWhere('c.city IS NOT NULL')
+            ->andWhere('TRIM(c.city) <> :emptyCity')
+            ->setParameter('emptyCity', '');
+
+        if ('' != $sSearch) {
+            $consulta->andWhere('c.city LIKE :search OR c.description LIKE :search OR d.description LIKE :search')
+                ->setParameter('search', "%{$sSearch}%");
+        }
+
+        if ('' !== $status) {
+            $consulta->andWhere('c.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        $consulta->orderBy('c.city', 'ASC');
+
+        return $consulta->getQuery()->getResult();
+    }
+
+    /**
      * ListarCountysDeDistrict: Lista los countys de un district.
      *
      * @return County[]

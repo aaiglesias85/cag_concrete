@@ -2245,6 +2245,10 @@ class ProjectService extends Base
             $arreglo_resultado['county_id_single'] = !empty($county_ids) ? $county_ids[0] : '';
             $arreglo_resultado['county_single'] = !empty($county_descriptions) ? $county_descriptions[0] : '';
 
+            $cityCounty = $entity->getCityCounty();
+            $arreglo_resultado['city_id'] = null !== $cityCounty ? $cityCounty->getCountyId() : '';
+            $arreglo_resultado['city'] = $this->getCityLabelForCounty($cityCounty);
+
             $arreglo_resultado['number'] = $entity->getProjectNumber();
             $arreglo_resultado['name'] = $entity->getName();
             $arreglo_resultado['description'] = $entity->getDescription();
@@ -3234,6 +3238,7 @@ class ProjectService extends Base
         $subcontract = $p['subcontract'];
         $federal_funding = $p['federal_funding'];
         $county_ids = $p['county_ids'];
+        $city_id = $p['city_id'];
         $resurfacing = $p['resurfacing'];
         $invoice_contact = $p['invoice_contact'];
         $certified_payrolls = $p['certified_payrolls'];
@@ -3384,6 +3389,9 @@ class ProjectService extends Base
         // counties
         $this->SalvarCounties($entity, $county_ids, false);
 
+        // city
+        $this->SalvarCity($entity, $city_id, false);
+
         // prevailing roles (cada uno con role_id y rate)
         $this->SalvarPrevailingRoles($entity, $prevailing_roles, false);
 
@@ -3428,6 +3436,7 @@ class ProjectService extends Base
         $subcontract = $p['subcontract'];
         $federal_funding = $p['federal_funding'];
         $county_ids = $p['county_ids'];
+        $city_id = $p['city_id'];
         $resurfacing = $p['resurfacing'];
         $invoice_contact = $p['invoice_contact'];
         $certified_payrolls = $p['certified_payrolls'];
@@ -3818,6 +3827,14 @@ class ProjectService extends Base
                 ];
             }
 
+            $city_changes = $this->SalvarCity($entity, $city_id, true);
+            if ($city_changes['changed']) {
+                $notas[] = [
+                    'notes' => 'Change city, old value: '.$city_changes['old_description'],
+                    'date' => new \DateTime(),
+                ];
+            }
+
             // prevailing roles (cada uno con role_id y rate)
             $prevailing_role_changes = $this->SalvarPrevailingRoles($entity, $prevailing_roles, true);
             if ($prevailing_role_changes['changed']) {
@@ -3889,6 +3906,7 @@ class ProjectService extends Base
             'subcontract' => $d->subcontract,
             'federal_funding' => $d->federal_funding,
             'county_ids' => $county_ids,
+            'city_id' => $d->city_id,
             'resurfacing' => $d->resurfacing,
             'invoice_contact' => $d->invoice_contact,
             'certified_payrolls' => $d->certified_payrolls,
@@ -4067,6 +4085,71 @@ class ProjectService extends Base
         }
 
         return $result;
+    }
+
+    /**
+     * SalvarCity: asocia una ubicación tipo City (registro county con columna city poblada).
+     *
+     * @param Project $entity
+     * @param mixed   $city_id
+     * @param bool    $check_changes
+     *
+     * @return array{changed: bool, old_description: string}
+     */
+    public function SalvarCity($entity, $city_id, $check_changes = false)
+    {
+        $countyRepo = $this->getDoctrine()->getRepository(County::class);
+
+        $result = [
+            'changed' => false,
+            'old_description' => '',
+        ];
+
+        $city_id = is_string($city_id) ? trim($city_id) : $city_id;
+        $city_id = ('' === $city_id || null === $city_id) ? null : (int) $city_id;
+
+        $old = $entity->getCityCounty();
+        $old_id = null !== $old ? $old->getCountyId() : null;
+
+        if ($check_changes && $old_id !== $city_id) {
+            $result['changed'] = true;
+            $old_label = $this->getCityLabelForCounty($old);
+            $result['old_description'] = '' !== $old_label ? $old_label : '(none)';
+        }
+
+        if (null === $city_id) {
+            $entity->setCityCounty(null);
+
+            return $result;
+        }
+
+        $county = $countyRepo->find($city_id);
+        if (null !== $county && '' !== trim((string) ($county->getCity() ?? ''))) {
+            $entity->setCityCounty($county);
+        } else {
+            $entity->setCityCounty(null);
+        }
+
+        return $result;
+    }
+
+    private function getCityLabelForCounty(?County $county): string
+    {
+        if (null === $county) {
+            return '';
+        }
+
+        $city = trim((string) ($county->getCity() ?? ''));
+        if ('' !== $city) {
+            $desc = trim((string) ($county->getDescription() ?? ''));
+            if ('' !== $desc && $desc !== $city) {
+                return $city.' ('.$desc.')';
+            }
+
+            return $city;
+        }
+
+        return (string) ($county->getDescription() ?? '');
     }
 
     /**

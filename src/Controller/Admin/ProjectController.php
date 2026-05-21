@@ -92,9 +92,12 @@ class ProjectController extends AbstractAdminController
 
         $yields_calculation = $this->projectService->ListarYieldsCalculation();
 
-        // countys
+        // countys (solo tipo County, sin registros City)
         $countys = $this->projectService->getDoctrine()->getRepository(County::class)
-           ->ListarOrdenados();
+           ->ListarCondadosOrdenados('', '1', '');
+
+        $cities = $this->projectService->getDoctrine()->getRepository(County::class)
+           ->ListarCiudadesOrdenadas('', '1');
 
         // concrete vendors
         $concrete_vendors = $this->projectService->getDoctrine()->getRepository(ConcreteVendor::class)
@@ -118,6 +121,7 @@ class ProjectController extends AbstractAdminController
             'yields_calculation' => $yields_calculation,
             'units' => $units,
             'countys' => $countys,
+            'cities' => $cities,
             'concrete_vendors' => $concrete_vendors,
             'concrete_classes' => $concrete_classes,
             'employee_roles' => $employee_roles,

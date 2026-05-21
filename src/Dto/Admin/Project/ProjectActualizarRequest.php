@@ -49,6 +49,8 @@ final class ProjectActualizarRequest implements AdminHttpRequestDtoInterface
     /** Puede ser string CSV, array, etc. — el controlador normaliza a array. */
     public mixed $county_id = null;
 
+    public ?string $city_id = null;
+
     public ?string $resurfacing = null;
 
     public ?string $invoice_contact = null;
@@ -118,6 +120,7 @@ final class ProjectActualizarRequest implements AdminHttpRequestDtoInterface
         $d->subcontract = self::s($request->get('subcontract'));
         $d->federal_funding = self::s($request->get('federal_funding'));
         $d->county_id = $request->get('county_id');
+        $d->city_id = self::s($request->get('city_id'));
         foreach (['resurfacing', 'invoice_contact', 'certified_payrolls', 'start_date', 'end_date', 'due_date', 'vendor_id', 'concrete_class_id', 'concrete_quote_price', 'concrete_start_date', 'concrete_quote_price_escalator', 'concrete_time_period_every_n', 'concrete_time_period_unit', 'retainage', 'retainage_percentage', 'retainage_adjustment_percentage', 'retainage_adjustment_completion', 'prevailing_wage', 'prevailing_roles', 'items', 'contacts', 'concrete_classes', 'ajustes_precio', 'archivos'] as $k) {
             $d->{$k} = self::s($request->get($k));
         }

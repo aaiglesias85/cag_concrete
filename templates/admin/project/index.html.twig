@@ -862,7 +862,16 @@
                                  {% endfor %}
                               </select>
                            </div>
-                           <div class="col-md-4" id="select-inspector">
+                           <div class="col-md-2" id="select-city">
+                              <label class="form-label"> City </label>
+                              <select class="form-control form-select form-select2 form-select-solid event-change" id="city" name="city">
+                                 <option value="">Select</option>
+                                 {% for item in cities %}
+                                 <option value="{{ item.countyId }}">{{ item.city }}{% if item.description %} ({{ item.description }}){% endif %}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                           <div class="col-md-3" id="select-inspector">
                               <label class="form-label"> Inspector </label>
                               <select class="form-control form-select form-select2 select-validate form-select-solid event-change" id="inspector" name="inspector">
                                  <option value="">Select</option>
@@ -2353,7 +2362,11 @@
                               <label class="form-label required"> County </label>
                               <input type="text" class="form-control form-control-solid" id="county-detalle" disabled />
                            </div>
-                           <div class="col-md-4" id="select-inspector">
+                           <div class="col-md-2" id="select-city-detalle">
+                              <label class="form-label"> City </label>
+                              <input type="text" class="form-control form-control-solid" id="city-detalle" disabled />
+                           </div>
+                           <div class="col-md-3" id="select-inspector">
                               <label class="form-label"> Inspector </label>
                               <input type="text" class="form-control form-control-solid" id="inspector-detalle" disabled />
                            </div>

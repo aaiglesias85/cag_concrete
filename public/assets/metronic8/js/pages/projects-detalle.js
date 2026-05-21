@@ -129,6 +129,7 @@ var ProjectsDetalle = (function () {
          $('#owner-detalle').val(project.owner);
          $('#subcontract-detalle').val(project.subcontract);
          $('#county-detalle').val(project.county);
+         $('#city-detalle').val(project.city || '');
          $('#invoice_contact-detalle').val(project.invoice_contact);
 
          $('#contract_amount-detalle').val(MyApp.formatearNumero(project.contract_amount, 2, '.', ','));
