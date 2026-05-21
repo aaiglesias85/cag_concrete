@@ -3226,7 +3226,7 @@ class InvoiceService extends Base
     }
 
     /**
-     * @return list<array{id: int, name: string|null, file: string|null, posicion: int}>
+     * @return list<array{id: int, name: string|null, file: string|null, note: string, posicion: int}>
      */
     private function listArchivosPayload(int $invoice_id): array
     {
@@ -3235,13 +3235,21 @@ class InvoiceService extends Base
         /** @var \App\Repository\InvoiceAttachmentRepository $invoiceAttachmentRepo */
         $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
         $lista = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
-        foreach ($lista as $key => $attachment) {
+        $posicion = 0;
+        foreach ($lista as $attachment) {
+            $file = trim((string) ($attachment->getFile() ?? ''));
+            if ('' === $file) {
+                continue;
+            }
+
             $archivos[] = [
                 'id' => $attachment->getId(),
                 'name' => $attachment->getName(),
                 'file' => $attachment->getFile(),
-                'posicion' => $key,
+                'note' => $attachment->getNote() ?? '',
+                'posicion' => $posicion,
             ];
+            ++$posicion;
         }
 
         return $archivos;
@@ -3259,6 +3267,19 @@ class InvoiceService extends Base
         $em = $this->getDoctrine()->getManager();
 
         foreach ($archivos as $value) {
+            $file = trim((string) ($value->file ?? ''));
+            if ('' === $file) {
+                if (is_numeric($value->id ?? null)) {
+                    $orphan = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+                        ->find($value->id);
+                    if (null !== $orphan && $orphan->getInvoice()?->getInvoiceId() === $entity->getInvoiceId()) {
+                        $em->remove($orphan);
+                    }
+                }
+
+                continue;
+            }
+
             $archivo_entity = null;
 
             if (is_numeric($value->id ?? null)) {
@@ -3274,6 +3295,7 @@ class InvoiceService extends Base
 
             $archivo_entity->setName($value->name ?? null);
             $archivo_entity->setFile($value->file ?? null);
+            $archivo_entity->setNote($value->note ?? null);
 
             if ($is_new_archivo) {
                 $archivo_entity->setInvoice($entity);

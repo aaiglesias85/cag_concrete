@@ -714,13 +714,21 @@ class DataTrackingService extends Base
         /** @var DataTrackingAttachmentRepository $dataTrackingAttachmentRepo */
         $dataTrackingAttachmentRepo = $this->getDoctrine()->getRepository(DataTrackingAttachment::class);
         $data_tracking_archivos = $dataTrackingAttachmentRepo->ListarAttachmentsDeDataTracking($data_tracking_id);
-        foreach ($data_tracking_archivos as $key => $data_tracking_archivo) {
+        $posicion = 0;
+        foreach ($data_tracking_archivos as $data_tracking_archivo) {
+            $file = trim((string) ($data_tracking_archivo->getFile() ?? ''));
+            if ('' === $file) {
+                continue;
+            }
+
             $archivos[] = [
                 'id' => $data_tracking_archivo->getId(),
                 'name' => $data_tracking_archivo->getName(),
                 'file' => $data_tracking_archivo->getFile(),
-                'posicion' => $key,
+                'note' => $data_tracking_archivo->getNote() ?? '',
+                'posicion' => $posicion,
             ];
+            ++$posicion;
         }
 
         return $archivos;
@@ -1255,6 +1263,19 @@ class DataTrackingService extends Base
         $em = $this->getDoctrine()->getManager();
 
         foreach ($archivos as $value) {
+            $file = trim((string) ($value->file ?? ''));
+            if ('' === $file) {
+                if (isset($value->id) && is_numeric($value->id)) {
+                    $orphan = $this->getDoctrine()->getRepository(DataTrackingAttachment::class)
+                        ->find($value->id);
+                    if (null !== $orphan && $orphan->getDataTracking()?->getId() === $entity->getId()) {
+                        $em->remove($orphan);
+                    }
+                }
+
+                continue;
+            }
+
             $archivo_entity = null;
 
             if (is_numeric($value->id)) {
@@ -1270,6 +1291,7 @@ class DataTrackingService extends Base
 
             $archivo_entity->setName($value->name);
             $archivo_entity->setFile($value->file);
+            $archivo_entity->setNote($value->note ?? null);
 
             if ($is_new_archivo) {
                 $archivo_entity->setDataTracking($entity);

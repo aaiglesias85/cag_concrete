@@ -959,7 +959,7 @@ var Projects = (function () {
       formData.set('contacts', JSON.stringify(contacts));
       formData.set('concrete_classes', JSON.stringify(concrete_classes));
       formData.set('ajustes_precio', JSON.stringify(ajustes_precio));
-      formData.set('archivos', JSON.stringify(archivos));
+      formData.set('archivos', JSON.stringify(filtrarArchivosValidos(archivos)));
 
       BlockUtil.block('#form-project');
 
@@ -1253,7 +1253,7 @@ var Projects = (function () {
          actualizarTableListaAjustesPrecio();
 
          // archivos
-         archivos = project.archivos;
+         archivos = filtrarArchivosValidos(project.archivos);
          actualizarTableListaArchivos();
 
          // items completion
@@ -1405,6 +1405,7 @@ var Projects = (function () {
 
       // Quill SIN variables: se gestiona por selector
       QuillUtil.init('#notes');
+      QuillUtil.init('#archivo-note');
 
       // 1. Definimos la función de formato (La "B" Roja)
       var formatItemState = function (state) {
@@ -4381,6 +4382,11 @@ var Projects = (function () {
 
    // Archivos
    var archivos = [];
+   var filtrarArchivosValidos = function (lista) {
+      return (lista || []).filter(function (item) {
+         return item && String(item.file || '').trim() !== '';
+      });
+   };
    var oTableArchivos;
    var nEditingRowArchivo = null;
    var initTableListaArchivos = function () {
@@ -4536,8 +4542,9 @@ var Projects = (function () {
                      BlockUtil.unblock('#modal-archivo .modal-content');
                   });
             } else {
-               //actualizar solo nombre
+               //actualizar solo nombre y nota
                archivos[nEditingRowArchivo].name = nombre;
+               archivos[nEditingRowArchivo].note = QuillUtil.getHtml('#archivo-note');
 
                actualizarTableListaArchivos();
                resetFormArchivo();
@@ -4563,16 +4570,23 @@ var Projects = (function () {
       }
 
       function salvarArchivo(nombre, archivo) {
+         if (!archivo || String(archivo).trim() === '') {
+            toastr.error('Select the file', '');
+            return;
+         }
+         var note = QuillUtil.getHtml('#archivo-note');
          if (nEditingRowArchivo == null) {
             archivos.push({
                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
                name: nombre,
                file: archivo,
+               note: note,
                posicion: archivos.length,
             });
          } else {
             archivos[nEditingRowArchivo].name = nombre;
             archivos[nEditingRowArchivo].file = archivo;
+            archivos[nEditingRowArchivo].note = note;
          }
 
          // close modal
@@ -4595,6 +4609,7 @@ var Projects = (function () {
             nEditingRowArchivo = posicion;
 
             $('#archivo-name').val(archivos[posicion].name);
+            QuillUtil.setHtml('#archivo-note', archivos[posicion].note || '');
 
             $('#fileinput-archivo .fileinput-filename').html(archivos[nEditingRowArchivo].file);
             $('#fileinput-archivo').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
@@ -4761,6 +4776,7 @@ var Projects = (function () {
       $('#fileinput').val('');
       $('#fileinput-archivo .fileinput-filename').html('');
       $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      QuillUtil.setHtml('#archivo-note', '');
 
       nEditingRowArchivo = null;
    };

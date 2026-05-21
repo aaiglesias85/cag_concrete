@@ -942,6 +942,7 @@ var Invoices = (function () {
       $('#fileinput-invoice').val('');
       $('#fileinput-archivo-invoice .fileinput-filename').html('');
       $('#fileinput-archivo-invoice').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      QuillUtil.setHtml('#archivo-note-invoice', '');
       nEditingRowInvoiceArchivo = null;
    };
 
@@ -991,6 +992,7 @@ var Invoices = (function () {
             } else {
                if (nEditingRowInvoiceArchivo != null) {
                   invoiceArchivos[nEditingRowInvoiceArchivo].name = nombre;
+                  invoiceArchivos[nEditingRowInvoiceArchivo].note = QuillUtil.getHtml('#archivo-note-invoice');
                   actualizarTableListaArchivosInvoice();
                   resetFormArchivoInvoice();
                   ModalUtil.hide('modal-archivo-invoice');
@@ -1009,16 +1011,19 @@ var Invoices = (function () {
          return invoiceArchivos.some((item) => item.name === name && item.id !== excludeId);
       }
       function salvarArchivoInvoiceUi(nombre, archivo) {
+         var note = QuillUtil.getHtml('#archivo-note-invoice');
          if (nEditingRowInvoiceArchivo == null) {
             invoiceArchivos.push({
                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
                name: nombre,
                file: archivo,
+               note: note,
                posicion: invoiceArchivos.length,
             });
          } else {
             invoiceArchivos[nEditingRowInvoiceArchivo].name = nombre;
             invoiceArchivos[nEditingRowInvoiceArchivo].file = archivo;
+            invoiceArchivos[nEditingRowInvoiceArchivo].note = note;
          }
          ModalUtil.hide('modal-archivo-invoice');
          actualizarTableListaArchivosInvoice();
@@ -1031,6 +1036,7 @@ var Invoices = (function () {
             resetFormArchivoInvoice();
             nEditingRowInvoiceArchivo = posicion;
             $('#archivo-name-invoice').val(invoiceArchivos[posicion].name);
+            QuillUtil.setHtml('#archivo-note-invoice', invoiceArchivos[posicion].note || '');
             $('#fileinput-archivo-invoice .fileinput-filename').html(invoiceArchivos[nEditingRowInvoiceArchivo].file);
             $('#fileinput-archivo-invoice').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
             ModalUtil.show('modal-archivo-invoice', { backdrop: 'static', keyboard: true });
@@ -1806,6 +1812,8 @@ items_lista = items.filter((item) => item.quantity > 0 || item.unpaid_qty > 0 ||
    var initWidgets = function () {
       // init widgets generales
       MyApp.initWidgets();
+
+      QuillUtil.init('#archivo-note-invoice');
 
       initFlatpickr();
 

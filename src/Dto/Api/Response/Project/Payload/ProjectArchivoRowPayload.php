@@ -12,6 +12,7 @@ final readonly class ProjectArchivoRowPayload implements \JsonSerializable
         public mixed $id,
         public string $name,
         public string $file,
+        public string $note,
         public int $posicion,
     ) {
     }
@@ -25,6 +26,7 @@ final readonly class ProjectArchivoRowPayload implements \JsonSerializable
             $row['id'] ?? null,
             (string) ($row['name'] ?? ''),
             (string) ($row['file'] ?? ''),
+            (string) ($row['note'] ?? ''),
             isset($row['posicion']) ? (int) $row['posicion'] : 0,
         );
     }
@@ -38,6 +40,7 @@ final readonly class ProjectArchivoRowPayload implements \JsonSerializable
             'id' => $this->id,
             'name' => $this->name,
             'file' => $this->file,
+            'note' => $this->note,
             'posicion' => $this->posicion,
         ];
     }

@@ -1446,6 +1446,8 @@ var Estimates = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
+      QuillUtil.init('#archivo-note-estimate');
+
       initTempus();
 
       $('.select-modal-item').select2({
@@ -3670,6 +3672,7 @@ var Estimates = (function () {
       $('#fileinput-estimate').val('');
       $('#fileinput-archivo-estimate .fileinput-filename').html('');
       $('#fileinput-archivo-estimate').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      QuillUtil.setHtml('#archivo-note-estimate', '');
       nEditingRowArchivoEstimate = null;
    };
    var initAccionesArchivoEstimate = function () {
@@ -3728,16 +3731,19 @@ var Estimates = (function () {
                      var response = res.data;
                      if (response.success) {
                         toastr.success(response.message, 'Done');
+                        var note = QuillUtil.getHtml('#archivo-note-estimate');
                         if (nEditingRowArchivoEstimate == null) {
                            archivos.push({
                               id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
                               name: nombre,
                               file: response.name,
+                              note: note,
                               posicion: archivos.length,
                            });
                         } else {
                            archivos[nEditingRowArchivoEstimate].name = nombre;
                            archivos[nEditingRowArchivoEstimate].file = response.name;
+                           archivos[nEditingRowArchivoEstimate].note = note;
                         }
                         ModalUtil.hide('modal-archivo-estimate');
                         actualizarTableListaArchivosEstimate();
@@ -3760,6 +3766,7 @@ var Estimates = (function () {
                });
          } else {
             archivos[nEditingRowArchivoEstimate].name = nombre;
+            archivos[nEditingRowArchivoEstimate].note = QuillUtil.getHtml('#archivo-note-estimate');
             actualizarTableListaArchivosEstimate();
             resetFormArchivoEstimate();
             ModalUtil.hide('modal-archivo-estimate');
@@ -3773,6 +3780,7 @@ var Estimates = (function () {
             resetFormArchivoEstimate();
             nEditingRowArchivoEstimate = posicion;
             $('#archivo-name-estimate').val(archivos[posicion].name);
+            QuillUtil.setHtml('#archivo-note-estimate', archivos[posicion].note || '');
             $('#fileinput-archivo-estimate .fileinput-filename').html(archivos[nEditingRowArchivoEstimate].file);
             $('#fileinput-archivo-estimate').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
             ModalUtil.show('modal-archivo-estimate', { backdrop: 'static', keyboard: true });

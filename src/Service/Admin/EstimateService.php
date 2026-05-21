@@ -1856,7 +1856,7 @@ class EstimateService extends Base
     /**
      * ListarArchivosDeEstimate.
      *
-     * @return array<int, array{id: int, name: string|null, file: string|null, posicion: int}>
+     * @return array<int, array{id: int, name: string|null, file: string|null, note: string, posicion: int}>
      */
     public function ListarArchivosDeEstimate($estimate_id): array
     {
@@ -1865,13 +1865,21 @@ class EstimateService extends Base
         /** @var EstimateAttachmentRepository $estimateAttachmentRepo */
         $estimateAttachmentRepo = $this->getDoctrine()->getRepository(EstimateAttachment::class);
         $rows = $estimateAttachmentRepo->ListarAttachmentsDeEstimate($estimate_id);
-        foreach ($rows as $key => $row) {
+        $posicion = 0;
+        foreach ($rows as $row) {
+            $file = trim((string) ($row->getFile() ?? ''));
+            if ('' === $file) {
+                continue;
+            }
+
             $archivos[] = [
                 'id' => $row->getId(),
                 'name' => $row->getName(),
                 'file' => $row->getFile(),
-                'posicion' => $key,
+                'note' => $row->getNote() ?? '',
+                'posicion' => $posicion,
             ];
+            ++$posicion;
         }
 
         return $archivos;
@@ -1889,6 +1897,19 @@ class EstimateService extends Base
         $em = $this->getDoctrine()->getManager();
 
         foreach ($archivos as $value) {
+            $file = trim((string) ($value->file ?? ''));
+            if ('' === $file) {
+                if (isset($value->id) && is_numeric($value->id)) {
+                    $orphan = $this->getDoctrine()->getRepository(EstimateAttachment::class)
+                        ->find((int) $value->id);
+                    if (null !== $orphan && $orphan->getEstimate()?->getEstimateId() === $entity->getEstimateId()) {
+                        $em->remove($orphan);
+                    }
+                }
+
+                continue;
+            }
+
             $archivo_entity = null;
 
             if (isset($value->id) && is_numeric($value->id)) {
@@ -1904,6 +1925,7 @@ class EstimateService extends Base
 
             $archivo_entity->setName($value->name ?? null);
             $archivo_entity->setFile($value->file ?? null);
+            $archivo_entity->setNote($value->note ?? null);
 
             if ($is_new_archivo) {
                 $archivo_entity->setEstimate($entity);

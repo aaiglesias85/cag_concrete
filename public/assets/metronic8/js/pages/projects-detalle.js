@@ -215,7 +215,9 @@ var ProjectsDetalle = (function () {
          actualizarTableListaAjustesPrecio();
 
          // archivos
-         archivos = project.archivos;
+         archivos = (project.archivos || []).filter(function (item) {
+            return item && String(item.file || '').trim() !== '';
+         });
          actualizarTableListaArchivos();
 
          // items completion

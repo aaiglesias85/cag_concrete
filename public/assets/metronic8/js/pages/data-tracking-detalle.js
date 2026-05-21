@@ -1029,10 +1029,10 @@ var DataTrackingDetalle = (function () {
       // acciones
       columnDefs.push({
          targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
+        data: null,
+        orderable: false,
+        className: 'text-center',
+        render: function (data, type, row) {
             return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['download']);
          },
       });

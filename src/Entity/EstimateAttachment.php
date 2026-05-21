@@ -19,6 +19,9 @@ class EstimateAttachment
     #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
+    #[ORM\Column(name: 'note', type: 'text', nullable: true)]
+    private ?string $note = null;
+
     #[ORM\ManyToOne(targetEntity: Estimate::class)]
     #[ORM\JoinColumn(name: 'estimate_id', referencedColumnName: 'estimate_id', nullable: false)]
     private ?Estimate $estimate;
@@ -46,6 +49,16 @@ class EstimateAttachment
     public function setFile(?string $file): void
     {
         $this->file = $file;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): void
+    {
+        $this->note = $note;
     }
 
     public function getEstimate(): ?Estimate

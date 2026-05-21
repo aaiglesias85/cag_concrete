@@ -1313,6 +1313,8 @@ var DataTracking = (function () {
       // init widgets generales
       MyApp.initWidgets();
 
+      QuillUtil.init('#archivo-note');
+
       initTempus();
 
       initSelectsModal();
@@ -4217,10 +4219,10 @@ var DataTracking = (function () {
       // acciones
       columnDefs.push({
          targets: -1,
-         data: null,
-         orderable: false,
-         className: 'text-center',
-         render: function (data, type, row) {
+        data: null,
+        orderable: false,
+        className: 'text-center',
+        render: function (data, type, row) {
             return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, getAccionesTablaArchivos());
          },
       });
@@ -4343,8 +4345,9 @@ var DataTracking = (function () {
                      BlockUtil.unblock('#modal-archivo .modal-content');
                   });
             } else {
-               //actualizar solo nombre
+               //actualizar solo nombre y nota
                archivos[nEditingRowArchivo].name = nombre;
+               archivos[nEditingRowArchivo].note = QuillUtil.getHtml('#archivo-note');
 
                actualizarTableListaArchivos();
                resetFormArchivo();
@@ -4370,16 +4373,19 @@ var DataTracking = (function () {
       }
 
       function salvarArchivo(nombre, archivo) {
+         var note = QuillUtil.getHtml('#archivo-note');
          if (nEditingRowArchivo == null) {
             archivos.push({
                id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10),
                name: nombre,
                file: archivo,
+               note: note,
                posicion: archivos.length,
             });
          } else {
             archivos[nEditingRowArchivo].name = nombre;
             archivos[nEditingRowArchivo].file = archivo;
+            archivos[nEditingRowArchivo].note = note;
          }
 
          // close modal
@@ -4402,6 +4408,7 @@ var DataTracking = (function () {
             nEditingRowArchivo = posicion;
 
             $('#archivo-name').val(archivos[posicion].name);
+            QuillUtil.setHtml('#archivo-note', archivos[posicion].note || '');
 
             $('#fileinput-archivo .fileinput-filename').html(archivos[nEditingRowArchivo].file);
             $('#fileinput-archivo').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
@@ -4568,6 +4575,7 @@ var DataTracking = (function () {
       $('#fileinput').val('');
       $('#fileinput-archivo .fileinput-filename').html('');
       $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      QuillUtil.setHtml('#archivo-note', '');
 
       nEditingRowArchivo = null;
    };

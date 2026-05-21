@@ -19,6 +19,9 @@ class DataTrackingAttachment
     #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
+    #[ORM\Column(name: 'note', type: 'text', nullable: true)]
+    private ?string $note = null;
+
     #[ORM\ManyToOne(targetEntity: DataTracking::class)]
     #[ORM\JoinColumn(name: 'data_tracking_id', referencedColumnName: 'id')]
     private ?DataTracking $dataTracking;
@@ -46,6 +49,16 @@ class DataTrackingAttachment
     public function setFile(?string $file): void
     {
         $this->file = $file;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): void
+    {
+        $this->note = $note;
     }
 
     public function getDataTracking(): ?DataTracking

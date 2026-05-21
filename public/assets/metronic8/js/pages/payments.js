@@ -866,6 +866,7 @@ var Payments = (function () {
       initTempus();
       QuillUtil.init('#notes');
       QuillUtil.init('#notes-item');
+      QuillUtil.init('#archivo-note');
       $('#filtro-company').change(changeFiltroCompany);
       $('#fileinput').on('change', changeFile);
    };
@@ -2313,7 +2314,7 @@ var Payments = (function () {
          targets: -1,
          data: null,
          orderable: false,
-         className: 'text-center',
+        className: 'text-center',
          render: function (data, type, row) {
             return DatatableUtil.getRenderAccionesDataSourceLocal(data, type, row, ['edit', 'delete', 'download']);
          },
@@ -2408,6 +2409,7 @@ var Payments = (function () {
                   });
             } else {
                archivos[nEditingRowArchivo].name = nombre;
+               archivos[nEditingRowArchivo].note = QuillUtil.getHtml('#archivo-note');
                actualizarTableListaArchivos();
                resetFormArchivo();
                ModalUtil.hide('modal-archivo');
@@ -2425,11 +2427,13 @@ var Payments = (function () {
          return archivos.some((item) => item.name === name && item.id !== excludeId);
       }
       function salvarArchivo(nombre, archivo) {
+         var note = QuillUtil.getHtml('#archivo-note');
          if (nEditingRowArchivo == null) {
-            archivos.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10), name: nombre, file: archivo, posicion: archivos.length });
+            archivos.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 10), name: nombre, file: archivo, note: note, posicion: archivos.length });
          } else {
             archivos[nEditingRowArchivo].name = nombre;
             archivos[nEditingRowArchivo].file = archivo;
+            archivos[nEditingRowArchivo].note = note;
          }
          ModalUtil.hide('modal-archivo');
          actualizarTableListaArchivos();
@@ -2442,6 +2446,7 @@ var Payments = (function () {
             resetFormArchivo();
             nEditingRowArchivo = posicion;
             $('#archivo-name').val(archivos[posicion].name);
+            QuillUtil.setHtml('#archivo-note', archivos[posicion].note || '');
             $('#fileinput-archivo .fileinput-filename').html(archivos[nEditingRowArchivo].file);
             $('#fileinput-archivo').fileinput().removeClass('fileinput-new').addClass('fileinput-exists');
             ModalUtil.show('modal-archivo', { backdrop: 'static', keyboard: true });
@@ -2569,6 +2574,7 @@ var Payments = (function () {
       $('#fileinput').val('');
       $('#fileinput-archivo .fileinput-filename').html('');
       $('#fileinput-archivo').fileinput().addClass('fileinput-new').removeClass('fileinput-exists');
+      QuillUtil.setHtml('#archivo-note', '');
       nEditingRowArchivo = null;
    };
 

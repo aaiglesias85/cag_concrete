@@ -691,13 +691,21 @@ class PaymentService extends Base
         /** @var InvoiceAttachmentRepository $invoiceAttachmentRepo */
         $invoiceAttachmentRepo = $this->getDoctrine()->getRepository(InvoiceAttachment::class);
         $project_archivos = $invoiceAttachmentRepo->ListarAttachmentsDeInvoice($invoice_id);
-        foreach ($project_archivos as $key => $project_archivo) {
+        $posicion = 0;
+        foreach ($project_archivos as $project_archivo) {
+            $file = trim((string) ($project_archivo->getFile() ?? ''));
+            if ('' === $file) {
+                continue;
+            }
+
             $archivos[] = [
                 'id' => $project_archivo->getId(),
                 'name' => $project_archivo->getName(),
                 'file' => $project_archivo->getFile(),
-                'posicion' => $key,
+                'note' => $project_archivo->getNote() ?? '',
+                'posicion' => $posicion,
             ];
+            ++$posicion;
         }
 
         return $archivos;
@@ -866,6 +874,19 @@ class PaymentService extends Base
         $em = $this->getDoctrine()->getManager();
 
         foreach ($archivos as $value) {
+            $file = trim((string) ($value->file ?? ''));
+            if ('' === $file) {
+                if (isset($value->id) && is_numeric($value->id)) {
+                    $orphan = $this->getDoctrine()->getRepository(InvoiceAttachment::class)
+                        ->find($value->id);
+                    if (null !== $orphan && $orphan->getInvoice()?->getInvoiceId() === $entity->getInvoiceId()) {
+                        $em->remove($orphan);
+                    }
+                }
+
+                continue;
+            }
+
             $archivo_entity = null;
 
             if (is_numeric($value->id)) {
@@ -881,6 +902,7 @@ class PaymentService extends Base
 
             $archivo_entity->setName($value->name);
             $archivo_entity->setFile($value->file);
+            $archivo_entity->setNote($value->note ?? null);
 
             if ($is_new_archivo) {
                 $archivo_entity->setInvoice($entity);

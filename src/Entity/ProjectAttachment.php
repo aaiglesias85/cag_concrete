@@ -19,6 +19,9 @@ class ProjectAttachment
     #[ORM\Column(name: 'file', type: 'string', length: 255, nullable: true)]
     private ?string $file;
 
+    #[ORM\Column(name: 'note', type: 'text', nullable: true)]
+    private ?string $note = null;
+
     #[ORM\ManyToOne(targetEntity: "App\Entity\Project")]
     #[ORM\JoinColumn(name: 'project_id', referencedColumnName: 'project_id', nullable: true)]
     private ?Project $project;
@@ -46,6 +49,16 @@ class ProjectAttachment
     public function setFile(?string $file): void
     {
         $this->file = $file;
+    }
+
+    public function getNote(): ?string
+    {
+        return $this->note;
+    }
+
+    public function setNote(?string $note): void
+    {
+        $this->note = $note;
     }
 
     public function getProject(): ?Project
