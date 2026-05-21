@@ -1993,27 +1993,26 @@ class DataTrackingService extends Base
                     '_seen_rows' => [],
                 ];
             }
-            $emp = &$employees[$uid];
             $projectId = (int) $r['project_id'];
             $countyId = null !== $r['county_id'] ? (int) $r['county_id'] : null;
 
-            if (!in_array($projectId, $emp['project_ids'], true)) {
-                $emp['project_ids'][] = $projectId;
+            if (!in_array($projectId, $employees[$uid]['project_ids'], true)) {
+                $employees[$uid]['project_ids'][] = $projectId;
             }
 
             if (null !== $countyId) {
-                if (!isset($emp['counties_count'][$countyId])) {
-                    $emp['counties_count'][$countyId] = [];
+                if (!isset($employees[$uid]['counties_count'][$countyId])) {
+                    $employees[$uid]['counties_count'][$countyId] = [];
                 }
-                if (!in_array($projectId, $emp['counties_count'][$countyId], true)) {
-                    $emp['counties_count'][$countyId][] = $projectId;
+                if (!in_array($projectId, $employees[$uid]['counties_count'][$countyId], true)) {
+                    $employees[$uid]['counties_count'][$countyId][] = $projectId;
                 }
             }
 
             $rowKey = (int) $r['tracking_id'].'-'.($countyId ?? 0);
-            if (!in_array($rowKey, $emp['_seen_rows'], true)) {
-                $emp['_seen_rows'][] = $rowKey;
-                $emp['rows'][] = [
+            if (!in_array($rowKey, $employees[$uid]['_seen_rows'], true)) {
+                $employees[$uid]['_seen_rows'][] = $rowKey;
+                $employees[$uid]['rows'][] = [
                     'date' => $this->formatWorkDate($r['work_date']),
                     'project_id' => $projectId,
                     'project_number' => (string) ($r['project_number'] ?? ''),
@@ -2021,7 +2020,6 @@ class DataTrackingService extends Base
                     'county_id' => $countyId,
                 ];
             }
-            unset($emp);
         }
 
         // 5) Calcular porcentaje
